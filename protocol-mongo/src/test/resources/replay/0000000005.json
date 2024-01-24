@@ -1,0 +1,55 @@
+{
+  "index" : 5,
+  "input" : {
+    "flags" : 0,
+    "opCode" : "OP_MSG",
+    "sections" : [ {
+      "documents" : [ {
+        "find" : "testcollection",
+        "filter" : {
+          "_id" : {
+            "$oid" : "65b0fbda763af12f58f1b6e1"
+          }
+        },
+        "limit" : {
+          "$numberInt" : "1"
+        },
+        "singleBatch" : true,
+        "$db" : "admin"
+      } ]
+    } ]
+  },
+  "output" : {
+    "flags" : 0,
+    "opCode" : "OP_MSG",
+    "sections" : [ {
+      "documents" : [ {
+        "cursor" : {
+          "firstBatch" : [ {
+            "_id" : {
+              "$oid" : "65b0fbda763af12f58f1b6e1"
+            },
+            "title" : "Ski Bloopers",
+            "genres" : [ "Documentary", "Comedy" ]
+          } ],
+          "id" : {
+            "$numberLong" : "0"
+          },
+          "ns" : "admin.testcollection"
+        },
+        "ok" : {
+          "$numberDouble" : "1.0"
+        },
+        "operationTime" : {
+          "$timestamp" : {
+            "t" : 1706097627,
+            "i" : 2
+          }
+        }
+      } ]
+    } ]
+  },
+  "durationMs" : 2,
+  "type" : "OP_MSG",
+  "caller" : "MONGODB"
+}

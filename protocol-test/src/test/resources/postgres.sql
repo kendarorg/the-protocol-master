@@ -1,0 +1,11 @@
+CREATE TABLE COMPANY
+(
+    ID           INTEGER PRIMARY KEY generated always as identity,
+    DENOMINATION TEXT    NOT NULL,
+    AGE          INTEGER NOT NULL,
+    ADDRESS      CHAR(50),
+    SALARY       NUMERIC
+);
+
+INSERT INTO COMPANY (DENOMINATION, AGE, ADDRESS, SALARY)
+VALUES ('Test Ltd', 42, 'Ping Road 22', 25000.7);

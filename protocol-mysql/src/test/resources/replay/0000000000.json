@@ -1,0 +1,210 @@
+{
+  "index" : 0,
+  "input" : {
+    "query" : "/* mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c) */SELECT  @@session.auto_increment_increment AS auto_increment_increment, @@character_set_client AS character_set_client, @@character_set_connection AS character_set_connection, @@character_set_results AS character_set_results, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@collation_connection AS collation_connection, @@init_connect AS init_connect, @@interactive_timeout AS interactive_timeout, @@license AS license, @@lower_case_table_names AS lower_case_table_names, @@max_allowed_packet AS max_allowed_packet, @@net_write_timeout AS net_write_timeout, @@performance_schema AS performance_schema, @@sql_mode AS sql_mode, @@system_time_zone AS system_time_zone, @@time_zone AS time_zone, @@transaction_isolation AS transaction_isolation, @@wait_timeout AS wait_timeout",
+    "parameterValues" : [ ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ [ "1", "utf8mb4", "utf8mb4", null, "utf8mb4", "utf8mb4_0900_ai_ci", "utf8mb4_0900_ai_ci", "", "28800", "GPL", "0", "1048576", "60", "1", "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION", "UTC", "SYSTEM", "REPEATABLE-READ", "28800" ] ],
+      "metadata" : [ {
+        "columnName" : "auto_increment_increment",
+        "columnLabel" : "auto_increment_increment",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 20,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "character_set_client",
+        "columnLabel" : "character_set_client",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "character_set_connection",
+        "columnLabel" : "character_set_connection",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "character_set_results",
+        "columnLabel" : "character_set_results",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "character_set_server",
+        "columnLabel" : "character_set_server",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "collation_server",
+        "columnLabel" : "collation_server",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "collation_connection",
+        "columnLabel" : "collation_connection",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "init_connect",
+        "columnLabel" : "init_connect",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "interactive_timeout",
+        "columnLabel" : "interactive_timeout",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 20,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "license",
+        "columnLabel" : "license",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "lower_case_table_names",
+        "columnLabel" : "lower_case_table_names",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 20,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "max_allowed_packet",
+        "columnLabel" : "max_allowed_packet",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 20,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "net_write_timeout",
+        "columnLabel" : "net_write_timeout",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 20,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "performance_schema",
+        "columnLabel" : "performance_schema",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 19,
+        "columnType" : "BIGINT",
+        "precision" : 19
+      }, {
+        "columnName" : "sql_mode",
+        "columnLabel" : "sql_mode",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "system_time_zone",
+        "columnLabel" : "system_time_zone",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "time_zone",
+        "columnLabel" : "time_zone",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "transaction_isolation",
+        "columnLabel" : "transaction_isolation",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 21845,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "wait_timeout",
+        "columnLabel" : "wait_timeout",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 20,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      } ],
+      "count" : 1,
+      "intResult" : false,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 0
+  },
+  "durationMs" : 10,
+  "type" : "QUERY",
+  "caller" : "JDBC"
+}

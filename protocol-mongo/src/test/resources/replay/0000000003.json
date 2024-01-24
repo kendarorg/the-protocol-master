@@ -1,0 +1,72 @@
+{
+  "index" : 3,
+  "input" : {
+    "flags" : 0,
+    "opCode" : "OP_MSG",
+    "sections" : [ {
+      "documents" : [ {
+        "dbStats" : {
+          "$numberLong" : "1"
+        },
+        "$db" : "admin"
+      } ]
+    } ]
+  },
+  "output" : {
+    "flags" : 0,
+    "opCode" : "OP_MSG",
+    "sections" : [ {
+      "documents" : [ {
+        "db" : "admin",
+        "collections" : {
+          "$numberInt" : "2"
+        },
+        "views" : {
+          "$numberInt" : "0"
+        },
+        "objects" : {
+          "$numberInt" : "3"
+        },
+        "avgObjSize" : {
+          "$numberDouble" : "76.33333333333333"
+        },
+        "dataSize" : {
+          "$numberDouble" : "229.0"
+        },
+        "storageSize" : {
+          "$numberDouble" : "40960.0"
+        },
+        "indexes" : {
+          "$numberInt" : "2"
+        },
+        "indexSize" : {
+          "$numberDouble" : "40960.0"
+        },
+        "totalSize" : {
+          "$numberDouble" : "81920.0"
+        },
+        "scaleFactor" : {
+          "$numberDouble" : "1.0"
+        },
+        "fsUsedSize" : {
+          "$numberDouble" : "1.8330947584E10"
+        },
+        "fsTotalSize" : {
+          "$numberDouble" : "6.652123136E10"
+        },
+        "ok" : {
+          "$numberDouble" : "1.0"
+        },
+        "operationTime" : {
+          "$timestamp" : {
+            "t" : 1706097625,
+            "i" : 8
+          }
+        }
+      } ]
+    } ]
+  },
+  "durationMs" : 2,
+  "type" : "OP_MSG",
+  "caller" : "MONGODB"
+}

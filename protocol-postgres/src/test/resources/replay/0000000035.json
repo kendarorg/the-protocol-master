@@ -1,0 +1,90 @@
+{
+  "index" : 35,
+  "input" : {
+    "query" : "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *",
+    "parameterValues" : [ {
+      "output" : false,
+      "type" : "VARCHAR",
+      "binary" : false,
+      "value" : "TEST RD"
+    }, {
+      "output" : false,
+      "type" : "INTEGER",
+      "binary" : false,
+      "value" : "22"
+    }, {
+      "output" : false,
+      "type" : "VARCHAR",
+      "binary" : false,
+      "value" : "Test Ltd"
+    }, {
+      "output" : false,
+      "type" : "DOUBLE",
+      "binary" : false,
+      "value" : "500.22"
+    } ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ [ "1", "TEST RD", "22", "Test Ltd", "500.22" ] ],
+      "metadata" : [ {
+        "columnName" : "id",
+        "columnLabel" : "id",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "company_jpa",
+        "columnDisplaySize" : 20,
+        "columnType" : "BIGINT",
+        "precision" : 19
+      }, {
+        "columnName" : "address",
+        "columnLabel" : "address",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "company_jpa",
+        "columnDisplaySize" : 255,
+        "columnType" : "VARCHAR",
+        "precision" : 255
+      }, {
+        "columnName" : "age",
+        "columnLabel" : "age",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "company_jpa",
+        "columnDisplaySize" : 11,
+        "columnType" : "INTEGER",
+        "precision" : 10
+      }, {
+        "columnName" : "denomination",
+        "columnLabel" : "denomination",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "company_jpa",
+        "columnDisplaySize" : 255,
+        "columnType" : "VARCHAR",
+        "precision" : 255
+      }, {
+        "columnName" : "salary",
+        "columnLabel" : "salary",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "company_jpa",
+        "columnDisplaySize" : 25,
+        "columnType" : "DOUBLE",
+        "precision" : 17
+      } ],
+      "count" : 1,
+      "intResult" : false,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 0
+  },
+  "durationMs" : 4,
+  "type" : "QUERY",
+  "caller" : "JDBC"
+}

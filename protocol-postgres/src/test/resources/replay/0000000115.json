@@ -1,0 +1,19 @@
+{
+  "input" : {
+    "query" : "SET extra_float_digits = 3",
+    "parameterValues" : [ ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ ],
+      "metadata" : [ ],
+      "count" : 0,
+      "intResult" : true,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 0
+  },
+  "durationMs" : 4,
+  "type" : "QUERY",
+  "caller" : "JDBC"
+}

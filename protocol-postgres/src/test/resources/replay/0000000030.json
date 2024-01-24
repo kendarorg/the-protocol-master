@@ -1,0 +1,30 @@
+{
+  "index" : 30,
+  "input" : {
+    "query" : "select current_schema()",
+    "parameterValues" : [ ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ [ "public" ] ],
+      "metadata" : [ {
+        "columnName" : "current_schema",
+        "columnLabel" : "current_schema",
+        "byteData" : false,
+        "catalogName" : "",
+        "schemaName" : "",
+        "tableName" : "",
+        "columnDisplaySize" : 2147483647,
+        "columnType" : "VARCHAR",
+        "precision" : 2147483647
+      } ],
+      "count" : 1,
+      "intResult" : false,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 0
+  },
+  "durationMs" : 1,
+  "type" : "QUERY",
+  "caller" : "JDBC"
+}

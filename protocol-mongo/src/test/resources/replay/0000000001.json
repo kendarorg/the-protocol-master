@@ -1,0 +1,72 @@
+{
+  "index" : 1,
+  "input" : {
+    "flags" : 0,
+    "opCode" : "OP_MSG",
+    "sections" : [ {
+      "documents" : [ {
+        "hello" : {
+          "$numberInt" : "1"
+        },
+        "helloOk" : true,
+        "client" : {
+          "driver" : {
+            "name" : "mongo-java-driver|sync",
+            "version" : "4.11.0"
+          },
+          "os" : {
+            "type" : "Windows",
+            "name" : "Windows 11",
+            "architecture" : "amd64",
+            "version" : "10.0"
+          },
+          "platform" : "Java/Amazon.com Inc./11.0.21+9-LTS"
+        },
+        "$db" : "admin",
+        "$readPreference" : {
+          "mode" : "primaryPreferred"
+        }
+      } ]
+    } ]
+  },
+  "output" : {
+    "flags" : 0,
+    "opCode" : "OP_MSG",
+    "sections" : [ {
+      "documents" : [ {
+        "ok" : true,
+        "ismaster" : true,
+        "maxBsonObjectSize" : {
+          "$numberInt" : "16777216"
+        },
+        "maxMessageSizeBytes" : {
+          "$numberInt" : "48000000"
+        },
+        "maxWriteBatchSize" : {
+          "$numberInt" : "100000"
+        },
+        "localTime" : {
+          "$date" : {
+            "$numberLong" : "1706097626817"
+          }
+        },
+        "logicalSessionTimeoutMinutes" : {
+          "$numberInt" : "30"
+        },
+        "connectionId" : {
+          "$numberInt" : "3"
+        },
+        "minWireVersion" : {
+          "$numberInt" : "0"
+        },
+        "maxWireVersion" : {
+          "$numberInt" : "8"
+        },
+        "readOnly" : false
+      } ]
+    } ]
+  },
+  "durationMs" : 20,
+  "type" : "HELLO_OP_MSG",
+  "caller" : "MONGODB"
+}
