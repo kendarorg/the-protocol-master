@@ -1,60 +1,74 @@
 {
-  "index" : 4,
-  "input" : {
-    "flags" : 0,
-    "opCode" : "OP_MSG",
-    "sections" : [ {
-      "documents" : [ {
-        "insert" : "testcollection",
-        "ordered" : true,
-        "$db" : "admin"
-      } ]
-    }, {
-      "identifier" : "documents",
-      "documents" : [ {
-        "_id" : {
-          "$oid" : "65b0fbda763af12f58f1b6e1"
-        },
-        "title" : "Ski Bloopers",
-        "genres" : [ "Documentary", "Comedy" ]
-      } ]
-    } ]
+  "index": 4,
+  "input": {
+    "flags": 0,
+    "opCode": "OP_MSG",
+    "sections": [
+      {
+        "documents": [
+          {
+            "insert": "testcollection",
+            "ordered": true,
+            "$db": "admin"
+          }
+        ]
+      },
+      {
+        "identifier": "documents",
+        "documents": [
+          {
+            "_id": {
+              "$oid": "65b0fbda763af12f58f1b6e1"
+            },
+            "title": "Ski Bloopers",
+            "genres": [
+              "Documentary",
+              "Comedy"
+            ]
+          }
+        ]
+      }
+    ]
   },
-  "output" : {
-    "flags" : 0,
-    "opCode" : "OP_MSG",
-    "sections" : [ {
-      "documents" : [ {
-        "n" : {
-          "$numberInt" : "1"
-        },
-        "opTime" : {
-          "ts" : {
-            "$timestamp" : {
-              "t" : 1706097627,
-              "i" : 2
+  "output": {
+    "flags": 0,
+    "opCode": "OP_MSG",
+    "sections": [
+      {
+        "documents": [
+          {
+            "n": {
+              "$numberInt": "1"
+            },
+            "opTime": {
+              "ts": {
+                "$timestamp": {
+                  "t": 1706097627,
+                  "i": 2
+                }
+              },
+              "t": {
+                "$numberLong": "1"
+              }
+            },
+            "electionId": {
+              "$oid": "7fffffff0000000000000001"
+            },
+            "ok": {
+              "$numberDouble": "1.0"
+            },
+            "operationTime": {
+              "$timestamp": {
+                "t": 1706097627,
+                "i": 2
+              }
             }
-          },
-          "t" : {
-            "$numberLong" : "1"
           }
-        },
-        "electionId" : {
-          "$oid" : "7fffffff0000000000000001"
-        },
-        "ok" : {
-          "$numberDouble" : "1.0"
-        },
-        "operationTime" : {
-          "$timestamp" : {
-            "t" : 1706097627,
-            "i" : 2
-          }
-        }
-      } ]
-    } ]
+        ]
+      }
+    ]
   },
-  "durationMs" : 11,
-  "type" : "OP_MSG",
-  "caller" : "MONGODB"
+  "durationMs": 11,
+  "type": "OP_MSG",
+  "caller": "MONGODB"
 }

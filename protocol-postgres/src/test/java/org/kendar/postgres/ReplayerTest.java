@@ -16,11 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReplayerTest {
     protected static final int FAKE_PORT = 5431;
+
     @Test
     void test() throws Exception {
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcReplayProxy(new JdbcFileStorage(Path.of("src",
-                "test","resources","replay")));
+                "test", "resources", "replay")));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);
@@ -32,7 +33,7 @@ public class ReplayerTest {
         HibernateSessionFactory.initialize("org.postgresql.Driver",
                 //postgresContainer.getJdbcUrl(),
                 String.format("jdbc:postgresql://127.0.0.1:%d/test?ssl=false", FAKE_PORT),
-               "uid", "pwd",
+                "uid", "pwd",
                 "org.hibernate.dialect.PostgreSQLDialect",
                 CompanyJpa.class);
 

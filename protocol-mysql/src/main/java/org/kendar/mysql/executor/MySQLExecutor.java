@@ -83,7 +83,7 @@ public class MySQLExecutor {
         return ProtoState.iteratorOfList(ok);
     }
 
-    public Iterator<ProtoStep> executeText(MySQLProtoContext protoContext, String parse, List<BindingParameter> parameterValues,boolean text) {
+    public Iterator<ProtoStep> executeText(MySQLProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) {
 
         try {
             parser = (SqlStringParser) protoContext.getValue("PARSER");
@@ -101,7 +101,7 @@ public class MySQLExecutor {
                     }
                 }
             }
-            return executeRealQuery(protoContext, parse, parameterValues,text);
+            return executeRealQuery(protoContext, parse, parameterValues, text);
         } catch (RuntimeException ex) {
             return runExceptionInternal(protoContext, ex);
         }
@@ -127,11 +127,11 @@ public class MySQLExecutor {
             if (!shouldHandleAsSingleQuery(parsed) &&
                     CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_MULTI_STATEMENTS
                     )) {
-                return handleWithinTransaction(parsed, protoContext, parse, parameterValues,text);
+                return handleWithinTransaction(parsed, protoContext, parse, parameterValues, text);
                 //TODO transaction
             } else {
                 var sqlParseResult = new SqlParseResult(parse, parsed.get(0).getType());
-                return handleSingleQuery(sqlParseResult, protoContext, parse, parameterValues,text);
+                return handleSingleQuery(sqlParseResult, protoContext, parse, parameterValues, text);
             }
         } catch (SQLException e) {
             System.err.printf("[SERVER] Error %s", e.getMessage());
@@ -151,13 +151,13 @@ public class MySQLExecutor {
         }
         switch (parsed.getType()) {
             case UPDATE:
-                return executeQuery(999999, parsed, protoContext, parse, "UPDATE", parameterValues,text);
+                return executeQuery(999999, parsed, protoContext, parse, "UPDATE", parameterValues, text);
             case INSERT:
-                return executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues,text);
+                return executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
             case SELECT:
-                return executeQuery(999999, parsed, protoContext, parse, "SELECT", parameterValues,text);
+                return executeQuery(999999, parsed, protoContext, parse, "SELECT", parameterValues, text);
             case CALL:
-                return executeQuery(999999, parsed, protoContext, parse, "CALL", parameterValues,text);
+                return executeQuery(999999, parsed, protoContext, parse, "CALL", parameterValues, text);
             default:
                 if (parsed.getValue().toUpperCase().startsWith("BEGIN")) {
                     return executeBegin(parse, protoContext);
@@ -216,9 +216,9 @@ public class MySQLExecutor {
         }
         var result = new ArrayList<ReturnMessage>();
 
-        if(parsed.getType()==SqlStringType.INSERT){
-            if(resultSet.getRecords().size()==1 && resultSet.getMetadata().size()==1 &&
-                resultSet.getMetadata().get(0).getColumnName().equalsIgnoreCase("GENERATED_KEY")){
+        if (parsed.getType() == SqlStringType.INSERT) {
+            if (resultSet.getRecords().size() == 1 && resultSet.getMetadata().size() == 1 &&
+                    resultSet.getMetadata().get(0).getColumnName().equalsIgnoreCase("GENERATED_KEY")) {
                 resultSet.setIntResult(true);
                 resultSet.setLastInsertedId(Long.parseLong(resultSet.getRecords().get(0).get(0)));
                 resultSet.getMetadata().clear();
@@ -242,7 +242,7 @@ public class MySQLExecutor {
             var showMetadata = true;// (metadataFollows.isPresent()&&metadataFollows.get()) && !metadataFollows.isEmpty();
             if (showMetadata) {
                 for (var field : resultSet.getMetadata()) {
-                    result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI,false).
+                    result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, false).
                             withPacketNumber(++packetNumber));
                 }
             }
@@ -335,13 +335,13 @@ public class MySQLExecutor {
             var someColumn = false;
             for (var field : fields) {
                 if (field.getColumnName().equalsIgnoreCase("?")) {
-                    result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI,true).
+                    result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, true).
                             withPacketNumber(++packetNumber));
                     someColumn = true;
                 }
             }
 
-            if(someColumn && resultSetMetaData!=null) {
+            if (someColumn && resultSetMetaData != null) {
                 result.add(new EOFPacket().
                         withStatusFlags(0x022).
                         withPacketNumber(++packetNumber));
@@ -352,7 +352,7 @@ public class MySQLExecutor {
 
                 for (var field : fields) {
                     if (!field.getColumnName().equalsIgnoreCase("?")) {
-                        result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI,true).
+                        result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, true).
                                 withPacketNumber(++packetNumber));
                     }
                 }

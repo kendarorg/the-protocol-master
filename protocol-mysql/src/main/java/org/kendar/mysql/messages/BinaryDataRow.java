@@ -20,10 +20,10 @@ public class BinaryDataRow extends MySQLReturnMessage {
     private static void buildMysqlBinaryType(MySQLBBuffer resultBuffer, ProxyMetadata md, String row) {
 
 
-        switch (md.getColumnType()){
+        switch (md.getColumnType()) {
             case BOOLEAN:
             case BIT:
-                resultBuffer.write((byte) (Boolean.parseBoolean(row)?0x01:0x00));
+                resultBuffer.write((byte) (Boolean.parseBoolean(row) ? 0x01 : 0x00));
                 break;
 
             case DATE:
@@ -68,11 +68,11 @@ public class BinaryDataRow extends MySQLReturnMessage {
     }
 
     private byte[] generateNullBitmap() {
-        int nullBitmapSize = (rows.size() + 7+2) / 8;
+        int nullBitmapSize = (rows.size() + 7 + 2) / 8;
         var newAr = new byte[nullBitmapSize];
         for (int i = 0; i < rows.size(); i++) {
-            if(rows.get(i)==null){
-                BBufferUtils.setBit(newAr,i);
+            if (rows.get(i) == null) {
+                BBufferUtils.setBit(newAr, i);
             }
         }
         return newAr;

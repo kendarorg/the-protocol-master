@@ -3,23 +3,12 @@ package org.kendar.sql.jdbc;
 import java.sql.JDBCType;
 
 public class BindingParameter {
+    public boolean binary;
     private boolean output;
     private JDBCType type;
-
-
-
-    public void setOutput(boolean output) {
-        this.output = output;
-    }
-
-    public void setType(JDBCType type) {
-        this.type = type;
-    }
-
-    public boolean binary;
     private String value;
 
-    public BindingParameter(){
+    public BindingParameter() {
 
     }
     public BindingParameter(String value, boolean binary, boolean output, int type) {
@@ -48,6 +37,10 @@ public class BindingParameter {
         return output;
     }
 
+    public void setOutput(boolean output) {
+        this.output = output;
+    }
+
     public boolean isBinary() {
         return binary;
     }
@@ -66,5 +59,9 @@ public class BindingParameter {
 
     public JDBCType getType() {
         return type;
+    }
+
+    public void setType(JDBCType type) {
+        this.type = type;
     }
 }

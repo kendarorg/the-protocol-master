@@ -13,10 +13,6 @@ public class BBuffer {
         this(BBufferEndianness.BE);
     }
 
-    public boolean isBe(){
-        return endianness==BBufferEndianness.BE;
-    }
-
     public BBuffer(BBufferEndianness endianness) {
         this.endianness = endianness;
     }
@@ -93,6 +89,10 @@ public class BBuffer {
                     + (lower & 0xffffffffL));
         }
         //}
+    }
+
+    public boolean isBe() {
+        return endianness == BBufferEndianness.BE;
     }
 
     public byte[] getAll() {
@@ -270,8 +270,7 @@ public class BBuffer {
             intBytes = BBEndiannessConverter.swap8Bytes(intBytes, 0);
         }
         long value = 0;
-        for (int i = 0; i < intBytes.length; i++)
-        {
+        for (int i = 0; i < intBytes.length; i++) {
             value += ((long) intBytes[i] & 0xffL) << (8 * i);
         }
         return value;
@@ -400,7 +399,6 @@ public class BBuffer {
         var data = getBytes(position, 8);
         return byte2Double(data, this.endianness == BBufferEndianness.LE);
     }
-
 
 
     public Float getFloat(int position) {

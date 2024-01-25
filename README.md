@@ -1,4 +1,4 @@
-## Who is who
+## The Protocol Master
 
 The "protocol-master" is a project aimed at various tasks
 
@@ -15,11 +15,46 @@ The "protocol-master" is a project aimed at various tasks
 For this to become real an event based state machine has been developed, with
 several database wire protocol implementations:
 
-* [PostgresSQL](protocol-postgres/README.md) Usable for most db (for hibernate you should set the final db dialect of course)
+* [PostgresSQL](protocol-postgres/README.md) Usable for most db (for hibernate you should set the final db dialect of
+  course)
+  * Support for simple and extended query protocol
+  * Transactions
+  * Simple authentication (could add an "auth provider")
 * [MySQL](protocol-mysql/README.md)
+  * Support for cached queries and stored procedures
+  * Simple authentication (could add an "auth provider")
 * [MongoDB](protocol-mongo/README.md)
 * Redis (soon)
 * ActiveMQ (soon)
+
+## Using it out of the box
+
+You can use the "protocol-runner-VERSION.jar" to proxy all your calls and test your
+connections (and add some ISSUE to this project hopefully). 
+
+Inside protocol-runner/src/test/java/org/kenndar/runner/MainTest.java you can see 
+an example where a recording is made and then reporduced.
+
+Just call it like the following:
+
+<pre>
+  java -jar protocol-runner.jar \
+    -p postgres -l 3175 \
+    -xl remoteUser -xw remotePassword -xc jdbc:postgresql://remoteDb/test \
+    -xd test/{timestamp}
+</pre>
+
+<pre>
+usage: runner
+ -l <arg>    Select listening port
+ -p <arg>    Select protocol (mysql/mongo/postgres
+ -pl         Replay from log directory
+ -xc <arg>   Select remote connection string
+ -xd <arg>   Select remote log directory (you can set a {timestamp} value
+             that will be replaced with the current timestamp)
+ -xl <arg>   Select remote login
+ -xw <arg>   Select remote password
+</pre>
 
 ## The state machine
 

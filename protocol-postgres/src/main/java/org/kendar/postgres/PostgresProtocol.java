@@ -34,6 +34,7 @@ public class PostgresProtocol extends ProtoDescriptor {
     public PostgresProtocol() {
         this(PORT);
     }
+
     public PostgresProtocol(int port) {
         this.port = port;
     }

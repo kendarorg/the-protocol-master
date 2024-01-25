@@ -1,6 +1,7 @@
-package org.kendar.postgres;
+package org.kenndar.runner;
 
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.Sleeper;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BasicTest {
 
-    protected static final int FAKE_PORT = 5431;
+    protected static final int FAKE_PORT = 5631;
     protected static PostgreslImage postgresContainer;
     protected static TcpServer protocolServer;
 

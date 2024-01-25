@@ -24,7 +24,7 @@ public abstract class BaseMessageData extends ReturnMessage {
     private int responseId;
     private OpCodes opCode;
 
-    public BaseMessageData(){
+    public BaseMessageData() {
 
     }
 
@@ -34,7 +34,6 @@ public abstract class BaseMessageData extends ReturnMessage {
         this.responseId = responseId;
         this.opCode = opCode;
     }
-
 
 
     public static byte[] toBytes(BsonDocument document) {
@@ -89,7 +88,6 @@ public abstract class BaseMessageData extends ReturnMessage {
     }
 
 
-
     public Object serialize() {
         try {
             var dataMap = new HashMap<String, Object>();
@@ -103,7 +101,6 @@ public abstract class BaseMessageData extends ReturnMessage {
             throw new RuntimeException(e);
         }
     }
-
 
 
     public void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {

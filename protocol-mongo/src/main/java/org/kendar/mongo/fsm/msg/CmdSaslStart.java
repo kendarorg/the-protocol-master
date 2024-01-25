@@ -41,7 +41,7 @@ public class CmdSaslStart extends StandardOpMsgCommand {
 
     @Override
     protected Iterator<ProtoStep> executeInternal(OpMsgRequest event) {
-        
+
         try {
             var login = "";
             var nonce = "";
@@ -108,7 +108,7 @@ public class CmdSaslStart extends StandardOpMsgCommand {
 
         String clientFinalMessageWithoutProof = "c=" + Base64.getEncoder().encodeToString(GS2_HEADER.getBytes(StandardCharsets.UTF_8)) + ",r=" + serverNonce;
         String authMessage = clientFirstMessageBare + "," + serverFirstMessage + "," + clientFinalMessageWithoutProof;
-       return null;
+        return null;
     }
 
 }

@@ -20,6 +20,7 @@ public class MysqlImage extends BaseImage<MysqlImage, MySQLContainer> {
     private String jdbcUrl;
     private String userId;
     private String password;
+
     public MysqlImage() {
         this.withExposedPorts(3306);
     }

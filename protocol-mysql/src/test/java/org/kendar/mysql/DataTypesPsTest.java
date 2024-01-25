@@ -32,10 +32,10 @@ public class DataTypesPsTest extends BasicTest {
                         && m.getParameterCount() == 1
                         && m.getParameterTypes()[0] == int.class).
                 findFirst();
-            var mt = mto.get();
-            mt.setAccessible(true);
-            var ob = mt.invoke(result, 1);
-            return ob;
+        var mt = mto.get();
+        mt.setAccessible(true);
+        var ob = mt.invoke(result, 1);
+        return ob;
     }
 
     private static void setValue(String functionName, Object expected, PreparedStatement pstmt) throws IllegalAccessException, InvocationTargetException, InvocationTargetException {
@@ -45,9 +45,9 @@ public class DataTypesPsTest extends BasicTest {
                         && m.getParameterTypes()[0] == int.class).
                 findFirst();
 
-            var mt = mto.get();
-            mt.setAccessible(true);
-            mt.invoke(pstmt,1,expected);
+        var mt = mto.get();
+        mt.setAccessible(true);
+        mt.invoke(pstmt, 1, expected);
     }
 
     public static Stream<Arguments> createInsertSelect() {

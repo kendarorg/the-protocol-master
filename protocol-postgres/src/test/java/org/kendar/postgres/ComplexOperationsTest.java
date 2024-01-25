@@ -1,7 +1,9 @@
 package org.kendar.postgres;
 
+import junit.framework.TestSuite;
 import org.junit.jupiter.api.*;
 import org.kendar.testcontainer.utils.IOReplicator;
+import org.testcontainers.shaded.org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -228,7 +230,10 @@ public class ComplexOperationsTest extends BasicTest {
 
     @Test
     void testSimpleQueryProtocol() throws IOException {
-
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            TestSuite.warning("Not on windows, cannot test the simple postgres query protocol");
+            return;
+        }
 
         var psqlWinExecutable = getRootPath("client\\psql.exe");
         assertTrue(Files.exists(psqlWinExecutable));

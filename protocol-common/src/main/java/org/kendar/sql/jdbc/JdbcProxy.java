@@ -56,10 +56,10 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         for (var i = 0; i < parameterValues.size(); i++) {
             var pv = parameterValues.get(i);
             if (!pv.isOutput()) {
-                ps.setObject(i + 1,convertObject(pv));
+                ps.setObject(i + 1, convertObject(pv));
             } else {
-                if (pv.getValue()==null
-                        || pv.getType()==JDBCType.NULL
+                if (pv.getValue() == null
+                        || pv.getType() == JDBCType.NULL
                 ) {
                     ((CallableStatement) ps).registerOutParameter(i + 1, pv.isBinary() ? Types.VARBINARY : Types.VARCHAR);
                 } else {
@@ -74,8 +74,8 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
 
     private static Object convertObject(BindingParameter value) {
         var val = value.getValue();
-        if(value==null)return null;
-        switch (value.getType()){
+        if (value == null) return null;
+        switch (value.getType()) {
             case INTEGER:
             case BIGINT:
             case TINYINT:
@@ -100,8 +100,8 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             case TIME_WITH_TIMEZONE:
                 return Time.valueOf(val);
             case DATE:
-                if(val.length()>10){
-                    val = val.substring(0,10);
+                if (val.length() > 10) {
+                    val = val.substring(0, 10);
                 }
                 return Date.valueOf(val);
             case TIMESTAMP:
@@ -153,6 +153,51 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         }
     }
 
+    private static void fillOutputParametersOnRecordset(List<BindingParameter> parameterValues, PreparedStatement statement, SelectResult result, AtomicLong count) {
+        var maxRecordsAtomic = new AtomicLong(1);
+        result.setIntResult(false);
+        var cs = (CallableStatement) statement;
+        for (int i = 0; i < parameterValues.size(); i++) {
+            var op = parameterValues.get(i);
+            if (!op.isOutput()) continue;
+            result.getMetadata().add(new ProxyMetadata(
+                    "" + i,
+                    op.isBinary()));
+        }
+        var qrIterator = new QueryResultIterator<List<String>>(
+                () -> maxRecordsAtomic.get() > 0,
+                () -> {
+                    try {
+                        var byteRow = new ArrayList<String>();
+                        for (int i = 0; i < parameterValues.size(); i++) {
+                            var op = parameterValues.get(i);
+                            if (!op.isOutput()) continue;
+                            if (op.isBinary()) {
+                                byteRow.add(Base64.getEncoder().encodeToString((cs.getBytes(i + 1))));
+                            } else {
+                                byteRow.add(cs.getString(i + 1));
+                            }
+                        }
+                        count.incrementAndGet();
+                        maxRecordsAtomic.decrementAndGet();
+                        return byteRow;
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                () -> {
+                    try {
+                        statement.close();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        while (qrIterator.hasNext()) {
+            result.getRecords().add(qrIterator.next());
+        }
+        result.setCount((int) count.get());
+    }
+
     public String getDriver() {
         return driver;
     }
@@ -173,7 +218,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                                                   AtomicLong maxRecordsAtomic,
                                                                   SelectResult result,
                                                                   Statement statement,
-                                                                  AtomicLong count){
+                                                                  AtomicLong count) {
         return new QueryResultIterator<List<String>>(
                 () -> {
                     try {
@@ -244,11 +289,11 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
 //                statement.executeUpdate();
 //                runThroughSingleResult(true, parameterValues, statement, result, count);
 //            }else {
-                if (statement.execute()) {
-                    runThroughRecordset(maxRecords, statement, result, count);
-                } else {
-                    runThroughSingleResult(insert, parameterValues, statement, result, count);
-                }
+            if (statement.execute()) {
+                runThroughRecordset(maxRecords, statement, result, count);
+            } else {
+                runThroughSingleResult(insert, parameterValues, statement, result, count);
+            }
             //}
             long end = System.currentTimeMillis();
             storage.write(query, result, parameterValues, end - start, "QUERY");
@@ -301,51 +346,6 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         }
     }
 
-    private static void fillOutputParametersOnRecordset(List<BindingParameter> parameterValues, PreparedStatement statement, SelectResult result, AtomicLong count) {
-        var maxRecordsAtomic = new AtomicLong(1);
-        result.setIntResult(false);
-        var cs = (CallableStatement) statement;
-        for (int i = 0; i < parameterValues.size(); i++) {
-            var op = parameterValues.get(i);
-            if (!op.isOutput()) continue;
-            result.getMetadata().add(new ProxyMetadata(
-                    "" + i,
-                    op.isBinary()));
-        }
-        var qrIterator = new QueryResultIterator<List<String>>(
-                () -> maxRecordsAtomic.get() > 0,
-                () -> {
-                    try {
-                        var byteRow = new ArrayList<String>();
-                        for (int i = 0; i < parameterValues.size(); i++) {
-                            var op = parameterValues.get(i);
-                            if (!op.isOutput()) continue;
-                            if (op.isBinary()) {
-                                byteRow.add(Base64.getEncoder().encodeToString((cs.getBytes(i + 1))));
-                            } else {
-                                byteRow.add(cs.getString(i + 1));
-                            }
-                        }
-                        count.incrementAndGet();
-                        maxRecordsAtomic.decrementAndGet();
-                        return byteRow;
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                },
-                () -> {
-                    try {
-                        statement.close();
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-        while (qrIterator.hasNext()) {
-            result.getRecords().add(qrIterator.next());
-        }
-        result.setCount((int) count.get());
-    }
-
     private void runThroughRecordset(int maxRecords, PreparedStatement statement, SelectResult result, AtomicLong count) throws SQLException {
         ResultSet resultSet;
         if (maxRecords == 0) {
@@ -357,7 +357,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         result.getMetadata().addAll(identifyFields(resultSet));
 
         var qrIterator = iterateThroughRecSet(resultSet,
-             maxRecordsAtomic,
+                maxRecordsAtomic,
                 result,
                 statement,
                 count);

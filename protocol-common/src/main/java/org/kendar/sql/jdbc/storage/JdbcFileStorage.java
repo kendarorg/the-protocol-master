@@ -13,6 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JdbcFileStorage extends BaseFileStorage<JdbcRequest, JdbcResponse> implements JdbcStorage {
 
 
+    private ConcurrentHashMap<Long, StorageItem<JdbcRequest, JdbcResponse>> inMemoryDb = new ConcurrentHashMap<>();
+    private boolean initialized = false;
+
     public JdbcFileStorage(String targetDir) {
         super(targetDir);
     }
@@ -23,7 +26,8 @@ public class JdbcFileStorage extends BaseFileStorage<JdbcRequest, JdbcResponse> 
 
     @Override
     protected TypeReference<?> getTypeReference() {
-        return new TypeReference<StorageItem<JdbcRequest,JdbcResponse>>(){};
+        return new TypeReference<StorageItem<JdbcRequest, JdbcResponse>>() {
+        };
     }
 
     @Override
@@ -44,26 +48,23 @@ public class JdbcFileStorage extends BaseFileStorage<JdbcRequest, JdbcResponse> 
         write(item);
     }
 
-    private ConcurrentHashMap<Long,StorageItem<JdbcRequest,JdbcResponse>> inMemoryDb = new ConcurrentHashMap<>();
-    private boolean initialized = false;
-
     @Override
     public StorageItem read(String query, List<BindingParameter> parameterValues, String type) {
-        if(!initialized){
-            for(var item:readAllItems()){
-                inMemoryDb.put(item.getIndex(),item);
+        if (!initialized) {
+            for (var item : readAllItems()) {
+                inMemoryDb.put(item.getIndex(), item);
             }
-            initialized=true;
+            initialized = true;
         }
         var item = inMemoryDb.values().stream()
-                .filter(a->{
-                    var req = (JdbcRequest)a.getInput();
+                .filter(a -> {
+                    var req = (JdbcRequest) a.getInput();
                     return req.getQuery().equalsIgnoreCase(query) &&
                             type.equalsIgnoreCase(a.getType()) &&
-                            parameterValues.size()==req.getParameterValues().size() &&
+                            parameterValues.size() == req.getParameterValues().size() &&
                             a.getCaller().equalsIgnoreCase("JDBC");
                 }).findFirst();
-        if(item.isPresent()){
+        if (item.isPresent()) {
             inMemoryDb.remove(item.get().getIndex());
             return item.get();
         }

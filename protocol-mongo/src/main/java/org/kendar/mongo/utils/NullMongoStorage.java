@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.StorageRoot;
 
-public class NullMongoStorage implements StorageRoot<JsonNode,JsonNode>,MongoStorage {
+public class NullMongoStorage implements StorageRoot<JsonNode, JsonNode>, MongoStorage {
     @Override
     public void initialize() {
 

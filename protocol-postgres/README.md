@@ -1,7 +1,7 @@
 # Postgres Protocol
 
 You can directly use the "proxy" as a normal postgres backend
-This protocol can be used as a "drop-in" replacement since the 
+This protocol can be used as a "drop-in" replacement since the
 "special queries" like commit, savepoints etc are translate to JDBC and
 not left as they are. So you can use this protocol to proxy and log a
 connection even with Oracle or SQLServer
@@ -36,16 +36,14 @@ Always on bind the indication of the return columns is fake
 ### Generated keys and returning data
 
 Something not specified on documentation is that when an Execute request is made
-with an insert, the generated keys are returned according to the MaxRecords 
+with an insert, the generated keys are returned according to the MaxRecords
 field in the Execute message
 
-When it's set to 0 (zero) then the data inserted CAN be returned without generating 
-errors. And will be returned all the inserted row. Given some unknown setting with the 
+When it's set to 0 (zero) then the data inserted CAN be returned without generating
+errors. And will be returned all the inserted row. Given some unknown setting with the
 execution with JPA it MUST be returned
 
 When is set to 1 (one) then the data inserted MUST NOT be returned
-
-
 
 ### Sp and function calls (jdbc)
 

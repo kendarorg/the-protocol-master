@@ -15,8 +15,8 @@ public class ErrorResponse extends ReturnMessage {
 
     @Override
     public void write(BBuffer buffer) {
-        if(message==null){
-            message="MISSING MESSAGE";
+        if (message == null) {
+            message = "MISSING MESSAGE";
         }
         var s = "FATAL".getBytes(StandardCharsets.UTF_8);
         var m = message.getBytes(StandardCharsets.UTF_8);

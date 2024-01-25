@@ -38,12 +38,12 @@ public class DataTypeDescriptor {
         return dataType;
     }
 
-    public JDBCType extractJdbcType(){
-        return JDBCType.valueOf(dataType);
-    }
-
     public void setDataType(int dataType) {
         this.dataType = dataType;
+    }
+
+    public JDBCType extractJdbcType() {
+        return JDBCType.valueOf(dataType);
     }
 
     public int getPrecision() {

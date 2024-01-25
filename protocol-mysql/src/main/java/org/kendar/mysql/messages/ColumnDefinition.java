@@ -41,10 +41,9 @@ public class ColumnDefinition extends MySQLReturnMessage {
         resultBuffer.writeUB2(language.getValue());
         resultBuffer.writeUB4(field.getColumnDisplaySize());
 
-        if(binary) {
+        if (binary) {
             resultBuffer.write((byte) toMysql(field.getColumnType()));
-        }else
-        {
+        } else {
             resultBuffer.write((byte) MySQLType.MYSQL_TYPE_VAR_STRING.getValue());
         }
         resultBuffer.writeUB2(0x00);
@@ -60,7 +59,7 @@ public class ColumnDefinition extends MySQLReturnMessage {
 
     private int toMysql(JDBCType columnType) {
         MySQLType value = MySQLType.MYSQL_TYPE_VARCHAR;
-        switch (columnType){
+        switch (columnType) {
             case BOOLEAN:
             case BIT:
                 value = MySQLType.MYSQL_TYPE_BIT;

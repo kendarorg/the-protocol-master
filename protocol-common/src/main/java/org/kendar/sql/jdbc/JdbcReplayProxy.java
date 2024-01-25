@@ -15,11 +15,10 @@ import java.util.List;
 public class JdbcReplayProxy extends JdbcProxy {
 
     public JdbcReplayProxy(JdbcStorage jdbcStorage) {
-        super(null,null,null,null);
+        super(null, null, null, null);
         setStorage(jdbcStorage);
 
     }
-
 
 
     public SelectResult executeQuery(boolean insert, String query,
@@ -28,13 +27,12 @@ public class JdbcReplayProxy extends JdbcProxy {
                                      SqlStringParser parser,
                                      ArrayList<JDBCType> concreteTypes) {
 
-            long start = System.currentTimeMillis();
-            StorageItem storageItem = storage.read(query, parameterValues, "QUERY");
-            var duration = storageItem.getDurationMs();
+        long start = System.currentTimeMillis();
+        StorageItem storageItem = storage.read(query, parameterValues, "QUERY");
+        var duration = storageItem.getDurationMs();
 
-            return ((JdbcResponse) storageItem.getOutput()).getSelectResult();
+        return ((JdbcResponse) storageItem.getOutput()).getSelectResult();
     }
-
 
 
     @Override

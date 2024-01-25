@@ -70,7 +70,7 @@ public class Bind extends StandardMessage {
         var count = message.getShort();
 
 
-        System.out.println("[SERVER]\tSTATEMENT_" + statementName+" "+count);
+        System.out.println("[SERVER]\tSTATEMENT_" + statementName + " " + count);
         var bindMessage = new Binding("STATEMENT_" + statementName, portal, formatCodes, parameterValues);
         parse.put("PORTAL_" + portal, bindMessage);
         postgresContext.setValue("PORTAL_" + portal, bindMessage);

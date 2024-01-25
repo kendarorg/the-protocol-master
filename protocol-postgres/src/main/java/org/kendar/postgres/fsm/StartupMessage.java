@@ -15,6 +15,7 @@ import java.util.Iterator;
 public class StartupMessage extends ProtoState {
     private static final int FIXED_SECRET = 5678;
     private static final byte[] STARTUP_MESSAGE_MARKER = BBufferUtils.toByteArray(0x00, 0x03, 0x00, 0x00);
+
     public StartupMessage(Class<?>... messages) {
         super(messages);
     }

@@ -1,30 +1,36 @@
 {
-  "index" : 9,
-  "input" : {
-    "query" : "SELECT @@session.transaction_read_only",
-    "parameterValues" : [ ]
+  "index": 9,
+  "input": {
+    "query": "SELECT @@session.transaction_read_only",
+    "parameterValues": []
   },
-  "output" : {
-    "selectResult" : {
-      "records" : [ [ "0" ] ],
-      "metadata" : [ {
-        "columnName" : "@@session.transaction_read_only",
-        "columnLabel" : "@@session.transaction_read_only",
-        "byteData" : false,
-        "catalogName" : "",
-        "schemaName" : "",
-        "tableName" : "",
-        "columnDisplaySize" : 19,
-        "columnType" : "BIGINT",
-        "precision" : 19
-      } ],
-      "count" : 1,
-      "intResult" : false,
-      "lastInsertedId" : 0
+  "output": {
+    "selectResult": {
+      "records": [
+        [
+          "0"
+        ]
+      ],
+      "metadata": [
+        {
+          "columnName": "@@session.transaction_read_only",
+          "columnLabel": "@@session.transaction_read_only",
+          "byteData": false,
+          "catalogName": "",
+          "schemaName": "",
+          "tableName": "",
+          "columnDisplaySize": 19,
+          "columnType": "BIGINT",
+          "precision": 19
+        }
+      ],
+      "count": 1,
+      "intResult": false,
+      "lastInsertedId": 0
     },
-    "intResult" : 0
+    "intResult": 0
   },
-  "durationMs" : 1,
-  "type" : "QUERY",
-  "caller" : "JDBC"
+  "durationMs": 1,
+  "type": "QUERY",
+  "caller": "JDBC"
 }

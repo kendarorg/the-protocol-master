@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MongoProxy extends Proxy<MongoStorage> {
     private static final ObjectMapper mapper = new ObjectMapper();
-
+    private static AtomicInteger connectionId = new AtomicInteger(1);
     private String connectionString;
     private ServerApiVersion serverApiVersion;
     private boolean replayer = false;
@@ -42,7 +42,7 @@ public class MongoProxy extends Proxy<MongoStorage> {
     }
 
     public MongoProxy(MongoStorage storage) {
-        replayer=true;
+        replayer = true;
         this.setStorage(storage);
     }
 
@@ -51,11 +51,9 @@ public class MongoProxy extends Proxy<MongoStorage> {
         this(connectionString, ServerApiVersion.V1);
     }
 
-    private static AtomicInteger connectionId = new AtomicInteger(1);
-
     @Override
     public ProxyConnection connect() {
-        if(replayer){
+        if (replayer) {
             return new ProxyConnection(null);
         }
 //        var serverApi = ServerApi.builder()
@@ -78,10 +76,10 @@ public class MongoProxy extends Proxy<MongoStorage> {
                                         Class<?> prevState, MongoClient mongoClient, String db) {
         long start = System.currentTimeMillis();
 
-        if(replayer){
-            var item = storage.read((JsonNode) data.serialize(),"OP_MSG");
+        if (replayer) {
+            var item = storage.read((JsonNode) data.serialize(), "OP_MSG");
             var res = new OpMsgContent();
-            res.doDeserialize((JsonNode)item.getOutput(),mapper);
+            res.doDeserialize((JsonNode) item.getOutput(), mapper);
             res.setRequestId(protoContext.getReqResId());
             res.setResponseId(data.getRequestId());
             res.setFlags(8);
@@ -123,17 +121,17 @@ public class MongoProxy extends Proxy<MongoStorage> {
         toSend.getSections().add(section);
         long end = System.currentTimeMillis();
 
-        this.storage.write((JsonNode)data.serialize(),(JsonNode) toSend.serialize(), end - start, "OP_MSG", "MONGODB");
+        this.storage.write((JsonNode) data.serialize(), (JsonNode) toSend.serialize(), end - start, "OP_MSG", "MONGODB");
         return toSend;
     }
 
     public OpMsgContent runHelloOpMsg(MongoProtoContext protoContext, OpMsgContent lsatOp, Class<?> prevState, MongoClient mongoClient, String dbName) {
         long start = System.currentTimeMillis();
 
-        if(replayer){
-            var item = storage.read((JsonNode) lsatOp.serialize(),"HELLO_OP_MSG");
+        if (replayer) {
+            var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_MSG");
             var res = new OpMsgContent();
-            res.doDeserialize((JsonNode)item.getOutput(),mapper);
+            res.doDeserialize((JsonNode) item.getOutput(), mapper);
             res.setRequestId(protoContext.getReqResId());
             res.setResponseId(lsatOp.getRequestId());
             res.setFlags(8);
@@ -166,16 +164,16 @@ public class MongoProxy extends Proxy<MongoStorage> {
         section.getDocuments().add(json);
         toSend.getSections().add(section);
         long end = System.currentTimeMillis();
-        this.storage.write((JsonNode)lsatOp.serialize(),(JsonNode) toSend.serialize(), end - start, "HELLO_OP_MSG", "MONGODB");
+        this.storage.write((JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_MSG", "MONGODB");
         return toSend;
     }
 
     public OpReplyContent runHelloOpQuery(MongoProtoContext protoContext, OpQueryContent lsatOp, Class<?> prevState, MongoClient mongoClient, String dbName) {
         long start = System.currentTimeMillis();
-        if(replayer){
-            var item = storage.read((JsonNode) lsatOp.serialize(),"HELLO_OP_QUERY");
+        if (replayer) {
+            var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_QUERY");
             var res = new OpReplyContent();
-            res.doDeserialize((JsonNode)item.getOutput(),mapper);
+            res.doDeserialize((JsonNode) item.getOutput(), mapper);
             res.setRequestId(protoContext.getReqResId());
             res.setResponseId(lsatOp.getRequestId());
             res.setFlags(8);
@@ -208,7 +206,7 @@ public class MongoProxy extends Proxy<MongoStorage> {
         toSend.getDocuments().add(json);
 
         long end = System.currentTimeMillis();
-        this.storage.write((JsonNode)lsatOp.serialize(),(JsonNode) toSend.serialize(), end - start, "HELLO_OP_QUERY", "MONGODB");
+        this.storage.write((JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_QUERY", "MONGODB");
         return toSend;
     }
 }

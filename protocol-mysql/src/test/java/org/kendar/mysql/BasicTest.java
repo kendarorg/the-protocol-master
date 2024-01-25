@@ -43,10 +43,10 @@ public class BasicTest {
         if (testInfo != null) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
-            if(testInfo.getDisplayName().startsWith("[")){
+            if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method,dsp)));
-            }else {
+                proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method, dsp)));
+            } else {
                 proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method)));
             }
         }
@@ -68,10 +68,10 @@ public class BasicTest {
         if (testInfo != null) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
-            if(testInfo.getDisplayName().startsWith("[")){
+            if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method,dsp)));
-            }else {
+                proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method, dsp)));
+            } else {
                 proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method)));
             }
         }

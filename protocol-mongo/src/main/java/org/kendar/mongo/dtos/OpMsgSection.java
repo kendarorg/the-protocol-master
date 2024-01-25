@@ -38,7 +38,7 @@ public class OpMsgSection {
             }
             var list = new ArrayList<JsonNode>();
             for (var item : documents) {
-                var doc = (ObjectNode)mapper.readTree(item);
+                var doc = (ObjectNode) mapper.readTree(item);
                 doc.remove("lsid");
                 doc.remove("$clusterTime");
                 doc.remove("apiVersion");
@@ -52,15 +52,15 @@ public class OpMsgSection {
 
     }
 
-    protected void doDeserialize(JsonNode toDeserialize,ObjectMapper mapper) {
+    protected void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {
         var jnIdentifier = toDeserialize.get("identifier");
-        if(jnIdentifier!=null){
-            identifier= jnIdentifier.asText();
+        if (jnIdentifier != null) {
+            identifier = jnIdentifier.asText();
         }
         documents = new ArrayList<>();
         var jnDocuments = toDeserialize.get("documents");
-        if(jnDocuments!=null && jnDocuments.size()>0){
-            for(var i=0;i<jnDocuments.size();i++){
+        if (jnDocuments != null && jnDocuments.size() > 0) {
+            for (var i = 0; i < jnDocuments.size(); i++) {
                 var doc = jnDocuments.get(i);
                 try {
                     documents.add(mapper.writeValueAsString(doc));

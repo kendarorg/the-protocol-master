@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.StorageRoot;
 
-public interface MongoStorage extends StorageRoot<JsonNode,JsonNode> {
+public interface MongoStorage extends StorageRoot<JsonNode, JsonNode> {
     void initialize();
-    StorageItem<JsonNode, JsonNode> read(JsonNode node,String type);
+
+    StorageItem<JsonNode, JsonNode> read(JsonNode node, String type);
 }

@@ -46,17 +46,17 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
         }
     }
 
-    protected List<StorageItem<I,O>> readAllItems() {
+    protected List<StorageItem<I, O>> readAllItems() {
         var fileNames = Stream.of(new File(targetDir).listFiles())
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .sorted()
                 .collect(Collectors.toList());
-        var result = new ArrayList<StorageItem<I,O>>();
-        for(var fileName:fileNames){
+        var result = new ArrayList<StorageItem<I, O>>();
+        for (var fileName : fileNames) {
             try {
-                var fileContent = Files.readString(Path.of(targetDir,fileName));
-                result.add((StorageItem<I,O>) mapper.deserialize(fileContent,getTypeReference()));
+                var fileContent = Files.readString(Path.of(targetDir, fileName));
+                result.add((StorageItem<I, O>) mapper.deserialize(fileContent, getTypeReference()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

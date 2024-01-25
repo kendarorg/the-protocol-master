@@ -25,6 +25,6 @@ public class ComRefresh extends ProtoState {
         toSend.setCapabilities(CapabilityFlag.getFakeServerCapabilities());
         toSend.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());
         return iteratorOfList(toSend);
-        
+
     }
 }

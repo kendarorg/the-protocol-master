@@ -158,7 +158,7 @@ public class PostgresExecutor {
                     return executeQuery(999999, parsed, protoContext, binding, parse.getConcreteTypes(), "UPDATE");
                 }
             case INSERT:
-                return executeQuery(maxRecords==1?-1:0, parsed, protoContext, binding, parse.getConcreteTypes(), "INSERT 0");
+                return executeQuery(maxRecords == 1 ? -1 : 0, parsed, protoContext, binding, parse.getConcreteTypes(), "INSERT 0");
             case SELECT:
                 return executeQuery(maxRecords, parsed, protoContext, binding, parse.getConcreteTypes(), "SELECT");
             case CALL:
@@ -245,13 +245,13 @@ public class PostgresExecutor {
         var connection = protoContext.getValue("CONNECTION");
         var originalMaxRecords = maxRecords;
 
-        if(parsed.getType()==SqlStringType.INSERT){
-            if(maxRecords==-1){
-                maxRecords=0;
-            }else if(maxRecords==0){
+        if (parsed.getType() == SqlStringType.INSERT) {
+            if (maxRecords == -1) {
+                maxRecords = 0;
+            } else if (maxRecords == 0) {
                 maxRecords = Integer.MAX_VALUE;
             }
-        }else if (maxRecords == 0) {
+        } else if (maxRecords == 0) {
             maxRecords = Integer.MAX_VALUE;
         }
         var matcher = PostgresCallConverter.convertToJdbc(parsed.getValue(), binding.getParameterValues());
@@ -267,7 +267,7 @@ public class PostgresExecutor {
                     parser, concreteTypes);
         }
         var result = new ArrayList<ReturnMessage>();
-        if(originalMaxRecords==-1){
+        if (originalMaxRecords == -1) {
             resultSet.setIntResult(true);
             resultSet.setCount(resultSet.getRecords().size());
             resultSet.getRecords().clear();

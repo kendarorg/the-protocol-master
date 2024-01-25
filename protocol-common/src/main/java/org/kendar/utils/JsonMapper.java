@@ -24,9 +24,10 @@ public class JsonMapper {
             throw new RuntimeException(e);
         }
     }
+
     public <T> T deserialize(String serialized, TypeReference target) {
         try {
-            return (T)mapper.readValue(serialized, target);
+            return (T) mapper.readValue(serialized, target);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

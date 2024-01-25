@@ -35,7 +35,7 @@ public class Execute extends StandardMessage {
             parseMessage.getBinds().remove("PORTAL_" + portal);
             var executor = new PostgresExecutor();
 
-            System.out.println("[SERVER] \tExecuting: ("+maxRecords+") " + parseMessage.getQuery());
+            System.out.println("[SERVER] \tExecuting: (" + maxRecords + ") " + parseMessage.getQuery());
             //for maxRecords
             var res = executor.executePortal(
                     protoContext, parseMessage, bindMessage, maxRecords,

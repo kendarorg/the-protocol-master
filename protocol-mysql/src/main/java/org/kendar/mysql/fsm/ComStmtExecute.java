@@ -82,7 +82,7 @@ public class ComStmtExecute extends ProtoState {
             case TIMESTAMP_WITH_TIMEZONE: {
                 var length = (int) inputBuffer.get();
                 value = Calendar.getInstance();
-                ((Calendar)value).setTimeInMillis(0);
+                ((Calendar) value).setTimeInMillis(0);
                 switch (mysqlFieldType) {
                     case (0x0a): //MYSQL_TYPE_DATE
                     case (0x0c): //MYSQL_TYPE_DATETIME
@@ -95,13 +95,13 @@ public class ComStmtExecute extends ProtoState {
                             case (4):    //no time
                                 ((Calendar) value).set(
                                         inputBuffer.readUB2(),
-                                        inputBuffer.get()-1,
+                                        inputBuffer.get() - 1,
                                         inputBuffer.get(), 0, 0, 0);
                                 break;
                             case (7):    //no microsec
                                 ((Calendar) value).set(
                                         inputBuffer.readUB2(),
-                                        inputBuffer.get()-1,
+                                        inputBuffer.get() - 1,
                                         inputBuffer.get(),
                                         inputBuffer.get(),
                                         inputBuffer.get(),
@@ -111,7 +111,7 @@ public class ComStmtExecute extends ProtoState {
                                 SimpleDateFormat outDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 ((Calendar) value).set(
                                         inputBuffer.readUB2(),
-                                        inputBuffer.get()-1,
+                                        inputBuffer.get() - 1,
                                         inputBuffer.get(),
                                         inputBuffer.get(),
                                         inputBuffer.get(),
@@ -126,34 +126,33 @@ public class ComStmtExecute extends ProtoState {
                     break;
                     case (0x0b): //MYSQL_TYPE_TIME
                     {
-                        switch (length)
-                        {
+                        switch (length) {
                             case (0):    //empty
                                 value = "00:00:00.000000";
                                 break;
                             case (8):    //no microsec
                             {
-                                var sign = inputBuffer.get()>0?"-":"";
-                                var days = inputBuffer.readUB4()*24;
-                                value= sign+String.format("%d:%02d:%02d",
-                                        inputBuffer.get()+days,
+                                var sign = inputBuffer.get() > 0 ? "-" : "";
+                                var days = inputBuffer.readUB4() * 24;
+                                value = sign + String.format("%d:%02d:%02d",
+                                        inputBuffer.get() + days,
                                         inputBuffer.get(),
                                         inputBuffer.get()
                                 );
                             }
-                                break;
+                            break;
                             default: //all fields set (12)
                             {
-                                var sign = inputBuffer.get()>0?"-":"";
-                                var days = inputBuffer.readUB4()*24;
-                                value= sign+String.format("%d:%02d:%02d.%06d",
-                                        inputBuffer.get()+days,
+                                var sign = inputBuffer.get() > 0 ? "-" : "";
+                                var days = inputBuffer.readUB4() * 24;
+                                value = sign + String.format("%d:%02d:%02d.%06d",
+                                        inputBuffer.get() + days,
                                         inputBuffer.get(),
                                         inputBuffer.get(),
                                         inputBuffer.readUB4()
                                 );
                             }
-                                break;
+                            break;
                         }
                     }
                     //break;
@@ -224,6 +223,6 @@ public class ComStmtExecute extends ProtoState {
         }
 
         var executor = new MySQLExecutor();
-        return executor.executeText(context, query, bindingParameters,false);
+        return executor.executeText(context, query, bindingParameters, false);
     }
 }

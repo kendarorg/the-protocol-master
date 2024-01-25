@@ -22,7 +22,9 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ReplayerTest{
+public class ReplayerTest {
+
+    protected static final int FAKE_PORT = 27079;
 
     protected static MongoClient getProxyConnectionWithServerApis() {
         var serverApi = ServerApi.builder()
@@ -35,13 +37,13 @@ public class ReplayerTest{
                 .build();
         return MongoClients.create(settings);
     }
-    protected static final int FAKE_PORT = 27079;
+
     @Test
-    void replay(){
+    void replay() {
         var baseProtocol = new MongoProtocol(FAKE_PORT);
         var proxy = new MongoProxy(new MongoFileStorage(
                 Path.of("src",
-                        "test","resources","replay")));
+                        "test", "resources", "replay")));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

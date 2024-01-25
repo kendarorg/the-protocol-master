@@ -1,12 +1,7 @@
 Handle begin transaction with specifiers
 BinaryDataRow: Conversion to binary from sql types (
 
-
 Writing standard double and floats
-   
-
-
-
 
 https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_command_phase.html
 

@@ -15,7 +15,7 @@ import java.util.Map;
 public class OpMsgContent extends BaseMessageData {
     private List<OpMsgSection> sections = new ArrayList<>();
 
-    public OpMsgContent(){
+    public OpMsgContent() {
 
     }
 
@@ -68,13 +68,13 @@ public class OpMsgContent extends BaseMessageData {
 
     @Override
     public void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {
-        super.doDeserialize(toDeserialize,mapper);
+        super.doDeserialize(toDeserialize, mapper);
         var sections = toDeserialize.get("sections");
         this.sections = new ArrayList<>();
-        for(var i=0;i<sections.size();i++){
+        for (var i = 0; i < sections.size(); i++) {
             var section = sections.get(i);
             var om = new OpMsgSection();
-            om.doDeserialize(section,mapper);
+            om.doDeserialize(section, mapper);
             this.sections.add(om);
         }
     }

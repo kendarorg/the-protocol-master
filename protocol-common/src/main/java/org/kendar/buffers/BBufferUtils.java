@@ -6,16 +6,16 @@ public class BBufferUtils {
         int posByte = pos / 8;
         int posBit = pos % 8;
         byte valByte = data[posByte];
-        int valInt = (valByte >> posBit ) & 0x0001;
-                //valByte >> (8 - (posBit + 1)) & 0x0001;
+        int valInt = (valByte >> posBit) & 0x0001;
+        //valByte >> (8 - (posBit + 1)) & 0x0001;
         return valInt;
     }
 
     public static void setBit(byte[] data, int pos) {
         int posByte = pos / 8;
         int posBit = pos % 8;
-        var newVal = (byte)(1 << posBit );
-        data[posByte] = (byte) (newVal|data[posByte]);
+        var newVal = (byte) (1 << posBit);
+        data[posByte] = (byte) (newVal | data[posByte]);
     }
 
     public static byte toByte(int by) {
@@ -35,7 +35,7 @@ public class BBufferUtils {
     public static void unSetBit(byte[] data, int pos) {
         int posByte = pos / 8;
         int posBit = pos % 8;
-        var newVal = (byte)(1 << posBit );
-        data[posByte] = (byte) (newVal^data[posByte]);
+        var newVal = (byte) (1 << posBit);
+        data[posByte] = (byte) (newVal ^ data[posByte]);
     }
 }

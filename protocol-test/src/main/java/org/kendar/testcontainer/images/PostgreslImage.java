@@ -22,6 +22,7 @@ public class PostgreslImage extends BaseImage<PostgreslImage, PostgreSQLContaine
     private String jdbcUrl;
     private String userId;
     private String password;
+
     public PostgreslImage() {
         this.withExposedPorts(5432);
     }

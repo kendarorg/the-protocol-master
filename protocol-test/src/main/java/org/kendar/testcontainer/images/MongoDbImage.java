@@ -8,6 +8,7 @@ public class MongoDbImage extends BaseImage<MongoDbImage, MongoDBContainer> {
     private String connectionString;
     private String userId;
     private String password;
+
     public MongoDbImage() {
         this.withExposedPorts(27017);
     }

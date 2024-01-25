@@ -73,7 +73,7 @@ and its response)
 This happens only on binary protocol and -real- prepared statements (that are
 used extensively by ODBC and .NET drivers)
 
-During the conversions, from/to wire protocol, the data types returned by JDBC 
+During the conversions, from/to wire protocol, the data types returned by JDBC
 drivers ARE NOT MATCHING WITH MySQL types. The smallest possible type is used
 e.g.
 
@@ -81,11 +81,11 @@ e.g.
 * The driver uses a Float!
 * Everything is messed up :P
 
-Double and floats follows the IEEE 754 floating-point value in Little-endian 
+Double and floats follows the IEEE 754 floating-point value in Little-endian
 format on 8 or 4 bytes.
 
-When using the binary protocol (prepared statements)...everything is transmitted 
-as string.. as with text protocol (cached statement) there is now no point in 
+When using the binary protocol (prepared statements)...everything is transmitted
+as string.. as with text protocol (cached statement) there is now no point in
 using that approach. Only the parameters of the PS are sent in "compact mysql format"
 
 ### Generated keys and returning data

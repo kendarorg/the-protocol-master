@@ -16,9 +16,10 @@ public class OpReplyContent extends BaseMessageData {
     private List<String> documents = new ArrayList<>();
     private int cursorId;
 
-    public OpReplyContent(){
+    public OpReplyContent() {
 
     }
+
     public OpReplyContent(int flags, int requestId, int responseId) {
         super(flags, requestId, responseId, OpCodes.OP_REPLY);
     }
@@ -59,17 +60,17 @@ public class OpReplyContent extends BaseMessageData {
 
     @Override
     public void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {
-        super.doDeserialize(toDeserialize,mapper);
+        super.doDeserialize(toDeserialize, mapper);
 
         var jnCursorId = toDeserialize.get("cursorId");
-        if(jnCursorId!=null) {
+        if (jnCursorId != null) {
             cursorId = jnCursorId.asInt();
         }
         documents = new ArrayList<>();
         var jnDocuments = toDeserialize.get("documents");
-        if(jnDocuments!=null && jnDocuments.size()>0){
-            for(var i=0;i<jnDocuments.size();i++){
-                var doc = (ObjectNode)jnDocuments.get(i);
+        if (jnDocuments != null && jnDocuments.size() > 0) {
+            for (var i = 0; i < jnDocuments.size(); i++) {
+                var doc = (ObjectNode) jnDocuments.get(i);
                 doc.remove("lsid");
                 doc.remove("$clusterTime");
                 doc.remove("apiVersion");

@@ -136,6 +136,7 @@ public class MySQLBBuffer extends BBuffer {
         var data = getBytes(8);
         return byte2Double(data, isBe());
     }
+
     public Float getFloatLe() {
         var data = getBytes(4);
         return byte2Float(data, isBe());
