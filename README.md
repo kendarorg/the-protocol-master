@@ -56,6 +56,9 @@ usage: runner
  -xw <arg>   Select remote password
 </pre>
 
+Inside the choosen directory you will find simple jsons containing all the data exchanged 
+with the server AND you can modify it before replaying, to simulate special situations!
+
 ## The state machine
 
 ### TLDR
