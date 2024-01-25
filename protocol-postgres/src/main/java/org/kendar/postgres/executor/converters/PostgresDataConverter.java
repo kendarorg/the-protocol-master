@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Base64;
 import java.util.regex.Pattern;
 
 public class PostgresDataConverter {
@@ -52,8 +53,9 @@ public class PostgresDataConverter {
                     value = bb.getUtf8String();
                     break;
                 case "[B":
+                case "byte[]":
                 default:
-                    value = bytes;
+                    value = Base64.getEncoder().encodeToString(bytes);
                     break;
             }
         }

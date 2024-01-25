@@ -82,6 +82,8 @@ public class DataTypesPsTest extends BasicTest {
                 //Arguments.of("uuid",),
                 //TODO Arguments.of("xml",)
 
+
+                Arguments.of("blob", "Bytes", new byte[]{1,2,3,4}),
                 Arguments.of("timestamp", "Timestamp",
                         Timestamp.valueOf("2022-03-05 12:38:18.0")),
                 Arguments.of("time|time", "Time",

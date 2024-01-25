@@ -257,7 +257,7 @@ public class MySQLExecutor {
             for (var byteRow : resultSet.getRecords()) {
                 if (text) {
                     //Text resultset
-                    result.add(new DataRow(byteRow).
+                    result.add(new DataRow(byteRow,resultSet.getMetadata()).
                             withPacketNumber(++packetNumber));
                 } else {
                     //Binary resultset
