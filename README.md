@@ -1,6 +1,6 @@
 ## The Protocol Master
 
-The "protocol-master" is a library, aimed at various tasks (and an executable jar if you
+The "protocol-master" is a set of java libraries, aimed at various tasks (and an executable jar if you
 want to try it quickly)
 
 * Create a state machine able to interpret a generic wire protocol, handling
