@@ -4,7 +4,7 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.protocol.ReturnMessage;
 
-public abstract class MySQLReturnMessage extends ReturnMessage {
+public abstract class MySQLReturnMessage implements ReturnMessage {
     private int packetNumber;
 
     public MySQLReturnMessage withPacketNumber(int packetNumber) {

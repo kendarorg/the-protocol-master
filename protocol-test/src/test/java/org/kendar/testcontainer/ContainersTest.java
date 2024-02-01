@@ -1,9 +1,13 @@
 package org.kendar.testcontainer;
 
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kendar.testcontainer.images.MysqlImage;
 import org.kendar.testcontainer.images.PostgreslImage;
+import org.kendar.testcontainer.images.RabbitMqImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.testcontainers.containers.Network;
 
@@ -12,7 +16,7 @@ import java.sql.DriverManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class DbTest {
+public class ContainersTest {
     @Test
     @Disabled("Only callable directly")
     void testMysql() throws Exception {
@@ -63,6 +67,32 @@ public class DbTest {
             }
             resultset.close();
             statement.close();
+            connection.close();
+
+        }
+    }
+
+    @Test
+    @Disabled("Only callable directly")
+    void testRabbitMq() throws Exception {
+        var dockerHost = Utils.getDockerHost();
+        assertNotNull(dockerHost);
+        var network = Network.newNetwork();
+
+        try (var rabbitContainer = new RabbitMqImage()) {
+            rabbitContainer
+                    .withNetwork(network)
+                    .withAliases("rabbitmq.sample.test", "rabbitmq.proxy.test")
+                    .start();
+            ConnectionFactory connectionFactory = new ConnectionFactory();
+            connectionFactory.enableHostnameVerification();
+            connectionFactory.setUri(rabbitContainer.getConnectionString());
+            connectionFactory.setPassword(rabbitContainer.getAdminPassword());
+            Connection connection = connectionFactory.newConnection();
+            Channel channel = connection
+                    .openChannel()
+                    .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+            channel.close();
             connection.close();
 
         }

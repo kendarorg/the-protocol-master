@@ -5,7 +5,7 @@ import org.kendar.protocol.ReturnMessage;
 
 import java.nio.charset.StandardCharsets;
 
-public class CommandComplete extends ReturnMessage {
+public class CommandComplete implements ReturnMessage {
 
     private final String tag;
 

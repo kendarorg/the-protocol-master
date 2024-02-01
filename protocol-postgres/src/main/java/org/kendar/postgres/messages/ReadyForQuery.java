@@ -3,7 +3,7 @@ package org.kendar.postgres.messages;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.ReturnMessage;
 
-public class ReadyForQuery extends ReturnMessage {
+public class ReadyForQuery implements ReturnMessage {
     private final boolean inTransaction;
 
     public ReadyForQuery(boolean inTransaction) {

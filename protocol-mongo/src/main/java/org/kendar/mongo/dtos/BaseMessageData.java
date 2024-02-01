@@ -17,7 +17,7 @@ import org.kendar.protocol.ReturnMessage;
 
 import java.util.HashMap;
 
-public abstract class BaseMessageData extends ReturnMessage {
+public abstract class BaseMessageData implements ReturnMessage {
     private static final ObjectMapper mapper = new ObjectMapper();
     private int flags;
     private int requestId;

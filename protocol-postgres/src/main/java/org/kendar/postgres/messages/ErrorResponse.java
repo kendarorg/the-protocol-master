@@ -5,7 +5,7 @@ import org.kendar.protocol.ReturnMessage;
 
 import java.nio.charset.StandardCharsets;
 
-public class ErrorResponse extends ReturnMessage {
+public class ErrorResponse implements ReturnMessage {
     private String message;
 
     public ErrorResponse(String message) {

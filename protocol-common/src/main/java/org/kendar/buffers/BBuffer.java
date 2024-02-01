@@ -91,6 +91,12 @@ public class BBuffer {
         //}
     }
 
+    public static BBuffer of(byte[] bytes) {
+        var bb = new BBuffer();
+        bb.write(bytes);
+        return bb;
+    }
+
     public boolean isBe() {
         return endianness == BBufferEndianness.BE;
     }
@@ -286,26 +292,8 @@ public class BBuffer {
         return true;
     }
 
-    public void writeInt(int value, int offset) {
-        var data = new byte[]{
-                (byte) (value >> 24),
-                (byte) (value >> 16),
-                (byte) (value >> 8),
-                (byte) value};
-        if (this.endianness == BBufferEndianness.LE) {
-            data = BBEndiannessConverter.swap4Bytes(data, 0);
-        }
-        write(data, offset);
 
-    }
 
-    public void writeInt(int value) {
-        if (this.position == -1) {
-            this.position = 0;
-        }
-        writeInt(value, this.position);
-        this.position += 4;
-    }
 
     public void writeShort(short value, int offset) {
         var data = new byte[]{
@@ -400,6 +388,10 @@ public class BBuffer {
         return byte2Double(data, this.endianness == BBufferEndianness.LE);
     }
 
+    public Float getFloat() {
+        var data = getBytes(8);
+        return byte2Float(data, this.endianness == BBufferEndianness.LE);
+    }
 
     public Float getFloat(int position) {
         var data = getBytes(position, 4);
@@ -416,5 +408,95 @@ public class BBuffer {
 
     public void writeFloat(float v) {
         writeInt(Float.floatToIntBits(v));
+    }
+
+    public void writeInt(int value) {
+        if (this.position == -1) {
+            this.position = 0;
+        }
+        writeInt(value, this.position);
+        this.position += 4;
+    }
+
+    public void writeInt(int value, int offset) {
+        var data = new byte[]{
+                (byte) (value >> 24),
+                (byte) (value >> 16),
+                (byte) (value >> 8),
+                (byte) value};
+        if (this.endianness == BBufferEndianness.LE) {
+            data = BBEndiannessConverter.swap4Bytes(data, 0);
+        }
+        write(data, offset);
+
+    }
+
+
+    public void writeUnsignedInt(int value) {
+        if (this.position == -1) {
+            this.position = 0;
+        }
+        writeUnsignedInt(value, this.position);
+        this.position += 4;
+    }
+
+    public void writeUnsignedInt(int value, int offset) {
+        var data = new byte[]{
+                (byte) (value >> 24),
+                (byte) (value >> 16),
+                (byte) (value >> 8),
+                (byte) value};
+        BBufferUtils.unSetBit(data,0);
+
+        BBuffer.toHexByteArray(data);
+        if (this.endianness == BBufferEndianness.LE) {
+            data = BBEndiannessConverter.swap4Bytes(data, 0);
+        }
+        write(data, offset);
+
+    }
+
+    public int indexOf(byte[] needle)
+    {
+        // needle is null or empty
+        if (needle == null || needle.length == 0)
+            return 0;
+
+        // haystack is null, or haystack's length is less than that of needle
+        if (this.bytes == null || needle.length > this.bytes.length)
+            return -1;
+
+        // pre construct failure array for needle pattern
+        int[] failure = new int[needle.length];
+        int n = needle.length;
+        failure[0] = -1;
+        for (int j = 1; j < n; j++)
+        {
+            int i = failure[j - 1];
+            while ((needle[j] != needle[i + 1]) && i >= 0)
+                i = failure[i];
+            if (needle[j] == needle[i + 1])
+                failure[j] = i + 1;
+            else
+                failure[j] = -1;
+        }
+
+        // find match
+        int i = 0, j = 0;
+        int haystackLen = this.bytes.length;
+        int needleLen = needle.length;
+        while (i < haystackLen && j < needleLen)
+        {
+            if (this.bytes[i] == needle[j])
+            {
+                i++;
+                j++;
+            }
+            else if (j == 0)
+                i++;
+            else
+                j = failure[j - 1] + 1;
+        }
+        return ((j == needleLen) ? (i - needleLen) : -1);
     }
 }

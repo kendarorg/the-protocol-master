@@ -8,7 +8,7 @@ import org.kendar.protocol.ReturnMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class RowDescription extends ReturnMessage {
+public class RowDescription implements ReturnMessage {
 
     private final List<Field> fields;
 

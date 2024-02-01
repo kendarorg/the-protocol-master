@@ -57,10 +57,12 @@ public abstract class ProtoDescriptor {
         protoLines.put(currentState.getClass(), protoLine);
     }
 
-    public ProtoState[] getPossibleNext(Class<?> current) {
+
+    public <T> ProtoState[] getPossibleNext(Class<T> current) {
         if (protoLines.get(current) == null) {
-            throw new RuntimeException("Unable to find following states for " + current.getSimpleName());
+            return new ProtoState[]{new MissingState<T>()};
         }
         return protoLines.get(current).getPossibleStates();
+
     }
 }

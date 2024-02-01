@@ -7,7 +7,7 @@ import org.kendar.protocol.ReturnMessage;
 import java.util.Base64;
 import java.util.List;
 
-public class DataRow extends ReturnMessage {
+public class DataRow implements ReturnMessage {
     private final List<String> values;
     private final List<Field> fields;
 

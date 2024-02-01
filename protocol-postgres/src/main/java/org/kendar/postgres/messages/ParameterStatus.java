@@ -5,7 +5,7 @@ import org.kendar.protocol.ReturnMessage;
 
 import java.nio.charset.StandardCharsets;
 
-public class ParameterStatus extends ReturnMessage {
+public class ParameterStatus implements ReturnMessage {
     private final String key;
     private final String value;
 

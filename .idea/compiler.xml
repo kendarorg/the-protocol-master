@@ -13,6 +13,7 @@
         <module name="protocol-mongo" />
         <module name="protocol-test" />
         <module name="protocol-redis" />
+        <module name="protocol-amqp-091" />
       </profile>
     </annotationProcessing>
   </component>

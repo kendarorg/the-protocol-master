@@ -3,7 +3,7 @@ package org.kendar.postgres.messages;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.ReturnMessage;
 
-public class NoticeReponse extends ReturnMessage {
+public class NoticeReponse implements ReturnMessage {
     private final int pid;
 
     public NoticeReponse(int pid) {

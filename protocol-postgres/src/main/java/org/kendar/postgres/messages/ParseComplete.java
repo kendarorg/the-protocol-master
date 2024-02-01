@@ -3,7 +3,7 @@ package org.kendar.postgres.messages;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.ReturnMessage;
 
-public class ParseComplete extends ReturnMessage {
+public class ParseComplete implements ReturnMessage {
     @Override
     public void write(BBuffer resultBuffer) {
         resultBuffer.write((byte) '1');
