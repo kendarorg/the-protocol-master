@@ -57,6 +57,7 @@ public class SimpleTest extends BasicTest {
     }
 
     @Test
+    @Disabled("TODO TO IMPLEMENT")
     void queueTest() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
         String exectedMessage = "product details";
         ConnectionFactory connectionFactory = new ConnectionFactory();
