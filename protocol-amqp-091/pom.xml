@@ -9,6 +9,7 @@
 
     <artifactId>protocol-amqp-091</artifactId>
     <dependencies>
+
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-common</artifactId>

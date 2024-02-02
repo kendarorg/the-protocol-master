@@ -12,9 +12,11 @@
         <module name="protocol-runner" />
         <module name="protocol-mongo" />
         <module name="protocol-test" />
-        <module name="protocol-redis" />
         <module name="protocol-amqp-091" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="protocol-redis" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>

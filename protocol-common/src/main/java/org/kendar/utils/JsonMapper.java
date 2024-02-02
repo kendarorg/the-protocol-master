@@ -3,7 +3,9 @@ package org.kendar.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonMapper {
     private static final ObjectMapper mapper = new ObjectMapper().
@@ -12,6 +14,14 @@ public class JsonMapper {
     public String serialize(Object target) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(target);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String serializeCompact(Object target) {
+        try {
+            return mapper.writeValueAsString(target);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -34,4 +44,18 @@ public class JsonMapper {
     }
 
 
+    public JsonNode toJsonNode(Object of) {
+        try {
+            if(of instanceof String){
+                return mapper.readTree((String)of);
+            }
+            return mapper.readTree(mapper.writeValueAsString(of));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ObjectNode createObjectNode() {
+        return mapper.createObjectNode();
+    }
 }

@@ -2,10 +2,7 @@ package org.kendar.protocol;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
-import org.kendar.protocol.fsm.BaseEvent;
-import org.kendar.protocol.fsm.NullState;
-import org.kendar.protocol.fsm.Start;
-import org.kendar.protocol.fsm.Stop;
+import org.kendar.protocol.fsm.*;
 import org.kendar.proxy.Proxy;
 import org.kendar.server.Channel;
 
@@ -178,18 +175,18 @@ public class ProtoContext {
                     Sleeper.sleep(1);
                     continue;
                 }
-//            if(!hasMessagesToParseOrToReceive()){
-//                return;
-//            }
 
                 somethingDone = false;
-                for (var executor : descriptor.getPossibleNext(this.currentState)) {
+                var possibleNexts = descriptor.getPossibleNext(this.currentState);
+                for (var executor : possibleNexts) {
                     if (executor.canHandle(currentEvent.getClass())) {
                         if (executor.canRunEvent(currentEvent)) {
                             somethingDone = true;
                             this.prevState = this.currentState;
-                            this.currentState = executor.getClass();
-                            System.out.println("[SERVER] State: " + this.currentState.getSimpleName());
+                            if(!isIsIntertwined(executor)) {
+                                this.currentState = executor.getClass();
+                            }
+                            System.out.println("[SERVER] State: " + executor.getClass().getSimpleName());
 
                             var resultBuffer = buildBuffer(descriptor);
                             var stepsToInvoke = executor.executeEvent(currentEvent);
@@ -203,7 +200,7 @@ public class ProtoContext {
                                         try {
                                             client.close();
                                         } catch (IOException e) {
-                                            System.out.println("[SERVER] Closed connection: " + this.currentState.getSimpleName());
+                                            System.out.println("[SERVER] Closed connection: " + executor.getClass().getSimpleName());
                                         }
                                         return;
                                     }
@@ -223,6 +220,10 @@ public class ProtoContext {
         } catch (RuntimeException ex) {
             runException(ex);
         }
+    }
+
+    private boolean isIsIntertwined(ProtoState executor) {
+        return executor instanceof IntertwinedProtoState;
     }
 //
 //    private boolean hasMessagesToParseOrToReceive() {

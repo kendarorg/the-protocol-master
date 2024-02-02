@@ -1,16 +1,20 @@
 package org.kendar.protocol;
 
+import org.kendar.buffers.BBuffer;
+import org.kendar.buffers.BBufferEndianness;
+import org.kendar.protocol.fsm.IntertwinedProtoState;
 import org.kendar.protocol.fsm.ProtoLine;
 import org.kendar.protocol.fsm.ProtoState;
 import org.kendar.proxy.Proxy;
 import org.kendar.server.Channel;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class ProtoDescriptor {
 
     private final Map<Class<?>, ProtoLine> protoLines = new HashMap<>();
+    private final List<ProtoState> intertwined = new ArrayList<>();
+
     private Proxy proxyInstance;
     private boolean proxy;
 
@@ -29,6 +33,7 @@ public abstract class ProtoDescriptor {
 
     public void setProxy(Proxy proxyInstance) {
         this.proxyInstance = proxyInstance;
+        this.proxyInstance.setProtocol(this);
         this.proxy = true;
     }
 
@@ -57,12 +62,26 @@ public abstract class ProtoDescriptor {
         protoLines.put(currentState.getClass(), protoLine);
     }
 
-
-    public <T> ProtoState[] getPossibleNext(Class<T> current) {
-        if (protoLines.get(current) == null) {
-            return new ProtoState[]{new MissingState<T>()};
+    protected void addIntertwinedState(ProtoState currentState) {
+        if(!(currentState instanceof IntertwinedProtoState)){
+            throw new RuntimeException(currentState.getClass().getSimpleName()+" is not an IntertwinedProtoState");
         }
-        return protoLines.get(current).getPossibleStates();
+        intertwined.add(currentState);
+    }
 
+    public BBuffer buildBuffer() {
+        return new BBuffer(isBe() ? BBufferEndianness.BE : BBufferEndianness.LE);
+    }
+
+
+    public <T> List<ProtoState> getPossibleNext(Class<T> current) {
+        List<ProtoState> result = new ArrayList<>();
+        if (protoLines.get(current) == null) {
+            result.add(new MissingState<T>());
+        }else {
+            result.addAll(protoLines.get(current).getPossibleStates());
+        }
+        result.addAll(intertwined);
+        return result;
     }
 }

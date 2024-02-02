@@ -23,11 +23,6 @@ public class ConnectionCloseOk extends MethodFrame {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
-//        var context = (AmqpProtoContext)event.getContext();
-//        var connection = ((ProxyConnection)event.getContext().getValue("CONNECTION"));
-//        var sock = (SocketChannel)connection.getConnection();
-
-
         this.setChannel(channel);
         return iteratorOfList(this);
     }

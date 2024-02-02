@@ -1,5 +1,7 @@
 package org.kendar.amqp.v09.fsm;
 
+import org.kendar.amqp.v09.AmqpProxy;
+import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionStart;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.BytesEvent;
@@ -7,7 +9,6 @@ import org.kendar.protocol.ProtoStep;
 import org.kendar.protocol.ReturnMessage;
 import org.kendar.protocol.fsm.ProtoState;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.server.SocketChannel;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,11 +36,14 @@ public class ProtocolHeader extends ProtoState implements ReturnMessage {
     }
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
+        var context = (AmqpProtoContext)event.getContext();
+        var proxy = (AmqpProxy)context.getProxy();
         var connection = ((ProxyConnection)event.getContext().getValue("CONNECTION"));
-        var sock = (SocketChannel)connection.getConnection();
-        sock.write(BBuffer.of(new byte[]{'A','M','Q','P',0,0,9,1}));
-        var proxyConStart = new ConnectionStart();
-        sock.read(proxyConStart);
+
+        var proxyConStart = proxy.execute(
+                connection,BBuffer.of(new byte[]{'A','M','Q','P',0,0,9,1}),
+                new ConnectionStart());
+
         Map<String, Object> toSendBack = new HashMap<String, Object>();
         Map<String, Object> capabilities = new HashMap<String,Object>();
         toSendBack.put("product","protocol-master");

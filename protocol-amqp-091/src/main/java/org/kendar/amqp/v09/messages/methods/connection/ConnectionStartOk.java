@@ -79,8 +79,8 @@ public class ConnectionStartOk extends MethodFrame {
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
         var context = (AmqpProtoContext)event.getContext();
+        var proxy = (AmqpProxy)context.getProxy();
         var connection = ((ProxyConnection)event.getContext().getValue("CONNECTION"));
-        var proxy = (AmqpProxy)event.getContext().getProxy();
 
 
 
@@ -97,16 +97,19 @@ public class ConnectionStartOk extends MethodFrame {
         connStartOk.setMechanisms(mechanisms.split(" "));
         connStartOk.setLocales(locale.split(" "));
         connStartOk.setAuth(new String[]{proxy.getUserId(),proxy.getPassword()});
-        sock.write(connStartOk,context.buildBuffer());
-        var conTune = new ConnectionTune();
-        sock.read(conTune);
+
+        var conTune = proxy.execute(
+                connection,
+                connStartOk,
+                new ConnectionTune()
+        );
         var conTuneOk = new ConnectionTuneOk();
         conTuneOk.setChannelMax(conTune.getChannelMax());
         conTuneOk.setHearthBeat(conTune.getHearthBeat());
         conTuneOk.setFrameMax(conTune.getFrameMax());
-        sock.write(conTuneOk,context.buildBuffer());
-//        throw new RuntimeException("MISSING AUT");
-        //connStartOk.set
+        proxy.execute(
+                connection,
+                conTuneOk);
 
         var response = new ConnectionTune();
         response.setChannelMax((short) 0);

@@ -2,6 +2,7 @@ package org.kendar.amqp.v09;
 
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.ProtocolHeader;
+import org.kendar.amqp.v09.messages.frames.HearthBeatFrame;
 import org.kendar.amqp.v09.messages.methods.channel.ChannelClose;
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpen;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionClose;
@@ -20,6 +21,8 @@ public class AmqpProtocol extends ProtoDescriptor {
     private static final boolean IS_BIG_ENDIAN = true;
     @Override
     protected void initializeProtocol() {
+        addIntertwinedState(new HearthBeatFrame());
+
         addState(new Start(),
                 new ProtocolHeader(BytesEvent.class));
         addState(new ProtocolHeader(),

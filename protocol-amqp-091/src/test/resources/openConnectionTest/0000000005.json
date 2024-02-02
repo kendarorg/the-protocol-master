@@ -1,0 +1,28 @@
+{
+  "index" : 5,
+  "input" : {
+    "type" : "ChannelClose",
+    "data" : {
+      "channel" : 1,
+      "type" : 1,
+      "classId" : 20,
+      "methodId" : 40,
+      "replyCode" : 200,
+      "replyText" : "OK",
+      "failingClassId" : 0,
+      "failingMethodId" : 0
+    }
+  },
+  "output" : {
+    "type" : "ChannelCloseOk",
+    "data" : {
+      "channel" : 1,
+      "type" : 1,
+      "classId" : 20,
+      "methodId" : 41
+    }
+  },
+  "durationMs" : 2,
+  "type" : "ChannelClose",
+  "caller" : "AMQP"
+}

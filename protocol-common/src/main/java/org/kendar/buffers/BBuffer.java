@@ -121,6 +121,7 @@ public class BBuffer {
         this.position++;
     }
 
+
     public void write(byte[] second) {
         if (this.position == -1) {
             this.position = 0;

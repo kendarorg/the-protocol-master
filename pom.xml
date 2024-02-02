@@ -15,7 +15,6 @@
         <module>protocol-postgres</module>
         <module>protocol-mongo</module>
         <module>protocol-mysql</module>
-        <module>protocol-redis</module>
         <module>protocol-runner</module>
         <module>protocol-amqp-091</module>
     </modules>
