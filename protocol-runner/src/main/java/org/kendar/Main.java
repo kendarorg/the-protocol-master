@@ -71,7 +71,7 @@ public class Main {
                 throw new Exception("missing protocol (p)");
             }
             while (stopWhenFalse.get()) {
-
+                Thread.yield();
             }
         } catch (Exception ex) {
             HelpFormatter formatter = new HelpFormatter();
