@@ -17,12 +17,12 @@ several database wire protocol implementations:
 
 * [PostgresSQL](protocol-postgres/README.md) Usable for most db (for hibernate you should set the final db dialect of
   course)
-  * Support for simple and extended query protocol
-  * Transactions
-  * Simple authentication (could add an "auth provider")
+    * Support for simple and extended query protocol
+    * Transactions
+    * Simple authentication (could add an "auth provider")
 * [MySQL](protocol-mysql/README.md)
-  * Support for cached queries and stored procedures
-  * Simple authentication (could add an "auth provider")
+    * Support for cached queries and stored procedures
+    * Simple authentication (could add an "auth provider")
 * [MongoDB](protocol-mongo/README.md)
 * Redis (soon)
 * ActiveMQ (soon)
@@ -30,9 +30,9 @@ several database wire protocol implementations:
 ## Using it out of the box
 
 You can use the "protocol-runner-VERSION.jar" to proxy all your calls and test your
-connections (and add some ISSUE to this project hopefully). 
+connections (and add some ISSUE to this project hopefully).
 
-Inside protocol-runner/src/test/java/org/kenndar/runner/MainTest.java you can see 
+Inside protocol-runner/src/test/java/org/kenndar/runner/MainTest.java you can see
 an example where a recording is made and then reporduced.
 
 Just call it like the following:
@@ -56,7 +56,7 @@ usage: runner
  -xw <arg>   Select remote password
 </pre>
 
-Inside the choosen directory you will find simple jsons containing all the data exchanged 
+Inside the choosen directory you will find simple jsons containing all the data exchanged
 with the server AND you can modify it before replaying, to simulate special situations!
 
 ## The state machine

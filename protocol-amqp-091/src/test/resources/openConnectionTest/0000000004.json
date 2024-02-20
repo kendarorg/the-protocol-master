@@ -1,26 +1,26 @@
 {
-  "index" : 4,
-  "input" : {
-    "type" : "ChannelOpen",
-    "data" : {
-      "channel" : 1,
-      "type" : 1,
-      "classId" : 20,
-      "methodId" : 10,
-      "reserved1" : ""
+  "index": 4,
+  "input": {
+    "type": "ChannelOpen",
+    "data": {
+      "channel": 1,
+      "type": 1,
+      "classId": 20,
+      "methodId": 10,
+      "reserved1": ""
     }
   },
-  "output" : {
-    "type" : "ChannelOpenOk",
-    "data" : {
-      "channel" : 1,
-      "type" : 1,
-      "classId" : 20,
-      "methodId" : 11,
-      "reserved1" : ""
+  "output": {
+    "type": "ChannelOpenOk",
+    "data": {
+      "channel": 1,
+      "type": 1,
+      "classId": 20,
+      "methodId": 11,
+      "reserved1": ""
     }
   },
-  "durationMs" : 2,
-  "type" : "ChannelOpen",
-  "caller" : "AMQP"
+  "durationMs": 2,
+  "type": "ChannelOpen",
+  "caller": "AMQP"
 }

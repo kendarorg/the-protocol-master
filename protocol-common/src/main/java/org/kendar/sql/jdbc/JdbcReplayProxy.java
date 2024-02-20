@@ -1,6 +1,7 @@
 package org.kendar.sql.jdbc;
 
-import org.kendar.protocol.ProtoContext;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.sql.jdbc.storage.JdbcStorage;
@@ -21,11 +22,12 @@ public class JdbcReplayProxy extends JdbcProxy {
     }
 
 
+    @Override
     public SelectResult executeQuery(boolean insert, String query,
                                      Object connection, int maxRecords,
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
-                                     ArrayList<JDBCType> concreteTypes) {
+                                     ArrayList<JDBCType> concreteTypes, ProtoContext protoContext) {
 
         long start = System.currentTimeMillis();
         StorageItem storageItem = storage.read(query, parameterValues, "QUERY");
@@ -36,7 +38,7 @@ public class JdbcReplayProxy extends JdbcProxy {
 
 
     @Override
-    public ProxyConnection connect() {
+    public ProxyConnection connect(NetworkProtoContext context) {
         return new ProxyConnection(null);
     }
 

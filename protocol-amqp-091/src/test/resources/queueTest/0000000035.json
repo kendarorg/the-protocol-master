@@ -1,0 +1,32 @@
+{
+  "index": 35,
+  "input": {
+    "type": "ConnectionClose",
+    "data": {
+      "uuid": "1609aad9-e654-4403-81c3-a624ce27decb",
+      "optional": false,
+      "channel": 0,
+      "type": 1,
+      "classId": 10,
+      "methodId": 50,
+      "replyCode": 200,
+      "replyText": "OK",
+      "failingClassId": 0,
+      "failingMethodId": 0
+    }
+  },
+  "output": {
+    "type": "ConnectionCloseOk",
+    "data": {
+      "uuid": "80600838-6a95-4d51-bfd9-a27c75cf2885",
+      "optional": false,
+      "channel": 0,
+      "type": 1,
+      "classId": 10,
+      "methodId": 51
+    }
+  },
+  "durationMs": 22,
+  "type": "ConnectionClose",
+  "caller": "AMQP"
+}

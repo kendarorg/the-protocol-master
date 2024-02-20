@@ -36,6 +36,6 @@ public enum AmqpClasses {
     }
 
     public short asShort() {
-        return (short)value;
+        return (short) value;
     }
 }

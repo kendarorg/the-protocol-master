@@ -1,8 +1,8 @@
 package org.kendar.mongo.fsm;
 
 import org.kendar.mongo.fsm.events.OpMsgRequest;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
 
 import java.util.Iterator;
 

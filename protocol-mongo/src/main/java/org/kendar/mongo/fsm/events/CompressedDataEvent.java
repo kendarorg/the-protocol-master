@@ -1,8 +1,8 @@
 package org.kendar.mongo.fsm.events;
 
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.fsm.BaseEvent;
+import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.events.BaseEvent;
 
 public class CompressedDataEvent extends BaseEvent {
     private final BBuffer buffer;

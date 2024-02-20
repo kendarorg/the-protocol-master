@@ -6,13 +6,17 @@ import org.kendar.mysql.constants.CommandType;
 import org.kendar.mysql.executor.MySQLExecutor;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.fsm.events.CommandEvent;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ComQuery extends ProtoState {
+    private static final Logger log = LoggerFactory.getLogger(ComQuery.class);
+
     public ComQuery(Class<?>... messages) {
         super(messages);
     }
@@ -30,7 +34,7 @@ public class ComQuery extends ProtoState {
 
         }
         var query = inputBuffer.getString(5);
-        System.out.println("[SERVER] \tExecuting: " + query);
+        log.debug("[SERVER][QUERY]: " + query);
         var executor = new MySQLExecutor();
         return executor.executeText(context, query, new ArrayList<>(), true);
 

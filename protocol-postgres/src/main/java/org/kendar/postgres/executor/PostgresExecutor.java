@@ -6,14 +6,17 @@ import org.kendar.postgres.dtos.Parse;
 import org.kendar.postgres.executor.converters.PostgresCallConverter;
 import org.kendar.postgres.fsm.PostgresProtoContext;
 import org.kendar.postgres.messages.*;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ReturnMessage;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.messages.ReturnMessage;
+import org.kendar.protocol.states.ProtoState;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.parser.SqlParseResult;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.JDBCType;
@@ -44,7 +47,7 @@ public class PostgresExecutor {
 
     private SqlStringParser parser;
 
-    private static ExecutorResult executeCommit(Parse parse, ProtoContext protoContext) {
+    private static ExecutorResult executeCommit(Parse parse, NetworkProtoContext protoContext) {
         var postgresContext = (PostgresProtoContext) protoContext;
         ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
         var res = new ArrayList<ReturnMessage>();
@@ -59,7 +62,7 @@ public class PostgresExecutor {
         return new ExecutorResult(ProtoState.iteratorOfList(res.toArray(new ReturnMessage[0]))).runNow();
     }
 
-    private static ExecutorResult executeRollback(Parse parse, ProtoContext protoContext) {
+    private static ExecutorResult executeRollback(Parse parse, NetworkProtoContext protoContext) {
         var postgresContext = (PostgresProtoContext) protoContext;
         ((JdbcProxy) protoContext.getProxy()).executeRollback(protoContext);
         var res = new ArrayList<ReturnMessage>();
@@ -75,7 +78,7 @@ public class PostgresExecutor {
         return new ExecutorResult(ProtoState.iteratorOfList(res.toArray(new ReturnMessage[0]))).runNow();
     }
 
-    private static ExecutorResult executeBegin(Parse parse, ProtoContext protoContext) {
+    private static ExecutorResult executeBegin(Parse parse, NetworkProtoContext protoContext) {
         var postgresContext = (PostgresProtoContext) protoContext;
         ((JdbcProxy) protoContext.getProxy()).executeBegin(protoContext);
         var res = new ArrayList<ReturnMessage>();
@@ -102,7 +105,8 @@ public class PostgresExecutor {
         return fields;
     }
 
-    public ExecutorResult executePortal(ProtoContext protoContext, Parse parse, Binding binding, int maxRecords, boolean describable, boolean possiblyMultiple) {
+    public ExecutorResult executePortal(NetworkProtoContext protoContext, Parse parse, Binding binding,
+                                        int maxRecords, boolean describable, boolean possiblyMultiple) {
 
         try {
             parser = (SqlStringParser) protoContext.getValue("PARSER");
@@ -121,16 +125,18 @@ public class PostgresExecutor {
             }
             return executeRealQuery(protoContext, parse, binding, maxRecords, describable, possiblyMultiple);
         } catch (RuntimeException ex) {
-            ex.printStackTrace();
+            log.error(ex.getMessage(),ex);
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(ex.getMessage())));
         }
     }
-
+    private static Logger log = LoggerFactory.getLogger(PostgresExecutor.class);
     protected boolean shouldHandleAsSingleQuery(List<SqlParseResult> parsed) {
         return parser.isUnknown(parsed) || parser.isMixed(parsed) || parsed.size() == 1;
     }
 
-    private ExecutorResult executeRealQuery(ProtoContext protoContext, Parse parse, Binding binding, int maxRecords, boolean describable, boolean possiblyMultiple) {
+    private ExecutorResult executeRealQuery(NetworkProtoContext protoContext, Parse parse,
+                                            Binding binding, int maxRecords, boolean describable,
+                                            boolean possiblyMultiple) {
         var parsed = parser.getTypes(parse.getQuery());
         var returning = new ArrayList<ReturnMessage>();
         try {
@@ -142,27 +148,32 @@ public class PostgresExecutor {
                 return handleSingleQuery(sqlParseResult, protoContext, parse, binding, maxRecords, describable);
             }
         } catch (SQLException e) {
-            System.err.printf("[SERVER] Error %s", e.getMessage());
-            e.printStackTrace();
+            log.error("[SERVER] Error %s", e.getMessage());
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(e.getMessage()))).runNow();
         }
     }
 
-    private ExecutorResult handleSingleQuery(SqlParseResult parsed, ProtoContext protoContext, Parse parse, Binding binding, int maxRecords, boolean describable) throws SQLException {
+    private ExecutorResult handleSingleQuery(SqlParseResult parsed,
+                                             NetworkProtoContext protoContext, Parse parse, Binding binding,
+                                             int maxRecords, boolean describable) throws SQLException {
         switch (parsed.getType()) {
             case UPDATE:
                 if (parsed.getValue().replaceAll("\\s", " ").
                         toUpperCase().contains(TRANSACTION_ISOLATION_LEVEL_ID)) {
                     return changeTransactionIsolation(protoContext, parsed.getValue().toUpperCase());
                 } else {
-                    return executeQuery(999999, parsed, protoContext, binding, parse.getConcreteTypes(), "UPDATE");
+                    return executeQuery(999999, parsed, protoContext,
+                            binding, parse.getConcreteTypes(), "UPDATE");
                 }
             case INSERT:
-                return executeQuery(maxRecords == 1 ? -1 : 0, parsed, protoContext, binding, parse.getConcreteTypes(), "INSERT 0");
+                return executeQuery(maxRecords == 1 ? -1 : 0, parsed, protoContext,
+                        binding, parse.getConcreteTypes(), "INSERT 0");
             case SELECT:
-                return executeQuery(maxRecords, parsed, protoContext, binding, parse.getConcreteTypes(), "SELECT");
+                return executeQuery(maxRecords, parsed, protoContext,
+                        binding, parse.getConcreteTypes(), "SELECT");
             case CALL:
-                return executeQuery(maxRecords, parsed, protoContext, binding, parse.getConcreteTypes(), "CALL");
+                return executeQuery(maxRecords, parsed, protoContext,
+                        binding, parse.getConcreteTypes(), "CALL");
             default:
                 if (parsed.getValue().toUpperCase().startsWith("BEGIN")) {
                     return executeBegin(parse, protoContext);
@@ -175,7 +186,7 @@ public class PostgresExecutor {
         }
     }
 
-    private ExecutorResult changeTransactionIsolation(ProtoContext protoContext, String value) {
+    private ExecutorResult changeTransactionIsolation(NetworkProtoContext protoContext, String value) {
 
         var pattern = Pattern.compile("(.+)" + TRANSACTION_ISOLATION_LEVEL_ID + "([\\s]*)([\\sa-zA-Z\\-_0-9]+)");
         var matcher = pattern.matcher(value);
@@ -206,41 +217,7 @@ public class PostgresExecutor {
     }
 
 
-//    private SelectResult executeCall(int maxRecords, ProtoContext protoContext, Binding binding, String query, List<String> parsedParams, Object connection) {
-//        var singleOut = binding.getParameterValues().stream().filter(p->p.isOutput()).count()==1;
-//        if(singleOut) {
-//            query = "{? = call " + query + "(";
-//        }else{
-//            query = "{call " + query + "(";
-//        }
-//        var resultingParams = parsedParams.stream().
-//                map(String::trim).
-//                filter(pp-> (pp.length()>0 && !pp.equalsIgnoreCase(","))).
-//                collect(Collectors.toList());
-//        var paramIndex = 0;
-//        var finalParams = new ArrayList<String>();
-//        for (int i = 0; i < resultingParams.size(); i++) {
-//            var parPar = resultingParams.get(i);
-//            if(!parPar.startsWith("$")){
-//                finalParams.add(parPar);
-//                continue;
-//            }
-//            var binPar = binding.getParameterValues().get(paramIndex);
-//            if(binPar.isOutput()){
-//                if(singleOut) {
-//                    paramIndex++;
-//                    continue;
-//                }
-//
-//            }
-//            finalParams.add("?");
-//            paramIndex++;
-//        }
-//        query +=String.join(",",finalParams)+")}";
-//
-//    }
-
-    private ExecutorResult executeQuery(int maxRecords, SqlParseResult parsed, ProtoContext protoContext, Binding binding,
+    private ExecutorResult executeQuery(int maxRecords, SqlParseResult parsed, NetworkProtoContext protoContext, Binding binding,
                                         ArrayList<JDBCType> concreteTypes, String operation) throws SQLException {
         var connection = protoContext.getValue("CONNECTION");
         var originalMaxRecords = maxRecords;
@@ -259,12 +236,12 @@ public class PostgresExecutor {
         if (!matcher.equalsIgnoreCase(parsed.getValue())) {
             resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
                     matcher, connection, maxRecords, binding.getParameterValues(),
-                    parser, concreteTypes);
+                    parser, concreteTypes, protoContext);
 
         } else {
             resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
                     parsed.getValue(), connection, maxRecords, binding.getParameterValues(),
-                    parser, concreteTypes);
+                    parser, concreteTypes, protoContext);
         }
         var result = new ArrayList<ReturnMessage>();
         if (originalMaxRecords == -1) {
@@ -290,7 +267,8 @@ public class PostgresExecutor {
         return new ExecutorResult(ProtoState.iteratorOfList(result.toArray(new ReturnMessage[0])));
     }
 
-    private ExecutorResult handleWithinTransaction(List<SqlParseResult> parsed, ProtoContext protoContext, Parse parse, Binding binding, int maxRecords, boolean describable) throws SQLException {
+    private ExecutorResult handleWithinTransaction(List<SqlParseResult> parsed, ProtoContext protoContext, Parse parse,
+                                                   Binding binding, int maxRecords, boolean describable) throws SQLException {
         throw new SQLException("UNSUPPORTED TRANSACTIONS");
     }
 

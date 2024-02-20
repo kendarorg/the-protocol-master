@@ -1,24 +1,27 @@
 package org.kendar.amqp.v09.messages.methods.channel;
 
-import org.kendar.amqp.v09.messages.frames.MethodFrame;
+import org.kendar.amqp.v09.messages.methods.Channel;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 
-public class ChannelCloseOk extends MethodFrame {
+public class ChannelCloseOk extends Channel {
 
 
-    public ChannelCloseOk(){super();}
-    public ChannelCloseOk(Class<?> ...events){super(events);}
-    @Override
-    protected void setClassAndMethod() {
-        setClassId((short) 20);
-        setMethodId((short) 41);
+    public ChannelCloseOk() {
+        super();
     }
 
+    public ChannelCloseOk(Class<?>... events) {
+        super(events);
+    }
 
+    @Override
+    protected void setMethod() {
+        setMethodId((short) 41);
+    }
 
 
     @Override

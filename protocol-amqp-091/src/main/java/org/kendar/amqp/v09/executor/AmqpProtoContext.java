@@ -1,17 +1,16 @@
 package org.kendar.amqp.v09.executor;
 
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoDescriptor;
-import org.kendar.server.Channel;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 
-public class AmqpProtoContext extends ProtoContext {
-    public AmqpProtoContext(ProtoDescriptor descriptor, Channel client) {
-        super(descriptor, client);
+public class AmqpProtoContext extends NetworkProtoContext {
+    private short channel = 1;
+
+    public AmqpProtoContext(ProtoDescriptor descriptor) {
+        super(descriptor);
     }
 
-    private short channel=1;
-
-    public short getChannel(){
+    public short getChannel() {
         return ++channel;
     }
 }

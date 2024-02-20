@@ -1,0 +1,135 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.kendar.protocol</groupId>
+        <artifactId>protocol-master</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>jacoco</artifactId>
+    <dependencies>
+
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-mongo</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-postgres</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-amqp-091</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-mysql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target name="report">
+                                <!-- Execute an ant task within maven -->
+                                <echo message="Generating JaCoCo Reports"/>
+                                <taskdef name="report"
+                                         classname="org.jacoco.ant.ReportTask">
+                                    <classpath
+                                            path="**/*.jar"/>
+                                </taskdef>
+                                <mkdir dir="${basedir}/target/coverage-report"/>
+                                <report>
+                                    <executiondata>
+                                        <fileset dir="${basedir}/../protocol-amqp-091/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-common/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-mongo/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-mysql/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-postgres/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                    </executiondata>
+                                    <structure name="Integration Tests Coverage Report">
+                                        <sourcefiles encoding="UTF-8">
+                                            <dirset dir="${basedir}/../protocol-amqp-091">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-common">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-mongo">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-mysql">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-postgres">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                        </sourcefiles>
+                                        <classfiles>
+                                            <fileset dir="${basedir}/../protocol-amqp-091/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-common/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-mongo/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-mysql/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-postgres/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                        </classfiles>
+                                    </structure>
+                                    <html destdir="${basedir}/target/coverage-report/html"/>
+                                </report>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>org.jacoco.ant</artifactId>
+                        <version>0.8.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+</project>

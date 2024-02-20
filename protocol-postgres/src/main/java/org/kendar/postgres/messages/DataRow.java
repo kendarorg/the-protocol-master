@@ -2,12 +2,12 @@ package org.kendar.postgres.messages;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.postgres.dtos.Field;
-import org.kendar.protocol.ReturnMessage;
+import org.kendar.protocol.messages.NetworkReturnMessage;
 
 import java.util.Base64;
 import java.util.List;
 
-public class DataRow implements ReturnMessage {
+public class DataRow implements NetworkReturnMessage {
     private final List<String> values;
     private final List<Field> fields;
 

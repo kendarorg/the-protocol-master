@@ -10,13 +10,14 @@ import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MongoFileStorage extends BaseFileStorage<JsonNode, JsonNode> implements MongoStorage {
-    private ConcurrentHashMap<Long, StorageItem<JsonNode, JsonNode>> inMemoryDb = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, StorageItem<JsonNode, JsonNode>> inMemoryDb = new ConcurrentHashMap<>();
     private boolean initialized = false;
-    private Object lockObject = new Object();
+    private final Object lockObject = new Object();
 
     public MongoFileStorage(String targetDir) {
         super(targetDir);
     }
+
     public MongoFileStorage(Path targetDir) {
         super(targetDir);
     }

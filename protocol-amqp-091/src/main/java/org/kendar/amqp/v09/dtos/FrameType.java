@@ -33,6 +33,6 @@ public enum FrameType {
     }
 
     public byte asByte() {
-        return (byte)value;
+        return (byte) value;
     }
 }

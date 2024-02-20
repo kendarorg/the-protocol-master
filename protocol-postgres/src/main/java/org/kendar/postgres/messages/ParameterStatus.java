@@ -1,11 +1,11 @@
 package org.kendar.postgres.messages;
 
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.ReturnMessage;
+import org.kendar.protocol.messages.NetworkReturnMessage;
 
 import java.nio.charset.StandardCharsets;
 
-public class ParameterStatus implements ReturnMessage {
+public class ParameterStatus implements NetworkReturnMessage {
     private final String key;
     private final String value;
 

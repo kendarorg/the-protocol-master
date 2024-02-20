@@ -1,11 +1,11 @@
 package org.kendar.postgres.messages;
 
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.ReturnMessage;
+import org.kendar.protocol.messages.NetworkReturnMessage;
 
 import java.nio.charset.StandardCharsets;
 
-public class ErrorResponse implements ReturnMessage {
+public class ErrorResponse implements NetworkReturnMessage {
     private String message;
 
     public ErrorResponse(String message) {

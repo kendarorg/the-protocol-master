@@ -2,26 +2,31 @@ package org.kendar.amqp.v09.messages.methods.channel;
 
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
-import org.kendar.amqp.v09.messages.frames.MethodFrame;
+import org.kendar.amqp.v09.messages.methods.Channel;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
 
-public class ChannelClose extends MethodFrame {
+public class ChannelClose extends Channel {
     private short replyCode;
     private String replyText;
     private short failingClassId;
     private short failingMethodId;
 
-    public ChannelClose(){super();}
-    public ChannelClose(Class<?> ...events){super(events);}
+    public ChannelClose() {
+        super();
+    }
+
+    public ChannelClose(Class<?>... events) {
+        super(events);
+    }
+
     @Override
-    protected void setClassAndMethod() {
-        setClassId((short) 20);
+    protected void setMethod() {
         setMethodId((short) 40);
     }
 
@@ -68,9 +73,9 @@ public class ChannelClose extends MethodFrame {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
-        var context = (AmqpProtoContext)event.getContext();
-        var proxy = (AmqpProxy)context.getProxy();
-        var connection = ((ProxyConnection)event.getContext().getValue("CONNECTION"));
+        var context = (AmqpProtoContext) event.getContext();
+        var proxy = (AmqpProxy) context.getProxy();
+        var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
         var replyCode = rb.getShort();
         var replyText = ShortStringHelper.read(rb);
@@ -83,12 +88,10 @@ public class ChannelClose extends MethodFrame {
         chClose.setReplyText(replyText);
         chClose.setFailingMethodId(methodIdMsg);
 
-        var chCloseCok = proxy.execute(
+        return iteratorOfRunnable(() -> proxy.execute(context,
                 connection,
                 chClose,
-                new ChannelCloseOk()
+                new ChannelCloseOk())
         );
-
-        return iteratorOfList(chCloseCok);
     }
 }

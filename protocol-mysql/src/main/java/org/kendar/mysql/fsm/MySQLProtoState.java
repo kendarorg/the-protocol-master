@@ -1,9 +1,10 @@
 package org.kendar.mysql.fsm;
 
+import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.mysql.buffers.MySQLBBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
 
 import java.util.Iterator;
 
@@ -18,7 +19,11 @@ public abstract class MySQLProtoState extends ProtoState {
         inputBuffer.setPosition(0);
         var packetLength = inputBuffer.readUB3() + 4;
         inputBuffer.setPosition(0);
-        return inputBuffer.size() >= packetLength && canRunBytes(event);
+        if(inputBuffer.size() >= packetLength){
+            return canRunBytes(event);
+        }else{
+            throw new AskMoreDataException();
+        }
     }
 
     protected abstract boolean canRunBytes(BytesEvent event);

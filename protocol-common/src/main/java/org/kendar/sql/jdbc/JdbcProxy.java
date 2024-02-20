@@ -1,7 +1,8 @@
 package org.kendar.sql.jdbc;
 
-import org.kendar.dtos.QueryResultIterator;
-import org.kendar.protocol.ProtoContext;
+import org.kendar.iterators.QueryResultIterator;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.storage.JdbcStorage;
@@ -47,12 +48,6 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         } else {
             ps = c.prepareStatement(query, insert ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
         }
-//        ParameterMetaData psMetaData = null;
-//        try {
-//            psMetaData = ps.getParameterMetaData();
-//        } catch (Exception ex) {
-//            System.out.println("EX");
-//        }
         for (var i = 0; i < parameterValues.size(); i++) {
             var pv = parameterValues.get(i);
             if (!pv.isOutput()) {
@@ -73,8 +68,8 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     }
 
     private static Object convertObject(BindingParameter value) {
-        var val = value.getValue();
         if (value == null) return null;
+        var val = value.getValue();
         switch (value.getType()) {
             case INTEGER:
             case BIGINT:
@@ -232,9 +227,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                         var byteRow = new ArrayList<String>();
                         for (var i = 0; i < result.getMetadata().size(); i++) {
                             var current = result.getMetadata().get(i);
-                            var sc = new SelectColumn();
                             if (current.isByteData()) {
-                                sc.setBytes(true);
                                 var data = toBytes(current, resultSet, i + 1);
                                 if (data == null) {
                                     data = new byte[0];
@@ -266,7 +259,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                      Object connection, int maxRecords,
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
-                                     ArrayList<JDBCType> concreteTypes) {
+                                     ArrayList<JDBCType> concreteTypes, ProtoContext context) {
         try {
             long start = System.currentTimeMillis();
             var result = new SelectResult();
@@ -284,11 +277,8 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                 statement = parametrizedStatementBuilder.ps;
             }
 
+            context.setValue("EXECUTING_NOW", (Statement) statement);
             var count = new AtomicLong(0);
-//            if(insert){
-//                statement.executeUpdate();
-//                runThroughSingleResult(true, parameterValues, statement, result, count);
-//            }else {
             if (statement.execute()) {
                 runThroughRecordset(maxRecords, statement, result, count);
             } else {
@@ -319,21 +309,11 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                         result,
                         statement,
                         count);
-                //var cl = resultSet.getMetaData().getColumnType(1);
                 while (qrIterator.hasNext()) {
                     result.getRecords().add(qrIterator.next());
                 }
 
                 result.setCount(result.getRecords().size());
-
-
-//                if(result.getRecords().size()==1){
-//                    if(cl==Types.INTEGER||cl==Types.BIGINT) {
-//                        //TODO HANDLE RETURN TYPES
-//                        result.setLastInsertedId(resultSet.getLong(1));
-//                        throw new RuntimeException("TODOOOO");
-//                    }
-//                }
 
             }
         }
@@ -393,7 +373,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     }
 
     @Override
-    public ProxyConnection connect() {
+    public ProxyConnection connect(NetworkProtoContext context) {
         try {
             return new ProxyConnection(DriverManager.
                     getConnection(getConnectionString(), getLogin(), getPassword()));

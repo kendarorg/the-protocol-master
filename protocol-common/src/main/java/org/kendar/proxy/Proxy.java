@@ -1,23 +1,23 @@
 package org.kendar.proxy;
 
-import org.kendar.protocol.ProtoDescriptor;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.storage.StorageRoot;
 
 public abstract class Proxy<T extends StorageRoot> {
 
+    public NetworkProtoDescriptor protocol;
     protected T storage;
 
-    public ProtoDescriptor getProtocol() {
+    public NetworkProtoDescriptor getProtocol() {
         return protocol;
     }
 
-    public void setProtocol(ProtoDescriptor protocol) {
+    public void setProtocol(NetworkProtoDescriptor protocol) {
         this.protocol = protocol;
     }
 
-    public ProtoDescriptor protocol;
-
-    public abstract ProxyConnection connect();
+    public abstract ProxyConnection connect(NetworkProtoContext context);
 
     public abstract void initialize();
 

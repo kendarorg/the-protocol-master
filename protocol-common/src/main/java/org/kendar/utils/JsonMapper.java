@@ -46,8 +46,8 @@ public class JsonMapper {
 
     public JsonNode toJsonNode(Object of) {
         try {
-            if(of instanceof String){
-                return mapper.readTree((String)of);
+            if (of instanceof String) {
+                return mapper.readTree((String) of);
             }
             return mapper.readTree(mapper.writeValueAsString(of));
         } catch (JsonProcessingException e) {

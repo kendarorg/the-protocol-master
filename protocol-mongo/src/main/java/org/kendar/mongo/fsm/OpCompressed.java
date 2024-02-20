@@ -3,14 +3,16 @@ package org.kendar.mongo.fsm;
 import org.kendar.buffers.BBuffer;
 import org.kendar.mongo.compressors.*;
 import org.kendar.mongo.fsm.events.CompressedDataEvent;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.messages.ProtoStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class OpCompressed extends StandardMessage {
+public class OpCompressed extends MongoState {
+    private static Logger log = LoggerFactory.getLogger(OpCompressed.class);
     private static final Map<Integer, CompressionHandler> compressionHandlers;
 
     static {
@@ -35,7 +37,7 @@ public class OpCompressed extends StandardMessage {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, ProtoContext protoContext) {
+    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, MongoProtoContext protoContext) {
         inputBuffer.setPosition(0);
         int messageLength = inputBuffer.getInt();
         int requestId = inputBuffer.getInt();
@@ -62,7 +64,7 @@ public class OpCompressed extends StandardMessage {
     private byte[] decompressMessage(byte[] inputBuffer, byte compressorId) {
         var compressor = compressionHandlers.get(compressorId);
         if (compressor == null) {
-            System.err.println("Unknow compression " + compressorId);
+            log.error("Unknow compression " + compressorId);
         }
         return compressor.decompress(inputBuffer);
     }

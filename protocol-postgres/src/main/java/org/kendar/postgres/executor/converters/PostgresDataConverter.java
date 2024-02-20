@@ -1,7 +1,7 @@
 package org.kendar.postgres.executor.converters;
 
 import org.apache.commons.beanutils.ConvertUtils;
-import org.kendar.protocol.ProtoContext;
+import org.kendar.protocol.context.NetworkProtoContext;
 import org.postgresql.util.ByteConverter;
 
 import java.math.BigDecimal;
@@ -20,7 +20,7 @@ public class PostgresDataConverter {
             "\\s*([0-9]{2}:[0-9]{2}:[0-9]{2})" +
             "([\\.]{0,1})([0-9]+)\\s*([+\\-]*)([0-9]*)");
 
-    public static Object bytesToJava(byte[] bytes, String simpleClassName, ProtoContext protoContext, boolean isOutput) {
+    public static Object bytesToJava(byte[] bytes, String simpleClassName, NetworkProtoContext protoContext, boolean isOutput) {
         Object value = null;
 
         if (!isOutput) {

@@ -1,15 +1,18 @@
 package org.kendar;
 
 import org.apache.commons.cli.*;
+import org.kendar.amqp.v09.AmqpFileStorage;
+import org.kendar.amqp.v09.AmqpProtocol;
+import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.mongo.MongoFileStorage;
 import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.postgres.PostgresProtocol;
-import org.kendar.protocol.Sleeper;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.JdbcReplayProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
+import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
 import java.util.Date;
@@ -19,10 +22,10 @@ import java.util.function.Supplier;
 public class Main {
     private static TcpServer protocolServer;
 
-    public static void execute(String[] args, Supplier<Boolean> stopWhenFalse){
+    public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
 
         Options options = new Options();
-        options.addOption("p", true, "Select protocol (mysql/mongo/postgres");
+        options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091)");
         options.addOption("l", true, "Select listening port");
         options.addOption("xl", true, "Select remote login");
         options.addOption("xw", true, "Select remote password");
@@ -41,8 +44,8 @@ public class Main {
             var password = cmd.getOptionValue("xw");
             var connectionString = cmd.getOptionValue("xc");
             var logsDir = cmd.getOptionValue("xd");
-            if(logsDir!=null && !logsDir.isEmpty()){
-                logsDir = logsDir.replace("{timestamp}",""+new Date().getTime());
+            if (logsDir != null && !logsDir.isEmpty()) {
+                logsDir = logsDir.replace("{timestamp}", "" + new Date().getTime());
             }
             if (replayFromLog &&
                     (logsDir == null || logsDir.isEmpty())) {
@@ -61,6 +64,9 @@ public class Main {
             } else if (protocol.equalsIgnoreCase("mongo")) {
                 if (port == -1) port = 27017;
                 runMongo(port, logsDir, connectionString, login, password, replayFromLog);
+            } else if (protocol.equalsIgnoreCase("amqp091")) {
+                if (port == -1) port = 5672;
+                runAmqp091(port, logsDir, connectionString, login, password, replayFromLog);
             } else {
                 throw new Exception("missing protocol (p)");
             }
@@ -73,7 +79,7 @@ public class Main {
         }
     }
 
-    private static Boolean stopWhenQuitCommand(){
+    private static Boolean stopWhenQuitCommand() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Press Q to quit");
         String line = scanner.nextLine();
@@ -137,6 +143,25 @@ public class Main {
                 proxy = new MongoProxy(new MongoFileStorage(Path.of(logsDir)));
             } else {
                 proxy.setStorage(new MongoFileStorage(Path.of(logsDir)));
+            }
+        }
+        baseProtocol.setProxy(proxy);
+        baseProtocol.initialize();
+        protocolServer = new TcpServer(baseProtocol);
+
+        protocolServer.start();
+        Sleeper.sleep(1000);
+    }
+
+    private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
+        var baseProtocol = new AmqpProtocol(port);
+        var proxy = new AmqpProxy(connectionString, login, password);
+        if (logsDir != null) {
+            if (replayFromLog) {
+                proxy = new AmqpProxy();
+                proxy.setStorage(new AmqpFileStorage(Path.of(logsDir)));
+            } else {
+                proxy.setStorage(new AmqpFileStorage(Path.of(logsDir)));
             }
         }
         baseProtocol.setProxy(proxy);

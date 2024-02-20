@@ -1,6 +1,6 @@
 package org.kendar.mysql.executor;
 
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 

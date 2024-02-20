@@ -2,26 +2,31 @@ package org.kendar.amqp.v09.messages.methods.connection;
 
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
-import org.kendar.amqp.v09.messages.frames.MethodFrame;
+import org.kendar.amqp.v09.messages.methods.Connection;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
 
-public class ConnectionClose extends MethodFrame {
+public class ConnectionClose extends Connection {
     private short replyCode;
     private String replyText;
     private short failingClassId;
     private short failingMethodId;
 
-    public ConnectionClose(){super();}
-    public ConnectionClose(Class<?> ...events){super(events);}
+    public ConnectionClose() {
+        super();
+    }
+
+    public ConnectionClose(Class<?>... events) {
+        super(events);
+    }
+
     @Override
-    protected void setClassAndMethod() {
-        setClassId((short) 10);
+    protected void setMethod() {
         setMethodId((short) 50);
     }
 
@@ -68,9 +73,13 @@ public class ConnectionClose extends MethodFrame {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
-        var context = (AmqpProtoContext)event.getContext();
-        var proxy = (AmqpProxy)context.getProxy();
-        var connection = ((ProxyConnection)event.getContext().getValue("CONNECTION"));
+        var context = (AmqpProtoContext) event.getContext();
+        AmqpProxy proxy = null;
+        ProxyConnection connection = null;
+        if (context != null) {
+            proxy = (AmqpProxy) context.getProxy();
+            connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
+        }
 
         var replyCode = rb.getShort();
         var replyText = ShortStringHelper.read(rb);
@@ -84,12 +93,16 @@ public class ConnectionClose extends MethodFrame {
         chClose.setFailingMethodId(methodIdMsg);
 
 
-        var chCloseCok = proxy.execute(
-                connection,
-                chClose,
-                new ConnectionCloseOk()
-        );
-
-        return iteratorOfList(chCloseCok);
+        if (context != null) {
+            var fproxy = proxy;
+            var fconn = connection;
+            return iteratorOfRunnable(() -> fproxy.execute(context,
+                            fconn,
+                            chClose,
+                            new ConnectionCloseOk()
+                    )
+            );
+        }
+        return iteratorOfEmpty();
     }
 }

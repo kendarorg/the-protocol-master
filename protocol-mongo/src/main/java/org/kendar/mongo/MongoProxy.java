@@ -14,7 +14,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
-import org.kendar.dtos.ProcessId;
+import org.kendar.iterators.ProcessId;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpMsgSection;
 import org.kendar.mongo.dtos.OpQueryContent;
@@ -22,6 +22,7 @@ import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.utils.MongoStorage;
 import org.kendar.mongo.utils.NullMongoStorage;
+import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 
@@ -29,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MongoProxy extends Proxy<MongoStorage> {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static AtomicInteger connectionId = new AtomicInteger(1);
+    private static final AtomicInteger connectionId = new AtomicInteger(1);
     private String connectionString;
     private ServerApiVersion serverApiVersion;
     private boolean replayer = false;
@@ -52,19 +53,14 @@ public class MongoProxy extends Proxy<MongoStorage> {
     }
 
     @Override
-    public ProxyConnection connect() {
+    public ProxyConnection connect(NetworkProtoContext context) {
         if (replayer) {
             return new ProxyConnection(null);
         }
-//        var serverApi = ServerApi.builder()
-//                .version(ServerApiVersion.V1)
-//                .build();
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
-                //.serverApi(serverApi)
                 .build();
         return new ProxyConnection(MongoClients.create(settings));
-        //return new ProxyConnection(null);
     }
 
     @Override

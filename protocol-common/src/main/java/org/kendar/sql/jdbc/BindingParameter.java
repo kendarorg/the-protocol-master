@@ -11,6 +11,7 @@ public class BindingParameter {
     public BindingParameter() {
 
     }
+
     public BindingParameter(String value, boolean binary, boolean output, int type) {
         this.binary = binary;
         this.value = value;

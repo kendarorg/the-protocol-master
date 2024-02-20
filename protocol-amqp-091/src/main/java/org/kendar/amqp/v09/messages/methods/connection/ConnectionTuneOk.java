@@ -1,23 +1,29 @@
 package org.kendar.amqp.v09.messages.methods.connection;
 
-import org.kendar.amqp.v09.messages.frames.MethodFrame;
+import org.kendar.amqp.v09.messages.methods.Connection;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 
-public class ConnectionTuneOk extends MethodFrame {
-    public ConnectionTuneOk(){super();}
-    public ConnectionTuneOk(Class<?> ...events){super(events);}
-
-    @Override
-    protected void setClassAndMethod() {
-        setClassId((short) 10);
-        setMethodId((short) 31);
-    }
+public class ConnectionTuneOk extends Connection {
     private short channelMax;
     private int frameMax;
+    private short hearthBeat;
+
+    public ConnectionTuneOk() {
+        super();
+    }
+
+    public ConnectionTuneOk(Class<?>... events) {
+        super(events);
+    }
+
+    @Override
+    protected void setMethod() {
+        setMethodId((short) 31);
+    }
 
     public short getChannelMax() {
         return channelMax;
@@ -42,9 +48,6 @@ public class ConnectionTuneOk extends MethodFrame {
     public void setHearthBeat(short hearthBeat) {
         this.hearthBeat = hearthBeat;
     }
-
-    private short hearthBeat;
-
 
     @Override
     protected void writePreArguments(BBuffer rb) {

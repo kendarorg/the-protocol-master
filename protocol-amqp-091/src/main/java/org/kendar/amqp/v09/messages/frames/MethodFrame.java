@@ -3,14 +3,27 @@ package org.kendar.amqp.v09.messages.frames;
 import org.kendar.amqp.v09.dtos.FrameType;
 import org.kendar.amqp.v09.utils.FieldsWriter;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 import java.util.Map;
 
-public abstract class MethodFrame extends Frame{
+public abstract class MethodFrame extends Frame {
     private short classId;
+    private short methodId;
+
+    public MethodFrame() {
+        this.setClassAndMethod();
+
+        setType(FrameType.METHOD.asByte());
+    }
+
+    public MethodFrame(Class<?>... events) {
+        super(events);
+        this.setClassAndMethod();
+        setType(FrameType.METHOD.asByte());
+    }
 
     public short getClassId() {
         return classId;
@@ -28,20 +41,7 @@ public abstract class MethodFrame extends Frame{
         this.methodId = methodId;
     }
 
-    private short methodId;
-    public MethodFrame() {
-        this.setClassAndMethod();
-
-        setType(FrameType.METHOD.asByte());
-    }
-
     protected abstract void setClassAndMethod();
-
-    public MethodFrame(Class<?>...events) {
-        super(events);
-        this.setClassAndMethod();
-        setType(FrameType.METHOD.asByte());
-    }
 
     @Override
     protected void writeFrameContent(BBuffer rb) {
@@ -49,13 +49,13 @@ public abstract class MethodFrame extends Frame{
         rb.writeShort(getMethodId());
         writePreArguments(rb);
         var args = retrieveMethodArguments();
-        if(args!=null) {
+        if (args != null) {
             FieldsWriter.writeTable(args, rb);
         }
         writePostArguments(rb);
     }
 
-    protected Map<String,Object> retrieveMethodArguments(){
+    protected Map<String, Object> retrieveMethodArguments() {
         return null;
     }
 
@@ -69,18 +69,18 @@ public abstract class MethodFrame extends Frame{
 
     protected boolean canRunFrame(BytesEvent event) {
         var rb = event.getBuffer();
-        var pos =rb.getPosition();
+        var pos = rb.getPosition();
         var classId = rb.getShort();
         var methodId = rb.getShort();
         rb.setPosition(pos);
-        return classId==getClassId() && methodId==getMethodId();
+        return classId == getClassId() && methodId == getMethodId();
     }
 
     @Override
-    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, BytesEvent event){
+    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, BytesEvent event, int size) {
         var classId = rb.getShort();
         var methodId = rb.getShort();
-        return executeMethod(channel,classId,methodId,rb,event);
+        return executeMethod(channel, classId, methodId, rb, event);
     }
 
     protected abstract Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event);

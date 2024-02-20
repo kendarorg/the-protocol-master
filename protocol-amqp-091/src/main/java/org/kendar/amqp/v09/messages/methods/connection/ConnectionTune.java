@@ -1,25 +1,31 @@
 package org.kendar.amqp.v09.messages.methods.connection;
 
-import org.kendar.amqp.v09.messages.frames.MethodFrame;
+import org.kendar.amqp.v09.messages.methods.Connection;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class ConnectionTune extends MethodFrame {
-    public ConnectionTune(){super();}
-    public ConnectionTune(Class<?> ...events){super(events);}
-
-    @Override
-    protected void setClassAndMethod() {
-        setClassId((short) 10);
-        setMethodId((short) 30);
-    }
+public class ConnectionTune extends Connection {
     private short channelMax;
     private int frameMax;
+    private short hearthBeat;
+
+    public ConnectionTune() {
+        super();
+    }
+
+    public ConnectionTune(Class<?>... events) {
+        super(events);
+    }
+
+    @Override
+    protected void setMethod() {
+        setMethodId((short) 30);
+    }
 
     public short getChannelMax() {
         return channelMax;
@@ -45,7 +51,6 @@ public class ConnectionTune extends MethodFrame {
         this.hearthBeat = hearthBeat;
     }
 
-    private short hearthBeat;
     @Override
     protected Map<String, Object> retrieveMethodArguments() {
         return new HashMap<>();
@@ -61,7 +66,7 @@ public class ConnectionTune extends MethodFrame {
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
         this.channelMax = rb.getShort();
-        this.frameMax =rb.getInt();
+        this.frameMax = rb.getInt();
         this.hearthBeat = rb.getShort();
         return iteratorOfList(this);
     }

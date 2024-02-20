@@ -2,30 +2,33 @@ package org.kendar.amqp.v09.messages.methods.connection;
 
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
-import org.kendar.amqp.v09.messages.frames.MethodFrame;
+import org.kendar.amqp.v09.messages.methods.Connection;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
 
-public class ConnectionOpen extends MethodFrame {
-    public ConnectionOpen(){super();}
-    public ConnectionOpen(Class<?> ...events){super(events);}
-
-    @Override
-    protected void setClassAndMethod() {
-        setClassId((short) 10);
-        setMethodId((short) 40);
-    }
-
-
-
+public class ConnectionOpen extends Connection {
     private String vhost;
     private String reserved1;
     private byte reserved2;
+
+
+    public ConnectionOpen() {
+        super();
+    }
+
+    public ConnectionOpen(Class<?>... events) {
+        super(events);
+    }
+
+    @Override
+    protected void setMethod() {
+        setMethodId((short) 40);
+    }
 
     public String getVhost() {
         return vhost;
@@ -60,30 +63,32 @@ public class ConnectionOpen extends MethodFrame {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
-        var context = (AmqpProtoContext)event.getContext();
-        var proxy = (AmqpProxy)context.getProxy();
-        var connection = ((ProxyConnection)event.getContext().getValue("CONNECTION"));
+        var context = (AmqpProtoContext) event.getContext();
+        var proxy = (AmqpProxy) context.getProxy();
+        var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
         var vhost = ShortStringHelper.read(rb);
         var reserved1 = ShortStringHelper.read(rb);
         var reserved2 = rb.get();
-        context.setValue("VHOST",vhost);
-        context.setValue("RESERVED1",reserved1);
+        context.setValue("VHOST", vhost);
+        context.setValue("RESERVED1", reserved1);
 
         var conOpen = new ConnectionOpen();
         conOpen.setVhost(vhost);
         conOpen.setReserved1(reserved1);
         conOpen.setReserved2(reserved2);
 
+        return iteratorOfRunnable(() -> {
+                    var message = proxy.execute(context,
+                            connection,
+                            conOpen,
+                            new ConnectionOpenOk()
+                    );
 
-        var message = proxy.execute(
-                connection,
-                conOpen,
-                new ConnectionOpenOk()
+                    message.setReserved1(reserved1);
+                    return message;
+                }
         );
-
-        message.setReserved1(reserved1);
-        return iteratorOfList(message);
     }
 
 

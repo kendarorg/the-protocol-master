@@ -2,10 +2,10 @@ package org.kendar.amqp.v09;
 
 
 import org.junit.jupiter.api.TestInfo;
-import org.kendar.protocol.Sleeper;
 import org.kendar.server.TcpServer;
 import org.kendar.testcontainer.images.RabbitMqImage;
 import org.kendar.testcontainer.utils.Utils;
+import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
@@ -19,6 +19,8 @@ public class BasicTest {
     protected static TcpServer protocolServer;
 
     public static void beforeClassBase() {
+        //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
+
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
         var network = Network.newNetwork();
@@ -35,7 +37,7 @@ public class BasicTest {
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy(rabbitContainer.getConnectionString(),
-                rabbitContainer.getUserId(),rabbitContainer.getPassword());
+                rabbitContainer.getUserId(), rabbitContainer.getPassword());
         if (testInfo != null) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();

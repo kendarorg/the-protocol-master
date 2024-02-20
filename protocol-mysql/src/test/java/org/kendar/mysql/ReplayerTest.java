@@ -3,10 +3,10 @@ package org.kendar.mysql;
 import org.junit.jupiter.api.Test;
 import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
-import org.kendar.protocol.Sleeper;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcReplayProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
+import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;

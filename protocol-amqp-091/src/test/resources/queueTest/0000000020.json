@@ -1,0 +1,21 @@
+{
+  "index": 20,
+  "input": {
+    "type": "BasicPublish",
+    "data": {
+      "uuid": "57c46a38-7298-4d14-857e-982e9e56ab3c",
+      "optional": false,
+      "channel": 1,
+      "type": 1,
+      "classId": 60,
+      "methodId": 40
+    }
+  },
+  "output": {
+    "type": null,
+    "data": null
+  },
+  "durationMs": 0,
+  "type": "BasicPublish",
+  "caller": "AMQP"
+}

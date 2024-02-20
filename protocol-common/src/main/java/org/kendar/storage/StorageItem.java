@@ -7,12 +7,14 @@ public class StorageItem<I, O> {
     private long durationMs;
     private String type;
     private String caller;
+
     /**
      * Needed for serialization
      */
     public StorageItem() {
 
     }
+
     public StorageItem(I input, O output, long durationMs, String type, String caller) {
         this.input = input;
         this.output = output;

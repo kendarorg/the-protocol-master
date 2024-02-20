@@ -1,19 +1,26 @@
 package org.kendar.amqp.v09.messages.methods.channel;
 
-import org.kendar.amqp.v09.messages.frames.MethodFrame;
+import org.kendar.amqp.v09.messages.methods.Channel;
 import org.kendar.amqp.v09.utils.LongStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 
-public class ChannelOpenOk extends MethodFrame {
-    public ChannelOpenOk(){super();}
-    public ChannelOpenOk(Class<?> ...events){super(events);}
+public class ChannelOpenOk extends Channel {
+    private String reserved1;
+
+    public ChannelOpenOk() {
+        super();
+    }
+
+    public ChannelOpenOk(Class<?>... events) {
+        super(events);
+    }
+
     @Override
-    protected void setClassAndMethod() {
-        setClassId((short) 20);
+    protected void setMethod() {
         setMethodId((short) 11);
     }
 
@@ -24,8 +31,6 @@ public class ChannelOpenOk extends MethodFrame {
     public void setReserved1(String reserved1) {
         this.reserved1 = reserved1;
     }
-
-    private String reserved1;
 
     @Override
     protected void writePreArguments(BBuffer rb) {

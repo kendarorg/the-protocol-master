@@ -3,9 +3,9 @@ package org.kendar.postgres.executor;
 import org.kendar.postgres.dtos.Binding;
 import org.kendar.postgres.dtos.Parse;
 import org.kendar.postgres.messages.CommandComplete;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
 
 import java.util.Iterator;
 import java.util.regex.Pattern;

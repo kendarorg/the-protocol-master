@@ -20,7 +20,6 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
     protected static final JsonMapper mapper = new JsonMapper();
 
 
-
     protected String targetDir;
 
     public BaseFileStorage(String targetDir) {

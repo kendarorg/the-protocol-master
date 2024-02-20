@@ -6,9 +6,11 @@ import org.kendar.postgres.dtos.Binding;
 import org.kendar.postgres.dtos.Parse;
 import org.kendar.postgres.executor.converters.PostgresDataConverter;
 import org.kendar.postgres.messages.BindComplete;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.sql.jdbc.BindingParameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.JDBCType;
 import java.util.ArrayList;
@@ -16,7 +18,9 @@ import java.util.Iterator;
 
 import static org.kendar.postgres.executor.converters.PostgresDataConverter.bytesToJava;
 
-public class Bind extends StandardMessage {
+public class Bind extends PostgresState {
+    private static final Logger log = LoggerFactory.getLogger(Bind.class);
+
     public Bind(Class<?>... messages) {
         super(messages);
     }
@@ -27,7 +31,7 @@ public class Bind extends StandardMessage {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeStandardMessage(BBuffer message, ProtoContext protoContext) {
+    protected Iterator<ProtoStep> executeStandardMessage(BBuffer message, NetworkProtoContext protoContext) {
         var postgresContext = (PostgresProtoContext) protoContext;
         var portal = message.getString();
         var statementName = message.getString();
@@ -70,7 +74,7 @@ public class Bind extends StandardMessage {
         var count = message.getShort();
 
 
-        System.out.println("[SERVER]\tSTATEMENT_" + statementName + " " + count);
+        log.debug("[SERVER][STMTBIND]\tSTATEMENT_" + statementName + " Count:" + count + " Query: " + parse.getQuery());
         var bindMessage = new Binding("STATEMENT_" + statementName, portal, formatCodes, parameterValues);
         parse.put("PORTAL_" + portal, bindMessage);
         postgresContext.setValue("PORTAL_" + portal, bindMessage);
@@ -80,7 +84,7 @@ public class Bind extends StandardMessage {
         return iteratorOfEmpty();
     }
 
-    private BindingParameter convert(byte[] bytes, String simpleClassName, ProtoContext protoContext, boolean isOutput, JDBCType dataType) {
+    private BindingParameter convert(byte[] bytes, String simpleClassName, NetworkProtoContext protoContext, boolean isOutput, JDBCType dataType) {
         Object value = bytesToJava(bytes, simpleClassName, protoContext, isOutput);
         return new BindingParameter(value.toString(), value == bytes, isOutput, dataType);
     }

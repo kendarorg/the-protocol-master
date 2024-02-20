@@ -9,6 +9,11 @@ public class RabbitMqImage extends BaseImage<RabbitMqImage, RabbitMQContainer> {
     private String userId;
     private String password;
     private String adminPassword;
+    private String adminUserId;
+
+    public RabbitMqImage() {
+        this.withExposedPorts(5672);
+    }
 
     public String getAdminPassword() {
         return adminPassword;
@@ -16,12 +21,6 @@ public class RabbitMqImage extends BaseImage<RabbitMqImage, RabbitMQContainer> {
 
     public String getAdminUserId() {
         return adminUserId;
-    }
-
-    private String adminUserId;
-
-    public RabbitMqImage() {
-        this.withExposedPorts(5672);
     }
 
     public String getConnectionString() {

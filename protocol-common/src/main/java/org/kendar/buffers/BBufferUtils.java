@@ -6,9 +6,8 @@ public class BBufferUtils {
         int posByte = pos / 8;
         int posBit = pos % 8;
         byte valByte = data[posByte];
-        int valInt = (valByte >> posBit) & 0x0001;
         //valByte >> (8 - (posBit + 1)) & 0x0001;
-        return valInt;
+        return (valByte >> posBit) & 0x0001;
     }
 
     public static void setBit(byte[] data, int pos) {

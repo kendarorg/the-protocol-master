@@ -5,13 +5,14 @@ import java.nio.charset.StandardCharsets;
 @SuppressWarnings("DataFlowIssue")
 public class BBuffer {
 
-    private final BBufferEndianness endianness;
-    private byte[] bytes = new byte[0];
-    private int position = -1;
+    protected final BBufferEndianness endianness;
+    protected byte[] bytes = new byte[0];
+    protected int position = -1;
 
     public BBuffer() {
         this(BBufferEndianness.BE);
     }
+
 
     public BBuffer(BBufferEndianness endianness) {
         this.endianness = endianness;
@@ -91,7 +92,7 @@ public class BBuffer {
         //}
     }
 
-    public static BBuffer of(byte[] bytes) {
+    public static BBuffer of(byte... bytes) {
         var bb = new BBuffer();
         bb.write(bytes);
         return bb;
@@ -162,9 +163,6 @@ public class BBuffer {
         var res = get(this.position);
         this.position++;
         return res;
-
-//        this.position++;
-//        return get(this.position);
     }
 
     public byte get(int position) {
@@ -272,15 +270,25 @@ public class BBuffer {
     }
 
     public long getLong(int position) {
-        var intBytes = getBytes(position, 8);
+        var readBuffer = getBytes(position, 8);
         if (endianness == BBufferEndianness.LE) {
-            intBytes = BBEndiannessConverter.swap8Bytes(intBytes, 0);
+            readBuffer = BBEndiannessConverter.swap8Bytes(readBuffer, 0);
         }
-        long value = 0;
-        for (int i = 0; i < intBytes.length; i++) {
-            value += ((long) intBytes[i] & 0xffL) << (8 * i);
-        }
-        return value;
+
+        return (((long) readBuffer[0] << 56) +
+                ((long) (readBuffer[1] & 255) << 48) +
+                ((long) (readBuffer[2] & 255) << 40) +
+                ((long) (readBuffer[3] & 255) << 32) +
+                ((long) (readBuffer[4] & 255) << 24) +
+                ((readBuffer[5] & 255) << 16) +
+                ((readBuffer[6] & 255) << 8) +
+                ((readBuffer[7] & 255) << 0));
+
+//        long value = 0;
+//        for (int i = 0; i < intBytes.length; i++) {
+//            value += ((long) intBytes[i] & 0xffL) << (8 * i);
+//        }
+//        return value;
     }
 
     public boolean contains(byte[] toSearch, int offset) {
@@ -292,8 +300,6 @@ public class BBuffer {
         }
         return true;
     }
-
-
 
 
     public void writeShort(short value, int offset) {
@@ -315,16 +321,24 @@ public class BBuffer {
         this.position += 2;
     }
 
-    public void writeLong(long value, int offset) {
-        byte[] data = new byte[Long.BYTES];
-        for (int i = Long.BYTES - 1; i >= 0; i--) {
-            data[i] = (byte) (value & 0xFF);
-            value >>= Byte.SIZE;
-        }
+    public void writeLong(long v, int offset) {
+        byte[] writeBuffer = new byte[Long.BYTES];
+//        for (int i = Long.BYTES - 1; i >= 0; i--) {
+//            data[i] = (byte) (value & 0xFF);
+//            value >>= Byte.SIZE;
+//        }
+        writeBuffer[0] = (byte) (v >>> 56);
+        writeBuffer[1] = (byte) (v >>> 48);
+        writeBuffer[2] = (byte) (v >>> 40);
+        writeBuffer[3] = (byte) (v >>> 32);
+        writeBuffer[4] = (byte) (v >>> 24);
+        writeBuffer[5] = (byte) (v >>> 16);
+        writeBuffer[6] = (byte) (v >>> 8);
+        writeBuffer[7] = (byte) (v >>> 0);
         if (this.endianness == BBufferEndianness.LE) {
-            data = BBEndiannessConverter.swap8Bytes(data, 0);
+            writeBuffer = BBEndiannessConverter.swap8Bytes(writeBuffer, 0);
         }
-        write(data, offset);
+        write(writeBuffer, offset);
 
     }
 
@@ -447,7 +461,7 @@ public class BBuffer {
                 (byte) (value >> 16),
                 (byte) (value >> 8),
                 (byte) value};
-        BBufferUtils.unSetBit(data,0);
+        BBufferUtils.unSetBit(data, 0);
 
         BBuffer.toHexByteArray(data);
         if (this.endianness == BBufferEndianness.LE) {
@@ -457,8 +471,7 @@ public class BBuffer {
 
     }
 
-    public int indexOf(byte[] needle)
-    {
+    public int indexOf(byte[] needle) {
         // needle is null or empty
         if (needle == null || needle.length == 0)
             return 0;
@@ -471,8 +484,7 @@ public class BBuffer {
         int[] failure = new int[needle.length];
         int n = needle.length;
         failure[0] = -1;
-        for (int j = 1; j < n; j++)
-        {
+        for (int j = 1; j < n; j++) {
             int i = failure[j - 1];
             while ((needle[j] != needle[i + 1]) && i >= 0)
                 i = failure[i];
@@ -486,14 +498,11 @@ public class BBuffer {
         int i = 0, j = 0;
         int haystackLen = this.bytes.length;
         int needleLen = needle.length;
-        while (i < haystackLen && j < needleLen)
-        {
-            if (this.bytes[i] == needle[j])
-            {
+        while (i < haystackLen && j < needleLen) {
+            if (this.bytes[i] == needle[j]) {
                 i++;
                 j++;
-            }
-            else if (j == 0)
+            } else if (j == 0)
                 i++;
             else
                 j = failure[j - 1] + 1;

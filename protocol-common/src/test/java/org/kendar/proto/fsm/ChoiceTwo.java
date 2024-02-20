@@ -1,0 +1,26 @@
+package org.kendar.proto.fsm;
+
+import org.kendar.proto.SillyTest;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.messages.ReturnMessage;
+import org.kendar.protocol.states.ProtoState;
+
+import java.util.Iterator;
+
+public class ChoiceTwo extends ProtoState implements ReturnMessage {
+    public static boolean run = true;
+
+    public ChoiceTwo(Class<?> bytesEventClass) {
+        super(bytesEventClass);
+    }
+
+    public boolean canRun(BytesEvent event) {
+        return run;
+    }
+
+    public Iterator<ProtoStep> execute(BytesEvent event) {
+        SillyTest.result += "ChoiceTwo";
+        return iteratorOfList(this);
+    }
+}

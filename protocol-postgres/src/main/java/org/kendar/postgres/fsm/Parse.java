@@ -3,8 +3,9 @@ package org.kendar.postgres.fsm;
 import org.kendar.buffers.BBuffer;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.postgres.messages.ParseComplete;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.parser.SqlStringParser;
 
@@ -15,7 +16,7 @@ import java.util.Iterator;
 
 import static org.kendar.sql.jdbc.JdbcProxy.parseParameters;
 
-public class Parse extends StandardMessage {
+public class Parse extends PostgresState {
     public Parse(Class<?>... messages) {
         super(messages);
     }
@@ -44,7 +45,7 @@ public class Parse extends StandardMessage {
     }
 
     @Override
-    public Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, ProtoContext protoContext) {
+    public Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, NetworkProtoContext protoContext) {
         var postgresContext = (PostgresProtoContext) protoContext;
         var statementName = inputBuffer.getString();
         var query = inputBuffer.getUtf8String();

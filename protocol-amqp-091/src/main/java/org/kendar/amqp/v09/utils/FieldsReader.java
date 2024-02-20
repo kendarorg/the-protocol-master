@@ -7,10 +7,24 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class FieldsReader {
-    public static Object readField( BBuffer in) {
+
+    public static Date readTimestamp(BBuffer rb) {
+        var readBuffer = rb.getBytes(8);
+        var longVal = (((long) readBuffer[0] << 56) +
+                ((long) (readBuffer[1] & 255) << 48) +
+                ((long) (readBuffer[2] & 255) << 40) +
+                ((long) (readBuffer[3] & 255) << 32) +
+                ((long) (readBuffer[4] & 255) << 24) +
+                ((readBuffer[5] & 255) << 16) +
+                ((readBuffer[6] & 255) << 8) +
+                ((readBuffer[7] & 255) << 0));
+        return new Date(longVal * 1000);
+    }
+
+    public static Object readField(BBuffer in) {
         Object value = null;
-        var type = (char)in.get();
-        switch(type) {
+        var type = (char) in.get();
+        switch (type) {
             case 'S':
                 value = LongStringHelper.read(in);
                 break;
@@ -20,15 +34,14 @@ public class FieldsReader {
             case 'i':
                 value = in.getInt();
                 break;
-            case 'D':
-            {
+            case 'D': {
                 int scale = in.get();
-                long unscaled =in.getLong();
-                value = new BigDecimal(new BigInteger(String.valueOf(unscaled)),scale);
+                long unscaled = in.getLong();
+                value = new BigDecimal(new BigInteger(String.valueOf(unscaled)), scale);
             }
-                break;
+            break;
             case 'T':
-                value = new Date(in.getLong()*1000);
+                value = readTimestamp(in);
                 break;
             case 'F':
                 value = readTable(in);
@@ -58,14 +71,13 @@ public class FieldsReader {
                 value = in.getShort();
                 break;
             case 't':
-                value = in.get()==1;
+                value = in.get() == 1;
                 break;
-            case 'x':
-            {
+            case 'x': {
                 var contentLength = in.getInt();
                 value = in.getBytes(contentLength);
             }
-                break;
+            break;
             case 'V':
                 value = null;
                 break;
@@ -79,23 +91,23 @@ public class FieldsReader {
 
     public static List<Object> readArray(BBuffer in) {
         var size = in.getInt();
-        var lastPos = size+in.getPosition();
+        var lastPos = size + in.getPosition();
         List<Object> list = new ArrayList<>();
-        while(in.getPosition()<lastPos){
+        while (in.getPosition() < lastPos) {
             Object value = readField(in);
             list.add(value);
         }
         return list;
     }
 
-    public static Map<String,Object> readTable(BBuffer in) {
+    public static Map<String, Object> readTable(BBuffer in) {
         var size = in.getInt();
-        var lastPos = size+in.getPosition();
+        var lastPos = size + in.getPosition();
         Map<String, Object> table = new HashMap<String, Object>();
-        while(in.getPosition()<lastPos){
+        while (in.getPosition() < lastPos) {
             String name = ShortStringHelper.read(in);
             Object value = readField(in);
-            if(!table.containsKey(name))
+            if (!table.containsKey(name))
                 table.put(name, value);
         }
         return table;
