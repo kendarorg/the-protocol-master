@@ -8,14 +8,16 @@ The "protocol-master" is a project aimed at various tasks
 * Translate the queries in a standard, serializable format, logging all queries
   and results in a consistent way
 * Forward wire protocol to drivers. For SQL means passing the queries to JDBC drivers,
-  for NO-SQL forwarding to the specific ones like MongoDB or Redis
+  for NO-SQL forwarding to the specific ones like MongoDB or AMQP
 * Run queries against a pre-recorded sequence of commands to simulate a real data
   storage, without the need of a real server (in the making)
+
+The whole project is covered with Jacoco (66% coverage actually)
 
 For this to become real an event based state machine has been developed, with
 several database wire protocol implementations:
 
-* [PostgresSQL](protocol-postgres/README.md) Usable for most db (for hibernate you should set the final db dialect of
+* [PostgresSQL](protocol-postgres/README.md)  Usable for most db (for hibernate you should set the final db dialect of
   course)
     * Support for simple and extended query protocol
     * Transactions
@@ -24,8 +26,11 @@ several database wire protocol implementations:
     * Support for cached queries and stored procedures
     * Simple authentication (could add an "auth provider")
 * [MongoDB](protocol-mongo/README.md)
+    * Basic authentication
+* [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md) 
+    * Support for basic queue/publish/consume
+    * Channels multiplexing 
 * Redis (soon)
-* ActiveMQ (soon)
 
 ## Using it out of the box
 
@@ -47,7 +52,7 @@ Just call it like the following:
 <pre>
 usage: runner
  -l <arg>    Select listening port
- -p <arg>    Select protocol (mysql/mongo/postgres
+ -p <arg>    Select protocol (mysql/mongo/postgres/amqp091)
  -pl         Replay from log directory
  -xc <arg>   Select remote connection string
  -xd <arg>   Select remote log directory (you can set a {timestamp} value
