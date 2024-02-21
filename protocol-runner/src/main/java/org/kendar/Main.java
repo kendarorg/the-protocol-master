@@ -1,5 +1,7 @@
 package org.kendar;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import org.apache.commons.cli.*;
 import org.kendar.amqp.v09.AmqpFileStorage;
 import org.kendar.amqp.v09.AmqpProtocol;
@@ -13,6 +15,7 @@ import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.JdbcReplayProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
 import org.kendar.utils.Sleeper;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.Date;
@@ -33,6 +36,7 @@ public class Main {
         options.addOption("xd", true, "Select remote log directory (you can set a {timestamp} value\n" +
                 "that will be replaced with the current timestamp)");
         options.addOption("pl", false, "Replay from log directory");
+        options.addOption("v", true, "Log level (default ERROR)");
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -42,6 +46,16 @@ public class Main {
             var portVal = cmd.getOptionValue("l");
             var login = cmd.getOptionValue("xl");
             var password = cmd.getOptionValue("xw");
+            var logLevel = cmd.getOptionValue("v");
+            if(logLevel==null || logLevel.isEmpty()){
+                logLevel="ERROR";
+            }
+
+            LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+            var logger = loggerContext.getLogger("org.kendar");
+            logger.setLevel(Level.toLevel(logLevel,Level.ERROR));
+
             var connectionString = cmd.getOptionValue("xc");
             var logsDir = cmd.getOptionValue("xd");
             if (logsDir != null && !logsDir.isEmpty()) {
@@ -71,12 +85,14 @@ public class Main {
                 throw new Exception("missing protocol (p)");
             }
             while (stopWhenFalse.get()) {
-                Thread.yield();
+                Sleeper.sleep(100);
             }
+            protocolServer.stop();
         } catch (Exception ex) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("runner", options);
         }
+        System.out.println("EXITED");
     }
 
     private static Boolean stopWhenQuitCommand() {
@@ -86,7 +102,6 @@ public class Main {
         try {
             if (line != null && line.trim().equalsIgnoreCase("q")) {
                 System.out.println("Exiting");
-                protocolServer.stop();
                 return false;
             } else {
                 System.out.println("Command not recognized: " + line.trim());

@@ -59,9 +59,10 @@ usage: runner
              that will be replaced with the current timestamp)
  -xl <arg>   Select remote login
  -xw <arg>   Select remote password
+ -v  <arg>   Log level (default ERROR)
 </pre>
 
-Inside the choosen directory you will find simple jsons containing all the data exchanged
+Inside the chosen directory you will find simple jsons containing all the data exchanged
 with the server AND you can modify it before replaying, to simulate special situations!
 
 ## The state machine

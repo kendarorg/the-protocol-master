@@ -1,6 +1,7 @@
 package org.kenndar.runner;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.kendar.Main;
@@ -22,16 +23,22 @@ public class MainTest extends BasicTest {
 
     }
 
+
+    @AfterEach
+    public void afterEach() {
+        runTheServer.set(false);
+        Sleeper.sleep(100);
+    }
     @AfterAll
     public static void afterClass() throws Exception {
         afterClassBase();
     }
 
 
+    private AtomicBoolean runTheServer = new AtomicBoolean(true);
     @Test
     void testMain() throws Exception {
-        var runTheServer = new AtomicBoolean(true);
-
+        System.out.println("RECORDING ==============================================");
         var timestampForThisRun = "" + new Date().getTime();
         //RECORDING
         var args = new String[]{
@@ -40,7 +47,8 @@ public class MainTest extends BasicTest {
                 "-xl", postgresContainer.getUserId(),
                 "-xw", postgresContainer.getPassword(),
                 "-xc", postgresContainer.getJdbcUrl(),
-                "-xd", Path.of("target", "tests", timestampForThisRun).toString()
+                "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-v","DEBUG"
         };
 
         var serverThread = new Thread(() -> {
@@ -81,6 +89,8 @@ public class MainTest extends BasicTest {
         Sleeper.sleep(1000);
         assertTrue(verifyTestRun.get());
 
+        System.out.println("REPLAYING ==============================================");
+
         //REPLAYING
         runTheServer.set(true);
         verifyTestRun.set(false);
@@ -91,7 +101,8 @@ public class MainTest extends BasicTest {
                 "-xw", postgresContainer.getPassword(),
                 "-xc", postgresContainer.getJdbcUrl(),
                 "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
-                "-pl"
+                "-pl",
+                "-v","DEBUG"
         };
 
         serverThread = new Thread(() -> {
