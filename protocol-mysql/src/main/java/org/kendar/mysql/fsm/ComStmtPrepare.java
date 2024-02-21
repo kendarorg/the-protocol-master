@@ -6,12 +6,16 @@ import org.kendar.mysql.constants.CommandType;
 import org.kendar.mysql.executor.MySQLExecutor;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.fsm.events.CommandEvent;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
 public class ComStmtPrepare extends ProtoState {
+    private static final Logger log = LoggerFactory.getLogger(ComStmtPrepare.class);
+
     public ComStmtPrepare(Class<?>... messages) {
         super(messages);
     }
@@ -29,7 +33,8 @@ public class ComStmtPrepare extends ProtoState {
 
         }
         var query = inputBuffer.getString(5);
-        System.out.println("[SERVER] \tPreparing: " + query);
+
+        log.debug("[SERVER][STMTPREP]: " + query);
         var executor = new MySQLExecutor();
         return executor.prepareStatement(context, query);
     }

@@ -3,12 +3,12 @@ package org.kendar.postgres.messages;
 import org.kendar.buffers.BBuffer;
 import org.kendar.postgres.constants.TypesOids;
 import org.kendar.postgres.dtos.Field;
-import org.kendar.protocol.ReturnMessage;
+import org.kendar.protocol.messages.NetworkReturnMessage;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class RowDescription extends ReturnMessage {
+public class RowDescription implements NetworkReturnMessage {
 
     private final List<Field> fields;
 

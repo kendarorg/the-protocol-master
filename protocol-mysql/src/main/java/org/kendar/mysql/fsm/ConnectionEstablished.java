@@ -4,9 +4,9 @@ import org.kendar.mysql.constants.CapabilityFlag;
 import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.messages.Handshake;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
 
 import java.util.Iterator;
 

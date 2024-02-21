@@ -1,7 +1,10 @@
 package org.kendar.server;
 
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoDescriptor;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
+import org.kendar.protocol.events.BytesEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,12 +18,13 @@ import java.util.concurrent.*;
 
 public class TcpServer {
     private static final String HOST = "*";
+    private static final Logger log = LoggerFactory.getLogger(TcpServer.class);
     private static boolean running = false;
-    private final ProtoDescriptor protoDescriptor;
+    private final NetworkProtoDescriptor protoDescriptor;
     private Thread thread;
     private AsynchronousServerSocketChannel server;
 
-    public TcpServer(ProtoDescriptor protoDescriptor) {
+    public TcpServer(NetworkProtoDescriptor protoDescriptor) {
 
         this.protoDescriptor = protoDescriptor;
     }
@@ -56,16 +60,16 @@ public class TcpServer {
             server.setOption(StandardSocketOptions.SO_RCVBUF, 1024);
             server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
-            System.out.println("[SERVER] Listening on " + HOST + ":" + protoDescriptor.getPort());
+            log.info("[SERVER] Listening on " + HOST + ":" + protoDescriptor.getPort());
 
             //noinspection InfiniteLoopStatement
             for (; ; ) {
                 Future<AsynchronousSocketChannel> future = server.accept();
                 try {
-                    Channel client = new TcpChannel(future.get());
-                    System.out.println("[SERVER] Accepted connection from " + ((TcpChannel) client).getRemoteAddress());
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
-                    var context = protoDescriptor.buildContext(client);
+                    ClientServerChannel client = new TcpServerChannel(future.get());
+                    log.info("[SERVER] Accepted connection from " + ((TcpServerChannel) client).getRemoteAddress());
+                    ByteBuffer buffer = ByteBuffer.allocate(4096);
+                    var context = (NetworkProtoContext) protoDescriptor.buildContext(client);
 
                     if (protoDescriptor.sendImmediateGreeting()) {
                         context.runGreetings();
@@ -81,7 +85,7 @@ public class TcpServer {
                                 if (result != -1 || attachment.remaining() > 0) {
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
-                                    System.out.println("[SERVER] Received: " + byteArray.length);
+                                    log.trace("[SERVER][RX]: " + byteArray.length);
                                     var bb = context.buildBuffer();
                                     bb.write(byteArray);
                                     context.send(new BytesEvent(context, null, bb));

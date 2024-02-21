@@ -141,4 +141,47 @@ public class MySQLBBuffer extends BBuffer {
         var data = getBytes(4);
         return byte2Float(data, isBe());
     }
+
+    public void writeLong(long value, int offset) {
+        byte[] data = new byte[Long.BYTES];
+        for (int i = Long.BYTES - 1; i >= 0; i--) {
+            data[i] = (byte) (value & 0xFF);
+            value >>= Byte.SIZE;
+        }
+        if (this.endianness == BBufferEndianness.LE) {
+            data = BBEndiannessConverter.swap8Bytes(data, 0);
+        }
+        write(data, offset);
+
+    }
+
+    public void writeLong(long value) {
+        if (this.position == -1) {
+            this.position = 0;
+        }
+        writeLong(value, this.position);
+        this.position += 8;
+    }
+
+
+    public long getLong() {
+        if (this.position == -1) {
+            this.position = 0;
+        }
+        var result = getLong(this.position);
+        this.position += 8;
+        return result;
+    }
+
+    public long getLong(int position) {
+        var intBytes = getBytes(position, 8);
+        if (endianness == BBufferEndianness.LE) {
+            intBytes = BBEndiannessConverter.swap8Bytes(intBytes, 0);
+        }
+        long value = 0;
+        for (int i = 0; i < intBytes.length; i++) {
+            value += ((long) intBytes[i] & 0xffL) << (8 * i);
+        }
+        return value;
+    }
 }

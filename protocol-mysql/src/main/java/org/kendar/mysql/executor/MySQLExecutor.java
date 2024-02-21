@@ -6,10 +6,10 @@ import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.constants.StatusFlag;
 import org.kendar.mysql.messages.Error;
 import org.kendar.mysql.messages.*;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.ReturnMessage;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.messages.ReturnMessage;
+import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.BindingParameter;
 import org.kendar.sql.jdbc.JdbcProxy;
@@ -20,6 +20,8 @@ import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.sql.parser.SqlParseResult;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -31,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class MySQLExecutor {
+    private static Logger log = LoggerFactory.getLogger(MySQLExecutor.class);
 
     public static final String TRANSACTION_ISOLATION_LEVEL_ID = "TRANSACTION ISOLATION LEVEL";
     protected static final List<BasicHandler> fakeQueries;
@@ -55,7 +58,7 @@ public class MySQLExecutor {
 
     private static Iterator<ProtoStep> executeCommit(String parse, ProtoContext protoContext) {
         var mysqlContext = (MySQLProtoContext) protoContext;
-        ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
+        ((JdbcProxy) mysqlContext.getProxy()).executeCommit(protoContext);
         var res = new ArrayList<ReturnMessage>();
         protoContext.setTransaction(false);
         var ok = new OkPacket();
@@ -65,7 +68,7 @@ public class MySQLExecutor {
 
     private static Iterator<ProtoStep> executeRollback(String parse, ProtoContext protoContext) {
         var mysqlContext = (MySQLProtoContext) protoContext;
-        ((JdbcProxy) protoContext.getProxy()).executeRollback(protoContext);
+        ((JdbcProxy) mysqlContext.getProxy()).executeRollback(protoContext);
         var res = new ArrayList<ReturnMessage>();
         protoContext.setTransaction(false);
         var ok = new OkPacket();
@@ -75,7 +78,7 @@ public class MySQLExecutor {
 
     private static Iterator<ProtoStep> executeBegin(String parse, ProtoContext protoContext) {
         var mysqlContext = (MySQLProtoContext) protoContext;
-        ((JdbcProxy) protoContext.getProxy()).executeBegin(protoContext);
+        ((JdbcProxy) mysqlContext.getProxy()).executeBegin(protoContext);
         var res = new ArrayList<ReturnMessage>();
         protoContext.setTransaction(true);
         var ok = new OkPacket();
@@ -109,7 +112,7 @@ public class MySQLExecutor {
 
     protected Iterator<ProtoStep> runExceptionInternal(MySQLProtoContext context, Exception ex) {
         var error = new Error();
-        ex.printStackTrace();
+        log.error(ex.getMessage(),ex);
         error.setCapabilities(context.getClientCapabilities());
         error.setErrorCode(ErrorCode.ER_UNKNOWN_COM_ERROR.getValue());
         error.setErrorMessage(ex.getMessage());
@@ -134,19 +137,20 @@ public class MySQLExecutor {
                 return handleSingleQuery(sqlParseResult, protoContext, parse, parameterValues, text);
             }
         } catch (SQLException e) {
-            System.err.printf("[SERVER] Error %s", e.getMessage());
-            e.printStackTrace();
+            log.error("[SERVER] Error %s", e);
             return runExceptionInternal(protoContext, e);
         }
     }
 
+    @SuppressWarnings("DuplicateCondition")
     private Iterator<ProtoStep> handleSingleQuery(SqlParseResult parsed, MySQLProtoContext
             protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
-        if (parsed.getValue().toUpperCase().startsWith("SET AUTOCOMMIT=0")) {
+        var pvup = parsed.getValue().toUpperCase();
+        if (pvup.startsWith("SET AUTOCOMMIT=0")) {
             return executeBegin(parse, protoContext);
-        } else if (parsed.getValue().toUpperCase().startsWith("SET AUTOCOMMIT=0")) {
+        } else if (pvup.startsWith("SET AUTOCOMMIT=0")) {
             return executeCommit(parse, protoContext);
-        } else if (parsed.getValue().toUpperCase().startsWith("ROLLBACK")) {
+        } else if (pvup.startsWith("ROLLBACK")) {
             return executeRollback(parse, protoContext);
         }
         switch (parsed.getType()) {
@@ -171,7 +175,7 @@ public class MySQLExecutor {
     }
 
     private Iterator<ProtoStep> changeTransactionIsolation(ProtoContext protoContext, String value) {
-
+        var mysqlContext = (MySQLProtoContext) protoContext;
         var pattern = Pattern.compile("(.+)" + TRANSACTION_ISOLATION_LEVEL_ID + "([\\s]*)([\\sa-zA-Z\\-_0-9]+)");
         var matcher = pattern.matcher(value);
         var result = matcher.matches();
@@ -179,16 +183,16 @@ public class MySQLExecutor {
             var transactionType = matcher.group(3).toUpperCase();
             switch (transactionType) {
                 case ("REPEATABLE READ"):
-                    ((JdbcProxy) protoContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_REPEATABLE_READ);
+                    ((JdbcProxy) mysqlContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_REPEATABLE_READ);
                     break;
                 case ("READ UNCOMMITTED"):
-                    ((JdbcProxy) protoContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_READ_UNCOMMITTED);
+                    ((JdbcProxy) mysqlContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_READ_UNCOMMITTED);
                     break;
                 case ("READ COMMITTED"):
-                    ((JdbcProxy) protoContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_READ_COMMITTED);
+                    ((JdbcProxy) mysqlContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_READ_COMMITTED);
                     break;
                 case ("SERIALIZABLE"):
-                    ((JdbcProxy) protoContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_SERIALIZABLE);
+                    ((JdbcProxy) mysqlContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_SERIALIZABLE);
                     break;
                 default:
                     throw new RuntimeException("Unsupported isolation " + transactionType);
@@ -209,10 +213,14 @@ public class MySQLExecutor {
         var matcher = parsed.getValue();//PostgresCallConverter.convertToJdbc(parsed.getValue(),binding.getParameterValues());
         SelectResult resultSet = null;
         if (!matcher.equalsIgnoreCase(parsed.getValue())) {
-            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT, matcher, connection, maxRecords, parameterValues, parser, new ArrayList<>());
+            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
+                    matcher, connection, maxRecords, parameterValues, parser,
+                    new ArrayList<>(), protoContext);
 
         } else {
-            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT, parsed.getValue(), connection, maxRecords, parameterValues, parser, new ArrayList<>());
+            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
+                    parsed.getValue(), connection, maxRecords,
+                    parameterValues, parser, new ArrayList<>(), protoContext);
         }
         var result = new ArrayList<ReturnMessage>();
 
@@ -236,16 +244,15 @@ public class MySQLExecutor {
             //}
             var packetNumber = 0;
 
-            result.add(new ColumnsCount(resultSet.getMetadata(),
-                    metadataFollows, Language.UTF8_GENERAL_CI).
+            result.add(new ColumnsCount(resultSet.getMetadata()).
                     withPacketNumber(++packetNumber));
-            var showMetadata = true;// (metadataFollows.isPresent()&&metadataFollows.get()) && !metadataFollows.isEmpty();
-            if (showMetadata) {
+//            var showMetadata = true;// (metadataFollows.isPresent()&&metadataFollows.get()) && !metadataFollows.isEmpty();
+//            if (showMetadata) {
                 for (var field : resultSet.getMetadata()) {
                     result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, false).
                             withPacketNumber(++packetNumber));
                 }
-            }
+            //}
             //TODO Check for the
             // if CLIENT_DEPRECATE_EOF is on, OK_Packet is sent instead of an actual EOF_Packet packet.
             //https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response.html
@@ -257,7 +264,7 @@ public class MySQLExecutor {
             for (var byteRow : resultSet.getRecords()) {
                 if (text) {
                     //Text resultset
-                    result.add(new DataRow(byteRow,resultSet.getMetadata()).
+                    result.add(new DataRow(byteRow, resultSet.getMetadata()).
                             withPacketNumber(++packetNumber));
                 } else {
                     //Binary resultset
@@ -285,6 +292,7 @@ public class MySQLExecutor {
         throw new SQLException("UNSUPPORTED TRANSACTIONS");
     }
 
+    @SuppressWarnings("SqlSourceToSinkFlow")
     public Iterator<ProtoStep> prepareStatement(MySQLProtoContext protoContext, String query) {
         parser = (SqlStringParser) protoContext.getValue("PARSER");
         var result = new ArrayList<ReturnMessage>();

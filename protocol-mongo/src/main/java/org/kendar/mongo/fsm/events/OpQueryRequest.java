@@ -1,8 +1,8 @@
 package org.kendar.mongo.fsm.events;
 
 import org.kendar.mongo.dtos.OpQueryContent;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.fsm.BaseEvent;
+import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.events.BaseEvent;
 
 public class OpQueryRequest extends BaseEvent {
 

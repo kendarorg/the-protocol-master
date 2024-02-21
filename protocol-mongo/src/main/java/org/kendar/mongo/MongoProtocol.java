@@ -11,13 +11,15 @@ import org.kendar.mongo.fsm.msg.CmdGeneric;
 import org.kendar.mongo.fsm.msg.CmdHello;
 import org.kendar.mongo.fsm.msg.CmdSaslStart;
 import org.kendar.mongo.fsm.query.QueryHello;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoDescriptor;
-import org.kendar.protocol.fsm.Start;
-import org.kendar.server.Channel;
+import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.states.special.ProtoStateSequence;
+import org.kendar.protocol.states.special.ProtoStateSwitchCase;
+import org.kendar.protocol.states.special.ProtoStateWhile;
 
-public class MongoProtocol extends ProtoDescriptor {
+public class MongoProtocol extends NetworkProtoDescriptor {
     private static final int PORT = 27017;
     private static final boolean IS_BIG_ENDIAN = false;
     private final int port;
@@ -32,35 +34,27 @@ public class MongoProtocol extends ProtoDescriptor {
 
     @Override
     protected void initializeProtocol() {
-        addState(new Start(),
-                new OpMsg(BytesEvent.class),
-                new OpQuery(BytesEvent.class),
-                new OpCompressed(BytesEvent.class));
 
-        addState(new OpCompressed(),
-                new OpQuery(BytesEvent.class, CompressedDataEvent.class),
-                new OpMsg(BytesEvent.class, CompressedDataEvent.class));
 
-        addState(new OpMsg(),
-                new CmdHello(OpMsgRequest.class),
-                new CmdGeneric(OpMsgRequest.class),
-                new CmdSaslStart(OpMsgRequest.class));
-
-        addState(new OpQuery(),
-                new QueryHello(OpQueryRequest.class));
-
-        addState(new QueryHello(),
-                new OpMsg(BytesEvent.class),
-                new OpCompressed(BytesEvent.class));
-
-        addState(new CmdGeneric(),
-                new OpMsg(BytesEvent.class));
-
-        addState(new CmdSaslStart(),
-                new OpMsg(BytesEvent.class));
-
-        addState(new CmdHello(),
-                new OpMsg(BytesEvent.class));
+        initialize(new ProtoStateSwitchCase(
+                new ProtoStateWhile(
+                        new OpCompressed(BytesEvent.class).asOptional(),
+                        new ProtoStateSwitchCase(
+                                new ProtoStateSequence(
+                                        new OpMsg(BytesEvent.class, CompressedDataEvent.class),
+                                        new ProtoStateSwitchCase(
+                                                new CmdGeneric(OpMsgRequest.class),
+                                                new CmdHello(OpMsgRequest.class),
+                                                new CmdSaslStart(OpMsgRequest.class)
+                                        )
+                                ),
+                                new ProtoStateSequence(
+                                        new OpQuery(BytesEvent.class, CompressedDataEvent.class),
+                                        new QueryHello(OpQueryRequest.class)
+                                )
+                        )
+                )
+        ));
 
     }
 
@@ -75,8 +69,7 @@ public class MongoProtocol extends ProtoDescriptor {
     }
 
     @Override
-    protected ProtoContext createContext(ProtoDescriptor protoDescriptor, Channel client) {
-        var result = new MongoProtoContext(this, client);
-        return result;
+    protected ProtoContext createContext(ProtoDescriptor protoDescriptor) {
+        return new MongoProtoContext(this);
     }
 }

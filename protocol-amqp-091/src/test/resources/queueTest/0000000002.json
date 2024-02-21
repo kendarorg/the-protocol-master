@@ -1,0 +1,24 @@
+{
+  "index": 2,
+  "input": {
+    "type": "ConnectionTuneOk",
+    "data": {
+      "uuid": "a1fd6fdc-ace4-413b-92fe-bf5d5a8bf9a0",
+      "optional": false,
+      "channel": 0,
+      "type": 1,
+      "classId": 10,
+      "methodId": 31,
+      "channelMax": 2047,
+      "frameMax": 131072,
+      "hearthBeat": 60
+    }
+  },
+  "output": {
+    "type": null,
+    "data": null
+  },
+  "durationMs": 0,
+  "type": "ConnectionTuneOk",
+  "caller": "AMQP"
+}

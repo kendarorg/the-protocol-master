@@ -7,10 +7,10 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.junit.jupiter.api.TestInfo;
-import org.kendar.protocol.Sleeper;
 import org.kendar.server.TcpServer;
 import org.kendar.testcontainer.images.MongoDbImage;
 import org.kendar.testcontainer.utils.Utils;
+import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;

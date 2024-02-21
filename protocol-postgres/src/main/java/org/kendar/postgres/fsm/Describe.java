@@ -3,12 +3,12 @@ package org.kendar.postgres.fsm;
 import org.kendar.buffers.BBuffer;
 import org.kendar.postgres.dtos.Binding;
 import org.kendar.postgres.dtos.Parse;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 
-public class Describe extends StandardMessage {
+public class Describe extends PostgresState {
     public Describe(Class<?>... messages) {
         super(messages);
     }
@@ -19,7 +19,7 @@ public class Describe extends StandardMessage {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeStandardMessage(BBuffer message, ProtoContext protoContext) {
+    protected Iterator<ProtoStep> executeStandardMessage(BBuffer message, NetworkProtoContext protoContext) {
         var postgresContext = (PostgresProtoContext) protoContext;
         var type = message.get();
         var name = message.getString();

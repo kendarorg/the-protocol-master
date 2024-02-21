@@ -1,19 +1,23 @@
 package org.kendar.postgres.fsm;
 
 import org.kendar.buffers.BBuffer;
+import org.kendar.iterators.IteratorOfLists;
 import org.kendar.postgres.dtos.Binding;
 import org.kendar.postgres.dtos.Parse;
 import org.kendar.postgres.executor.PostgresExecutor;
 import org.kendar.postgres.messages.ReadyForQuery;
-import org.kendar.protocol.IteratorOfLists;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
-public class Query extends StandardMessage {
+public class Query extends PostgresState {
+    private static final Logger log = LoggerFactory.getLogger(Query.class);
+
     public Query(Class<?>... messages) {
         super(messages);
     }
@@ -24,7 +28,7 @@ public class Query extends StandardMessage {
     }
 
     @Override
-    public Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, ProtoContext protoContext) {
+    public Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, NetworkProtoContext protoContext) {
         var postgresContext = (PostgresProtoContext) protoContext;
         var query = inputBuffer.getUtf8String();
         var fakePortalStatement = UUID.randomUUID().toString();
@@ -32,7 +36,8 @@ public class Query extends StandardMessage {
 
         var bindMessage = new Binding("STATEMENT_" + fakePortalStatement, "PORTAL_" + fakePortalStatement, new ArrayList<>(), new ArrayList<>());
         var parseMessage = new Parse("STATEMENT_" + fakePortalStatement, query, new ArrayList<>(), new ArrayList<>());
-        System.out.println("[SERVER] \tExecuting: " + parseMessage.getQuery());
+
+        log.debug("[SERVER][QUERY]:" + parseMessage.getQuery());
         var res = executor.executePortal(
                 protoContext, parseMessage, bindMessage, Integer.MAX_VALUE,
                 true, true);

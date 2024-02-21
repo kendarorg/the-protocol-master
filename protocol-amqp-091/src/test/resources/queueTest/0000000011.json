@@ -1,0 +1,30 @@
+{
+  "index": 11,
+  "input": {
+    "type": "ChannelOpen",
+    "data": {
+      "uuid": "7c864a53-6804-49ba-8890-71b7862868f6",
+      "optional": false,
+      "channel": 1,
+      "type": 1,
+      "classId": 20,
+      "methodId": 10,
+      "reserved1": ""
+    }
+  },
+  "output": {
+    "type": "ChannelOpenOk",
+    "data": {
+      "uuid": "8a597f7d-21f0-4cae-a550-7a4a1ecf4992",
+      "optional": false,
+      "channel": 1,
+      "type": 1,
+      "classId": 20,
+      "methodId": 11,
+      "reserved1": ""
+    }
+  },
+  "durationMs": 21,
+  "type": "ChannelOpen",
+  "caller": "AMQP"
+}

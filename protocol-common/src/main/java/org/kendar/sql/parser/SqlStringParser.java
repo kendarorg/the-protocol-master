@@ -224,9 +224,6 @@ public class SqlStringParser {
                             } else {
                                 tokens.add(sb.toString());
                                 sb = new StringBuilder();
-                                //i--;
-                                //c = input.charAt(i);
-                                //sb.append(c);
                                 break;
                             }
                         }

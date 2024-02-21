@@ -5,7 +5,7 @@ import org.kendar.mongo.executor.MongoExecutor;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.fsm.StandardOpMsgCommand;
 import org.kendar.mongo.fsm.events.OpMsgRequest;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 

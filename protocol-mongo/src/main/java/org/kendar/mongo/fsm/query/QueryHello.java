@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.kendar.mongo.executor.MongoExecutor;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.fsm.events.OpQueryRequest;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
 
 import java.util.Iterator;
 

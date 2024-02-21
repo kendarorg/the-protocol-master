@@ -1,9 +1,9 @@
 package org.kendar.postgres.messages;
 
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.ReturnMessage;
+import org.kendar.protocol.messages.NetworkReturnMessage;
 
-public class ReadyForQuery extends ReturnMessage {
+public class ReadyForQuery implements NetworkReturnMessage {
     private final boolean inTransaction;
 
     public ReadyForQuery(boolean inTransaction) {

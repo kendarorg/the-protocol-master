@@ -13,11 +13,11 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.io.BasicOutputBuffer;
 import org.kendar.buffers.BBuffer;
 import org.kendar.mongo.fsm.OpCodes;
-import org.kendar.protocol.ReturnMessage;
+import org.kendar.protocol.messages.NetworkReturnMessage;
 
 import java.util.HashMap;
 
-public abstract class BaseMessageData extends ReturnMessage {
+public abstract class BaseMessageData implements NetworkReturnMessage {
     private static final ObjectMapper mapper = new ObjectMapper();
     private int flags;
     private int requestId;
@@ -91,8 +91,6 @@ public abstract class BaseMessageData extends ReturnMessage {
     public Object serialize() {
         try {
             var dataMap = new HashMap<String, Object>();
-//            dataMap.put("requestId", getRequestId());
-//            dataMap.put("responseId", getResponseId());
             dataMap.put("opCode", getOpCode().toString());
             dataMap.put("flags", getFlags());
             serialize(dataMap, mapper);
@@ -104,8 +102,6 @@ public abstract class BaseMessageData extends ReturnMessage {
 
 
     public void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {
-//        requestId = toDeserialize.get("requestId").asInt();
-//        responseId = toDeserialize.get("responseId").asInt();
         opCode = OpCodes.valueOf(toDeserialize.get("opCode").textValue());
         flags = toDeserialize.get("flags").asInt();
     }

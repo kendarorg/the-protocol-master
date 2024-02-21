@@ -1,0 +1,51 @@
+{
+  "index": 7,
+  "input": {
+    "type": "byte[]",
+    "data": {
+      "bytes": "[B@46c2fd29"
+    }
+  },
+  "output": {
+    "type": "ConnectionStart",
+    "data": {
+      "uuid": "474f1899-0160-4b1f-98b6-f77948a22b9f",
+      "optional": false,
+      "channel": 0,
+      "type": 1,
+      "classId": 10,
+      "methodId": 10,
+      "serverProperties": {
+        "cluster_name": "rabbit@914768ba7c2e",
+        "copyright": "Copyright (c) 2007-2020 Pivotal Software, Inc.",
+        "product": "RabbitMQ",
+        "capabilities": {
+          "consumer_priorities": true,
+          "exchange_exchange_bindings": true,
+          "connection.blocked": true,
+          "authentication_failure_close": true,
+          "per_consumer_qos": true,
+          "basic.nack": true,
+          "direct_reply_to": true,
+          "publisher_confirms": true,
+          "consumer_cancel_notify": true
+        },
+        "information": "Licensed under the MPL.  See https://www.rabbitmq.com/",
+        "version": "3.7.25",
+        "platform": "Erlang/OTP 22.3.3"
+      },
+      "mechanisms": [
+        "AMQPLAIN",
+        "PLAIN"
+      ],
+      "locales": [
+        "en_US"
+      ],
+      "versionMinor": 9,
+      "versionMajor": 0
+    }
+  },
+  "durationMs": 23,
+  "type": "byte[]",
+  "caller": "AMQP"
+}

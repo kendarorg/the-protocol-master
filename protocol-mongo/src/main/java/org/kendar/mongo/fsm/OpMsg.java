@@ -13,14 +13,17 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpMsgSection;
 import org.kendar.mongo.fsm.events.OpMsgRequest;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.messages.ProtoStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Iterator;
 
-public class OpMsg extends StandardMessage {
+public class OpMsg extends MongoState {
+    private static final Logger log = LoggerFactory.getLogger(OpMsg.class);
+
     public OpMsg(Class<?>... events) {
         super(events);
     }
@@ -30,7 +33,7 @@ public class OpMsg extends StandardMessage {
         BsonBinaryReader bsonReader = new BsonBinaryReader(byteBuffer);
         BsonDocument document = documentCodec.decode(bsonReader, DecoderContext.builder().build());
         var json = document.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        System.out.println("\t\t" + json);
+        log.debug("[SERVER][RX]\t\t" + json);
         return json;
     }
 
@@ -40,9 +43,9 @@ public class OpMsg extends StandardMessage {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, ProtoContext protoContext) {
+    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer,
+                                                         MongoProtoContext context) {
 
-        var context = (MongoProtoContext) protoContext;
         inputBuffer.setPosition(0);
         var length = inputBuffer.getInt();//length
         var requestId = inputBuffer.getInt();
@@ -55,7 +58,7 @@ public class OpMsg extends StandardMessage {
             var payloadType = inputBuffer.get();
             if (payloadType == 0) {
                 var section = new OpMsgSection();
-                System.out.println("\tSection 0");
+                log.debug("[SERVER][RX]\tSection 0");
                 var documentLength = inputBuffer.getInt(inputBuffer.getPosition());
                 inputBuffer.setPosition(inputBuffer.getPosition());
                 var byteBuffer = ByteBuffer.
@@ -67,8 +70,8 @@ public class OpMsg extends StandardMessage {
                 var section = new OpMsgSection();
                 var sequenceSize = inputBuffer.getInt();
                 section.setIdentifier(inputBuffer.getUtf8String());
-                System.out.println("\tSection 1");
-                System.out.println("\t\tIdentifier: " + section.getIdentifier());
+                log.debug("[SERVER][RX]\tSection 1");
+                log.debug("[SERVER][RX]\t\tIdentifier: " + section.getIdentifier());
                 var byteBuffer = ByteBuffer.
                         wrap(inputBuffer.getBytes(sequenceSize - 4 - section.getIdentifier().length() - 1)).
                         order(ByteOrder.LITTLE_ENDIAN);
@@ -82,7 +85,7 @@ public class OpMsg extends StandardMessage {
             }
         }
 
-        protoContext.send(new OpMsgRequest(protoContext, OpMsg.class, newData));
+        context.send(new OpMsgRequest(context, OpMsg.class, newData));
 
         return iteratorOfEmpty();
     }

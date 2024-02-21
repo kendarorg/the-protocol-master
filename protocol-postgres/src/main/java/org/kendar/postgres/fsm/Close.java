@@ -2,12 +2,12 @@ package org.kendar.postgres.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.postgres.messages.CloseComplete;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 
-public class Close extends StandardMessage {
+public class Close extends PostgresState {
     public Close(Class<?>... bytesEventClass) {
         super(bytesEventClass);
     }
@@ -35,7 +35,7 @@ public class Close extends StandardMessage {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, ProtoContext protoContext) {
+    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, NetworkProtoContext protoContext) {
         var postgresContext = (PostgresProtoContext) protoContext;
         var closeId = (char) inputBuffer.get();
         var toCloseName = inputBuffer.getString();

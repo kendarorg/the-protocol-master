@@ -10,7 +10,7 @@ import java.sql.JDBCType;
 public class ColumnDefinition extends MySQLReturnMessage {
     private final ProxyMetadata field;
     private final Language language;
-    private boolean binary;
+    private final boolean binary;
 
     public ColumnDefinition(ProxyMetadata fields, Language language, boolean binary) {
 

@@ -1,10 +1,12 @@
 package org.kendar.postgres;
 
 import org.junit.jupiter.api.*;
-import org.kendar.protocol.Sleeper;
+import org.kendar.utils.Sleeper;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -214,5 +216,36 @@ public class PostgresProtocolTest extends BasicTest {
         c.close();
 
         assertTrue(runned);
+    }
+
+
+    @Test
+    void testCancel() throws Exception {
+
+        Connection c = getProxyConnection();
+        Statement stmt;
+
+        //ResultSet resultSet;
+        AtomicInteger counter = new AtomicInteger(0);
+        stmt = c.createStatement();
+        new Thread(() -> {
+            try {
+                stmt.execute(
+                        "SELECT *,pg_sleep(1) as sleep from generate_series(1,10)");
+                var resultSet = stmt.getResultSet();
+                while (resultSet.next()) {
+                    counter.incrementAndGet();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        Sleeper.sleep(3000);
+        stmt.cancel();
+        stmt.close();
+        c.close();
+        assertEquals(0, counter.get());
+
     }
 }

@@ -1,0 +1,39 @@
+{
+  "index": 5,
+  "input": {
+    "type": "QueueDeclare",
+    "data": {
+      "uuid": "1343c58f-df71-4a49-8d70-cf714c614655",
+      "optional": false,
+      "channel": 1,
+      "type": 1,
+      "classId": 50,
+      "methodId": 10,
+      "reserved1": 0,
+      "name": "fuffa_queue",
+      "passive": false,
+      "durable": false,
+      "exclusive": false,
+      "autoDelete": false,
+      "noWait": false,
+      "args": {}
+    }
+  },
+  "output": {
+    "type": "QueueDeclareOk",
+    "data": {
+      "uuid": "c9eb5dc9-6c36-4e72-9e94-0e9618696226",
+      "optional": false,
+      "channel": 1,
+      "type": 1,
+      "classId": 50,
+      "methodId": 11,
+      "queueName": "fuffa_queue",
+      "messageCount": 0,
+      "consumerCount": 0
+    }
+  },
+  "durationMs": 23,
+  "type": "QueueDeclare",
+  "caller": "AMQP"
+}

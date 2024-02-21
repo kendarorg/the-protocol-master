@@ -1,9 +1,12 @@
 package org.kenndar.runner;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.kendar.Main;
 import org.kendar.jpa.HibernateSessionFactory;
-import org.kendar.protocol.Sleeper;
+import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
 import java.util.Date;
@@ -20,30 +23,36 @@ public class MainTest extends BasicTest {
 
     }
 
+
+    @AfterEach
+    public void afterEach() {
+        runTheServer.set(false);
+        Sleeper.sleep(100);
+    }
     @AfterAll
     public static void afterClass() throws Exception {
         afterClassBase();
     }
 
 
-
+    private AtomicBoolean runTheServer = new AtomicBoolean(true);
     @Test
     void testMain() throws Exception {
-        var runTheServer = new AtomicBoolean(true);
-
-        var timestampForThisRun = ""+new Date().getTime();
+        System.out.println("RECORDING ==============================================");
+        var timestampForThisRun = "" + new Date().getTime();
         //RECORDING
         var args = new String[]{
-                "-p","postgres",
-                "-l",""+FAKE_PORT,
-                "-xl",postgresContainer.getUserId(),
-                "-xw",postgresContainer.getPassword(),
-                "-xc",postgresContainer.getJdbcUrl(),
-                "-xd", Path.of("target", "tests",timestampForThisRun).toString()
+                "-p", "postgres",
+                "-l", "" + FAKE_PORT,
+                "-xl", postgresContainer.getUserId(),
+                "-xw", postgresContainer.getPassword(),
+                "-xc", postgresContainer.getJdbcUrl(),
+                "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-v","DEBUG"
         };
 
-        var serverThread = new Thread(()->{
-            Main.execute(args,()->{
+        var serverThread = new Thread(() -> {
+            Main.execute(args, () -> {
                 Sleeper.sleep(100);
                 return runTheServer.get();
             });
@@ -80,21 +89,24 @@ public class MainTest extends BasicTest {
         Sleeper.sleep(1000);
         assertTrue(verifyTestRun.get());
 
+        System.out.println("REPLAYING ==============================================");
+
         //REPLAYING
         runTheServer.set(true);
         verifyTestRun.set(false);
         var replayArgs = new String[]{
-                "-p","postgres",
-                "-l",""+FAKE_PORT,
-                "-xl",postgresContainer.getUserId(),
-                "-xw",postgresContainer.getPassword(),
-                "-xc",postgresContainer.getJdbcUrl(),
-                "-xd", Path.of("target", "tests",timestampForThisRun).toString(),
-                "-pl"
+                "-p", "postgres",
+                "-l", "" + FAKE_PORT,
+                "-xl", postgresContainer.getUserId(),
+                "-xw", postgresContainer.getPassword(),
+                "-xc", postgresContainer.getJdbcUrl(),
+                "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-pl",
+                "-v","DEBUG"
         };
 
-        serverThread = new Thread(()->{
-            Main.execute(replayArgs,()->{
+        serverThread = new Thread(() -> {
+            Main.execute(replayArgs, () -> {
                 Sleeper.sleep(100);
                 return runTheServer.get();
             });

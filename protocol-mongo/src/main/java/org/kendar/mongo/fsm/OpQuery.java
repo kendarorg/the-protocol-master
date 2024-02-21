@@ -12,15 +12,18 @@ import org.bson.json.JsonWriterSettings;
 import org.kendar.buffers.BBuffer;
 import org.kendar.mongo.dtos.OpQueryContent;
 import org.kendar.mongo.fsm.events.OpQueryRequest;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.messages.ProtoStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class OpQuery extends StandardMessage {
+public class OpQuery extends MongoState {
+    private static final Logger log = LoggerFactory.getLogger(OpQuery.class);
+
     public OpQuery(Class<?>... events) {
         super(events);
     }
@@ -30,7 +33,7 @@ public class OpQuery extends StandardMessage {
         BsonBinaryReader bsonReader = new BsonBinaryReader(byteBuffer);
         BsonDocument document = documentCodec.decode(bsonReader, DecoderContext.builder().build());
         var json = document.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        System.out.println(json);
+        log.debug("[SERVER][PARSE] " + json);
         return json;
     }
 
@@ -40,8 +43,8 @@ public class OpQuery extends StandardMessage {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, ProtoContext protoContext) {
-        var context = (MongoProtoContext) protoContext;
+    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer,
+                                                         MongoProtoContext context) {
         inputBuffer.setPosition(0);
         var length = inputBuffer.getInt();//length
         var requestId = inputBuffer.getInt();
@@ -60,7 +63,7 @@ public class OpQuery extends StandardMessage {
         while (byteBuffer.hasRemaining()) {
             docs.add(parseBsonDocument(codecRegistry, byteBuffer));
         }
-        protoContext.send(new OpQueryRequest(protoContext, OpQuery.class, new OpQueryContent(
+        context.send(new OpQueryRequest(context, OpQuery.class, new OpQueryContent(
                 flagBits, requestId, responseId, fullCollectionName, numberToSkip, numberToReturn, docs)));
         return iteratorOfEmpty();
     }

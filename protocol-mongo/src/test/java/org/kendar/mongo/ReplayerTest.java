@@ -13,8 +13,8 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
-import org.kendar.protocol.Sleeper;
 import org.kendar.server.TcpServer;
+import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
 import java.util.Arrays;

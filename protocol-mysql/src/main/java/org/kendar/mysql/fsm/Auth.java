@@ -6,8 +6,8 @@ import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.constants.StatusFlag;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.messages.OkPacket;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 

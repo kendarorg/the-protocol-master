@@ -1,0 +1,19 @@
+{
+  "index": 31,
+  "input": null,
+  "output": {
+    "type": "BodyFrame",
+    "data": {
+      "uuid": "8d413477-c8ec-4f69-809f-b2ed01aaab6b",
+      "optional": false,
+      "channel": 1,
+      "type": 3,
+      "contentBytes": "enp6eiBkZXRhaWxzMw==",
+      "contentString": "zzzz details3",
+      "consumeId": 2
+    }
+  },
+  "durationMs": 0,
+  "type": "RESPONSE",
+  "caller": "AMQP"
+}

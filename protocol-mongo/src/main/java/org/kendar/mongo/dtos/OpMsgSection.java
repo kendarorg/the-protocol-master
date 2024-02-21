@@ -59,7 +59,7 @@ public class OpMsgSection {
         }
         documents = new ArrayList<>();
         var jnDocuments = toDeserialize.get("documents");
-        if (jnDocuments != null && jnDocuments.size() > 0) {
+        if (jnDocuments != null && !jnDocuments.isEmpty()) {
             for (var i = 0; i < jnDocuments.size(); i++) {
                 var doc = jnDocuments.get(i);
                 try {

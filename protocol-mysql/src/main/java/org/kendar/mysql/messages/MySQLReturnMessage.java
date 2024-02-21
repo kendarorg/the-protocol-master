@@ -2,9 +2,9 @@ package org.kendar.mysql.messages;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.mysql.buffers.MySQLBBuffer;
-import org.kendar.protocol.ReturnMessage;
+import org.kendar.protocol.messages.NetworkReturnMessage;
 
-public abstract class MySQLReturnMessage extends ReturnMessage {
+public abstract class MySQLReturnMessage implements NetworkReturnMessage {
     private int packetNumber;
 
     public MySQLReturnMessage withPacketNumber(int packetNumber) {

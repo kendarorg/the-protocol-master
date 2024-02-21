@@ -1,0 +1,56 @@
+{
+  "index": 8,
+  "input": {
+    "type": "ConnectionStartOk",
+    "data": {
+      "uuid": "1f582ca5-3fc5-44ff-928d-010c42a2a4fd",
+      "optional": false,
+      "channel": 0,
+      "type": 1,
+      "classId": 10,
+      "methodId": 11,
+      "auth": [
+        "guest",
+        "guest"
+      ],
+      "clientProperties": {
+        "product": "RabbitMQ",
+        "copyright": "Copyright (c) 2007-2021 VMware, Inc. or its affiliates.",
+        "capabilities": {
+          "exchange_exchange_bindings": true,
+          "connection.blocked": true,
+          "authentication_failure_close": true,
+          "basic.nack": true,
+          "publisher_confirms": true,
+          "consumer_cancel_notify": true
+        },
+        "information": "Licensed under the MPL. See https://www.rabbitmq.com/",
+        "version": "5.20.0",
+        "platform": "Java"
+      },
+      "mechanisms": [
+        "PLAIN"
+      ],
+      "locales": [
+        "en_US"
+      ]
+    }
+  },
+  "output": {
+    "type": "ConnectionTune",
+    "data": {
+      "uuid": "cee6d72e-38c8-424c-866a-07c029e969eb",
+      "optional": false,
+      "channel": 0,
+      "type": 1,
+      "classId": 10,
+      "methodId": 30,
+      "channelMax": 2047,
+      "frameMax": 131072,
+      "hearthBeat": 60
+    }
+  },
+  "durationMs": 22,
+  "type": "ConnectionStartOk",
+  "caller": "AMQP"
+}

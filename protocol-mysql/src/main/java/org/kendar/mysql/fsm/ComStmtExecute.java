@@ -6,10 +6,12 @@ import org.kendar.mysql.constants.CommandType;
 import org.kendar.mysql.executor.MySQLExecutor;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.fsm.events.CommandEvent;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
 import org.kendar.sql.jdbc.BindingParameter;
 import org.kendar.sql.jdbc.ProxyMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.JDBCType;
 import java.sql.Timestamp;
@@ -21,6 +23,8 @@ import java.util.Iterator;
 import java.util.stream.Collectors;
 
 public class ComStmtExecute extends ProtoState {
+    private static final Logger log = LoggerFactory.getLogger(ComStmtExecute.class);
+
     public ComStmtExecute(Class<?>... messages) {
         super(messages);
     }
@@ -170,8 +174,7 @@ public class ComStmtExecute extends ProtoState {
                 value = new String(cdata);
                 break;
             default:
-                var bdata = inputBuffer.readBytesWithLength();
-                value = bdata;
+                value = inputBuffer.readBytesWithLength();
                 break;
         }
         bindingParameters.add(new BindingParameter(value.toString(),
@@ -196,7 +199,7 @@ public class ComStmtExecute extends ProtoState {
         var nullBitmap = inputBuffer.getBytes(nullBitmapSize);
 
         var bindingParameters = new ArrayList<BindingParameter>();
-        System.out.println("[SERVER] \tExecuting PS: " + query);
+        log.debug("[SERVER][STMTEXEC]: " + query);
         for (var i = 0; i < paramFields.size(); i++) {
             var field = paramFields.get(i);
             var isNull = BBufferUtils.getBit(nullBitmap, i) == 1;

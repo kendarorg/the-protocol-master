@@ -1,11 +1,11 @@
 package org.kendar.postgres.fsm;
 
 import org.kendar.buffers.BBufferUtils;
-import org.kendar.dtos.ProcessId;
+import org.kendar.iterators.ProcessId;
 import org.kendar.postgres.messages.NoticeReponse;
-import org.kendar.protocol.BytesEvent;
-import org.kendar.protocol.ProtoStep;
-import org.kendar.protocol.fsm.ProtoState;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.protocol.states.ProtoState;
 
 import java.util.Iterator;
 
@@ -28,7 +28,7 @@ public class SSLRequest extends ProtoState {
         var postgresContext = (PostgresProtoContext) protoContext;
         var pid = (ProcessId) protoContext.getValue("PG_PID");
         if (pid == null) {
-            pid = new ProcessId(postgresContext.getNewPid());
+            pid = new ProcessId(postgresContext.getPid());
             protoContext.setValue("PG_PID", pid);
         }
         var pidValue = pid.getPid();

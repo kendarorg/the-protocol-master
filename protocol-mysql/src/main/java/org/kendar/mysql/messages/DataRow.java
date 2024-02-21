@@ -24,9 +24,9 @@ public class DataRow extends MySQLReturnMessage {
             if (row == null) {
                 resultBuffer.write((byte) 0xFB);
             } else {
-                if(md.isByteData()){
+                if (md.isByteData()) {
                     resultBuffer.writeWithLength(Base64.getDecoder().decode(row.getBytes()));
-                }else {
+                } else {
                     resultBuffer.writeWithLength(row.getBytes());
                 }
             }

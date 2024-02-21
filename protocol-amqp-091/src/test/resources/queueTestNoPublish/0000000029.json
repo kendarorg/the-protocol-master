@@ -1,0 +1,24 @@
+{
+  "index": 29,
+  "input": null,
+  "output": {
+    "type": "BasicDeliver",
+    "data": {
+      "uuid": "c01a8175-f53d-49b9-bf9c-a313dcd0d921",
+      "optional": false,
+      "channel": 1,
+      "type": 1,
+      "classId": 60,
+      "methodId": 60,
+      "consumerTag": "amq.ctag-9DYAJWtK_vtlYnSv9yI1_A",
+      "deliveryTag": 3,
+      "redelivered": false,
+      "exchange": "",
+      "routingKey": "fuffa_queue",
+      "consumeId": 2
+    }
+  },
+  "durationMs": 0,
+  "type": "RESPONSE",
+  "caller": "AMQP"
+}

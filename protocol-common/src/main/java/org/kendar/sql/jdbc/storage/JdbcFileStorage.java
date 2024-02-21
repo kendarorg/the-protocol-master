@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JdbcFileStorage extends BaseFileStorage<JdbcRequest, JdbcResponse> implements JdbcStorage {
 
 
-    private ConcurrentHashMap<Long, StorageItem<JdbcRequest, JdbcResponse>> inMemoryDb = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, StorageItem<JdbcRequest, JdbcResponse>> inMemoryDb = new ConcurrentHashMap<>();
     private boolean initialized = false;
 
     public JdbcFileStorage(String targetDir) {

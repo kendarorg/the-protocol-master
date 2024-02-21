@@ -1,12 +1,12 @@
 package org.kendar.postgres;
 
 import org.junit.jupiter.api.TestInfo;
-import org.kendar.protocol.Sleeper;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
 import org.kendar.testcontainer.images.PostgreslImage;
 import org.kendar.testcontainer.utils.Utils;
+import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
@@ -70,7 +70,7 @@ public class BasicTest {
         Connection c;
         Class.forName("org.postgresql.Driver");
         c = DriverManager
-                .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test?ssl=false", FAKE_PORT),
+                .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test", FAKE_PORT),//?ssl=false
                         "root", "test");
         assertNotNull(c);
         return c;

@@ -9,24 +9,29 @@ want to try it quickly)
 * Translate the queries in a standard, serializable format, logging all queries
   and results in a consistent way
 * Forward wire protocol to drivers. For SQL means passing the queries to JDBC drivers,
-  for NO-SQL forwarding to the specific ones like MongoDB or Redis
+  for NO-SQL forwarding to the specific ones like MongoDB or AMQP
 * Run queries against a pre-recorded sequence of commands to simulate a real data
   storage, without the need of a real server (in the making)
+
+The whole project is covered with Jacoco (66% coverage actually)
 
 For this to become real an event based state machine has been developed, with
 several database wire protocol implementations:
 
-* [PostgresSQL](protocol-postgres/README.md) Usable for most db (for hibernate you should set the final db dialect of
+* [PostgresSQL](protocol-postgres/README.md)  Usable for most db (for hibernate you should set the final db dialect of
   course)
-  * Support for simple and extended query protocol
-  * Transactions
-  * Simple authentication (could add an "auth provider")
+    * Support for simple and extended query protocol
+    * Transactions
+    * Simple authentication (could add an "auth provider")
 * [MySQL](protocol-mysql/README.md)
-  * Support for cached queries and stored procedures
-  * Simple authentication (could add an "auth provider")
+    * Support for cached queries and stored procedures
+    * Simple authentication (could add an "auth provider")
 * [MongoDB](protocol-mongo/README.md)
+    * Basic authentication
+* [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md) 
+    * Support for basic queue/publish/consume
+    * Channels multiplexing 
 * Redis (soon)
-* ActiveMQ (soon)
 
 ## If you like it Buy me a coffe :)
 
@@ -35,9 +40,9 @@ several database wire protocol implementations:
 ## Using it out of the box
 
 You can use the "protocol-runner-VERSION.jar" to proxy all your calls and test your
-connections (and add some ISSUE to this project hopefully). 
+connections (and add some ISSUE to this project hopefully).
 
-Inside protocol-runner/src/test/java/org/kenndar/runner/MainTest.java you can see 
+Inside protocol-runner/src/test/java/org/kenndar/runner/MainTest.java you can see
 an example where a recording is made and then reporduced.
 
 Just call it like the following:
@@ -52,16 +57,17 @@ Just call it like the following:
 <pre>
 usage: runner
  -l <arg>    Select listening port
- -p <arg>    Select protocol (mysql/mongo/postgres
+ -p <arg>    Select protocol (mysql/mongo/postgres/amqp091)
  -pl         Replay from log directory
  -xc <arg>   Select remote connection string
  -xd <arg>   Select remote log directory (you can set a {timestamp} value
              that will be replaced with the current timestamp)
  -xl <arg>   Select remote login
  -xw <arg>   Select remote password
+ -v  <arg>   Log level (default ERROR)
 </pre>
 
-Inside the choosen directory you will find simple jsons containing all the data exchanged 
+Inside the chosen directory you will find simple jsons containing all the data exchanged
 with the server AND you can modify it before replaying, to simulate special situations!
 
 ## The state machine

@@ -2,12 +2,12 @@ package org.kendar.postgres.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.postgres.messages.ReadyForQuery;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 
-public class Sync extends StandardMessage {
+public class Sync extends PostgresState {
     public Sync(Class<?>... messages) {
         super(messages);
     }
@@ -18,7 +18,7 @@ public class Sync extends StandardMessage {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, ProtoContext protoContext) {
+    protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, NetworkProtoContext protoContext) {
 
         var postgresContext = (PostgresProtoContext) protoContext;
         postgresContext.addSync(iteratorOfList(new ReadyForQuery(protoContext.isTransaction())));

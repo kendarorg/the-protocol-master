@@ -4,13 +4,18 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.postgres.dtos.Binding;
 import org.kendar.postgres.dtos.Parse;
 import org.kendar.postgres.executor.PostgresExecutor;
-import org.kendar.protocol.ProtoContext;
-import org.kendar.protocol.ProtoStep;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.messages.ProtoStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Execute extends StandardMessage {
+public class Execute extends PostgresState {
+    private static final Logger log = LoggerFactory.getLogger(Execute.class);
+    private static int counter = 0;
+
     public Execute(Class<?>... messages) {
         super(messages);
     }
@@ -21,7 +26,8 @@ public class Execute extends StandardMessage {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeStandardMessage(BBuffer message, ProtoContext protoContext) {
+    protected Iterator<ProtoStep> executeStandardMessage(BBuffer message, NetworkProtoContext protoContext) {
+        counter++;
         var postgresContext = (PostgresProtoContext) protoContext;
         var portal = message.getString();
         var maxRecords = message.getInt();
@@ -35,11 +41,13 @@ public class Execute extends StandardMessage {
             parseMessage.getBinds().remove("PORTAL_" + portal);
             var executor = new PostgresExecutor();
 
-            System.out.println("[SERVER] \tExecuting: (" + maxRecords + ") " + parseMessage.getQuery());
+
+            log.debug("[SERVER][STMTEXEC]: Max:" + maxRecords + " Query:" + parseMessage.getQuery());
             //for maxRecords
             var res = executor.executePortal(
                     protoContext, parseMessage, bindMessage, maxRecords,
-                    bindMessage.isDescribable() || parseMessage.isDescribable(), false);
+                    bindMessage.isDescribable() || parseMessage.isDescribable(),
+                    false);
             if (res.isRunNow()) {
                 postgresContext.clearSync();
                 return res.getReturnMessages();
