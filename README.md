@@ -1,6 +1,6 @@
 ## The Protocol Master
 
-![](protocolmaster_s.png)
+![](protocolmaster_s.gif)
 
 The "protocol-master" is a command line tool (usable for any language) with (if you want to embed it) 
 a set of java libraries, aimed at various tasks (and an executable jar if you want to try it quickly)
