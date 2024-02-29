@@ -1,6 +1,12 @@
 package org.kendar.storage;
 
-public abstract class BaseStorage<I, O> implements StorageRoot<I, O> {
+/**
+ * Base class for the storage
+ *
+ * @param <I>
+ * @param <O>
+ */
+public abstract class BaseStorage<I, O> implements Storage<I, O> {
     public static String padLeftZeros(String inputString, int length) {
         if (inputString.length() >= length) {
             return inputString;

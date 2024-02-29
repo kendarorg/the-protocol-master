@@ -1,8 +1,6 @@
 package org.kendar.mongo.dtos;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClientSettings;
 import org.bson.BsonBinaryWriter;
 import org.bson.BsonDocument;
@@ -14,11 +12,12 @@ import org.bson.io.BasicOutputBuffer;
 import org.kendar.buffers.BBuffer;
 import org.kendar.mongo.fsm.OpCodes;
 import org.kendar.protocol.messages.NetworkReturnMessage;
+import org.kendar.utils.JsonMapper;
 
 import java.util.HashMap;
 
 public abstract class BaseMessageData implements NetworkReturnMessage {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final JsonMapper mapper = new JsonMapper();
     private int flags;
     private int requestId;
     private int responseId;
@@ -89,22 +88,18 @@ public abstract class BaseMessageData implements NetworkReturnMessage {
 
 
     public Object serialize() {
-        try {
-            var dataMap = new HashMap<String, Object>();
-            dataMap.put("opCode", getOpCode().toString());
-            dataMap.put("flags", getFlags());
-            serialize(dataMap, mapper);
-            return mapper.readTree(mapper.writeValueAsString(dataMap));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        var dataMap = new HashMap<String, Object>();
+        dataMap.put("opCode", getOpCode().toString());
+        dataMap.put("flags", getFlags());
+        serialize(dataMap, mapper);
+        return mapper.toJsonNode(mapper.serialize(dataMap));
     }
 
 
-    public void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {
+    public void doDeserialize(JsonNode toDeserialize, JsonMapper mapper) {
         opCode = OpCodes.valueOf(toDeserialize.get("opCode").textValue());
         flags = toDeserialize.get("flags").asInt();
     }
 
-    protected abstract void serialize(HashMap<String, Object> dataMap, ObjectMapper mapper);
+    protected abstract void serialize(HashMap<String, Object> dataMap, JsonMapper mapper);
 }

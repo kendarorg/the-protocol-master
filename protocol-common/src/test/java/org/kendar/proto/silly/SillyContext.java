@@ -1,4 +1,4 @@
-package org.kendar.proto;
+package org.kendar.proto.silly;
 
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.ProtoDescriptor;

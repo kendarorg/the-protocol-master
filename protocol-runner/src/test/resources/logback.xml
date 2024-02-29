@@ -2,7 +2,7 @@
 <configuration debug="false">
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%date [%level] %msg [%logger{0}] %n</pattern>
+            <pattern>%date [%level] CID:%X{connection} %msg [%logger{0}] %n</pattern>
         </encoder>
     </appender>
 

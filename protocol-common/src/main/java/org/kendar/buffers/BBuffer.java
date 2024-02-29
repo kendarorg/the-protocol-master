@@ -2,6 +2,9 @@ package org.kendar.buffers;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Buffer with utility methods to read/write data in BE or LE
+ */
 @SuppressWarnings("DataFlowIssue")
 public class BBuffer {
 
@@ -45,17 +48,8 @@ public class BBuffer {
                     + ((inData[j + 1] & 0xff) << 16)
                     + ((inData[j + 2] & 0xff) << 8)
                     + ((inData[j + 3] & 0xff) << 0));
-//            lower = (((inData[j + 4] & 0xff) << 24)
-//                    + ((inData[j + 5] & 0xff) << 16)
-//                    + ((inData[j + 6] & 0xff) << 8)
-//                    + ((inData[j + 7] & 0xff) << 0));
             return Float.intBitsToFloat(upper);
         } else {
-            //for (int i = 0; i < length; i++) {
-//            upper = (((inData[j + 7] & 0xff) << 24)
-//                    + ((inData[j + 6] & 0xff) << 16)
-//                    + ((inData[j + 5] & 0xff) << 8)
-//                    + ((inData[j + 4] & 0xff) << 0));
             lower = (((inData[j + 3] & 0xff) << 24)
                     + ((inData[j + 2] & 0xff) << 16)
                     + ((inData[j + 1] & 0xff) << 8)
@@ -228,7 +222,7 @@ public class BBuffer {
         }
         var intBytes = getBytes(position, 4);
         if (endianness == BBufferEndianness.LE) {
-            intBytes = BBEndiannessConverter.swap4Bytes(intBytes, 0);
+            intBytes = BBEndiannessConverter.swap4Bytes(intBytes);
         }
         int intValue = 0;
         for (byte b : intBytes) {
@@ -250,7 +244,7 @@ public class BBuffer {
     public short getShort(int position) {
         var intBytes = getBytes(position, 2);
         if (endianness == BBufferEndianness.LE) {
-            intBytes = BBEndiannessConverter.swap2Bytes(intBytes, 0);
+            intBytes = BBEndiannessConverter.swap2Bytes(intBytes);
         }
         int intValue = 0;
         for (byte b : intBytes) {
@@ -272,7 +266,7 @@ public class BBuffer {
     public long getLong(int position) {
         var readBuffer = getBytes(position, 8);
         if (endianness == BBufferEndianness.LE) {
-            readBuffer = BBEndiannessConverter.swap8Bytes(readBuffer, 0);
+            readBuffer = BBEndiannessConverter.swap8Bytes(readBuffer);
         }
 
         return (((long) readBuffer[0] << 56) +
@@ -283,12 +277,6 @@ public class BBuffer {
                 ((readBuffer[5] & 255) << 16) +
                 ((readBuffer[6] & 255) << 8) +
                 ((readBuffer[7] & 255) << 0));
-
-//        long value = 0;
-//        for (int i = 0; i < intBytes.length; i++) {
-//            value += ((long) intBytes[i] & 0xffL) << (8 * i);
-//        }
-//        return value;
     }
 
     public boolean contains(byte[] toSearch, int offset) {
@@ -307,7 +295,7 @@ public class BBuffer {
                 (byte) (value >> 8),
                 (byte) value};
         if (this.endianness == BBufferEndianness.LE) {
-            data = BBEndiannessConverter.swap2Bytes(data, 0);
+            data = BBEndiannessConverter.swap2Bytes(data);
         }
         write(data, offset);
 
@@ -323,10 +311,6 @@ public class BBuffer {
 
     public void writeLong(long v, int offset) {
         byte[] writeBuffer = new byte[Long.BYTES];
-//        for (int i = Long.BYTES - 1; i >= 0; i--) {
-//            data[i] = (byte) (value & 0xFF);
-//            value >>= Byte.SIZE;
-//        }
         writeBuffer[0] = (byte) (v >>> 56);
         writeBuffer[1] = (byte) (v >>> 48);
         writeBuffer[2] = (byte) (v >>> 40);
@@ -336,7 +320,7 @@ public class BBuffer {
         writeBuffer[6] = (byte) (v >>> 8);
         writeBuffer[7] = (byte) (v >>> 0);
         if (this.endianness == BBufferEndianness.LE) {
-            writeBuffer = BBEndiannessConverter.swap8Bytes(writeBuffer, 0);
+            writeBuffer = BBEndiannessConverter.swap8Bytes(writeBuffer);
         }
         write(writeBuffer, offset);
 
@@ -440,7 +424,7 @@ public class BBuffer {
                 (byte) (value >> 8),
                 (byte) value};
         if (this.endianness == BBufferEndianness.LE) {
-            data = BBEndiannessConverter.swap4Bytes(data, 0);
+            data = BBEndiannessConverter.swap4Bytes(data);
         }
         write(data, offset);
 
@@ -462,10 +446,8 @@ public class BBuffer {
                 (byte) (value >> 8),
                 (byte) value};
         BBufferUtils.unSetBit(data, 0);
-
-        BBuffer.toHexByteArray(data);
         if (this.endianness == BBufferEndianness.LE) {
-            data = BBEndiannessConverter.swap4Bytes(data, 0);
+            data = BBEndiannessConverter.swap4Bytes(data);
         }
         write(data, offset);
 
@@ -508,5 +490,10 @@ public class BBuffer {
                 j = failure[j - 1] + 1;
         }
         return ((j == needleLen) ? (i - needleLen) : -1);
+    }
+
+    public String toHexStringUpToLength(int length) {
+        var size = Math.min(size(), length);
+        return toHexByteArray(getBytes(size));
     }
 }

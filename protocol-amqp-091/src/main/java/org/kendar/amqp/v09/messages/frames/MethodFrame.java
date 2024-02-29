@@ -1,9 +1,9 @@
 package org.kendar.amqp.v09.messages.frames;
 
 import org.kendar.amqp.v09.dtos.FrameType;
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.utils.FieldsWriter;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
@@ -67,7 +67,7 @@ public abstract class MethodFrame extends Frame {
 
     }
 
-    protected boolean canRunFrame(BytesEvent event) {
+    protected boolean canRunFrame(AmqpFrame event) {
         var rb = event.getBuffer();
         var pos = rb.getPosition();
         var classId = rb.getShort();
@@ -77,12 +77,12 @@ public abstract class MethodFrame extends Frame {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, BytesEvent event, int size) {
+    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, AmqpFrame event, int size) {
         var classId = rb.getShort();
         var methodId = rb.getShort();
         return executeMethod(channel, classId, methodId, rb, event);
     }
 
-    protected abstract Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event);
+    protected abstract Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event);
 
 }

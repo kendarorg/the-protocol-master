@@ -1,12 +1,11 @@
 package org.kendar.mongo.dtos;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.BsonDocument;
 import org.kendar.buffers.BBuffer;
 import org.kendar.mongo.fsm.OpCodes;
+import org.kendar.utils.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,22 +43,18 @@ public class OpReplyContent extends BaseMessageData {
     }
 
     @Override
-    protected void serialize(HashMap<String, Object> dataMap, ObjectMapper mapper) {
-        try {
-            dataMap.put("cursorId", cursorId);
+    protected void serialize(HashMap<String, Object> dataMap, JsonMapper mapper) {
+        dataMap.put("cursorId", cursorId);
 
-            var list = new ArrayList<JsonNode>();
-            for (var item : documents) {
-                list.add(mapper.readTree(item));
-            }
-            dataMap.put("documents", list);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        var list = new ArrayList<JsonNode>();
+        for (var item : documents) {
+            list.add(mapper.toJsonNode(item));
         }
+        dataMap.put("documents", list);
     }
 
     @Override
-    public void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {
+    public void doDeserialize(JsonNode toDeserialize, JsonMapper mapper) {
         super.doDeserialize(toDeserialize, mapper);
 
         var jnCursorId = toDeserialize.get("cursorId");
@@ -74,11 +69,7 @@ public class OpReplyContent extends BaseMessageData {
                 doc.remove("lsid");
                 doc.remove("$clusterTime");
                 doc.remove("apiVersion");
-                try {
-                    documents.add(mapper.writeValueAsString(doc));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+                documents.add(mapper.serialize(doc));
             }
         }
     }

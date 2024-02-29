@@ -28,9 +28,9 @@ public abstract class MongoState extends ProtoState {
         } else {
             var length = inputBuffer.getInt(0);
             var opCode = OpCodes.of(inputBuffer.getInt(12));
-            if(inputBuffer.size() >= length) {
-                canRun =  opCode == getOpCode();
-            }else{
+            if (inputBuffer.size() >= length) {
+                canRun = opCode == getOpCode();
+            } else {
                 inputBuffer.setPosition(pos);
                 throw new AskMoreDataException();
             }

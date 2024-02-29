@@ -1,6 +1,5 @@
 package org.kendar.mongo.fsm.msg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.json.JsonMode;
@@ -12,6 +11,7 @@ import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.fsm.StandardOpMsgCommand;
 import org.kendar.mongo.fsm.events.OpMsgRequest;
 import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.utils.JsonMapper;
 
 import javax.security.sasl.SaslException;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +23,7 @@ public class CmdSaslStart extends StandardOpMsgCommand {
 
     private static final String GS2_HEADER = "n,,";
     private static final int MINIMUM_ITERATION_COUNT = 4096;
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final JsonMapper mapper = new JsonMapper();
 
     public CmdSaslStart(Class<?>... events) {
         super(events);
@@ -32,7 +32,7 @@ public class CmdSaslStart extends StandardOpMsgCommand {
     @Override
     protected boolean canRun(String identifier, String doc) {
         try {
-            var jsonTree = mapper.readTree(doc);
+            var jsonTree = mapper.toJsonNode(doc);
             return jsonTree.get("saslStart") != null;
         } catch (Exception ex) {
             return false;

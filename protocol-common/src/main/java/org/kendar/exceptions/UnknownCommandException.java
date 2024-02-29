@@ -7,9 +7,4 @@ public class UnknownCommandException extends RuntimeException {
         super(message);
     }
 
-    public UnknownCommandException(String message, Throwable exception) {
-
-        super(message,exception);
-    }
-
 }

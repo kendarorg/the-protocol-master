@@ -1,8 +1,8 @@
 package org.kendar.amqp.v09.messages.frames;
 
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
@@ -15,6 +15,7 @@ import java.util.Iterator;
 public abstract class Frame extends ProtoState implements NetworkReturnMessage {
     private short channel = 0;
     private byte type = 0;
+    private boolean proxyed;
 
     public Frame() {
         super();
@@ -22,6 +23,15 @@ public abstract class Frame extends ProtoState implements NetworkReturnMessage {
 
     public Frame(Class<?>... events) {
         super(events);
+    }
+
+    public boolean isProxyed() {
+        return proxyed;
+    }
+
+    public Frame asProxy() {
+        this.proxyed = true;
+        return this;
     }
 
     public byte getType() {
@@ -52,26 +62,26 @@ public abstract class Frame extends ProtoState implements NetworkReturnMessage {
         var sizeEndPos = rb.getPosition();
         rb.writeInt(sizeEndPos - sizeStartPos, sizePos);
         rb.write((byte) 0xCE);
-//        System.out.println("TO SRV" +BBuffer.toHexByteArray(rb.getAll()));
 
     }
 
     protected abstract void writeFrameContent(BBuffer rb);
 
-    public boolean canRun(BytesEvent event) {
+    public boolean canRun(AmqpFrame event) {
         var rb = event.getBuffer();
         if (rb.size() < 7) {
             return false;
         }
         var pos = rb.getPosition();
         var type = rb.get();
+        if (type < 0) return false;
         var channel = rb.getShort();
         var size = rb.getInt();
-        var result = type == getType()
-                && canRunFrame(event);
-        if(rb.size() >= (size + 7)){
-            result=true;
-        }else{
+        var result = false;
+        if (rb.size() >= (size + 7)) {
+            result = type == getType()
+                    && canRunFrame(event);
+        } else {
             rb.setPosition(pos);
             throw new AskMoreDataException();
         }
@@ -79,9 +89,9 @@ public abstract class Frame extends ProtoState implements NetworkReturnMessage {
         return result;
     }
 
-    protected abstract boolean canRunFrame(BytesEvent event);
+    protected abstract boolean canRunFrame(AmqpFrame event);
 
-    public Iterator<ProtoStep> execute(BytesEvent event) {
+    public Iterator<ProtoStep> execute(AmqpFrame event) {
         var rb = event.getBuffer();
         var type = rb.get();
         var channel = rb.getShort();
@@ -91,5 +101,5 @@ public abstract class Frame extends ProtoState implements NetworkReturnMessage {
         return result;
     }
 
-    protected abstract Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, BytesEvent event, int size);
+    protected abstract Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, AmqpFrame event, int size);
 }

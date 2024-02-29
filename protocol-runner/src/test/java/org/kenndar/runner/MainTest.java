@@ -17,25 +17,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MainTest extends BasicTest {
 
+    private AtomicBoolean runTheServer = new AtomicBoolean(true);
+
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();
 
     }
 
+    @AfterAll
+    public static void afterClass() throws Exception {
+        afterClassBase();
+    }
 
     @AfterEach
     public void afterEach() {
         runTheServer.set(false);
         Sleeper.sleep(100);
     }
-    @AfterAll
-    public static void afterClass() throws Exception {
-        afterClassBase();
-    }
 
-
-    private AtomicBoolean runTheServer = new AtomicBoolean(true);
     @Test
     void testMain() throws Exception {
         System.out.println("RECORDING ==============================================");
@@ -48,7 +48,7 @@ public class MainTest extends BasicTest {
                 "-xw", postgresContainer.getPassword(),
                 "-xc", postgresContainer.getJdbcUrl(),
                 "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
-                "-v","DEBUG"
+                "-v", "DEBUG"
         };
 
         var serverThread = new Thread(() -> {
@@ -102,7 +102,7 @@ public class MainTest extends BasicTest {
                 "-xc", postgresContainer.getJdbcUrl(),
                 "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
                 "-pl",
-                "-v","DEBUG"
+                "-v", "DEBUG"
         };
 
         serverThread = new Thread(() -> {

@@ -114,7 +114,7 @@ public class MySQLBBuffer extends BBuffer {
             value >>= Byte.SIZE;
         }
         if (this.isBe()) {
-            data = BBEndiannessConverter.swap8Bytes(data, 0);
+            data = BBEndiannessConverter.swap8Bytes(data);
         }
         write(data);
     }
@@ -127,7 +127,7 @@ public class MySQLBBuffer extends BBuffer {
                 (byte) (value >> 8),
                 (byte) value};
         if (this.isBe()) {
-            data = BBEndiannessConverter.swap4Bytes(data, 0);
+            data = BBEndiannessConverter.swap4Bytes(data);
         }
         write(data);
     }
@@ -149,7 +149,7 @@ public class MySQLBBuffer extends BBuffer {
             value >>= Byte.SIZE;
         }
         if (this.endianness == BBufferEndianness.LE) {
-            data = BBEndiannessConverter.swap8Bytes(data, 0);
+            data = BBEndiannessConverter.swap8Bytes(data);
         }
         write(data, offset);
 
@@ -176,7 +176,7 @@ public class MySQLBBuffer extends BBuffer {
     public long getLong(int position) {
         var intBytes = getBytes(position, 8);
         if (endianness == BBufferEndianness.LE) {
-            intBytes = BBEndiannessConverter.swap8Bytes(intBytes, 0);
+            intBytes = BBEndiannessConverter.swap8Bytes(intBytes);
         }
         long value = 0;
         for (int i = 0; i < intBytes.length; i++) {

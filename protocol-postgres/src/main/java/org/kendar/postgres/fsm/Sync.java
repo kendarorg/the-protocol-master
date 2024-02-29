@@ -21,7 +21,7 @@ public class Sync extends PostgresState {
     protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, NetworkProtoContext protoContext) {
 
         var postgresContext = (PostgresProtoContext) protoContext;
-        postgresContext.addSync(iteratorOfList(new ReadyForQuery(protoContext.isTransaction())));
+        postgresContext.addSync(iteratorOfList(new ReadyForQuery(protoContext.getValue("TRANSACTION", false))));
         return postgresContext.clearSync();
     }
 }

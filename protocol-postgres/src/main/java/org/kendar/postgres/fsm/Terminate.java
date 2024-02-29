@@ -21,6 +21,6 @@ public class Terminate extends PostgresState {
     @Override
     public Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, NetworkProtoContext protoContext) {
 
-        return iteratorOfList(new Stop());
+        return iteratorOfRunner(new Stop());
     }
 }

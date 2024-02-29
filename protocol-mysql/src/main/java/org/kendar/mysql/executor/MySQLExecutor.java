@@ -33,11 +33,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class MySQLExecutor {
-    private static Logger log = LoggerFactory.getLogger(MySQLExecutor.class);
-
     public static final String TRANSACTION_ISOLATION_LEVEL_ID = "TRANSACTION ISOLATION LEVEL";
     protected static final List<BasicHandler> fakeQueries;
     private static final AtomicInteger statementId = new AtomicInteger(1);
+    private static final Logger log = LoggerFactory.getLogger(MySQLExecutor.class);
 
     static {
         fakeQueries = new ArrayList<>();
@@ -60,7 +59,7 @@ public class MySQLExecutor {
         var mysqlContext = (MySQLProtoContext) protoContext;
         ((JdbcProxy) mysqlContext.getProxy()).executeCommit(protoContext);
         var res = new ArrayList<ReturnMessage>();
-        protoContext.setTransaction(false);
+        protoContext.setValue("TRANSACTION", false);
         var ok = new OkPacket();
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());
         return ProtoState.iteratorOfList(ok);
@@ -70,7 +69,7 @@ public class MySQLExecutor {
         var mysqlContext = (MySQLProtoContext) protoContext;
         ((JdbcProxy) mysqlContext.getProxy()).executeRollback(protoContext);
         var res = new ArrayList<ReturnMessage>();
-        protoContext.setTransaction(false);
+        protoContext.setValue("TRANSACTION", false);
         var ok = new OkPacket();
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());
         return ProtoState.iteratorOfList(ok);
@@ -80,7 +79,7 @@ public class MySQLExecutor {
         var mysqlContext = (MySQLProtoContext) protoContext;
         ((JdbcProxy) mysqlContext.getProxy()).executeBegin(protoContext);
         var res = new ArrayList<ReturnMessage>();
-        protoContext.setTransaction(true);
+        protoContext.setValue("TRANSACTION", true);
         var ok = new OkPacket();
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_IN_TRANS.getCode());
         return ProtoState.iteratorOfList(ok);
@@ -112,7 +111,7 @@ public class MySQLExecutor {
 
     protected Iterator<ProtoStep> runExceptionInternal(MySQLProtoContext context, Exception ex) {
         var error = new Error();
-        log.error(ex.getMessage(),ex);
+        log.error(ex.getMessage(), ex);
         error.setCapabilities(context.getClientCapabilities());
         error.setErrorCode(ErrorCode.ER_UNKNOWN_COM_ERROR.getValue());
         error.setErrorMessage(ex.getMessage());
@@ -248,10 +247,10 @@ public class MySQLExecutor {
                     withPacketNumber(++packetNumber));
 //            var showMetadata = true;// (metadataFollows.isPresent()&&metadataFollows.get()) && !metadataFollows.isEmpty();
 //            if (showMetadata) {
-                for (var field : resultSet.getMetadata()) {
-                    result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, false).
-                            withPacketNumber(++packetNumber));
-                }
+            for (var field : resultSet.getMetadata()) {
+                result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, false).
+                        withPacketNumber(++packetNumber));
+            }
             //}
             //TODO Check for the
             // if CLIENT_DEPRECATE_EOF is on, OK_Packet is sent instead of an actual EOF_Packet packet.

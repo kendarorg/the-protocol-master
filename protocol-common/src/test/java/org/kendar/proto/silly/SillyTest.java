@@ -1,4 +1,4 @@
-package org.kendar.proto;
+package org.kendar.proto.silly;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,8 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.utils.Sleeper;
+
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +30,7 @@ public class SillyTest {
 
 
     @Test
-    void testExplode2() {
+    void testExplode2() throws ExecutionException, InterruptedException {
         var protocol = new SillyProtocol() {
             @Override
             public ProtoState doTestInitialize() {
@@ -47,28 +49,29 @@ public class SillyTest {
         protocol.initializeProtocol();
         var context = (SillyContext) protocol.createContext(protocol);
 
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
         LoopOne.run = false;
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
         ChoiceOne.run = false;
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
         assertArrayEquals(
                 new String[]{"LoopOne", "LoopTwo", "LoopOne", "LoopTwo", "ChoiceOne", "ChoiceOne", "ChoiceTwo"}
                 , context.getResult().stream().map(r -> r.getClass().getSimpleName()).toArray());
         ChoiceTwo.run = false;
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'Z'})));
-        assertThrows(RuntimeException.class, () -> assertFalse(context.runFsmCycle()), "Wrong message!");
+        assertThrows(RuntimeException.class, () ->
+                        context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'Z'})))
+                , "Wrong message!");
         assertArrayEquals(
                 new String[]{"LoopOne", "LoopTwo", "LoopOne", "LoopTwo", "ChoiceOne", "ChoiceOne", "ChoiceTwo"}
                 , context.getResult().stream().map(r -> r.getClass().getSimpleName()).toArray());
@@ -91,16 +94,16 @@ public class SillyTest {
         protocol.initializeProtocol();
         var context = (SillyContext) protocol.createContext(protocol);
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'})));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'}))));
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'2'})));
-        assertTrue(context.runFsmCycle());
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'I'})));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'3'})));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'2'}))));
+
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'I'}))));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'3'}))));
+
         assertArrayEquals(
                 new String[]{"ToIntOne", "ToIntTwo", "Interrupt", "ToIntThree"}
                 , context.getResult().stream().map(r -> r.getClass().getSimpleName()).toArray());
@@ -122,17 +125,16 @@ public class SillyTest {
         protocol.initializeProtocol();
         var context = (SillyContext) protocol.createContext(protocol);
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'})));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'}))));
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'2'})));
-        assertTrue(context.runFsmCycle());
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'3'})));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'2'}))));
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'3'})));
-        assertThrows(RuntimeException.class, () -> context.runFsmCycle(), "Wrong message!");
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'3'}))));
+
+
+        assertThrows(RuntimeException.class, () -> context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'3'}))), "Wrong message!");
 
         var state = context.getCurrentState();
         assertEquals("ToIntThree", state.getSimpleName());
@@ -144,7 +146,7 @@ public class SillyTest {
     }
 
     @Test
-    void testThread() {
+    void testThread() throws ExecutionException, InterruptedException {
         var protocol = new SillyProtocol() {
             @Override
             public ProtoState doTestInitialize() {
@@ -162,15 +164,13 @@ public class SillyTest {
         };
         protocol.initializeProtocol();
         var context = (SillyContext) protocol.createContext(protocol);
-        var th = new Thread(context::start);
-        th.start();
         Sleeper.sleep(500);
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'})));
+        assertTrue(context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'}))).get());
         Sleeper.sleep(500);
         var state = context.getCurrentState();
         assertEquals("ToIntOne", state.getSimpleName());
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'2'})));
+        assertTrue(context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'2'}))).get());
         Sleeper.sleep(100);
         state = context.getCurrentState();
         assertEquals("ToIntTwo", state.getSimpleName());
@@ -200,17 +200,16 @@ public class SillyTest {
         };
         protocol.initializeProtocol();
         var context = (SillyContext) protocol.createContext(protocol);
-        context.send(new BytesEvent(context, null, new BBuffer())); //l1
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer())); //l2
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer())); //l1
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer())); //l2
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer()))); //l1
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer()))); //l2
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer()))); //l1
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer()))); //l2
+
         LoopOne.run = false;
-        context.send(new BytesEvent(context, null, new BBuffer())); //c1-Machine ended
-        assertThrows(RuntimeException.class, () -> context.runFsmCycle(), "FAILED STATE ProtoStateSwitchCase[ProtoStateWhile,ProtoStateSwitchCase] BytesEvent");
+        assertThrows(RuntimeException.class, () -> context.sendSync(new BytesEvent(context, null, new BBuffer())));
 
         assertArrayEquals(
                 new String[]{"LoopOne", "LoopTwo", "LoopOne", "LoopTwo"}
@@ -238,26 +237,26 @@ public class SillyTest {
         protocol.initializeProtocol();
         var context = (SillyContext) protocol.createContext(protocol);
 
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
         LoopOne.run = false;
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
         ChoiceOne.run = false;
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
 
         LoopOne.run = true;
-        context.send(new BytesEvent(context, null, new BBuffer()));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
+
         assertArrayEquals(
                 new String[]{"LoopOne", "LoopTwo", "LoopOne", "LoopTwo",
                         "ChoiceOne", "ChoiceOne", "ChoiceTwo",
@@ -283,16 +282,16 @@ public class SillyTest {
         protocol.initializeProtocol();
         var context = (SillyContext) protocol.createContext(protocol);
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'})));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'}))));
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'2'})));
-        assertTrue(context.runFsmCycle());
 
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'I'})));
-        assertTrue(context.runFsmCycle());
-        context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'3'})));
-        assertTrue(context.runFsmCycle());
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'2'}))));
+
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'I'}))));
+
+        assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'3'}))));
+
         assertArrayEquals(
                 new String[]{"ToIntOne", "ToIntTwo", "Interrupt", "ToIntThree"}
                 , context.getResult().stream().map(r -> r.getClass().getSimpleName()).toArray());

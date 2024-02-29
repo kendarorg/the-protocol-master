@@ -3,12 +3,12 @@ package org.kendar.amqp.v09.messages.frames;
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.dtos.FrameType;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.utils.FieldsReader;
 import org.kendar.amqp.v09.utils.FieldsWriter;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
@@ -32,7 +32,6 @@ public class HeaderFrame extends Frame {
     private String expiration;
     private String messageId;
     private short weight;
-    private boolean proxyed;
     private short classId;
     private long bodySize;
     private Date timestamp;
@@ -196,11 +195,6 @@ public class HeaderFrame extends Frame {
         this.propertyFlags = propertyFlags;
     }
 
-    public HeaderFrame asProxy() {
-        this.proxyed = true;
-        return this;
-    }
-
     @Override
     protected void writeFrameContent(BBuffer rb) {
         rb.writeShort(classId);
@@ -241,12 +235,12 @@ public class HeaderFrame extends Frame {
     }
 
     @Override
-    protected boolean canRunFrame(BytesEvent event) {
+    protected boolean canRunFrame(AmqpFrame event) {
         return true;
     }
 
     @Override
-    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, BytesEvent event, int size) {
+    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, AmqpFrame event, int size) {
         var context = (AmqpProtoContext) event.getContext();
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
@@ -257,11 +251,6 @@ public class HeaderFrame extends Frame {
         hf.bodySize = rb.getLong();
         var propertyFlags = (int) rb.getShort();
         hf.propertyFlags = propertyFlags;
-        var data = new byte[]{
-                (byte) (propertyFlags >> 8),
-                (byte) (propertyFlags)};
-        BBuffer.toHexByteArray(data);
-
 
         boolean contentType_present = isFlagSet(propertyFlags, FLAG_CONTENT_TYPE);
         boolean contentEncoding_present = isFlagSet(propertyFlags, FLAG_CONTENT_ENCODING);
@@ -295,12 +284,12 @@ public class HeaderFrame extends Frame {
         hf.clusterId = clusterId_present ? ShortStringHelper.read(rb) : null;
         hf.setChannel(channel);
 
-        if (proxyed) {
+        if (isProxyed()) {
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             hf.setConsumeId(basicConsume.getConsumeId());
             var storage = proxy.getStorage();
             var res = "{\"type\":\"" + hf.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serializeCompact(hf) + "}";
+                    mapper.serialize(hf) + "}";
 
             storage.write(
                     null

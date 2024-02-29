@@ -18,6 +18,7 @@
         <module>protocol-runner</module>
         <module>protocol-amqp-091</module>
         <module>jacoco</module>
+        <module>todo</module>
     </modules>
 
     <properties>
@@ -38,24 +39,38 @@
         <jaxb.api.version>2.3.0</jaxb.api.version>
         <commons.cli.version>1.6.0</commons.cli.version>
         <amqp.client.version>5.20.0</amqp.client.version>
-        <logback.version>1.4.8</logback.version>
-        <slf4j.version>2.0.7</slf4j.version>
     </properties>
     <dependencies>
+        <!--        <dependency>-->
+        <!--            <groupId>org.slf4j</groupId>-->
+        <!--            <artifactId>slf4j-api</artifactId>-->
+        <!--            <version>2.0.7</version>-->
+
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.slf4j</groupId>-->
+        <!--            <artifactId>slf4j-log4j12</artifactId>-->
+        <!--            <version>2.0.7</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.logging.log4j</groupId>-->
+        <!--            <artifactId>log4j-api</artifactId>-->
+        <!--            <version>2.22.0</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
+            <version>1.4.8</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
+            <version>1.4.8</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <version>2.0.7</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -105,6 +120,7 @@
             <id>central2</id>
             <name>Central Repository2</name>
             <url>https://repo.maven.apache.org/maven2</url>
+            <!-- https://repo.maven.apache.org/maven2 -->
             <layout>default</layout>
             <snapshots>
                 <enabled>false</enabled>

@@ -3,6 +3,7 @@ package org.kendar.amqp.v09.messages.methods.basic;
 import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
 import org.kendar.amqp.v09.utils.FieldsReader;
 import org.kendar.amqp.v09.utils.FieldsWriter;
@@ -10,7 +11,6 @@ import org.kendar.amqp.v09.utils.ProxySocket;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferUtils;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 
@@ -121,7 +121,7 @@ public class BasicConsume extends Basic {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
+    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         var context = (AmqpProtoContext) event.getContext();
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));

@@ -1,6 +1,6 @@
 package org.kendar.proto.fsm;
 
-import org.kendar.proto.SillyTest;
+import org.kendar.proto.silly.SillyTest;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;

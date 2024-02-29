@@ -3,6 +3,12 @@ package org.kendar.iterators;
 import java.util.Iterator;
 import java.util.function.Supplier;
 
+/**
+ * Iterator for query results. Contains a callback to stop the iterator
+ * e.g. in case of asynchronous cancel of operations
+ *
+ * @param <T>
+ */
 public class QueryResultIterator<T> implements Iterator<T> {
 
     private final Supplier<T> next;

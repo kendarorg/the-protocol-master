@@ -6,6 +6,9 @@ import org.kendar.utils.Sleeper;
 
 import java.util.Iterator;
 
+/**
+ * State to wait for bytes
+ */
 public class NetworkWait extends ProtoState {
     public NetworkWait(Class<?>... messages) {
         super(messages);

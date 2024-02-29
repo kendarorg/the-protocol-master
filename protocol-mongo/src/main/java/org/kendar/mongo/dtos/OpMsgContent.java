@@ -1,10 +1,10 @@
 package org.kendar.mongo.dtos;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.BsonDocument;
 import org.kendar.buffers.BBuffer;
 import org.kendar.mongo.fsm.OpCodes;
+import org.kendar.utils.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class OpMsgContent extends BaseMessageData {
     }
 
     @Override
-    protected void serialize(HashMap<String, Object> dataMap, ObjectMapper mapper) {
+    protected void serialize(HashMap<String, Object> dataMap, JsonMapper mapper) {
 
         var sections = new ArrayList<Map<String, Object>>();
         for (var item : this.sections) {
@@ -67,7 +67,7 @@ public class OpMsgContent extends BaseMessageData {
     }
 
     @Override
-    public void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {
+    public void doDeserialize(JsonNode toDeserialize, JsonMapper mapper) {
         super.doDeserialize(toDeserialize, mapper);
         var sections = toDeserialize.get("sections");
         this.sections = new ArrayList<>();

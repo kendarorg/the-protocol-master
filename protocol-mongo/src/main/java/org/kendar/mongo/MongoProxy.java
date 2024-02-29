@@ -1,7 +1,6 @@
 package org.kendar.mongo;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerApiVersion;
@@ -25,11 +24,12 @@ import org.kendar.mongo.utils.NullMongoStorage;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.utils.JsonMapper;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MongoProxy extends Proxy<MongoStorage> {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final JsonMapper mapper = new JsonMapper();
     private static final AtomicInteger connectionId = new AtomicInteger(1);
     private String connectionString;
     private ServerApiVersion serverApiVersion;

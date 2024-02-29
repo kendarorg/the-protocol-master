@@ -1,5 +1,11 @@
 package org.kendar.storage;
 
+/**
+ * Storage item
+ *
+ * @param <I>
+ * @param <O>
+ */
 public class StorageItem<I, O> {
     private long index;
     private I input;

@@ -2,9 +2,9 @@ package org.kendar.amqp.v09.messages.frames;
 
 import org.kendar.amqp.v09.dtos.FrameType;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.utils.ProxySocket;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.InterruptProtoState;
 import org.kendar.proxy.ProxyConnection;
@@ -30,12 +30,12 @@ public class HearthBeatFrame extends Frame implements InterruptProtoState {
     }
 
     @Override
-    protected boolean canRunFrame(BytesEvent event) {
+    protected boolean canRunFrame(AmqpFrame event) {
         return true;
     }
 
     @Override
-    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, BytesEvent event, int size) {
+    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, AmqpFrame event, int size) {
         var hbFrame = new HearthBeatFrame();
         hbFrame.setChannel(channel);
 

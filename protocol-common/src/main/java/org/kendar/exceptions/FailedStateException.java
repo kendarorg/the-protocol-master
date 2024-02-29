@@ -1,6 +1,7 @@
 package org.kendar.exceptions;
 
 import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.states.NullState;
 import org.kendar.protocol.states.ProtoState;
 
 public class FailedStateException extends RuntimeException {
@@ -12,6 +13,13 @@ public class FailedStateException extends RuntimeException {
 
         this.message = message;
         this.state = state;
+        this.event = event;
+    }
+
+    public FailedStateException(String message, BaseEvent event) {
+
+        this.message = message;
+        this.state = new NullState();
         this.event = event;
     }
 

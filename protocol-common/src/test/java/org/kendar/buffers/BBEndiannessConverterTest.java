@@ -20,7 +20,7 @@ public class BBEndiannessConverterTest {
         buffer.get(dst, 0, LEN);
         assertArrayEquals(verifyBe, dst);
 
-        var verifyLe = BBEndiannessConverter.swap2Bytes(verifyBe, 0);
+        var verifyLe = BBEndiannessConverter.swap2Bytes(verifyBe);
 
         buffer = ByteBuffer.allocate(LEN);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -42,7 +42,7 @@ public class BBEndiannessConverterTest {
         buffer.get(dst, 0, LEN);
         assertArrayEquals(verifyBe, dst);
 
-        var verifyLe = BBEndiannessConverter.swap4Bytes(verifyBe, 0);
+        var verifyLe = BBEndiannessConverter.swap4Bytes(verifyBe);
 
         buffer = ByteBuffer.allocate(LEN);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -65,7 +65,7 @@ public class BBEndiannessConverterTest {
         buffer.get(dst, 0, LEN);
         assertArrayEquals(verifyBe, dst);
 
-        var verifyLe = BBEndiannessConverter.swap8Bytes(verifyBe, 0);
+        var verifyLe = BBEndiannessConverter.swap8Bytes(verifyBe);
 
         buffer = ByteBuffer.allocate(LEN);
         buffer.order(ByteOrder.LITTLE_ENDIAN);

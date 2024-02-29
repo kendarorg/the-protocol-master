@@ -8,11 +8,13 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Basic communication class with client
+ */
 public class TcpServerChannel implements ClientServerChannel {
     private final AsynchronousSocketChannel client;
 
     public TcpServerChannel(AsynchronousSocketChannel client) {
-
         this.client = client;
     }
 

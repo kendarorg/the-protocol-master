@@ -2,12 +2,12 @@ package org.kendar.sql.jdbc.storage;
 
 import org.kendar.sql.jdbc.BindingParameter;
 import org.kendar.sql.jdbc.SelectResult;
+import org.kendar.storage.Storage;
 import org.kendar.storage.StorageItem;
-import org.kendar.storage.StorageRoot;
 
 import java.util.List;
 
-public interface JdbcStorage extends StorageRoot<JdbcRequest, JdbcResponse> {
+public interface JdbcStorage extends Storage<JdbcRequest, JdbcResponse> {
     void initialize();
 
     void write(String query, int result, List<BindingParameter> parameterValues, long durationMs, String type);

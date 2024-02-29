@@ -43,7 +43,7 @@ public class Query extends PostgresState {
                 true, true);
         var itol = new IteratorOfLists<ProtoStep>();
         itol.addIterator(res.getReturnMessages());
-        itol.addIterator(iteratorOfList(new ReadyForQuery(protoContext.isTransaction())));
+        itol.addIterator(iteratorOfList(new ReadyForQuery(protoContext.getValue("TRANSACTION", false))));
         postgresContext.clearSync();
         return itol;
     }

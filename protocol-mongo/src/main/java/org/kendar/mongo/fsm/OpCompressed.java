@@ -12,8 +12,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class OpCompressed extends MongoState {
-    private static Logger log = LoggerFactory.getLogger(OpCompressed.class);
     private static final Map<Integer, CompressionHandler> compressionHandlers;
+    private static final Logger log = LoggerFactory.getLogger(OpCompressed.class);
 
     static {
         compressionHandlers = new HashMap<>();

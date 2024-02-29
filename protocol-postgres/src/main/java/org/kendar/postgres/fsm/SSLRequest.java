@@ -10,7 +10,7 @@ import org.kendar.protocol.states.ProtoState;
 import java.util.Iterator;
 
 public class SSLRequest extends ProtoState {
-    private static final byte[] SSL_MESSAGE_MARKER = BBufferUtils.toByteArray(0x04, 0xd2, 0x16, 0x2f);
+    public static final byte[] SSL_MESSAGE_MARKER = BBufferUtils.toByteArray(0x04, 0xd2, 0x16, 0x2f);
 
     public SSLRequest(Class<?>... messages) {
         super(messages);

@@ -3,6 +3,9 @@ package org.kendar.protocol.events;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.ProtoContext;
 
+/**
+ * Default "bytes" kind event
+ */
 public class BytesEvent extends BaseEvent {
     private final BBuffer buffer;
 

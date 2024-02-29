@@ -65,32 +65,33 @@ public class ReplayerTest {
         var protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        try {
+            Sleeper.sleep(1000);
 
 
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.enableHostnameVerification();
-        var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
-        connectionFactory.setUri(cs);
-        connectionFactory.setPassword("test");
+            ConnectionFactory connectionFactory = new ConnectionFactory();
+            connectionFactory.enableHostnameVerification();
+            var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
+            connectionFactory.setUri(cs);
+            connectionFactory.setPassword("test");
 
-        Sleeper.sleep(100);
+            Sleeper.sleep(100);
 
-        var chanConsume = consume(connectionFactory, messages);
+            var chanConsume = consume(connectionFactory, messages);
 
 
-        Sleeper.sleep(100);
+            Sleeper.sleep(100);
 
-        Connection connection = connectionFactory.newConnection();
-        Channel channel = connection
-                .openChannel()
-                .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
-        channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
+            Connection connection = connectionFactory.newConnection();
+            Channel channel = connection
+                    .openChannel()
+                    .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+            channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
 
-        var props = new AMQP.BasicProperties.Builder()
-                .contentType("text/plain")
+            var props = new AMQP.BasicProperties.Builder()
+                    .contentType("text/plain")
 //                .contentEncoding("UTF-8")
-                .deliveryMode(1)
+                    .deliveryMode(1)
 //                .priority(2)
 //                .correlationId("3") //?
 //                //.replyTo("4")
@@ -99,28 +100,31 @@ public class ReplayerTest {
 //                .timestamp(new Date())
 //                //.type("7")
 //                //.userId("8")
-                .appId("TESTAPP")
-                //.clusterId("9")
-                .build();
-        //SimpleProxyServer.write=true;
-        Sleeper.sleep(100);
-        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
-        Sleeper.sleep(100);
-        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
-        chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
-        System.out.println("------------------------------------------------------------");
-        Sleeper.sleep(100);
-        channel.close();
-        connection.close();
+                    .appId("TESTAPP")
+                    //.clusterId("9")
+                    .build();
+            //SimpleProxyServer.write=true;
+            Sleeper.sleep(100);
+            channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
+            Sleeper.sleep(100);
+            channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
+            chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
+            System.out.println("------------------------------------------------------------");
+            Sleeper.sleep(100);
+            channel.close();
+            connection.close();
 
 
-        Sleeper.sleep(100);
+            Sleeper.sleep(100);
 
-        assertEquals(3, messages.size());
-        assertTrue(messages.containsValue(exectedMessage + "1"));
-        assertTrue(messages.containsValue(exectedMessage + "2"));
-        assertTrue(messages.containsValue(exectedMessage + "3"));
-        protocolServer.stop();
+            assertEquals(3, messages.size());
+            assertTrue(messages.containsValue(exectedMessage + "1"));
+            assertTrue(messages.containsValue(exectedMessage + "2"));
+            assertTrue(messages.containsValue(exectedMessage + "3"));
+        } finally {
+
+            protocolServer.stop();
+        }
     }
 
     @Test
@@ -137,32 +141,33 @@ public class ReplayerTest {
         var protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        try {
+            Sleeper.sleep(1000);
 
 
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.enableHostnameVerification();
-        var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
-        connectionFactory.setUri(cs);
-        connectionFactory.setPassword("test");
+            ConnectionFactory connectionFactory = new ConnectionFactory();
+            connectionFactory.enableHostnameVerification();
+            var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
+            connectionFactory.setUri(cs);
+            connectionFactory.setPassword("test");
 
-        Sleeper.sleep(100);
+            Sleeper.sleep(100);
 
-        var chanConsume = consume(connectionFactory, messages);
+            var chanConsume = consume(connectionFactory, messages);
 
 
-        Sleeper.sleep(100);
+            Sleeper.sleep(100);
 
-        Connection connection = connectionFactory.newConnection();
-        Channel channel = connection
-                .openChannel()
-                .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
-        channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
+            Connection connection = connectionFactory.newConnection();
+            Channel channel = connection
+                    .openChannel()
+                    .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+            channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
 
-        var props = new AMQP.BasicProperties.Builder()
-                .contentType("text/plain")
+            var props = new AMQP.BasicProperties.Builder()
+                    .contentType("text/plain")
 //                .contentEncoding("UTF-8")
-                .deliveryMode(1)
+                    .deliveryMode(1)
 //                .priority(2)
 //                .correlationId("3") //?
 //                //.replyTo("4")
@@ -171,25 +176,28 @@ public class ReplayerTest {
 //                .timestamp(new Date())
 //                //.type("7")
 //                //.userId("8")
-                .appId("TESTAPP")
-                //.clusterId("9")
-                .build();
-        //SimpleProxyServer.write=true;
-        Sleeper.sleep(100);
-        System.out.println("------------------------------------------------------------");
-        Sleeper.sleep(100);
-        channel.close();
-        connection.close();
+                    .appId("TESTAPP")
+                    //.clusterId("9")
+                    .build();
+            //SimpleProxyServer.write=true;
+            Sleeper.sleep(100);
+            System.out.println("------------------------------------------------------------");
+            Sleeper.sleep(100);
+            channel.close();
+            connection.close();
 
 
-        Sleeper.sleep(100);
+            Sleeper.sleep(100);
 
-        assertEquals(3, messages.size());
-        assertTrue(messages.containsValue(exectedMessage + "1"));
-        assertTrue(messages.containsValue(exectedMessage + "2"));
-        assertTrue(messages.containsValue(exectedMessage + "3"));
+            assertEquals(3, messages.size());
+            assertTrue(messages.containsValue(exectedMessage + "1"));
+            assertTrue(messages.containsValue(exectedMessage + "2"));
+            assertTrue(messages.containsValue(exectedMessage + "3"));
 
-        protocolServer.stop();
+        } finally {
+
+            protocolServer.stop();
+        }
     }
 
     @Test
@@ -205,20 +213,24 @@ public class ReplayerTest {
         var protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        try {
+            Sleeper.sleep(1000);
 
 
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.enableHostnameVerification();
-        var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
-        connectionFactory.setUri(cs);
-        connectionFactory.setPassword("test");
-        Connection connection = connectionFactory.newConnection();
-        Channel channel = connection
-                .openChannel()
-                .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
-        channel.close();
-        connection.close();
-        protocolServer.stop();
+            ConnectionFactory connectionFactory = new ConnectionFactory();
+            connectionFactory.enableHostnameVerification();
+            var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
+            connectionFactory.setUri(cs);
+            connectionFactory.setPassword("test");
+            Connection connection = connectionFactory.newConnection();
+            Channel channel = connection
+                    .openChannel()
+                    .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+            channel.close();
+            connection.close();
+        } finally {
+
+            protocolServer.stop();
+        }
     }
 }

@@ -12,7 +12,6 @@ import org.kendar.mongo.MongoProxy;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.sql.jdbc.JdbcReplayProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
 import org.kendar.utils.Sleeper;
 import org.slf4j.LoggerFactory;
@@ -47,14 +46,14 @@ public class Main {
             var login = cmd.getOptionValue("xl");
             var password = cmd.getOptionValue("xw");
             var logLevel = cmd.getOptionValue("v");
-            if(logLevel==null || logLevel.isEmpty()){
-                logLevel="ERROR";
+            if (logLevel == null || logLevel.isEmpty()) {
+                logLevel = "ERROR";
             }
 
             LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
             var logger = loggerContext.getLogger("org.kendar");
-            logger.setLevel(Level.toLevel(logLevel,Level.ERROR));
+            logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
 
             var connectionString = cmd.getOptionValue("xc");
             var logsDir = cmd.getOptionValue("xd");
@@ -137,7 +136,7 @@ public class Main {
                 login, password);
         if (logsDir != null) {
             if (replayFromLog) {
-                proxy = new JdbcReplayProxy(new JdbcFileStorage(Path.of(logsDir)));
+                proxy = new JdbcProxy(new JdbcFileStorage(Path.of(logsDir)));
             } else {
                 proxy.setStorage(new JdbcFileStorage(Path.of(logsDir)));
             }
