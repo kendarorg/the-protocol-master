@@ -1,5 +1,8 @@
 package org.kendar.iterators;
 
+/**
+ * Current process id
+ */
 public class ProcessId {
     private final int pid;
 

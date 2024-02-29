@@ -1,8 +1,8 @@
 package org.kendar.amqp.v09.messages.methods.connection;
 
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Connection;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.HashMap;
@@ -64,7 +64,7 @@ public class ConnectionTune extends Connection {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
+    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         this.channelMax = rb.getShort();
         this.frameMax = rb.getInt();
         this.hearthBeat = rb.getShort();

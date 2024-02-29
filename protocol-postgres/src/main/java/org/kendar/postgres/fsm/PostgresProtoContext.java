@@ -22,9 +22,10 @@ public class PostgresProtoContext extends NetworkProtoContext {
 
     private static final AtomicInteger processIdCounter = new AtomicInteger(0);
     private static final ConcurrentHashMap<Integer, PostgresProtoContext> pids = new ConcurrentHashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(PostgresProtoContext.class);
     private final int pid;
-    private List<Iterator<ProtoStep>> toSync = new ArrayList<>();
     private final AtomicBoolean cancel = new AtomicBoolean(false);
+    private List<Iterator<ProtoStep>> toSync = new ArrayList<>();
 
     public PostgresProtoContext(ProtoDescriptor descriptor) {
 
@@ -59,23 +60,17 @@ public class PostgresProtoContext extends NetworkProtoContext {
         return result;
     }
 
-    public void stop() {
-        run.set(false);
-        inputQueue.clear();
-    }
-    private static Logger log = LoggerFactory.getLogger(PostgresProtoContext.class);
     @Override
-    protected List<ReturnMessage> runExceptionInternal(Exception ex, ProtoState state, BaseEvent event) {
+    protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
 
-        var result = new ArrayList<ReturnMessage>(super.runExceptionInternal(ex, state, event));
-        log.error(ex.getMessage(),ex);
+        var result = new ArrayList<ReturnMessage>(super.runException(ex, state, event));
+        log.error(ex.getMessage(), ex);
         result.add(new ErrorResponse(ex.getMessage()));
         return result;
     }
 
     public void cancel() {
         cancel.set(true);
-        inputQueue.clear();
     }
 
     public boolean shouldCancel() {

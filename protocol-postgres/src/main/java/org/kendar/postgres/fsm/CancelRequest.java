@@ -27,11 +27,11 @@ public class CancelRequest extends ProtoState implements InterruptProtoState {
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
         var context = (PostgresProtoContext) event.getContext();
-        context.stop();
         var inputBuffer = event.getBuffer();
         var pid = inputBuffer.getInt(8);
         var secret = inputBuffer.getInt(12);
         var contextToCancel = PostgresProtoContext.getContextByPid(pid);
+        contextToCancel.cancel();
         var statement = (Statement) contextToCancel.getValue("EXECUTING_NOW");
         if (statement != null) {
             try {
@@ -41,7 +41,7 @@ public class CancelRequest extends ProtoState implements InterruptProtoState {
             }
         }
 
-        return iteratorOfList(new Stop());
+        return iteratorOfRunner(new Stop());
     }
 
 }

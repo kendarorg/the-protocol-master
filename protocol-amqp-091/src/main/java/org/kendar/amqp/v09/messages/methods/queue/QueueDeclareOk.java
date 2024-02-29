@@ -1,9 +1,9 @@
 package org.kendar.amqp.v09.messages.methods.queue;
 
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Queue;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
@@ -61,7 +61,7 @@ public class QueueDeclareOk extends Queue {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
+    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         this.setChannel(channel);
         this.queueName = ShortStringHelper.read(rb);
         this.messageCount = rb.getInt();

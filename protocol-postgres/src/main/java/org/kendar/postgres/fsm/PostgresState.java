@@ -2,8 +2,8 @@ package org.kendar.postgres.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.postgres.fsm.events.PostgresPacket;
 import org.kendar.protocol.context.NetworkProtoContext;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
 
@@ -19,13 +19,13 @@ public abstract class PostgresState extends ProtoState {
     }
 
 
-    public boolean canRun(BytesEvent event) {
+    public boolean canRun(PostgresPacket event) {
         var inputBuffer = event.getBuffer();
         if (inputBuffer.size() < 5 || inputBuffer.get(0) != getMessageId()) {
             return false;
         }
         var length = inputBuffer.getInt(1);
-        if(inputBuffer.size() >= length){
+        if (inputBuffer.size() >= length) {
             return true;
         }
         throw new AskMoreDataException();
@@ -34,7 +34,7 @@ public abstract class PostgresState extends ProtoState {
     protected abstract byte getMessageId();
 
 
-    public Iterator<ProtoStep> execute(BytesEvent event) {
+    public Iterator<ProtoStep> execute(PostgresPacket event) {
         var inputBuffer = event.getBuffer();
         var protoContext = (NetworkProtoContext) event.getContext();
         inputBuffer.setPosition(5);

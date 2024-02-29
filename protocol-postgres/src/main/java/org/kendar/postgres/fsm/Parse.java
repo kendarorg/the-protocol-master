@@ -8,6 +8,8 @@ import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.parser.SqlStringParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.JDBCType;
@@ -17,6 +19,8 @@ import java.util.Iterator;
 import static org.kendar.sql.jdbc.JdbcProxy.parseParameters;
 
 public class Parse extends PostgresState {
+    private static final Logger log = LoggerFactory.getLogger(Parse.class);
+
     public Parse(Class<?>... messages) {
         super(messages);
     }
@@ -49,6 +53,7 @@ public class Parse extends PostgresState {
         var postgresContext = (PostgresProtoContext) protoContext;
         var statementName = inputBuffer.getString();
         var query = inputBuffer.getUtf8String();
+        log.debug("[SERVER][PARSE] Query=" + query);
         var paramsCount = inputBuffer.getShort();
         var oids = new ArrayList<Integer>();
         var concreteTypes = new ArrayList<JDBCType>();

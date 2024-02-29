@@ -1,40 +1,108 @@
 package org.kendar.protocol.context;
 
+import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.protocol.states.TaggedObject;
 import org.kendar.protocol.states.special.SpecialProtoState;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class ProtoStackItem {
+/**
+ * Represent the instance of a state during an execution
+ */
+public class ProtoStackItem implements TaggedObject {
+    /**
+     * Generate the unique stack id number
+     */
+    private static AtomicInteger stackIdGenerator = new AtomicInteger(1);
+
+    /**
+     * STore the id
+     */
+    private final String id;
+
+    /**
+     * The state definition
+     */
     protected ProtoState state;
+
+    /**
+     * The stack of possible sub states to execute
+     */
     protected Stack<ProtoState> executable = new Stack<>();
 
-    public ProtoStackItem(ProtoState state) {
+    /**
+     * Tags
+     */
+    private List<Tag> tags;
 
+    /**
+     * Given an event and its tags, and a state matching create a state instance
+     *
+     * @param state
+     * @param event
+     */
+    public ProtoStackItem(ProtoState state, BaseEvent event) {
+        this.id = stackIdGenerator.getAndIncrement() + "";
+        this.tags = new ArrayList<>();
         this.state = state;
+        if (event != null) {
+            this.tags = ((TaggedObject) event).getTag();
+        }
         reset();
     }
 
+    /**
+     * If state has value
+     *
+     * @return
+     */
+    public boolean hasState() {
+        return state != null;
+    }
+
+    /**
+     * Retrieve the current state
+     *
+     * @return
+     */
     public ProtoState getState() {
         return state;
     }
 
+    /**
+     * True if can do something and is a special state
+     *
+     * @return
+     */
     public boolean canRun() {
         return !executable.empty() && (state instanceof SpecialProtoState);
     }
 
+    /**
+     * Has no state to execute
+     *
+     * @return
+     */
     public boolean isEmpty() {
         return executable.empty();
     }
 
+    /**
+     * Pop the new item to execute
+     *
+     * @return
+     */
     public ProtoState getNextExecutable() {
         return executable.pop();
     }
 
-    public ProtoState peekNextExecutable() {
-        return executable.peek();
-    }
-
+    /**
+     * RE-initialize the executable (typically for first run or loops)
+     */
     public void reset() {
         if (state instanceof SpecialProtoState) {
             this.executable = new Stack<>();
@@ -52,10 +120,34 @@ public class ProtoStackItem {
         if (this.executable.empty()) {
             return state.toString() + " (-)";
         }
-        return state.toString() + " (" + this.executable.peek() + ")";
+        return state.toString() + " (" + this.executable.peek().getClass().getSimpleName() + ")";
     }
 
+    /**
+     * Get size of things
+     *
+     * @return
+     */
     public int getSize() {
         return executable.size();
+    }
+
+    /**
+     * Get the tags list
+     *
+     * @return
+     */
+    @Override
+    public List<Tag> getTag() {
+        return tags;
+    }
+
+    /**
+     * Get the id
+     *
+     * @return
+     */
+    public String getId() {
+        return id;
     }
 }

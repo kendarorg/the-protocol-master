@@ -13,8 +13,8 @@ import org.kendar.protocol.states.ProtoState;
 import java.util.Iterator;
 
 public class StartupMessage extends ProtoState {
+    public static final byte[] STARTUP_MESSAGE_MARKER = BBufferUtils.toByteArray(0x00, 0x03, 0x00, 0x00);
     private static final int FIXED_SECRET = 5678;
-    private static final byte[] STARTUP_MESSAGE_MARKER = BBufferUtils.toByteArray(0x00, 0x03, 0x00, 0x00);
 
     public StartupMessage(Class<?>... messages) {
         super(messages);
@@ -52,7 +52,7 @@ public class StartupMessage extends ProtoState {
                 new ParameterStatus("is_superuser", "on"),
                 new ParameterStatus("integer_datetimes", "on"),
                 new BackendKeyData(pidValue, FIXED_SECRET),
-                new ReadyForQuery(protoContext.isTransaction()));
+                new ReadyForQuery(protoContext.getValue("TRANSACTION", false)));
     }
 
 

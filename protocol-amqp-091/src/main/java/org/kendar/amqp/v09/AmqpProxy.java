@@ -19,19 +19,24 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.channels.AsynchronousChannelGroup;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AmqpProxy extends Proxy<AmqpStorage> {
 
-    protected static JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(AmqpProxy.class);
+    protected static JsonMapper mapper = new JsonMapper();
+    private final boolean replayer;
     private String connectionString;
     private String userId;
     private String password;
     private int port;
-    private final boolean replayer;
     private String host;
+    private ExecutorService executor;
+    private AsynchronousChannelGroup group;
 
     public AmqpProxy(String connectionString, String userId, String password) {
         try {
@@ -42,6 +47,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
             this.host = uri.getHost();
             this.userId = userId;
             this.password = password;
+            init();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -49,6 +55,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
 
     public AmqpProxy() {
         this.replayer = true;
+        init();
     }
 
     public int getPort() {
@@ -71,6 +78,15 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         return password;
     }
 
+    private void init() {
+        executor = Executors.newCachedThreadPool();
+        try {
+            group = AsynchronousChannelGroup.withThreadPool(executor);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
         if (replayer) {
@@ -83,7 +99,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
             connection.setTcpNoDelay(true);
             connection.connect(new InetSocketAddress(InetAddress.getByName(host), port));
             return new ProxyConnection(new ProxySocket(context,
-                    new InetSocketAddress(InetAddress.getByName(host), port)));
+                    new InetSocketAddress(InetAddress.getByName(host), port), group));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -110,7 +126,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         sock.write(of);
         sock.read(toRead);
 
-        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serializeCompact(toRead) + "}";
+        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(toRead) + "}";
         long end = System.currentTimeMillis();
         storage.write(
                 jsonReq
@@ -151,7 +167,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
 
 
     public <T extends Frame, K extends Frame> T execute(NetworkProtoContext context, ProxyConnection connection, K of, T toRead) {
-        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serializeCompact(of) + "}";
+        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(of) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
@@ -170,7 +186,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         sock.write(of, bufferToWrite);
         sock.read(toRead);
 
-        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serializeCompact(toRead) + "}";
+        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(toRead) + "}";
         long end = System.currentTimeMillis();
 
         storage.write(
@@ -181,7 +197,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
     }
 
     public <T extends Frame> void execute(NetworkProtoContext context, ProxyConnection connection, T of) {
-        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serializeCompact(of) + "}";
+        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(of) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());

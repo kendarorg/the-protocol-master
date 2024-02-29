@@ -57,27 +57,11 @@ public class BasicTest {
     }
 
     public static void afterEachBase() {
+
         protocolServer.stop();
     }
 
     public static void afterClassBase() throws Exception {
         rabbitContainer.close();
     }
-//
-//    protected static MongoClient getProxyConnection() {
-//        var settings = MongoClientSettings.builder()
-//                .applyConnectionString(new ConnectionString(
-//                        "mongodb://localhost:" + FAKE_PORT + "/?retryWrites=false&retryReads=false&tls=false&ssl=false"))
-//                //.serverApi(serverApi)
-//                .build();
-//        return MongoClients.create(settings);
-//    }
-//
-//    protected static MongoClient getRealConnection() {
-//        var settings = MongoClientSettings.builder()
-//                .applyConnectionString(new ConnectionString(mongoContainer.getConnectionString()))
-//                //.serverApi(serverApi)
-//                .build();
-//        return MongoClients.create(settings);
-//    }
 }

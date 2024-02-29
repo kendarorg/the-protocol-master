@@ -1,9 +1,9 @@
 package org.kendar.amqp.v09.messages.methods.channel;
 
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Channel;
 import org.kendar.amqp.v09.utils.LongStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
@@ -38,7 +38,7 @@ public class ChannelOpenOk extends Channel {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
+    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
 
         this.setChannel(channel);
         this.reserved1 = LongStringHelper.read(rb);

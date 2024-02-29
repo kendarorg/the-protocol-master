@@ -1,5 +1,8 @@
 package org.kendar.utils;
 
+/**
+ * No thread lock wait
+ */
 @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 public class Sleeper {
     /**
@@ -21,9 +24,8 @@ public class Sleeper {
 
     /**
      * Give control to other threads
-     * @param timeoutMillis
      */
-    public static void yield(long timeoutMillis) {
+    public static void yield() {
         Thread.yield();
     }
 }

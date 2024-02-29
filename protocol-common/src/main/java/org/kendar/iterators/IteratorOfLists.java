@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Iterate on multiple lists
+ *
+ * @param <T>
+ */
 public class IteratorOfLists<T> implements Iterator<T> {
     private final List<Iterator<T>> iterators = new ArrayList<>();
     private Iterator<T> current;

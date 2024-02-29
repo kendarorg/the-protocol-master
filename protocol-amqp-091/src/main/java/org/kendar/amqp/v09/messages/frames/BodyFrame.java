@@ -3,10 +3,10 @@ package org.kendar.amqp.v09.messages.frames;
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.dtos.FrameType;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.utils.ProxySocket;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
@@ -16,12 +16,11 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 
 public class BodyFrame extends Frame {
-    protected static JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BodyFrame.class);
     private static final Logger logPs = LoggerFactory.getLogger(ProxySocket.class.getName());
+    protected static JsonMapper mapper = new JsonMapper();
     private byte[] contentBytes;
     private String contentString;
-    private boolean proxyed;
     private int consumeId;
 
     public BodyFrame() {
@@ -34,11 +33,6 @@ public class BodyFrame extends Frame {
         setType(FrameType.BODY.asByte());
     }
 
-    public BodyFrame asProxy() {
-        this.proxyed = true;
-        return this;
-    }
-
     @Override
     protected void writeFrameContent(BBuffer rb) {
 
@@ -46,12 +40,12 @@ public class BodyFrame extends Frame {
     }
 
     @Override
-    protected boolean canRunFrame(BytesEvent event) {
+    protected boolean canRunFrame(AmqpFrame event) {
         return true;
     }
 
     @Override
-    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, BytesEvent event, int size) {
+    protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, AmqpFrame event, int size) {
 
         var context = (AmqpProtoContext) event.getContext();
         var proxy = (AmqpProxy) context.getProxy();
@@ -60,7 +54,7 @@ public class BodyFrame extends Frame {
         var contentBytes = rb.getBytes(size);
         String contentString = null;
         String ext = "[SERVER]";
-        if (proxyed) ext = "[PROXY ]";
+        if (isProxyed()) ext = "[PROXY ]";
         logPs.debug(ext + "[RX]: BodyFrame Content Length: " + contentBytes.length);
         if (contentType != null) {
             logPs.debug(ext + "[RX]: BodyFrame Content type: " + contentType);
@@ -77,12 +71,12 @@ public class BodyFrame extends Frame {
         bf.setChannel(channel);
         bf.setContentBytes(contentBytes);
         bf.setContentString(contentString);
-        if (proxyed) {
+        if (isProxyed()) {
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             bf.setConsumeId(basicConsume.getConsumeId());
             var storage = proxy.getStorage();
             var res = "{\"type\":\"" + bf.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serializeCompact(bf) + "}";
+                    mapper.serialize(bf) + "}";
 
 
             storage.write(

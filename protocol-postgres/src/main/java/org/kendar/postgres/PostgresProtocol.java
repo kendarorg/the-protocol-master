@@ -1,8 +1,8 @@
 package org.kendar.postgres;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.kendar.postgres.fsm.*;
+import org.kendar.postgres.fsm.events.PostgresPacket;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -12,6 +12,7 @@ import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.sql.jdbc.DataTypesConverter;
 import org.kendar.sql.parser.SqlStringParser;
+import org.kendar.utils.JsonMapper;
 
 public class PostgresProtocol extends NetworkProtoDescriptor {
     private static final int PORT = 5432;
@@ -21,10 +22,10 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
 
     static {
         try {
-            var om = new ObjectMapper();
+            var om = new JsonMapper();
             String text = new String(PostgresProtocol.class.getResourceAsStream("/postgresdtt.json")
                     .readAllBytes());
-            dataTypesConverter = new DataTypesConverter(om.readValue(text, new TypeReference<>() {
+            dataTypesConverter = new DataTypesConverter(om.deserialize(text, new TypeReference<>() {
             }));
         } catch (Exception e) {
 
@@ -56,31 +57,32 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     @Override
     protected void initializeProtocol() {
         addInterruptState(new CancelRequest(BytesEvent.class));
+        addInterruptState(new PostgresPacketTranslator(BytesEvent.class));
         initialize(
                 new ProtoStateSequence(
                         new SSLRequest(BytesEvent.class).asOptional(),
                         new StartupMessage(BytesEvent.class),
                         new ProtoStateWhile(
                                 new ProtoStateSwitchCase(
-                                        new Query(BytesEvent.class),
+                                        new Query(PostgresPacket.class),
                                         new ProtoStateSequence(
-                                                new Parse(BytesEvent.class),
+                                                new Parse(PostgresPacket.class),
                                                 new ProtoStateSequence(
-                                                        new Bind(BytesEvent.class).asOptional(),
-                                                        new Describe(BytesEvent.class).asOptional(),
-                                                        new Execute(BytesEvent.class)
+                                                        new Bind(PostgresPacket.class).asOptional(),
+                                                        new Describe(PostgresPacket.class).asOptional(),
+                                                        new Execute(PostgresPacket.class)
                                                 ).asOptional()
                                         ),
                                         new ProtoStateSequence(
-                                                new Bind(BytesEvent.class),
-                                                new Execute(BytesEvent.class)
+                                                new Bind(PostgresPacket.class),
+                                                new Execute(PostgresPacket.class)
                                         ),
-                                        new Sync(BytesEvent.class),
-                                        new Close(BytesEvent.class),
-                                        new Terminate(BytesEvent.class)
+                                        new Sync(PostgresPacket.class),
+                                        new Close(PostgresPacket.class),
+                                        new Terminate(PostgresPacket.class)
                                 )
                         ),
-                        new Terminate(BytesEvent.class)
+                        new Terminate(PostgresPacket.class)
                 )
 
         );

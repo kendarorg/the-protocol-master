@@ -2,7 +2,6 @@ package org.kendar.amqp.v09;
 
 import com.rabbitmq.client.*;
 import org.junit.jupiter.api.*;
-import org.kendar.SimpleProxyServer;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
@@ -17,11 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class SimpleTest extends BasicTest {
 
     public static final String MAIN_QUEUE = "fuffa_queue";
     public static final String DEFAULT_MESSAGE_CONTENT = "zzzz details";
-    private static boolean proxyOnly = false;
 
     @BeforeAll
     public static void beforeClass() {
@@ -38,13 +37,20 @@ public class SimpleTest extends BasicTest {
         }
     }
 
-    private static Channel consume(ConnectionFactory connectionFactory, ConcurrentHashMap<Integer, String> messages) throws IOException, TimeoutException {
-        var connectionConsume = connectionFactory.newConnection();
-        var channelConsume = connectionConsume
-                .openChannel()
-                .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
-        channelConsume.queueDeclare(MAIN_QUEUE, false, false, false, null);
+    private static Channel consume(ConnectionFactory connectionFactory, ConcurrentHashMap<Integer, String> messages, Channel... channels) throws IOException, TimeoutException {
+        Channel channelConsume = null;
+        if (channels.length == 1) {
+            channelConsume = channels[0];
 
+        } else {
+            var connectionConsume = connectionFactory.newConnection();
+            channelConsume = connectionConsume
+                    .openChannel()
+                    .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+            channelConsume.queueDeclare(MAIN_QUEUE, false, false, false, null);
+        }
+
+        var channelBlocked = channelConsume;
         AtomicInteger resultMessage = new AtomicInteger(1);
         DefaultConsumer consumer = new DefaultConsumer(channelConsume) {
             @Override
@@ -56,43 +62,105 @@ public class SimpleTest extends BasicTest {
 
                 String message = new String(body, "UTF-8");
                 messages.put(resultMessage.getAndIncrement(), message);
-                channelConsume.basicAck(envelope.getDeliveryTag(), false);
+                channelBlocked.basicAck(envelope.getDeliveryTag(), false);
                 // process the message
             }
         };
-        channelConsume.basicConsume(MAIN_QUEUE, false, consumer);
-        return channelConsume;
+        channelBlocked.basicConsume(MAIN_QUEUE, false, consumer);
+        return channelBlocked;
     }
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
-        if (proxyOnly) return;
         beforeEachBase(testInfo);
     }
 
     @AfterEach
     public void afterEach() {
-        if (proxyOnly) return;
         afterEachBase();
     }
 
+
     @Test
-    void openConnectionTest() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test0_sameChannel() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+        var messages = new ConcurrentHashMap<Integer, String>();
+        String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.enableHostnameVerification();
-        var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
+        var cs = "amqp://localhost:" + FAKE_PORT;
+        //cs = rabbitContainer.getConnectionString();
+        Sleeper.sleep(100);
+
         connectionFactory.setUri(cs);
         connectionFactory.setPassword(rabbitContainer.getAdminPassword());
+
         Connection connection = connectionFactory.newConnection();
         Channel channel = connection
                 .openChannel()
                 .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+
+
+        channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
+
+        var chanConsume = consume(connectionFactory, messages, channel);
+
+
+        Sleeper.sleep(100);
+
+
+        var props = new AMQP.BasicProperties.Builder()
+                .contentType("text/plain")
+//                .contentEncoding("UTF-8")
+                .deliveryMode(1)
+//                .priority(2)
+//                .correlationId("3") //?
+//                //.replyTo("4")
+//                //.expiration("5")
+//                .messageId("6")
+//                .timestamp(new Date())
+//                //.type("7")
+//                //.userId("8")
+                .appId("TESTAPP")
+                //.clusterId("9")
+                .build();
+        //SimpleProxyServer.write=true;
+        Sleeper.sleep(100);
+        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
+        Sleeper.sleep(100);
+        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
+        chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
+        Sleeper.sleep(100);
+
+        System.out.println("QEUEUE DELETE------------------------------------------------------");
+        channel.queueDelete(MAIN_QUEUE);
+
+        Sleeper.sleep(100);
+        System.out.println("CLOSE CHANNEL ------------------------------------------------");
         channel.close();
+        Sleeper.sleep(100);
+        System.out.println("CLOSE CONNNECTION ------------------------------------------------");
         connection.close();
+
+
+        Sleeper.sleep(100);
+
+        assertEquals(3, messages.size());
+        assertTrue(messages.containsValue(exectedMessage + "1"));
+        assertTrue(messages.containsValue(exectedMessage + "2"));
+        assertTrue(messages.containsValue(exectedMessage + "3"));
     }
 
+
+    /**
+     * PUT IT AS TEST4 to BREAK
+     *
+     * @throws URISyntaxException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyManagementException
+     * @throws IOException
+     * @throws TimeoutException
+     */
     @Test
-    void queueTest() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test4_diffChannelSameConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -100,16 +168,78 @@ public class SimpleTest extends BasicTest {
         var cs = "amqp://localhost:" + FAKE_PORT;
         var realCs = new URI(rabbitContainer.getConnectionString());
         //cs = rabbitContainer.getConnectionString();
-        if (proxyOnly) {
-            var th = new Thread(() -> {
-                try {
-                    SimpleProxyServer.runServer("127.0.0.1", realCs.getPort(), FAKE_PORT, realCs.getHost());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            th.start();
-        }
+        Sleeper.sleep(100);
+
+        connectionFactory.setUri(cs);
+        connectionFactory.setPassword(rabbitContainer.getAdminPassword());
+
+        Connection connection = connectionFactory.newConnection();
+        Channel channel1 = connection
+                .openChannel()
+                .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+
+
+        channel1.queueDeclare(MAIN_QUEUE, false, false, false, null);
+
+        var chanConsume = consume(connectionFactory, messages, channel1);
+
+        Channel channel = connection
+                .openChannel()
+                .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+
+
+        channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
+
+
+        Sleeper.sleep(100);
+
+
+        var props = new AMQP.BasicProperties.Builder()
+                .contentType("text/plain")
+//                .contentEncoding("UTF-8")
+                .deliveryMode(1)
+//                .priority(2)
+//                .correlationId("3") //?
+//                //.replyTo("4")
+//                //.expiration("5")
+//                .messageId("6")
+//                .timestamp(new Date())
+//                //.type("7")
+//                //.userId("8")
+                .appId("TESTAPP")
+                //.clusterId("9")
+                .build();
+        //SimpleProxyServer.write=true;
+        Sleeper.sleep(100);
+        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
+        Sleeper.sleep(100);
+        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
+        chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
+        System.out.println("------------------------------------------------------------");
+        Sleeper.sleep(100);
+        channel1.queueDelete(MAIN_QUEUE);
+        channel.queueDelete(MAIN_QUEUE);
+        channel.close();
+        connection.close();
+
+
+        Sleeper.sleep(100);
+
+        assertEquals(3, messages.size());
+        assertTrue(messages.containsValue(exectedMessage + "1"));
+        assertTrue(messages.containsValue(exectedMessage + "2"));
+        assertTrue(messages.containsValue(exectedMessage + "3"));
+    }
+
+    @Test
+    void test2_differentChannelAndConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+        var messages = new ConcurrentHashMap<Integer, String>();
+        String exectedMessage = DEFAULT_MESSAGE_CONTENT;
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        // connectionFactory.enableHostnameVerification();
+        var cs = "amqp://localhost:" + FAKE_PORT;
+        var realCs = new URI(rabbitContainer.getConnectionString());
+        //cs = rabbitContainer.getConnectionString();
         Sleeper.sleep(100);
 
         connectionFactory.setUri(cs);
@@ -149,6 +279,9 @@ public class SimpleTest extends BasicTest {
         chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
         System.out.println("------------------------------------------------------------");
         Sleeper.sleep(100);
+
+        chanConsume.queueDelete(MAIN_QUEUE);
+        channel.queueDelete(MAIN_QUEUE);
         channel.close();
         connection.close();
 
@@ -159,5 +292,21 @@ public class SimpleTest extends BasicTest {
         assertTrue(messages.containsValue(exectedMessage + "1"));
         assertTrue(messages.containsValue(exectedMessage + "2"));
         assertTrue(messages.containsValue(exectedMessage + "3"));
+    }
+
+
+    @Test
+    void test3_openConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        connectionFactory.enableHostnameVerification();
+        var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
+        connectionFactory.setUri(cs);
+        connectionFactory.setPassword(rabbitContainer.getAdminPassword());
+        Connection connection = connectionFactory.newConnection();
+        Channel channel = connection
+                .openChannel()
+                .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+        channel.close();
+        connection.close();
     }
 }

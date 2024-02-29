@@ -1,17 +1,17 @@
 package org.kendar.mongo.fsm.msg;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.kendar.mongo.executor.MongoExecutor;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.fsm.StandardOpMsgCommand;
 import org.kendar.mongo.fsm.events.OpMsgRequest;
 import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
 public class CmdHello extends StandardOpMsgCommand {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final JsonMapper mapper = new JsonMapper();
 
     public CmdHello(Class<?>... events) {
         super(events);
@@ -20,7 +20,7 @@ public class CmdHello extends StandardOpMsgCommand {
     @Override
     protected boolean canRun(String identifier, String doc) {
         try {
-            var jsonTree = mapper.readTree(doc);
+            var jsonTree = mapper.toJsonNode(doc);
             return jsonTree.get("saslStart") == null
                     && jsonTree.get("saslContinue") == null
                     && jsonTree.get("helloOk") != null

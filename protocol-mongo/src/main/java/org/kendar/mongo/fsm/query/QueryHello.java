@@ -1,16 +1,16 @@
 package org.kendar.mongo.fsm.query;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.kendar.mongo.executor.MongoExecutor;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.fsm.events.OpQueryRequest;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
 public class QueryHello extends ProtoState {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final JsonMapper mapper = new JsonMapper();
 
     public QueryHello(Class<?>... events) {
         super(events);
@@ -27,7 +27,7 @@ public class QueryHello extends ProtoState {
     public boolean canRun(OpQueryRequest event) {
         for (var doc : event.getData().getDocuments()) {
             try {
-                var jsonTree = mapper.readTree(doc);
+                var jsonTree = mapper.toJsonNode(doc);
                 return jsonTree.get("helloOk") != null && jsonTree.get("helloOk").asBoolean();
             } catch (Exception ex) {
             }

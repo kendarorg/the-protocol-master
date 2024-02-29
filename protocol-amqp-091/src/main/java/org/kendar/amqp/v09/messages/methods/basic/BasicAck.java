@@ -2,18 +2,21 @@ package org.kendar.amqp.v09.messages.methods.basic;
 
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
 public class BasicAck extends Basic {
 
+    protected static JsonMapper mapper = new JsonMapper();
     private long deliveryTag;
     private boolean multiple;
+    private int consumeId;
 
     public BasicAck() {
         super();
@@ -51,7 +54,7 @@ public class BasicAck extends Basic {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
+    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         var context = (AmqpProtoContext) event.getContext();
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
@@ -61,11 +64,32 @@ public class BasicAck extends Basic {
         toSend.setDeliveryTag(rb.getLong());
         toSend.setMultiple(rb.get() > 0x00);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
-                connection,
-                toSend
-        ));
+        if (isProxyed()) {
+            var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
+            toSend.setConsumeId(basicConsume.getConsumeId());
+            var storage = proxy.getStorage();
+            var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
+                    mapper.serialize(toSend) + "}";
+
+
+            storage.write(
+                    null
+                    , mapper.toJsonNode(res)
+                    , 0, "RESPONSE", "AMQP");
+            return iteratorOfList(toSend);
+        }
+        return iteratorOfRunnable(() -> {
+            proxy.execute(context, connection, toSend);
+        });
+
+
     }
 
+    public int getConsumeId() {
+        return consumeId;
+    }
 
+    public void setConsumeId(int consumeId) {
+        this.consumeId = consumeId;
+    }
 }

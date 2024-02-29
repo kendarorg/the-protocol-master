@@ -1,9 +1,9 @@
 package org.kendar.amqp.v09.messages.methods.basic;
 
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
@@ -38,7 +38,7 @@ public class BasicConsumeOk extends Basic {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
+    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         setChannel(channel);
         this.tag = ShortStringHelper.read(rb);
         return iteratorOfList(this);

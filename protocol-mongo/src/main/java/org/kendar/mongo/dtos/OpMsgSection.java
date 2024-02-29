@@ -1,9 +1,8 @@
 package org.kendar.mongo.dtos;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.kendar.utils.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,29 +29,25 @@ public class OpMsgSection {
         this.documents = documents;
     }
 
-    public Map<String, Object> serialize(ObjectMapper mapper) {
-        try {
-            var result = new HashMap<String, Object>();
-            if (identifier != null && !identifier.isEmpty()) {
-                result.put("identifier", identifier);
-            }
-            var list = new ArrayList<JsonNode>();
-            for (var item : documents) {
-                var doc = (ObjectNode) mapper.readTree(item);
-                doc.remove("lsid");
-                doc.remove("$clusterTime");
-                doc.remove("apiVersion");
-                list.add(doc);
-            }
-            result.put("documents", list);
-            return result;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+    public Map<String, Object> serialize(JsonMapper mapper) {
+        var result = new HashMap<String, Object>();
+        if (identifier != null && !identifier.isEmpty()) {
+            result.put("identifier", identifier);
         }
+        var list = new ArrayList<JsonNode>();
+        for (var item : documents) {
+            var doc = (ObjectNode) mapper.toJsonNode(item);
+            doc.remove("lsid");
+            doc.remove("$clusterTime");
+            doc.remove("apiVersion");
+            list.add(doc);
+        }
+        result.put("documents", list);
+        return result;
 
     }
 
-    protected void doDeserialize(JsonNode toDeserialize, ObjectMapper mapper) {
+    protected void doDeserialize(JsonNode toDeserialize, JsonMapper mapper) {
         var jnIdentifier = toDeserialize.get("identifier");
         if (jnIdentifier != null) {
             identifier = jnIdentifier.asText();
@@ -62,11 +57,7 @@ public class OpMsgSection {
         if (jnDocuments != null && !jnDocuments.isEmpty()) {
             for (var i = 0; i < jnDocuments.size(); i++) {
                 var doc = jnDocuments.get(i);
-                try {
-                    documents.add(mapper.writeValueAsString(doc));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+                documents.add(mapper.serialize(doc));
             }
         }
     }

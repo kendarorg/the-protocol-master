@@ -1,12 +1,14 @@
 package org.kendar.buffers;
 
+/**
+ * Utilities for bitmaps and byte arrays
+ */
 public class BBufferUtils {
 
     public static int getBit(byte[] data, int pos) {
         int posByte = pos / 8;
         int posBit = pos % 8;
         byte valByte = data[posByte];
-        //valByte >> (8 - (posBit + 1)) & 0x0001;
         return (valByte >> posBit) & 0x0001;
     }
 

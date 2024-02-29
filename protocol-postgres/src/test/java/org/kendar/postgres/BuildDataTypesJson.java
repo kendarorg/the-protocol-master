@@ -1,10 +1,10 @@
 package org.kendar.postgres;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.kendar.sql.jdbc.DataTypeDescriptor;
 import org.kendar.sql.jdbc.utils.DataTypesBuilder;
+import org.kendar.utils.JsonMapper;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -70,8 +70,8 @@ public class BuildDataTypesJson extends BasicTest {
                 .ignoring("bpchar", "serial", "bigserial", "smallserial", "name", "oid");
 
         var result = dataTypesBuilder.run();
-        ObjectMapper mapper = new ObjectMapper();
-        var res = mapper.writeValueAsString(result);
+        JsonMapper mapper = new JsonMapper();
+        var res = mapper.serialize(result);
         System.out.println(res);
     }
 

@@ -33,8 +33,8 @@ public class JdbcFileStorage extends BaseFileStorage<JdbcRequest, JdbcResponse> 
     @Override
     public void write(String query, int intResult, List<BindingParameter> parameterValues, long durationMs, String type) {
         var item = new StorageItem(
-                mapper.serialize(new JdbcRequest(query, parameterValues)),
-                mapper.serialize(new JdbcResponse(intResult)),
+                mapper.serializePretty(new JdbcRequest(query, parameterValues)),
+                mapper.serializePretty(new JdbcResponse(intResult)),
                 durationMs, type, "JDBC");
         write(item);
     }

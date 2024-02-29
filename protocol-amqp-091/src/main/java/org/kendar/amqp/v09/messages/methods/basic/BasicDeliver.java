@@ -2,10 +2,10 @@ package org.kendar.amqp.v09.messages.methods.basic;
 
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
@@ -85,7 +85,7 @@ public class BasicDeliver extends Basic {
     }
 
     @Override
-    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, BytesEvent event) {
+    protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         var context = (AmqpProtoContext) event.getContext();
         AmqpProxy proxy = null;
         ProxyConnection connection = null;
@@ -104,10 +104,10 @@ public class BasicDeliver extends Basic {
         bd.exchange = ShortStringHelper.read(rb);
         bd.routingKey = ShortStringHelper.read(rb);
 
-        //if (proxyed) {
+
         var storage = proxy.getStorage();
         var res = "{\"type\":\"" + bd.getClass().getSimpleName() + "\",\"data\":" +
-                mapper.serializeCompact(bd) + "}";
+                mapper.serialize(bd) + "}";
 
 
         storage.write(

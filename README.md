@@ -2,7 +2,7 @@
 
 ![](protocolmaster_s.gif)
 
-The "protocol-master" is a command line tool (usable for any language) with (if you want to embed it) 
+The "protocol-master" is a command line tool (usable for any language) with (if you want to embed it)
 a set of java libraries, aimed at various tasks (and an executable jar if you want to try it quickly)
 
 * Create a state machine able to interpret a generic wire protocol, handling
@@ -30,9 +30,9 @@ several database wire protocol implementations:
     * Simple authentication (could add an "auth provider")
 * [MongoDB](protocol-mongo/README.md)
     * Basic authentication
-* [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md) 
+* [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md)
     * Support for basic queue/publish/consume
-    * Channels multiplexing 
+    * Channels multiplexing
 * Redis (soon)
 
 ## If you like it Buy me a coffe :)

@@ -5,13 +5,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * Wrapper to have a single json serializer
+ */
 public class JsonMapper {
     private static final ObjectMapper mapper = new ObjectMapper().
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    public String serialize(Object target) {
+    public String serializePretty(Object target) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(target);
         } catch (JsonProcessingException e) {
@@ -19,7 +21,7 @@ public class JsonMapper {
         }
     }
 
-    public String serializeCompact(Object target) {
+    public String serialize(Object target) {
         try {
             return mapper.writeValueAsString(target);
         } catch (JsonProcessingException e) {
@@ -35,7 +37,7 @@ public class JsonMapper {
         }
     }
 
-    public <T> T deserialize(String serialized, TypeReference target) {
+    public <T> T deserialize(String serialized, TypeReference<T> target) {
         try {
             return (T) mapper.readValue(serialized, target);
         } catch (JsonProcessingException e) {
@@ -53,9 +55,5 @@ public class JsonMapper {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public ObjectNode createObjectNode() {
-        return mapper.createObjectNode();
     }
 }

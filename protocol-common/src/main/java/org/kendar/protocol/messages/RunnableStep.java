@@ -2,6 +2,9 @@ package org.kendar.protocol.messages;
 
 import java.util.function.Supplier;
 
+/**
+ * Utility wrapper to build the iterators returned by the execution
+ */
 public class RunnableStep implements ProtoStep {
     private final Supplier<ReturnMessage> supplier;
 

@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MongoFileStorage extends BaseFileStorage<JsonNode, JsonNode> implements MongoStorage {
     private final ConcurrentHashMap<Long, StorageItem<JsonNode, JsonNode>> inMemoryDb = new ConcurrentHashMap<>();
-    private boolean initialized = false;
     private final Object lockObject = new Object();
+    private boolean initialized = false;
 
     public MongoFileStorage(String targetDir) {
         super(targetDir);

@@ -2,7 +2,6 @@ package org.kendar.mongo.executor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoClient;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.mongo.dtos.OpMsgContent;
@@ -11,9 +10,10 @@ import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.utils.JsonMapper;
 
 public class MongoExecutor {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final JsonMapper mapper = new JsonMapper();
     private final Proxy proxy;
 
     public MongoExecutor(Proxy proxy) {
@@ -26,7 +26,7 @@ public class MongoExecutor {
         try {
             for (var section : data.getSections()) {
                 for (var doc : section.getDocuments()) {
-                    var jsonTree = mapper.readTree(doc);
+                    var jsonTree = mapper.toJsonNode(doc);
                     var db = (JsonNode) jsonTree.get("$db");
                     return db.asText();
                 }

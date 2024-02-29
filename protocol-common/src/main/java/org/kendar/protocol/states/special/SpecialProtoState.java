@@ -6,6 +6,7 @@ import org.kendar.protocol.states.ProtoState;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class SpecialProtoState extends ProtoState {
     protected List<ProtoState> children;
@@ -31,5 +32,10 @@ public abstract class SpecialProtoState extends ProtoState {
 
     public boolean canRun(BaseEvent event) {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " [ " + children.stream().map(a -> a.getClass().getSimpleName()).collect(Collectors.joining(",")) + "]";
     }
 }

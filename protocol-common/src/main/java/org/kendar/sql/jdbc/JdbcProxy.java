@@ -25,6 +25,14 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     private final String connectionString;
     private final String login;
     private final String password;
+    private boolean replayer;
+
+    public JdbcProxy(JdbcStorage jdbcStorage) {
+        this(null, null, null, null);
+        setStorage(jdbcStorage);
+        this.replayer = true;
+
+    }
 
     public JdbcProxy(String driver, String connectionString, String login, String password) {
 
@@ -260,6 +268,10 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
                                      ArrayList<JDBCType> concreteTypes, ProtoContext context) {
+        if (replayer) {
+            var storageItem = storage.read(query, parameterValues, "QUERY");
+            return storageItem.getOutput().getSelectResult();
+        }
         try {
             long start = System.currentTimeMillis();
             var result = new SelectResult();
@@ -374,6 +386,9 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
 
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
+        if (replayer) {
+            return new ProxyConnection(null);
+        }
         try {
             return new ProxyConnection(DriverManager.
                     getConnection(getConnectionString(), getLogin(), getPassword()));
@@ -384,6 +399,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
 
     @Override
     public void initialize() {
+        if (replayer) return;
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
@@ -393,6 +409,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
 
 
     public void executeBegin(ProtoContext protoContext) {
+        if (replayer) return;
         try {
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setAutoCommit(false);
@@ -402,6 +419,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     }
 
     public void executeCommit(ProtoContext protoContext) {
+        if (replayer) return;
         try {
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setAutoCommit(true);
@@ -411,6 +429,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     }
 
     public void executeRollback(ProtoContext protoContext) {
+        if (replayer) return;
         try {
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.rollback();
@@ -420,6 +439,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     }
 
     public void setIsolation(ProtoContext protoContext, int transactionIsolation) {
+        if (replayer) return;
         try {
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setTransactionIsolation(transactionIsolation);

@@ -1,10 +1,9 @@
 package org.kendar.mongo.dtos;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.mongo.fsm.OpCodes;
+import org.kendar.utils.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,18 +47,14 @@ public class OpQueryContent extends BaseMessageData {
     }
 
     @Override
-    protected void serialize(HashMap<String, Object> dataMap, ObjectMapper mapper) {
-        try {
-            dataMap.put("fullCollectionName", fullCollectionName);
-            dataMap.put("numberToSkip", numberToSkip);
-            dataMap.put("numberToReturn", numberToReturn);
-            var list = new ArrayList<JsonNode>();
-            for (var item : documents) {
-                list.add(mapper.readTree(item));
-            }
-            dataMap.put("documents", list);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+    protected void serialize(HashMap<String, Object> dataMap, JsonMapper mapper) {
+        dataMap.put("fullCollectionName", fullCollectionName);
+        dataMap.put("numberToSkip", numberToSkip);
+        dataMap.put("numberToReturn", numberToReturn);
+        var list = new ArrayList<JsonNode>();
+        for (var item : documents) {
+            list.add(mapper.toJsonNode(item));
         }
+        dataMap.put("documents", list);
     }
 }

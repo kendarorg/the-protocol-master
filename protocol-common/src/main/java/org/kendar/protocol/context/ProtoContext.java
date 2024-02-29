@@ -17,40 +17,126 @@ import org.kendar.protocol.states.special.SpecialProtoState;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Instance of a protocol definition
+ */
 public class ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
+
+    /**
+     * Count the instances of the protocol
+     */
+    private final static AtomicInteger contextCounter = new AtomicInteger(1);
+    /**
+     * Stores the variable relatives to the current instance execution
+     */
     protected final Map<String, Object> values = new HashMap<>();
+    /**
+     * The executor to run asynchronously the system
+     */
+    protected final ExecutorService executorService =
+            new ThreadPoolExecutor(1, 100, 0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<>());
+    /**
+     * Contains the -DECLARATION- of the protocol
+     */
+    private final Map<String, ProtoState> root;
+    /**
+     * Exclusively lock the send operation
+     */
+    private final Object sendLock = new Object();
+    protected int contextId;
+    /**
+     * The descriptor of the protocol
+     */
     protected ProtoDescriptor descriptor;
+    /**
+     * Flag to stop the execution
+     */
     protected AtomicBoolean run = new AtomicBoolean(true);
-    protected ConcurrentLinkedDeque<BaseEvent> inputQueue = new ConcurrentLinkedDeque<>();
-    protected Stack<ProtoStackItem> executionStack;
-    protected List<BaseEvent> orderedEvents = new ArrayList<>();
-    private boolean transaction;
-    private final ProtoState root;
+    /**
+     * Execution stack, this stores the current state
+     */
+    protected Map<String, Stack<ProtoStackItem>> executionStack;
+    /**
+     * Contains the list of executed states to avoid recursion
+     */
     private HashSet<String> recursionBlocker;
+    /**
+     * The last state used
+     */
     private ProtoState currentState;
 
-
-    public ProtoContext(ProtoState root) {
-
-        this.root = root;
-    }
-
     public ProtoContext(ProtoDescriptor descriptor) {
+        this.contextId = contextCounter.getAndIncrement();
         this.descriptor = descriptor;
-        this.root = descriptor.getStart();
+        this.root = descriptor.getTaggedStates();
     }
 
-    private static boolean isNormalState(ProtoState currentInstanceState) {
-        return !(currentInstanceState instanceof SpecialProtoState);
+    /**
+     * Check if a state is a "standard" state
+     *
+     * @param state
+     * @return
+     */
+    private static boolean isNormalState(ProtoState state) {
+        return !(state instanceof SpecialProtoState);
     }
 
+    /**
+     * Check if the possibleChild is a child of parentTag
+     *
+     * @param parentTag     channel:1
+     * @param possibleChild channel:1,transaction:2
+     * @return
+     */
+    private static boolean isSubKey(String parentTag, String possibleChild) {
+        if (!parentTag.isEmpty()) {
+            return possibleChild.startsWith(parentTag + ",");
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Retrieve the executable state
+     *
+     * @param candidate
+     * @param event
+     * @return
+     */
+    private static ProtoState retrieveExecutableState(ProtoState candidate, BaseEvent event) {
+        ProtoState result;
+        if (candidate.canRunEvent(event)) {
+            result = candidate;
+        } else {
+            result = new FailedState("Unable to run event", candidate, event);
+        }
+        return result;
+    }
+
+    /**
+     * The instance id
+     */
+    public int getContextId() {
+        return contextId;
+    }
+
+    /**
+     * Store a value in the current instance
+     *
+     * @param key
+     * @param value
+     */
     public void setValue(String key, Object value) {
+        key = key.toUpperCase();
         if (value == null) {
             values.remove(key);
         } else {
@@ -58,333 +144,542 @@ public class ProtoContext {
         }
     }
 
+    /**
+     * Retrieve a value from the current instance
+     *
+     * @param key
+     * @return
+     */
     public Object getValue(String key) {
+        key = key.toUpperCase();
         return values.get(key);
     }
 
-    public void send(BaseEvent event) {
-        inputQueue.add(event);
+    /**
+     * Retrieve a value from the current instance with default
+     *
+     * @param key
+     * @param defaultResult
+     * @param <E>
+     * @return
+     */
+    public <E> E getValue(String key, E defaultResult) {
+        key = key.toUpperCase();
+        if (!values.containsKey(key)) return defaultResult;
+        return (E) values.get(key);
     }
 
-    public void start() {
-        preStart();
-        while (run.get()) {
-            if (!runFsmCycle()) {
-                return;
+    /**
+     * Send a message and execute it
+     *
+     * @param event
+     * @return
+     */
+    public Future<Boolean> send(BaseEvent event) {
+        return executorService.submit(() -> {
+            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
+                synchronized (sendLock) {
+                    return reactToEvent(event);
+                }
             }
-        }
-        postEnd();
-        log.trace("[SERVER] Context closed");
+        });
     }
 
-    public void postEnd() {
-
-    }
-
-    public void preStart() {
-
-    }
-
-    private void retrieveEvents() {
-        while (!inputQueue.isEmpty() && run.get()) {
-            var event = inputQueue.poll();
-            if (!customHandledEvent(event)) {
-                orderedEvents.add(event);
-            }
+    /**
+     * Send a message synchronously
+     *
+     * @param event
+     * @return
+     */
+    public boolean sendSync(BaseEvent event) {
+        try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
+            return reactToEvent(event);
         }
     }
 
-    protected boolean customHandledEvent(BaseEvent event) {
-        return false;
-    }
-
-    protected BaseEvent findCurrentEvent() {
+    /**
+     * Find the correct handler for the event and execute it
+     *
+     * @param currentEvent
+     * @return
+     */
+    public boolean reactToEvent(BaseEvent currentEvent) {
         try {
-            if (!orderedEvents.isEmpty()) {
-                return orderedEvents.remove(0);
-            }
-            return null;
-        }finally {
-            Sleeper.yield(10);
-        }
-    }
-
-    public boolean runFsmCycle() {
-        try {
-            retrieveEvents();
-            var currentEvent = findCurrentEvent();
-            if (currentEvent == null) {
-                return true;
-            }
-            initialize();
-            var possible = getPossibleInterrupt(currentEvent);
-            ProtoState foundedState = null;
-            if (possible.isPresent()) {
-                foundedState = possible.get();
-            } else {
-                foundedState = runInternal(currentEvent);
-            }
-            if (foundedState instanceof FailedState) {
-                throw new FailedStateException("[SERVER] State: FailedState", foundedState, currentEvent);
-            }
+            log.trace("[SERVER] RunFsmCycle");
+            //Prepartion for the execution
+            preExecute(currentEvent);
+            //Find what should execute
+            ProtoState foundedState = findThePossibleNextState(currentEvent);
             if (foundedState == null) {
+                //May be next time
                 return true;
             }
 
-            log.debug("[SERVER][RX]: " + foundedState.getClass().getSimpleName());
+            log.debug("[SERVER][RX]: {} Tags: {}", foundedState.getClass().getSimpleName(), currentEvent.getTagKeyValues());
             currentState = foundedState;
+
+            //Invoke the execution
             var stepsToInvoke = currentState.executeEvent(currentEvent);
-            postExecute();
             if (stepsToInvoke != null) {
-                runSteps(stepsToInvoke, currentState);
+                runSteps(stepsToInvoke, currentState, currentEvent);
             }
+            //Post execution
+            postExecute(currentEvent);
             return true;
-        }catch (AskMoreDataException ex) {
-            return true;
-        }catch (Exception ex) {
-            runException(ex);
+        } catch (AskMoreDataException askMoreData) {
+            //If more data is required just rethrow
+            throw askMoreData;
+        } catch (Exception ex) {
+            //Real exception
+            log.debug(ex.getMessage(), ex);
+            //Execute the special handler
+            handleExceptionInternal(ex);
+            //Stop the execution
             return false;
-        }finally {
-            Sleeper.yield(10);
+        } finally {
+            Sleeper.yield();
         }
     }
 
-    public void runSteps(Iterator<ProtoStep> stepsToInvoke, ProtoState executor) {
-        while (stepsToInvoke.hasNext()) {
-            var steps = stepsToInvoke.next();
+    /**
+     * Seek the possible next state (interrupt or normal state)
+     *
+     * @param event
+     * @return
+     */
+    private ProtoState findThePossibleNextState(BaseEvent event) {
+        //Check if there are interrupts
+        var possible = findPossibleInterrupt(event);
+        ProtoState foundedState = null;
+        //noinspection OptionalIsPresent
+        if (possible.isEmpty()) {
+            foundedState = findThePossibleNextStateOnStack(event, 0);
+        } else {
+            //If there is an interrupt run it!
+            foundedState = possible.get();
+        }
+        if (foundedState == null) {
+            return null;
+        }
+        if (foundedState instanceof FailedState) {
+            throw new FailedStateException("[SERVER] State: FailedState", foundedState, event);
+        }
+        return foundedState;
+    }
+
+    /**
+     * Run the result of the invocation of the state
+     *
+     * @param stepsToRun
+     * @param currentState
+     * @param event
+     */
+    public void runSteps(Iterator<ProtoStep> stepsToRun, ProtoState currentState, BaseEvent event) {
+
+        while (stepsToRun.hasNext()) {
+            var steps = stepsToRun.next();
             if (steps == null) continue;
             if (steps.getClass() == Stop.class) {
-                postStop(executor);
+                //Special state, termiante
+                postStop(currentState);
                 run.set(false);
                 break;
             } else {
+                //Run the step
                 var stepResult = steps.run();
                 if (stepResult == null) continue;
-                log.debug("[SERVER][TX]: " + stepResult.getClass().getSimpleName());
+                //Write somwhere the result
+                log.debug("[SERVER][TX]: {} Tags: {}", stepResult.getClass().getSimpleName(), event.getTagKeyValues());
                 write(stepResult);
             }
         }
     }
 
+    /**
+     * Override for termination
+     *
+     * @param executor
+     */
     protected void postStop(ProtoState executor) {
 
     }
 
+    /**
+     * Override to send data outside
+     *
+     * @param returnMessage
+     */
     public void write(ReturnMessage returnMessage) {
 
     }
 
-    private void initialize() {
+    /**
+     * Pre execute
+     *
+     * @param event
+     */
+    protected void preExecute(BaseEvent event) {
+        var tagKey = event.getTagKeys();
+        var tag = event.getTagKeyValues();
+
+        //Initialize the execution stack
         if (executionStack == null) {
-            executionStack = new Stack<>();
-            executionStack.add(new ProtoStackItem(root));
+            executionStack = new HashMap<>();
         }
+        //Prepare the tagged stack
+        if (!executionStack.containsKey(tag)) {
+            executionStack.put(tag, new Stack<>());
+            executionStack.get(tag).add(new ProtoStackItem(root.get(tagKey), event));
+        }
+        //Cleanup the recursion blocker
         recursionBlocker = new HashSet<>();
     }
 
-    public ProtoState run(BaseEvent event) {
-        initialize();
-        currentState = runInternal(event);
-        if (currentState instanceof FailedState) {
-            return currentState;
-        }
-        currentState.executeEvent(event);
-        return currentState;
-    }
-
+    /**
+     * Get the current state type
+     *
+     * @return
+     */
     public Class<?> getCurrentState() {
         return currentState.getClass();
     }
 
-    private void resetInstanceIfEmptyAndNotBlocked(ProtoState currentInstanceState, ProtoStackItem currentInstance) {
-        if (!recursionBlocker.contains(currentInstanceState.getUuid()) && !currentInstance.canRun()) {
-            currentInstance.reset();
+    /**
+     * If a state is not inhibited clean it up
+     *
+     * @param currentState
+     * @param currentStateInstance
+     */
+    private void resetInstanceIfEmptyAndNotBlocked(ProtoState currentState, ProtoStackItem currentStateInstance) {
+        if (!recursionBlocker.contains(currentState.getUuid() + Tag.toString(currentStateInstance.getTag())) && !currentStateInstance.canRun()) {
+            currentStateInstance.reset();
         }
     }
 
-
-    private ProtoState runLoopState(ProtoStackItem currentInstance, BaseEvent event) {
-        ProtoState result = null;
-        while (currentInstance.canRun()) {
-            var candidate = currentInstance.getNextExecutable();
-            if (isNormalState(candidate)) {
-                if (candidate.canRunEvent(event)) {
-                    result = candidate;
-                } else {
-                    result = new FailedState("Unable to run event", candidate, event);
-                }
-            } else {
-                if (recursionBlocker.contains(candidate.getUuid())) {
-                    result = new FailedState("Blocked recursion", candidate, event);
-                } else {
-                    executionStack.add(new ProtoStackItem(candidate));
-                    result = runInternal(event);
-                }
-            }
-            if (isFailed(result) && candidate.isOptional()) {
-                continue;
-            }
-            break;
-        }
-        if (currentInstance.isEmpty() || isFailed(result)) {
-            recursionBlocker.add(currentInstance.getState().getUuid());
-        }
-        if (isFailed(result) && !executionStack.empty()) {
-            var peek = executionStack.peek();
-            if (peek.getState().getUuid().equalsIgnoreCase(currentInstance.getState().getUuid())) {
-                executionStack.pop();
-            }
-        }
-
-        return result;
-    }
-
+    /**
+     * If a state is falied
+     *
+     * @param result
+     * @return
+     */
     private boolean isFailed(ProtoState result) {
         return result instanceof FailedState;
     }
 
-    protected ProtoState runInternal(BaseEvent event) {
+    /**
+     * @param event
+     * @param depth
+     * @return
+     */
+    protected ProtoState findThePossibleNextStateOnStack(BaseEvent event, int depth) {
+        if (depth > 10) {
+            log.error("MAX RECURSION HIT");
+            throw new RuntimeException("max recursion hit");
+        }
 
+
+        var eventTags = event.getTagKeyValues();
         ProtoState result = null;
+        //While there is something to do
         while (true) {
-            if (executionStack.empty()) {
+            //If nothing to do
+            if (executionStack.get(eventTags).empty()) {
                 return new FailedState("Machine interrupted");
             }
-            var currentInstance = executionStack.peek();
-            var currentInstanceState = currentInstance.getState();
-            if (isNormalState(currentInstanceState) && currentInstanceState.canRunEvent(event)) {
-                result = currentInstanceState;
-            } else if (currentInstanceState instanceof ProtoStateWhile) {
-                resetInstanceIfEmptyAndNotBlocked(currentInstanceState, currentInstance);
-                result = runLoopState(currentInstance, event);
-            } else if (currentInstanceState instanceof ProtoStateSwitchCase) {
-                resetInstanceIfEmptyAndNotBlocked(currentInstanceState, currentInstance);
-                result = runChoiceState(currentInstance, event);
-            } else if (currentInstanceState instanceof ProtoStateSequence) {
-                resetInstanceIfEmptyAndNotBlocked(currentInstanceState, currentInstance);
-                result = runSequenceState(currentInstance, event);
-
+            //If executing a step while its parent had not been emptied/finished yet
+            if (!parentAreClosed(eventTags)) {
+                return new FailedState("Machine interrupted. Sub states not closed");
             }
-            if (isFailed(result)) {
-                continue;
-            } else {
+            var currentStateInstance = executionStack.get(eventTags).peek();
+            if (!currentStateInstance.hasState()) {
+                //Something gone horribly wrong
+                log.error("Missing state with tag " + eventTags);
+                return new FailedState("Missing State");
+            }
+            var currentState = currentStateInstance.getState();
+            if (isNormalState(currentState) && currentState.canRunEvent(event)) {
+                result = currentState;
+            } else if (currentState instanceof ProtoStateWhile) {
+                //Refill if it's empty
+                resetInstanceIfEmptyAndNotBlocked(currentState, currentStateInstance);
+                //Execute the loop
+                result = executeLoop(currentStateInstance, event, depth);
+            } else if (currentState instanceof ProtoStateSwitchCase) {
+                //Refill if it's empty
+                resetInstanceIfEmptyAndNotBlocked(currentState, currentStateInstance);
+                //Execute the switch case
+                result = executeSwitchCase(currentStateInstance, event, depth);
+            } else if (currentState instanceof ProtoStateSequence) {
+                //Refill if it's empty
+                resetInstanceIfEmptyAndNotBlocked(currentState, currentStateInstance);
+                //Execute the sequence
+                result = executeSequence(currentStateInstance, event, depth);
+            }
+            //If it's a good thing stop it
+            if (!isFailed(result)) {
                 break;
             }
         }
         return result;
     }
 
-    private ProtoState runChoiceState(ProtoStackItem currentInstance, BaseEvent event) {
-        if (currentInstance.getSize() != ((SpecialProtoState) currentInstance.getState()).getChildren().size()) {
-            executionStack.pop();
-            return new FailedState("");
+    /**
+     * Check if there are executions with longest tags (not closed)
+     *
+     * @param parentTags
+     * @return
+     */
+    private boolean parentAreClosed(String parentTags) {
+        //Iterate to all existing tags
+        for (var executionTag : executionStack.keySet().toArray(new String[0])) {
+            //Ignore itself
+            if (executionTag.equalsIgnoreCase(parentTags)) continue;
+            //Retrieve the current stack for the given tag
+            var subExecutionStack = executionStack.get(executionTag);
+            //If it's a sub of the parentTag
+            if (isSubKey(parentTags, executionTag) && subExecutionStack != null && !subExecutionStack.empty()) {
+                var stateInstance = subExecutionStack.peek();
+                if (stateInstance == null) continue;
+                //If there is nothing to do
+                if (stateInstance.executable.empty()) continue;
+                var state = stateInstance.getState();
+                //If no state set
+                if (state == null) continue;
+                return false;
+            }
+
         }
+        return true;
+    }
+
+    /**
+     * Run the special loop state (loops, can stop only before start or after end)
+     *
+     * @param currentInstance
+     * @param event
+     * @param depth           Recursion blocker
+     * @return
+     */
+    private ProtoState executeLoop(ProtoStackItem currentInstance, BaseEvent event, int depth) {
         ProtoState result = null;
+        var eventTags = event.getTagKeyValues();
+        //While it can run (has something to execute)
         while (currentInstance.canRun()) {
+            //Find who's next
             var candidate = currentInstance.getNextExecutable();
             if (isNormalState(candidate)) {
-                if (candidate.canRunEvent(event)) {
-                    result = candidate;
-                } else {
-                    result = new FailedState("Unable to run event", candidate, event);
-                }
+                //If it's an executable return it
+                result = retrieveExecutableState(candidate, event);
             } else {
-                if (recursionBlocker.contains(candidate.getUuid())) {
-
+                if (shouldBlockRecursion(event, candidate)) {
+                    //Can't continue
                     result = new FailedState("Blocked recursion", candidate, event);
                 } else {
-                    executionStack.add(new ProtoStackItem(candidate));
-                    result = runInternal(event);
+                    //Execute special states
+                    executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
+                    result = findThePossibleNextStateOnStack(event, depth + 1);
                 }
             }
+            //If it's an optional state just continue
+            if (isFailed(result) && candidate.isOptional()) {
+                continue;
+            }
+            //Always execute only the first good one
+            break;
+        }
+
+        //If nothing more can be executed
+        if (currentInstance.isEmpty() || isFailed(result)) {
+            //Stop it for this cycle
+            blockRecursionForCurrentStateInstance(currentInstance);
+        }
+        //If it's an error and there is something yet to do
+        if (isFailed(result)) {
+            popTheCurrentState(currentInstance, eventTags);
+        }
+
+        return result;
+    }
+
+
+    /**
+     * If it's a possible recursion and should be blocked
+     *
+     * @param event
+     * @param candidate
+     * @return
+     */
+    private boolean shouldBlockRecursion(BaseEvent event, ProtoState candidate) {
+        return recursionBlocker.contains(candidate.getUuid() + Tag.toString(event.getTag()));
+    }
+
+
+    private void popTheCurrentState(ProtoStackItem currentInstance, String eventTags) {
+        if (executionStack.get(eventTags).empty()) return;
+        var peek = executionStack.get(eventTags).peek();
+        //Check if it's the last good one
+        if (peek != null) {
+            if (peek.getId().equalsIgnoreCase(currentInstance.getId()) && !executionStack.get(eventTags).empty()) {
+                //And remove
+                executionStack.get(eventTags).pop();
+            }
+        }
+    }
+
+    /**
+     * Handle the switch case (only one can be executed)
+     *
+     * @param currentInstance
+     * @param event
+     * @param depth
+     * @return
+     */
+    private ProtoState executeSwitchCase(ProtoStackItem currentInstance, BaseEvent event, int depth) {
+        ProtoState result = null;
+        var eventTags = event.getTagKeyValues();
+        //The switch case can run ONLY if the available executors are all set
+        if (currentInstance.getSize() != ((SpecialProtoState) currentInstance.getState()).getChildren().size()) {
+            executionStack.get(eventTags).pop();
+            return new FailedState("Missing data on switch case");
+        }
+        //While it can run (has something to execute)
+        while (currentInstance.canRun()) {
+            //Find who's next
+            var candidate = currentInstance.getNextExecutable();
+            if (isNormalState(candidate)) {
+                //If it's an executable return it
+                result = retrieveExecutableState(candidate, event);
+            } else {
+                if (shouldBlockRecursion(event, candidate)) {
+                    //Can't continue
+                    result = new FailedState("Blocked recursion", candidate, event);
+                } else {
+                    //Execute special states
+                    executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
+                    result = findThePossibleNextStateOnStack(event, depth + 1);
+                }
+            }
+            //May be there is something more
             if (isFailed(result)) {
                 continue;
             }
+            //Always execute only the first good one
             break;
         }
         if (result == null) {
             result = new FailedState("Unable to run event", currentInstance.getState(), event);
         }
-        recursionBlocker.add(currentInstance.getState().getUuid());
-
-        var peek = executionStack.peek();
-        if (peek.getState().getUuid().equalsIgnoreCase(currentInstance.getState().getUuid()) && !executionStack.empty()) {
-            executionStack.pop();
-        }
+        blockRecursionForCurrentStateInstance(currentInstance);
+        popTheCurrentState(currentInstance, eventTags);
 
         return result;
     }
 
-    private ProtoState runSequenceState(ProtoStackItem currentInstance, BaseEvent event) {
+    /**
+     * Execute a sequence (all mandatory)
+     *
+     * @param currentInstance
+     * @param event
+     * @param depth
+     * @return
+     */
+    private ProtoState executeSequence(ProtoStackItem currentInstance, BaseEvent event, int depth) {
         ProtoState result = null;
+        var eventTags = event.getTagKeyValues();
+        //While it can run (has something to execute)
         while (currentInstance.canRun()) {
+            //Find who's next
             var candidate = currentInstance.getNextExecutable();
             if (isNormalState(candidate)) {
-                if (candidate.canRunEvent(event)) {
-                    result = candidate;
-                } else {
-                    result = new FailedState("Unable to run event", candidate, event);
-                }
+                //If it's an executable return it
+                result = retrieveExecutableState(candidate, event);
             } else {
-                if (recursionBlocker.contains(candidate.getUuid())) {
-
+                if (shouldBlockRecursion(event, candidate)) {
+                    //Can't continue
                     result = new FailedState("Blocked recursion", candidate, event);
                 } else {
-                    executionStack.add(new ProtoStackItem(candidate));
-                    result = runInternal(event);
+                    //Execute special states
+                    executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
+                    result = findThePossibleNextStateOnStack(event, depth + 1);
                 }
             }
+            //If it's an optional state just continue
             if (isFailed(result) && candidate.isOptional()) {
                 continue;
             }
+            //Always execute only the first good one
             break;
         }
+        //If nothing more can be executed or there is an error
         if (currentInstance.isEmpty() || isFailed(result)) {
-            recursionBlocker.add(currentInstance.getState().getUuid());
-            var peek = executionStack.peek();
-            if (peek.getState().getUuid().equalsIgnoreCase(currentInstance.getState().getUuid()) && !executionStack.empty()) {
-                executionStack.pop();
-            }
-        }
+            blockRecursionForCurrentStateInstance(currentInstance);
+            popTheCurrentState(currentInstance, eventTags);
 
+        }
 
         return result;
     }
 
-    protected void postExecute() {
+    /**
+     * Consider this isntance as blocked
+     *
+     * @param currentInstance
+     */
+    private void blockRecursionForCurrentStateInstance(ProtoStackItem currentInstance) {
+        recursionBlocker.add(currentInstance.getState().getUuid() + Tag.toString(currentInstance.getTag()));
+    }
+
+    /**
+     * Post execute handler
+     *
+     * @param currentEvent
+     */
+    protected void postExecute(BaseEvent currentEvent) {
 
     }
 
-    public void runException(Exception ex) {
+    /**
+     * Handle exception thrown during execution
+     *
+     * @param ex
+     */
+    public void handleExceptionInternal(Exception ex) {
         BaseEvent event = null;
         ProtoState state = null;
         if (ex instanceof FailedStateException) {
             event = ((FailedStateException) ex).getEvent();
             state = ((FailedStateException) ex).getState();
         }
-        var exceptionResults = runExceptionInternal(ex, state, event);
+        var exceptionResults = runException(ex, state, event);
         for (var exceptionResult : exceptionResults) {
             log.error("Message: " + exceptionResult.getClass().getSimpleName());
             write(exceptionResult);
         }
     }
 
-    protected List<ReturnMessage> runExceptionInternal(Exception ex, ProtoState state, BaseEvent event) {
+
+    /**
+     * Overridable exception handler
+     *
+     * @param ex
+     * @param state
+     * @param event
+     * @return
+     */
+    protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
         throw new RuntimeException(ex);
     }
 
-    private Optional<ProtoState> getPossibleInterrupt(BaseEvent currentEvent) {
+    /**
+     * Find possible interrupt given the event type
+     *
+     * @param currentEvent
+     * @return
+     */
+    private Optional<ProtoState> findPossibleInterrupt(BaseEvent currentEvent) {
         return this.descriptor.getInterrupts().stream()
                 .filter(s -> s.canHandle(currentEvent.getClass()))
                 .filter(s -> s.canRunEvent(currentEvent))
                 .findFirst();
-    }
-
-    public boolean isTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(boolean transaction) {
-        this.transaction = transaction;
     }
 }

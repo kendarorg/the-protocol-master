@@ -29,6 +29,7 @@ public class PostgresExecutor {
 
     public static final String TRANSACTION_ISOLATION_LEVEL_ID = "TRANSACTION ISOLATION LEVEL";
     protected static final List<BasicHandler> fakeQueries;
+    private static final Logger log = LoggerFactory.getLogger(PostgresExecutor.class);
 
     static {
         fakeQueries = new ArrayList<>();
@@ -51,7 +52,7 @@ public class PostgresExecutor {
         var postgresContext = (PostgresProtoContext) protoContext;
         ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
         var res = new ArrayList<ReturnMessage>();
-        protoContext.setTransaction(false);
+        protoContext.setValue("TRANSACTION", false);
 
         //res.add(new RunNow());
         if (postgresContext.getValue("STATEMENT_" + parse.getStatementName() + "_PARSED") == null) {
@@ -66,7 +67,7 @@ public class PostgresExecutor {
         var postgresContext = (PostgresProtoContext) protoContext;
         ((JdbcProxy) protoContext.getProxy()).executeRollback(protoContext);
         var res = new ArrayList<ReturnMessage>();
-        protoContext.setTransaction(false);
+        protoContext.setValue("TRANSACTION", false);
 
 
         //if(postgresContext.getValue("STATEMENT_"+parse.getStatementName()+"_PARSED")==null)
@@ -82,7 +83,7 @@ public class PostgresExecutor {
         var postgresContext = (PostgresProtoContext) protoContext;
         ((JdbcProxy) protoContext.getProxy()).executeBegin(protoContext);
         var res = new ArrayList<ReturnMessage>();
-        protoContext.setTransaction(true);
+        protoContext.setValue("TRANSACTION", true);
 
         //if(postgresContext.getValue("STATEMENT_"+parse.getStatementName()+"_PARSED")==null)
         {
@@ -125,11 +126,11 @@ public class PostgresExecutor {
             }
             return executeRealQuery(protoContext, parse, binding, maxRecords, describable, possiblyMultiple);
         } catch (RuntimeException ex) {
-            log.error(ex.getMessage(),ex);
+            log.error(ex.getMessage(), ex);
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(ex.getMessage())));
         }
     }
-    private static Logger log = LoggerFactory.getLogger(PostgresExecutor.class);
+
     protected boolean shouldHandleAsSingleQuery(List<SqlParseResult> parsed) {
         return parser.isUnknown(parsed) || parser.isMixed(parsed) || parsed.size() == 1;
     }

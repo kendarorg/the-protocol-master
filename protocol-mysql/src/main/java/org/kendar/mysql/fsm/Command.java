@@ -15,7 +15,8 @@ public class Command extends MySQLProtoState {
     }
 
     @Override
-    protected boolean canRunBytes(BytesEvent event) {return true;
+    protected boolean canRunBytes(BytesEvent event) {
+        return true;
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MySQLProtoContext extends NetworkProtoContext {
     private static final AtomicInteger processIdCounter = new AtomicInteger(0);
+    private static final Logger log = LoggerFactory.getLogger(MySQLProtoContext.class);
     private int clientCapabilities;
     private int packetNumber = -1;
 
@@ -53,11 +54,9 @@ public class MySQLProtoContext extends NetworkProtoContext {
         return new MySQLBBuffer(descriptor.isBe() ? BBufferEndianness.BE : BBufferEndianness.LE);
     }
 
-    private static Logger log = LoggerFactory.getLogger(MySQLProtoContext.class);
-
-    protected List<ReturnMessage> runExceptionInternal(Exception ex, ProtoState state, BaseEvent event) {
-        var result = new ArrayList<ReturnMessage>(super.runExceptionInternal(ex, state, event));
-        log.error(ex.getMessage(),ex);
+    protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
+        var result = new ArrayList<ReturnMessage>(super.runException(ex, state, event));
+        log.error(ex.getMessage(), ex);
         var error = new Error();
         error.setCapabilities(this.getClientCapabilities());
         error.setErrorCode(ErrorCode.ER_UNKNOWN_COM_ERROR.getValue());

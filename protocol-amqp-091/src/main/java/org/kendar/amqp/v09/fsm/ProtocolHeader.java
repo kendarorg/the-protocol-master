@@ -22,6 +22,7 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
     public boolean canRun(BytesEvent event) {
         var prevState = event.getPrevState();
         var inputBuffer = event.getBuffer();
+        inputBuffer.setPosition(0);
         var canRun = false;
         if (inputBuffer.size() < 8) {
             canRun = false;

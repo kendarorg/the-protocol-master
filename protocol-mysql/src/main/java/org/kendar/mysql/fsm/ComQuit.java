@@ -18,7 +18,7 @@ public class ComQuit extends ProtoState {
     }
 
     public Iterator<ProtoStep> execute(CommandEvent event) {
-        return iteratorOfList(new Stop());
+        return iteratorOfRunner(new Stop());
 
     }
 }

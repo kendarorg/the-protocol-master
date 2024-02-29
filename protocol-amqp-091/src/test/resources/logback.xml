@@ -2,7 +2,7 @@
 <configuration debug="false">
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%level] %msg [%logger{0}] %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%level] CID:%X{connection} %msg [%logger{0}] %n</pattern>
         </encoder>
     </appender>
 
@@ -11,6 +11,7 @@
     <logger name="com.github" level="ERROR"/>
     <logger name="org.kendar.amqp.v09.utils" level="INFO"/>
     <logger name="org.testcontainers" level="ERROR"/>
+    <!--    <logger name="org.kendar.amqp.v09.utils.ProxySocket" level="TRACE"/>-->
 
     <root level="ERROR">
         <appender-ref ref="stdout"/>

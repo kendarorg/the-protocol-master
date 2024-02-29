@@ -18,9 +18,9 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
     private final List<StorageItem<JsonNode, JsonNode>> inMemoryDb = new ArrayList<>();
     private final List<StorageItem<JsonNode, JsonNode>> compareData = new ArrayList<>();
     private final List<StorageItem<JsonNode, JsonNode>> outItems = new ArrayList<>();
-    private boolean initialized = false;
     private final Object lockObject = new Object();
     private final Object responseLockObject = new Object();
+    private boolean initialized = false;
 
     public AmqpFileStorage(String targetDir) {
         super(targetDir);
@@ -42,7 +42,7 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
         synchronized (lockObject) {
             var item = inMemoryDb.stream()
                     .filter(a -> type.equalsIgnoreCase(a.getType()) &&
-                                    a.getCaller().equalsIgnoreCase("AMQP")).findFirst();
+                            a.getCaller().equalsIgnoreCase("AMQP")).findFirst();
             if (item.isPresent()) {
                 inMemoryDb.remove(item.get());
                 return item.get();
@@ -73,7 +73,7 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
             var result = new ArrayList<StorageItem<JsonNode, JsonNode>>();
             for (var item : compareData.stream().filter(a -> a.getIndex() > afterIndex).collect(Collectors.toList())) {
                 if (item.getType().equalsIgnoreCase("RESPONSE")) {
-                    if(outItems.contains(item)) {
+                    if (outItems.contains(item)) {
                         result.add(item);
                         log.trace("[SERVER][CB] After: " + afterIndex + " Index: " + item.getIndex() + " Type: " + item.getOutput().get("type").textValue());
                         outItems.remove(item);

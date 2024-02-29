@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
 import org.kendar.server.TcpServer;
-import org.kendar.sql.jdbc.JdbcReplayProxy;
+import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
 import org.kendar.utils.Sleeper;
 
@@ -20,7 +20,7 @@ public class ReplayerTest {
     @Test
     void test() throws Exception {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcReplayProxy(new JdbcFileStorage(Path.of("src",
+        var proxy = new JdbcProxy(new JdbcFileStorage(Path.of("src",
                 "test", "resources", "replay")));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
