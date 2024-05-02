@@ -234,7 +234,7 @@ public class MainTest extends BasicTest {
 
 
         var stmt = c.createStatement();
-        stmt.executeUpdate("CREATE TABLE COMPANY_1 " +
+        stmt.executeUpdate("CREATE TABLE COMPANY_N " +
                 "(ID INT PRIMARY KEY NOT NULL," +
                 " DENOMINATION TEXT NOT NULL, " +
                 " AGE INT NOT NULL, " +
@@ -254,7 +254,7 @@ public class MainTest extends BasicTest {
         }
 
         stmt = c.createStatement();
-        stmt.executeUpdate("INSERT INTO COMPANY_1 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+        stmt.executeUpdate("INSERT INTO COMPANY_N (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
                 "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
         stmt.close();
         c.close();
