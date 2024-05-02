@@ -25,10 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -137,6 +134,12 @@ public class MySQLExecutor {
             }
         } catch (SQLException e) {
             log.error("[SERVER] Error %s", e);
+            return runExceptionInternal(protoContext, e);
+        }catch (RuntimeException e) {
+            var uuid = UUID.randomUUID().toString();
+            log.error("[SERVER] Runtime Error {} {}", uuid, e.getMessage());
+            log.error("[SERVER] Runtime Error "+uuid, e);
+
             return runExceptionInternal(protoContext, e);
         }
     }

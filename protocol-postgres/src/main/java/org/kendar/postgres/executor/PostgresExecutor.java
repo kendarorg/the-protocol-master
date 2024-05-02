@@ -23,6 +23,7 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class PostgresExecutor {
@@ -150,6 +151,12 @@ public class PostgresExecutor {
             }
         } catch (SQLException e) {
             log.error("[SERVER] Error %s", e.getMessage());
+            return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(e.getMessage()))).runNow();
+        } catch (RuntimeException e) {
+            var uuid = UUID.randomUUID().toString();
+            log.error("[SERVER] Runtime Error {} {}", uuid, e.getMessage());
+            log.error("[SERVER] Runtime Error "+uuid, e);
+
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(e.getMessage()))).runNow();
         }
     }
