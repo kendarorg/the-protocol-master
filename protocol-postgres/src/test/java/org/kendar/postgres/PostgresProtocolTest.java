@@ -280,4 +280,26 @@ public class PostgresProtocolTest extends BasicTest {
         c.close();
 
     }
+
+    @Test
+    void testWeirdQuery() throws Exception {
+
+        var runned = false;
+
+
+        Connection c = getProxyConnection();
+
+
+        var stmt = c.createStatement();
+        stmt.execute(
+                "SELECT current_setting('server_version_num')::int/100 as version;");
+        var resultSet = stmt.getResultSet();
+        while (resultSet.next()) {
+            System.out.println(resultSet.getString(1));
+        }
+        resultSet.close();
+        stmt.close();
+        c.close();
+
+    }
 }

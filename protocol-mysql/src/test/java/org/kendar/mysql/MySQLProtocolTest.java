@@ -113,4 +113,52 @@ public class MySQLProtocolTest extends BasicTest {
 
         assertTrue(runned);
     }
+
+
+    @Test
+    void testWeirdQuery() throws Exception {
+
+        var runned = false;
+
+
+        Connection c = getProxyConnection();
+
+
+        var stmt = c.createStatement();
+
+        stmt.executeUpdate("CREATE TABLE COMPANY_21 " +
+                "(ID INT PRIMARY KEY NOT NULL," +
+                " DENOMINATION TEXT NOT NULL, " +
+                " AGE INT NOT NULL, " +
+                " ADDRESS CHAR(50), " +
+                " SALARY REAL)");
+        stmt.close();
+        stmt = c.createStatement();
+        stmt.executeUpdate("INSERT INTO COMPANY_21 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
+        stmt.close();
+
+        try {
+            stmt = c.createStatement();
+            stmt.execute(
+                    "SELECT current_setting('server_version_num')::int/100 as version;");
+            var resultSet = stmt.getResultSet();
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString(1));
+            }
+            resultSet.close();
+            stmt.close();
+        }catch (Exception ex){
+
+        }
+        stmt = c.createStatement();
+        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_21;");
+        while (resultset.next()) {
+            assertEquals("Test Ltd", resultset.getString("DENOMINATION"));
+            runned = true;
+        }
+        resultset.close();
+        c.close();
+
+    }
 }
