@@ -47,12 +47,24 @@ connections (and add some ISSUE to this project hopefully).
 Inside protocol-runner/src/test/java/org/kenndar/runner/MainTest.java you can see
 an example where a recording is made and then reporduced.
 
-Just call it like the following:
+Just call it like the following if using included mysql and postgres driver (adapt
+the line end to your system!):
 
 <pre>
   java -jar protocol-runner.jar \
     -p postgres -l 3175 \
     -xl remoteUser -xw remotePassword -xc jdbc:postgresql://remoteDb/test \
+    -xd test/{timestamp}
+</pre>
+
+Or like this to use an external driver (in this case Oracle JDBC driver) (adapt 
+the cp/classpath and line end to your system!)
+
+<pre>
+java -cp "ojdbc11.jar;protocol-runner.jar" \
+    org.springframework.boot.loader.JarLauncher \
+    -p postgres -l 5432 \
+    -xl system -xw password -xc jdbc:oracle:thin:@192.168.1.96:1521/FREEPDB1 \
     -xd test/{timestamp}
 </pre>
 
@@ -97,3 +109,5 @@ The events are immediatly executed. If no bytes are present or there are not eno
 bytes to read, the events queue is seeked for "BytesEvent" and then the execution is
 retried.
 
+
+java -cp .ojdbc14.jar UserInterface filldb
