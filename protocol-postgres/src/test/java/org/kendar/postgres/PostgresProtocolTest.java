@@ -244,6 +244,9 @@ public class PostgresProtocolTest extends BasicTest {
         Sleeper.sleep(3000);
         stmt.cancel();
         stmt.close();
+        System.out.println("=================================");
+        Sleeper.sleep(100);
+        System.out.println("=================================");
         c.close();
         assertEquals(0, counter.get());
 

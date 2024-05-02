@@ -15,6 +15,7 @@ import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.parser.SqlParseResult;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +127,7 @@ public class PostgresExecutor {
                 }
             }
             return executeRealQuery(protoContext, parse, binding, maxRecords, describable, possiblyMultiple);
-        } catch (RuntimeException ex) {
+        }catch (RuntimeException ex) {
             log.error(ex.getMessage(), ex);
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(ex.getMessage())));
         }

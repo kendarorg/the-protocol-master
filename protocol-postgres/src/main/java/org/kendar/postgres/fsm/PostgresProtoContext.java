@@ -35,7 +35,10 @@ public class PostgresProtoContext extends NetworkProtoContext {
     }
 
     public static PostgresProtoContext getContextByPid(int pid) {
-        return pids.get(pid);
+        if(pids.containsKey(pid)) {
+            return pids.get(pid);
+        }
+        return null;
     }
 
     public int getPid() {

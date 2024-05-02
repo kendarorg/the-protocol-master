@@ -5,6 +5,8 @@ import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.InterruptProtoState;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.Stop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,20 +26,27 @@ public class CancelRequest extends ProtoState implements InterruptProtoState {
         return marker == 80877102;
     }
 
+    private static final Logger log = LoggerFactory.getLogger(CancelRequest.class);
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
+
         var context = (PostgresProtoContext) event.getContext();
         var inputBuffer = event.getBuffer();
         var pid = inputBuffer.getInt(8);
         var secret = inputBuffer.getInt(12);
         var contextToCancel = PostgresProtoContext.getContextByPid(pid);
+        if(contextToCancel==null){
+            log.warn("Missing context to cancel: {}",pid);
+            return iteratorOfRunner(new Stop());
+        }
         contextToCancel.cancel();
         var statement = (Statement) contextToCancel.getValue("EXECUTING_NOW");
         if (statement != null) {
             try {
                 statement.cancel();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                log.error("Unable to cancel statement {}",pid);
+                return iteratorOfRunner(new Stop());
             }
         }
 
