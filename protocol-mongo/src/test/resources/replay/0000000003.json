@@ -1,4 +1,6 @@
 {
+  "constant": false,
+  "connectionId": 3,
   "index": 3,
   "input": {
     "flags": 0,
@@ -7,10 +9,27 @@
       {
         "documents": [
           {
-            "dbStats": {
-              "$numberLong": "1"
+            "hello": {
+              "$numberInt": "1"
             },
-            "$db": "admin"
+            "helloOk": true,
+            "client": {
+              "driver": {
+                "name": "mongo-java-driver|sync",
+                "version": "4.11.0"
+              },
+              "os": {
+                "type": "Windows",
+                "name": "Windows 11",
+                "architecture": "amd64",
+                "version": "10.0"
+              },
+              "platform": "Java/Amazon.com Inc./11.0.21+9-LTS"
+            },
+            "$db": "admin",
+            "$readPreference": {
+              "mode": "primaryPreferred"
+            }
           }
         ]
       }
@@ -23,58 +42,41 @@
       {
         "documents": [
           {
-            "db": "admin",
-            "collections": {
-              "$numberInt": "2"
+            "ok": true,
+            "ismaster": true,
+            "maxBsonObjectSize": {
+              "$numberInt": "16777216"
             },
-            "views": {
-              "$numberInt": "0"
+            "maxMessageSizeBytes": {
+              "$numberInt": "48000000"
             },
-            "objects": {
+            "maxWriteBatchSize": {
+              "$numberInt": "100000"
+            },
+            "localTime": {
+              "$date": {
+                "$numberLong": "1709545404782"
+              }
+            },
+            "logicalSessionTimeoutMinutes": {
+              "$numberInt": "30"
+            },
+            "connectionId": {
               "$numberInt": "3"
             },
-            "avgObjSize": {
-              "$numberDouble": "76.33333333333333"
+            "minWireVersion": {
+              "$numberInt": "0"
             },
-            "dataSize": {
-              "$numberDouble": "229.0"
+            "maxWireVersion": {
+              "$numberInt": "8"
             },
-            "storageSize": {
-              "$numberDouble": "40960.0"
-            },
-            "indexes": {
-              "$numberInt": "2"
-            },
-            "indexSize": {
-              "$numberDouble": "40960.0"
-            },
-            "totalSize": {
-              "$numberDouble": "81920.0"
-            },
-            "scaleFactor": {
-              "$numberDouble": "1.0"
-            },
-            "fsUsedSize": {
-              "$numberDouble": "1.8330947584E10"
-            },
-            "fsTotalSize": {
-              "$numberDouble": "6.652123136E10"
-            },
-            "ok": {
-              "$numberDouble": "1.0"
-            },
-            "operationTime": {
-              "$timestamp": {
-                "t": 1706097625,
-                "i": 8
-              }
-            }
+            "readOnly": false
           }
         ]
       }
     ]
   },
   "durationMs": 2,
-  "type": "OP_MSG",
+  "type": "HELLO_OP_MSG",
   "caller": "MONGODB"
 }

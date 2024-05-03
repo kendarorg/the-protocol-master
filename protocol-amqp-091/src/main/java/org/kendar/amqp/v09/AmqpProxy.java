@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.Frame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
+import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.amqp.v09.utils.AmqpStorage;
 import org.kendar.amqp.v09.utils.ProxySocket;
@@ -28,8 +29,7 @@ import java.util.concurrent.Executors;
 public class AmqpProxy extends Proxy<AmqpStorage> {
 
     private static final Logger log = LoggerFactory.getLogger(AmqpProxy.class);
-    protected static JsonMapper mapper = new JsonMapper();
-    private final boolean replayer;
+    protected static final JsonMapper mapper = new JsonMapper();
     private String connectionString;
     private String userId;
     private String password;
@@ -115,6 +115,10 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
 
         if (replayer) {
             var item = storage.read(jsonReq, "byte[]");
+            if (item.getOutput() == null && item.getInput() == null) {
+                writeResponses(storage.readResponses(item.getIndex()));
+                return toRead;
+            }
             writeResponses(storage.readResponses(item.getIndex()));
             var out = item.getOutput();
             return (T) mapper.deserialize(out.get("data").toString(), toRead.getClass());
@@ -129,6 +133,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(toRead) + "}";
         long end = System.currentTimeMillis();
         storage.write(
+                context.getContextId(),
                 jsonReq
                 , mapper.toJsonNode(res)
                 , (end - start), "byte[]", "AMQP");
@@ -158,10 +163,20 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
                     consumeId = bf.getConsumeId();
                     fr = bf;
                     break;
+                case "BasicCancel":
+                    var bc = mapper.deserialize(out.get("data").toString(), BasicCancel.class);
+                    consumeId = bc.getConsumeId();
+                    fr = bc;
+                    break;
             }
-            log.debug("[SERVER][CB]: " + fr.getClass().getSimpleName());
-            var ctx = AmqpProtocol.consumeContext.get(consumeId);
-            ctx.write(fr);
+            if (fr != null) {
+                log.debug("[SERVER][CB]: " + fr.getClass().getSimpleName());
+                var ctx = AmqpProtocol.consumeContext.get(consumeId);
+                ctx.write(fr);
+            } else {
+                throw new RuntimeException("MISSING CLASS " + clazz);
+            }
+
         }
     }
 
@@ -171,8 +186,11 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
+            if (item.getOutput() == null && item.getInput() == null) {
+                writeResponses(storage.readResponses(item.getIndex()));
+                return toRead;
+            }
             writeResponses(storage.readResponses(item.getIndex()));
-            item.getIndex();
 
             var out = item.getOutput();
             return (T) mapper.deserialize(out.get("data").toString(), toRead.getClass());
@@ -190,6 +208,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         long end = System.currentTimeMillis();
 
         storage.write(
+                context.getContextId(),
                 jsonReq
                 , mapper.toJsonNode(res)
                 , (end - start), of.getClass().getSimpleName(), "AMQP");
@@ -201,6 +220,10 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
+            if (item.getOutput() == null && item.getInput() == null) {
+                writeResponses(storage.readResponses(item.getIndex()));
+                return;
+            }
             writeResponses(storage.readResponses(item.getIndex()));
             return;
         }
@@ -212,6 +235,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         var res = "{\"type\":null,\"data\":null}";
         long end = System.currentTimeMillis();
         storage.write(
+                context.getContextId(),
                 mapper.toJsonNode(req)
                 , mapper.toJsonNode(res)
                 , (end - start), of.getClass().getSimpleName(), "AMQP");

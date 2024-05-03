@@ -43,7 +43,7 @@ public class ProxySocket {
     private final NetworkProtoContext context;
     private final Semaphore semaphore = new Semaphore(1);
     private final Semaphore readSemaphore = new Semaphore(1);
-    private final List<BytesEvent> received = new ArrayList<BytesEvent>();
+    private final List<BytesEvent> received = new ArrayList<>();
     private final List<ProtoState> states = new ArrayList<>(Arrays.asList(
             new BasicDeliver(),
             new BasicCancel().asProxy(),
@@ -55,7 +55,7 @@ public class ProxySocket {
             new BasicNack().asProxy(),
             new BasicReturn().asProxy(),
             new BasicGetEmpty().asProxy()));
-    protected ConcurrentLinkedDeque<BytesEvent> inputQueue = new ConcurrentLinkedDeque<BytesEvent>();
+    protected final ConcurrentLinkedDeque<BytesEvent> inputQueue = new ConcurrentLinkedDeque<>();
 
     public ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
         this.context = context;
@@ -66,7 +66,7 @@ public class ProxySocket {
 
 
             BBuffer tempBuffer = context.buildBuffer();
-            channel.connect(inetSocketAddress, channel, new CompletionHandler<Void, AsynchronousSocketChannel>() {
+            channel.connect(inetSocketAddress, channel, new CompletionHandler<>() {
                 @Override
                 public void completed(Void result, AsynchronousSocketChannel channel) {
                     //start to read message

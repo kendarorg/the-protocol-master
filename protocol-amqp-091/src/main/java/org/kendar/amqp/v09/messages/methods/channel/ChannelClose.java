@@ -88,10 +88,13 @@ public class ChannelClose extends Channel {
         chClose.setReplyText(replyText);
         chClose.setFailingMethodId(methodIdMsg);
 
+        var result = new ChannelCloseOk();
+        result.setChannel(channel);
+
         return iteratorOfRunnable(() -> proxy.execute(context,
                 connection,
                 chClose,
-                new ChannelCloseOk())
+                result)
         );
     }
 }

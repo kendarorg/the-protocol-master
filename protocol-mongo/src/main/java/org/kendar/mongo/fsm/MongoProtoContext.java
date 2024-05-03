@@ -4,11 +4,7 @@ import org.kendar.iterators.ProcessId;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class MongoProtoContext extends NetworkProtoContext {
-    private static final AtomicInteger processIdCounter = new AtomicInteger(1);
-    private static final AtomicInteger reqResId = new AtomicInteger(1);
 
     public MongoProtoContext(ProtoDescriptor descriptor) {
         super(descriptor);
@@ -16,10 +12,10 @@ public class MongoProtoContext extends NetworkProtoContext {
     }
 
     public int getNewPid() {
-        return processIdCounter.incrementAndGet();
+        return ProtoDescriptor.getCounter("PID_COUNTER");
     }
 
     public int getReqResId() {
-        return reqResId.incrementAndGet();
+        return ProtoDescriptor.getCounter("REQ_ID_COUNTER");
     }
 }

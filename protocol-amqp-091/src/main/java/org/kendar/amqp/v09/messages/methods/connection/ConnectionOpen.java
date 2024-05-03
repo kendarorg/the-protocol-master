@@ -78,11 +78,14 @@ public class ConnectionOpen extends Connection {
         conOpen.setReserved1(reserved1);
         conOpen.setReserved2(reserved2);
 
+        var result = new ConnectionOpenOk();
+        result.setReserved1(reserved1);
+
         return iteratorOfRunnable(() -> {
                     var message = proxy.execute(context,
                             connection,
                             conOpen,
-                            new ConnectionOpenOk()
+                            result
                     );
 
                     message.setReserved1(reserved1);

@@ -4,6 +4,7 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
+import org.kendar.amqp.v09.utils.ProxyedBehaviour;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
@@ -13,7 +14,7 @@ import java.util.Iterator;
 
 public class BasicNack extends Basic {
 
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private long deliveryTag;
     private boolean multiple;
     private boolean requeue;
@@ -76,23 +77,7 @@ public class BasicNack extends Basic {
         toSend.setMultiple((get & 0x01) == 0x01);
         toSend.setRequeue((get & 0x02) == 0x02);
 
-        if (isProxyed()) {
-            var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
-            toSend.setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(toSend) + "}";
-
-
-            storage.write(
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
-            return iteratorOfList(toSend);
-        }
-        return iteratorOfRunnable(() -> {
-            proxy.execute(context, connection, toSend);
-        });
+        return ProxyedBehaviour.doStuff(this,context,channel,toSend,proxy,connection);
 
 
     }

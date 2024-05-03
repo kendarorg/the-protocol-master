@@ -15,7 +15,6 @@ import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.parser.SqlParseResult;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
-import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +126,7 @@ public class PostgresExecutor {
                 }
             }
             return executeRealQuery(protoContext, parse, binding, maxRecords, describable, possiblyMultiple);
-        }catch (RuntimeException ex) {
+        } catch (RuntimeException ex) {
             log.error(ex.getMessage(), ex);
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(ex.getMessage())));
         }
@@ -243,12 +242,14 @@ public class PostgresExecutor {
         var matcher = PostgresCallConverter.convertToJdbc(parsed.getValue(), binding.getParameterValues());
         SelectResult resultSet = null;
         if (!matcher.equalsIgnoreCase(parsed.getValue())) {
-            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
+            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(
+                    protoContext.getContextId(), parsed.getType() == SqlStringType.INSERT,
                     matcher, connection, maxRecords, binding.getParameterValues(),
                     parser, concreteTypes, protoContext);
 
         } else {
-            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
+            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(
+                    protoContext.getContextId(), parsed.getType() == SqlStringType.INSERT,
                     parsed.getValue(), connection, maxRecords, binding.getParameterValues(),
                     parser, concreteTypes, protoContext);
         }

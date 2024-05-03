@@ -5,7 +5,6 @@ import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.sql.jdbc.storage.JdbcFileStorage;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
@@ -18,9 +17,9 @@ public class ReplayerTest {
     protected static final int FAKE_PORT = 5431;
 
     @Test
-    void test() throws Exception {
+    void simpleJpaTest() throws Exception {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy(new JdbcFileStorage(Path.of("src",
+        var proxy = new JdbcProxy(new MySqlFileStorage(Path.of("src",
                 "test", "resources", "replay")));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

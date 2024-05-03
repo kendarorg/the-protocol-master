@@ -1,6 +1,7 @@
 package org.kendar.protocol.states;
 
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -12,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  * Basic state
  */
 public abstract class ProtoState {
-    private static final AtomicInteger protoStateCounter = new AtomicInteger(0);
 
     /**
      * List of handled messages types
@@ -38,7 +37,7 @@ public abstract class ProtoState {
     private boolean optional;
 
     public ProtoState(Class<?>... messages) {
-        this.uuid = protoStateCounter.getAndIncrement() + "";
+        this.uuid = ProtoDescriptor.getCounterString("PROTO_STATE_COUNTER");
 
         this.messages = new HashSet<>(Arrays.asList(messages));
         Class<?> current;

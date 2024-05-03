@@ -144,10 +144,16 @@ public class QueueDeclare extends Queue {
         queueDeclare.setNoWait(noWait);
         queueDeclare.setName(name);
 
+        var queueDeclareOk = new QueueDeclareOk();
+        queueDeclareOk.setChannel(channel);
+        queueDeclareOk.setQueueName(name);
+        queueDeclareOk.setConsumerCount(1);
+        queueDeclareOk.setMessageCount(0);
+
         return iteratorOfRunnable(() -> proxy.execute(context,
                 connection,
                 queueDeclare,
-                new QueueDeclareOk()
+                queueDeclareOk
         ));
     }
 }

@@ -35,7 +35,7 @@ public class IOReplicator {
                 byte[] buf = new byte[len];
                 process.getInputStream().read(buf);
                 var res = new String(buf).trim();
-                result.append(res + "\n");
+                result.append(res).append("\n");
                 for (var exp : res.split("\n")) {
                     System.out.println("[OUT]\t" + exp);
                 }
@@ -45,13 +45,13 @@ public class IOReplicator {
                 byte[] buf = new byte[len];
                 process.getErrorStream().read(buf);
                 var res = new String(buf).trim();
-                result.append(res + "\n");
+                result.append(res).append("\n");
                 for (var exp : res.split("\n")) {
                     System.err.println("[ERR]\t" + exp);
                 }
             }
         } catch (Exception e) {
-            result.append("[ERR]\tException " + e.getMessage());
+            result.append("[ERR]\tException ").append(e.getMessage());
         }
         return result.toString();
     }

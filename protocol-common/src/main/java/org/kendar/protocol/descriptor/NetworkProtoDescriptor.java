@@ -74,6 +74,10 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
         return proxy;
     }
 
+    public Proxy getProxy() {
+        return this.proxyInstance;
+    }
+
     /**
      * Set the proxy instance
      *

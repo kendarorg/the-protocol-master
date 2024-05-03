@@ -3,7 +3,6 @@ package org.kendar.mysql;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.sql.jdbc.storage.JdbcFileStorage;
 import org.kendar.testcontainer.images.MysqlImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
@@ -45,9 +44,9 @@ public class BasicTest {
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method, dsp)));
+                proxy.setStorage(new MySqlFileStorage(Path.of("target", "tests", className, method, dsp)));
             } else {
-                proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method)));
+                proxy.setStorage(new MySqlFileStorage(Path.of("target", "tests", className, method)));
             }
         }
         baseProtocol.setProxy(proxy);
@@ -70,9 +69,9 @@ public class BasicTest {
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method, dsp)));
+                proxy.setStorage(new MySqlFileStorage(Path.of("target", "tests", className, method, dsp)));
             } else {
-                proxy.setStorage(new JdbcFileStorage(Path.of("target", "tests", className, method)));
+                proxy.setStorage(new MySqlFileStorage(Path.of("target", "tests", className, method)));
             }
         }
         baseProtocol.setProxy(proxy);

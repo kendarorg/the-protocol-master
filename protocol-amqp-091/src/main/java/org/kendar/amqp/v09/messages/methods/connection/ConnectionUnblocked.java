@@ -5,6 +5,7 @@ import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Connection;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
+import org.kendar.amqp.v09.utils.ProxyedBehaviour;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
@@ -15,7 +16,7 @@ import java.util.Iterator;
 public class ConnectionUnblocked extends Connection {
 
 
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private int consumeId;
 
     public ConnectionUnblocked() {
@@ -41,23 +42,7 @@ public class ConnectionUnblocked extends Connection {
         toSend.setChannel(channel);
 
 
-        if (isProxyed()) {
-            var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
-            toSend.setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(toSend) + "}";
-
-
-            storage.write(
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
-            return iteratorOfList(toSend);
-        }
-        return iteratorOfRunnable(() -> {
-            proxy.execute(context, connection, toSend);
-        });
+        return ProxyedBehaviour.doStuff(this,context,channel,toSend,proxy,connection);
     }
 
     public int getConsumeId() {

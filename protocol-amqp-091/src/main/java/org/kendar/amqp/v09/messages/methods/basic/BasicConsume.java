@@ -11,13 +11,18 @@ import org.kendar.amqp.v09.utils.ProxySocket;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferUtils;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.Map;
 
 public class BasicConsume extends Basic {
+
+    private static final Logger log = LoggerFactory.getLogger(BasicConsume.class);
     private short reserved1;
     private String queue;
     private String consumerTag;
@@ -148,11 +153,12 @@ public class BasicConsume extends Basic {
         basicConsume.consumerTag = consumerTag;
         basicConsume.noLocal = noLocal;
         basicConsume.queue = queue;
-        basicConsume.setConsumeId(AmqpProtocol.consumeIdCounter.incrementAndGet());
+        basicConsume.setConsumeId(ProtoDescriptor.getCounter("CONSUME_ID"));
 
         AmqpProtocol.consumeContext.put(basicConsume.getConsumeId(), context);
 
         context.setValue("BASIC_CONSUME_CH_" + channel, basicConsume);
+        log.debug("CTX:" + context.getContextId() + " CHAN:" + channel + " CNS_ID:" + basicConsume.getConsumeId());
 
         context.setValue("BASIC_CONSUME_CI_" + basicConsume.getConsumeId(), basicConsume);
 

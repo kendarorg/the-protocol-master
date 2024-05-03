@@ -16,10 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MySQLProtoContext extends NetworkProtoContext {
-    private static final AtomicInteger processIdCounter = new AtomicInteger(0);
     private static final Logger log = LoggerFactory.getLogger(MySQLProtoContext.class);
     private int clientCapabilities;
     private int packetNumber = -1;
@@ -46,7 +44,7 @@ public class MySQLProtoContext extends NetworkProtoContext {
     }
 
     public int getNewPid() {
-        return processIdCounter.incrementAndGet();
+        return ProtoDescriptor.getCounter("PID_COUNTER");
     }
 
     @Override
@@ -55,7 +53,7 @@ public class MySQLProtoContext extends NetworkProtoContext {
     }
 
     protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
-        var result = new ArrayList<ReturnMessage>(super.runException(ex, state, event));
+        var result = new ArrayList<>(super.runException(ex, state, event));
         log.error(ex.getMessage(), ex);
         var error = new Error();
         error.setCapabilities(this.getClientCapabilities());

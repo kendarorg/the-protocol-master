@@ -7,6 +7,7 @@ import org.kendar.mysql.constants.StatusFlag;
 import org.kendar.mysql.messages.Error;
 import org.kendar.mysql.messages.*;
 import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
@@ -26,13 +27,11 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class MySQLExecutor {
     public static final String TRANSACTION_ISOLATION_LEVEL_ID = "TRANSACTION ISOLATION LEVEL";
     protected static final List<BasicHandler> fakeQueries;
-    private static final AtomicInteger statementId = new AtomicInteger(1);
     private static final Logger log = LoggerFactory.getLogger(MySQLExecutor.class);
 
     static {
@@ -215,12 +214,14 @@ public class MySQLExecutor {
         var matcher = parsed.getValue();//PostgresCallConverter.convertToJdbc(parsed.getValue(),binding.getParameterValues());
         SelectResult resultSet = null;
         if (!matcher.equalsIgnoreCase(parsed.getValue())) {
-            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
+            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(protoContext.getContextId(),
+                    parsed.getType() == SqlStringType.INSERT,
                     matcher, connection, maxRecords, parameterValues, parser,
                     new ArrayList<>(), protoContext);
 
         } else {
-            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
+            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(protoContext.getContextId(),
+                    parsed.getType() == SqlStringType.INSERT,
                     parsed.getValue(), connection, maxRecords,
                     parameterValues, parser, new ArrayList<>(), protoContext);
         }
@@ -338,7 +339,7 @@ public class MySQLExecutor {
                             resultSetMetaData.getPrecision(i + 1)));
                 }
             }
-            int currentStatementId = statementId.getAndIncrement();
+            int currentStatementId = ProtoDescriptor.getCounter("STATEMENT_ID");
             var packetNumber = 0;
             result.add(new ComStmtPrepareOk(fields, currentStatementId)
                     .withPacketNumber(++packetNumber));
@@ -383,7 +384,7 @@ public class MySQLExecutor {
             //protoContext.setValue("STATEMENT_PS_"+currentStatementId,ps);
             selRes.setLastInsertedId(currentStatementId);
             selRes.getMetadata().addAll(fields);
-            storage.write(
+            storage.write(protoContext.getContextId(),
                     new JdbcRequest(query, new ArrayList<>()),
                     new JdbcResponse(selRes),
                     end - start, "PREPARE", "JDBC");

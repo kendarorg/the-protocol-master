@@ -10,9 +10,9 @@ import java.util.List;
 public interface JdbcStorage extends Storage<JdbcRequest, JdbcResponse> {
     void initialize();
 
-    void write(String query, int result, List<BindingParameter> parameterValues, long durationMs, String type);
+    void write(int connectionId, String query, int result, List<BindingParameter> parameterValues, long durationMs, String type);
 
-    void write(String query, SelectResult result, List<BindingParameter> parameterValues, long durationMs, String type);
+    void write(int connectionId, String query, SelectResult result, List<BindingParameter> parameterValues, long durationMs, String type);
 
     StorageItem<JdbcRequest, JdbcResponse> read(String query, List<BindingParameter> parameterValues, String type);
 }

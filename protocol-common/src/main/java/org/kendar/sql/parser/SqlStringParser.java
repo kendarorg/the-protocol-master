@@ -206,7 +206,6 @@ public class SqlStringParser {
                             i++;
                             c = input.charAt(i);
                         }
-                        //tokens.add(sb.toString());
                         sb = new StringBuilder();
                         continue;
                     }

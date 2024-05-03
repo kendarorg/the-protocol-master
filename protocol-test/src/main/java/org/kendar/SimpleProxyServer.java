@@ -92,26 +92,24 @@ public class SimpleProxyServer {
 
                     // a thread to read the client's requests and pass them
                     // to the server. A separate thread for asynchronous.
-                    Thread t = new Thread() {
-                        public void run() {
-                            int bytesRead;
-                            try {
-                                while ((bytesRead = streamFromClient.read(request)) != -1) {
-                                    System.out.println("[PROXY ] " + currentConnection + " TO SERVER:\n" + toHexByteArray(request, bytesRead));
-                                    streamToServer.write(request, 0, bytesRead);
-                                    streamToServer.flush();
-                                }
-                            } catch (IOException e) {
+                    Thread t = new Thread(() -> {
+                        int bytesRead;
+                        try {
+                            while ((bytesRead = streamFromClient.read(request)) != -1) {
+                                System.out.println("[PROXY ] " + currentConnection + " TO SERVER:\n" + toHexByteArray(request, bytesRead));
+                                streamToServer.write(request, 0, bytesRead);
+                                streamToServer.flush();
                             }
-
-                            // the client closed the connection to us, so close our
-                            // connection to the server.
-                            try {
-                                streamToServer.close();
-                            } catch (IOException e) {
-                            }
+                        } catch (IOException e) {
                         }
-                    };
+
+                        // the client closed the connection to us, so close our
+                        // connection to the server.
+                        try {
+                            streamToServer.close();
+                        } catch (IOException e) {
+                        }
+                    });
 
                     // Start the client-to-server request thread running
                     t.start();

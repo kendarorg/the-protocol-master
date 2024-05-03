@@ -146,7 +146,6 @@ public class MainTest extends BasicTest {
 
 
 
-
     @Test
     void testErrorInsert() throws Exception {
         System.out.println("RECORDING ==============================================");
@@ -262,6 +261,5 @@ public class MainTest extends BasicTest {
         runTheServer.set(false);
         Sleeper.sleep(1000);
     }
-
 
 }

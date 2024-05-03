@@ -10,16 +10,19 @@ import org.kendar.storage.Storage;
  * @param <T>
  */
 public abstract class Proxy<T extends Storage> {
-
     /**
      * Descriptor (of course network like)
      */
     public NetworkProtoDescriptor protocol;
-
+    protected boolean replayer;
     /**
      * (Eventual) storage
      */
     protected T storage;
+
+    public boolean isReplayer() {
+        return replayer;
+    }
 
     /**
      * Retrieve the protocol data

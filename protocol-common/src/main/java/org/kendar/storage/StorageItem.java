@@ -7,26 +7,43 @@ package org.kendar.storage;
  * @param <O>
  */
 public class StorageItem<I, O> {
+    private boolean constant;
+    private int connectionId;
     private long index;
     private I input;
     private O output;
     private long durationMs;
     private String type;
     private String caller;
-
     /**
      * Needed for serialization
      */
     public StorageItem() {
 
     }
-
-    public StorageItem(I input, O output, long durationMs, String type, String caller) {
+    public StorageItem(int connectionId, I input, O output, long durationMs, String type, String caller) {
+        this.connectionId = connectionId;
         this.input = input;
         this.output = output;
         this.durationMs = durationMs;
         this.type = type;
         this.caller = caller;
+    }
+
+    public boolean isConstant() {
+        return constant;
+    }
+
+    public void setConstant(boolean constant) {
+        this.constant = constant;
+    }
+
+    public int getConnectionId() {
+        return connectionId;
+    }
+
+    public void setConnectionId(int connectionId) {
+        this.connectionId = connectionId;
     }
 
     public long getIndex() {

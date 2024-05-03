@@ -13,6 +13,16 @@ public class NullStorage<I, O> extends BaseStorage<I, O> {
     }
 
     @Override
+    public Storage<I, O> withFullData() {
+        return this;
+    }
+
+    @Override
+    public void optimize() {
+
+    }
+
+    @Override
     protected void write(StorageItem item) {
 
     }

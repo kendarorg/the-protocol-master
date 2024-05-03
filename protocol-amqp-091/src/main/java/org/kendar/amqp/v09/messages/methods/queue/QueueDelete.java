@@ -95,15 +95,18 @@ public class QueueDelete extends Queue {
         queueDeclare.setChannel(channel);
         queueDeclare.setReserved1(reserved1);
         queueDeclare.setIfUnused(ifUnused);
-        ;
         queueDeclare.setEmpty(empty);
         queueDeclare.setNoWait(noWait);
         queueDeclare.setName(name);
 
+        var queueDeleteOk = new QueueDeleteOk();
+        queueDeleteOk.setChannel(channel);
+        queueDeleteOk.setMessageCount(0);
+
         return iteratorOfRunnable(() -> proxy.execute(context,
                 connection,
                 queueDeclare,
-                new QueueDeleteOk()
+                queueDeleteOk
         ));
     }
 

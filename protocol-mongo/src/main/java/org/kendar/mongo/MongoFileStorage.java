@@ -4,12 +4,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.mongo.utils.MongoStorage;
 import org.kendar.storage.BaseFileStorage;
+import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MongoFileStorage extends BaseFileStorage<JsonNode, JsonNode> implements MongoStorage {
+    private static final Logger log = LoggerFactory.getLogger(MongoFileStorage.class);
     private final ConcurrentHashMap<Long, StorageItem<JsonNode, JsonNode>> inMemoryDb = new ConcurrentHashMap<>();
     private final Object lockObject = new Object();
     private boolean initialized = false;
@@ -54,5 +60,15 @@ public class MongoFileStorage extends BaseFileStorage<JsonNode, JsonNode> implem
 
             return null;
         }
+    }
+
+    @Override
+    protected boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<JsonNode, JsonNode> item, List<StorageItem<JsonNode, JsonNode>> loadedData) {
+        return false;
+    }
+
+    @Override
+    protected Map<String, String> buildTag(StorageItem<JsonNode, JsonNode> item) {
+        return null;
     }
 }

@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 public class BasicCancel extends Basic {
 
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private String consumerTag;
     private boolean noWait;
     private int consumeId;
@@ -75,6 +75,7 @@ public class BasicCancel extends Basic {
 
 
             storage.write(
+                    context.getContextId(),
                     null
                     , mapper.toJsonNode(res)
                     , 0, "RESPONSE", "AMQP");

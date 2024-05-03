@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+@SuppressWarnings("DuplicateBranchesInSwitch")
 public class FieldsReader {
 
     public static Date readTimestamp(BBuffer rb) {
@@ -103,7 +104,7 @@ public class FieldsReader {
     public static Map<String, Object> readTable(BBuffer in) {
         var size = in.getInt();
         var lastPos = size + in.getPosition();
-        Map<String, Object> table = new HashMap<String, Object>();
+        Map<String, Object> table = new HashMap<>();
         while (in.getPosition() < lastPos) {
             String name = ShortStringHelper.read(in);
             Object value = readField(in);

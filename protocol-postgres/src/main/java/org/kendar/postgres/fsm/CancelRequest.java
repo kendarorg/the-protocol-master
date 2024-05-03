@@ -29,7 +29,6 @@ public class CancelRequest extends ProtoState implements InterruptProtoState {
     private static final Logger log = LoggerFactory.getLogger(CancelRequest.class);
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
-
         var context = (PostgresProtoContext) event.getContext();
         var inputBuffer = event.getBuffer();
         var pid = inputBuffer.getInt(8);

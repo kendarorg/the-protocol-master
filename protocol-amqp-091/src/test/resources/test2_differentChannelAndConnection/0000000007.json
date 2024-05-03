@@ -1,0 +1,42 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 7,
+  "input": {
+    "type": "BasicConsume",
+    "data": {
+      "uuid": "70",
+      "optional": false,
+      "channel": 1,
+      "type": 1,
+      "proxyed": false,
+      "classId": 60,
+      "methodId": 20,
+      "reserved1": 0,
+      "queue": "fuffa_queue",
+      "consumerTag": "",
+      "noLocal": false,
+      "noAck": false,
+      "exclusive": false,
+      "noWait": false,
+      "arguments": {},
+      "consumeId": 1
+    }
+  },
+  "output": {
+    "type": "BasicConsumeOk",
+    "data": {
+      "uuid": "71",
+      "optional": false,
+      "channel": 1,
+      "type": 1,
+      "proxyed": false,
+      "classId": 60,
+      "methodId": 21,
+      "tag": "amq.ctag-FmXqPJK3K5YPwwaUXLwuEw"
+    }
+  },
+  "durationMs": 1,
+  "type": "BasicConsume",
+  "caller": "AMQP"
+}

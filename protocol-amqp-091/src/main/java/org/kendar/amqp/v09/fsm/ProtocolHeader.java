@@ -42,14 +42,15 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        var proxyConStart = proxy.execute(context,
+        proxy.execute(context,
                 connection, BBuffer.of(new byte[]{'A', 'M', 'Q', 'P', 0, 0, 9, 1}),
                 new ConnectionStart());
 
-        Map<String, Object> toSendBack = new HashMap<String, Object>();
-        Map<String, Object> capabilities = new HashMap<String, Object>();
+
+        Map<String, Object> toSendBack = new HashMap<>();
+        Map<String, Object> capabilities = new HashMap<>();
         toSendBack.put("product", "protocol-master");
-        toSendBack.put("version", "1.0.0");
+        toSendBack.put("version", "1.2.0");
         toSendBack.put("capabilities", capabilities);
         capabilities.put("consumer_priorities", true);
         capabilities.put("exchange_exchange_bindings", true);
