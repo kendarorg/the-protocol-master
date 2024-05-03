@@ -78,6 +78,7 @@ usage: runner
  -xl <arg>   Select remote login
  -xw <arg>   Select remote password
  -v  <arg>   Log level (default ERROR)
+ -s  <arg>   Set schema (Jdbc servers only)
 </pre>
 
 Inside the chosen directory you will find simple jsons containing all the data exchanged

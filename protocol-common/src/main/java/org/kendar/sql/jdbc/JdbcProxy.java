@@ -23,20 +23,22 @@ import java.util.stream.Collectors;
 public class JdbcProxy extends Proxy<JdbcStorage> {
     private final String driver;
     private final String connectionString;
+    private final String forcedSchema;
     private final String login;
     private final String password;
 
     public JdbcProxy(JdbcStorage jdbcStorage) {
-        this(null, null, null, null);
+        this(null, null, null, null, null);
         setStorage(jdbcStorage);
         this.replayer = true;
 
     }
 
-    public JdbcProxy(String driver, String connectionString, String login, String password) {
+    public JdbcProxy(String driver, String connectionString, String forcedSchema, String login, String password) {
 
         this.driver = driver;
         this.connectionString = connectionString;
+        this.forcedSchema = forcedSchema;
         this.login = login;
         this.password = password;
         setStorage(new NullJdbcStorage());
@@ -389,8 +391,12 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             return new ProxyConnection(null);
         }
         try {
-            return new ProxyConnection(DriverManager.
-                    getConnection(getConnectionString(), getLogin(), getPassword()));
+            var connection = DriverManager.
+                    getConnection(getConnectionString(), getLogin(), getPassword());
+            if(this.forcedSchema!=null && !this.forcedSchema.isEmpty()) {
+                connection.setSchema(this.forcedSchema);
+            }
+            return new ProxyConnection(connection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
