@@ -33,10 +33,11 @@ public class Main {
         options.addOption("xl", true, "Select remote login");
         options.addOption("xw", true, "Select remote password");
         options.addOption("xc", true, "Select remote connection string");
-        options.addOption("xd", true, "Select remote log directory (you can set a {timestamp} value\n" +
+        options.addOption("xd", true, "Select log/replay directory (you can set a {timestamp} value\n" +
                 "that will be replaced with the current timestamp)");
-        options.addOption("pl", false, "Replay from log directory");
+        options.addOption("pl", false, "Replay from log/replay directory");
         options.addOption("v", true, "Log level (default ERROR)");
+        options.addOption("s", true, "Set schema (Jdbc servers only)");
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -47,6 +48,7 @@ public class Main {
             var login = cmd.getOptionValue("xl");
             var password = cmd.getOptionValue("xw");
             var logLevel = cmd.getOptionValue("v");
+            var forcedSchema = cmd.getOptionValue("s");
             if (logLevel == null || logLevel.isEmpty()) {
                 logLevel = "ERROR";
             }
@@ -71,10 +73,10 @@ public class Main {
             }
             if (protocol.equalsIgnoreCase("mysql")) {
                 if (port == -1) port = 3306;
-                runMysql(port, logsDir, connectionString, login, password, replayFromLog);
+                runMysql(port, logsDir, connectionString,forcedSchema, login, password, replayFromLog);
             } else if (protocol.equalsIgnoreCase("postgres")) {
                 if (port == -1) port = 5432;
-                runPostgres(port, logsDir, connectionString, login, password, replayFromLog);
+                runPostgres(port, logsDir, connectionString,forcedSchema, login, password, replayFromLog);
             } else if (protocol.equalsIgnoreCase("mongo")) {
                 if (port == -1) port = 27017;
                 runMongo(port, logsDir, connectionString, login, password, replayFromLog);
@@ -119,28 +121,32 @@ public class Main {
     }
 
 
-    private static void runPostgres(int port, String logsDir, String connectionString,
+    private static void runPostgres(int port, String logsDir, String connectionString, String forcedSchema,
                                     String login, String password, boolean replayFromLog) {
-        runJdbc("postgres", "org.postgresql.Driver", port, logsDir, connectionString, login, password, replayFromLog);
+        runJdbc("postgres", "org.postgresql.Driver", port, logsDir, connectionString, forcedSchema,
+                login, password, replayFromLog);
     }
 
-    private static void runMysql(int port, String logsDir, String connectionString,
+    private static void runMysql(int port, String logsDir, String connectionString, String forcedSchema,
                                  String login, String password, boolean replayFromLog) {
-        runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, login, password, replayFromLog);
+        runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString,forcedSchema,
+                login, password, replayFromLog);
     }
 
     private static void runJdbc(String type, String driver, int port, String logsDir,
-                                String connectionString, String login, String password, boolean replayFromLog) {
+                                String connectionString, String forcedSchema,
+                                String login, String password, boolean replayFromLog) {
         var baseProtocol = new PostgresProtocol(port);
         var proxy = new JdbcProxy(driver,
-                connectionString,
+                connectionString,forcedSchema,
                 login, password);
-        var logsDirPath = Path.of(logsDir);
-        JdbcFileStorage storage = new JdbcFileStorage(logsDirPath);
-        if (type.equalsIgnoreCase("mysql")) {
-            storage = new MySqlFileStorage(logsDirPath);
-        }
+
         if (logsDir != null) {
+            var logsDirPath = Path.of(logsDir);
+            JdbcFileStorage storage = new JdbcFileStorage(logsDirPath);
+            if (type.equalsIgnoreCase("mysql")) {
+                storage = new MySqlFileStorage(logsDirPath);
+            }
             if (replayFromLog) {
                 proxy = new JdbcProxy(storage);
             } else {
