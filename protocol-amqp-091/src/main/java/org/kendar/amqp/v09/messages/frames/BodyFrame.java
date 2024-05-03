@@ -18,7 +18,7 @@ import java.util.Iterator;
 public class BodyFrame extends Frame {
     private static final Logger log = LoggerFactory.getLogger(BodyFrame.class);
     private static final Logger logPs = LoggerFactory.getLogger(ProxySocket.class.getName());
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private byte[] contentBytes;
     private String contentString;
     private int consumeId;
@@ -74,20 +74,28 @@ public class BodyFrame extends Frame {
         if (isProxyed()) {
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             bf.setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + bf.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(bf) + "}";
 
 
-            storage.write(
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
+            //If it is not a replayer do not save
+            if (!proxy.isReplayer()) {
+                var storage = proxy.getStorage();
+                var res = "{\"type\":\"" + bf.getClass().getSimpleName() + "\",\"data\":" +
+                        mapper.serialize(bf) + "}";
+                //Write it down
+                storage.write(
+                        context.getContextId(),
+                        null
+                        , mapper.toJsonNode(res)
+                        , 0, "RESPONSE", "AMQP");
+            }
+            //Return itself
             return iteratorOfList(bf);
+        } else if (proxy.isReplayer() && isProxyed()) {
+            var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
+            bf.setConsumeId(basicConsume.getConsumeId());
         }
-        return iteratorOfRunnable(() -> {
-            proxy.execute(context, connection, bf);
-        });
+
+        return iteratorOfRunnable(() -> proxy.execute(context, connection, bf));
     }
 
     public byte[] getContentBytes() {

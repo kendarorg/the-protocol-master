@@ -26,14 +26,10 @@ import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class MongoProxy extends Proxy<MongoStorage> {
     private static final JsonMapper mapper = new JsonMapper();
-    private static final AtomicInteger connectionId = new AtomicInteger(1);
     private String connectionString;
     private ServerApiVersion serverApiVersion;
-    private boolean replayer = false;
 
     public MongoProxy(String connectionString, ServerApiVersion serverApiVersion) {
 
@@ -117,7 +113,8 @@ public class MongoProxy extends Proxy<MongoStorage> {
         toSend.getSections().add(section);
         long end = System.currentTimeMillis();
 
-        this.storage.write((JsonNode) data.serialize(), (JsonNode) toSend.serialize(), end - start, "OP_MSG", "MONGODB");
+        this.storage.write(protoContext.getContextId(),
+                (JsonNode) data.serialize(), (JsonNode) toSend.serialize(), end - start, "OP_MSG", "MONGODB");
         return toSend;
     }
 
@@ -160,7 +157,8 @@ public class MongoProxy extends Proxy<MongoStorage> {
         section.getDocuments().add(json);
         toSend.getSections().add(section);
         long end = System.currentTimeMillis();
-        this.storage.write((JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_MSG", "MONGODB");
+        this.storage.write(protoContext.getContextId(),
+                (JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_MSG", "MONGODB");
         return toSend;
     }
 
@@ -202,7 +200,8 @@ public class MongoProxy extends Proxy<MongoStorage> {
         toSend.getDocuments().add(json);
 
         long end = System.currentTimeMillis();
-        this.storage.write((JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_QUERY", "MONGODB");
+        this.storage.write(protoContext.getContextId(),
+                (JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_QUERY", "MONGODB");
         return toSend;
     }
 }

@@ -98,12 +98,17 @@ public class ConnectionStartOk extends Connection {
         connStartOk.setLocales(locale.split(" "));
         connStartOk.setAuth(new String[]{proxy.getUserId(), proxy.getPassword()});
 
+
+        var response = new ConnectionTune();
+        response.setChannelMax((short) 0);
+        response.setFrameMax(131072);
+        response.setHearthBeat((short) 0);
+        var conTuneOk = new ConnectionTuneOk();
         var conTune = proxy.execute(context,
                 connection,
                 connStartOk,
-                new ConnectionTune()
+                response
         );
-        var conTuneOk = new ConnectionTuneOk();
         conTuneOk.setChannelMax(conTune.getChannelMax());
         conTuneOk.setHearthBeat(conTune.getHearthBeat());
         conTuneOk.setFrameMax(conTune.getFrameMax());
@@ -114,11 +119,11 @@ public class ConnectionStartOk extends Connection {
                             connection,
                             conTuneOk);
 
-                    var response = new ConnectionTune();
-                    response.setChannelMax((short) 0);
-                    response.setFrameMax(131072);
-                    response.setHearthBeat((short) 0);
-                    return response;
+                    var response2 = new ConnectionTune();
+                    response2.setChannelMax((short) 0);
+                    response2.setFrameMax(131072);
+                    response2.setHearthBeat((short) 0);
+                    return response2;
                 }
         );
     }

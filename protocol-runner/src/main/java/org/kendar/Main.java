@@ -9,6 +9,7 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.mongo.MongoFileStorage;
 import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
+import org.kendar.mysql.MySqlFileStorage;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
@@ -120,25 +121,30 @@ public class Main {
 
     private static void runPostgres(int port, String logsDir, String connectionString,
                                     String login, String password, boolean replayFromLog) {
-        runJdbc("org.postgresql.Driver", port, logsDir, connectionString, login, password, replayFromLog);
+        runJdbc("postgres", "org.postgresql.Driver", port, logsDir, connectionString, login, password, replayFromLog);
     }
 
     private static void runMysql(int port, String logsDir, String connectionString,
                                  String login, String password, boolean replayFromLog) {
-        runJdbc("com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, login, password, replayFromLog);
+        runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, login, password, replayFromLog);
     }
 
-    private static void runJdbc(String driver, int port, String logsDir,
+    private static void runJdbc(String type, String driver, int port, String logsDir,
                                 String connectionString, String login, String password, boolean replayFromLog) {
         var baseProtocol = new PostgresProtocol(port);
         var proxy = new JdbcProxy(driver,
                 connectionString,
                 login, password);
+        var logsDirPath = Path.of(logsDir);
+        JdbcFileStorage storage = new JdbcFileStorage(logsDirPath);
+        if (type.equalsIgnoreCase("mysql")) {
+            storage = new MySqlFileStorage(logsDirPath);
+        }
         if (logsDir != null) {
             if (replayFromLog) {
-                proxy = new JdbcProxy(new JdbcFileStorage(Path.of(logsDir)));
+                proxy = new JdbcProxy(storage);
             } else {
-                proxy.setStorage(new JdbcFileStorage(Path.of(logsDir)));
+                proxy.setStorage(storage);
             }
         }
         baseProtocol.setProxy(proxy);

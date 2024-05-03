@@ -235,6 +235,8 @@ public class SimpleTest extends BasicTest {
     void test2_differentChannelAndConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
+
+        Sleeper.sleep(1000);
         ConnectionFactory connectionFactory = new ConnectionFactory();
         // connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;
@@ -244,9 +246,10 @@ public class SimpleTest extends BasicTest {
 
         connectionFactory.setUri(cs);
         connectionFactory.setPassword(rabbitContainer.getAdminPassword());
+        System.out.println("LISTENING ------------------------------------------------------------");
 
         var chanConsume = consume(connectionFactory, messages);
-
+        System.out.println("PREPARING ------------------------------------------------------------");
 
         Sleeper.sleep(100);
 
@@ -271,13 +274,14 @@ public class SimpleTest extends BasicTest {
                 .appId("TESTAPP")
                 //.clusterId("9")
                 .build();
+        System.out.println("SENDING ------------------------------------------------------------");
         //SimpleProxyServer.write=true;
         Sleeper.sleep(100);
         channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
         Sleeper.sleep(100);
         channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
         chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
-        System.out.println("------------------------------------------------------------");
+        System.out.println("WAIT------------------------------------------------------------");
         Sleeper.sleep(100);
 
         chanConsume.queueDelete(MAIN_QUEUE);

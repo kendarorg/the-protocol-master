@@ -12,28 +12,43 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Simple protocol descriptor
  */
 public abstract class ProtoDescriptor {
 
+    private static final ConcurrentHashMap<String, AtomicInteger> counters = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(ProtoDescriptor.class);
-
     /**
      * Interrupt states, these are evaluated always, BEFORE the standard events
      */
     private final List<ProtoState> interrupts = new ArrayList<>();
-
     /**
      * A map of [tag keys][states] one for each "tag" branch
      */
-    protected Map<String, ProtoState> taggedStates = new HashMap<>();
+    protected final Map<String, ProtoState> taggedStates = new HashMap<>();
+
+    public static int getCounter(String id) {
+        id = id.toUpperCase();
+        return counters.computeIfAbsent(id, (key) ->
+                new AtomicInteger(0)).incrementAndGet();
+    }
+
+    public static String getCounterString(String id) {
+        id = id.toUpperCase();
+        return "" + counters.computeIfAbsent(id, (key) ->
+                new AtomicInteger(0)).incrementAndGet();
+    }
 
     /**
      * Initialize the protocol
      */
     public void initialize() {
+
+        counters.clear();
         initializeProtocol();
     }
 

@@ -15,7 +15,7 @@ a set of java libraries, aimed at various tasks (and an executable jar if you wa
 * Run queries against a pre-recorded sequence of commands to simulate a real data
   storage, without the need of a real server (in the making)
 
-The whole project is covered with Jacoco (66% coverage actually)
+The whole project is covered with Jacoco (64% coverage actually)
 
 For this to become real an event based state machine has been developed, with
 several database wire protocol implementations:
@@ -49,7 +49,6 @@ an example where a recording is made and then reporduced.
 
 Just call it like the following if using included mysql and postgres driver (adapt
 the line end to your system!):
-
 <pre>
   java -jar protocol-runner.jar \
     -p postgres -l 3175 \
@@ -109,5 +108,3 @@ The events are immediatly executed. If no bytes are present or there are not eno
 bytes to read, the events queue is seeked for "BytesEvent" and then the execution is
 retried.
 
-
-java -cp .ojdbc14.jar UserInterface filldb

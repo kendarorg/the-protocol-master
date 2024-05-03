@@ -31,19 +31,17 @@ import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AmqpProtocol extends NetworkProtoDescriptor {
 
     private static final boolean IS_BIG_ENDIAN = true;
     private static final int PORT = 5672;
     public static ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
-    public static AtomicInteger consumeIdCounter;
+
     private int port = PORT;
 
     private AmqpProtocol() {
         consumeContext = new ConcurrentHashMap<>();
-        consumeIdCounter = new AtomicInteger(1);
 
     }
 

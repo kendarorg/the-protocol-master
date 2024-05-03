@@ -242,12 +242,14 @@ public class PostgresExecutor {
         var matcher = PostgresCallConverter.convertToJdbc(parsed.getValue(), binding.getParameterValues());
         SelectResult resultSet = null;
         if (!matcher.equalsIgnoreCase(parsed.getValue())) {
-            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
+            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(
+                    protoContext.getContextId(), parsed.getType() == SqlStringType.INSERT,
                     matcher, connection, maxRecords, binding.getParameterValues(),
                     parser, concreteTypes, protoContext);
 
         } else {
-            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(parsed.getType() == SqlStringType.INSERT,
+            resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(
+                    protoContext.getContextId(), parsed.getType() == SqlStringType.INSERT,
                     parsed.getValue(), connection, maxRecords, binding.getParameterValues(),
                     parser, concreteTypes, protoContext);
         }

@@ -1,7 +1,10 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,13 +24,22 @@ import java.util.stream.Stream;
  * @param <O> output type
  */
 public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
-    /**
-     * Internal counter for the specific run
-     */
-    protected static final AtomicLong counter = new AtomicLong(0);
+
 
     protected static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(BaseFileStorage.class);
 
+    protected List<CompactLine> retrieveIndexFile(){
+        String fileContent = null;
+        try {
+            fileContent = Files.readString(Path.of(targetDir, "index.json"));
+        } catch (IOException e) {
+            log.error("Missing index file!");
+            throw new RuntimeException(e);
+        }
+        return mapper.deserialize(fileContent, new TypeReference<List<CompactLine>>() {
+        });
+    }
 
     protected String targetDir;
 
@@ -72,6 +84,12 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
                 .collect(Collectors.toList());
         var result = new ArrayList<StorageItem<I, O>>();
         for (var fileName : fileNames) {
+            var nameOnly = fileName.replace(".json", "");
+            try {
+                Long.parseLong(nameOnly);
+            } catch (NumberFormatException ex) {
+                continue;
+            }
             try {
                 var fileContent = Files.readString(Path.of(targetDir, fileName));
                 result.add((StorageItem<I, O>) mapper.deserialize(fileContent, getTypeReference()));
@@ -96,7 +114,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
      */
     protected void write(StorageItem item) {
         try {
-            var valueId = counter.getAndIncrement();
+            var valueId = ProtoDescriptor.getCounter("STORAGE_ID");
             var id = BaseStorage.padLeftZeros(String.valueOf(valueId), 10) + ".json";
             item.setIndex(valueId);
             var result = mapper.serializePretty(item);
@@ -105,4 +123,42 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
             throw new RuntimeException();
         }
     }
+
+    @Override
+    public void optimize() {
+
+        List<CompactLine> compactLines = new ArrayList<>();
+
+        List<StorageItem<I, O>> loadedData = new ArrayList<>();
+        try {
+            for (var item : readAllItems()) {
+                var cl = new CompactLine(item, () -> buildTag(item));
+                compactLines.add(cl);
+                if (!useFullData && shouldNotSave(cl, compactLines, item, loadedData)) {
+                    var id = BaseStorage.padLeftZeros(String.valueOf(cl.getIndex()), 10) + ".json";
+                    if (Files.exists(Path.of(targetDir, id + ".noop"))) {
+                        Files.delete(Path.of(targetDir, id + ".noop"));
+                    }
+                    Files.move(Path.of(targetDir, id), Path.of(targetDir, id + ".noop"));
+                    continue;
+                }
+                loadedData.add(item);
+            }
+            if (Files.exists(Path.of(targetDir, "index.json"))) {
+                Files.delete(Path.of(targetDir, "index.json"));
+            }
+            Files.writeString(Path.of(targetDir, "index.json"), mapper.serializePretty(compactLines));
+        } catch (IOException e) {
+            log.error("[SERVER] Unable to write index file");
+            throw new RuntimeException(e);
+        }
+
+        log.debug("[SERVER] Optimized recording");
+    }
+
+    protected abstract boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<I, O> item, List<StorageItem<I, O>> loadedData);
+
+    protected abstract Map<String, String> buildTag(StorageItem<I, O> item);
+
+
 }

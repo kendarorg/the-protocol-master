@@ -52,10 +52,14 @@ public class ChannelOpen extends Channel {
         channelOpen.setChannel(channel);
         channelOpen.setReserved1(reserved1);
 
+        var chok = new ChannelOpenOk();
+        chok.setChannel(channel);
+        chok.setReserved1(reserved1);
+
         return iteratorOfRunnable(() -> proxy.execute(context,
                         connection,
                         channelOpen,
-                        new ChannelOpenOk()
+                        chok
                 )
         );
     }

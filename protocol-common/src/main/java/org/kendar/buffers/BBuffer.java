@@ -70,8 +70,6 @@ public class BBuffer {
             lower = (((inData[j + 4] & 0xff) << 24)
                     + ((inData[j + 5] & 0xff) << 16)
                     + ((inData[j + 6] & 0xff) << 8) + ((inData[j + 7] & 0xff) << 0));
-            return Double.longBitsToDouble((((long) upper) << 32)
-                    + (lower & 0xffffffffL));
         } else {
             //for (int i = 0; i < length; i++) {
             upper = (((inData[j + 7] & 0xff) << 24)
@@ -80,9 +78,9 @@ public class BBuffer {
             lower = (((inData[j + 3] & 0xff) << 24)
                     + ((inData[j + 2] & 0xff) << 16)
                     + ((inData[j + 1] & 0xff) << 8) + ((inData[j] & 0xff) << 0));
-            return Double.longBitsToDouble((((long) upper) << 32)
-                    + (lower & 0xffffffffL));
         }
+        return Double.longBitsToDouble((((long) upper) << 32)
+                + (lower & 0xffffffffL));
         //}
     }
 

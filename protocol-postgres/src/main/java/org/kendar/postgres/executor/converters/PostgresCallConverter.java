@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class PostgresCallConverter {
     private static final Pattern callToSelect = Pattern.compile("select \\* from ([a-zA-Z0-9_\\-]+)([\\s]*)\\((.*)\\)([\\s]*)as result", Pattern.CASE_INSENSITIVE);
-    public static SqlStringParser parser = new SqlStringParser("$");
+    public static final SqlStringParser parser = new SqlStringParser("$");
 
     public static String convertToJdbc(String originalQuery, List<BindingParameter> parameterValues) {
         var matcher = callToSelect.matcher(originalQuery);

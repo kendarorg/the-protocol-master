@@ -1,7 +1,9 @@
 package org.kendar.amqp.v09;
 
 import com.rabbitmq.client.*;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.kendar.server.TcpServer;
 import org.kendar.utils.Sleeper;
 
@@ -17,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class ReplayerTest {
 
 
@@ -52,13 +55,13 @@ public class ReplayerTest {
     }
 
     @Test
-    void queueTest() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test2_differentChannelAndConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
         proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "queueTest")));
+                "test", "resources", "test2_differentChannelAndConnection")));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -77,8 +80,9 @@ public class ReplayerTest {
 
             Sleeper.sleep(100);
 
+            System.out.println("LISTENING ------------------------------------------------------------");
             var chanConsume = consume(connectionFactory, messages);
-
+            System.out.println("PREPARING ------------------------------------------------------------");
 
             Sleeper.sleep(100);
 
@@ -103,14 +107,18 @@ public class ReplayerTest {
                     .appId("TESTAPP")
                     //.clusterId("9")
                     .build();
+            System.out.println("SENDING ------------------------------------------------------------");
             //SimpleProxyServer.write=true;
             Sleeper.sleep(100);
             channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
             Sleeper.sleep(100);
             channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
             chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
-            System.out.println("------------------------------------------------------------");
+            System.out.println("WAIT------------------------------------------------------------");
             Sleeper.sleep(100);
+
+            chanConsume.queueDelete(MAIN_QUEUE);
+            channel.queueDelete(MAIN_QUEUE);
             channel.close();
             connection.close();
 
@@ -128,13 +136,13 @@ public class ReplayerTest {
     }
 
     @Test
-    void queueTestNoPublish() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test5_noPublish() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
         proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "queueTestNoPublish")));
+                "test", "resources", "test5_noPublish")));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -201,12 +209,12 @@ public class ReplayerTest {
     }
 
     @Test
-    void openConnectionTest() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test3_openConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
 
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
         proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "openConnectionTest")));
+                "test", "resources", "test3_openConnection")));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

@@ -7,6 +7,8 @@ package org.kendar.storage;
  * @param <O>
  */
 public abstract class BaseStorage<I, O> implements Storage<I, O> {
+    protected boolean useFullData = false;
+
     public static String padLeftZeros(String inputString, int length) {
         if (inputString.length() >= length) {
             return inputString;
@@ -22,12 +24,17 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
 
     public abstract void initialize();
 
-    public void write(I request, O response, long durationMs, String type, String caller) {
-        var item = new StorageItem(request, response, durationMs, type, caller);
+    public void write(int connectionId, I request, O response, long durationMs, String type, String caller) {
+        var item = new StorageItem(connectionId, request, response, durationMs, type, caller);
         write(item);
     }
 
     protected abstract void write(StorageItem item);
+
+    public Storage<I, O> withFullData() {
+        this.useFullData = true;
+        return this;
+    }
 
 
 }

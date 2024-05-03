@@ -22,7 +22,6 @@ import org.slf4j.MDC;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Instance of a protocol definition
@@ -30,10 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
 
-    /**
-     * Count the instances of the protocol
-     */
-    private final static AtomicInteger contextCounter = new AtomicInteger(1);
     /**
      * Stores the variable relatives to the current instance execution
      */
@@ -52,15 +47,15 @@ public class ProtoContext {
      * Exclusively lock the send operation
      */
     private final Object sendLock = new Object();
-    protected int contextId;
+    protected final int contextId;
     /**
      * The descriptor of the protocol
      */
-    protected ProtoDescriptor descriptor;
+    protected final ProtoDescriptor descriptor;
     /**
      * Flag to stop the execution
      */
-    protected AtomicBoolean run = new AtomicBoolean(true);
+    protected final AtomicBoolean run = new AtomicBoolean(true);
     /**
      * Execution stack, this stores the current state
      */
@@ -75,7 +70,7 @@ public class ProtoContext {
     private ProtoState currentState;
 
     public ProtoContext(ProtoDescriptor descriptor) {
-        this.contextId = contextCounter.getAndIncrement();
+        this.contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
         this.descriptor = descriptor;
         this.root = descriptor.getTaggedStates();
     }
@@ -467,19 +462,7 @@ public class ProtoContext {
         while (currentInstance.canRun()) {
             //Find who's next
             var candidate = currentInstance.getNextExecutable();
-            if (isNormalState(candidate)) {
-                //If it's an executable return it
-                result = retrieveExecutableState(candidate, event);
-            } else {
-                if (shouldBlockRecursion(event, candidate)) {
-                    //Can't continue
-                    result = new FailedState("Blocked recursion", candidate, event);
-                } else {
-                    //Execute special states
-                    executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
-                    result = findThePossibleNextStateOnStack(event, depth + 1);
-                }
-            }
+            result = getProtoState(candidate, result, event, eventTags, depth);
             //If it's an optional state just continue
             if (isFailed(result) && candidate.isOptional()) {
                 continue;
@@ -498,6 +481,24 @@ public class ProtoContext {
             popTheCurrentState(currentInstance, eventTags);
         }
 
+        return result;
+    }
+
+    private ProtoState getProtoState(ProtoState candidate, ProtoState result, BaseEvent event, String eventTags, int depth) {
+
+        if (isNormalState(candidate)) {
+            //If it's an executable return it
+            result = retrieveExecutableState(candidate, event);
+        } else {
+            if (shouldBlockRecursion(event, candidate)) {
+                //Can't continue
+                result = new FailedState("Blocked recursion", candidate, event);
+            } else {
+                //Execute special states
+                executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
+                result = findThePossibleNextStateOnStack(event, depth + 1);
+            }
+        }
         return result;
     }
 
@@ -546,19 +547,7 @@ public class ProtoContext {
         while (currentInstance.canRun()) {
             //Find who's next
             var candidate = currentInstance.getNextExecutable();
-            if (isNormalState(candidate)) {
-                //If it's an executable return it
-                result = retrieveExecutableState(candidate, event);
-            } else {
-                if (shouldBlockRecursion(event, candidate)) {
-                    //Can't continue
-                    result = new FailedState("Blocked recursion", candidate, event);
-                } else {
-                    //Execute special states
-                    executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
-                    result = findThePossibleNextStateOnStack(event, depth + 1);
-                }
-            }
+            result = getProtoState(candidate, result, event, eventTags, depth);
             //May be there is something more
             if (isFailed(result)) {
                 continue;
@@ -590,19 +579,7 @@ public class ProtoContext {
         while (currentInstance.canRun()) {
             //Find who's next
             var candidate = currentInstance.getNextExecutable();
-            if (isNormalState(candidate)) {
-                //If it's an executable return it
-                result = retrieveExecutableState(candidate, event);
-            } else {
-                if (shouldBlockRecursion(event, candidate)) {
-                    //Can't continue
-                    result = new FailedState("Blocked recursion", candidate, event);
-                } else {
-                    //Execute special states
-                    executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
-                    result = findThePossibleNextStateOnStack(event, depth + 1);
-                }
-            }
+            result = getProtoState(candidate, result, event, eventTags, depth);
             //If it's an optional state just continue
             if (isFailed(result) && candidate.isOptional()) {
                 continue;

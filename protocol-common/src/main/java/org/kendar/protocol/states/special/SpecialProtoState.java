@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class SpecialProtoState extends ProtoState {
-    protected List<ProtoState> children;
+    protected final List<ProtoState> children;
 
     public SpecialProtoState(ProtoState... states) {
         this.children = new ArrayList<>(Arrays.asList(states));

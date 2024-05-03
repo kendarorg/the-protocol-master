@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 public class BasicDeliver extends Basic {
 
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private String consumerTag;
     private long deliveryTag;
     private boolean redelivered;
@@ -111,6 +111,7 @@ public class BasicDeliver extends Basic {
 
 
         storage.write(
+                context.getContextId(),
                 null
                 , mapper.toJsonNode(res)
                 , 0, "RESPONSE", "AMQP");

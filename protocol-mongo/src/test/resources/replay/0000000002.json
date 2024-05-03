@@ -1,4 +1,6 @@
 {
+  "constant": false,
+  "connectionId": 2,
   "index": 2,
   "input": {
     "flags": 0,
@@ -53,14 +55,14 @@
             },
             "localTime": {
               "$date": {
-                "$numberLong": "1706097626930"
+                "$numberLong": "1709545404774"
               }
             },
             "logicalSessionTimeoutMinutes": {
               "$numberInt": "30"
             },
             "connectionId": {
-              "$numberInt": "4"
+              "$numberInt": "2"
             },
             "minWireVersion": {
               "$numberInt": "0"
@@ -74,7 +76,7 @@
       }
     ]
   },
-  "durationMs": 4,
+  "durationMs": 3,
   "type": "HELLO_OP_MSG",
   "caller": "MONGODB"
 }

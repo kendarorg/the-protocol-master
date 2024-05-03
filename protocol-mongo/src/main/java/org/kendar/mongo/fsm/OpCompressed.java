@@ -62,7 +62,7 @@ public class OpCompressed extends MongoState {
 
 
     private byte[] decompressMessage(byte[] inputBuffer, byte compressorId) {
-        var compressor = compressionHandlers.get(compressorId);
+        var compressor = compressionHandlers.get((int)compressorId);
         if (compressor == null) {
             log.error("Unknow compression " + compressorId);
         }

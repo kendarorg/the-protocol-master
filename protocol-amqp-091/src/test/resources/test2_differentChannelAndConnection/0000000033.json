@@ -1,0 +1,22 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 33,
+  "input": null,
+  "output": {
+    "type": "BodyFrame",
+    "data": {
+      "uuid": "214",
+      "optional": false,
+      "channel": 1,
+      "type": 3,
+      "proxyed": false,
+      "contentBytes": "enp6eiBkZXRhaWxzMg==",
+      "contentString": "zzzz details2",
+      "consumeId": 1
+    }
+  },
+  "durationMs": 0,
+  "type": "RESPONSE",
+  "caller": "AMQP"
+}

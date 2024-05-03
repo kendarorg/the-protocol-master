@@ -1,0 +1,44 @@
+[
+  {
+    "index": 1,
+    "type": "HELLO_OP_MSG",
+    "caller": "MONGODB",
+    "durationMs": 3,
+    "tags": null
+  },
+  {
+    "index": 2,
+    "type": "HELLO_OP_MSG",
+    "caller": "MONGODB",
+    "durationMs": 3,
+    "tags": null
+  },
+  {
+    "index": 3,
+    "type": "HELLO_OP_MSG",
+    "caller": "MONGODB",
+    "durationMs": 2,
+    "tags": null
+  },
+  {
+    "index": 4,
+    "type": "OP_MSG",
+    "caller": "MONGODB",
+    "durationMs": 1,
+    "tags": null
+  },
+  {
+    "index": 5,
+    "type": "OP_MSG",
+    "caller": "MONGODB",
+    "durationMs": 2,
+    "tags": null
+  },
+  {
+    "index": 6,
+    "type": "OP_MSG",
+    "caller": "MONGODB",
+    "durationMs": 1,
+    "tags": null
+  }
+]

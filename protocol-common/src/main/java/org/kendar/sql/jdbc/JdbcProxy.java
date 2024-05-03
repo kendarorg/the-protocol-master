@@ -25,7 +25,6 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     private final String connectionString;
     private final String login;
     private final String password;
-    private boolean replayer;
 
     public JdbcProxy(JdbcStorage jdbcStorage) {
         this(null, null, null, null);
@@ -222,7 +221,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                                                   SelectResult result,
                                                                   Statement statement,
                                                                   AtomicLong count) {
-        return new QueryResultIterator<List<String>>(
+        return new QueryResultIterator<>(
                 () -> {
                     try {
                         return resultSet.next() && maxRecordsAtomic.get() > 0;
@@ -263,7 +262,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         );
     }
 
-    public SelectResult executeQuery(boolean insert, String query,
+    public SelectResult executeQuery(int connectionId, boolean insert, String query,
                                      Object connection, int maxRecords,
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
@@ -298,7 +297,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             }
             //}
             long end = System.currentTimeMillis();
-            storage.write(query, result, parameterValues, end - start, "QUERY");
+            storage.write(connectionId, query, result, parameterValues, end - start, "QUERY");
             return result;
         } catch (SQLException e) {
             throw new RuntimeException(e);

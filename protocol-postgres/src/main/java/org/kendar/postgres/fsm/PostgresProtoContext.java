@@ -16,11 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class PostgresProtoContext extends NetworkProtoContext {
 
-    private static final AtomicInteger processIdCounter = new AtomicInteger(0);
     private static final ConcurrentHashMap<Integer, PostgresProtoContext> pids = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(PostgresProtoContext.class);
     private final int pid;
@@ -43,7 +41,7 @@ public class PostgresProtoContext extends NetworkProtoContext {
     }
 
     private int getNewPid() {
-        return processIdCounter.incrementAndGet();
+        return ProtoDescriptor.getCounter("PID_COUNTER");
     }
 
     public void addSync(Iterator<ProtoStep> message) {
@@ -63,7 +61,7 @@ public class PostgresProtoContext extends NetworkProtoContext {
     @Override
     protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
 
-        var result = new ArrayList<ReturnMessage>(super.runException(ex, state, event));
+        var result = new ArrayList<>(super.runException(ex, state, event));
         log.error(ex.getMessage(), ex);
         result.add(new ErrorResponse(ex.getMessage()));
         return result;

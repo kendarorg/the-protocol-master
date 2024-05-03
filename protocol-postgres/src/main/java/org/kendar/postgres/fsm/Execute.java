@@ -33,7 +33,6 @@ public class Execute extends PostgresState {
         var maxRecords = message.getInt();
         var bindMessage = (Binding) postgresContext.getValue("PORTAL_" + portal);
         Parse parseMessage = null;
-        try {
             if (bindMessage == null) {
                 bindMessage = new Binding(null, null, new ArrayList<>(), new ArrayList<>());
             }
@@ -55,8 +54,6 @@ public class Execute extends PostgresState {
                 postgresContext.addSync(res.getReturnMessages());
             }
             return iteratorOfEmpty();
-        } finally {
-        }
     }
 
 

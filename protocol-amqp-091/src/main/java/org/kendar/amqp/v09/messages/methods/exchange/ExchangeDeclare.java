@@ -136,24 +136,24 @@ public class ExchangeDeclare extends Exchange {
         boolean noWait = BBufferUtils.getBit(bits, 4) > 0;
         var args = FieldsReader.readTable(rb);
 
-        var queueDeclare = new ExchangeDeclare();
-        queueDeclare.setChannel(channel);
-        queueDeclare.setReserved1(reserved1);
-        queueDeclare.setArgs(args);
-        queueDeclare.setExchangeType(exchangeType);
-        queueDeclare.setPassive(passive);
-        queueDeclare.setDurable(durable);
-        queueDeclare.setInternal(internal);
-        queueDeclare.setAutoDelete(autoDelete);
-        queueDeclare.setNoWait(noWait);
-        queueDeclare.setName(name);
+        var exchangeDec = new ExchangeDeclare();
+        exchangeDec.setChannel(channel);
+        exchangeDec.setReserved1(reserved1);
+        exchangeDec.setArgs(args);
+        exchangeDec.setExchangeType(exchangeType);
+        exchangeDec.setPassive(passive);
+        exchangeDec.setDurable(durable);
+        exchangeDec.setInternal(internal);
+        exchangeDec.setAutoDelete(autoDelete);
+        exchangeDec.setNoWait(noWait);
+        exchangeDec.setName(name);
 
-        var exchangeDeclare = new ExchangeDeclareOk();
-        exchangeDeclare.setChannel(channel);
+        var exchangeDeclareOk = new ExchangeDeclareOk();
+        exchangeDeclareOk.setChannel(channel);
         return iteratorOfRunnable(() -> proxy.execute(context,
                 connection,
-                queueDeclare,
-                exchangeDeclare
+                exchangeDec,
+                exchangeDeclareOk
         ));
     }
 

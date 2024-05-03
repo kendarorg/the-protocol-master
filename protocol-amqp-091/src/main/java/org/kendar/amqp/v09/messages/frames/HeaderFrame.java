@@ -21,7 +21,7 @@ import static org.kendar.amqp.v09.messages.frames.HeaderFrameField.*;
 
 public class HeaderFrame extends Frame {
 
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private String contentType;
     private String contentEncoding;
     private Map<String, Object> headers;
@@ -292,6 +292,7 @@ public class HeaderFrame extends Frame {
                     mapper.serialize(hf) + "}";
 
             storage.write(
+                    context.getContextId(),
                     null
                     , mapper.toJsonNode(res)
                     , 0, "RESPONSE", "AMQP");

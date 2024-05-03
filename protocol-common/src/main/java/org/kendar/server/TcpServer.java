@@ -50,6 +50,14 @@ public class TcpServer {
             server.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            var proxy = protoDescriptor.getProxy();
+            if (proxy != null && !proxy.isReplayer()) {
+                var storage = protoDescriptor.getProxy().getStorage();
+                if (storage != null) {
+                    storage.optimize();
+                }
+            }
         }
     }
 
@@ -74,7 +82,6 @@ public class TcpServer {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    @SuppressWarnings("CatchMayIgnoreException")
     private void run() throws IOException, ExecutionException, InterruptedException {
         //Executor for the asynchronous requests
         ExecutorService executor = Executors.newCachedThreadPool();

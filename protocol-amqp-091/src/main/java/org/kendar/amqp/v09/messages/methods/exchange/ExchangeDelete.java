@@ -95,10 +95,13 @@ public class ExchangeDelete extends Exchange {
         queueDeclare.setNoWait(noWait);
         queueDeclare.setName(name);
 
+        var deleteOk = new ExchangeDeleteOk();
+        deleteOk.setChannel(channel);
+
         return iteratorOfRunnable(() -> proxy.execute(context,
                 connection,
                 queueDeclare,
-                new ExchangeDeleteOk()
+                deleteOk
         ));
     }
 }

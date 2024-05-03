@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class FieldsWriter {
 
+    @SuppressWarnings("DuplicateBranchesInSwitch")
     public static void writeField(Object value, BBuffer io) {
         if (value == null) {
             io.write((byte) 'V');

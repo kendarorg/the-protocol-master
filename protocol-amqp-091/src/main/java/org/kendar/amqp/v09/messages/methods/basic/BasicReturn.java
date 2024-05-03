@@ -4,6 +4,7 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
+import org.kendar.amqp.v09.utils.ProxyedBehaviour;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
@@ -14,7 +15,7 @@ import java.util.Iterator;
 
 public class BasicReturn extends Basic {
 
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private short replyCode;
     private String replyText;
     private String exchange;
@@ -88,23 +89,7 @@ public class BasicReturn extends Basic {
         toSend.setExchange(ShortStringHelper.read(rb));
         toSend.setRoutingKey(ShortStringHelper.read(rb));
 
-        if (isProxyed()) {
-            var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
-            toSend.setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(toSend) + "}";
-
-
-            storage.write(
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
-            return iteratorOfList(toSend);
-        }
-        return iteratorOfRunnable(() -> {
-            proxy.execute(context, connection, toSend);
-        });
+        return ProxyedBehaviour.doStuff(this,context,channel,toSend,proxy,connection);
     }
 
     public int getConsumeId() {

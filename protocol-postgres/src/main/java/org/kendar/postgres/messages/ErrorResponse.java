@@ -34,7 +34,5 @@ public class ErrorResponse implements NetworkReturnMessage {
         buffer.write((byte) 'C'); // errorCode
         buffer.write(ec);
         buffer.write((byte) 0);
-
-
     }
 }
