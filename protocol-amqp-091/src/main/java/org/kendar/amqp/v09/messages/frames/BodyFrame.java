@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 
 public class BodyFrame extends Frame {
+    protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BodyFrame.class);
     private static final Logger logPs = LoggerFactory.getLogger(ProxySocket.class.getName());
-    protected static final JsonMapper mapper = new JsonMapper();
     private byte[] contentBytes;
     private String contentString;
     private int consumeId;

@@ -39,14 +39,6 @@ public class ProtoContext {
     protected final ExecutorService executorService =
             new ThreadPoolExecutor(1, 100, 0L, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<>());
-    /**
-     * Contains the -DECLARATION- of the protocol
-     */
-    private final Map<String, ProtoState> root;
-    /**
-     * Exclusively lock the send operation
-     */
-    private final Object sendLock = new Object();
     protected final int contextId;
     /**
      * The descriptor of the protocol
@@ -56,6 +48,14 @@ public class ProtoContext {
      * Flag to stop the execution
      */
     protected final AtomicBoolean run = new AtomicBoolean(true);
+    /**
+     * Contains the -DECLARATION- of the protocol
+     */
+    private final Map<String, ProtoState> root;
+    /**
+     * Exclusively lock the send operation
+     */
+    private final Object sendLock = new Object();
     /**
      * Execution stack, this stores the current state
      */

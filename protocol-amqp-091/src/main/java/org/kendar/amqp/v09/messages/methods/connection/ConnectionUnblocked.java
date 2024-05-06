@@ -4,7 +4,6 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Connection;
-import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.utils.ProxyedBehaviour;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
@@ -42,7 +41,7 @@ public class ConnectionUnblocked extends Connection {
         toSend.setChannel(channel);
 
 
-        return ProxyedBehaviour.doStuff(this,context,channel,toSend,proxy,connection);
+        return ProxyedBehaviour.doStuff(this, context, channel, toSend, proxy, connection);
     }
 
     public int getConsumeId() {

@@ -42,7 +42,7 @@ public class Main {
         options.addOption("pl", false, "Replay from log/replay directory");
         options.addOption("v", true, "Log level (default ERROR)");
         options.addOption("js", true, "[jdbc] Set schema");
-        options.addOption("jr",true,"[jdbc] Replace queries");
+        options.addOption("jr", true, "[jdbc] Replace queries");
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -79,10 +79,10 @@ public class Main {
             }
             if (protocol.equalsIgnoreCase("mysql")) {
                 if (port == -1) port = 3306;
-                runMysql(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog,jdbcReplaceQueries);
+                runMysql(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries);
             } else if (protocol.equalsIgnoreCase("postgres")) {
                 if (port == -1) port = 5432;
-                runPostgres(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog,jdbcReplaceQueries);
+                runPostgres(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries);
             } else if (protocol.equalsIgnoreCase("mongo")) {
                 if (port == -1) port = 27017;
                 runMongo(port, logsDir, connectionString, login, password, replayFromLog);
@@ -135,7 +135,7 @@ public class Main {
 
     private static void runMysql(int port, String logsDir, String connectionString, String forcedSchema,
                                  String login, String password, boolean replayFromLog, String jdbcReplaceQueries) throws IOException {
-        runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString,forcedSchema,
+        runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, forcedSchema,
                 login, password, replayFromLog, jdbcReplaceQueries);
     }
 
@@ -144,7 +144,7 @@ public class Main {
                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries) throws IOException {
         var baseProtocol = new PostgresProtocol(port);
         var proxy = new JdbcProxy(driver,
-                connectionString,forcedSchema,
+                connectionString, forcedSchema,
                 login, password);
 
         if (logsDir != null) {
@@ -159,7 +159,7 @@ public class Main {
                 proxy.setStorage(storage);
             }
         }
-        if(jdbcReplaceQueries!=null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))){
+        if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
 
             handleReplacementQueries(jdbcReplaceQueries, (JdbcProxy) proxy);
         }
@@ -175,31 +175,31 @@ public class Main {
         var lines = Files.readAllLines(Path.of(jdbcReplaceQueries));
         var items = new ArrayList<QueryReplacerItem>();
         QueryReplacerItem replacerItem = new QueryReplacerItem();
-        boolean find=false;
-        for(var line:lines){
-            if(line.toLowerCase().startsWith("#regexfind")){
-                if(replacerItem.getToFind()!=null){
+        boolean find = false;
+        for (var line : lines) {
+            if (line.toLowerCase().startsWith("#regexfind")) {
+                if (replacerItem.getToFind() != null) {
                     items.add(replacerItem);
-                    replacerItem= new QueryReplacerItem();
+                    replacerItem = new QueryReplacerItem();
                 }
                 replacerItem.setRegex(true);
                 replacerItem.setToFind("");
-                find=true;
-            }else if(line.toLowerCase().startsWith("#find")){
-                if(replacerItem.getToFind()!=null){
+                find = true;
+            } else if (line.toLowerCase().startsWith("#find")) {
+                if (replacerItem.getToFind() != null) {
                     items.add(replacerItem);
-                    replacerItem= new QueryReplacerItem();
+                    replacerItem = new QueryReplacerItem();
                 }
                 replacerItem.setToFind("");
-                find=true;
-            }else if(line.toLowerCase().startsWith("#replace")){
+                find = true;
+            } else if (line.toLowerCase().startsWith("#replace")) {
                 replacerItem.setToReplace("");
-                find=false;
-            }else{
-                if(find){
-                    replacerItem.setToFind(replacerItem.getToFind()+line+"\n");
-                }else{
-                    replacerItem.setToReplace(replacerItem.getToReplace()+line+"\n");
+                find = false;
+            } else {
+                if (find) {
+                    replacerItem.setToFind(replacerItem.getToFind() + line + "\n");
+                } else {
+                    replacerItem.setToReplace(replacerItem.getToReplace() + line + "\n");
                 }
             }
         }

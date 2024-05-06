@@ -28,19 +28,6 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
 
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BaseFileStorage.class);
-
-    protected List<CompactLine> retrieveIndexFile(){
-        String fileContent = null;
-        try {
-            fileContent = Files.readString(Path.of(targetDir, "index.json"));
-        } catch (IOException e) {
-            log.error("Missing index file!");
-            throw new RuntimeException(e);
-        }
-        return mapper.deserialize(fileContent, new TypeReference<List<CompactLine>>() {
-        });
-    }
-
     protected String targetDir;
 
     public BaseFileStorage(String targetDir) {
@@ -51,6 +38,18 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
     public BaseFileStorage(Path targetDir) {
 
         this.targetDir = targetDir.toString();
+    }
+
+    protected List<CompactLine> retrieveIndexFile() {
+        String fileContent = null;
+        try {
+            fileContent = Files.readString(Path.of(targetDir, "index.json"));
+        } catch (IOException e) {
+            log.error("Missing index file!");
+            throw new RuntimeException(e);
+        }
+        return mapper.deserialize(fileContent, new TypeReference<List<CompactLine>>() {
+        });
     }
 
     /**

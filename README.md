@@ -56,7 +56,7 @@ the line end to your system!):
     -xd test/{timestamp}
 </pre>
 
-Or like this to use an external driver (in this case Oracle JDBC driver) (adapt 
+Or like this to use an external driver (in this case Oracle JDBC driver) (adapt
 the cp/classpath and line end to your system!)
 
 <pre>
@@ -78,11 +78,61 @@ usage: runner
  -xl <arg>   Select remote login
  -xw <arg>   Select remote password
  -v  <arg>   Log level (default ERROR)
- -s  <arg>   Set schema (Jdbc servers only)
+ -js <arg>   [jdbc] Set schema
+ -jr <arg>   [jdbc] Replace queries
 </pre>
 
 Inside the chosen directory you will find simple jsons containing all the data exchanged
 with the server AND you can modify it before replaying, to simulate special situations!
+
+### Set Schema
+
+The set schema is called in case the jdbc driver does not allow setting the schema from connection string
+
+### Replace Queries
+
+Specify a file containing "replacement queries" this is specially useful when running ... the runner
+as postgres and contacting a different kind of database. Here can be inserted the replacements. 
+
+SPACE ARE IMPORTANT INSIDE THE QUERY. THEY MUST MATCH THE REAL ONE.
+
+This first example replaces "SELECT 1 AS TEST" directly with "SELECT 2 AS TEST".
+
+<pre>
+#find
+SELECT 
+ 1 AS TEST
+#replace
+SELECT 
+ 2 AS TEST
+</pre>
+
+This second example replaces "SELECT anynumber AS TEST" with "SELECT anynumber+1 AS TEST"
+So if you send a "SELECT 10 AS TEST" the resultset will contain a 12.
+
+Please notice the usage of the $1 in the capture group.
+
+<pre>
+#regexfind
+SELECT 
+ ([0-9]+) AS TEST
+#replace
+SELECT 
+ $1+2 AS TEST
+</pre>
+
+This third example replaces "SELECT anynumber AS TEST" directly with "SELECT 2 AS TEST".
+
+In this case the capture group is not used and the whole query will be ALWAYS be replaced
+
+<pre>
+#regexfind
+SELECT 
+ ([0-9]+) AS TEST
+#replace
+SELECT 
+ 2 AS TEST
+</pre>
 
 ## The state machine
 

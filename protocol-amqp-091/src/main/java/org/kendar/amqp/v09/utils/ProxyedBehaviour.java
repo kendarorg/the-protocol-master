@@ -13,14 +13,15 @@ import static org.kendar.protocol.states.ProtoState.iteratorOfRunnable;
 
 public class ProxyedBehaviour {
     private static JsonMapper mapper = new JsonMapper();
+
     public static Iterator<ProtoStep> doStuff(Frame input,
                                               NetworkProtoContext context, int channel,
                                               Frame toSend,
                                               AmqpProxy proxy,
-                                              ProxyConnection connection){
+                                              ProxyConnection connection) {
         if (input.isProxyed()) {
             var basicConsume = (ConsumeConnected) context.getValue("BASIC_CONSUME_CH_" + channel);
-            ((ConsumeConnected)toSend).setConsumeId(basicConsume.getConsumeId());
+            ((ConsumeConnected) toSend).setConsumeId(basicConsume.getConsumeId());
             var storage = proxy.getStorage();
             var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
                     mapper.serialize(toSend) + "}";

@@ -155,7 +155,7 @@ public class PostgresExecutor {
         } catch (RuntimeException e) {
             var uuid = UUID.randomUUID().toString();
             log.error("[SERVER] Runtime Error {} {}", uuid, e.getMessage());
-            log.error("[SERVER] Runtime Error "+uuid, e);
+            log.error("[SERVER] Runtime Error " + uuid, e);
 
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(e.getMessage()))).runNow();
         }

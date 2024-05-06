@@ -39,7 +39,7 @@ public class BasicTest {
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("org.postgresql.Driver",
-                postgresContainer.getJdbcUrl(),null,
+                postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
         if (testInfo != null) {
             var className = testInfo.getTestClass().get().getSimpleName();

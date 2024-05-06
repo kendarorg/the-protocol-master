@@ -29,6 +29,14 @@ public class QueryTranslationTest extends BasicTest {
         afterClassBase();
     }
 
+    public static Stream<Arguments> createInsertSelect() {
+        return Stream.of(
+                Arguments.of(false, "SELECT \r\n 1 AS TEST", "SELECT \r\n 2 AS TEST", "SELECT \n 1 AS TEST", "2"),
+                Arguments.of(true, "SELECT \r\n ([0-9]+) AS TEST", "SELECT \r\n $1+2 AS TEST", "SELECT \n 1 AS TEST", "3"),
+                Arguments.of(true, "SELECT \r\n ([0-9]+) AS TEST", "SELECT \r\n 2 AS TEST", "SELECT \n 1 AS TEST", "2")
+        );
+    }
+
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
 
@@ -39,21 +47,13 @@ public class QueryTranslationTest extends BasicTest {
         afterEachBase();
     }
 
-    public static Stream<Arguments> createInsertSelect() {
-        return Stream.of(
-                Arguments.of(false,"SELECT \r\n 1 AS TEST", "SELECT \r\n 2 AS TEST","SELECT \n 1 AS TEST","2"),
-                Arguments.of(true,"SELECT \r\n ([0-9]+) AS TEST", "SELECT \r\n $1+2 AS TEST","SELECT \n 1 AS TEST","3"),
-                Arguments.of(true,"SELECT \r\n ([0-9]+) AS TEST", "SELECT \r\n 2 AS TEST","SELECT \n 1 AS TEST","2")
-        );
-    }
-
     @ParameterizedTest
     @MethodSource("createInsertSelect")
-    void testSimpleReplace(boolean regex,String find,String replace,String execute,String result) throws Exception {
+    void testSimpleReplace(boolean regex, String find, String replace, String execute, String result) throws Exception {
 
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("org.postgresql.Driver",
-                postgresContainer.getJdbcUrl(),null,
+                postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
 
         var replaceList = new ArrayList<QueryReplacerItem>();
@@ -80,7 +80,7 @@ public class QueryTranslationTest extends BasicTest {
         var resultSet = stmt.getResultSet();
         while (resultSet.next()) {
             runned = true;
-            assertEquals(result,resultSet.getString(1));
+            assertEquals(result, resultSet.getString(1));
         }
         assertTrue(runned);
         resultSet.close();

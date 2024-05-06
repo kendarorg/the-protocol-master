@@ -65,7 +65,7 @@ public class BasicAck extends Basic {
         toSend.setDeliveryTag(rb.getLong());
         toSend.setMultiple(rb.get() > 0x00);
 
-        return ProxyedBehaviour.doStuff(this,context,channel,toSend,proxy,connection);
+        return ProxyedBehaviour.doStuff(this, context, channel, toSend, proxy, connection);
 
 
     }

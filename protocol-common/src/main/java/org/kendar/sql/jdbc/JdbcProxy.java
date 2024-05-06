@@ -272,7 +272,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
                                      ArrayList<JDBCType> concreteTypes, ProtoContext context) {
-        if(queryReplacements.size()>0) {
+        if (queryReplacements.size() > 0) {
             query = query.replaceAll("\r\n", "\n").trim();
             for (int i = 0; i < queryReplacements.size(); i++) {
                 var replace = queryReplacements.get(i);
@@ -281,8 +281,8 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
 
                 if (replace.isRegex()) {
                     query = Pattern.compile(find).matcher(query).replaceFirst(repl);
-                }else{
-                    if(find.equalsIgnoreCase(query)){
+                } else {
+                    if (find.equalsIgnoreCase(query)) {
                         query = repl;
                     }
                 }
@@ -412,7 +412,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         try {
             var connection = DriverManager.
                     getConnection(getConnectionString(), getLogin(), getPassword());
-            if(this.forcedSchema!=null && !this.forcedSchema.isEmpty()) {
+            if (this.forcedSchema != null && !this.forcedSchema.isEmpty()) {
                 connection.setSchema(this.forcedSchema);
             }
             return new ProxyConnection(connection);

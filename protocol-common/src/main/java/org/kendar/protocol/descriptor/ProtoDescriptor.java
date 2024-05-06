@@ -23,13 +23,13 @@ public abstract class ProtoDescriptor {
     private static final ConcurrentHashMap<String, AtomicInteger> counters = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(ProtoDescriptor.class);
     /**
-     * Interrupt states, these are evaluated always, BEFORE the standard events
-     */
-    private final List<ProtoState> interrupts = new ArrayList<>();
-    /**
      * A map of [tag keys][states] one for each "tag" branch
      */
     protected final Map<String, ProtoState> taggedStates = new HashMap<>();
+    /**
+     * Interrupt states, these are evaluated always, BEFORE the standard events
+     */
+    private final List<ProtoState> interrupts = new ArrayList<>();
 
     public static int getCounter(String id) {
         id = id.toUpperCase();

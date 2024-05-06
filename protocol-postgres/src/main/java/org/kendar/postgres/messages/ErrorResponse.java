@@ -24,7 +24,7 @@ public class ErrorResponse implements NetworkReturnMessage {
         var ec = "58000".getBytes(StandardCharsets.UTF_8);
 
         buffer.write((byte) 'E');
-        buffer.writeInt(4 + s.length  + 2 + m.length + 2+ ec.length+2);
+        buffer.writeInt(4 + s.length + 2 + m.length + 2 + ec.length + 2);
         buffer.write((byte) 'S'); // severity
         buffer.write(s);
         buffer.write((byte) 0);

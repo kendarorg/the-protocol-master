@@ -37,8 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProxySocket {
     private static final Logger log = LoggerFactory.getLogger(ProxySocket.class.getName());
-
-
+    protected final ConcurrentLinkedDeque<BytesEvent> inputQueue = new ConcurrentLinkedDeque<>();
     private final AsynchronousSocketChannel channel;
     private final NetworkProtoContext context;
     private final Semaphore semaphore = new Semaphore(1);
@@ -55,7 +54,6 @@ public class ProxySocket {
             new BasicNack().asProxy(),
             new BasicReturn().asProxy(),
             new BasicGetEmpty().asProxy()));
-    protected final ConcurrentLinkedDeque<BytesEvent> inputQueue = new ConcurrentLinkedDeque<>();
 
     public ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
         this.context = context;

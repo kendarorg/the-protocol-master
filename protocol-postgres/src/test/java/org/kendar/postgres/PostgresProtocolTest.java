@@ -273,9 +273,9 @@ public class PostgresProtocolTest extends BasicTest {
             sstmt.executeUpdate("INSERT INTO WETHEAVER (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
                     "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
             sstmt.close();
-        }catch (SQLException ex){
-            assertEquals("58000",ex.getSQLState());
-            thrown=true;
+        } catch (SQLException ex) {
+            assertEquals("58000", ex.getSQLState());
+            thrown = true;
         }
         assertTrue(thrown);
         stmt = c.createStatement();

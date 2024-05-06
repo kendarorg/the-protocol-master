@@ -37,7 +37,7 @@ public class BasicTest {
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
-                mysqlContainer.getJdbcUrl(),null,
+                mysqlContainer.getJdbcUrl(), null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
         if (testInfo != null) {
             var className = testInfo.getTestClass().get().getSimpleName();
@@ -62,7 +62,7 @@ public class BasicTest {
         var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl() +
                         "?generateSimpleParameterMetadata=true" +
-                        "&useServerPrepStmts=true",null,
+                        "&useServerPrepStmts=true", null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
         if (testInfo != null) {
             var className = testInfo.getTestClass().get().getSimpleName();
