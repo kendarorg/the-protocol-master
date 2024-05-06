@@ -145,7 +145,6 @@ public class MainTest extends BasicTest {
     }
 
 
-
     @Test
     void testErrorInsert() throws Exception {
         System.out.println("RECORDING ==============================================");
@@ -189,7 +188,7 @@ public class MainTest extends BasicTest {
             stmt.executeUpdate("INSERT INTO WETHEAVER (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
                     "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
             stmt.close();
-        }catch (Exception ex){
+        } catch (Exception ex) {
             Sleeper.sleep(100);
         }
 
@@ -248,7 +247,7 @@ public class MainTest extends BasicTest {
             while (resultset.next()) {
                 assertEquals("Test Ltd", resultset.getString("DENOMINATION"));
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             Sleeper.sleep(100);
         }
 

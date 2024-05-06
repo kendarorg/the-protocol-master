@@ -28,8 +28,8 @@ import java.util.concurrent.Executors;
 
 public class AmqpProxy extends Proxy<AmqpStorage> {
 
-    private static final Logger log = LoggerFactory.getLogger(AmqpProxy.class);
     protected static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(AmqpProxy.class);
     private String connectionString;
     private String userId;
     private String password;

@@ -33,27 +33,27 @@ public class Execute extends PostgresState {
         var maxRecords = message.getInt();
         var bindMessage = (Binding) postgresContext.getValue("PORTAL_" + portal);
         Parse parseMessage = null;
-            if (bindMessage == null) {
-                bindMessage = new Binding(null, null, new ArrayList<>(), new ArrayList<>());
-            }
-            parseMessage = (Parse) postgresContext.getValue(bindMessage.getStatement());
-            parseMessage.getBinds().remove("PORTAL_" + portal);
-            var executor = new PostgresExecutor();
+        if (bindMessage == null) {
+            bindMessage = new Binding(null, null, new ArrayList<>(), new ArrayList<>());
+        }
+        parseMessage = (Parse) postgresContext.getValue(bindMessage.getStatement());
+        parseMessage.getBinds().remove("PORTAL_" + portal);
+        var executor = new PostgresExecutor();
 
 
-            log.debug("[SERVER][STMTEXEC]: Max:" + maxRecords + " Query:" + parseMessage.getQuery());
-            //for maxRecords
-            var res = executor.executePortal(
-                    protoContext, parseMessage, bindMessage, maxRecords,
-                    bindMessage.isDescribable() || parseMessage.isDescribable(),
-                    false);
-            if (res.isRunNow()) {
-                postgresContext.clearSync();
-                return res.getReturnMessages();
-            } else {
-                postgresContext.addSync(res.getReturnMessages());
-            }
-            return iteratorOfEmpty();
+        log.debug("[SERVER][STMTEXEC]: Max:" + maxRecords + " Query:" + parseMessage.getQuery());
+        //for maxRecords
+        var res = executor.executePortal(
+                protoContext, parseMessage, bindMessage, maxRecords,
+                bindMessage.isDescribable() || parseMessage.isDescribable(),
+                false);
+        if (res.isRunNow()) {
+            postgresContext.clearSync();
+            return res.getReturnMessages();
+        } else {
+            postgresContext.addSync(res.getReturnMessages());
+        }
+        return iteratorOfEmpty();
     }
 
 

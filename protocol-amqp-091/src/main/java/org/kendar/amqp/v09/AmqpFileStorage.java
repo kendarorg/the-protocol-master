@@ -28,9 +28,9 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
     private final List<StorageItem<JsonNode, JsonNode>> outItems = new ArrayList<>();
     private final Object lockObject = new Object();
     private final Object responseLockObject = new Object();
+    private final JsonMapper mapper = new JsonMapper();
     private boolean initialized = false;
     private List<CompactLine> index;
-    private final JsonMapper mapper = new JsonMapper();
 
     public AmqpFileStorage(String targetDir) {
         super(targetDir);

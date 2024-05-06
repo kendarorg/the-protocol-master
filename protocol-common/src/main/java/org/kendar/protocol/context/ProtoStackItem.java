@@ -16,15 +16,13 @@ import java.util.Stack;
 public class ProtoStackItem implements TaggedObject {
 
     /**
-     * STore the id
-     */
-    private final String id;
-
-    /**
      * The state definition
      */
     protected final ProtoState state;
-
+    /**
+     * STore the id
+     */
+    private final String id;
     /**
      * The stack of possible sub states to execute
      */

@@ -134,10 +134,10 @@ public class MySQLExecutor {
         } catch (SQLException e) {
             log.error("[SERVER] Error %s", e);
             return runExceptionInternal(protoContext, e);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             var uuid = UUID.randomUUID().toString();
             log.error("[SERVER] Runtime Error {} {}", uuid, e.getMessage());
-            log.error("[SERVER] Runtime Error "+uuid, e);
+            log.error("[SERVER] Runtime Error " + uuid, e);
 
             return runExceptionInternal(protoContext, e);
         }

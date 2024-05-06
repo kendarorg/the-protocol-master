@@ -89,7 +89,7 @@ public class BasicReturn extends Basic {
         toSend.setExchange(ShortStringHelper.read(rb));
         toSend.setRoutingKey(ShortStringHelper.read(rb));
 
-        return ProxyedBehaviour.doStuff(this,context,channel,toSend,proxy,connection);
+        return ProxyedBehaviour.doStuff(this, context, channel, toSend, proxy, connection);
     }
 
     public int getConsumeId() {

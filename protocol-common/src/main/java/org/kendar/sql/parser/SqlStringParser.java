@@ -1,5 +1,8 @@
 package org.kendar.sql.parser;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -9,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("StringConcatenationInLoop")
 public class SqlStringParser {
 
+    private static final Logger log = LoggerFactory.getLogger(SqlStringParser.class);
     final Map<String, SqlStringType> select;
     private final String parameterSeparator;
 
@@ -51,22 +55,31 @@ public class SqlStringParser {
 
     public List<SqlParseResult> getTypes(String input) {
         var result = new ArrayList<SqlParseResult>();
-        var sqls = parseSql(input);
-        for (var sql : sqls) {
-            var splitted = sql.trim().split("\\s+");
-            if (splitted.length == 0) {
-                continue;
+        try {
+            var sqls = parseSql(input);
+            for (var sql : sqls) {
+                var splitted = sql.trim().split("\\s+");
+                if (splitted.length == 0) {
+                    continue;
+                }
+                var first = splitted[0].trim().toLowerCase(Locale.ROOT);
+                if (first.isEmpty()) {
+                    continue;
+                }
+                if (select.containsKey(first)) {
+                    var founded = select.get(first);
+                    result.add(new SqlParseResult(sql, founded));
+                } else {
+                    result.add(new SqlParseResult(sql, SqlStringType.UNKNOWN));
+                }
             }
-            var first = splitted[0].trim().toLowerCase(Locale.ROOT);
-            if (first.isEmpty()) {
-                continue;
+        }catch (Exception ex){
+            log.error("Unable to split query: "+input);
+            result.clear();
+            if(input.endsWith(";")){
+                input = input.substring(0, input.length()-1);
             }
-            if (select.containsKey(first)) {
-                var founded = select.get(first);
-                result.add(new SqlParseResult(sql, founded));
-            } else {
-                result.add(new SqlParseResult(sql, SqlStringType.UNKNOWN));
-            }
+            result.add(new SqlParseResult(input, SqlStringType.UNKNOWN));
         }
         return result;
     }

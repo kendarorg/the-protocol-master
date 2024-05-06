@@ -56,7 +56,7 @@ public class BasicGetEmpty extends Basic {
         var toSend = new BasicGetEmpty();
         toSend.setChannel(channel);
         toSend.reserved1 = ShortStringHelper.read(rb);
-        return ProxyedBehaviour.doStuff(this,context,channel,toSend,proxy,connection);
+        return ProxyedBehaviour.doStuff(this, context, channel, toSend, proxy, connection);
     }
 
     public int getConsumeId() {

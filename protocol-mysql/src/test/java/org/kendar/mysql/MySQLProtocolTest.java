@@ -148,7 +148,7 @@ public class MySQLProtocolTest extends BasicTest {
             }
             resultSet.close();
             stmt.close();
-        }catch (Exception ex){
+        } catch (Exception ex) {
 
         }
         stmt = c.createStatement();

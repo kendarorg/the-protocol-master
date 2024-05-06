@@ -77,7 +77,7 @@ public class BasicNack extends Basic {
         toSend.setMultiple((get & 0x01) == 0x01);
         toSend.setRequeue((get & 0x02) == 0x02);
 
-        return ProxyedBehaviour.doStuff(this,context,channel,toSend,proxy,connection);
+        return ProxyedBehaviour.doStuff(this, context, channel, toSend, proxy, connection);
 
 
     }
