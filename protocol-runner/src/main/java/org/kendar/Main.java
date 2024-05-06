@@ -203,6 +203,9 @@ public class Main {
                 }
             }
         }
+        if(replacerItem.getToFind()!=null && !replacerItem.getToFind().isEmpty()){
+            items.add(replacerItem);
+        }
         proxy.setQueryReplacement(items);
     }
 

@@ -273,14 +273,14 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                      SqlStringParser parser,
                                      ArrayList<JDBCType> concreteTypes, ProtoContext context) {
         if (queryReplacements.size() > 0) {
-            query = query.replaceAll("\r\n", "\n").trim();
+            query = query.replaceAll("\r\n", " ").trim();
             for (int i = 0; i < queryReplacements.size(); i++) {
                 var replace = queryReplacements.get(i);
-                var find = replace.getToFind().replaceAll("\r\n", "\n").trim();
-                var repl = replace.getToReplace().replaceAll("\r\n", "\n").trim();
+                var find = replace.getToFind().replaceAll("\r\n", " ").trim();
+                var repl = replace.getToReplace().replaceAll("\r\n", " ").trim();
 
                 if (replace.isRegex()) {
-                    query = Pattern.compile(find).matcher(query).replaceFirst(repl);
+                    query = Pattern.compile(find,Pattern.DOTALL|Pattern.CASE_INSENSITIVE).matcher(query).replaceFirst(repl);
                 } else {
                     if (find.equalsIgnoreCase(query)) {
                         query = repl;
