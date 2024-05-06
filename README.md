@@ -69,8 +69,8 @@ java -cp "ojdbc11.jar;protocol-runner.jar" \
 
 <pre>
 usage: runner
- -l  [arg]    Select listening port
- -p  [arg]    Select protocol (mysql/mongo/postgres/amqp091)
+ -l  [arg]   Select listening port
+ -p  [arg]   Select protocol (mysql/mongo/postgres/amqp091)
  -pl         Replay from log directory
  -xc [arg]   Select remote connection string
  -xd [arg]   Select remote log directory (you can set a {timestamp} value
