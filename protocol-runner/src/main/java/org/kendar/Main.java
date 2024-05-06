@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 public class Main {
     private static TcpServer protocolServer;
@@ -41,6 +42,7 @@ public class Main {
                 "that will be replaced with the current timestamp)");
         options.addOption("pl", false, "Replay from log/replay directory");
         options.addOption("v", true, "Log level (default ERROR)");
+        options.addOption("t", true, "Set timeout in seconds towards proxied system (default 30s)");
         options.addOption("js", true, "[jdbc] Set schema");
         options.addOption("jr", true, "[jdbc] Replace queries");
 
@@ -55,9 +57,16 @@ public class Main {
             var logLevel = cmd.getOptionValue("v");
             var jdbcForcedSchema = cmd.getOptionValue("js");
             var jdbcReplaceQueries = cmd.getOptionValue("jr");
+            var timeout = cmd.getOptionValue("t");
             if (logLevel == null || logLevel.isEmpty()) {
                 logLevel = "ERROR";
             }
+            var timeoutSec = 30;
+            if (timeout != null && !timeout.isEmpty() && Pattern.matches("[0-9]+",timeout)) {
+                timeoutSec = Integer.parseInt(timeout);
+            }
+
+            //ProtoContext.setTimeout(timeoutSec);
 
             LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 

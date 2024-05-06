@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Instance of a network protocol defintion
  */
-public class NetworkProtoContext extends ProtoContext {
+public abstract class NetworkProtoContext extends ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(NetworkProtoContext.class);
 
     /**
@@ -84,6 +84,7 @@ public class NetworkProtoContext extends ProtoContext {
      */
     @Override
     public void write(ReturnMessage rm) {
+        lastAccess.set(getNow());
         var returnMessage = (NetworkReturnMessage) rm;
         //Create a new buffer fit for the destination
         var resultBuffer = buildBuffer();
@@ -221,6 +222,7 @@ public class NetworkProtoContext extends ProtoContext {
     @Override
     public boolean reactToEvent(BaseEvent currentEvent) {
         try {
+            lastAccess.set(getNow());
             if (currentEvent instanceof BytesEvent) {
                 var be = (BytesEvent) currentEvent;
                 if (remainingBytes != null && remainingBytes.getBuffer().size() > 0) {
