@@ -8,6 +8,7 @@ import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.storage.JdbcStorage;
 import org.kendar.sql.jdbc.storage.NullJdbcStorage;
 import org.kendar.sql.parser.SqlStringParser;
+import org.kendar.utils.QueryReplacerItem;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +18,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("SqlSourceToSinkFlow")
@@ -26,6 +28,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     private final String forcedSchema;
     private final String login;
     private final String password;
+    private ArrayList<QueryReplacerItem> queryReplacements = new ArrayList<>();
 
     public JdbcProxy(JdbcStorage jdbcStorage) {
         this(null, null, null, null, null);
@@ -269,6 +272,22 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
                                      ArrayList<JDBCType> concreteTypes, ProtoContext context) {
+        if(queryReplacements.size()>0) {
+            query = query.replaceAll("\\r\\n", "\\n").trim();
+            for (int i = 0; i < queryReplacements.size(); i++) {
+                var replace = queryReplacements.get(i);
+                var find = replace.getToFind().replaceAll("\\r\\n", "\\n").trim();
+                var repl = replace.getToReplace().replaceAll("\\r\\n", "\\n").trim();
+
+                if (replace.isRegex()) {
+                    query = Pattern.compile(find).matcher(query).replaceFirst(repl);
+                }else{
+                    if(find.equalsIgnoreCase(query)){
+                        query = repl;
+                    }
+                }
+            }
+        }
         if (replayer) {
             var storageItem = storage.read(query, parameterValues, "QUERY");
             return storageItem.getOutput().getSelectResult();
@@ -451,5 +470,9 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setQueryReplacement(ArrayList<QueryReplacerItem> items) {
+        queryReplacements = items;
     }
 }

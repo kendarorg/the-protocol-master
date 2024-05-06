@@ -14,10 +14,14 @@ import org.kendar.postgres.PostgresProtocol;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
+import org.kendar.utils.QueryReplacerItem;
 import org.kendar.utils.Sleeper;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.function.Supplier;
@@ -37,7 +41,8 @@ public class Main {
                 "that will be replaced with the current timestamp)");
         options.addOption("pl", false, "Replay from log/replay directory");
         options.addOption("v", true, "Log level (default ERROR)");
-        options.addOption("s", true, "Set schema (Jdbc servers only)");
+        options.addOption("js", true, "[jdbc] Set schema");
+        options.addOption("jr",true,"[jdbc] Replace queries");
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -48,7 +53,8 @@ public class Main {
             var login = cmd.getOptionValue("xl");
             var password = cmd.getOptionValue("xw");
             var logLevel = cmd.getOptionValue("v");
-            var forcedSchema = cmd.getOptionValue("s");
+            var jdbcForcedSchema = cmd.getOptionValue("js");
+            var jdbcReplaceQueries = cmd.getOptionValue("jr");
             if (logLevel == null || logLevel.isEmpty()) {
                 logLevel = "ERROR";
             }
@@ -73,10 +79,10 @@ public class Main {
             }
             if (protocol.equalsIgnoreCase("mysql")) {
                 if (port == -1) port = 3306;
-                runMysql(port, logsDir, connectionString,forcedSchema, login, password, replayFromLog);
+                runMysql(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog,jdbcReplaceQueries);
             } else if (protocol.equalsIgnoreCase("postgres")) {
                 if (port == -1) port = 5432;
-                runPostgres(port, logsDir, connectionString,forcedSchema, login, password, replayFromLog);
+                runPostgres(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog,jdbcReplaceQueries);
             } else if (protocol.equalsIgnoreCase("mongo")) {
                 if (port == -1) port = 27017;
                 runMongo(port, logsDir, connectionString, login, password, replayFromLog);
@@ -122,20 +128,20 @@ public class Main {
 
 
     private static void runPostgres(int port, String logsDir, String connectionString, String forcedSchema,
-                                    String login, String password, boolean replayFromLog) {
+                                    String login, String password, boolean replayFromLog, String jdbcReplaceQueries) throws IOException {
         runJdbc("postgres", "org.postgresql.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog);
+                login, password, replayFromLog, jdbcReplaceQueries);
     }
 
     private static void runMysql(int port, String logsDir, String connectionString, String forcedSchema,
-                                 String login, String password, boolean replayFromLog) {
+                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries) throws IOException {
         runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString,forcedSchema,
-                login, password, replayFromLog);
+                login, password, replayFromLog, jdbcReplaceQueries);
     }
 
     private static void runJdbc(String type, String driver, int port, String logsDir,
                                 String connectionString, String forcedSchema,
-                                String login, String password, boolean replayFromLog) {
+                                String login, String password, boolean replayFromLog, String jdbcReplaceQueries) throws IOException {
         var baseProtocol = new PostgresProtocol(port);
         var proxy = new JdbcProxy(driver,
                 connectionString,forcedSchema,
@@ -153,12 +159,51 @@ public class Main {
                 proxy.setStorage(storage);
             }
         }
+        if(jdbcReplaceQueries!=null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))){
+
+            handleReplacementQueries(jdbcReplaceQueries, (JdbcProxy) proxy);
+        }
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(1000);
+    }
+
+    private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws IOException {
+        var lines = Files.readAllLines(Path.of(jdbcReplaceQueries));
+        var items = new ArrayList<QueryReplacerItem>();
+        QueryReplacerItem replacerItem = new QueryReplacerItem();
+        boolean find=false;
+        for(var line:lines){
+            if(line.toLowerCase().startsWith("#regexfind")){
+                if(replacerItem.getToFind()!=null){
+                    items.add(replacerItem);
+                    replacerItem= new QueryReplacerItem();
+                }
+                replacerItem.setRegex(true);
+                replacerItem.setToFind("");
+                find=true;
+            }else if(line.toLowerCase().startsWith("#find")){
+                if(replacerItem.getToFind()!=null){
+                    items.add(replacerItem);
+                    replacerItem= new QueryReplacerItem();
+                }
+                replacerItem.setToFind("");
+                find=true;
+            }else if(line.toLowerCase().startsWith("#replace")){
+                replacerItem.setToReplace("");
+                find=false;
+            }else{
+                if(find){
+                    replacerItem.setToFind(replacerItem.getToFind()+line+"\n");
+                }else{
+                    replacerItem.setToReplace(replacerItem.getToReplace()+line+"\n");
+                }
+            }
+        }
+        proxy.setQueryReplacement(items);
     }
 
     private static void runMongo(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
