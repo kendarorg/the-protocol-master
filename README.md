@@ -95,6 +95,7 @@ Specify a file containing "replacement queries" this is specially useful when ru
 as postgres and contacting a different kind of database. Here can be inserted the replacements. 
 
 SPACE ARE IMPORTANT INSIDE THE QUERY. THEY MUST MATCH THE REAL ONE.
+AND NO ";" SHOULD BE ADDED AT THE END OF QUERIES
 
 This first example replaces "SELECT 1 AS TEST" directly with "SELECT 2 AS TEST".
 
