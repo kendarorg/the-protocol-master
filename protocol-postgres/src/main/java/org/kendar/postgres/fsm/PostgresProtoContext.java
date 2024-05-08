@@ -8,9 +8,11 @@ import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.proxy.ProxyConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +26,19 @@ public class PostgresProtoContext extends NetworkProtoContext {
     private final int pid;
     private final AtomicBoolean cancel = new AtomicBoolean(false);
     private List<Iterator<ProtoStep>> toSync = new ArrayList<>();
+
+    @Override
+    public void disconnect(Object connection) {
+        var conn = getValue("CONNECTION");
+        var c = ((Connection) ((ProxyConnection) conn).getConnection());
+        try {
+            if (!c.isValid(1)) {
+                c.close();
+            }
+        }catch (Exception ex){
+
+        }
+    }
 
     public PostgresProtoContext(ProtoDescriptor descriptor) {
 

@@ -24,6 +24,11 @@ public class SillyContext extends ProtoContext {
     }
 
     @Override
+    public void disconnect(Object connection) {
+
+    }
+
+    @Override
     public void write(ReturnMessage returnMessage) {
         result.add(returnMessage);
     }

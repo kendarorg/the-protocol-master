@@ -14,6 +14,7 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.SpecialProtoState;
+import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +23,64 @@ import org.slf4j.MDC;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Instance of a protocol definition
  */
-public class ProtoContext {
+public abstract class ProtoContext {
+
+    private static Thread contextCleaner;
+    private static final ConcurrentHashMap<Integer, ProtoContext> contextsCache = new ConcurrentHashMap<>();
+    private static final AtomicInteger timeout = new AtomicInteger(30);
+
+    static {
+        contextCleaner = new Thread(ProtoContext::contextsClean);
+        contextCleaner.start();
+    }
+
+    public static void setTimeout(int value){
+        timeout.set(value);
+    }
+
+
+    private static void contextsClean(){
+
+        while(true){
+            Sleeper.sleep(1000);
+            var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
+            for(var item:fixedItemsList){
+                var now = getNow();
+                if(item.getValue().lastAccess.get()<(now+timeout.get())){
+                    var context = item.getValue();
+                    var contextConnection = context.getValue("CONNECTION");
+                    if(contextConnection==null){
+                        contextsCache.remove(item.getKey());
+                    }
+
+                    try {
+                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                        log.debug("Disconnecting");
+                    }catch (Exception ex){
+                        log.trace("Error disconnecting",ex);
+                    }
+                    contextsCache.remove(item.getKey());
+                }else{
+                    log.debug("keepalive");
+                }
+            }
+        }
+    }
+
+    public abstract void disconnect(Object connection);
+
+    protected AtomicLong lastAccess = new AtomicLong(getNow());
+
+    protected static long getNow() {
+        return System.currentTimeMillis() / 1000;
+    }
+
     private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
 
     /**
@@ -73,6 +127,7 @@ public class ProtoContext {
         this.contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
         this.descriptor = descriptor;
         this.root = descriptor.getTaggedStates();
+        contextsCache.put(this.contextId,this);
     }
 
     /**
@@ -171,6 +226,7 @@ public class ProtoContext {
      * @return
      */
     public Future<Boolean> send(BaseEvent event) {
+        lastAccess.set(getNow());
         return executorService.submit(() -> {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
                 synchronized (sendLock) {
@@ -187,6 +243,7 @@ public class ProtoContext {
      * @return
      */
     public boolean sendSync(BaseEvent event) {
+
         try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
             return reactToEvent(event);
         }
@@ -200,6 +257,7 @@ public class ProtoContext {
      */
     public boolean reactToEvent(BaseEvent currentEvent) {
         try {
+            lastAccess.set(getNow());
             log.trace("[SERVER] RunFsmCycle");
             //Prepartion for the execution
             preExecute(currentEvent);
@@ -272,6 +330,7 @@ public class ProtoContext {
     public void runSteps(Iterator<ProtoStep> stepsToRun, ProtoState currentState, BaseEvent event) {
 
         while (stepsToRun.hasNext()) {
+            lastAccess.set(getNow());
             var steps = stepsToRun.next();
             if (steps == null) continue;
             if (steps.getClass() == Stop.class) {

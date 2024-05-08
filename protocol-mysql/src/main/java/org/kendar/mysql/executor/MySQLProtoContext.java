@@ -11,9 +11,11 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.proxy.ProxyConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,19 @@ public class MySQLProtoContext extends NetworkProtoContext {
     @Override
     protected BBuffer buildBuffer(NetworkProtoDescriptor descriptor) {
         return new MySQLBBuffer(descriptor.isBe() ? BBufferEndianness.BE : BBufferEndianness.LE);
+    }
+
+    @Override
+    public void disconnect(Object connection) {
+        var conn = getValue("CONNECTION");
+        var c = ((Connection) ((ProxyConnection) conn).getConnection());
+        try {
+            if (!c.isValid(1)) {
+                c.close();
+            }
+        }catch (Exception ex){
+
+        }
     }
 
     protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
