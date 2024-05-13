@@ -5,9 +5,18 @@ import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 
 public class Resp3Protocol extends NetworkProtoDescriptor {
+    private static final int PORT = 6379;
+    private  int port = PORT;
+
+    private Resp3Protocol() {}
+    public Resp3Protocol(int port) {
+        this.port = port;
+    }
+
+
     @Override
     public boolean isBe() {
-        return false;
+        return true;
     }
 
     @Override
@@ -22,6 +31,6 @@ public class Resp3Protocol extends NetworkProtoDescriptor {
 
     @Override
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor) {
-        return null;
+        return new Reps3Context(protoDescriptor);
     }
 }
