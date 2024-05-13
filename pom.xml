@@ -17,6 +17,7 @@
         <module>protocol-mysql</module>
         <module>protocol-runner</module>
         <module>protocol-amqp-091</module>
+        <module>protocol-redis</module>
         <module>jacoco</module>
         <module>todo</module>
     </modules>

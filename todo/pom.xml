@@ -11,7 +11,6 @@
 
     <modules>
         <module>protocol-amqp-100</module>
-        <module>protocol-redis</module>
         <module>protocol-kafka</module>
         <module>protocol-mqtt</module>
     </modules>
