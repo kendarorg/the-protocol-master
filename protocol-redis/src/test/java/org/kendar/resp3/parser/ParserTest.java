@@ -6,6 +6,8 @@ import org.kendar.redis.parser.Resp3ParseException;
 import org.kendar.redis.parser.Resp3Parser;
 import org.kendar.redis.parser.RespError;
 
+import java.math.BigInteger;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -207,5 +209,30 @@ public class ParserTest {
         assertEquals(result,Float.NaN,0.0001);
     }
 
-    //https://redis.io/docs/latest/develop/reference/protocol-spec/#booleans
+    @Test
+    void parseBigInteger() throws Resp3ParseException {
+        var target = new Resp3Parser();
+        var data = "(3492890328409238509324850943850943825024385\r\n";
+        var result = target.parse(Resp3Input.of(data));
+        var expected = new BigInteger("3492890328409238509324850943850943825024385");
+        assertEquals(result,expected);
+    }
+
+    @Test
+    void parseBigIntegerNeg() throws Resp3ParseException {
+        var target = new Resp3Parser();
+        var data = "(-3492890328409238509324850943850943825024385\r\n";
+        var result = target.parse(Resp3Input.of(data));
+        var expected = new BigInteger("-3492890328409238509324850943850943825024385");
+        assertEquals(result,expected);
+    }
+
+    @Test
+    void parseBigIntegerPlus() throws Resp3ParseException {
+        var target = new Resp3Parser();
+        var data = "(+3492890328409238509324850943850943825024385\r\n";
+        var result = target.parse(Resp3Input.of(data));
+        var expected = new BigInteger("+3492890328409238509324850943850943825024385");
+        assertEquals(result,expected);
+    }
 }

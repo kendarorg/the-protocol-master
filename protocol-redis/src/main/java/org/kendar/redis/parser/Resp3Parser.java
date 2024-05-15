@@ -6,6 +6,7 @@ import redis.clients.jedis.util.RedisInputStream;
 import redis.clients.jedis.util.RedisOutputStream;
 
 import java.io.BufferedReader;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -186,8 +187,37 @@ public class Resp3Parser {
                 return parseBool(line);
             case ',':
                 return parseDouble(line);
+            case '(':
+                return parseBigNumber(line);
             default:
                 throw new Resp3ParseException("Unknown response type: " + prefix);
+        }
+    }
+
+
+
+    private BigInteger parseBigNumber(Resp3Input line) throws Resp3ParseException {
+        String result = "";
+        var end = 0;
+        while(line.hasNext() && end!=2){
+            var ch = line.charAtAndIncrement();
+            if (ch=='\r' && end==0){
+                end++;
+            }else if (ch=='\n' && end==1){
+                end++;
+            }else if( ((ch >= '0' && ch <= '9')|| ch=='-' || ch=='+') && end==0){
+                result+=ch;
+            }else{
+                throw new Resp3ParseException("Invalid integer format");
+            }
+        }
+        if(end!=2){
+            throw new Resp3ParseException("Unterminated end of integer",true);
+        }
+        try {
+            return new BigInteger(result);
+        }catch (Exception ex){
+            throw new Resp3ParseException("Invalid integer");
         }
     }
 
