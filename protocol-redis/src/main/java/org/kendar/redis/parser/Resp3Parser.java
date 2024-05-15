@@ -6,7 +6,8 @@ import redis.clients.jedis.util.RedisInputStream;
 import redis.clients.jedis.util.RedisOutputStream;
 
 import java.io.BufferedReader;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Resp3Parser {
@@ -28,91 +29,145 @@ public class Resp3Parser {
         }
         return true;
     }
+    private RespError parseSimpleError(Resp3Input line) throws Resp3ParseException {
+        var content = parseSimpleString(line);
 
-
-    private String parseSimpleString(String line) {
-        if(line.endsWith("\r\n")){
-            line = line.substring(0, line.length()-2);
-        }
-        return line;
-    }
-    private RespError parseSimpleError(String line) {
-        if(line.endsWith("\r\n")){
-            line = line.substring(0, line.length()-2);
-        }
-        var spl = line.split("\\s");
+        var spl = content.split("\\s");
         var result = new RespError();
         if(isUpper(spl[0])){
             result.setType(spl[0]);
-            result.setMsg(line.substring(spl[0].length()+1));
+            result.setMsg(content.substring(spl[0].length()+1));
         }else{
-            result.setMsg(line);
+            result.setMsg(content);
         }
         return result;
     }
 
-    private int parseInteger(String line) throws IOException {
+
+    private String parseSimpleString(Resp3Input line) throws Resp3ParseException{
+        String result = "";
+        var end = 0;
+        while(line.hasNext() && end!=2){
+            var ch = line.charAtAndIncrement();
+            if (ch=='\r' && end==0){
+                end++;
+            }else if (ch=='\n' && end==1){
+                end++;
+            }else if( ch!='\r' && ch!='\n' && end==0){
+                result+=ch;
+            }else{
+                throw new Resp3ParseException("Invalid string format");
+            }
+        }
+        if(end!=2){
+            throw new Resp3ParseException("Unterminated end of string",true);
+        }
+        return result;
+    }
+
+    private int parseInteger(Resp3Input line) throws Resp3ParseException {
+        String result = "";
+        var end = 0;
+        while(line.hasNext() && end!=2){
+            var ch = line.charAtAndIncrement();
+            if (ch=='\r' && end==0){
+                end++;
+            }else if (ch=='\n' && end==1){
+                end++;
+            }else if( ((ch >= '0' && ch <= '9')|| ch=='-' || ch=='+') && end==0){
+                result+=ch;
+            }else{
+                throw new Resp3ParseException("Invalid integer format");
+            }
+        }
+        if(end!=2){
+            throw new Resp3ParseException("Unterminated end of integer",true);
+        }
         try {
-            if (line.endsWith("\r\n")) {
-                line = line.substring(0, line.length() - 2);
-            }
-            var positive = true;
-            if (line.startsWith("+")) {
-                line = line.substring(1);
-            } else if (line.startsWith("-")) {
-                line = line.substring(1);
-                positive = false;
-            }
-            var result = Integer.parseInt(line);
-            if (!positive) {
-                result = -result;
-            }
-            return result;
+            return Integer.parseInt(result);
         }catch (Exception ex){
-            throw new IOException("Invalid integer");
+            throw new Resp3ParseException("Invalid integer");
         }
     }
-    private String parseBulkString(String line) throws IOException {
-        if(line.endsWith("\r\n")){
-            line = line.substring(0, line.length()-2);
-        }
-        var lengthStr = "";
-        var expectedLength = 0;
-        while(line.charAt(0)<='9' && line.charAt(0)>='0'){
-            lengthStr+=line.charAt(0);
-            line=line.substring(1);
-        }
-        if(line.startsWith("\r\n")){
-            line = line.substring(2);
-        }else{
-            throw new IOException("Invalid bulk string");
-        }
+
+    private String parseBulkString(Resp3Input line) throws Resp3ParseException {
+        int length = -1;
         try{
-            expectedLength = Integer.parseInt(lengthStr);
-        }catch (Exception ex) {
-            throw new IOException("Invalid bulk string length");
+            length = parseInteger(line);
+        }catch (Resp3ParseException ex){
+            throw new Resp3ParseException("Invalid bulk string length",ex.isMissingData());
         }
-        if(expectedLength!=line.length()){
-            throw new IOException(
-                    String.format("Not matchin bulk string length expected:%d found:%d",expectedLength,line.length()));
+        String content = null;
+        if(length==-1) {
+            return content;
         }
-        return line;
+        if (line.length() < (length + 2)) {
+            throw new Resp3ParseException("Unterminated end of bulk string", true);
+        }
+        content = line.substring(length);
+        if(line.charAtAndIncrement()!='\r'){
+            throw new Resp3ParseException("Invalid bulk string format");
+        }
+
+        if(line.charAtAndIncrement()!='\n'){
+            throw new Resp3ParseException("Invalid bulk string format");
+        }
+        return content;
     }
 
-    public Object parse(String line) throws IOException {
+    private List<Object> parseArray(Resp3Input line) throws Resp3ParseException {
+        int length = -1;
+        try{
+            length = parseInteger(line);
+        }catch (Resp3ParseException ex){
+            throw new Resp3ParseException("Invalid bulk string length",ex.isMissingData());
+        }
+        List<Object> content = null;
+        if(length==-1) {
+            return content;
+        }
+        try {
+            content = new ArrayList<Object>();
+            for (var i = 0; i < length; i++) {
+                var result = parse(line);
+                content.add(result);
+            }
+        }catch (Resp3ParseException ex){
+            throw new Resp3ParseException("Invalid array format",ex.isMissingData());
+        }
+        return content;
+    }
 
-        char prefix = line.charAt(0);
+    public Object parse(Resp3Input line) throws Resp3ParseException {
+
+        char prefix = line.charAtAndIncrement();
         switch (prefix) {
             case '+':
-                return parseSimpleString(line.substring(1));
+                return parseSimpleString(line);
             case '-':
-                return parseSimpleError(line.substring(1));
+                return parseSimpleError(line);
             case ':':
-                return parseInteger(line.substring(1));
+                return parseInteger(line);
             case '$':
-                return parseBulkString(line.substring(1));
+                return parseBulkString(line);
+            case '*':
+                return parseArray(line);
+            case '_':
+                return parseNull(line);
             default:
-                throw new IOException("Unknown response type: " + prefix);
+                throw new Resp3ParseException("Unknown response type: " + prefix);
         }
+    }
+
+    private Object parseNull(Resp3Input line) throws Resp3ParseException {
+
+        if(line.charAtAndIncrement()!='\r'){
+            throw new Resp3ParseException("Invalid null format");
+        }
+
+        if(line.charAtAndIncrement()!='\n'){
+            throw new Resp3ParseException("Invalid null format");
+        }
+        return null;
     }
 }
