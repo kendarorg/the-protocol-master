@@ -1,11 +1,12 @@
 package org.kendar.resp3.parser;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.redis.parser.*;
+import org.kendar.redis.parser.Resp3ParseException;
+import org.kendar.redis.parser.Resp3Parser;
+import org.kendar.redis.parser.RespError;
+import org.kendar.redis.parser.RespVerbatimString;
 
 import java.math.BigInteger;
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +18,7 @@ public class ParserTest {
     void parseString() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "+OK\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertEquals("OK",result);
     }
 
@@ -25,7 +26,7 @@ public class ParserTest {
     void parseError() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "-This is a fancy error\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertTrue(result instanceof RespError);
         assertEquals("This is a fancy error",((RespError)result).getMsg());
         assertEquals("ERR",((RespError)result).getType());
@@ -35,7 +36,7 @@ public class ParserTest {
     void parseErrorWithERR() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "-ERR unknown command 'asdf'\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertTrue(result instanceof RespError);
         assertEquals("unknown command 'asdf'",((RespError)result).getMsg());
         assertEquals("ERR",((RespError)result).getType());
@@ -44,7 +45,7 @@ public class ParserTest {
     void parseErrorWithSpecificType() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "-UNKNOWN unknown command 'asdf'\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertTrue(result instanceof RespError);
         assertEquals("unknown command 'asdf'",((RespError)result).getMsg());
         assertEquals("UNKNOWN",((RespError)result).getType());
@@ -54,21 +55,21 @@ public class ParserTest {
     void parseInt() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ":22\r\n";
-        var result = (int)target.parse(Resp3Input.of(data));
+        var result = (int)target.parse(data);
         assertEquals(22,result);
     }
     @Test
     void parseIntPlus() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ":+22\r\n";
-        var result = (int)target.parse(Resp3Input.of(data));
+        var result = (int)target.parse(data);
         assertEquals(22,result);
     }
     @Test
     void parseIntMinus() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ":-22\r\n";
-        var result = (int)target.parse(Resp3Input.of(data));
+        var result = (int)target.parse(data);
         assertEquals(-22,result);
     }
 
@@ -78,7 +79,7 @@ public class ParserTest {
     void parseBulk() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "$5\r\nhello\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertEquals("hello",result);
     }
 
@@ -88,7 +89,7 @@ public class ParserTest {
         var data = "$4\r\nhello\r\n";
         var isMissingData = true;
         try{
-            target.parse(Resp3Input.of(data));
+            target.parse(data);
         }catch (Resp3ParseException ex){
             isMissingData = ex.isMissingData();
         }
@@ -101,7 +102,7 @@ public class ParserTest {
         var data = "$6\r\nhello\r\n";
         var isMissingData = false;
         try{
-            target.parse(Resp3Input.of(data));
+            target.parse(data);
         }catch (Resp3ParseException ex){
             isMissingData = ex.isMissingData();
         }
@@ -112,7 +113,7 @@ public class ParserTest {
     void parseBulkEmpty() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "$0\r\n\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertEquals("",result);
     }
 
@@ -120,7 +121,7 @@ public class ParserTest {
     void parseBulkNull() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "$-1\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertNull(result);
     }
 
@@ -128,7 +129,7 @@ public class ParserTest {
     void parseNull() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "_\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertNull(result);
     }
 
@@ -136,7 +137,7 @@ public class ParserTest {
     void parseBoolTrue() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "#t\r\n";
-        var result = (boolean) target.parse(Resp3Input.of(data));
+        var result = (boolean) target.parse(data);
         assertTrue(result);
     }
 
@@ -144,7 +145,7 @@ public class ParserTest {
     void parseBoolFalse() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "#f\r\n";
-        var result = (boolean) target.parse(Resp3Input.of(data));
+        var result = (boolean) target.parse(data);
         assertFalse(result);
     }
 
@@ -152,7 +153,7 @@ public class ParserTest {
     void parseDouble() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ",1.29e-1\r\n";
-        var result = (double) target.parse(Resp3Input.of(data));
+        var result = (double) target.parse(data);
         assertEquals(result,0.129,0.0001);
     }
 
@@ -160,7 +161,7 @@ public class ParserTest {
     void parseDouble1() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ",-1.29e-1\r\n";
-        var result = (double) target.parse(Resp3Input.of(data));
+        var result = (double) target.parse(data);
         assertEquals(result,-0.129,0.0001);
     }
 
@@ -170,7 +171,7 @@ public class ParserTest {
     void parseDouble2() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ",+1.29\r\n";
-        var result = (double) target.parse(Resp3Input.of(data));
+        var result = (double) target.parse(data);
         assertEquals(result,1.29,0.0001);
     }
 
@@ -178,7 +179,7 @@ public class ParserTest {
     void parseDouble3() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ",10\r\n";
-        var result = (double) target.parse(Resp3Input.of(data));
+        var result = (double) target.parse(data);
         assertEquals(result,10,0.0001);
     }
 
@@ -186,7 +187,7 @@ public class ParserTest {
     void parseDoubleInf() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ",inf\r\n";
-        var result = (double) target.parse(Resp3Input.of(data));
+        var result = (double) target.parse(data);
         assertEquals(result,Double.POSITIVE_INFINITY,0.0001);
     }
 
@@ -195,7 +196,7 @@ public class ParserTest {
     void parseDoubleMinusInf() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ",-inf\r\n";
-        var result = (double) target.parse(Resp3Input.of(data));
+        var result = (double) target.parse(data);
         assertEquals(result,Double.NEGATIVE_INFINITY,0.0001);
     }
 
@@ -204,7 +205,7 @@ public class ParserTest {
     void parseDoubleNan() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = ",nan\r\n";
-        var result = (double) target.parse(Resp3Input.of(data));
+        var result = (double) target.parse(data);
         assertEquals(result,Float.NaN,0.0001);
     }
 
@@ -212,7 +213,7 @@ public class ParserTest {
     void parseBigInteger() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "(3492890328409238509324850943850943825024385\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         var expected = new BigInteger("3492890328409238509324850943850943825024385");
         assertEquals(result,expected);
     }
@@ -221,7 +222,7 @@ public class ParserTest {
     void parseBigIntegerNeg() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "(-3492890328409238509324850943850943825024385\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         var expected = new BigInteger("-3492890328409238509324850943850943825024385");
         assertEquals(result,expected);
     }
@@ -230,7 +231,7 @@ public class ParserTest {
     void parseBigIntegerPlus() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "(+3492890328409238509324850943850943825024385\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         var expected = new BigInteger("+3492890328409238509324850943850943825024385");
         assertEquals(result,expected);
     }
@@ -239,7 +240,7 @@ public class ParserTest {
     void bulkError() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "!21\r\nSYNTAX invalid syntax\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertTrue(result instanceof RespError);
         assertEquals("invalid syntax",((RespError)result).getMsg());
         assertEquals("SYNTAX",((RespError)result).getType());
@@ -249,7 +250,7 @@ public class ParserTest {
     void verbatimString() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "=15\r\ntxt:Some string\r\n";
-        var result = target.parse(Resp3Input.of(data));
+        var result = target.parse(data);
         assertTrue(result instanceof RespVerbatimString);
         assertEquals("Some string",((RespVerbatimString)result).getMsg());
         assertEquals("txt",((RespVerbatimString)result).getType());

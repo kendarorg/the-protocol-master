@@ -320,6 +320,11 @@ public class Resp3Parser {
         return content;
     }
 
+    public Object parse(String line) throws Resp3ParseException {
+        var data = Resp3Input.of(line);
+        return parse(data);
+    }
+
     public Object parse(Resp3Input line) throws Resp3ParseException {
 
         char prefix = line.charAtAndIncrement();
