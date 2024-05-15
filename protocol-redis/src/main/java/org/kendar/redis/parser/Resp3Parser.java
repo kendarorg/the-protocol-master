@@ -8,6 +8,7 @@ import redis.clients.jedis.util.RedisOutputStream;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 public class Resp3Parser {
@@ -138,6 +139,33 @@ public class Resp3Parser {
         return content;
     }
 
+    private Object parseNull(Resp3Input line) throws Resp3ParseException {
+
+        if(line.charAtAndIncrement()!='\r'){
+            throw new Resp3ParseException("Invalid null format");
+        }
+
+        if(line.charAtAndIncrement()!='\n'){
+            throw new Resp3ParseException("Invalid null format");
+        }
+        return null;
+    }
+
+    private boolean parseBool(Resp3Input line) throws Resp3ParseException {
+        var letter = line.charAtAndIncrement();
+        if(letter!='t' && letter!='f'){
+            throw new Resp3ParseException("Invalid bool format string");
+        }
+        if(line.charAtAndIncrement()!='\r'){
+            throw new Resp3ParseException("Invalid bool format");
+        }
+
+        if(line.charAtAndIncrement()!='\n'){
+            throw new Resp3ParseException("Invalid bool format");
+        }
+        return letter=='t';
+    }
+
     public Object parse(Resp3Input line) throws Resp3ParseException {
 
         char prefix = line.charAtAndIncrement();
@@ -154,20 +182,48 @@ public class Resp3Parser {
                 return parseArray(line);
             case '_':
                 return parseNull(line);
+            case '#':
+                return parseBool(line);
+            case ',':
+                return parseDouble(line);
             default:
                 throw new Resp3ParseException("Unknown response type: " + prefix);
         }
     }
 
-    private Object parseNull(Resp3Input line) throws Resp3ParseException {
+    private double parseDouble(Resp3Input line) throws Resp3ParseException {
 
-        if(line.charAtAndIncrement()!='\r'){
-            throw new Resp3ParseException("Invalid null format");
+        String result = "";
+        var end = 0;
+        while(line.hasNext() && end!=2){
+            var ch = line.charAtAndIncrement();
+            if (ch=='\r' && end==0){
+                end++;
+            }else if (ch=='\n' && end==1){
+                end++;
+            }else if( (ch=='-' || ch=='+' || ch=='.' || ch=='e'
+                    || ch=='i' || ch=='n' || ch=='f' || ch=='a'
+                    || ch=='E'  || (ch>='0' && ch<='9')) && end==0){
+                result+=ch;
+            }else{
+                throw new Resp3ParseException("Invalid integer format");
+            }
         }
-
-        if(line.charAtAndIncrement()!='\n'){
-            throw new Resp3ParseException("Invalid null format");
+        if(end!=2){
+            throw new Resp3ParseException("Unterminated end of integer",true);
         }
-        return null;
+        if(result.equalsIgnoreCase("inf")){
+            return Double.POSITIVE_INFINITY;
+        }else if(result.equalsIgnoreCase("-inf")){
+            return Double.NEGATIVE_INFINITY;
+        }else if(result.equalsIgnoreCase("nan")){
+            return Float.NaN;
+        }
+        var pattern = Pattern.compile("([+\\-]?[0-9\\.]+)([Ee])?([\\-+]?[0-9]*)");
+        var matcher = pattern.matcher(result);
+        if(!matcher.find()){
+            throw new Resp3ParseException("Invalid double format");
+        }
+        return Double.parseDouble(result);
     }
 }
