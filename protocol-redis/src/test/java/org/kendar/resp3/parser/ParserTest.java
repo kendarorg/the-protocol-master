@@ -6,8 +6,7 @@ import org.kendar.redis.parser.RespError;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * According to https://redis.io/docs/latest/develop/reference/protocol-spec
@@ -70,5 +69,22 @@ public class ParserTest {
         var data = ":-22\r\n";
         var result = (int)target.parse(data);
         assertEquals(-22,result);
+    }
+
+
+
+    @Test
+    void parseBulk() throws IOException {
+        var target = new Resp3Parser();
+        var data = "$5\r\nhello\r\n";
+        var result = target.parse(data);
+        assertEquals("hello",result);
+    }
+
+    @Test
+    void parseBulkNotMatchingExpected() throws IOException {
+        var target = new Resp3Parser();
+        var data = "$6\r\nhello\r\n";
+        assertThrows(IOException.class,()->target.parse(data));
     }
 }

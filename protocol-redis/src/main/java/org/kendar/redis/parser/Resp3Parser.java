@@ -51,24 +51,53 @@ public class Resp3Parser {
         return result;
     }
 
-    private int parseInteger(String line) {
+    private int parseInteger(String line) throws IOException {
+        try {
+            if (line.endsWith("\r\n")) {
+                line = line.substring(0, line.length() - 2);
+            }
+            var positive = true;
+            if (line.startsWith("+")) {
+                line = line.substring(1);
+            } else if (line.startsWith("-")) {
+                line = line.substring(1);
+                positive = false;
+            }
+            var result = Integer.parseInt(line);
+            if (!positive) {
+                result = -result;
+            }
+            return result;
+        }catch (Exception ex){
+            throw new IOException("Invalid integer");
+        }
+    }
+    private String parseBulkString(String line) throws IOException {
         if(line.endsWith("\r\n")){
             line = line.substring(0, line.length()-2);
         }
-        var positive=true;
-        if(line.startsWith("+")){
-            line = line.substring(1);
-        }else if(line.startsWith("-")){
-            line = line.substring(1);
-            positive=false;
+        var lengthStr = "";
+        var expectedLength = 0;
+        while(line.charAt(0)<='9' && line.charAt(0)>='0'){
+            lengthStr+=line.charAt(0);
+            line=line.substring(1);
         }
-        var result = Integer.parseInt(line);
-        if(!positive){
-            result = -result;
+        if(line.startsWith("\r\n")){
+            line = line.substring(2);
+        }else{
+            throw new IOException("Invalid bulk string");
         }
-        return result;
+        try{
+            expectedLength = Integer.parseInt(lengthStr);
+        }catch (Exception ex) {
+            throw new IOException("Invalid bulk string length");
+        }
+        if(expectedLength!=line.length()){
+            throw new IOException(
+                    String.format("Not matchin bulk string length expected:%d found:%d",expectedLength,line.length()));
+        }
+        return line;
     }
-
 
     public Object parse(String line) throws IOException {
 
@@ -80,6 +109,8 @@ public class Resp3Parser {
                 return parseSimpleError(line.substring(1));
             case ':':
                 return parseInteger(line.substring(1));
+            case '$':
+                return parseBulkString(line.substring(1));
             default:
                 throw new IOException("Unknown response type: " + prefix);
         }
