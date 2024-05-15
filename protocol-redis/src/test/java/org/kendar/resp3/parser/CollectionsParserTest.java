@@ -1,12 +1,11 @@
 package org.kendar.resp3.parser;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.redis.parser.Resp3Input;
-import org.kendar.redis.parser.Resp3ParseException;
-import org.kendar.redis.parser.Resp3Parser;
-import org.kendar.redis.parser.RespError;
+import org.kendar.redis.parser.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,5 +81,40 @@ public class CollectionsParserTest {
         assertEquals("hello",((List)result).get(0));
         assertNull(((List)result).get(1));
         assertEquals("world",((List)result).get(2));
+    }
+
+    @Test
+    void map() throws Resp3ParseException {
+        var target = new Resp3Parser();
+        var data = "%2\r\n+first\r\n:1\r\n+second\r\n:2\r\n";
+        var result = (Map<Object,Object>)target.parse(Resp3Input.of(data));
+        assertEquals(2,result.size());
+        assertTrue(result.containsKey("first"));
+        assertEquals(1,result.get("first"));
+        assertTrue(result.containsKey("second"));
+        assertEquals(2,result.get("second"));
+    }
+
+    @Test
+    void set() throws Resp3ParseException {
+        var target = new Resp3Parser();
+        var data = "~3\r\n+first\r\n+second\r\n:2\r\n";
+        var result = (Set<Object>)target.parse(Resp3Input.of(data));
+        assertEquals(3,result.size());
+        assertTrue(result.contains("first"));
+        assertTrue(result.contains("second"));
+        assertTrue(result.contains(2));
+    }
+
+    @Test
+    void push() throws Resp3ParseException {
+        var target = new Resp3Parser();
+        var data = ">4\r\n+first\r\n:1\r\n+second\r\n:2\r\n";
+        var result = (RespPush)target.parse(Resp3Input.of(data));
+        assertEquals(4,result.size());
+        assertEquals("first",result.get(0));
+        assertEquals(1,result.get(1));
+        assertEquals("second",result.get(2));
+        assertEquals(2,result.get(3));
     }
 }

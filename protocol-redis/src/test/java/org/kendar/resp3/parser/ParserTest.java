@@ -1,12 +1,11 @@
 package org.kendar.resp3.parser;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.redis.parser.Resp3Input;
-import org.kendar.redis.parser.Resp3ParseException;
-import org.kendar.redis.parser.Resp3Parser;
-import org.kendar.redis.parser.RespError;
+import org.kendar.redis.parser.*;
 
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -235,6 +234,27 @@ public class ParserTest {
         var expected = new BigInteger("+3492890328409238509324850943850943825024385");
         assertEquals(result,expected);
     }
+
+    @Test
+    void bulkError() throws Resp3ParseException {
+        var target = new Resp3Parser();
+        var data = "!21\r\nSYNTAX invalid syntax\r\n";
+        var result = target.parse(Resp3Input.of(data));
+        assertTrue(result instanceof RespError);
+        assertEquals("invalid syntax",((RespError)result).getMsg());
+        assertEquals("SYNTAX",((RespError)result).getType());
+    }
+
+    @Test
+    void verbatimString() throws Resp3ParseException {
+        var target = new Resp3Parser();
+        var data = "=15\r\ntxt:Some string\r\n";
+        var result = target.parse(Resp3Input.of(data));
+        assertTrue(result instanceof RespVerbatimString);
+        assertEquals("Some string",((RespVerbatimString)result).getMsg());
+        assertEquals("txt",((RespVerbatimString)result).getType());
+    }
+
 
 
 }
