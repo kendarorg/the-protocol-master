@@ -26,6 +26,7 @@ public class Resp3Protocol extends NetworkProtoDescriptor {
 
     @Override
     protected void initializeProtocol() {
+        //addInterruptState(new Resp3FrameTranslator(BytesEvent.class));
 
     }
 
