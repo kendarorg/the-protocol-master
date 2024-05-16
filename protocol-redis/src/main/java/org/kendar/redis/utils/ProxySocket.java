@@ -94,7 +94,7 @@ public class ProxySocket {
                                                             if("message".equalsIgnoreCase(list.get(0).toString())){
                                                                 log.trace("[PROXY ][RX] Found(2): " + returnedMessage.getMessage());
                                                                 var res = "";
-                                                                res = "{\"type\":\"message\",\"data\":" + mapper.serialize(returnedMessage.getData()) + "}";
+                                                                res = "{\"type\":\"RESPONSE\",\"data\":" + mapper.serialize(returnedMessage.getData()) + "}";
                                                                 var jsonRes = mapper.toJsonNode(res);
                                                                 storage.write(
                                                                         context.getContextId(),
