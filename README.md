@@ -33,7 +33,7 @@ several database wire protocol implementations:
 * [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md)
     * Support for basic queue/publish/consume
     * Channels multiplexing
-* Redis (soon)
+* Redis ([in progress](https://github.com/kendarorg/the-protocol-master/tree/6-redis-protocol))
 
 ## If you like it Buy me a coffe :)
 
