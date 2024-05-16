@@ -3,6 +3,7 @@ package org.kendar.storage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,6 +31,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BaseFileStorage.class);
     protected String targetDir;
+    private final ConcurrentLinkedQueue<StorageItem> items = new ConcurrentLinkedQueue<>();
 
     public BaseFileStorage(String targetDir) {
 
@@ -65,6 +68,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
             if (!Files.exists(Path.of(targetDir))) {
                 Path.of(targetDir).toFile().mkdirs();
             }
+            new Thread(() -> writeOnFile()).start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -112,14 +116,28 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
      * @param item
      */
     protected void write(StorageItem item) {
-        try {
-            var valueId = ProtoDescriptor.getCounter("STORAGE_ID");
-            var id = BaseStorage.padLeftZeros(String.valueOf(valueId), 10) + ".json";
-            item.setIndex(valueId);
-            var result = mapper.serializePretty(item);
-            Files.writeString(Path.of(targetDir, id), result);
-        } catch (Exception e) {
-            throw new RuntimeException();
+
+        items.add(item);
+    }
+
+    private void writeOnFile() {
+
+        while (true) {
+            try {
+                if(items.isEmpty()){
+                    Sleeper.sleep(10);
+                    continue;
+                }
+                var item = items.poll();
+                var valueId = ProtoDescriptor.getCounter("STORAGE_ID");
+                var id = BaseStorage.padLeftZeros(String.valueOf(valueId), 10) + ".json";
+                item.setIndex(valueId);
+                var result = mapper.serializePretty(item);
+                Files.writeString(Path.of(targetDir, id), result);
+
+            } catch (Exception e) {
+                throw new RuntimeException();
+            }
         }
     }
 

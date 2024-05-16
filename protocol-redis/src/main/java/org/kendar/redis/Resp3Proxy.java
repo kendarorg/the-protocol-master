@@ -92,7 +92,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
             connection.setTcpNoDelay(true);
             connection.connect(new InetSocketAddress(InetAddress.getByName(host), port));
             return new ProxyConnection(new ProxySocket(context,
-                    new InetSocketAddress(InetAddress.getByName(host), port), group));
+                    new InetSocketAddress(InetAddress.getByName(host), port), group,storage));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

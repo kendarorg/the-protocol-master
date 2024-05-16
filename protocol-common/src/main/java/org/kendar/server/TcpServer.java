@@ -143,8 +143,6 @@ public class TcpServer {
                         }
                     });
 
-                } catch(AsynchronousCloseException closedChannelException){
-                    log.trace("Execution exception", closedChannelException);
                 } catch (ExecutionException e) {
                     log.trace("Execution exception", e);
                 }

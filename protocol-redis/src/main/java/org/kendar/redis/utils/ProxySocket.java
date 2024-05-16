@@ -40,7 +40,7 @@ public class ProxySocket {
     private final Semaphore readSemaphore = new Semaphore(1);
     private final List<Resp3Message> received = new ArrayList<>();
 
-    public ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+    public ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group, Resp3Storage storage) {
         this.context = context;
         try {
             channel = AsynchronousSocketChannel.open(group);
@@ -88,10 +88,34 @@ public class ProxySocket {
                                                 if(stepsToInvoke.hasNext()){
                                                     var sub = stepsToInvoke.next();
                                                     var returnedMessage = (Resp3Message)sub.run();
+                                                    if(returnedMessage.getData() instanceof List){
+                                                        var list = (List)returnedMessage.getData();
+                                                        if(list.size() > 0 && list.get(0)!=null){
+                                                            if("message".equalsIgnoreCase(list.get(0).toString())){
+                                                                log.trace("[PROXY ][RX] Found(2): " + returnedMessage.getMessage());
+                                                                var res = "";
+                                                                res = "{\"type\":\"message\",\"data\":" + mapper.serialize(returnedMessage.getData()) + "}";
+                                                                var jsonRes = mapper.toJsonNode(res);
+                                                                storage.write(
+                                                                        context.getContextId(),
+                                                                        null,
+                                                                        jsonRes,
+                                                                        0,"message","RESP3"
+                                                                );
+
+                                                                context.write(returnedMessage);
+                                                                run = true;
+
+
+                                                                break;
+                                                            }
+
+                                                        }
+                                                    }
                                                     inputQueue.add(returnedMessage);
+                                                    log.trace("[PROXY ][RX] Found(1): " + returnedMessage.getMessage());
                                                 }
 
-                                                log.trace("[PROXY ][RX] Found(1): " + possible.getClass().getSimpleName());
                                                 run = true;
                                                 break;
                                             }
@@ -185,6 +209,7 @@ public class ProxySocket {
                     if (protoState.canRunEvent(fe)) {
                         founded = fe;
                         log.debug("[PROXY ][RX]: " + mapper.serialize(fe.getData()));
+
                         received.remove(i);
                         break;
                     }
