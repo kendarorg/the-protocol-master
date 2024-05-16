@@ -36,7 +36,7 @@ public class BasicTest {
 
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
-        var proxy = new Resp3Proxy(redisImage.getHost(),redisImage.getPort());
+        var proxy = new Resp3Proxy("redis://"+redisImage.getHost()+":"+redisImage.getPort(),null,null);
         if (testInfo != null) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();

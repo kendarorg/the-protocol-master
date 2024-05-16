@@ -53,6 +53,9 @@ public class Resp3Input {
         var result = data.substring(index, index+length);
         index+=length;
         return result;
+    }
 
+    public String getPreString(){
+        return data.substring(0,index);
     }
 }

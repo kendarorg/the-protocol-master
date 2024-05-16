@@ -26,7 +26,7 @@ public class RedisImage extends BaseImage<RedisImage, RedisContainer> {
     @Override
     protected void preStart() {
 
-        container = new RedisContainer(DockerImageName.parse("redis:5.0.3-alpine"));
+        container = new RedisContainer(DockerImageName.parse("redis:7.2.4-alpine"));
 
     }
 
