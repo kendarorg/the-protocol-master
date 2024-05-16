@@ -37,17 +37,17 @@ public class BasicTest {
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
         var proxy = new Resp3Proxy(redisImage.getHost(),redisImage.getPort());
-//        if (testInfo != null) {
-//            var className = testInfo.getTestClass().get().getSimpleName();
-//            var method = testInfo.getTestMethod().get().getName();
-//            if (testInfo.getDisplayName().startsWith("[")) {
-//                var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-//                proxy.setStorage(new AmqpFileStorage(Path.of("target", "tests", className, method, dsp)));
-//            } else {
-//                proxy.setStorage(new AmqpFileStorage(Path.of("target", "tests", className, method)));
-//            }
-//        }
-//        baseProtocol.setProxy(proxy);
+        if (testInfo != null) {
+            var className = testInfo.getTestClass().get().getSimpleName();
+            var method = testInfo.getTestMethod().get().getName();
+            if (testInfo.getDisplayName().startsWith("[")) {
+                var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
+                //proxy.setStorage(new AmqpFileStorage(Path.of("target", "tests", className, method, dsp)));
+            } else {
+                //proxy.setStorage(new AmqpFileStorage(Path.of("target", "tests", className, method)));
+            }
+        }
+        baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 

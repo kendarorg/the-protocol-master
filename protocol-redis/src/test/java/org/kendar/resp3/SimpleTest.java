@@ -1,6 +1,6 @@
 package org.kendar.resp3;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -10,9 +10,35 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SimpleTest extends BasicTest{
+    @BeforeAll
+    public static void beforeClass() {
+        beforeClassBase();
+
+    }
+
+    @AfterAll
+    public static void afterClass() throws Exception {
+        try {
+            afterClassBase();
+        } catch (Exception ex) {
+
+        }
+    }
+
+    @BeforeEach
+    public void beforeEach(TestInfo testInfo) {
+        beforeEachBase(testInfo);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        afterEachBase();
+    }
+
+
     @Test
-    void test() throws Exception {
-        JedisPool pool = new JedisPool(redisImage.getHost(), redisImage.getPort());
+    void connectionToTestContainers() throws Exception {
+        JedisPool pool = new JedisPool("127.0.0.1", FAKE_PORT);
 
         try (Jedis jedis = pool.getResource()) {
             // Store & Retrieve a simple string

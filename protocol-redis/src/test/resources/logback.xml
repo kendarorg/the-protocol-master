@@ -7,7 +7,7 @@
     </appender>
 
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
-    <logger name="org.kendar" level="DEBUG"/>
+    <logger name="org.kendar" level="TRACE"/>
     <logger name="com.github" level="ERROR"/>
     <logger name="org.testcontainers" level="ERROR"/>
 

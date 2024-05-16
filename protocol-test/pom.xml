@@ -31,6 +31,11 @@
             <version>${mybatis.version}</version>
         </dependency>
         <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
             <version>${testcontainers.version}</version>
@@ -63,7 +68,7 @@
         <dependency>
             <groupId>com.redis.testcontainers</groupId>
             <artifactId>testcontainers-redis</artifactId>
-            <version>1.6.4</version>
+            <version>${testcontainers.redis.version}</version>
         </dependency>
     </dependencies>
 </project>

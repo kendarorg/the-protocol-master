@@ -98,6 +98,13 @@ public class BBuffer {
         return bytes;
     }
 
+    public byte[] getRemaining() {
+        if(position<0)return bytes;
+        var toCopy = new byte[bytes.length - position];
+        System.arraycopy(bytes, position, toCopy, 0, bytes.length - position);
+        return toCopy;
+    }
+
     public byte[] toArray() {
         return bytes;
     }
