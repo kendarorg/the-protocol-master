@@ -1,4 +1,4 @@
-package org.kendar.amqp.v09.utils;
+package org.kendar.redis.utils;
 
 
 import org.kendar.buffers.BBuffer;

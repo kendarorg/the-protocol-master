@@ -1,13 +1,14 @@
 package org.kendar.redis;
 
-import org.kendar.amqp.v09.utils.ProxySocket;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.redis.fsm.Resp3PullState;
 import org.kendar.redis.fsm.events.Resp3Message;
-import org.kendar.redis.parser.RespError;
+import org.kendar.redis.utils.ProxySocket;
+import org.kendar.redis.utils.Resp3Storage;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,11 +104,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
 
     public ReturnMessage execute(Reps3Context context, ProxyConnection connection, Resp3Message event, ProtoState toRead) {
         var req = "";
-        if(event.getData() instanceof RespError){
-            req = "{\"type\":\"ERROR\",\"data\":" + mapper.serialize(event.getData()) + "}";
-        }else {
-            req = "{\"type\":\"" + ((List<Object>)event.getData()).get(0) + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
-        }
+        req = "{\"type\":\"" + ((List<Object>)event.getData()).get(0) + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
         var jsonReq = mapper.toJsonNode(req);
 //        if (replayer) {
 //            var item = storage.read(jsonReq, of.getClass().getSimpleName());
@@ -132,15 +129,15 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
         }catch (Exception ex){
             log.error("CANNOT READ SHIT",ex);
         }
-//        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(toRead) + "}";
-//        long end = System.currentTimeMillis();
-//
-//        storage.write(
-//                context.getContextId(),
-//                jsonReq
-//                , mapper.toJsonNode(res)
-//                , (end - start), of.getClass().getSimpleName(), "AMQP");
-//        return toRead;
+        var content = ((Resp3PullState)toRead).getEvent().getData();
+        var res = "{\"type\":\"" + content.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(content) + "}";
+        long end = System.currentTimeMillis();
+
+        storage.write(
+                context.getContextId(),
+                jsonReq
+                , mapper.toJsonNode(res)
+                , (end - start), (String)((List<Object>)event.getData()).get(0), "RESP3");
         return (ReturnMessage) toRead;
     }
 }

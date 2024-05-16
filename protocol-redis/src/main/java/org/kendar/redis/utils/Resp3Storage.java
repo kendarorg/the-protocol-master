@@ -1,4 +1,4 @@
-package org.kendar.redis;
+package org.kendar.redis.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.storage.Storage;

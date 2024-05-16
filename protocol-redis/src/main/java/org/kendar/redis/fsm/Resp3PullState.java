@@ -14,6 +14,11 @@ import java.util.Iterator;
 
 public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
     private Resp3Parser parser = new Resp3Parser();
+
+    public Resp3Message getEvent() {
+        return event;
+    }
+
     private Resp3Message event;
 
     public Resp3PullState() {
