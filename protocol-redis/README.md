@@ -3,6 +3,7 @@
 ## Missing features
 
 * [Inline commands](https://redis.io/docs/latest/develop/reference/protocol-spec/#inline-commands) issued via Telnet
+* TODO: Replay (See Resp3Proxy)
 
 ## Documentation used
 

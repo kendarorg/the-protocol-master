@@ -102,12 +102,52 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
     public void initialize() {
     }
 
+//    private void writeResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
+//        if (storageItems.isEmpty()) return;
+//        for (var item : storageItems) {
+//            var out = item.getOutput();
+//            var clazz = out.get("type").textValue();
+//            ReturnMessage fr = null;
+//            int consumeId = -1;
+//            switch (clazz) {
+//                case "BasicDeliver":
+//                    var bd = mapper.deserialize(out.get("data").toString(), BasicDeliver.class);
+//                    consumeId = bd.getConsumeId();
+//                    fr = bd;
+//                    break;
+//                case "HeaderFrame":
+//                    var hf = mapper.deserialize(out.get("data").toString(), HeaderFrame.class);
+//                    consumeId = hf.getConsumeId();
+//                    fr = hf;
+//                    break;
+//                case "BodyFrame":
+//                    var bf = mapper.deserialize(out.get("data").toString(), BodyFrame.class);
+//                    consumeId = bf.getConsumeId();
+//                    fr = bf;
+//                    break;
+//                case "BasicCancel":
+//                    var bc = mapper.deserialize(out.get("data").toString(), BasicCancel.class);
+//                    consumeId = bc.getConsumeId();
+//                    fr = bc;
+//                    break;
+//            }
+//            if (fr != null) {
+//                log.debug("[SERVER][CB]: " + fr.getClass().getSimpleName());
+//                var ctx = AmqpProtocol.consumeContext.get(consumeId);
+//                ctx.write(fr);
+//            } else {
+//                throw new RuntimeException("MISSING CLASS " + clazz);
+//            }
+//
+//        }
+//    }
+
     public ReturnMessage execute(Reps3Context context, ProxyConnection connection, Resp3Message event, ProtoState toRead) {
         var req = "";
         req = "{\"type\":\"" + ((List<Object>)event.getData()).get(0) + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
         var jsonReq = mapper.toJsonNode(req);
-//        if (replayer) {
-//            var item = storage.read(jsonReq, of.getClass().getSimpleName());
+        if (replayer) {
+//            var item = storage.read(jsonReq,  (String)((List<Object>)event.getData()).get(0));
 //            if (item.getOutput() == null && item.getInput() == null) {
 //                writeResponses(storage.readResponses(item.getIndex()));
 //                return toRead;
@@ -116,8 +156,8 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
 //
 //            var out = item.getOutput();
 //            return (T) mapper.deserialize(out.get("data").toString(), toRead.getClass());
-//
-//        }
+
+        }
 
         long start = System.currentTimeMillis();
 
