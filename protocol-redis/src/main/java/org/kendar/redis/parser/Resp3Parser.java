@@ -1,5 +1,6 @@
 package org.kendar.redis.parser;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import redis.clients.jedis.Connection;
 import redis.clients.jedis.Protocol;
 import redis.clients.jedis.util.RedisInputStream;
@@ -385,5 +386,9 @@ public class Resp3Parser {
             throw new Resp3ParseException("Invalid push format",ex.isMissingData());
         }
         return content;
+    }
+
+    public String serialize(JsonNode data) {
+        return null;
     }
 }

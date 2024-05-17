@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Resp3FileStorage extends BaseFileStorage<JsonNode, JsonNode> implements Resp3Storage {
     private static final Logger log = LoggerFactory.getLogger(Resp3FileStorage.class);
@@ -92,7 +93,24 @@ public class Resp3FileStorage extends BaseFileStorage<JsonNode, JsonNode> implem
 
     @Override
     public List<StorageItem<JsonNode, JsonNode>> readResponses(long afterIndex) {
-        return List.of();
+        initializeContent();
+        synchronized (responseLockObject) {
+            var result = new ArrayList<StorageItem<JsonNode, JsonNode>>();
+            for (var item : index.stream().filter(a -> a.getIndex() > afterIndex).collect(Collectors.toList())) {
+                if (item.getType().equalsIgnoreCase("RESPONSE")) {
+                    var outItem = outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
+                    if (!outItem.isEmpty()) {
+                        result.add(outItem.get());
+                        log.debug("[SERVER][CB] After: " + afterIndex + " Index: " + item.getIndex() + " Type: " +
+                                outItem.get().getOutput().get("type").textValue());
+                        outItems.remove(outItem.get());
+                    }
+                } else {
+                    break;
+                }
+            }
+            return result;
+        }
     }
 
     @Override

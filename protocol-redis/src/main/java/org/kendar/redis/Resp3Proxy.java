@@ -108,19 +108,19 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = item.getOutput();
-            var clazz = out.get("type").textValue();
-            ReturnMessage fr = null;
-            int consumeId = -1;
-            switch (clazz) {
+            var type = out.get("type").textValue();
 
-            }
-            if (fr != null) {
-                log.debug("[SERVER][CB]: " + fr.getClass().getSimpleName());
-                //TODO_XXX var ctx = AmqpProtocol.consumeContext.get(consumeId);
-                //TODO_XXX ctx.write(fr);
+            int connectionId = item.getConnectionId();
+            if(type.equalsIgnoreCase("RESPONSE")){
+                log.debug("[SERVER][CB]: RESPONSE");
+                var ctx = Resp3Protocol.consumeContext.get(connectionId);
+
+                ReturnMessage fr = new Resp3Message(ctx,null,out.get("data"));
+                ctx.write(fr);
             } else {
-                throw new RuntimeException("MISSING CLASS " + clazz);
+                throw new RuntimeException("MISSING RESPONSE_CLASS");
             }
+
         }
     }
 
@@ -137,7 +137,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
             writeResponses(storage.readResponses(item.getIndex()));
 
             var out = item.getOutput();
-            //TODO_XXX return (T) mapper.deserialize(out.get("data").toString(), toRead.getClass());
+            return new Resp3Message(context,null,out.get("data"));
 
         }
 
