@@ -4,6 +4,7 @@ public class RespVerbatimString {
     private String type = "txt";
     private String msg;
 
+
     public String getType() {
         return type;
     }

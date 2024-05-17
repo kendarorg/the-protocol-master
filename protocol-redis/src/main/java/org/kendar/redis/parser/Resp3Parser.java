@@ -1,6 +1,9 @@
 package org.kendar.redis.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import redis.clients.jedis.Connection;
 import redis.clients.jedis.Protocol;
 import redis.clients.jedis.util.RedisInputStream;
@@ -8,7 +11,8 @@ import redis.clients.jedis.util.RedisOutputStream;
 
 import java.io.BufferedReader;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -274,23 +278,24 @@ public class Resp3Parser {
         return res;
     }
 
-    private Map<Object,Object> parseMap(Resp3Input line) throws Resp3ParseException {
+    private List<Object> parseMap(Resp3Input line) throws Resp3ParseException {
         int length = -1;
         try{
             length = parseInteger(line);
         }catch (Resp3ParseException ex){
             throw new Resp3ParseException("Invalid map length",ex.isMissingData());
         }
-        Map<Object,Object> content = null;
+        List<Object> content = null;
         if(length==-1) {
             return content;
         }
         try {
-            content = new HashMap<>();
+            content = new ArrayList<>();
+            content.add("@@MAP@@");
             for (var i = 0; i < length; i++) {
                 var key = parse(line);
                 var value = parse(line);
-                content.put(key,value);
+                content.add(List.of(key,value));
             }
         }catch (Resp3ParseException ex){
             throw new Resp3ParseException("Invalid map format",ex.isMissingData());
@@ -298,19 +303,20 @@ public class Resp3Parser {
         return content;
     }
 
-    private Set<Object> parseSet(Resp3Input line) throws Resp3ParseException {
+    private List<Object> parseSet(Resp3Input line) throws Resp3ParseException {
         int length = -1;
         try{
             length = parseInteger(line);
         }catch (Resp3ParseException ex){
             throw new Resp3ParseException("Invalid set length",ex.isMissingData());
         }
-        Set<Object> content = null;
+        List<Object> content = null;
         if(length==-1) {
             return content;
         }
         try {
-            content = new HashSet<>();
+            content = new ArrayList<>();
+            content.add("@@SET@@");
             for (var i = 0; i < length; i++) {
                 var key = parse(line);
                 content.add(key);
@@ -378,6 +384,7 @@ public class Resp3Parser {
         }
         try {
             content = new RespPush();
+            content.add("@@PUSH@@");
             for (var i = 0; i < length; i++) {
                 var result = parse(line);
                 content.add(result);
@@ -388,7 +395,88 @@ public class Resp3Parser {
         return content;
     }
 
-    public String serialize(JsonNode data) {
-        return null;
+    public String serialize(JsonNode jsonNode) throws Resp3ParseException {
+        String result = "";
+        if(jsonNode.isArray()){
+            var arrayNode = (ArrayNode)jsonNode;
+            var type="*";
+            var size=0;
+            var content = new ArrayList<String>();
+            for(var item:arrayNode){
+                if(item.asText().equalsIgnoreCase("@@ARRAY@@")){
+                    type="*";
+                }else if(item.asText().equalsIgnoreCase("@@SET@@")){
+                    type="~";
+                }else if(item.asText().equalsIgnoreCase("@@MAP@@")){
+                    type="%";
+                }else if(item.asText().equalsIgnoreCase("@@PUSH@@")){
+                    type=">";
+                }else{
+                    size++;
+                }
+            }
+            result +=type+size+"\r\n";
+
+            for(var item:arrayNode){
+                if(item.asText().equalsIgnoreCase("@@SET@@") || item.asText().equalsIgnoreCase("@@MAP@@")|| item.asText().equalsIgnoreCase("@@PUSH@@")|| item.asText().equalsIgnoreCase("@@ARRAY@@")){
+                    continue;
+                }
+                if(type.equalsIgnoreCase("%")){ //MAP
+                    var subArray = (ArrayNode)item;
+                    result+=serialize(subArray.get(0));
+                    result+=serialize(subArray.get(1));
+                }else{
+                    result+=serialize(item);
+                }
+            }
+        }else if(jsonNode.isValueNode()){
+            var valNode =  (ValueNode)jsonNode;
+            if(valNode.isFloat()||valNode.isFloatingPointNumber()||valNode.isNumber()){
+                var floatValue = Float.parseFloat(valNode.asText());
+                if(floatValue==Float.NaN){
+                    return ",nan";
+                }
+                return ","+floatValue+"\r\n";
+            }else if(valNode.isBigDecimal() ||valNode.isDouble()||valNode.isFloat()||valNode.isFloatingPointNumber()||valNode.isNumber()){
+                var doubleValue = valNode.asDouble();
+                if(doubleValue==Double.POSITIVE_INFINITY){
+                    return ",inf"+"\r\n";
+                }else if(doubleValue==Double.NEGATIVE_INFINITY){
+                    return ",-inf"+"\r\n";
+                }
+                return ","+doubleValue+"\r\n";
+            }else if(valNode.isInt() || valNode.isIntegralNumber()||valNode.isShort()){
+                return ":"+valNode.asInt()+"\r\n";
+            }else if(valNode.isLong() || valNode.isBigInteger()){
+                return "("+valNode.asText()+"\r\n";
+            }else if(valNode.isNull()){
+                return "_"+"\r\n";
+            }else if(valNode.isBoolean()){
+                return "#"+(valNode.asBoolean()?"t":"f")+"\r\n";
+            }else if(valNode.isTextual()){
+                var text =valNode.asText();
+                if(text.indexOf("\r")>=0||text.indexOf("\n")>0){
+                    return "$"+text.length()+"\r\n"+text+"\r\n";
+                }else{
+                    return "+"+text+"\r\n";
+                }
+            }
+        }else if(jsonNode.isObject()){
+            var objNode = (ObjectNode)jsonNode;
+            var type  = objNode.get("type").textValue();
+            var msg  = objNode.get("msg").textValue();
+            if(type.equalsIgnoreCase("txt")){
+                return "="+(msg.length()+4)+"\r\n"+type+":"+msg+"\r\n";
+            }else if(type.equalsIgnoreCase("bin")){
+                return "="+(msg.length()+4)+"\r\n"+type+":"+msg+"\r\n";
+            }else{
+                if(msg.indexOf("\r")>=0||msg.indexOf("\n")>0){
+                    return "!"+(msg.length()+1+type.length())+"\r\n"+type+" "+msg+"\r\n";
+                }else{
+                    return "-"+type+" "+msg+"\r\n";
+                }
+            }
+        }
+        throw new Resp3ParseException("UNABLE TO RECOGNIZE TYPE");
     }
 }

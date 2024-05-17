@@ -4,6 +4,7 @@ public class RespError {
     private String type = "ERR";
     private String msg;
 
+
     public String getType() {
         return type;
     }

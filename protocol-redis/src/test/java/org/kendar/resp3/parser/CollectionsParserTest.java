@@ -1,14 +1,14 @@
 package org.kendar.resp3.parser;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.redis.parser.*;
+import org.kendar.redis.parser.Resp3ParseException;
+import org.kendar.redis.parser.Resp3Parser;
+import org.kendar.redis.parser.RespError;
+import org.kendar.redis.parser.RespPush;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CollectionsParserTest {
 
@@ -87,23 +87,25 @@ public class CollectionsParserTest {
     void map() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "%2\r\n+first\r\n:1\r\n+second\r\n:2\r\n";
-        var result = (Map<Object,Object>)target.parse(data);
-        assertEquals(2,result.size());
-        assertTrue(result.containsKey("first"));
-        assertEquals(1,result.get("first"));
-        assertTrue(result.containsKey("second"));
-        assertEquals(2,result.get("second"));
+        var result = (List<Object>)target.parse(data);
+        assertEquals(3,result.size());
+        assertEquals("@@MAP@@",result.get(0));
+        assertEquals(((List<Object>)result.get(1)).get(0),"first");
+        assertEquals(((List<Object>)result.get(1)).get(1),1);
+        assertEquals(((List<Object>)result.get(2)).get(0),"second");
+        assertEquals(((List<Object>)result.get(2)).get(1),2);
     }
 
     @Test
     void set() throws Resp3ParseException {
         var target = new Resp3Parser();
         var data = "~3\r\n+first\r\n+second\r\n:2\r\n";
-        var result = (Set<Object>)target.parse(data);
-        assertEquals(3,result.size());
-        assertTrue(result.contains("first"));
-        assertTrue(result.contains("second"));
-        assertTrue(result.contains(2));
+        var result = (List<Object>)target.parse(data);
+        assertEquals(4,result.size());
+        assertEquals(result.get(0),"@@SET@@");
+        assertEquals(result.get(1),"first");
+        assertEquals(result.get(2),"second");
+        assertEquals(result.get(3),2);
     }
 
     @Test
@@ -111,10 +113,11 @@ public class CollectionsParserTest {
         var target = new Resp3Parser();
         var data = ">4\r\n+first\r\n:1\r\n+second\r\n:2\r\n";
         var result = (RespPush)target.parse(data);
-        assertEquals(4,result.size());
-        assertEquals("first",result.get(0));
-        assertEquals(1,result.get(1));
-        assertEquals("second",result.get(2));
-        assertEquals(2,result.get(3));
+        assertEquals(5,result.size());
+        assertEquals(result.get(0),"@@PUSH@@");
+        assertEquals(result.get(1),"first");
+        assertEquals(result.get(2),1);
+        assertEquals(result.get(3),"second");
+        assertEquals(result.get(4),2);
     }
 }
