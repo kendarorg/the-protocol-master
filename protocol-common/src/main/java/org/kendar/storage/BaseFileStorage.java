@@ -1,7 +1,6 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -129,9 +128,12 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
                     continue;
                 }
                 var item = items.poll();
-                var valueId = ProtoDescriptor.getCounter("STORAGE_ID");
-                var id = BaseStorage.padLeftZeros(String.valueOf(valueId), 10) + ".json";
-                item.setIndex(valueId);
+                if(item.getIndex()<=0) {
+                    var valueId = generateIndex();
+                    item.setIndex(valueId);
+                }
+                var id = BaseStorage.padLeftZeros(String.valueOf(item.getIndex()), 10) + ".json";
+
                 var result = mapper.serializePretty(item);
                 Files.writeString(Path.of(targetDir, id), result);
 

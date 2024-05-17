@@ -1,5 +1,7 @@
 package org.kendar.storage;
 
+import org.kendar.protocol.descriptor.ProtoDescriptor;
+
 /**
  * Base class for the storage
  *
@@ -29,11 +31,20 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
         write(item);
     }
 
+    public void write(long index,int connectionId, I request, O response, long durationMs, String type, String caller) {
+        var item = new StorageItem(index,connectionId, request, response, durationMs, type, caller);
+        write(item);
+    }
+
     protected abstract void write(StorageItem item);
 
     public Storage<I, O> withFullData() {
         this.useFullData = true;
         return this;
+    }
+
+    public long generateIndex(){
+        return ProtoDescriptor.getCounter("STORAGE_ID");
     }
 
 

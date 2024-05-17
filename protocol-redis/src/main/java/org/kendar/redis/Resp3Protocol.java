@@ -39,9 +39,17 @@ public class Resp3Protocol extends NetworkProtoDescriptor {
     @Override
     protected void initializeProtocol() {
         addInterruptState(new Resp3MessageTranslator(BytesEvent.class));
+//        initialize(
+//            new ProtoStateWhile(
+//                    new ProtoStateSwitchCase(
+//                        new Resp3PullState(Resp3Message.class),
+//                        new ProtoStateSequence(
+//                                new Resp3Subscribe(Resp3Message.class),
+//                                new Resp3Unsubscribe(Resp3Message.class))));
         initialize(
-            new ProtoStateWhile(
-                    new Resp3PullState(Resp3Message.class)));
+                new ProtoStateWhile(
+
+                                new Resp3PullState(Resp3Message.class)));
 
     }
 

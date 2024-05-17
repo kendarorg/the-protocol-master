@@ -141,6 +141,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
 
         }
 
+        var index = storage.generateIndex();
         long start = System.currentTimeMillis();
 
         var sock = (ProxySocket) connection.getConnection();
@@ -156,6 +157,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
         long end = System.currentTimeMillis();
 
         storage.write(
+                index,
                 context.getContextId(),
                 jsonReq
                 , mapper.toJsonNode(res)
