@@ -41,17 +41,16 @@ public class SimpleTest extends BasicTest {
 
 
     @Test
-    void resp2() throws Exception {
+    void resp2() {
         JedisPool pool = new JedisPool("127.0.0.1", FAKE_PORT);
 
         try (Jedis jedis = pool.getResource()) {
             // Store & Retrieve a simple string
             jedis.set("foo", "bar");
-            assertEquals("bar", jedis.get("foo").toString()); // prints bar
+            assertEquals("bar", jedis.get("foo")); // prints bar
 
             // Store & Retrieve a HashMap
             Map<String, String> hash = new HashMap<>();
-            ;
             hash.put("name", "John");
             hash.put("surname", "Smith");
             hash.put("company", "Redis");
@@ -64,17 +63,16 @@ public class SimpleTest extends BasicTest {
 
 
     @Test
-    void resp3() throws Exception {
+    void resp3() {
         HostAndPort hnp = HostAndPort.from("127.0.0.1:" + FAKE_PORT);
 
         try (Jedis jedis = new Jedis(hnp, DefaultJedisClientConfig.builder().resp3().build())) {
             // Store & Retrieve a simple string
             jedis.set("foo", "bar");
-            assertEquals("bar", jedis.get("foo").toString()); // prints bar
+            assertEquals("bar", jedis.get("foo")); // prints bar
 
             // Store & Retrieve a HashMap
             Map<String, String> hash = new HashMap<>();
-            ;
             hash.put("name", "John");
             hash.put("surname", "Smith");
             hash.put("company", "Redis");
@@ -86,30 +84,29 @@ public class SimpleTest extends BasicTest {
     }
 
     @Test
-    void binaryData() throws Exception {
+    void binaryData() {
         JedisPool pool = new JedisPool("127.0.0.1", FAKE_PORT);
 
         try (Jedis jedis = pool.getResource()) {
             // Store & Retrieve a simple string
-            var expected = new byte[]{1,2,3,4,5,6,7};
-            jedis.set("foo".getBytes(),expected );
-            var res= jedis.get("foo").getBytes(StandardCharsets.UTF_8);
-            assertArrayEquals(expected,res);
+            var expected = new byte[]{1, 2, 3, 4, 5, 6, 7};
+            jedis.set("foo".getBytes(), expected);
+            var res = jedis.get("foo").getBytes(StandardCharsets.UTF_8);
+            assertArrayEquals(expected, res);
         }
     }
 
 
-
     @Test
-    void binaryDataWithCRLF() throws Exception {
+    void binaryDataWithCRLF() {
         JedisPool pool = new JedisPool("127.0.0.1", FAKE_PORT);
 
         try (Jedis jedis = pool.getResource()) {
             // Store & Retrieve a simple string
-            var expected = new byte[]{1,2,3,4,5,6,7,'\r','\n'};
-            jedis.set("foo".getBytes(),expected );
-            var res= jedis.get("foo").getBytes(StandardCharsets.UTF_8);
-            assertArrayEquals(expected,res);
+            var expected = new byte[]{1, 2, 3, 4, 5, 6, 7, '\r', '\n'};
+            jedis.set("foo".getBytes(), expected);
+            var res = jedis.get("foo").getBytes(StandardCharsets.UTF_8);
+            assertArrayEquals(expected, res);
         }
     }
 }
