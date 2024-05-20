@@ -47,8 +47,33 @@ of the array label)
 
 ## Weirdness
 
+### Splitted commands
+
+The command identifier, if composed by two strings, is splitted! A command like
+"ACL CAT" (see https://redis.io/docs/latest/commands/command-docs/ ) is in fact
+splitted, in the array sent by the protocol like this
+
+<pre>
+*3
++ACL\r\n\
++CAT\r\n\
++argument\r\n\
+</pre>
+
+Instead of what was expected
+
+<pre>
+*3
++ACL CAT\r\n\
++argument\r\n\
+</pre>
+
+### The long integer
+
 The "integer" ( https://redis.io/docs/latest/develop/reference/protocol-spec/#integers ) is any "mathematically" integer
 value fitting in a long
+
+### Bits and bytes
 
 Byte arrays are written and considered as unicode strings, see the specific test
 to check how they are handled:

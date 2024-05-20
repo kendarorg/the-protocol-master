@@ -1,10 +1,5 @@
 ## TODO
 
-* Timeouts
-* Run from command line
-* Recording asynchronously
-* Replaying
-
 * Use the interrupt to generate "preformed" events for the state chart
 
 STATE CHARTS:
