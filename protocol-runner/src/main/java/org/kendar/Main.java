@@ -11,6 +11,9 @@ import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.mysql.MySqlFileStorage;
 import org.kendar.postgres.PostgresProtocol;
+import org.kendar.redis.Resp3FileStorage;
+import org.kendar.redis.Resp3Protocol;
+import org.kendar.redis.Resp3Proxy;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
@@ -33,11 +36,11 @@ public class Main {
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
 
         Options options = new Options();
-        options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091)");
+        options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091/redis)");
         options.addOption("l", true, "Select listening port");
         options.addOption("xl", true, "Select remote login");
         options.addOption("xw", true, "Select remote password");
-        options.addOption("xc", true, "Select remote connection string");
+        options.addOption("xc", true, "Select remote connection string (for redis use redis://host:port");
         options.addOption("xd", true, "Select log/replay directory (you can set a {timestamp} value\n" +
                 "that will be replaced with the current timestamp)");
         options.addOption("pl", false, "Replay from log/replay directory");
@@ -98,6 +101,9 @@ public class Main {
             } else if (protocol.equalsIgnoreCase("amqp091")) {
                 if (port == -1) port = 5672;
                 runAmqp091(port, logsDir, connectionString, login, password, replayFromLog);
+            } else if (protocol.equalsIgnoreCase("redis")) {
+                if (port == -1) port = 6379;
+                runRedis(port, logsDir, connectionString, login, password, replayFromLog);
             } else {
                 throw new Exception("missing protocol (p)");
             }
@@ -245,6 +251,26 @@ public class Main {
                 proxy.setStorage(new AmqpFileStorage(Path.of(logsDir)));
             } else {
                 proxy.setStorage(new AmqpFileStorage(Path.of(logsDir)));
+            }
+        }
+        baseProtocol.setProxy(proxy);
+        baseProtocol.initialize();
+        protocolServer = new TcpServer(baseProtocol);
+
+        protocolServer.start();
+        Sleeper.sleep(1000);
+    }
+
+    private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
+        var baseProtocol = new Resp3Protocol(port);
+        var proxy = new Resp3Proxy(connectionString, login, password);
+        if (logsDir != null) {
+            if (replayFromLog) {
+                proxy = new Resp3Proxy();
+                proxy.setStorage(new Resp3FileStorage(Path.of(logsDir)) {
+                });
+            } else {
+                proxy.setStorage(new Resp3FileStorage(Path.of(logsDir)));
             }
         }
         baseProtocol.setProxy(proxy);
