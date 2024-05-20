@@ -6,9 +6,11 @@ import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SimpleTest extends BasicTest {
@@ -80,6 +82,34 @@ public class SimpleTest extends BasicTest {
             jedis.hset("user-session:123", hash);
             assertEquals("{name=John, surname=Smith, company=Redis, age=29}", jedis.hgetAll("user-session:123").toString());
             // Prints: {name=John, surname=Smith, company=Redis, age=29}
+        }
+    }
+
+    @Test
+    void binaryData() throws Exception {
+        JedisPool pool = new JedisPool("127.0.0.1", FAKE_PORT);
+
+        try (Jedis jedis = pool.getResource()) {
+            // Store & Retrieve a simple string
+            var expected = new byte[]{1,2,3,4,5,6,7};
+            jedis.set("foo".getBytes(),expected );
+            var res= jedis.get("foo").getBytes(StandardCharsets.UTF_8);
+            assertArrayEquals(expected,res);
+        }
+    }
+
+
+
+    @Test
+    void binaryDataWithCRLF() throws Exception {
+        JedisPool pool = new JedisPool("127.0.0.1", FAKE_PORT);
+
+        try (Jedis jedis = pool.getResource()) {
+            // Store & Retrieve a simple string
+            var expected = new byte[]{1,2,3,4,5,6,7,'\r','\n'};
+            jedis.set("foo".getBytes(),expected );
+            var res= jedis.get("foo").getBytes(StandardCharsets.UTF_8);
+            assertArrayEquals(expected,res);
         }
     }
 }
