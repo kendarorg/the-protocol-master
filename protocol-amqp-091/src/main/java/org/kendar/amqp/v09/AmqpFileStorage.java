@@ -168,8 +168,7 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
 
     @Override
     protected List<StorageItem<JsonNode, JsonNode>> readAllItems() {
-        var res = super.readAllItems();
-        return res;
+        return super.readAllItems();
     }
 
 }

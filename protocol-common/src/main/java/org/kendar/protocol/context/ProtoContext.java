@@ -34,7 +34,7 @@ public abstract class ProtoContext {
     private static final ConcurrentHashMap<Integer, ProtoContext> contextsCache = new ConcurrentHashMap<>();
     private static final AtomicInteger timeout = new AtomicInteger(30);
     private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
-    private static Thread contextCleaner;
+    private static final Thread contextCleaner;
 
     static {
         contextCleaner = new Thread(ProtoContext::contextsClean);
@@ -68,7 +68,7 @@ public abstract class ProtoContext {
      * Exclusively lock the send operation
      */
     private final Object sendLock = new Object();
-    protected AtomicLong lastAccess = new AtomicLong(getNow());
+    protected final AtomicLong lastAccess = new AtomicLong(getNow());
     /**
      * Execution stack, this stores the current state
      */

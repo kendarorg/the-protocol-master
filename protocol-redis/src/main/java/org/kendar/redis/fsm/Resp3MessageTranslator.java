@@ -19,8 +19,8 @@ import java.util.Iterator;
 
 public class Resp3MessageTranslator extends ProtoState implements NetworkReturnMessage, InterruptProtoState {
     private static final Logger log = LoggerFactory.getLogger(Resp3MessageTranslator.class);
-    private static JsonMapper mapper = new JsonMapper();
-    private Resp3Parser parser = new Resp3Parser();
+    private static final JsonMapper mapper = new JsonMapper();
+    private final Resp3Parser parser = new Resp3Parser();
     private boolean proxy;
 
     public Resp3MessageTranslator() {

@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProxySocket {
     private static final Logger log = LoggerFactory.getLogger(ProxySocket.class.getName());
-    private static JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = new JsonMapper();
     protected final ConcurrentLinkedDeque<Resp3Message> inputQueue = new ConcurrentLinkedDeque<>();
     private final AsynchronousSocketChannel channel;
     private final NetworkProtoContext context;
@@ -91,7 +91,7 @@ public class ProxySocket {
                                                     var returnedMessage = (Resp3Message) sub.run();
                                                     if (returnedMessage.getData() instanceof List) {
                                                         var list = (List) returnedMessage.getData();
-                                                        if (list.size() > 0 && list.get(0) != null) {
+                                                        if (!list.isEmpty() && list.get(0) != null) {
                                                             if ("message".equalsIgnoreCase(list.get(0).toString())) {
                                                                 log.trace("[PROXY ][RX] Found(2): " + returnedMessage.getMessage());
                                                                 var res = "";
@@ -120,21 +120,6 @@ public class ProxySocket {
                                                 run = true;
                                                 break;
                                             }
-//                                            else if (possible.canRunEvent(fre)) {
-//                                                stepsToInvoke = possible.executeEvent(fre);
-//                                                tempBuffer.truncate();
-//                                                context.runSteps(stepsToInvoke, possible, fre);
-//                                                log.trace("[PROXY ][RX] Found(1): " + possible.getClass().getSimpleName());
-//                                                run = true;
-//                                                break;
-//                                            }
-//                                            if (!run && gf.canRun(be)) {
-//                                                var event = gf.execute(be);
-//                                                log.trace("[PROXY ][RX] Found(2): " + gf.getClass().getSimpleName());
-//                                                inputQueue.add(event);
-//                                                tempBuffer.truncate();
-//                                                run = true;
-//                                            }
                                         }
                                         semaphore.release();
 

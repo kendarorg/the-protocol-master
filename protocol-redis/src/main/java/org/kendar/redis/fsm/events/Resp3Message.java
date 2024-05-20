@@ -8,10 +8,12 @@ import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.states.TaggedObject;
 import org.kendar.redis.parser.Resp3Parser;
 
+import java.nio.charset.StandardCharsets;
+
 public class Resp3Message extends BaseEvent implements TaggedObject, NetworkReturnMessage {
-    private static Resp3Parser parser = new Resp3Parser();
-    private Object data;
-    private String message;
+    private static final Resp3Parser parser = new Resp3Parser();
+    private final Object data;
+    private final String message;
 
     public Resp3Message(ProtoContext context, Class<?> prevState, JsonNode data) {
         super(context, prevState);
@@ -40,7 +42,7 @@ public class Resp3Message extends BaseEvent implements TaggedObject, NetworkRetu
     @Override
     public void write(BBuffer resultBuffer) {
         try {
-            var data = message.getBytes("ASCII");
+            var data = message.getBytes(StandardCharsets.US_ASCII);
             resultBuffer.write(data);
         } catch (Exception ex) {
             System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAARRRH");

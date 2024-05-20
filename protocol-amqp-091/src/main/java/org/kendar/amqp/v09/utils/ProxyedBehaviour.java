@@ -12,7 +12,7 @@ import java.util.Iterator;
 import static org.kendar.protocol.states.ProtoState.iteratorOfRunnable;
 
 public class ProxyedBehaviour {
-    private static JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = new JsonMapper();
 
     public static Iterator<ProtoStep> doStuff(Frame input,
                                               NetworkProtoContext context, int channel,

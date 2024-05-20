@@ -68,11 +68,6 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
         return container.getMappedPort(exposedPort);
     }
 
-    public String getIpAddress() {
-        checkStarted();
-        return container.getIpAddress();
-    }
-
     @Override
     public void close() throws Exception {
         if (isStarted()) {

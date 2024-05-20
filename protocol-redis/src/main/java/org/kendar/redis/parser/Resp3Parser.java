@@ -145,7 +145,7 @@ public class Resp3Parser {
         return content;
     }
 
-    private Object parseNull(Resp3Input line) throws Resp3ParseException {
+    private void parseNull(Resp3Input line) throws Resp3ParseException {
 
         if (line.charAtAndIncrement() != '\r') {
             throw new Resp3ParseException("Invalid null format");
@@ -154,7 +154,6 @@ public class Resp3Parser {
         if (line.charAtAndIncrement() != '\n') {
             throw new Resp3ParseException("Invalid null format");
         }
-        return null;
     }
 
     private boolean parseBool(Resp3Input line) throws Resp3ParseException {
@@ -347,7 +346,8 @@ public class Resp3Parser {
             case '*':
                 return parseArray(line);
             case '_':
-                return parseNull(line);
+                parseNull(line);
+                return null;
             case '#':
                 return parseBool(line);
             case ',':

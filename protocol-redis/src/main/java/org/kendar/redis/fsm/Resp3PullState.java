@@ -8,12 +8,14 @@ import org.kendar.proxy.ProxyConnection;
 import org.kendar.redis.Resp3Context;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.fsm.events.Resp3Message;
-import org.kendar.redis.parser.Resp3Parser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
-    private Resp3Parser parser = new Resp3Parser();
+    private static final Logger log = LoggerFactory.getLogger(Resp3PullState.class);
     private Resp3Message event;
     private boolean proxy;
 
@@ -37,10 +39,10 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
     @Override
     public void write(BBuffer resultBuffer) {
         try {
-            var bytes = event.getMessage().getBytes("ASCII");
+            var bytes = event.getMessage().getBytes(StandardCharsets.US_ASCII);
             resultBuffer.write(bytes);
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
+            log.error(ex.getMessage());
         }
     }
 
