@@ -40,7 +40,7 @@ public class JdbcRequest {
             if (pv.isOutput()) {
                 pv.setValue(null);
             } else if (!pv.isBinary() && pv.getValue() != null) {
-                pv.setValue(pv.getValue().toString());
+                pv.setValue(pv.getValue());
             }
         }
         return parameterValues;

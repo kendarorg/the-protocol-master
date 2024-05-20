@@ -6,7 +6,7 @@
 
     <groupId>org.kendar.protocol</groupId>
     <artifactId>protocol-master</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -17,15 +17,17 @@
         <module>protocol-mysql</module>
         <module>protocol-runner</module>
         <module>protocol-amqp-091</module>
+        <module>protocol-redis</module>
         <module>jacoco</module>
         <module>todo</module>
     </modules>
 
     <properties>
-        <project.version>1.3.2</project.version>
+        <project.version>1.3.3</project.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
         <testcontainers.version>1.19.1</testcontainers.version>
+        <testcontainers.redis.version>1.6.4</testcontainers.redis.version>
         <junit.jupiter.version>RELEASE</junit.jupiter.version>
         <mybatis.version>3.5.7</mybatis.version>
         <mysql.version>8.2.0</mysql.version>
@@ -39,6 +41,7 @@
         <jaxb.api.version>2.3.0</jaxb.api.version>
         <commons.cli.version>1.6.0</commons.cli.version>
         <amqp.client.version>5.20.0</amqp.client.version>
+        <jedis.version>5.1.2</jedis.version>
     </properties>
     <dependencies>
         <!--        <dependency>-->

@@ -15,13 +15,13 @@ public class TaggedContext extends ProtoContext {
         super(descriptor);
     }
 
+    public TaggedContext(ProtoDescriptor descriptor) {
+        super(descriptor);
+    }
+
     @Override
     public void disconnect(Object connection) {
 
-    }
-
-    public TaggedContext(ProtoDescriptor descriptor) {
-        super(descriptor);
     }
 
     public List<ReturnMessage> getResult() {

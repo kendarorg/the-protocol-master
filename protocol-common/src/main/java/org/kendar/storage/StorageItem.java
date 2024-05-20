@@ -9,7 +9,7 @@ package org.kendar.storage;
 public class StorageItem<I, O> {
     private boolean constant;
     private int connectionId;
-    private long index;
+    private long index = -1;
     private I input;
     private O output;
     private long durationMs;
@@ -24,6 +24,16 @@ public class StorageItem<I, O> {
     }
 
     public StorageItem(int connectionId, I input, O output, long durationMs, String type, String caller) {
+        this.connectionId = connectionId;
+        this.input = input;
+        this.output = output;
+        this.durationMs = durationMs;
+        this.type = type;
+        this.caller = caller;
+    }
+
+    public StorageItem(long index, int connectionId, I input, O output, long durationMs, String type, String caller) {
+        this.index = index;
         this.connectionId = connectionId;
         this.input = input;
         this.output = output;

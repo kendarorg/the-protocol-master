@@ -1,4 +1,4 @@
-## AMQP 0.9.1 Protocol
+# AMQP 0.9.1 Protocol
 
 ## Documentation used
 

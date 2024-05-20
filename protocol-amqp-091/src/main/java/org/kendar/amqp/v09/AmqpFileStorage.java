@@ -128,7 +128,7 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
             for (var item : index.stream().filter(a -> a.getIndex() > afterIndex).collect(Collectors.toList())) {
                 if (item.getType().equalsIgnoreCase("RESPONSE")) {
                     var outItem = outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
-                    if (!outItem.isEmpty()) {
+                    if (outItem.isPresent()) {
                         result.add(outItem.get());
                         log.debug("[SERVER][CB] After: " + afterIndex + " Index: " + item.getIndex() + " Type: " +
                                 outItem.get().getOutput().get("type").textValue());
@@ -168,8 +168,7 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
 
     @Override
     protected List<StorageItem<JsonNode, JsonNode>> readAllItems() {
-        var res = super.readAllItems();
-        return res;
+        return super.readAllItems();
     }
 
 }

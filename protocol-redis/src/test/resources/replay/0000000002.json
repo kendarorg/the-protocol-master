@@ -1,0 +1,21 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 2,
+  "input": {
+    "type": "CLIENT",
+    "data": [
+      "CLIENT",
+      "SETINFO",
+      "LIB-VER",
+      "5.1.2"
+    ]
+  },
+  "output": {
+    "type": "String",
+    "data": "OK"
+  },
+  "durationMs": 0,
+  "type": "CLIENT",
+  "caller": "RESP3"
+}

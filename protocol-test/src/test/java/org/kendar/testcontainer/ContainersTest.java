@@ -8,10 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.kendar.testcontainer.images.MysqlImage;
 import org.kendar.testcontainer.images.PostgreslImage;
 import org.kendar.testcontainer.images.RabbitMqImage;
+import org.kendar.testcontainer.images.RedisImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.testcontainers.containers.Network;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -95,6 +100,38 @@ public class ContainersTest {
             channel.close();
             connection.close();
 
+        }
+    }
+
+    @Test
+    @Disabled("Only callable directly")
+    void testRedis() throws Exception {
+        var dockerHost = Utils.getDockerHost();
+        assertNotNull(dockerHost);
+        var network = Network.newNetwork();
+
+        try (var redisImage = new RedisImage()) {
+            redisImage.withNetwork(network)
+                    .withAliases("redis.sample.test", "redis.proxy.test")
+                    .start();
+            JedisPool pool = new JedisPool(redisImage.getHost(), redisImage.getPort());
+
+            try (Jedis jedis = pool.getResource()) {
+                // Store & Retrieve a simple string
+                jedis.set("foo", "bar");
+                assertEquals("bar", jedis.get("foo").toString()); // prints bar
+
+                // Store & Retrieve a HashMap
+                Map<String, String> hash = new HashMap<>();
+                ;
+                hash.put("name", "John");
+                hash.put("surname", "Smith");
+                hash.put("company", "Redis");
+                hash.put("age", "29");
+                jedis.hset("user-session:123", hash);
+                assertEquals("{name=John, surname=Smith, company=Redis, age=29}", jedis.hgetAll("user-session:123").toString());
+                // Prints: {name=John, surname=Smith, company=Redis, age=29}
+            }
         }
     }
 }

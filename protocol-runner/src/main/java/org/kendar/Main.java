@@ -11,6 +11,9 @@ import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.mysql.MySqlFileStorage;
 import org.kendar.postgres.PostgresProtocol;
+import org.kendar.redis.Resp3FileStorage;
+import org.kendar.redis.Resp3Protocol;
+import org.kendar.redis.Resp3Proxy;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
@@ -32,19 +35,7 @@ public class Main {
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
 
-        Options options = new Options();
-        options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091)");
-        options.addOption("l", true, "Select listening port");
-        options.addOption("xl", true, "Select remote login");
-        options.addOption("xw", true, "Select remote password");
-        options.addOption("xc", true, "Select remote connection string");
-        options.addOption("xd", true, "Select log/replay directory (you can set a {timestamp} value\n" +
-                "that will be replaced with the current timestamp)");
-        options.addOption("pl", false, "Replay from log/replay directory");
-        options.addOption("v", true, "Log level (default ERROR)");
-        options.addOption("t", true, "Set timeout in seconds towards proxied system (default 30s)");
-        options.addOption("js", true, "[jdbc] Set schema");
-        options.addOption("jr", true, "[jdbc] Replace queries");
+        Options options = getOptions();
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -62,7 +53,7 @@ public class Main {
                 logLevel = "ERROR";
             }
             var timeoutSec = 30;
-            if (timeout != null && !timeout.isEmpty() && Pattern.matches("[0-9]+",timeout)) {
+            if (timeout != null && !timeout.isEmpty() && Pattern.matches("[0-9]+", timeout)) {
                 timeoutSec = Integer.parseInt(timeout);
             }
 
@@ -98,6 +89,9 @@ public class Main {
             } else if (protocol.equalsIgnoreCase("amqp091")) {
                 if (port == -1) port = 5672;
                 runAmqp091(port, logsDir, connectionString, login, password, replayFromLog);
+            } else if (protocol.equalsIgnoreCase("redis")) {
+                if (port == -1) port = 6379;
+                runRedis(port, logsDir, connectionString, login, password, replayFromLog);
             } else {
                 throw new Exception("missing protocol (p)");
             }
@@ -110,6 +104,23 @@ public class Main {
             formatter.printHelp("runner", options);
         }
         System.out.println("EXITED");
+    }
+
+    private static Options getOptions() {
+        Options options = new Options();
+        options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091/redis)");
+        options.addOption("l", true, "[all] Select listening port");
+        options.addOption("xl", true, "[mysql/mongo/postgres/amqp091] Select remote login");
+        options.addOption("xw", true, "[mysql/mongo/postgres/amqp091] Select remote password");
+        options.addOption("xc", true, "[all] Select remote connection string (for redis use redis://host:port");
+        options.addOption("xd", true, "[all] Select log/replay directory (you can set a {timestamp} value\n" +
+                "that will be replaced with the current timestamp)");
+        options.addOption("pl", false, "[all] Replay from log/replay directory");
+        options.addOption("v", true, "[all] Log level (default ERROR)");
+        options.addOption("t", true, "[all] Set timeout in seconds towards proxied system (default 30s)");
+        options.addOption("js", true, "[jdbc] Set schema");
+        options.addOption("jr", true, "[jdbc] Replace queries");
+        return options;
     }
 
     private static Boolean stopWhenQuitCommand() {
@@ -212,7 +223,7 @@ public class Main {
                 }
             }
         }
-        if(replacerItem.getToFind()!=null && !replacerItem.getToFind().isEmpty()){
+        if (replacerItem.getToFind() != null && !replacerItem.getToFind().isEmpty()) {
             items.add(replacerItem);
         }
         proxy.setQueryReplacement(items);
@@ -222,10 +233,11 @@ public class Main {
         var baseProtocol = new MongoProtocol(port);
         var proxy = new MongoProxy(connectionString);
         if (logsDir != null) {
+            var path = Path.of(logsDir);
             if (replayFromLog) {
-                proxy = new MongoProxy(new MongoFileStorage(Path.of(logsDir)));
+                proxy = new MongoProxy(new MongoFileStorage(path));
             } else {
-                proxy.setStorage(new MongoFileStorage(Path.of(logsDir)));
+                proxy.setStorage(new MongoFileStorage(path));
             }
         }
         baseProtocol.setProxy(proxy);
@@ -240,11 +252,33 @@ public class Main {
         var baseProtocol = new AmqpProtocol(port);
         var proxy = new AmqpProxy(connectionString, login, password);
         if (logsDir != null) {
+            var path = Path.of(logsDir);
             if (replayFromLog) {
                 proxy = new AmqpProxy();
-                proxy.setStorage(new AmqpFileStorage(Path.of(logsDir)));
+                proxy.setStorage(new AmqpFileStorage(path));
             } else {
-                proxy.setStorage(new AmqpFileStorage(Path.of(logsDir)));
+                proxy.setStorage(new AmqpFileStorage(path));
+            }
+        }
+        baseProtocol.setProxy(proxy);
+        baseProtocol.initialize();
+        protocolServer = new TcpServer(baseProtocol);
+
+        protocolServer.start();
+        Sleeper.sleep(1000);
+    }
+
+    private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
+        var baseProtocol = new Resp3Protocol(port);
+        var proxy = new Resp3Proxy(connectionString, login, password);
+        if (logsDir != null) {
+            var path = Path.of(logsDir);
+            if (replayFromLog) {
+                proxy = new Resp3Proxy();
+                proxy.setStorage(new Resp3FileStorage(path) {
+                });
+            } else {
+                proxy.setStorage(new Resp3FileStorage(path));
             }
         }
         baseProtocol.setProxy(proxy);

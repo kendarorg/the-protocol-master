@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("SqlSourceToSinkFlow")
 public class JdbcProxy extends Proxy<JdbcStorage> {
     private final String driver;
     private final String connectionString;
@@ -272,7 +271,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
                                      ArrayList<JDBCType> concreteTypes, ProtoContext context) {
-        if (queryReplacements.size() > 0) {
+        if (!queryReplacements.isEmpty()) {
             query = query.replaceAll("\r\n", "\n").trim();
             for (int i = 0; i < queryReplacements.size(); i++) {
                 var replace = queryReplacements.get(i);
@@ -280,7 +279,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                 var repl = replace.getToReplace().replaceAll("\r\n", "\n").trim();
 
                 if (replace.isRegex()) {
-                    query = Pattern.compile(find,Pattern.DOTALL|Pattern.CASE_INSENSITIVE).matcher(query).replaceFirst(repl);
+                    query = Pattern.compile(find, Pattern.DOTALL | Pattern.CASE_INSENSITIVE).matcher(query).replaceFirst(repl);
                 } else {
                     if (find.equalsIgnoreCase(query)) {
                         query = repl;

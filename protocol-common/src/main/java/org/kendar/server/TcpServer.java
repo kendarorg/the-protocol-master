@@ -145,6 +145,7 @@ public class TcpServer {
                             log.trace("Connection failed", exc);
                         }
                     });
+
                 } catch (ExecutionException e) {
                     log.trace("Execution exception", e);
                 }

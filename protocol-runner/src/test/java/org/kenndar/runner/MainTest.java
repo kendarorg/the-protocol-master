@@ -275,7 +275,7 @@ public class MainTest extends BasicTest {
                 "-xc", postgresContainer.getJdbcUrl(),
                 "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
                 "-v", "DEBUG",
-                "-t","4"
+                "-t", "4"
         };
 
         var serverThread = new Thread(() -> {
@@ -315,7 +315,7 @@ public class MainTest extends BasicTest {
             Sleeper.sleep(100);
         }
 
-        Sleeper.sleep(15*1000);
+        Sleeper.sleep(15 * 1000);
         stmt = c.createStatement();
         var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_GG;");
         while (resultset.next()) {

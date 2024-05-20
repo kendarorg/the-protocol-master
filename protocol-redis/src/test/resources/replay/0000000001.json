@@ -1,0 +1,21 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 1,
+  "input": {
+    "type": "CLIENT",
+    "data": [
+      "CLIENT",
+      "SETINFO",
+      "LIB-NAME",
+      "jedis"
+    ]
+  },
+  "output": {
+    "type": "String",
+    "data": "OK"
+  },
+  "durationMs": 1,
+  "type": "CLIENT",
+  "caller": "RESP3"
+}

@@ -150,7 +150,7 @@ public class PostgresExecutor {
                 return handleSingleQuery(sqlParseResult, protoContext, parse, binding, maxRecords, describable);
             }
         } catch (SQLException e) {
-            log.error("[SERVER] Error %s", e.getMessage());
+            log.error("[SERVER] Error {}", e.getMessage());
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(e.getMessage()))).runNow();
         } catch (RuntimeException e) {
             var uuid = UUID.randomUUID().toString();

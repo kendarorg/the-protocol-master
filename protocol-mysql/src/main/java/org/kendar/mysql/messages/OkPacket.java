@@ -126,7 +126,6 @@ public class OkPacket extends MySQLReturnMessage {
             resultBuffer.writeUB2(this.warnings);
         } else if (CapabilityFlag.isFlagSet(capabilities, CapabilityFlag.CLIENT_TRANSACTIONS)) {
             resultBuffer.writeUB2(this.statusFlags);
-        } else {
         }
         if (CapabilityFlag.isFlagSet(extendedCapabilities, CapabilityFlag.CLIENT_SESSION_TRACK)) {
             resultBuffer.writeWithLength(this.info.getBytes());

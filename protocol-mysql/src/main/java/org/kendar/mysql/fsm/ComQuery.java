@@ -30,9 +30,9 @@ public class ComQuery extends ProtoState {
         var inputBuffer = (MySQLBBuffer) event.getBuffer();
         var context = (MySQLProtoContext) event.getContext();
         var capabilities = context.getClientCapabilities();
-        if (CapabilityFlag.isFlagSet(capabilities, CapabilityFlag.CLIENT_QUERY_ATTRIBUTES)) {
-
-        }
+//        if (CapabilityFlag.isFlagSet(capabilities, CapabilityFlag.CLIENT_QUERY_ATTRIBUTES)) {
+//
+//        }
         var query = inputBuffer.getString(5);
         log.debug("[SERVER][QUERY]: " + query);
         var executor = new MySQLExecutor();

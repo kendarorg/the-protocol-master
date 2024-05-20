@@ -51,7 +51,7 @@ public class EOFPacket extends MySQLReturnMessage {
         resultBuffer.write((byte) 0xFE);
         resultBuffer.writeUB2(this.warnings);
         resultBuffer.writeUB2(this.statusFlags);
-        if (CapabilityFlag.isFlagSet(capabilities, CapabilityFlag.CLIENT_PROTOCOL_41)) {
-        }
+//        if (CapabilityFlag.isFlagSet(capabilities, CapabilityFlag.CLIENT_PROTOCOL_41)) {
+//        }
     }
 }

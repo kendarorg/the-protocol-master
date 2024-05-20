@@ -102,21 +102,21 @@ public class ProxySocket {
                                                     stepsToInvoke = possible.executeEvent(be);
                                                     tempBuffer.truncate();
                                                     context.runSteps(stepsToInvoke, possible, be);
-                                                    log.trace("[PROXY ][RX] Found(1): " + possible.getClass().getSimpleName());
+                                                    log.trace("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
                                                     run = true;
                                                     break;
                                                 } else if (possible.canRunEvent(fre)) {
                                                     stepsToInvoke = possible.executeEvent(fre);
                                                     tempBuffer.truncate();
                                                     context.runSteps(stepsToInvoke, possible, fre);
-                                                    log.trace("[PROXY ][RX] Found(1): " + possible.getClass().getSimpleName());
+                                                    log.trace("[PROXY ][RX][2]: " + possible.getClass().getSimpleName());
                                                     run = true;
                                                     break;
                                                 }
                                             }
                                             if (!run && gf.canRun(be)) {
                                                 var event = gf.execute(be);
-                                                log.trace("[PROXY ][RX] Found(2): " + gf.getClass().getSimpleName());
+                                                log.trace("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
                                                 inputQueue.add(event);
                                                 tempBuffer.truncate();
                                                 run = true;
@@ -226,7 +226,7 @@ public class ProxySocket {
         try {
             channel.close();
         } catch (IOException e) {
-
+            log.trace("Ignorable",e);
         }
     }
 }

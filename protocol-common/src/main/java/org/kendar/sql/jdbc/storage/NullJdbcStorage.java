@@ -24,8 +24,18 @@ public class NullJdbcStorage implements JdbcStorage {
     }
 
     @Override
+    public void write(long index, int connectionId, JdbcRequest request, JdbcResponse response, long durationMs, String type, String caller) {
+
+    }
+
+    @Override
     public void optimize() {
 
+    }
+
+    @Override
+    public long generateIndex() {
+        return 0;
     }
 
     @Override
