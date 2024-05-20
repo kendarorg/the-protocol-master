@@ -33,7 +33,10 @@ several database wire protocol implementations:
 * [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md)
     * Support for basic queue/publish/consume
     * Channels multiplexing
-* Redis (soon)
+* [Redis](protocol-redis/README.md)
+    * Support for subscriptions
+    * Support for push parsing
+    * RESP2 and RESP3 supported out of the box
 
 ## If you like it Buy me a coffe :)
 
@@ -69,17 +72,21 @@ java -cp "ojdbc11.jar;protocol-runner.jar" \
 
 <pre>
 usage: runner
- -l  [arg]   Select listening port
- -p  [arg]   Select protocol (mysql/mongo/postgres/amqp091)
- -pl         Replay from log directory
- -xc [arg]   Select remote connection string
- -xd [arg]   Select remote log directory (you can set a {timestamp} value
+ -jr <arg>   [jdbc] Replace queries
+ -js <arg>   [jdbc] Set schema
+ -l <arg>    [all] Select listening port
+ -p <arg>    Select protocol (mysql/mongo/postgres/amqp091/redis)
+ -pl         [all] Replay from log/replay directory
+ -t <arg>    [all] Set timeout in seconds towards proxied system (default
+             30s)
+ -v <arg>    [all] Log level (default ERROR)
+ -xc <arg>   [all] Select remote connection string (for redis use
+             redis://host:port
+ -xd <arg>   [all] Select log/replay directory (you can set a {timestamp}
+             value
              that will be replaced with the current timestamp)
- -xl [arg]   Select remote login
- -xw [arg]   Select remote password
- -v  [arg]   Log level (default ERROR)
- -js [arg]   [jdbc] Set schema
- -jr [arg]   [jdbc] Replace queries
+ -xl <arg>   [mysql/mongo/postgres/amqp091] Select remote login
+ -xw <arg>   [mysql/mongo/postgres/amqp091] Select remote password
 </pre>
 
 Inside the chosen directory you will find simple jsons containing all the data exchanged
