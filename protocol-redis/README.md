@@ -49,3 +49,25 @@ of the array label)
 
 The "integer" ( https://redis.io/docs/latest/develop/reference/protocol-spec/#integers ) is any "mathematically" integer
 value fitting in a long
+
+Byte arrays are written and considered as unicode strings, see the specific test
+to check how they are handled:
+
+<pre>
+    {
+      "constant" : false,
+      "connectionId" : 1,
+      "index" : 3,
+      "input" : {
+        "type" : "SET",
+        "data" : [ "SET", "foo", "\u0001\u0002\u0003\u0004\u0005\u0006\u0007\r\n" ]
+      },
+      "output" : {
+        "type" : "String",
+        "data" : "OK"
+      },
+      "durationMs" : 1,
+      "type" : "SET",
+      "caller" : "RESP3"
+    }
+</pre>
