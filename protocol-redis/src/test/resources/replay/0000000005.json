@@ -1,16 +1,21 @@
 {
-  "constant" : false,
-  "connectionId" : 2,
-  "index" : 5,
-  "input" : {
-    "type" : "CLIENT",
-    "data" : [ "CLIENT", "SETINFO", "LIB-VER", "5.1.2" ]
+  "constant": false,
+  "connectionId": 2,
+  "index": 5,
+  "input": {
+    "type": "CLIENT",
+    "data": [
+      "CLIENT",
+      "SETINFO",
+      "LIB-VER",
+      "5.1.2"
+    ]
   },
-  "output" : {
-    "type" : "String",
-    "data" : "OK"
+  "output": {
+    "type": "String",
+    "data": "OK"
   },
-  "durationMs" : 1,
-  "type" : "CLIENT",
-  "caller" : "RESP3"
+  "durationMs": 1,
+  "type": "CLIENT",
+  "caller": "RESP3"
 }

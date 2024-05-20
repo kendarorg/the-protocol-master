@@ -31,8 +31,8 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
         write(item);
     }
 
-    public void write(long index,int connectionId, I request, O response, long durationMs, String type, String caller) {
-        var item = new StorageItem(index,connectionId, request, response, durationMs, type, caller);
+    public void write(long index, int connectionId, I request, O response, long durationMs, String type, String caller) {
+        var item = new StorageItem(index, connectionId, request, response, durationMs, type, caller);
         write(item);
     }
 
@@ -43,7 +43,7 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
         return this;
     }
 
-    public long generateIndex(){
+    public long generateIndex() {
         return ProtoDescriptor.getCounter("STORAGE_ID");
     }
 

@@ -8,13 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Subscriber extends JedisPubSub {
 
-    public ConcurrentHashMap<String,String> results = new ConcurrentHashMap<>();
-
     private static Logger logger = LoggerFactory.getLogger(Subscriber.class);
+    public ConcurrentHashMap<String, String> results = new ConcurrentHashMap<>();
 
     @Override
     public void onMessage(String channel, String message) {
-        results.put(message,channel);
+        results.put(message, channel);
         logger.info("Message received. Channel: {}, Msg: {}", channel, message);
     }
 

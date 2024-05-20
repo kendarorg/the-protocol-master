@@ -28,6 +28,7 @@ public class Resp3FileStorage extends BaseFileStorage<JsonNode, JsonNode> implem
     private final JsonMapper mapper = new JsonMapper();
     private boolean initialized = false;
     private List<CompactLine> index;
+
     public Resp3FileStorage(String targetDir) {
         super(targetDir);
     }

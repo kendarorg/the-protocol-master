@@ -9,31 +9,29 @@ import org.kendar.protocol.states.TaggedObject;
 import org.kendar.redis.parser.Resp3Parser;
 
 public class Resp3Message extends BaseEvent implements TaggedObject, NetworkReturnMessage {
-    private  Object data;
     private static Resp3Parser parser = new Resp3Parser();
+    private Object data;
+    private String message;
 
-    public Resp3Message(ProtoContext context, Class<?>  prevState, JsonNode data) {
+    public Resp3Message(ProtoContext context, Class<?> prevState, JsonNode data) {
         super(context, prevState);
         try {
             this.message = parser.serialize(data);
             this.data = parser.parse(message);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException("UNABLE TO DESERIALIZE FROM JSON NODE");
         }
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    private  String message;
-
-    public Resp3Message(ProtoContext context, Class<?> prevState, Object data,String message) {
+    public Resp3Message(ProtoContext context, Class<?> prevState, Object data, String message) {
         super(context, prevState);
         this.data = data;
         this.message = message;
     }
 
+    public String getMessage() {
+        return message;
+    }
 
     public Object getData() {
         return data;
@@ -44,7 +42,7 @@ public class Resp3Message extends BaseEvent implements TaggedObject, NetworkRetu
         try {
             var data = message.getBytes("ASCII");
             resultBuffer.write(data);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAARRRH");
         }
     }

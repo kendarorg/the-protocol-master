@@ -14,12 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Resp3Protocol extends NetworkProtoDescriptor {
     private static final int PORT = 6379;
-    private  int port = PORT;
     public static ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
+    private int port = PORT;
 
     private Resp3Protocol() {
         consumeContext = new ConcurrentHashMap<>();
     }
+
     public Resp3Protocol(int port) {
         this();
         this.port = port;
@@ -49,14 +50,14 @@ public class Resp3Protocol extends NetworkProtoDescriptor {
         initialize(
                 new ProtoStateWhile(
 
-                                new Resp3PullState(Resp3Message.class)));
+                        new Resp3PullState(Resp3Message.class)));
 
     }
 
     @Override
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor) {
         var result = new Resp3Context(protoDescriptor);
-        consumeContext.put(result.getContextId(),result);
+        consumeContext.put(result.getContextId(), result);
         return result;
     }
 }

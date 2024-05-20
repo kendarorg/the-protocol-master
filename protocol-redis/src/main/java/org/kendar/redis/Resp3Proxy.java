@@ -101,7 +101,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
             connection.setTcpNoDelay(true);
             connection.connect(new InetSocketAddress(InetAddress.getByName(host), port));
             return new ProxyConnection(new ProxySocket(context,
-                    new InetSocketAddress(InetAddress.getByName(host), port), group,storage));
+                    new InetSocketAddress(InetAddress.getByName(host), port), group, storage));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -118,11 +118,11 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
             var type = out.get("type").textValue();
 
             int connectionId = item.getConnectionId();
-            if(type.equalsIgnoreCase("RESPONSE")){
+            if (type.equalsIgnoreCase("RESPONSE")) {
                 log.debug("[SERVER][CB]: RESPONSE");
                 var ctx = Resp3Protocol.consumeContext.get(connectionId);
 
-                ReturnMessage fr = new Resp3Message(ctx,null,out.get("data"));
+                ReturnMessage fr = new Resp3Message(ctx, null, out.get("data"));
                 ctx.write(fr);
             } else {
                 throw new RuntimeException("MISSING RESPONSE_CLASS");
@@ -133,18 +133,18 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
 
     public ReturnMessage execute(Resp3Context context, ProxyConnection connection, Resp3Message event, ProtoState toRead) {
         var req = "";
-        req = "{\"type\":\"" + ((List<Object>)event.getData()).get(0) + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
+        req = "{\"type\":\"" + ((List<Object>) event.getData()).get(0) + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
-            var item = storage.read(jsonReq,  (String)((List<Object>)event.getData()).get(0));
+            var item = storage.read(jsonReq, (String) ((List<Object>) event.getData()).get(0));
             if (item.getOutput() == null && item.getInput() == null) {
                 writeResponses(storage.readResponses(item.getIndex()));
-                return (ReturnMessage)toRead;
+                return (ReturnMessage) toRead;
             }
             writeResponses(storage.readResponses(item.getIndex()));
 
             var out = item.getOutput();
-            return new Resp3Message(context,null,out.get("data"));
+            return new Resp3Message(context, null, out.get("data"));
 
         }
 
@@ -156,10 +156,10 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
         try {
             sock.write(event, bufferToWrite);
             sock.read(toRead);
-        }catch (Exception ex){
-            log.error("CANNOT READ SHIT",ex);
+        } catch (Exception ex) {
+            log.error("CANNOT READ SHIT", ex);
         }
-        var content = ((Resp3PullState)toRead).getEvent().getData();
+        var content = ((Resp3PullState) toRead).getEvent().getData();
         var res = "{\"type\":\"" + content.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(content) + "}";
         long end = System.currentTimeMillis();
 
@@ -168,7 +168,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
                 context.getContextId(),
                 jsonReq
                 , mapper.toJsonNode(res)
-                , (end - start), (String)((List<Object>)event.getData()).get(0), "RESP3");
+                , (end - start), (String) ((List<Object>) event.getData()).get(0), "RESP3");
         return (ReturnMessage) toRead;
     }
 }

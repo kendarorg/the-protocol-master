@@ -1,16 +1,20 @@
 {
-  "constant" : false,
-  "connectionId" : 2,
-  "index" : 8,
-  "input" : {
-    "type" : "PUBLISH",
-    "data" : [ "PUBLISH", "commonChannel", "SECOND" ]
+  "constant": false,
+  "connectionId": 2,
+  "index": 8,
+  "input": {
+    "type": "PUBLISH",
+    "data": [
+      "PUBLISH",
+      "commonChannel",
+      "SECOND"
+    ]
   },
-  "output" : {
-    "type" : "Integer",
-    "data" : 1
+  "output": {
+    "type": "Integer",
+    "data": 1
   },
-  "durationMs" : 1,
-  "type" : "PUBLISH",
-  "caller" : "RESP3"
+  "durationMs": 1,
+  "type": "PUBLISH",
+  "caller": "RESP3"
 }

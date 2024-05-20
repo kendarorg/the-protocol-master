@@ -29,7 +29,7 @@ public interface Storage<I, O> {
     /**
      * Write a storage item
      *
-     * @param index index of the item to write
+     * @param index        index of the item to write
      * @param connectionId from context
      * @param request
      * @param response
@@ -46,6 +46,7 @@ public interface Storage<I, O> {
 
     /**
      * Reserve an index
+     *
      * @return
      */
     long generateIndex();

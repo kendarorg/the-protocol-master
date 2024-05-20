@@ -11,7 +11,9 @@ import redis.clients.jedis.JedisPoolConfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PubSubTest extends BasicTest{
+public class PubSubTest extends BasicTest {
+    public static final String CHANNEL_NAME = "commonChannel";
+
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();
@@ -36,8 +38,6 @@ public class PubSubTest extends BasicTest{
     public void afterEach() {
         afterEachBase();
     }
-    public static final String CHANNEL_NAME = "commonChannel";
-
 
     @Test
     void pubsub() throws Exception {
@@ -59,14 +59,14 @@ public class PubSubTest extends BasicTest{
 
         final Jedis publisherJedis = jedisPool.getResource();
 
-        new Publisher(publisherJedis, CHANNEL_NAME).start("FIRST","SECOND","THIRD");
+        new Publisher(publisherJedis, CHANNEL_NAME).start("FIRST", "SECOND", "THIRD");
 
         Sleeper.sleep(500);
         subscriber.unsubscribe();
         jedisPool.returnResource(subscriberJedis);
         jedisPool.returnResource(publisherJedis);
         Sleeper.sleep(500);
-        assertEquals(3,subscriber.results.size());
+        assertEquals(3, subscriber.results.size());
         assertTrue(subscriber.results.containsKey("FIRST"));
         assertTrue(subscriber.results.containsKey("SECOND"));
         assertTrue(subscriber.results.containsKey("THIRD"));

@@ -280,7 +280,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                 var repl = replace.getToReplace().replaceAll("\r\n", "\n").trim();
 
                 if (replace.isRegex()) {
-                    query = Pattern.compile(find,Pattern.DOTALL|Pattern.CASE_INSENSITIVE).matcher(query).replaceFirst(repl);
+                    query = Pattern.compile(find, Pattern.DOTALL | Pattern.CASE_INSENSITIVE).matcher(query).replaceFirst(repl);
                 } else {
                     if (find.equalsIgnoreCase(query)) {
                         query = repl;

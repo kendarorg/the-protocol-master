@@ -29,8 +29,8 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
 
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BaseFileStorage.class);
-    protected String targetDir;
     private final ConcurrentLinkedQueue<StorageItem> items = new ConcurrentLinkedQueue<>();
+    protected String targetDir;
 
     public BaseFileStorage(String targetDir) {
 
@@ -123,12 +123,12 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
 
         while (true) {
             try {
-                if(items.isEmpty()){
+                if (items.isEmpty()) {
                     Sleeper.sleep(10);
                     continue;
                 }
                 var item = items.poll();
-                if(item.getIndex()<=0) {
+                if (item.getIndex() <= 0) {
                     var valueId = generateIndex();
                     item.setIndex(valueId);
                 }

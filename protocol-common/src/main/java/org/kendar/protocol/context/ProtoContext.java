@@ -31,57 +31,15 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class ProtoContext {
 
-    private static Thread contextCleaner;
     private static final ConcurrentHashMap<Integer, ProtoContext> contextsCache = new ConcurrentHashMap<>();
     private static final AtomicInteger timeout = new AtomicInteger(30);
+    private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
+    private static Thread contextCleaner;
 
     static {
         contextCleaner = new Thread(ProtoContext::contextsClean);
         contextCleaner.start();
     }
-
-    public static void setTimeout(int value){
-        timeout.set(value);
-    }
-
-
-    private static void contextsClean(){
-
-        while(true){
-            Sleeper.sleep(1000);
-            var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
-            for(var item:fixedItemsList){
-                var now = getNow();
-                if(item.getValue().lastAccess.get()<(now+timeout.get())){
-                    var context = item.getValue();
-                    var contextConnection = context.getValue("CONNECTION");
-                    if(contextConnection==null){
-                        contextsCache.remove(item.getKey());
-                    }
-
-                    try {
-                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                        log.debug("Disconnecting");
-                    }catch (Exception ex){
-                        log.trace("Error disconnecting",ex);
-                    }
-                    contextsCache.remove(item.getKey());
-                }else{
-                    log.debug("keepalive");
-                }
-            }
-        }
-    }
-
-    public abstract void disconnect(Object connection);
-
-    protected AtomicLong lastAccess = new AtomicLong(getNow());
-
-    protected static long getNow() {
-        return System.currentTimeMillis() / 1000;
-    }
-
-    private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
 
     /**
      * Stores the variable relatives to the current instance execution
@@ -110,6 +68,7 @@ public abstract class ProtoContext {
      * Exclusively lock the send operation
      */
     private final Object sendLock = new Object();
+    protected AtomicLong lastAccess = new AtomicLong(getNow());
     /**
      * Execution stack, this stores the current state
      */
@@ -122,12 +81,47 @@ public abstract class ProtoContext {
      * The last state used
      */
     private ProtoState currentState;
-
     public ProtoContext(ProtoDescriptor descriptor) {
         this.contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
         this.descriptor = descriptor;
         this.root = descriptor.getTaggedStates();
-        contextsCache.put(this.contextId,this);
+        contextsCache.put(this.contextId, this);
+    }
+
+    public static void setTimeout(int value) {
+        timeout.set(value);
+    }
+
+    private static void contextsClean() {
+
+        while (true) {
+            Sleeper.sleep(1000);
+            var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
+            for (var item : fixedItemsList) {
+                var now = getNow();
+                if (item.getValue().lastAccess.get() < (now + timeout.get())) {
+                    var context = item.getValue();
+                    var contextConnection = context.getValue("CONNECTION");
+                    if (contextConnection == null) {
+                        contextsCache.remove(item.getKey());
+                    }
+
+                    try {
+                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                        log.debug("Disconnecting");
+                    } catch (Exception ex) {
+                        log.trace("Error disconnecting", ex);
+                    }
+                    contextsCache.remove(item.getKey());
+                } else {
+                    log.debug("keepalive");
+                }
+            }
+        }
+    }
+
+    protected static long getNow() {
+        return System.currentTimeMillis() / 1000;
     }
 
     /**
@@ -171,6 +165,8 @@ public abstract class ProtoContext {
         }
         return result;
     }
+
+    public abstract void disconnect(Object connection);
 
     /**
      * The instance id

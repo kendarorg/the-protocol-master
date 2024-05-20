@@ -5,7 +5,7 @@ public class Resp3Input {
     private int index = 0;
 
 
-    public static Resp3Input of(final String data){
+    public static Resp3Input of(final String data) {
         var res = new Resp3Input();
         res.setData(data);
         res.setIndex(0);
@@ -29,16 +29,16 @@ public class Resp3Input {
     }
 
     public char charAt(int index) {
-        return data.charAt(index+this.index);
+        return data.charAt(index + this.index);
     }
 
     public char charAtAndIncrement() {
         this.index++;
-        return data.charAt(this.index-1);
+        return data.charAt(this.index - 1);
     }
 
-    public boolean hasNext(){
-        return index<data.length();
+    public boolean hasNext() {
+        return index < data.length();
     }
 
     public void incrementIndex() {
@@ -46,16 +46,16 @@ public class Resp3Input {
     }
 
     public int length() {
-        return data.length()-index;
+        return data.length() - index;
     }
 
     public String substring(int length) {
-        var result = data.substring(index, index+length);
-        index+=length;
+        var result = data.substring(index, index + length);
+        index += length;
         return result;
     }
 
-    public String getPreString(){
-        return data.substring(0,index);
+    public String getPreString() {
+        return data.substring(0, index);
     }
 }

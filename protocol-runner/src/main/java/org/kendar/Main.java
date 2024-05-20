@@ -65,7 +65,7 @@ public class Main {
                 logLevel = "ERROR";
             }
             var timeoutSec = 30;
-            if (timeout != null && !timeout.isEmpty() && Pattern.matches("[0-9]+",timeout)) {
+            if (timeout != null && !timeout.isEmpty() && Pattern.matches("[0-9]+", timeout)) {
                 timeoutSec = Integer.parseInt(timeout);
             }
 
@@ -218,7 +218,7 @@ public class Main {
                 }
             }
         }
-        if(replacerItem.getToFind()!=null && !replacerItem.getToFind().isEmpty()){
+        if (replacerItem.getToFind() != null && !replacerItem.getToFind().isEmpty()) {
             items.add(replacerItem);
         }
         proxy.setQueryReplacement(items);

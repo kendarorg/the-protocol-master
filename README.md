@@ -92,7 +92,7 @@ The set schema is called in case the jdbc driver does not allow setting the sche
 ### Replace Queries
 
 Specify a file containing "replacement queries" this is specially useful when running ... the runner
-as postgres and contacting a different kind of database. Here can be inserted the replacements. 
+as postgres and contacting a different kind of database. Here can be inserted the replacements.
 
 SPACE ARE IMPORTANT INSIDE THE QUERY. THEY MUST MATCH THE REAL ONE.
 AND NO ";" SHOULD BE ADDED AT THE END OF QUERIES

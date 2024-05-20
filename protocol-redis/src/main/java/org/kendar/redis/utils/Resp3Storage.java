@@ -6,7 +6,7 @@ import org.kendar.storage.StorageItem;
 
 import java.util.List;
 
-public interface  Resp3Storage extends Storage<JsonNode, JsonNode> {
+public interface Resp3Storage extends Storage<JsonNode, JsonNode> {
     StorageItem<JsonNode, JsonNode> read(JsonNode node, String type);
 
     List<StorageItem<JsonNode, JsonNode>> readResponses(long afterIndex);

@@ -17,7 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
-public class Resp3MessageTranslator  extends ProtoState implements NetworkReturnMessage, InterruptProtoState {
+public class Resp3MessageTranslator extends ProtoState implements NetworkReturnMessage, InterruptProtoState {
+    private static final Logger log = LoggerFactory.getLogger(Resp3MessageTranslator.class);
+    private static JsonMapper mapper = new JsonMapper();
     private Resp3Parser parser = new Resp3Parser();
     private boolean proxy;
 
@@ -25,10 +27,10 @@ public class Resp3MessageTranslator  extends ProtoState implements NetworkReturn
         super();
     }
 
-
     public Resp3MessageTranslator(Class<?>... events) {
         super(events);
     }
+
     @Override
     public void write(BBuffer resultBuffer) {
 
@@ -39,16 +41,16 @@ public class Resp3MessageTranslator  extends ProtoState implements NetworkReturn
         var oldPos = rb.getPosition();
         rb.setPosition(0);
         var allBytes = rb.getAll();
-        if(allBytes.length==0){
+        if (allBytes.length == 0) {
             return false;
         }
         var str = new String(allBytes);
         var input = Resp3Input.of(str);
-        try{
+        try {
             Object result = parser.parse(input);
             rb.setPosition(0);
-        }catch(Resp3ParseException ex){
-            if(ex.isMissingData()){
+        } catch (Resp3ParseException ex) {
+            if (ex.isMissingData()) {
                 rb.setPosition(0);
                 throw new AskMoreDataException();
             }
@@ -56,8 +58,6 @@ public class Resp3MessageTranslator  extends ProtoState implements NetworkReturn
         return true;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(Resp3MessageTranslator.class);
-    private static JsonMapper mapper = new JsonMapper();
     public Iterator<ProtoStep> execute(BytesEvent event) {
         var rb = event.getBuffer();
         var oldPos = rb.getPosition();
@@ -66,22 +66,22 @@ public class Resp3MessageTranslator  extends ProtoState implements NetworkReturn
         var str = new String(allBytes);
         var input = Resp3Input.of(str);
         Object result = null;
-        try{
+        try {
             result = parser.parse(input);
-            rb.setPosition(oldPos+input.getIndex());
-        }catch(Resp3ParseException ex){
-            if(ex.isMissingData()){
+            rb.setPosition(oldPos + input.getIndex());
+        } catch (Resp3ParseException ex) {
+            if (ex.isMissingData()) {
                 rb.setPosition(0);
                 throw new AskMoreDataException();
             }
         }
 
 
-        if(!this.proxy) {
+        if (!this.proxy) {
             log.debug("[SERVER ][RX]: " + mapper.serialize(result));
             event.getContext().send(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
             return iteratorOfEmpty();
-        }else{
+        } else {
             return iteratorOfList(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
         }
 

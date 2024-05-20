@@ -10,6 +10,10 @@ public class RedisImage extends BaseImage<RedisImage, RedisContainer> {
     private String host;
     private Integer port;
 
+    public RedisImage() {
+        this.withExposedPorts(6379);
+    }
+
     public String getHost() {
         return host;
     }
@@ -17,11 +21,6 @@ public class RedisImage extends BaseImage<RedisImage, RedisContainer> {
     public Integer getPort() {
         return port;
     }
-
-    public RedisImage() {
-        this.withExposedPorts(6379);
-    }
-
 
     @Override
     protected void preStart() {
@@ -32,7 +31,7 @@ public class RedisImage extends BaseImage<RedisImage, RedisContainer> {
 
     @Override
     protected void postStart() {
-        this.host= container.getHost();
+        this.host = container.getHost();
         this.port = container.getMappedPort(6379);
         System.setProperty("spring.redis.host", container.getHost());
         System.setProperty("spring.redis.port", container.getMappedPort(6379).toString());

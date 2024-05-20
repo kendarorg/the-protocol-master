@@ -73,11 +73,11 @@ public class SqlStringParser {
                     result.add(new SqlParseResult(sql, SqlStringType.UNKNOWN));
                 }
             }
-        }catch (Exception ex){
-            log.error("Unable to split query: "+input);
+        } catch (Exception ex) {
+            log.error("Unable to split query: " + input);
             result.clear();
-            if(input.endsWith(";")){
-                input = input.substring(0, input.length()-1);
+            if (input.endsWith(";")) {
+                input = input.substring(0, input.length() - 1);
             }
             result.add(new SqlParseResult(input, SqlStringType.UNKNOWN));
         }

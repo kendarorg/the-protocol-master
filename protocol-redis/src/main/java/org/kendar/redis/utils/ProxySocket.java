@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProxySocket {
     private static final Logger log = LoggerFactory.getLogger(ProxySocket.class.getName());
+    private static JsonMapper mapper = new JsonMapper();
     protected final ConcurrentLinkedDeque<Resp3Message> inputQueue = new ConcurrentLinkedDeque<>();
     private final AsynchronousSocketChannel channel;
     private final NetworkProtoContext context;
@@ -78,20 +79,20 @@ public class ProxySocket {
                                         log.trace("[PROXY ][RX] Bytes: " + byteArray.length);
                                         //var gf = new GenericFrame();
                                         var be = new BytesEvent(context, null, tempBuffer);
-                                        var fre = new Resp3Message(context, null, new ArrayList<>(),"");
+                                        var fre = new Resp3Message(context, null, new ArrayList<>(), "");
                                         boolean run = true;
                                         while (run) {
                                             run = false;
                                             if (possible.canRunEvent(be)) {
                                                 stepsToInvoke = possible.executeEvent(be);
                                                 tempBuffer.truncate();
-                                                if(stepsToInvoke.hasNext()){
+                                                if (stepsToInvoke.hasNext()) {
                                                     var sub = stepsToInvoke.next();
-                                                    var returnedMessage = (Resp3Message)sub.run();
-                                                    if(returnedMessage.getData() instanceof List){
-                                                        var list = (List)returnedMessage.getData();
-                                                        if(list.size() > 0 && list.get(0)!=null){
-                                                            if("message".equalsIgnoreCase(list.get(0).toString())){
+                                                    var returnedMessage = (Resp3Message) sub.run();
+                                                    if (returnedMessage.getData() instanceof List) {
+                                                        var list = (List) returnedMessage.getData();
+                                                        if (list.size() > 0 && list.get(0) != null) {
+                                                            if ("message".equalsIgnoreCase(list.get(0).toString())) {
                                                                 log.trace("[PROXY ][RX] Found(2): " + returnedMessage.getMessage());
                                                                 var res = "";
                                                                 res = "{\"type\":\"RESPONSE\",\"data\":" + mapper.serialize(returnedMessage.getData()) + "}";
@@ -100,7 +101,7 @@ public class ProxySocket {
                                                                         context.getContextId(),
                                                                         null,
                                                                         jsonRes,
-                                                                        0,"RESPONSE","RESP3"
+                                                                        0, "RESPONSE", "RESP3"
                                                                 );
 
                                                                 context.write(returnedMessage);
@@ -188,8 +189,6 @@ public class ProxySocket {
         write(buffer);
         log.debug("[PROXY ][TX]: " + returnMessage.getClass().getSimpleName());
     }
-
-    private static JsonMapper mapper = new JsonMapper();
 
     public List<ReturnMessage> read(ProtoState protoState) {
 

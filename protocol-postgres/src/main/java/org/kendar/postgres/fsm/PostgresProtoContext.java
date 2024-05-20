@@ -27,19 +27,6 @@ public class PostgresProtoContext extends NetworkProtoContext {
     private final AtomicBoolean cancel = new AtomicBoolean(false);
     private List<Iterator<ProtoStep>> toSync = new ArrayList<>();
 
-    @Override
-    public void disconnect(Object connection) {
-        var conn = getValue("CONNECTION");
-        var c = ((Connection) ((ProxyConnection) conn).getConnection());
-        try {
-            if (!c.isValid(1)) {
-                c.close();
-            }
-        }catch (Exception ex){
-
-        }
-    }
-
     public PostgresProtoContext(ProtoDescriptor descriptor) {
 
         super(descriptor);
@@ -49,6 +36,19 @@ public class PostgresProtoContext extends NetworkProtoContext {
 
     public static PostgresProtoContext getContextByPid(int pid) {
         return pids.get(pid);
+    }
+
+    @Override
+    public void disconnect(Object connection) {
+        var conn = getValue("CONNECTION");
+        var c = ((Connection) ((ProxyConnection) conn).getConnection());
+        try {
+            if (!c.isValid(1)) {
+                c.close();
+            }
+        } catch (Exception ex) {
+
+        }
     }
 
     public int getPid() {

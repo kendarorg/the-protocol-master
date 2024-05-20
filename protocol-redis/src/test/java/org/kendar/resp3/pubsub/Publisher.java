@@ -18,15 +18,15 @@ public class Publisher {
         this.channel = channel;
     }
 
-    public void start(String ... data) {
+    public void start(String... data) {
         //logger.info("Type your message (quit for terminate)");
 
-            //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            for(var line : data) {
-                System.out.println("Sending "+line);
-                publisherJedis.publish(channel, line);
-                Sleeper.sleep(100);
-            }
+        //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        for (var line : data) {
+            System.out.println("Sending " + line);
+            publisherJedis.publish(channel, line);
+            Sleeper.sleep(100);
+        }
 
     }
 }
