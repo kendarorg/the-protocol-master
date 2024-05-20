@@ -72,8 +72,6 @@ java -cp "ojdbc11.jar;protocol-runner.jar" \
 
 <pre>
 usage: runner
- -jr <arg>   [jdbc] Replace queries
- -js <arg>   [jdbc] Set schema
  -l <arg>    [all] Select listening port
  -p <arg>    Select protocol (mysql/mongo/postgres/amqp091/redis)
  -pl         [all] Replay from log/replay directory
@@ -87,6 +85,8 @@ usage: runner
              that will be replaced with the current timestamp)
  -xl <arg>   [mysql/mongo/postgres/amqp091] Select remote login
  -xw <arg>   [mysql/mongo/postgres/amqp091] Select remote password
+ -jr <arg>   [jdbc] Replace queries
+ -js <arg>   [jdbc] Set schema
 </pre>
 
 Inside the chosen directory you will find simple jsons containing all the data exchanged
