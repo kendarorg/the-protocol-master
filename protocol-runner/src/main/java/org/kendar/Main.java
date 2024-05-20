@@ -37,15 +37,15 @@ public class Main {
 
         Options options = new Options();
         options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091/redis)");
-        options.addOption("l", true, "Select listening port");
-        options.addOption("xl", true, "Select remote login");
-        options.addOption("xw", true, "Select remote password");
-        options.addOption("xc", true, "Select remote connection string (for redis use redis://host:port");
-        options.addOption("xd", true, "Select log/replay directory (you can set a {timestamp} value\n" +
+        options.addOption("l", true, "[all] Select listening port");
+        options.addOption("xl", true, "[mysql/mongo/postgres/amqp091] Select remote login");
+        options.addOption("xw", true, "[mysql/mongo/postgres/amqp091] Select remote password");
+        options.addOption("xc", true, "[all] Select remote connection string (for redis use redis://host:port");
+        options.addOption("xd", true, "[all] Select log/replay directory (you can set a {timestamp} value\n" +
                 "that will be replaced with the current timestamp)");
-        options.addOption("pl", false, "Replay from log/replay directory");
-        options.addOption("v", true, "Log level (default ERROR)");
-        options.addOption("t", true, "Set timeout in seconds towards proxied system (default 30s)");
+        options.addOption("pl", false, "[all] Replay from log/replay directory");
+        options.addOption("v", true, "[all] Log level (default ERROR)");
+        options.addOption("t", true, "[all] Set timeout in seconds towards proxied system (default 30s)");
         options.addOption("js", true, "[jdbc] Set schema");
         options.addOption("jr", true, "[jdbc] Replace queries");
 
