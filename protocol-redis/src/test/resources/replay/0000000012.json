@@ -1,0 +1,16 @@
+{
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 12,
+  "input" : {
+    "type" : "UNSUBSCRIBE",
+    "data" : [ "UNSUBSCRIBE" ]
+  },
+  "output" : {
+    "type" : "ArrayList",
+    "data" : [ "unsubscribe", "commonChannel", 0 ]
+  },
+  "durationMs" : 0,
+  "type" : "UNSUBSCRIBE",
+  "caller" : "RESP3"
+}

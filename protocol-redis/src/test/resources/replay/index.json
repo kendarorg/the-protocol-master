@@ -1,0 +1,73 @@
+[ {
+  "index" : 1,
+  "type" : "CLIENT",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 2,
+  "type" : "CLIENT",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : { }
+}, {
+  "index" : 3,
+  "type" : "SUBSCRIBE",
+  "caller" : "RESP3",
+  "durationMs" : 3,
+  "tags" : { }
+}, {
+  "index" : 4,
+  "type" : "CLIENT",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 5,
+  "type" : "CLIENT",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 6,
+  "type" : "PUBLISH",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 7,
+  "type" : "RESPONSE",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : { }
+}, {
+  "index" : 8,
+  "type" : "PUBLISH",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 9,
+  "type" : "RESPONSE",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : { }
+}, {
+  "index" : 10,
+  "type" : "PUBLISH",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 11,
+  "type" : "RESPONSE",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : { }
+}, {
+  "index" : 12,
+  "type" : "UNSUBSCRIBE",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : { }
+} ]

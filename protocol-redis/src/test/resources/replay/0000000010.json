@@ -1,0 +1,16 @@
+{
+  "constant" : false,
+  "connectionId" : 2,
+  "index" : 10,
+  "input" : {
+    "type" : "PUBLISH",
+    "data" : [ "PUBLISH", "commonChannel", "THIRD" ]
+  },
+  "output" : {
+    "type" : "Integer",
+    "data" : 1
+  },
+  "durationMs" : 1,
+  "type" : "PUBLISH",
+  "caller" : "RESP3"
+}

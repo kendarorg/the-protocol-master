@@ -1,0 +1,16 @@
+{
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 3,
+  "input" : {
+    "type" : "SUBSCRIBE",
+    "data" : [ "SUBSCRIBE", "commonChannel" ]
+  },
+  "output" : {
+    "type" : "ArrayList",
+    "data" : [ "subscribe", "commonChannel", 1 ]
+  },
+  "durationMs" : 3,
+  "type" : "SUBSCRIBE",
+  "caller" : "RESP3"
+}

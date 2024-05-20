@@ -100,7 +100,7 @@ public class ProxySocket {
                                                                         context.getContextId(),
                                                                         null,
                                                                         jsonRes,
-                                                                        0,"message","RESP3"
+                                                                        0,"RESPONSE","RESP3"
                                                                 );
 
                                                                 context.write(returnedMessage);

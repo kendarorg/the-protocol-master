@@ -429,9 +429,14 @@ public class Resp3Parser {
                     result+=serialize(item);
                 }
             }
+            return result;
         }else if(jsonNode.isValueNode()){
             var valNode =  (ValueNode)jsonNode;
-            if(valNode.isFloat()||valNode.isFloatingPointNumber()||valNode.isNumber()){
+            if(valNode.isLong() ||valNode.isInt() || valNode.isIntegralNumber()||valNode.isShort()){
+                return ":"+valNode.asInt()+"\r\n";
+            }else if(valNode.isBoolean()){
+                return "#"+(valNode.asBoolean()?"t":"f")+"\r\n";
+            }else if(valNode.isFloat()||valNode.isFloatingPointNumber()||valNode.isNumber()){
                 var floatValue = Float.parseFloat(valNode.asText());
                 if(floatValue==Float.NaN){
                     return ",nan";
@@ -445,14 +450,10 @@ public class Resp3Parser {
                     return ",-inf"+"\r\n";
                 }
                 return ","+doubleValue+"\r\n";
-            }else if(valNode.isInt() || valNode.isIntegralNumber()||valNode.isShort()){
-                return ":"+valNode.asInt()+"\r\n";
-            }else if(valNode.isLong() || valNode.isBigInteger()){
+            }else if( valNode.isBigInteger()){
                 return "("+valNode.asText()+"\r\n";
             }else if(valNode.isNull()){
                 return "_"+"\r\n";
-            }else if(valNode.isBoolean()){
-                return "#"+(valNode.asBoolean()?"t":"f")+"\r\n";
             }else if(valNode.isTextual()){
                 var text =valNode.asText();
                 if(text.indexOf("\r")>=0||text.indexOf("\n")>0){

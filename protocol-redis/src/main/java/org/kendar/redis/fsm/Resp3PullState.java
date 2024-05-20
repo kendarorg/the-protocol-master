@@ -5,7 +5,7 @@ import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.redis.Reps3Context;
+import org.kendar.redis.Resp3Context;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.redis.parser.Resp3Parser;
@@ -49,7 +49,7 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
     }
 
     public Iterator<ProtoStep> execute(Resp3Message event) {
-        var context = (Reps3Context) event.getContext();
+        var context = (Resp3Context) event.getContext();
         var proxy = (Resp3Proxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
         if(!this.proxy) {

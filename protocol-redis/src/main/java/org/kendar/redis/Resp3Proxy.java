@@ -48,6 +48,13 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
         }
     }
 
+    public Resp3Proxy(Resp3Storage jdbcStorage) {
+        this("redis://none:1", null, null);
+        setStorage(jdbcStorage);
+        this.replayer = true;
+
+    }
+
     public Resp3Proxy() {
         this.replayer = true;
         init();
@@ -124,7 +131,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
         }
     }
 
-    public ReturnMessage execute(Reps3Context context, ProxyConnection connection, Resp3Message event, ProtoState toRead) {
+    public ReturnMessage execute(Resp3Context context, ProxyConnection connection, Resp3Message event, ProtoState toRead) {
         var req = "";
         req = "{\"type\":\"" + ((List<Object>)event.getData()).get(0) + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
         var jsonReq = mapper.toJsonNode(req);

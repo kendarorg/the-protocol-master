@@ -5,8 +5,8 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.redis.utils.ProxySocket;
 
-public class Reps3Context extends NetworkProtoContext {
-    public Reps3Context(ProtoDescriptor descriptor) {
+public class Resp3Context extends NetworkProtoContext {
+    public Resp3Context(ProtoDescriptor descriptor) {
         super(descriptor);
     }
 
