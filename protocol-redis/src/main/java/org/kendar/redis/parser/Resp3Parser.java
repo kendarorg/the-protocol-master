@@ -134,7 +134,7 @@ public class Resp3Parser {
             return content;
         }
         try {
-            content = new ArrayList<Object>();
+            content = new ArrayList<>();
             for (var i = 0; i < length; i++) {
                 var result = parse(line);
                 content.add(result);
@@ -438,9 +438,6 @@ public class Resp3Parser {
                 return "#" + (valNode.asBoolean() ? "t" : "f") + "\r\n";
             } else if (valNode.isFloat() || valNode.isFloatingPointNumber() || valNode.isNumber()) {
                 var floatValue = Float.parseFloat(valNode.asText());
-                if (floatValue == Float.NaN) {
-                    return ",nan";
-                }
                 return "," + floatValue + "\r\n";
             } else if (valNode.isBigDecimal() || valNode.isDouble() || valNode.isFloat() || valNode.isFloatingPointNumber() || valNode.isNumber()) {
                 var doubleValue = valNode.asDouble();
@@ -456,7 +453,7 @@ public class Resp3Parser {
                 return "_" + "\r\n";
             } else if (valNode.isTextual()) {
                 var text = valNode.asText();
-                if (text.indexOf("\r") >= 0 || text.indexOf("\n") > 0) {
+                if (text.contains("\r") || text.indexOf("\n") > 0) {
                     return "$" + text.length() + "\r\n" + text + "\r\n";
                 } else {
                     return "+" + text + "\r\n";
@@ -471,7 +468,7 @@ public class Resp3Parser {
             } else if (type.equalsIgnoreCase("bin")) {
                 return "=" + (msg.length() + 4) + "\r\n" + type + ":" + msg + "\r\n";
             } else {
-                if (msg.indexOf("\r") >= 0 || msg.indexOf("\n") > 0) {
+                if (msg.contains("\r") || msg.indexOf("\n") > 0) {
                     return "!" + (msg.length() + 1 + type.length()) + "\r\n" + type + " " + msg + "\r\n";
                 } else {
                     return "-" + type + " " + msg + "\r\n";

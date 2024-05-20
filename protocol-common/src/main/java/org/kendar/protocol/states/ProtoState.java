@@ -62,7 +62,7 @@ public abstract class ProtoState {
      * @return
      */
     public static Iterator<ProtoStep> iteratorOfEmpty() {
-        return iteratorOfRunner(new ProtoStep[0]);
+        return iteratorOfRunner();
     }
 
     /**

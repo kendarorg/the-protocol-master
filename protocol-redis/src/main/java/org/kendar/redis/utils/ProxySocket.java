@@ -220,7 +220,7 @@ public class ProxySocket {
         try {
             channel.close();
         } catch (IOException e) {
-
+            log.trace("Ignorable",e);
         }
     }
 }

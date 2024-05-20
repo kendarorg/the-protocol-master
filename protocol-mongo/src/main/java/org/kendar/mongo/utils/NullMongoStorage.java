@@ -26,7 +26,17 @@ public class NullMongoStorage implements Storage<JsonNode, JsonNode>, MongoStora
     }
 
     @Override
+    public void write(long index, int connectionId, JsonNode request, JsonNode response, long durationMs, String type, String caller) {
+
+    }
+
+    @Override
     public void optimize() {
 
+    }
+
+    @Override
+    public long generateIndex() {
+        return 0;
     }
 }

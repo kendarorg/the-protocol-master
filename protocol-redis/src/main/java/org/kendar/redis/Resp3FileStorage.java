@@ -100,7 +100,7 @@ public class Resp3FileStorage extends BaseFileStorage<JsonNode, JsonNode> implem
             for (var item : index.stream().filter(a -> a.getIndex() > afterIndex).collect(Collectors.toList())) {
                 if (item.getType().equalsIgnoreCase("RESPONSE")) {
                     var outItem = outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
-                    if (!outItem.isEmpty()) {
+                    if (outItem.isPresent()) {
                         result.add(outItem.get());
                         log.debug("[SERVER][CB] After: " + afterIndex + " Index: " + item.getIndex() + " Type: " +
                                 outItem.get().getOutput().get("type").textValue());

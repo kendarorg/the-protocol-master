@@ -1,5 +1,8 @@
 package org.kendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleProxyServer {
     public static boolean write = false;
+    private static final Logger log = LoggerFactory.getLogger(SimpleProxyServer.class);
 
     public static String toHexByteArray(byte[] byteArray, int bytesRead) {
         StringBuilder hex = new StringBuilder();
@@ -45,6 +49,7 @@ public class SimpleProxyServer {
             System.err.println(e);
         }
     }
+
 
     /**
      * runs a single-threaded proxy server on
@@ -101,6 +106,7 @@ public class SimpleProxyServer {
                                 streamToServer.flush();
                             }
                         } catch (IOException e) {
+                            log.trace("Ignorable",e);
                         }
 
                         // the client closed the connection to us, so close our
@@ -108,6 +114,7 @@ public class SimpleProxyServer {
                         try {
                             streamToServer.close();
                         } catch (IOException e) {
+                            log.trace("Ignorable",e);
                         }
                     });
 
@@ -124,6 +131,7 @@ public class SimpleProxyServer {
                             streamToClient.flush();
                         }
                     } catch (IOException e) {
+                        log.trace("Ignorable",e);
                     }
 
                     // The server closed its connection to us, so we close our
@@ -141,6 +149,7 @@ public class SimpleProxyServer {
                         if (client != null)
                             client.close();
                     } catch (IOException e) {
+                        log.trace("Ignorable",e);
                     }
                 }
             });

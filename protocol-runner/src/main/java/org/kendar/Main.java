@@ -233,10 +233,11 @@ public class Main {
         var baseProtocol = new MongoProtocol(port);
         var proxy = new MongoProxy(connectionString);
         if (logsDir != null) {
+            var path = Path.of(logsDir);
             if (replayFromLog) {
-                proxy = new MongoProxy(new MongoFileStorage(Path.of(logsDir)));
+                proxy = new MongoProxy(new MongoFileStorage(path));
             } else {
-                proxy.setStorage(new MongoFileStorage(Path.of(logsDir)));
+                proxy.setStorage(new MongoFileStorage(path));
             }
         }
         baseProtocol.setProxy(proxy);
@@ -251,11 +252,12 @@ public class Main {
         var baseProtocol = new AmqpProtocol(port);
         var proxy = new AmqpProxy(connectionString, login, password);
         if (logsDir != null) {
+            var path = Path.of(logsDir);
             if (replayFromLog) {
                 proxy = new AmqpProxy();
-                proxy.setStorage(new AmqpFileStorage(Path.of(logsDir)));
+                proxy.setStorage(new AmqpFileStorage(path));
             } else {
-                proxy.setStorage(new AmqpFileStorage(Path.of(logsDir)));
+                proxy.setStorage(new AmqpFileStorage(path));
             }
         }
         baseProtocol.setProxy(proxy);
@@ -270,12 +272,13 @@ public class Main {
         var baseProtocol = new Resp3Protocol(port);
         var proxy = new Resp3Proxy(connectionString, login, password);
         if (logsDir != null) {
+            var path = Path.of(logsDir);
             if (replayFromLog) {
                 proxy = new Resp3Proxy();
-                proxy.setStorage(new Resp3FileStorage(Path.of(logsDir)) {
+                proxy.setStorage(new Resp3FileStorage(path) {
                 });
             } else {
-                proxy.setStorage(new Resp3FileStorage(Path.of(logsDir)));
+                proxy.setStorage(new Resp3FileStorage(path));
             }
         }
         baseProtocol.setProxy(proxy);

@@ -50,7 +50,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
             log.error("Missing index file!");
             throw new RuntimeException(e);
         }
-        return mapper.deserialize(fileContent, new TypeReference<List<CompactLine>>() {
+        return mapper.deserialize(fileContent, new TypeReference<>() {
         });
     }
 
@@ -67,7 +67,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
             if (!Files.exists(Path.of(targetDir))) {
                 Path.of(targetDir).toFile().mkdirs();
             }
-            new Thread(() -> writeOnFile()).start();
+            new Thread(this::writeOnFile).start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

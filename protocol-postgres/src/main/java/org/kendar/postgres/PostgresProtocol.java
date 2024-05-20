@@ -13,8 +13,11 @@ import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.sql.jdbc.DataTypesConverter;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PostgresProtocol extends NetworkProtoDescriptor {
+    private static final Logger log = LoggerFactory.getLogger(PostgresProtocol.class);
     private static final int PORT = 5432;
     private static final boolean IS_BIG_ENDIAN = true;
     private static final SqlStringParser parser = new SqlStringParser("$");
@@ -28,7 +31,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
             dataTypesConverter = new DataTypesConverter(om.deserialize(text, new TypeReference<>() {
             }));
         } catch (Exception e) {
-
+            log.trace("Ignorable",e);
         }
     }
 

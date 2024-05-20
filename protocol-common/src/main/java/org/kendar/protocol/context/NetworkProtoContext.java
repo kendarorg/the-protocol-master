@@ -175,7 +175,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
         try {
             client.close();
         } catch (IOException e) {
-
+            log.trace("Ignorable",e);
         }
     }
 

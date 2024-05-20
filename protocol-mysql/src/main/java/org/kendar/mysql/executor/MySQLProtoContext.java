@@ -63,7 +63,7 @@ public class MySQLProtoContext extends NetworkProtoContext {
                 c.close();
             }
         } catch (Exception ex) {
-
+            log.trace("Ignorable",ex);
         }
     }
 
