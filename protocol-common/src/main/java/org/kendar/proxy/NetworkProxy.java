@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
+import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.storage.Storage;
 import org.kendar.storage.StorageItem;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>, K extends NetworkReturnMessage> extends Proxy<T>{
+public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extends Proxy<T>{
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(NetworkProxy.class);
     protected String connectionString;
@@ -29,6 +30,31 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>, K exte
     protected String host;
     protected ExecutorService executor;
     protected AsynchronousChannelGroup group;
+
+    public NetworkProxy() {
+        this.replayer = true;
+        init();
+    }
+
+    public String getConnectionString() {
+        return connectionString;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getHost() {
+        return host;
+    }
 
     public NetworkProxy(String connectionString, String userId, String password) {
         try {
@@ -86,7 +112,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>, K exte
      * @param connection
      * @param of
      */
-    public void execute(NetworkProtoContext context, ProxyConnection connection, K of) {
+    public <K extends NetworkReturnMessage> void execute(NetworkProtoContext context, ProxyConnection connection, K of) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(of) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
@@ -110,6 +136,41 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>, K exte
                 mapper.toJsonNode(req)
                 , mapper.toJsonNode(res)
                 , (end - start), of.getClass().getSimpleName(), "AMQP");
+    }
+
+    public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
+                                                                     ProxyConnection connection, K of, T toRead) {
+        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(of) + "}";
+        var jsonReq = mapper.toJsonNode(req);
+        if (replayer) {
+            var item = storage.read(jsonReq, of.getClass().getSimpleName());
+            if (item.getOutput() == null && item.getInput() == null) {
+                sendBackResponses(storage.readResponses(item.getIndex()));
+                return toRead;
+            }
+            sendBackResponses(storage.readResponses(item.getIndex()));
+
+            var out = item.getOutput();
+            return (T) mapper.deserialize(out.get("data").toString(), toRead.getClass());
+
+        }
+
+        long start = System.currentTimeMillis();
+
+        var sock = (NetworkProxySocket) connection.getConnection();
+        var bufferToWrite = protocol.buildBuffer();
+        sock.write(of, bufferToWrite);
+        sock.read(toRead);
+
+        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(toRead) + "}";
+        long end = System.currentTimeMillis();
+
+        storage.write(
+                context.getContextId(),
+                jsonReq
+                , mapper.toJsonNode(res)
+                , (end - start), of.getClass().getSimpleName(), "AMQP");
+        return toRead;
     }
 
     /**
@@ -152,5 +213,5 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>, K exte
         return toRead;
     }
 
-    protected abstract void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems);
+    protected abstract void sendBackResponses(List<StorageItem<JsonNode,JsonNode>> storageItems);
 }

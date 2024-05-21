@@ -83,26 +83,39 @@ public abstract class NetworkProxySocket {
                                         //FLW04 GENERICFRAME AN EXPECTED RESPONSE
                                         var gf = getStateToRetrieveOneSingleMessage();
                                         //FLW05 BYTESEVENT from tmpBuffer (response specific to this flow)
-                                        var be = new BytesEvent(context, null, tempBuffer);
+
+
+                                        var eventsToTry = new ArrayList<BaseEvent>();
+                                        var bytesEvent  = new BytesEvent(context, null, tempBuffer);
+                                        eventsToTry.add(bytesEvent);
+                                        eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
                                         boolean run = true;
                                         while (run) {
                                             run = false;
+
                                             for (int i = 0; i < availableStates().size(); i++) {
                                                 possible = availableStates().get(i);
-                                                //FLW07 if THE STATE CAN RUN BYTES
-                                                if (possible.canRunEvent(be)) {;
-                                                    stepsToInvoke = possible.executeEvent(be);
-                                                    tempBuffer.truncate();
-                                                    //FLW08 run the steps (sending back data)
-                                                    context.runSteps(stepsToInvoke, possible, be);
-                                                    log.trace("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
-                                                    run = true;
+
+                                                for(var be:eventsToTry) {
+                                                    //FLW07 if THE STATE CAN RUN BYTES
+                                                    if (possible.canRunEvent(be)) {
+                                                        ;
+                                                        stepsToInvoke = possible.executeEvent(be);
+                                                        tempBuffer.truncate();
+                                                        //FLW08 run the steps (sending back data)
+                                                        context.runSteps(stepsToInvoke, possible, be);
+                                                        log.trace("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
+                                                        run = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if(run){
                                                     break;
                                                 }
                                             }
                                             //FLW11 IF NOTHING FOUND (build a new bytesevent to send back)
-                                            if (!run && gf.canRunEvent(be)) {
-                                                var event = gf.split(be);
+                                            if (!run && gf.canRunEvent(bytesEvent)) {
+                                                var event = gf.split(bytesEvent);
                                                 log.trace("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
                                                 inputQueue.add(event);
                                                 tempBuffer.truncate();
@@ -216,4 +229,12 @@ public abstract class NetworkProxySocket {
     }
 
     protected abstract List<? extends BaseEvent> buildPossibleEvents(NetworkProtoContext context, BBuffer buffer);
+
+    public void close() {
+        try {
+            channel.close();
+        } catch (IOException e) {
+            log.trace("Ignorable",e);
+        }
+    }
 }

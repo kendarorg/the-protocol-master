@@ -1,9 +1,9 @@
 package org.kendar.amqp.v09.utils;
 
-import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.messages.frames.Frame;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.proxy.NetworkProxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
@@ -17,7 +17,7 @@ public class ProxyedBehaviour {
     public static Iterator<ProtoStep> doStuff(Frame input,
                                               NetworkProtoContext context, int channel,
                                               Frame toSend,
-                                              AmqpProxy proxy,
+                                              NetworkProxy proxy,
                                               ProxyConnection connection) {
         if (input.isProxyed()) {
             var basicConsume = (ConsumeConnected) context.getValue("BASIC_CONSUME_CH_" + channel);
