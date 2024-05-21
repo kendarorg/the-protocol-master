@@ -39,10 +39,6 @@ public abstract class NetworkProxySocket {
     private final Semaphore readSemaphore = new Semaphore(1);
     private final List<BytesEvent> received = new ArrayList<>();
 
-    protected abstract NetworkProxySplitterState getStateToRetrieveOneSingleMessage();
-
-    protected abstract List<ProtoState> availableStates();
-
     public NetworkProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
         this.context = context;
         try {
@@ -86,17 +82,17 @@ public abstract class NetworkProxySocket {
 
 
                                         var eventsToTry = new ArrayList<BaseEvent>();
-                                        var bytesEvent  = new BytesEvent(context, null, tempBuffer);
+                                        var bytesEvent = new BytesEvent(context, null, tempBuffer);
                                         eventsToTry.add(bytesEvent);
                                         eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
                                         boolean run = true;
-                                        while (run && tempBuffer.size()>0) {
+                                        while (run && tempBuffer.size() > 0) {
                                             run = false;
 
                                             for (int i = 0; i < availableStates().size(); i++) {
                                                 possible = availableStates().get(i);
 
-                                                for(var be:eventsToTry) {
+                                                for (var be : eventsToTry) {
                                                     //FLW07 if THE STATE CAN RUN BYTES
                                                     if (possible.canRunEvent(be)) {
                                                         ;
@@ -109,7 +105,7 @@ public abstract class NetworkProxySocket {
                                                         break;
                                                     }
                                                 }
-                                                if(run){
+                                                if (run) {
                                                     break;
                                                 }
                                             }
@@ -162,6 +158,10 @@ public abstract class NetworkProxySocket {
         }
     }
 
+    protected abstract NetworkProxySplitterState getStateToRetrieveOneSingleMessage();
+
+    protected abstract List<ProtoState> availableStates();
+
     public void write(BBuffer buffer) {
         buffer.setPosition(0);
         channel.write(ByteBuffer.wrap(buffer.getAll()));
@@ -175,7 +175,6 @@ public abstract class NetworkProxySocket {
         write(buffer);
         log.debug("[PROXY ][TX]: " + returnMessage.getClass().getSimpleName());
     }
-
 
 
     public List<ReturnMessage> read(ProtoState protoState) {
@@ -199,14 +198,14 @@ public abstract class NetworkProxySocket {
                     eventsToTry.add(new BytesEvent(context, null, fr.getBuffer()));
                     eventsToTry.addAll(buildPossibleEvents(context, fr.getBuffer()));
                     //If can run the proto state
-                    for(var evt:eventsToTry){
+                    for (var evt : eventsToTry) {
                         if (protoState.canRunEvent(evt)) {
                             founded = evt;
                             received.remove(i);
                             break;
                         }
                     }
-                    if(founded!=null){
+                    if (founded != null) {
                         break;
                     }
 
@@ -234,7 +233,7 @@ public abstract class NetworkProxySocket {
         try {
             channel.close();
         } catch (IOException e) {
-            log.trace("Ignorable",e);
+            log.trace("Ignorable", e);
         }
     }
 }

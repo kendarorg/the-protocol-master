@@ -180,7 +180,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
 
     protected abstract Map<String, String> buildTag(StorageItem<I, O> item);
 
-    public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type){
+    public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type) {
         return null;
     }
 }

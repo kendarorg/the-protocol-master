@@ -23,6 +23,8 @@ import java.util.List;
 
 public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
 
+    private static final Logger log = LoggerFactory.getLogger(Resp3Proxy.class);
+
     public Resp3Proxy(String connectionString, String userId, String password) {
         super(connectionString, userId, password);
     }
@@ -33,8 +35,8 @@ public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
 
     @Override
     protected NetworkProxySocket buildProxyConnection(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
-        try{
-        return new Resp3ProxySocket(context,
+        try {
+            return new Resp3ProxySocket(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group);
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
@@ -46,20 +48,19 @@ public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
         return "RESP3";
     }
 
-    private static final Logger log = LoggerFactory.getLogger(Resp3Proxy.class);
     @Override
     protected Object getData(Object of) {
-        if(of instanceof Resp3Message) {
+        if (of instanceof Resp3Message) {
             return ((Resp3Message) of).getData();
         }
-        if(of instanceof Resp3Response) {
+        if (of instanceof Resp3Response) {
             return getData(((Resp3Response) of).getEvent());
         }
         return of;
     }
 
     @Override
-    protected Object buildState(ProtoContext context,JsonNode out, Class<? extends ProtoState> aClass) {
+    protected Object buildState(ProtoContext context, JsonNode out, Class<? extends ProtoState> aClass) {
         var res = new Resp3Response();
         res.execute(new Resp3Message(context, null, out.get("data")));
         return res;

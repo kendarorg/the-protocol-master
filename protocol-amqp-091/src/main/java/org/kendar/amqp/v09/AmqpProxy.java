@@ -5,8 +5,8 @@ import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
-import org.kendar.amqp.v09.utils.AmqpStorage;
 import org.kendar.amqp.v09.utils.AmqpProxySocket;
+import org.kendar.amqp.v09.utils.AmqpStorage;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -60,7 +60,7 @@ public class AmqpProxy extends NetworkProxy<AmqpStorage> {
     }
 
     @Override
-    protected void sendBackResponses(List<StorageItem<JsonNode,JsonNode>> storageItems) {
+    protected void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = item.getOutput();

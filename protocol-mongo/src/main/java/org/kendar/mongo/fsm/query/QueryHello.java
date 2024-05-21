@@ -33,7 +33,7 @@ public class QueryHello extends ProtoState {
                 var jsonTree = mapper.toJsonNode(doc);
                 return jsonTree.get("helloOk") != null && jsonTree.get("helloOk").asBoolean();
             } catch (Exception ex) {
-                log.trace("Ignorable",ex);
+                log.trace("Ignorable", ex);
             }
         }
         return false;

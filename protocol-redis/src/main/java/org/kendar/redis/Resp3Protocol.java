@@ -52,7 +52,6 @@ public class Resp3Protocol extends NetworkProtoDescriptor {
                         new Resp3PullState(Resp3Message.class)));
 
 
-
     }
 
     @Override

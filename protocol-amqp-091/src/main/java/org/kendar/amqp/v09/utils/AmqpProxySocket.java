@@ -21,10 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AmqpProxySocket extends NetworkProxySocket {
-    public AmqpProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
-        super(context, inetSocketAddress, group);
-    }
-
     private final List<ProtoState> states = new ArrayList<>(Arrays.asList(
             new BasicDeliver(),
             new BasicCancel().asProxy(),
@@ -36,6 +32,10 @@ public class AmqpProxySocket extends NetworkProxySocket {
             new BasicNack().asProxy(),
             new BasicReturn().asProxy(),
             new BasicGetEmpty().asProxy()));
+
+    public AmqpProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+        super(context, inetSocketAddress, group);
+    }
 
     @Override
     protected NetworkProxySplitterState getStateToRetrieveOneSingleMessage() {

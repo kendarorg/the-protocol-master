@@ -106,11 +106,11 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
         try {
             result = parser.parse(input);
             rb.setPosition(oldPos + input.getIndex());
-            var bb = rb.getBytes(oldPos,input.getIndex());
-            var buff = ((NetworkProtoContext)event.getContext()).buildBuffer();
+            var bb = rb.getBytes(oldPos, input.getIndex());
+            var buff = ((NetworkProtoContext) event.getContext()).buildBuffer();
             buff.write(bb);
             buff.setPosition(0);
-            return new BytesEvent(event.getContext(),event.getPrevState(),buff);
+            return new BytesEvent(event.getContext(), event.getPrevState(), buff);
         } catch (Resp3ParseException ex) {
             if (ex.isMissingData()) {
                 rb.setPosition(0);

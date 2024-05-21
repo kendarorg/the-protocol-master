@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 public class Resp3Response extends ProtoState implements NetworkReturnMessage {
+    protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(Resp3Response.class);
     private Resp3Message event;
     private boolean proxy;
@@ -56,7 +57,6 @@ public class Resp3Response extends ProtoState implements NetworkReturnMessage {
         return true;
     }
 
-    protected static final JsonMapper mapper = new JsonMapper();
     public Iterator<ProtoStep> execute(Resp3Message event) {
         var context = (Resp3Context) event.getContext();
         var proxy = (Resp3Proxy) context.getProxy();

@@ -11,12 +11,12 @@ import org.kendar.redis.parser.Resp3ParseException;
 import org.kendar.redis.parser.Resp3Parser;
 
 public class GenericFrame extends ProtoState implements NetworkReturnMessage, NetworkProxySplitterState {
+    private final Resp3Parser parser = new Resp3Parser();
+
     @Override
     public void write(BBuffer resultBuffer) {
         throw new RuntimeException();
     }
-
-    private final Resp3Parser parser = new Resp3Parser();
 
     public boolean canRun(BytesEvent event) {
         var rb = event.getBuffer();

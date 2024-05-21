@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extends Proxy<T>{
+public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extends Proxy<T> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(NetworkProxy.class);
     protected String connectionString;
@@ -35,6 +35,21 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
     public NetworkProxy() {
         this.replayer = true;
         init();
+    }
+
+    public NetworkProxy(String connectionString, String userId, String password) {
+        try {
+            this.replayer = false;
+            var uri = new URI(connectionString);
+            this.connectionString = connectionString;
+            this.port = uri.getPort();
+            this.host = uri.getHost();
+            this.userId = userId;
+            this.password = password;
+            init();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getConnectionString() {
@@ -55,21 +70,6 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
     public String getHost() {
         return host;
-    }
-
-    public NetworkProxy(String connectionString, String userId, String password) {
-        try {
-            this.replayer = false;
-            var uri = new URI(connectionString);
-            this.connectionString = connectionString;
-            this.port = uri.getPort();
-            this.host = uri.getHost();
-            this.userId = userId;
-            this.password = password;
-            init();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void init() {
@@ -109,6 +109,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
     /**
      * Execute with no return
+     *
      * @param context
      * @param connection
      * @param of
@@ -157,7 +158,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             sendBackResponses(storage.readResponses(item.getIndex()));
 
             var out = item.getOutput();
-            return (T) buildState(context,out,toRead.getClass());
+            return (T) buildState(context, out, toRead.getClass());
 
         }
         var index = storage.generateIndex();
@@ -185,12 +186,13 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
     /**
      * Execute with return data (proto state to be precise
+     *
      * @param context
      * @param connection
      * @param of
      * @param toRead
-     * @return
      * @param <J>
+     * @return
      */
     public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead) {
         var req = "{\"type\":\"byte[]\",\"data\":{\"bytes\":\"" + Base64.getEncoder().encode(of.getAll()) + "\"}}";
@@ -204,7 +206,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             }
             sendBackResponses(storage.readResponses(item.getIndex()));
             var out = item.getOutput();
-            return (J)buildState(context,out,toRead.getClass());
+            return (J) buildState(context, out, toRead.getClass());
 
         }
         var index = storage.generateIndex();
@@ -225,5 +227,5 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         return toRead;
     }
 
-    protected abstract void sendBackResponses(List<StorageItem<JsonNode,JsonNode>> storageItems);
+    protected abstract void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems);
 }

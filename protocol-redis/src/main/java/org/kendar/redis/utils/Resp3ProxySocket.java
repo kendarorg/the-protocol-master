@@ -20,7 +20,12 @@ import java.nio.channels.AsynchronousChannelGroup;
 import java.util.List;
 
 public class Resp3ProxySocket extends NetworkProxySocket {
-    private Resp3MessageTranslator translator= new Resp3MessageTranslator().asProxy();
+    private static final Logger log = LoggerFactory.getLogger(Resp3ProxySocket.class.getName());
+    private Resp3MessageTranslator translator = new Resp3MessageTranslator().asProxy();
+
+    public Resp3ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+        super(context, inetSocketAddress, group);
+    }
 
     @Override
     protected NetworkProxySplitterState getStateToRetrieveOneSingleMessage() {
@@ -32,24 +37,17 @@ public class Resp3ProxySocket extends NetworkProxySocket {
         return List.of(new Resp3PullState().asProxy());
     }
 
-    public Resp3ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
-        super(context, inetSocketAddress, group);
-    }
-
-
     @Override
     protected List<? extends BaseEvent> buildPossibleEvents(NetworkProtoContext context, BBuffer buffer) {
-        var be = new BytesEvent(context,null,buffer);
-        if(translator.canRunEvent(be)){
+        var be = new BytesEvent(context, null, buffer);
+        if (translator.canRunEvent(be)) {
             var it = translator.execute(be);
-            if(it.hasNext()) {
+            if (it.hasNext()) {
                 var item = it.next().run();
-                return List.of((Resp3Message)item);
+                return List.of((Resp3Message) item);
             }
         }
         return List.of();
     }
-
-    private static final Logger log = LoggerFactory.getLogger(Resp3ProxySocket.class.getName());
 
 }

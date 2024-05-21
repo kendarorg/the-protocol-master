@@ -60,6 +60,7 @@ public abstract class ProtoContext {
      * Flag to stop the execution
      */
     protected final AtomicBoolean run = new AtomicBoolean(true);
+    protected final AtomicLong lastAccess = new AtomicLong(getNow());
     /**
      * Contains the -DECLARATION- of the protocol
      */
@@ -68,7 +69,6 @@ public abstract class ProtoContext {
      * Exclusively lock the send operation
      */
     private final Object sendLock = new Object();
-    protected final AtomicLong lastAccess = new AtomicLong(getNow());
     /**
      * Execution stack, this stores the current state
      */
@@ -81,6 +81,7 @@ public abstract class ProtoContext {
      * The last state used
      */
     private ProtoState currentState;
+
     public ProtoContext(ProtoDescriptor descriptor) {
         this.contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
         this.descriptor = descriptor;

@@ -31,7 +31,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
             dataTypesConverter = new DataTypesConverter(om.deserialize(text, new TypeReference<>() {
             }));
         } catch (Exception e) {
-            log.trace("Ignorable",e);
+            log.trace("Ignorable", e);
         }
     }
 
