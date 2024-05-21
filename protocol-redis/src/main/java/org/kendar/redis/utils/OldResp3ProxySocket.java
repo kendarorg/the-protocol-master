@@ -1,4 +1,5 @@
-package org.kendar.proxy;
+package org.kendar.redis.utils;
+
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -8,6 +9,8 @@ import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.redis.fsm.Resp3MessageTranslator;
+import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -28,28 +31,23 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public abstract class NetworkProxySocket {
-    protected static final JsonMapper mapper = new JsonMapper();
-    private static final Logger log = LoggerFactory.getLogger(NetworkProxySocket.class);
-
-    protected final ConcurrentLinkedDeque<BytesEvent> inputQueue = new ConcurrentLinkedDeque<>();
+public class OldResp3ProxySocket {
+    private static final Logger log = LoggerFactory.getLogger(OldResp3ProxySocket.class.getName());
+    private static final JsonMapper mapper = new JsonMapper();
+    protected final ConcurrentLinkedDeque<Resp3Message> inputQueue = new ConcurrentLinkedDeque<>();
     private final AsynchronousSocketChannel channel;
     private final NetworkProtoContext context;
     private final Semaphore semaphore = new Semaphore(1);
     private final Semaphore readSemaphore = new Semaphore(1);
-    private final List<BytesEvent> received = new ArrayList<>();
+    private final List<Resp3Message> received = new ArrayList<>();
 
-    protected abstract NetworkProxySplitterState getStateToRetrieveOneSingleMessage();
-
-    protected abstract List<ProtoState> availableStates();
-
-    public NetworkProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+    public OldResp3ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group, Resp3Storage storage) {
         this.context = context;
         try {
             channel = AsynchronousSocketChannel.open(group);
             channel.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
             channel.setOption(StandardSocketOptions.TCP_NODELAY, true);
-
+            var possible = new Resp3MessageTranslator().asProxy();
 
             BBuffer tempBuffer = context.buildBuffer();
             channel.connect(inetSocketAddress, channel, new CompletionHandler<>() {
@@ -59,67 +57,68 @@ public abstract class NetworkProxySocket {
                     final ByteBuffer buffer = ByteBuffer.allocate(4096);
 
                     channel.read(buffer, 30000, TimeUnit.MILLISECONDS, buffer, new CompletionHandler<>() {
-                        //FLW01 RECEIVING DATA
+
                         @Override
                         public void completed(Integer result, ByteBuffer attachment) {
+
                             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.getContextId() + "")) {
                                 Iterator<ProtoStep> stepsToInvoke = null;
-                                ProtoState possible = null;
+                                //ProtoState possible = null;
                                 //message is read from server
                                 attachment.flip();
                                 if (result != -1 || attachment.remaining() > 0) {
-                                    //FLW02 RETRIEVE THE DATA
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
 
                                     try {
                                         semaphore.acquire();
                                         tempBuffer.setPosition(tempBuffer.size());
-                                        //FLW03 APPEND TO EXISTING BUFFER
                                         tempBuffer.write(byteArray);
                                         tempBuffer.setPosition(0);
 
                                         log.trace("[PROXY ][RX] Bytes: " + byteArray.length);
-                                        //FLW04 GENERICFRAME AN EXPECTED RESPONSE
-                                        var gf = getStateToRetrieveOneSingleMessage();
-                                        //FLW05 BYTESEVENT from tmpBuffer (response specific to this flow)
-
-
-                                        var eventsToTry = new ArrayList<BaseEvent>();
-                                        var bytesEvent  = new BytesEvent(context, null, tempBuffer);
-                                        eventsToTry.add(bytesEvent);
-                                        eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
+                                        //var gf = new GenericFrame();
+                                        var be = new BytesEvent(context, null, tempBuffer);
+                                        var fre = new Resp3Message(context, null, new ArrayList<>(), "");
                                         boolean run = true;
                                         while (run) {
                                             run = false;
-
-                                            for (int i = 0; i < availableStates().size(); i++) {
-                                                possible = availableStates().get(i);
-
-                                                for(var be:eventsToTry) {
-                                                    //FLW07 if THE STATE CAN RUN BYTES
-                                                    if (possible.canRunEvent(be)) {
-                                                        ;
-                                                        stepsToInvoke = possible.executeEvent(be);
-                                                        tempBuffer.truncate();
-                                                        //FLW08 run the steps (sending back data)
-                                                        context.runSteps(stepsToInvoke, possible, be);
-                                                        log.debug("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
-                                                        run = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if(run){
-                                                    break;
-                                                }
-                                            }
-                                            //FLW11 IF NOTHING FOUND (build a new bytesevent to send back)
-                                            if (!run && gf.canRunEvent(bytesEvent)) {
-                                                var event = gf.split(bytesEvent);
-                                                log.debug("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
-                                                inputQueue.add(event);
+                                            if (possible.canRunEvent(be)) {
+                                                stepsToInvoke = possible.executeEvent(be);
                                                 tempBuffer.truncate();
+                                                if (stepsToInvoke.hasNext()) {
+                                                    var sub = stepsToInvoke.next();
+                                                    var returnedMessage = (Resp3Message) sub.run();
+                                                    if (returnedMessage.getData() instanceof List) {
+                                                        var list = (List) returnedMessage.getData();
+                                                        if (!list.isEmpty() && list.get(0) != null) {
+                                                            if ("message".equalsIgnoreCase(list.get(0).toString())) {
+                                                                log.trace("[PROXY ][RX] Found(2): " + returnedMessage.getMessage());
+                                                                var res = "";
+                                                                res = "{\"type\":\"RESPONSE\",\"data\":" + mapper.serialize(returnedMessage.getData()) + "}";
+                                                                var jsonRes = mapper.toJsonNode(res);
+                                                                storage.write(
+                                                                        context.getContextId(),
+                                                                        null,
+                                                                        jsonRes,
+                                                                        0, "RESPONSE", "RESP3"
+                                                                );
+
+                                                                context.write(returnedMessage);
+                                                                run = true;
+
+
+                                                                break;
+                                                            }
+
+                                                        }
+                                                    }
+                                                    inputQueue.add(returnedMessage);
+                                                    log.trace("[PROXY ][RX] Found(1): " + returnedMessage.getMessage());
+                                                }
+
                                                 run = true;
+                                                break;
                                             }
                                         }
                                         semaphore.release();
@@ -176,37 +175,26 @@ public abstract class NetworkProxySocket {
         log.debug("[PROXY ][TX]: " + returnMessage.getClass().getSimpleName());
     }
 
-
-
     public List<ReturnMessage> read(ProtoState protoState) {
 
         log.debug("[SERVER][??]: " + protoState.getClass().getSimpleName());
         BaseEvent founded = null;
         try {
-            //FLW13 SEEK A SPECIFIC MESSAGE
             while (founded == null) {
                 readSemaphore.acquire();
-                //FLW14 EMPTY THE INPUT QUEUE
+
                 while (!inputQueue.isEmpty()) {
                     var toAdd = inputQueue.poll();
                     if (toAdd == null) break;
                     received.add(toAdd);
                 }
-                //FLW15 GET THE MESSAGE TO RUN
                 for (int i = 0; i < received.size(); i++) {
-                    BytesEvent fr = received.get(i);
-                    var eventsToTry = new ArrayList<BaseEvent>();
-                    eventsToTry.add(new BytesEvent(context, null, fr.getBuffer()));
-                    eventsToTry.addAll(buildPossibleEvents(context, fr.getBuffer()));
-                    //If can run the proto state
-                    for(var evt:eventsToTry){
-                        if (protoState.canRunEvent(evt)) {
-                            founded = evt;
-                            received.remove(i);
-                            break;
-                        }
-                    }
-                    if(founded!=null){
+                    Resp3Message fe = received.get(i);
+                    if (protoState.canRunEvent(fe)) {
+                        founded = fe;
+                        log.debug("[PROXY ][RX]: " + mapper.serialize(fe.getData()));
+
+                        received.remove(i);
                         break;
                     }
 
@@ -218,7 +206,7 @@ public abstract class NetworkProxySocket {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        //FLW16 RUN THE FOUNDED MESSAGE
+
         var returnMessage = new ArrayList<ReturnMessage>();
         Iterator<ProtoStep> it = protoState.executeEvent(founded);
         while (it.hasNext()) {
@@ -227,8 +215,6 @@ public abstract class NetworkProxySocket {
         log.debug("[PROXY ][RX]: " + protoState.getClass().getSimpleName());
         return returnMessage;
     }
-
-    protected abstract List<? extends BaseEvent> buildPossibleEvents(NetworkProtoContext context, BBuffer buffer);
 
     public void close() {
         try {

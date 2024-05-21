@@ -113,7 +113,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param of
      */
     public <K extends NetworkReturnMessage> void execute(NetworkProtoContext context, ProxyConnection connection, K of) {
-        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(of) + "}";
+        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
@@ -138,9 +138,11 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
                 , (end - start), of.getClass().getSimpleName(), "AMQP");
     }
 
+    protected abstract Object getData(Object of);
+
     public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
                                                                      ProxyConnection connection, K of, T toRead) {
-        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(of) + "}";
+        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
@@ -162,7 +164,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         sock.write(of, bufferToWrite);
         sock.read(toRead);
 
-        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(toRead) + "}";
+        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();
 
         storage.write(
@@ -203,7 +205,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         sock.write(of);
         sock.read(toRead);
 
-        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(toRead) + "}";
+        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();
         storage.write(
                 context.getContextId(),

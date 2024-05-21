@@ -43,6 +43,11 @@ public class AmqpProxy extends NetworkProxy<AmqpStorage> {
     }
 
     @Override
+    protected Object getData(Object of) {
+        return of;
+    }
+
+    @Override
     protected void sendBackResponses(List<StorageItem<JsonNode,JsonNode>> storageItems) {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {

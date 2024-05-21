@@ -25,9 +25,9 @@ public class ReplayerTest {
     @Test
     void testReplayer() {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
-        var proxy = new Resp3Proxy(new Resp3FileStorage(Path.of("src",
+        var proxy = new Resp3Proxy();
+        proxy.setStorage(new Resp3FileStorage(Path.of("src",
                 "test", "resources", "replay")));
-
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);
