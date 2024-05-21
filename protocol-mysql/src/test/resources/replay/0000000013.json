@@ -1,38 +1,22 @@
 {
-  "constant": false,
-  "connectionId": 1,
-  "index": 13,
-  "input": {
-    "query": "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ('TEST RD', 22, 'Test Ltd', 500.22)",
-    "parameterValues": []
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 13,
+  "input" : {
+    "query" : "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ('TEST RD', 22, 'Test Ltd', 500.22)",
+    "parameterValues" : [ ]
   },
-  "output": {
-    "selectResult": {
-      "records": [
-        [
-          "1"
-        ]
-      ],
-      "metadata": [
-        {
-          "columnName": "GENERATED_KEY",
-          "columnLabel": "GENERATED_KEY",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "",
-          "columnDisplaySize": 20,
-          "columnType": "BIGINT",
-          "precision": 20
-        }
-      ],
-      "count": 1,
-      "intResult": false,
-      "lastInsertedId": 0
+  "output" : {
+    "selectResult" : {
+      "records" : [ ],
+      "metadata" : [ ],
+      "count" : 1,
+      "intResult" : true,
+      "lastInsertedId" : 1
     },
-    "intResult": 0
+    "intResult" : 0
   },
-  "durationMs": 7,
-  "type": "QUERY",
-  "caller": "JDBC"
+  "durationMs" : 6,
+  "type" : "QUERY",
+  "caller" : "JDBC"
 }
