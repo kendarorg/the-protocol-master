@@ -39,6 +39,16 @@ public class NullJdbcStorage implements JdbcStorage {
     }
 
     @Override
+    public StorageItem<JdbcRequest, JdbcResponse> read(JdbcRequest toRead, String type) {
+        return null;
+    }
+
+    @Override
+    public List<StorageItem<JdbcRequest, JdbcResponse>> readResponses(long afterIndex) {
+        return List.of();
+    }
+
+    @Override
     public void write(int connectionId, String query, int result, List<BindingParameter> parameterValues, long durationMs, String type) {
 
     }

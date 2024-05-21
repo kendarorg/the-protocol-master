@@ -7,7 +7,7 @@ import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.amqp.v09.utils.AmqpStorage;
-import org.kendar.amqp.v09.utils.ProxySocket;
+import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -98,7 +98,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
             connection.setKeepAlive(true);
             connection.setTcpNoDelay(true);
             connection.connect(new InetSocketAddress(InetAddress.getByName(host), port));
-            return new ProxyConnection(new ProxySocket(context,
+            return new ProxyConnection(new AmqpProxySocket(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -116,17 +116,17 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         if (replayer) {
             var item = storage.read(jsonReq, "byte[]");
             if (item.getOutput() == null && item.getInput() == null) {
-                writeResponses(storage.readResponses(item.getIndex()));
+                sendBackResponses(storage.readResponses(item.getIndex()));
                 return toRead;
             }
-            writeResponses(storage.readResponses(item.getIndex()));
+            sendBackResponses(storage.readResponses(item.getIndex()));
             var out = item.getOutput();
             return (T) mapper.deserialize(out.get("data").toString(), toRead.getClass());
 
         }
 
         long start = System.currentTimeMillis();
-        var sock = (ProxySocket) connection.getConnection();
+        var sock = (AmqpProxySocket) connection.getConnection();
         sock.write(of);
         sock.read(toRead);
 
@@ -140,7 +140,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         return toRead;
     }
 
-    private void writeResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
+    private void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = item.getOutput();
@@ -187,10 +187,10 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
             if (item.getOutput() == null && item.getInput() == null) {
-                writeResponses(storage.readResponses(item.getIndex()));
+                sendBackResponses(storage.readResponses(item.getIndex()));
                 return toRead;
             }
-            writeResponses(storage.readResponses(item.getIndex()));
+            sendBackResponses(storage.readResponses(item.getIndex()));
 
             var out = item.getOutput();
             return (T) mapper.deserialize(out.get("data").toString(), toRead.getClass());
@@ -199,7 +199,7 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
 
         long start = System.currentTimeMillis();
 
-        var sock = (ProxySocket) connection.getConnection();
+        var sock = (AmqpProxySocket) connection.getConnection();
         var bufferToWrite = protocol.buildBuffer();
         sock.write(of, bufferToWrite);
         sock.read(toRead);
@@ -221,16 +221,16 @@ public class AmqpProxy extends Proxy<AmqpStorage> {
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
             if (item.getOutput() == null && item.getInput() == null) {
-                writeResponses(storage.readResponses(item.getIndex()));
+                sendBackResponses(storage.readResponses(item.getIndex()));
                 return;
             }
-            writeResponses(storage.readResponses(item.getIndex()));
+            sendBackResponses(storage.readResponses(item.getIndex()));
             return;
         }
 
         long start = System.currentTimeMillis();
 
-        var sock = (ProxySocket) connection.getConnection();
+        var sock = (AmqpProxySocket) connection.getConnection();
         sock.write(of, protocol.buildBuffer());
         var res = "{\"type\":null,\"data\":null}";
         long end = System.currentTimeMillis();

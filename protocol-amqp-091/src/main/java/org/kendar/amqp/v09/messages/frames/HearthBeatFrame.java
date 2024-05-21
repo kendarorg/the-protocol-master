@@ -3,7 +3,7 @@ package org.kendar.amqp.v09.messages.frames;
 import org.kendar.amqp.v09.dtos.FrameType;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
-import org.kendar.amqp.v09.utils.ProxySocket;
+import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.InterruptProtoState;
@@ -41,7 +41,7 @@ public class HearthBeatFrame extends Frame implements InterruptProtoState {
 
         var context = (AmqpProtoContext) event.getContext();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-        var sock = (ProxySocket) connection.getConnection();
+        var sock = (AmqpProxySocket) connection.getConnection();
 
         var heartBeatFrame = new HearthBeatFrame();
         heartBeatFrame.setChannel(channel);

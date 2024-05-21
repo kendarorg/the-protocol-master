@@ -31,8 +31,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class ProxySocket {
-    private static final Logger log = LoggerFactory.getLogger(ProxySocket.class.getName());
+public class Resp3ProxySocket {
+    private static final Logger log = LoggerFactory.getLogger(Resp3ProxySocket.class.getName());
     private static final JsonMapper mapper = new JsonMapper();
     protected final ConcurrentLinkedDeque<Resp3Message> inputQueue = new ConcurrentLinkedDeque<>();
     private final AsynchronousSocketChannel channel;
@@ -41,7 +41,7 @@ public class ProxySocket {
     private final Semaphore readSemaphore = new Semaphore(1);
     private final List<Resp3Message> received = new ArrayList<>();
 
-    public ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group, Resp3Storage storage) {
+    public Resp3ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group, Resp3Storage storage) {
         this.context = context;
         try {
             channel = AsynchronousSocketChannel.open(group);

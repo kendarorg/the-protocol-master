@@ -1,5 +1,7 @@
 package org.kendar.storage;
 
+import java.util.List;
+
 /**
  * Do-nothing storage
  *
@@ -20,6 +22,16 @@ public class NullStorage<I, O> extends BaseStorage<I, O> {
     @Override
     public void optimize() {
 
+    }
+
+    @Override
+    public StorageItem<I, O> read(I toRead, String type) {
+        return null;
+    }
+
+    @Override
+    public List<StorageItem<I, O>> readResponses(long afterIndex) {
+        return List.of();
     }
 
     @Override

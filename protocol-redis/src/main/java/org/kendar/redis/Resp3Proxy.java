@@ -8,7 +8,7 @@ import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.redis.fsm.Resp3PullState;
 import org.kendar.redis.fsm.events.Resp3Message;
-import org.kendar.redis.utils.ProxySocket;
+import org.kendar.redis.utils.Resp3ProxySocket;
 import org.kendar.redis.utils.Resp3Storage;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
@@ -100,7 +100,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
             connection.setKeepAlive(true);
             connection.setTcpNoDelay(true);
             connection.connect(new InetSocketAddress(InetAddress.getByName(host), port));
-            return new ProxyConnection(new ProxySocket(context,
+            return new ProxyConnection(new Resp3ProxySocket(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group, storage));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -111,7 +111,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
     public void initialize() {
     }
 
-    private void writeResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
+    protected void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = item.getOutput();
@@ -138,10 +138,10 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
         if (replayer) {
             var item = storage.read(jsonReq, (String) ((List<Object>) event.getData()).get(0));
             if (item.getOutput() == null && item.getInput() == null) {
-                writeResponses(storage.readResponses(item.getIndex()));
+                sendBackResponses(storage.readResponses(item.getIndex()));
                 return (ReturnMessage) toRead;
             }
-            writeResponses(storage.readResponses(item.getIndex()));
+            sendBackResponses(storage.readResponses(item.getIndex()));
 
             var out = item.getOutput();
             return new Resp3Message(context, null, out.get("data"));
@@ -151,7 +151,7 @@ public class Resp3Proxy extends Proxy<Resp3Storage> {
         var index = storage.generateIndex();
         long start = System.currentTimeMillis();
 
-        var sock = (ProxySocket) connection.getConnection();
+        var sock = (Resp3ProxySocket) connection.getConnection();
         var bufferToWrite = protocol.buildBuffer();
         try {
             sock.write(event, bufferToWrite);

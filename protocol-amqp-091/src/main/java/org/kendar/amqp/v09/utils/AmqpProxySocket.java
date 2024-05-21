@@ -35,8 +35,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class ProxySocket {
-    private static final Logger log = LoggerFactory.getLogger(ProxySocket.class.getName());
+public class AmqpProxySocket {
+    private static final Logger log = LoggerFactory.getLogger(AmqpProxySocket.class.getName());
     protected final ConcurrentLinkedDeque<BytesEvent> inputQueue = new ConcurrentLinkedDeque<>();
     private final AsynchronousSocketChannel channel;
     private final NetworkProtoContext context;
@@ -55,7 +55,7 @@ public class ProxySocket {
             new BasicReturn().asProxy(),
             new BasicGetEmpty().asProxy()));
 
-    public ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+    public AmqpProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
         this.context = context;
         try {
             channel = AsynchronousSocketChannel.open(group);
@@ -71,7 +71,7 @@ public class ProxySocket {
                     final ByteBuffer buffer = ByteBuffer.allocate(4096);
 
                     channel.read(buffer, 30000, TimeUnit.MILLISECONDS, buffer, new CompletionHandler<>() {
-
+                        //FLW01 RECEIVING DATA
                         @Override
                         public void completed(Integer result, ByteBuffer attachment) {
                             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.getContextId() + "")) {
@@ -80,40 +80,51 @@ public class ProxySocket {
                                 //message is read from server
                                 attachment.flip();
                                 if (result != -1 || attachment.remaining() > 0) {
+                                    //FLW02 RETRIEVE THE DATA
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
 
                                     try {
                                         semaphore.acquire();
                                         tempBuffer.setPosition(tempBuffer.size());
+                                        //FLW03 APPEND TO EXISTING BUFFER
                                         tempBuffer.write(byteArray);
                                         tempBuffer.setPosition(0);
 
                                         log.trace("[PROXY ][RX] Bytes: " + byteArray.length);
+                                        //FLW04 GENERICFRAME AN EXPECTED RESPONSE
                                         var gf = new GenericFrame();
+                                        //FLW05 BYTESEVENT from tmpBuffer (response specific to this flow)
                                         var be = new BytesEvent(context, null, tempBuffer);
+                                        //FLW06 AMQPFRAME if feasible (response specific to this flow)
                                         var fre = new AmqpFrame(context, null, tempBuffer, tempBuffer.getShort(1));
                                         boolean run = true;
                                         while (run) {
                                             run = false;
                                             for (int i = 0; i < states.size(); i++) {
                                                 possible = states.get(i);
-                                                if (possible.canRunEvent(be)) {
+                                                //FLW07 if THE STATE CAN RUN BYTES
+                                                if (possible.canRunEvent(be)) {;
+
                                                     stepsToInvoke = possible.executeEvent(be);
                                                     tempBuffer.truncate();
+                                                    //FLW08 run the steps (sending back data)
                                                     context.runSteps(stepsToInvoke, possible, be);
                                                     log.trace("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
                                                     run = true;
                                                     break;
+                                                    //FLW09 if THE STATE CAN RUN AMQPFRAME (???)
                                                 } else if (possible.canRunEvent(fre)) {
                                                     stepsToInvoke = possible.executeEvent(fre);
                                                     tempBuffer.truncate();
+                                                    //FLW10 run the steps (sending back data)
                                                     context.runSteps(stepsToInvoke, possible, fre);
                                                     log.trace("[PROXY ][RX][2]: " + possible.getClass().getSimpleName());
                                                     run = true;
                                                     break;
                                                 }
                                             }
+                                            //FLW11 IF NOTHING FOUND (build a new bytesevent to send back)
                                             if (!run && gf.canRun(be)) {
                                                 var event = gf.execute(be);
                                                 log.trace("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
@@ -176,24 +187,27 @@ public class ProxySocket {
         log.debug("[PROXY ][TX]: " + returnMessage.getClass().getSimpleName());
     }
 
+    //FLW12 READ EXPECT SPECIFIC MESSAGE
     public List<ReturnMessage> read(ProtoState protoState) {
 
         log.debug("[SERVER][??]: " + protoState.getClass().getSimpleName());
         BaseEvent founded = null;
         try {
+            //FLW13 SEEK A SPECIFIC MESSAGE
             while (founded == null) {
                 readSemaphore.acquire();
-
+                //FLW14 EMPTY THE INPUT QUEUE
                 while (!inputQueue.isEmpty()) {
                     var toAdd = inputQueue.poll();
                     if (toAdd == null) break;
                     received.add(toAdd);
                 }
+                //FLW15 GET THE MESSAGE TO RUN
                 for (int i = 0; i < received.size(); i++) {
                     BytesEvent fr = received.get(i);
                     fr = new BytesEvent(context, null, fr.getBuffer());
                     var fe = new AmqpFrame(context, null, fr.getBuffer(), (short) -1);
-                    //If can run the
+                    //If can run the proto state
                     if (protoState.canRunEvent(fr)) {
                         founded = fr;
                         received.remove(i);
@@ -212,7 +226,7 @@ public class ProxySocket {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
+        //FLW16 RUN THE FOUNDED MESSAGE
         var returnMessage = new ArrayList<ReturnMessage>();
         Iterator<ProtoStep> it = protoState.executeEvent(founded);
         while (it.hasNext()) {
