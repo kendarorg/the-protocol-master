@@ -14,18 +14,17 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
-import java.util.List;
 
-public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
-    private static final Logger log = LoggerFactory.getLogger(Resp3PullState.class);
+public class Resp3Response extends ProtoState implements NetworkReturnMessage {
+    private static final Logger log = LoggerFactory.getLogger(Resp3Response.class);
     private Resp3Message event;
     private boolean proxy;
 
-    public Resp3PullState() {
+    public Resp3Response() {
         super();
     }
 
-    public Resp3PullState(Class<?>... events) {
+    public Resp3Response(Class<?>... events) {
         super(events);
     }
 
@@ -33,7 +32,7 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         return event;
     }
 
-    public Resp3PullState asProxy() {
+    public Resp3Response asProxy() {
         this.proxy = true;
         return this;
     }
@@ -53,15 +52,7 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
     }
 
     public boolean canRun(Resp3Message event) {
-        if(isProxyed() && event.getData() instanceof List) {
-            if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("message")) {
-                return true;
-            }
 
-        }
-        if(isProxyed()) {
-            return false;
-        }
         return true;
     }
 
@@ -70,32 +61,8 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         var context = (Resp3Context) event.getContext();
         var proxy = (Resp3Proxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-
-        if (isProxyed()) {
-            if(event.getData() instanceof List){
-                if(((List<?>) event.getData()).get(0)!=null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("message")){
-                    var storage = proxy.getStorage();
-                    var res = "{\"type\":\"RESPONSE\",\"data\":" +
-                            mapper.serialize(event.getData()) + "}";
-
-
-                    storage.write(
-                            context.getContextId(),
-                            null
-                            , mapper.toJsonNode(res)
-                            , 0, "RESPONSE", "RESP3");
-                    return iteratorOfList(event);
-                }
-
-            }
-            return iteratorOfEmpty();
-
-        }
-        return iteratorOfRunnable(() -> proxy.execute(context,
-                connection,
-                event,
-                new Resp3Response()
-        ));
+        this.event = event;
+        return iteratorOfEmpty();
 //        if (!this.proxy) {
 //            return iteratorOfRunnable(() -> proxy.execute(context,
 //                    connection,

@@ -60,6 +60,7 @@ public class PubSubTest extends BasicTest {
         final Jedis publisherJedis = jedisPool.getResource();
 
         new Publisher(publisherJedis, CHANNEL_NAME).start("FIRST", "SECOND", "THIRD");
+        //new Publisher(publisherJedis, CHANNEL_NAME).start("FIRST");
 
         Sleeper.sleep(500);
         subscriber.unsubscribe();

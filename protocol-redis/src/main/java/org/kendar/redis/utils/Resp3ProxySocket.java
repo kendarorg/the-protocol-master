@@ -8,6 +8,7 @@ import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.NetworkProxySplitterState;
+import org.kendar.redis.fsm.GenericFrame;
 import org.kendar.redis.fsm.Resp3MessageTranslator;
 import org.kendar.redis.fsm.Resp3PullState;
 import org.kendar.redis.fsm.events.Resp3Message;
@@ -23,7 +24,7 @@ public class Resp3ProxySocket extends NetworkProxySocket {
 
     @Override
     protected NetworkProxySplitterState getStateToRetrieveOneSingleMessage() {
-        return new Resp3MessageTranslator();
+        return new GenericFrame();
     }
 
     @Override

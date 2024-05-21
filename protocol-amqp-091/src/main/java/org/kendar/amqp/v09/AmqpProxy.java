@@ -8,7 +8,9 @@ import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.amqp.v09.utils.AmqpStorage;
 import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
+import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.NetworkProxy;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.storage.StorageItem;
@@ -43,8 +45,18 @@ public class AmqpProxy extends NetworkProxy<AmqpStorage> {
     }
 
     @Override
+    protected String getCaller() {
+        return "AMQP";
+    }
+
+    @Override
     protected Object getData(Object of) {
         return of;
+    }
+
+    @Override
+    protected Object buildState(ProtoContext context, JsonNode out, Class<? extends ProtoState> aClass) {
+        return mapper.deserialize(out.get("data").toString(), aClass);
     }
 
     @Override

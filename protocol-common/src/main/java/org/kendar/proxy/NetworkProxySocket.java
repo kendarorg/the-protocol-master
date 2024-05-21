@@ -90,7 +90,7 @@ public abstract class NetworkProxySocket {
                                         eventsToTry.add(bytesEvent);
                                         eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
                                         boolean run = true;
-                                        while (run) {
+                                        while (run && tempBuffer.size()>0) {
                                             run = false;
 
                                             for (int i = 0; i < availableStates().size(); i++) {

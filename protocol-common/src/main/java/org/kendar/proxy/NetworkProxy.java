@@ -3,6 +3,7 @@ package org.kendar.proxy;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
@@ -124,7 +125,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             sendBackResponses(storage.readResponses(item.getIndex()));
             return;
         }
-
+        var index = storage.generateIndex();
         long start = System.currentTimeMillis();
 
         var sock = (NetworkProxySocket) connection.getConnection();
@@ -132,11 +133,14 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         var res = "{\"type\":null,\"data\":null}";
         long end = System.currentTimeMillis();
         storage.write(
+                index,
                 context.getContextId(),
                 mapper.toJsonNode(req)
                 , mapper.toJsonNode(res)
-                , (end - start), of.getClass().getSimpleName(), "AMQP");
+                , (end - start), of.getClass().getSimpleName(), getCaller());
     }
+
+    protected abstract String getCaller();
 
     protected abstract Object getData(Object of);
 
@@ -153,9 +157,10 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             sendBackResponses(storage.readResponses(item.getIndex()));
 
             var out = item.getOutput();
-            return (T) mapper.deserialize(out.get("data").toString(), toRead.getClass());
+            return (T) buildState(context,out,toRead.getClass());
 
         }
+        var index = storage.generateIndex();
 
         long start = System.currentTimeMillis();
 
@@ -168,12 +173,15 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         long end = System.currentTimeMillis();
 
         storage.write(
+                index,
                 context.getContextId(),
                 jsonReq
                 , mapper.toJsonNode(res)
-                , (end - start), of.getClass().getSimpleName(), "AMQP");
+                , (end - start), of.getClass().getSimpleName(), getCaller());
         return toRead;
     }
+
+    protected abstract Object buildState(ProtoContext context, JsonNode out, Class<? extends ProtoState> aClass);
 
     /**
      * Execute with return data (proto state to be precise
@@ -196,9 +204,10 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             }
             sendBackResponses(storage.readResponses(item.getIndex()));
             var out = item.getOutput();
-            return (J) mapper.deserialize(out.get("data").toString(), toRead.getClass());
+            return (J)buildState(context,out,toRead.getClass());
 
         }
+        var index = storage.generateIndex();
 
         long start = System.currentTimeMillis();
         var sock = (NetworkProxySocket) connection.getConnection();
@@ -208,10 +217,11 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();
         storage.write(
+                index,
                 context.getContextId(),
                 jsonReq
                 , mapper.toJsonNode(res)
-                , (end - start), "byte[]", "AMQP");
+                , (end - start), "byte[]", getCaller());
         return toRead;
     }
 
