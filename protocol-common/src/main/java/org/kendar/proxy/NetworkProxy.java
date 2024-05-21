@@ -1,8 +1,10 @@
 package org.kendar.proxy;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
+import org.kendar.protocol.states.ProtoState;
 import org.kendar.storage.Storage;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.*;
 import java.nio.channels.AsynchronousChannelGroup;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,8 +80,13 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>, K exte
     }
 
 
-
-    public <K> void execute(NetworkProtoContext context, ProxyConnection connection, K of) {
+    /**
+     * Execute with no return
+     * @param context
+     * @param connection
+     * @param of
+     */
+    public void execute(NetworkProtoContext context, ProxyConnection connection, K of) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(of) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
@@ -102,6 +110,46 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>, K exte
                 mapper.toJsonNode(req)
                 , mapper.toJsonNode(res)
                 , (end - start), of.getClass().getSimpleName(), "AMQP");
+    }
+
+    /**
+     * Execute with return data (proto state to be precise
+     * @param context
+     * @param connection
+     * @param of
+     * @param toRead
+     * @return
+     * @param <J>
+     */
+    public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead) {
+        var req = "{\"type\":\"byte[]\",\"data\":{\"bytes\":\"" + Base64.getEncoder().encode(of.getAll()) + "\"}}";
+        var jsonReq = mapper.toJsonNode(req);
+
+        if (replayer) {
+            var item = storage.read(jsonReq, "byte[]");
+            if (item.getOutput() == null && item.getInput() == null) {
+                sendBackResponses(storage.readResponses(item.getIndex()));
+                return toRead;
+            }
+            sendBackResponses(storage.readResponses(item.getIndex()));
+            var out = item.getOutput();
+            return (J) mapper.deserialize(out.get("data").toString(), toRead.getClass());
+
+        }
+
+        long start = System.currentTimeMillis();
+        var sock = (NetworkProxySocket) connection.getConnection();
+        sock.write(of);
+        sock.read(toRead);
+
+        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(toRead) + "}";
+        long end = System.currentTimeMillis();
+        storage.write(
+                context.getContextId(),
+                jsonReq
+                , mapper.toJsonNode(res)
+                , (end - start), "byte[]", "AMQP");
+        return toRead;
     }
 
     protected abstract void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems);

@@ -176,11 +176,11 @@ public class JdbcFileStorage extends BaseFileStorage<JdbcRequest, JdbcResponse> 
 
     @Override
     public StorageItem<JdbcRequest, JdbcResponse> read(JdbcRequest toRead, String type) {
-        throw new RuntimeException("NOT IMPLEMENTED EXCEPTION");
+        throw new RuntimeException("PUSH NOT IMPLEMENTED EXCEPTION");
     }
 
     @Override
     public List<StorageItem<JdbcRequest, JdbcResponse>> readResponses(long afterIndex) {
-        throw new RuntimeException("NOT IMPLEMENTED EXCEPTION");
+        throw new RuntimeException("PUSH NOT IMPLEMENTED EXCEPTION");
     }
 }

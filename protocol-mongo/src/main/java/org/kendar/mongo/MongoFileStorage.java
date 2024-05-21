@@ -63,6 +63,11 @@ public class MongoFileStorage extends BaseFileStorage<JsonNode, JsonNode> implem
     }
 
     @Override
+    public List<StorageItem<JsonNode, JsonNode>> readResponses(long afterIndex) {
+        throw new RuntimeException("PUSH NOT IMPLEMENTED");
+    }
+
+    @Override
     protected boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<JsonNode, JsonNode> item, List<StorageItem<JsonNode, JsonNode>> loadedData) {
         return false;
     }
