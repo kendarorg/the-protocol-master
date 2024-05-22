@@ -14,6 +14,11 @@ public class AmqpFrame extends BaseEvent implements TaggedObject {
 
     public AmqpFrame(ProtoContext context, Class<?> prevState, BBuffer buffer, short channel) {
         super(context, prevState);
+//        if(channel==-1) {
+//            System.out.println("[PROXY][RECEIVED] " + buffer.toHexStringUpToLength(0, 12));
+//        }else{
+//            System.out.println("[OTHER][RECEIVED] " + buffer.toHexStringUpToLength(0, 12));
+//        }
         this.buffer = buffer;
         this.channel = channel;
         this.setTags(new ArrayList<>());

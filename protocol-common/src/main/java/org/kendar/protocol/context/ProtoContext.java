@@ -31,15 +31,25 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class ProtoContext {
 
-    private static final ConcurrentHashMap<Integer, ProtoContext> contextsCache = new ConcurrentHashMap<>();
-    private static final AtomicInteger timeout = new AtomicInteger(30);
-    private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
-    private static final Thread contextCleaner;
+    public static void initializeStatic(){
 
-    static {
+        timeout = new AtomicInteger(30);
+        runClean = false;
+        if(contextCleaner!=null){
+            if(contextCleaner.isAlive()) {
+                Sleeper.sleep(2000);
+            }
+        }
+        runClean = true;
+        contextsCache = new ConcurrentHashMap<>();
         contextCleaner = new Thread(ProtoContext::contextsClean);
         contextCleaner.start();
     }
+    private static ConcurrentHashMap<Integer, ProtoContext> contextsCache ;
+    private static AtomicInteger timeout;
+    private static Logger log = LoggerFactory.getLogger(ProtoContext.class);
+    private static Thread contextCleaner;
+
 
     /**
      * Stores the variable relatives to the current instance execution
@@ -86,16 +96,18 @@ public abstract class ProtoContext {
         this.contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
         this.descriptor = descriptor;
         this.root = descriptor.getTaggedStates();
+        lastAccess.set(getNow());
         contextsCache.put(this.contextId, this);
     }
 
     public static void setTimeout(int value) {
         timeout.set(value);
     }
+    private static volatile  boolean runClean = false;
 
     private static void contextsClean() {
 
-        while (true) {
+        while (runClean) {
             Sleeper.sleep(1000);
             var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
             for (var item : fixedItemsList) {

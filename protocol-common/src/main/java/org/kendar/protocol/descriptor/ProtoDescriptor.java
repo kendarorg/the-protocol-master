@@ -48,6 +48,7 @@ public abstract class ProtoDescriptor {
      */
     public void initialize() {
 
+        ProtoContext.initializeStatic();
         counters.clear();
         initializeProtocol();
     }

@@ -43,7 +43,7 @@ public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
         }
     }
 
-    @Override
+
     protected String getCaller() {
         return "RESP3";
     }
@@ -59,7 +59,6 @@ public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
         return of;
     }
 
-    @Override
     protected Object buildState(ProtoContext context, JsonNode out, Class<? extends ProtoState> aClass) {
         var res = new Resp3Response();
         res.execute(new Resp3Message(context, null, out.get("data")));

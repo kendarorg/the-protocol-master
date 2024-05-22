@@ -46,7 +46,7 @@ public class HearthBeatFrame extends Frame implements InterruptProtoState {
         var heartBeatFrame = new HearthBeatFrame();
         heartBeatFrame.setChannel(channel);
         sock.write(heartBeatFrame, context.buildBuffer());
-        sock.read(heartBeatFrame);
+        sock.read(heartBeatFrame,false);
 
         return iteratorOfList(heartBeatFrame);
     }

@@ -58,6 +58,7 @@ public abstract class NetworkProxySocket {
                         //FLW01 RECEIVING DATA
                         @Override
                         public void completed(Integer result, ByteBuffer attachment) {
+                            context.setActive();
                             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.getContextId() + "")) {
                                 Iterator<ProtoStep> stepsToInvoke = null;
                                 ProtoState possible = null;
@@ -67,6 +68,9 @@ public abstract class NetworkProxySocket {
                                     //FLW02 RETRIEVE THE DATA
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
+                                    var bb = new BBuffer();
+                                    bb.write(byteArray);
+                                    //System.out.println("[XXXX] "+bb.toHexStringUpToLength(0,12));
 
                                     try {
                                         semaphore.acquire();
@@ -82,39 +86,64 @@ public abstract class NetworkProxySocket {
 
 
                                         var eventsToTry = new ArrayList<BaseEvent>();
-                                        var bytesEvent = new BytesEvent(context, null, tempBuffer);
-                                        eventsToTry.add(bytesEvent);
-                                        eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
+                                        var be = new BytesEvent(context, null, tempBuffer);
+//                                        eventsToTry.add(bytesEvent);
+//                                        eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
                                         boolean run = true;
                                         while (run && tempBuffer.size() > 0) {
+                                            context.setActive();
                                             run = false;
 
                                             for (int i = 0; i < availableStates().size(); i++) {
                                                 possible = availableStates().get(i);
 
-                                                for (var be : eventsToTry) {
-                                                    //FLW07 if THE STATE CAN RUN BYTES
-                                                    if (possible.canRunEvent(be)) {
-                                                        ;
-                                                        stepsToInvoke = possible.executeEvent(be);
-                                                        tempBuffer.truncate();
-                                                        //FLW08 run the steps (sending back data)
-                                                        context.runSteps(stepsToInvoke, possible, be);
-                                                        log.debug("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
-                                                        run = true;
-                                                        break;
-                                                    }
+                                                //for (var be : eventsToTry) {
+                                                //Check if can run with a bytes event
+                                                if (possible.canRunEvent(be)) {
+
+                                                    stepsToInvoke = possible.executeEvent(be);
+                                                    tempBuffer.truncate();
+                                                    //FLW08 run the steps (sending back data)
+                                                    context.runSteps(stepsToInvoke, possible, be);
+                                                    log.debug("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
+                                                    run = true;
+                                                    break;
                                                 }
+                                                //}
                                                 if (run) {
                                                     break;
                                                 }
                                             }
                                             //FLW11 IF NOTHING FOUND (build a new bytesevent to send back)
-                                            if (!run && gf.canRunEvent(bytesEvent)) {
-                                                var event = gf.split(bytesEvent);
-                                                log.debug("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
-                                                inputQueue.add(event);
-                                                tempBuffer.truncate();
+                                            if (!run && gf.canRunEvent(be)) {
+                                                var event = gf.split(be);
+                                                var internalRun = false;
+                                                for(var item:buildPossibleEvents(context,event.getBuffer())){
+                                                    for (int i = 0; i < availableStates().size(); i++) {
+                                                        possible = availableStates().get(i);
+                                                        if (possible.canRunEvent(item)) {
+
+                                                            stepsToInvoke = possible.executeEvent(item);
+                                                            tempBuffer.truncate();
+                                                            //FLW08 run the steps (sending back data)
+                                                            context.runSteps(stepsToInvoke, possible, item);
+                                                            log.debug("[PROXY ][RX][5]: " + possible.getClass().getSimpleName());
+                                                            internalRun = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if(internalRun==true){
+                                                        break;
+                                                    }
+                                                }
+                                                //This bytes event is one containing exactly one frame
+
+                                                if(internalRun==false){
+                                                    log.debug("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
+                                                    inputQueue.add(event);
+                                                    tempBuffer.truncate();
+                                                }
+
                                                 run = true;
                                             }
                                         }
@@ -163,11 +192,13 @@ public abstract class NetworkProxySocket {
     protected abstract List<ProtoState> availableStates();
 
     public void write(BBuffer buffer) {
+        context.setActive();
         buffer.setPosition(0);
         channel.write(ByteBuffer.wrap(buffer.getAll()));
     }
 
     public void write(ReturnMessage rm, BBuffer buffer) {
+        context.setActive();
         var returnMessage = (NetworkReturnMessage) rm;
         buffer.setPosition(0);
         buffer.truncate(0);
@@ -177,13 +208,15 @@ public abstract class NetworkProxySocket {
     }
 
 
-    public List<ReturnMessage> read(ProtoState protoState) {
+    public List<ReturnMessage> read(ProtoState protoState,boolean optional) {
 
-        log.debug("[SERVER][??]: " + protoState.getClass().getSimpleName());
+        log.debug("[SERVER][EX]: " + protoState.getClass().getSimpleName());
         BaseEvent founded = null;
         try {
+            long maxCount = System.currentTimeMillis()+1000;
             //FLW13 SEEK A SPECIFIC MESSAGE
-            while (founded == null) {
+            while (founded == null && maxCount > System.currentTimeMillis()) {
+                context.setActive();
                 readSemaphore.acquire();
                 //FLW14 EMPTY THE INPUT QUEUE
                 while (!inputQueue.isEmpty()) {
@@ -195,7 +228,7 @@ public abstract class NetworkProxySocket {
                 for (int i = 0; i < received.size(); i++) {
                     BytesEvent fr = received.get(i);
                     var eventsToTry = new ArrayList<BaseEvent>();
-                    eventsToTry.add(new BytesEvent(context, null, fr.getBuffer()));
+                    eventsToTry.add((BaseEvent) new BytesEvent(context, null, fr.getBuffer()));
                     eventsToTry.addAll(buildPossibleEvents(context, fr.getBuffer()));
                     //If can run the proto state
                     for (var evt : eventsToTry) {
@@ -217,11 +250,16 @@ public abstract class NetworkProxySocket {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        //FLW16 RUN THE FOUNDED MESSAGE
+
         var returnMessage = new ArrayList<ReturnMessage>();
-        Iterator<ProtoStep> it = protoState.executeEvent(founded);
-        while (it.hasNext()) {
-            returnMessage.add(it.next().run());
+        if(founded==null){
+            throw new RuntimeException("UNABLE TO FIND Contains STILL ("+received.size()+")");
+        }else {
+            //FLW16 RUN THE FOUNDED MESSAGE
+            Iterator<ProtoStep> it = protoState.executeEvent(founded);
+            while (it.hasNext()) {
+                returnMessage.add(it.next().run());
+            }
         }
         log.debug("[PROXY ][RX]: " + protoState.getClass().getSimpleName());
         return returnMessage;

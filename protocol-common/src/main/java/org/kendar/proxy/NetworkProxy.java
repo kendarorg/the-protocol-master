@@ -181,6 +181,10 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      */
     public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
                                                                      ProxyConnection connection, K of, T toRead) {
+        return execute(context,connection,of,toRead,false);
+    }
+    public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
+                                                                     ProxyConnection connection, K of, T toRead,boolean optional) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
@@ -202,7 +206,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         var sock = (NetworkProxySocket) connection.getConnection();
         var bufferToWrite = protocol.buildBuffer();
         sock.write(of, bufferToWrite);
-        sock.read(toRead);
+        sock.read(toRead,optional);
 
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();
@@ -236,6 +240,9 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @return
      */
     public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead) {
+        return execute(context,connection,of,toRead,false);
+    }
+    public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead,boolean optional) {
         var req = "{\"type\":\"byte[]\",\"data\":{\"bytes\":\"" + Base64.getEncoder().encode(of.getAll()) + "\"}}";
         var jsonReq = mapper.toJsonNode(req);
 
@@ -255,7 +262,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         long start = System.currentTimeMillis();
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of);
-        sock.read(toRead);
+        sock.read(toRead,optional);
 
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();

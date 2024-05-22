@@ -44,7 +44,7 @@ public class AmqpProxy extends NetworkProxy<AmqpStorage> {
         }
     }
 
-    @Override
+
     protected String getCaller() {
         return "AMQP";
     }
@@ -54,7 +54,7 @@ public class AmqpProxy extends NetworkProxy<AmqpStorage> {
         return of;
     }
 
-    @Override
+
     protected Object buildState(ProtoContext context, JsonNode out, Class<? extends ProtoState> aClass) {
         return mapper.deserialize(out.get("data").toString(), aClass);
     }

@@ -94,7 +94,8 @@ public class ChannelClose extends Channel {
         return iteratorOfRunnable(() -> proxy.execute(context,
                 connection,
                 chClose,
-                result)
+                result,
+                true)
         );
     }
 }
