@@ -47,8 +47,6 @@ public abstract class ProtoDescriptor {
      * Initialize the protocol
      */
     public void initialize() {
-
-        ProtoContext.initializeStatic();
         counters.clear();
         initializeProtocol();
     }
@@ -59,6 +57,7 @@ public abstract class ProtoDescriptor {
      * @param start
      */
     protected void initialize(ProtoState start) {
+        ProtoContext.initializeStatic();
         buildProtocolDescription(start);
         initializeTag("", start);
         initializeInternal(start, "");

@@ -167,3 +167,7 @@ The events are immediatly executed. If no bytes are present or there are not eno
 bytes to read, the events queue is seeked for "BytesEvent" and then the execution is
 retried.
 
+## Suggestion to run tests on testcontainers
+
+
+
