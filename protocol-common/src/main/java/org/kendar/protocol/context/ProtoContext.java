@@ -119,15 +119,17 @@ public abstract class ProtoContext {
                         contextsCache.remove(item.getKey());
                     }
 
-                    try {
-                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                        log.debug("Disconnecting");
-                    } catch (Exception ex) {
-                        log.trace("Error disconnecting", ex);
+                    try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.contextId + "")) {
+                        try {
+                            context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                            log.debug("[DISCONNECT]" );
+                        } catch (Exception ex) {
+                            log.trace("[DISCONNECT] Error", ex);
+                        }
                     }
                     contextsCache.remove(item.getKey());
                 } else {
-                    log.debug("keepalive");
+                    log.trace("[KEEPALIVE]");
                 }
             }
         }
