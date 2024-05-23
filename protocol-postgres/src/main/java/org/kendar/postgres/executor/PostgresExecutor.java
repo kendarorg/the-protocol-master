@@ -271,6 +271,7 @@ public class PostgresExecutor {
             result.add(new RowDescription(fields));
 
             for (var byteRow : resultSet.getRecords()) {
+                protoContext.updateLastAccess();
                 result.add(new DataRow(byteRow, fields));
             }
             result.add(new CommandComplete(String.format(operation + " %d", resultSet.getRecords().size())));

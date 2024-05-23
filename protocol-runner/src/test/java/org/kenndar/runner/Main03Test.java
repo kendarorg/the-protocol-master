@@ -58,7 +58,7 @@ public class Main03Test extends BasicTest {
             });
         });
         serverThread.start();
-        Sleeper.sleep(3000);
+        Sleeper.sleep(5000);
 
 
         Connection c = getProxyConnection();

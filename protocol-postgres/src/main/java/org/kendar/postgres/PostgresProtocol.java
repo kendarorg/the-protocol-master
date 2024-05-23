@@ -59,6 +59,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
 
     @Override
     protected void initializeProtocol() {
+        PostgresProtoContext.initializePids();
         addInterruptState(new CancelRequest(BytesEvent.class));
         addInterruptState(new PostgresPacketTranslator(BytesEvent.class));
         initialize(

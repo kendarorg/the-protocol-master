@@ -115,7 +115,7 @@ public class Main01Test extends BasicTest {
             });
         });
         serverThread.start();
-        Sleeper.sleep(2000);
+        Sleeper.sleep(5000);
 
 
         HibernateSessionFactory.initialize("org.postgresql.Driver",

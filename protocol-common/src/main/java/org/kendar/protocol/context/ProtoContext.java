@@ -71,6 +71,10 @@ public abstract class ProtoContext {
      */
     protected final AtomicBoolean run = new AtomicBoolean(true);
     protected final AtomicLong lastAccess = new AtomicLong(getNow());
+
+    public void updateLastAccess(){
+        lastAccess.set(getNow());
+    }
     /**
      * Contains the -DECLARATION- of the protocol
      */
@@ -112,7 +116,8 @@ public abstract class ProtoContext {
             var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
             for (var item : fixedItemsList) {
                 var now = getNow();
-                if (item.getValue().lastAccess.get() < (now + timeout.get())) {
+                if (item.getValue().lastAccess.get() < (now - timeout.get())) {
+                    System.out.println(item.getValue().lastAccess.get()+" "+(now + timeout.get()));
                     var context = item.getValue();
                     var contextConnection = context.getValue("CONNECTION");
                     if (contextConnection == null) {
