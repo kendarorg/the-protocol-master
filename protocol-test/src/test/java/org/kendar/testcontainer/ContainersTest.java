@@ -5,15 +5,13 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.kendar.testcontainer.images.MysqlImage;
-import org.kendar.testcontainer.images.PostgreslImage;
-import org.kendar.testcontainer.images.RabbitMqImage;
-import org.kendar.testcontainer.images.RedisImage;
+import org.kendar.testcontainer.images.*;
 import org.kendar.testcontainer.utils.Utils;
 import org.testcontainers.containers.Network;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.nio.file.Path;
 import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
@@ -132,6 +130,26 @@ public class ContainersTest {
                 assertEquals("{name=John, surname=Smith, company=Redis, age=29}", jedis.hgetAll("user-session:123").toString());
                 // Prints: {name=John, surname=Smith, company=Redis, age=29}
             }
+        }
+    }
+
+    @Test
+    @Disabled("Only callable directly")
+    void testJAva() throws Exception {
+        var dockerHost = Utils.getDockerHost();
+        assertNotNull(dockerHost);
+        var network = Network.newNetwork();
+
+        try (var javaImage = new JavaImage()){
+            javaImage
+                    .withDir("/test")
+                    .withFile(Path.of("..","protocol-runner","target","protocol-runner.jar").toString(),"/test/protocol-runner.jar")
+                    .withCmd(Path.of("..","protocol-test","run.sh").toString(),"/test/run.sh")
+                    .withNetwork(network)
+                    .withAliases("mysql.sample.test", "mysql.proxy.test")
+                    .start();
+            Thread.sleep(2000);
+
         }
     }
 }
