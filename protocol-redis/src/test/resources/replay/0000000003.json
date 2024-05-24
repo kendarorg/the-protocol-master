@@ -1,16 +1,23 @@
 {
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 3,
-  "input" : {
-    "type" : "Resp3Message",
-    "data" : [ "SUBSCRIBE", "commonChannel" ]
+  "constant": false,
+  "connectionId": 1,
+  "index": 3,
+  "input": {
+    "type": "Resp3Message",
+    "data": [
+      "SUBSCRIBE",
+      "commonChannel"
+    ]
   },
-  "output" : {
-    "type" : "Resp3Response",
-    "data" : [ "subscribe", "commonChannel", 1 ]
+  "output": {
+    "type": "Resp3Response",
+    "data": [
+      "subscribe",
+      "commonChannel",
+      1
+    ]
   },
-  "durationMs" : 2,
-  "type" : "Resp3Message",
-  "caller" : "RESP3"
+  "durationMs": 2,
+  "type": "Resp3Message",
+  "caller": "RESP3"
 }

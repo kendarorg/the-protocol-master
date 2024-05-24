@@ -3,11 +3,11 @@ package org.kendar.proxy;
 import org.kendar.protocol.events.BaseEvent;
 
 public class EventContainer {
-    public EventContainer(){
-
-    }
     private BaseEvent event;
     private int length;
+    public EventContainer() {
+
+    }
 
     public EventContainer(BaseEvent event, int size) {
         this.event = event;

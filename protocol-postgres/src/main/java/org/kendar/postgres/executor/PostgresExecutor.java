@@ -260,7 +260,7 @@ public class PostgresExecutor {
             resultSet.getRecords().clear();
             resultSet.getMetadata().clear();
         }
-        if(resultSet==null){
+        if (resultSet == null) {
             resultSet = new SelectResult();
             resultSet.setIntResult(true);
             resultSet.setCount(0);

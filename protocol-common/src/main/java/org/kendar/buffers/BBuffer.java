@@ -502,8 +502,8 @@ public class BBuffer {
         return toHexByteArray(getBytes(size));
     }
 
-    public String toHexStringUpToLength(int pos,int length) {
-        var size = Math.min(size(), length+pos);
-        return toHexByteArray(getBytes(pos,size));
+    public String toHexStringUpToLength(int pos, int length) {
+        var size = Math.min(size(), length + pos);
+        return toHexByteArray(getBytes(pos, size));
     }
 }

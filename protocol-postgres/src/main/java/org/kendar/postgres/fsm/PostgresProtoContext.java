@@ -21,21 +21,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PostgresProtoContext extends NetworkProtoContext {
 
-    private static ConcurrentHashMap<Integer, PostgresProtoContext> pids = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(PostgresProtoContext.class);
+    private static ConcurrentHashMap<Integer, PostgresProtoContext> pids = new ConcurrentHashMap<>();
     private final int pid;
     private final AtomicBoolean cancel = new AtomicBoolean(false);
     private List<Iterator<ProtoStep>> toSync = new ArrayList<>();
-
-    public static void initializePids(){
-        pids = new ConcurrentHashMap<>();
-    }
 
     public PostgresProtoContext(ProtoDescriptor descriptor) {
 
         super(descriptor);
         pid = getNewPid();
         pids.put(pid, this);
+    }
+
+    public static void initializePids() {
+        pids = new ConcurrentHashMap<>();
     }
 
     public static PostgresProtoContext getContextByPid(int pid) {

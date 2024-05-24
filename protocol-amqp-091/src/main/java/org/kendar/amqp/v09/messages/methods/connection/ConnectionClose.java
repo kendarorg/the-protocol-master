@@ -102,7 +102,7 @@ public class ConnectionClose extends Connection {
                             fconn,
                             chClose,
                             result,
-                    true
+                            true
                     )
             );
         }

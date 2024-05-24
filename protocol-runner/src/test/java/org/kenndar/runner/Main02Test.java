@@ -32,6 +32,7 @@ public class Main02Test extends BasicTest {
         runTheServer.set(false);
         Sleeper.sleep(100);
     }
+
     @Test
     void testErrorInsert() throws Exception {
         System.out.println("RECORDING ==============================================");

@@ -1,16 +1,20 @@
 {
-  "constant" : false,
-  "connectionId" : 2,
-  "index" : 6,
-  "input" : {
-    "type" : "Resp3Message",
-    "data" : [ "PUBLISH", "commonChannel", "FIRST" ]
+  "constant": false,
+  "connectionId": 2,
+  "index": 6,
+  "input": {
+    "type": "Resp3Message",
+    "data": [
+      "PUBLISH",
+      "commonChannel",
+      "FIRST"
+    ]
   },
-  "output" : {
-    "type" : "Resp3Response",
-    "data" : 1
+  "output": {
+    "type": "Resp3Response",
+    "data": 1
   },
-  "durationMs" : 0,
-  "type" : "Resp3Message",
-  "caller" : "RESP3"
+  "durationMs": 0,
+  "type": "Resp3Message",
+  "caller": "RESP3"
 }

@@ -86,6 +86,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
     /**
      * Create the connection
+     *
      * @param context
      * @return
      */
@@ -109,6 +110,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
     /**
      * Build the specific connection with custom parameter and class
+     *
      * @param context
      * @param inetSocketAddress
      * @param group
@@ -158,12 +160,14 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
     /**
      * Set the name of the protocol to store when recording
+     *
      * @return
      */
     protected abstract String getCaller();
 
     /**
      * Given a event to read return the data to serialize
+     *
      * @param of
      * @return
      */
@@ -171,20 +175,22 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
     /**
      * Run expecting a message and a return value
+     *
      * @param context
      * @param connection
      * @param of
      * @param toRead
-     * @return
      * @param <T>
      * @param <K>
+     * @return
      */
     public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
                                                                      ProxyConnection connection, K of, T toRead) {
-        return execute(context,connection,of,toRead,false);
+        return execute(context, connection, of, toRead, false);
     }
+
     public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
-                                                                     ProxyConnection connection, K of, T toRead,boolean optional) {
+                                                                     ProxyConnection connection, K of, T toRead, boolean optional) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
@@ -206,7 +212,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         var sock = (NetworkProxySocket) connection.getConnection();
         var bufferToWrite = protocol.buildBuffer();
         sock.write(of, bufferToWrite);
-        sock.read(toRead,optional);
+        sock.read(toRead, optional);
 
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();
@@ -222,6 +228,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
     /**
      * Build the state that will be rendered to the client based on the json serialized data
+     *
      * @param context
      * @param out
      * @param aClass
@@ -240,9 +247,10 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @return
      */
     public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead) {
-        return execute(context,connection,of,toRead,false);
+        return execute(context, connection, of, toRead, false);
     }
-    public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead,boolean optional) {
+
+    public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead, boolean optional) {
         var req = "{\"type\":\"byte[]\",\"data\":{\"bytes\":\"" + Base64.getEncoder().encode(of.getAll()) + "\"}}";
         var jsonReq = mapper.toJsonNode(req);
 
@@ -262,7 +270,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         long start = System.currentTimeMillis();
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of);
-        sock.read(toRead,optional);
+        sock.read(toRead, optional);
 
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();
@@ -280,6 +288,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * in the correct message. Finds the correct originating connection (From the connection
      * id and the list of connections just created) and write the result to the client resulting
      * in the emulation of an async response
+     *
      * @param storageItems
      */
     protected abstract void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems);

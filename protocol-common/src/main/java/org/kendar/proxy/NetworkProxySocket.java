@@ -118,7 +118,7 @@ public abstract class NetworkProxySocket {
                                             if (!run && gf.canRunEvent(be)) {
                                                 var event = gf.split(be);
                                                 var internalRun = false;
-                                                for(var item:buildPossibleEvents(context,event.getBuffer())){
+                                                for (var item : buildPossibleEvents(context, event.getBuffer())) {
                                                     for (int i = 0; i < availableStates().size(); i++) {
                                                         possible = availableStates().get(i);
                                                         if (possible.canRunEvent(item)) {
@@ -132,13 +132,13 @@ public abstract class NetworkProxySocket {
                                                             break;
                                                         }
                                                     }
-                                                    if(internalRun==true){
+                                                    if (internalRun == true) {
                                                         break;
                                                     }
                                                 }
                                                 //This bytes event is one containing exactly one frame
 
-                                                if(internalRun==false){
+                                                if (internalRun == false) {
                                                     log.debug("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
                                                     inputQueue.add(event);
                                                     tempBuffer.truncate();
@@ -208,12 +208,12 @@ public abstract class NetworkProxySocket {
     }
 
 
-    public List<ReturnMessage> read(ProtoState protoState,boolean optional) {
+    public List<ReturnMessage> read(ProtoState protoState, boolean optional) {
 
         log.debug("[SERVER][EX]: " + protoState.getClass().getSimpleName());
         BaseEvent founded = null;
         try {
-            long maxCount = System.currentTimeMillis()+1000;
+            long maxCount = System.currentTimeMillis() + 1000;
             //FLW13 SEEK A SPECIFIC MESSAGE
             while (founded == null && maxCount > System.currentTimeMillis()) {
                 context.setActive();
@@ -252,9 +252,9 @@ public abstract class NetworkProxySocket {
         }
 
         var returnMessage = new ArrayList<ReturnMessage>();
-        if(founded==null){
-            throw new RuntimeException("UNABLE TO FIND Contains STILL ("+received.size()+")");
-        }else {
+        if (founded == null) {
+            throw new RuntimeException("UNABLE TO FIND Contains STILL (" + received.size() + ")");
+        } else {
             //FLW16 RUN THE FOUNDED MESSAGE
             Iterator<ProtoStep> it = protoState.executeEvent(founded);
             while (it.hasNext()) {
