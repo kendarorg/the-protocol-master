@@ -117,7 +117,6 @@ public abstract class ProtoContext {
             for (var item : fixedItemsList) {
                 var now = getNow();
                 if (item.getValue().lastAccess.get() < (now - timeout.get())) {
-                    System.out.println(item.getValue().lastAccess.get()+" "+(now + timeout.get()));
                     var context = item.getValue();
                     var contextConnection = context.getValue("CONNECTION");
                     if (contextConnection == null) {
