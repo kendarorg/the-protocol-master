@@ -265,6 +265,7 @@ public class MySQLExecutor {
                     withPacketNumber(++packetNumber));
 
             for (var byteRow : resultSet.getRecords()) {
+                protoContext.updateLastAccess();
                 if (text) {
                     //Text resultset
                     result.add(new DataRow(byteRow, resultSet.getMetadata()).

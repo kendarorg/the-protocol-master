@@ -3,20 +3,20 @@
   "connectionId": 1,
   "index": 12,
   "input": {
-    "type": "UNSUBSCRIBE",
+    "type": "Resp3Message",
     "data": [
       "UNSUBSCRIBE"
     ]
   },
   "output": {
-    "type": "ArrayList",
+    "type": "Resp3Response",
     "data": [
       "unsubscribe",
       "commonChannel",
       0
     ]
   },
-  "durationMs": 0,
-  "type": "UNSUBSCRIBE",
+  "durationMs": 1,
+  "type": "Resp3Message",
   "caller": "RESP3"
 }

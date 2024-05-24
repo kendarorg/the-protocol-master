@@ -4,9 +4,9 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Connection;
+import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.amqp.v09.utils.FieldsReader;
 import org.kendar.amqp.v09.utils.LongStringHelper;
-import org.kendar.amqp.v09.utils.ProxySocket;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
@@ -91,7 +91,7 @@ public class ConnectionStartOk extends Connection {
         var password = auth[2];
         var locale = ShortStringHelper.read(rb);
 
-        var sock = (ProxySocket) connection.getConnection();
+        var sock = (AmqpProxySocket) connection.getConnection();
         var connStartOk = new ConnectionStartOk();
         connStartOk.setClientProperties(clientProperties);
         connStartOk.setMechanisms(mechanisms.split(" "));

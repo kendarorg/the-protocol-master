@@ -815,7 +815,7 @@
     },
     "intResult": 0
   },
-  "durationMs": 8,
+  "durationMs": 6,
   "type": "QUERY",
   "caller": "JDBC"
 }

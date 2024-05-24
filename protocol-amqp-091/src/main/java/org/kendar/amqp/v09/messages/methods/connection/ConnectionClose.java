@@ -95,12 +95,14 @@ public class ConnectionClose extends Connection {
 
         if (context != null) {
             var result = new ConnectionCloseOk();
+            result.setChannel(channel);
             var fproxy = proxy;
             var fconn = connection;
             return iteratorOfRunnable(() -> fproxy.execute(context,
                             fconn,
                             chClose,
-                            result
+                            result,
+                            true
                     )
             );
         }

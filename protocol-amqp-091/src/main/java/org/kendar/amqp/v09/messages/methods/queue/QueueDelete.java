@@ -106,7 +106,8 @@ public class QueueDelete extends Queue {
         return iteratorOfRunnable(() -> proxy.execute(context,
                 connection,
                 queueDeclare,
-                queueDeleteOk
+                queueDeleteOk,
+                true
         ));
     }
 

@@ -3,7 +3,7 @@
     "index": 1,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 13,
+    "durationMs": 10,
     "tags": {
       "query": "/* mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c) */SELECT  @@session.auto_increment_increment AS auto_increment_increment, @@character_set_client AS character_set_client, @@character_set_connection AS character_set_connection, @@character_set_results AS character_set_results, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@collation_connection AS collation_connection, @@init_connect AS init_connect, @@interactive_timeout AS interactive_timeout, @@license AS license, @@lower_case_table_names AS lower_case_table_names, @@max_allowed_packet AS max_allowed_packet, @@net_write_timeout AS net_write_timeout, @@performance_schema AS performance_schema, @@sql_mode AS sql_mode, @@system_time_zone AS system_time_zone, @@time_zone AS time_zone, @@transaction_isolation AS transaction_isolation, @@wait_timeout AS wait_timeout",
       "isIntResult": "false",
@@ -27,7 +27,7 @@
     "index": 3,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 8,
+    "durationMs": 6,
     "tags": {
       "query": "SELECT WORD FROM INFORMATION_SCHEMA.KEYWORDS WHERE RESERVED=1 ORDER BY WORD",
       "isIntResult": "false",
@@ -51,7 +51,7 @@
     "index": 5,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 0,
+    "durationMs": 1,
     "tags": {
       "query": "SET autocommit=1",
       "isIntResult": "true",
@@ -63,7 +63,7 @@
     "index": 6,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "query": "SELECT @@session.transaction_read_only",
       "isIntResult": "true",
@@ -75,7 +75,7 @@
     "index": 7,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 10,
+    "durationMs": 6,
     "tags": {
       "query": "drop table if exists COMPANY_JPA",
       "isIntResult": "true",
@@ -99,7 +99,7 @@
     "index": 9,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 0,
+    "durationMs": 1,
     "tags": {
       "query": "SET autocommit=1",
       "isIntResult": "true",
@@ -111,7 +111,7 @@
     "index": 10,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 2,
+    "durationMs": 0,
     "tags": {
       "query": "SELECT @@session.transaction_read_only",
       "isIntResult": "true",
@@ -123,7 +123,7 @@
     "index": 11,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 26,
+    "durationMs": 22,
     "tags": {
       "query": "create table COMPANY_JPA (ID bigint not null auto_increment, ADDRESS varchar(255), AGE integer, DENOMINATION varchar(255), SALARY double precision, primary key (ID))",
       "isIntResult": "true",
@@ -135,7 +135,7 @@
     "index": 12,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "query": "SET autocommit=1",
       "isIntResult": "true",
@@ -147,11 +147,11 @@
     "index": 13,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 7,
+    "durationMs": 6,
     "tags": {
       "query": "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ('TEST RD', 22, 'Test Ltd', 500.22)",
-      "isIntResult": "false",
-      "resultsCount": "1",
+      "isIntResult": "true",
+      "resultsCount": "0",
       "parametersCount": "0"
     }
   },
@@ -159,7 +159,7 @@
     "index": 14,
     "type": "QUERY",
     "caller": "JDBC",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "query": "SET autocommit=1",
       "isIntResult": "true",

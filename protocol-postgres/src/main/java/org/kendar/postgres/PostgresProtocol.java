@@ -31,7 +31,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
             dataTypesConverter = new DataTypesConverter(om.deserialize(text, new TypeReference<>() {
             }));
         } catch (Exception e) {
-            log.trace("Ignorable",e);
+            log.trace("Ignorable", e);
         }
     }
 
@@ -59,6 +59,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
 
     @Override
     protected void initializeProtocol() {
+        PostgresProtoContext.initializePids();
         addInterruptState(new CancelRequest(BytesEvent.class));
         addInterruptState(new PostgresPacketTranslator(BytesEvent.class));
         initialize(

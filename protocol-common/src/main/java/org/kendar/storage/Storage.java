@@ -1,5 +1,7 @@
 package org.kendar.storage;
 
+import java.util.List;
+
 /**
  * Base interface for storage
  *
@@ -50,4 +52,8 @@ public interface Storage<I, O> {
      * @return
      */
     long generateIndex();
+
+    StorageItem<I, O> read(I toRead, String type);
+
+    List<StorageItem<I, O>> readResponses(long afterIndex);
 }

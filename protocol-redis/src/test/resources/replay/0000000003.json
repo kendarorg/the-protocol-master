@@ -3,21 +3,21 @@
   "connectionId": 1,
   "index": 3,
   "input": {
-    "type": "SUBSCRIBE",
+    "type": "Resp3Message",
     "data": [
       "SUBSCRIBE",
       "commonChannel"
     ]
   },
   "output": {
-    "type": "ArrayList",
+    "type": "Resp3Response",
     "data": [
       "subscribe",
       "commonChannel",
       1
     ]
   },
-  "durationMs": 3,
-  "type": "SUBSCRIBE",
+  "durationMs": 2,
+  "type": "Resp3Message",
   "caller": "RESP3"
 }

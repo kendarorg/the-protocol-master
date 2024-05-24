@@ -1,7 +1,6 @@
 package org.kendar.mysql.messages;
 
 import org.kendar.mysql.buffers.MySQLBBuffer;
-import org.kendar.mysql.constants.CapabilityFlag;
 
 public class EOFPacket extends MySQLReturnMessage {
 

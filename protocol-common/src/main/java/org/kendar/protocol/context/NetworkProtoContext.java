@@ -175,7 +175,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
         try {
             client.close();
         } catch (IOException e) {
-            log.trace("Ignorable",e);
+            log.trace("Ignorable", e);
         }
     }
 
@@ -247,6 +247,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * Send the greetings to the server
      */
     public void sendGreetings() {
+        lastAccess.set(getNow());
         this.send(new BytesEvent(this, NullState.class, buildBuffer()));
     }
 
@@ -294,10 +295,16 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     @Override
     public void runSteps(Iterator<ProtoStep> stepsToInvoke, ProtoState executor, BaseEvent event) {
+        lastAccess.set(getNow());
         executorService.execute(() -> {
+            lastAccess.set(getNow());
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
                 super.runSteps(stepsToInvoke, executor, event);
             }
         });
+    }
+
+    public void setActive() {
+        lastAccess.set(getNow());
     }
 }

@@ -3,7 +3,7 @@
   "connectionId": 2,
   "index": 6,
   "input": {
-    "type": "PUBLISH",
+    "type": "Resp3Message",
     "data": [
       "PUBLISH",
       "commonChannel",
@@ -11,10 +11,10 @@
     ]
   },
   "output": {
-    "type": "Integer",
+    "type": "Resp3Response",
     "data": 1
   },
-  "durationMs": 1,
-  "type": "PUBLISH",
+  "durationMs": 0,
+  "type": "Resp3Message",
   "caller": "RESP3"
 }

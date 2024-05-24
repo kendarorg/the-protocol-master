@@ -39,7 +39,7 @@ public class Parse extends PostgresState {
                 }
             }
         } catch (Exception ex) {
-            log.trace("Ignorable",ex);
+            log.trace("Ignorable", ex);
         }
     }
 

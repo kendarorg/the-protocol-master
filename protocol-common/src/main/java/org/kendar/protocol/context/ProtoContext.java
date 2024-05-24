@@ -31,16 +31,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class ProtoContext {
 
-    private static final ConcurrentHashMap<Integer, ProtoContext> contextsCache = new ConcurrentHashMap<>();
-    private static final AtomicInteger timeout = new AtomicInteger(30);
-    private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
-    private static final Thread contextCleaner;
-
-    static {
-        contextCleaner = new Thread(ProtoContext::contextsClean);
-        contextCleaner.start();
-    }
-
+    private static ConcurrentHashMap<Integer, ProtoContext> contextsCache;
+    private static AtomicInteger timeout;
+    private static Logger log = LoggerFactory.getLogger(ProtoContext.class);
+    private static Thread contextCleaner;
+    private static volatile boolean runClean = false;
     /**
      * Stores the variable relatives to the current instance execution
      */
@@ -60,6 +55,7 @@ public abstract class ProtoContext {
      * Flag to stop the execution
      */
     protected final AtomicBoolean run = new AtomicBoolean(true);
+    protected final AtomicLong lastAccess = new AtomicLong(getNow());
     /**
      * Contains the -DECLARATION- of the protocol
      */
@@ -68,7 +64,6 @@ public abstract class ProtoContext {
      * Exclusively lock the send operation
      */
     private final Object sendLock = new Object();
-    protected final AtomicLong lastAccess = new AtomicLong(getNow());
     /**
      * Execution stack, this stores the current state
      */
@@ -85,7 +80,23 @@ public abstract class ProtoContext {
         this.contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
         this.descriptor = descriptor;
         this.root = descriptor.getTaggedStates();
+        lastAccess.set(getNow());
         contextsCache.put(this.contextId, this);
+    }
+
+    public static void initializeStatic() {
+
+        timeout = new AtomicInteger(30);
+        runClean = false;
+        if (contextCleaner != null) {
+            if (contextCleaner.isAlive()) {
+                Sleeper.sleep(2000);
+            }
+        }
+        runClean = true;
+        contextsCache = new ConcurrentHashMap<>();
+        contextCleaner = new Thread(ProtoContext::contextsClean);
+        contextCleaner.start();
     }
 
     public static void setTimeout(int value) {
@@ -94,27 +105,29 @@ public abstract class ProtoContext {
 
     private static void contextsClean() {
 
-        while (true) {
+        while (runClean) {
             Sleeper.sleep(1000);
             var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
             for (var item : fixedItemsList) {
                 var now = getNow();
-                if (item.getValue().lastAccess.get() < (now + timeout.get())) {
+                if (item.getValue().lastAccess.get() < (now - timeout.get())) {
                     var context = item.getValue();
                     var contextConnection = context.getValue("CONNECTION");
                     if (contextConnection == null) {
                         contextsCache.remove(item.getKey());
                     }
 
-                    try {
-                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                        log.debug("Disconnecting");
-                    } catch (Exception ex) {
-                        log.trace("Error disconnecting", ex);
+                    try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.contextId + "")) {
+                        try {
+                            context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                            log.debug("[DISCONNECT]");
+                        } catch (Exception ex) {
+                            log.trace("[DISCONNECT] Error", ex);
+                        }
                     }
                     contextsCache.remove(item.getKey());
                 } else {
-                    log.debug("keepalive");
+                    log.trace("[KEEPALIVE]");
                 }
             }
         }
@@ -164,6 +177,10 @@ public abstract class ProtoContext {
             result = new FailedState("Unable to run event", candidate, event);
         }
         return result;
+    }
+
+    public void updateLastAccess() {
+        lastAccess.set(getNow());
     }
 
     public abstract void disconnect(Object connection);

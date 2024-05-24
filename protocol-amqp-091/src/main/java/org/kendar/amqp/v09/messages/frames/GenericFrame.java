@@ -4,11 +4,12 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.proxy.NetworkProxySplitterState;
 
 /**
  * The frame-end octet MUST always be the hexadecimal value %xCE.
  */
-public class GenericFrame extends ProtoState implements NetworkReturnMessage {
+public class GenericFrame extends ProtoState implements NetworkReturnMessage, NetworkProxySplitterState {
     private short channel = 0;
     private byte type = 0;
 
@@ -75,4 +76,8 @@ public class GenericFrame extends ProtoState implements NetworkReturnMessage {
         return new BytesEvent(null, null, bb);
     }
 
+    @Override
+    public BytesEvent split(BytesEvent input) {
+        return execute(input);
+    }
 }

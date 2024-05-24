@@ -5,9 +5,9 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
+import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.amqp.v09.utils.FieldsReader;
 import org.kendar.amqp.v09.utils.FieldsWriter;
-import org.kendar.amqp.v09.utils.ProxySocket;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferUtils;
@@ -130,7 +130,7 @@ public class BasicConsume extends Basic {
         var context = (AmqpProtoContext) event.getContext();
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-        var sock = (ProxySocket) connection.getConnection();
+        var sock = (AmqpProxySocket) connection.getConnection();
 
         this.setChannel(channel);
         var reserved1 = rb.getShort();

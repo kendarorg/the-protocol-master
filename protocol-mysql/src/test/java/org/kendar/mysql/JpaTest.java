@@ -3,6 +3,7 @@ package org.kendar.mysql;
 import org.junit.jupiter.api.*;
 import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
+import org.kendar.utils.Sleeper;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +35,7 @@ public class JpaTest extends BasicTest {
 
     @Test
     void simpleJpaTest() throws Exception {
+        Sleeper.sleep(1000);
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",
                 //postgresContainer.getJdbcUrl(),
                 String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),

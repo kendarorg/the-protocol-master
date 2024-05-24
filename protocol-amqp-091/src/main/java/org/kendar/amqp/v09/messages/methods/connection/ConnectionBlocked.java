@@ -47,7 +47,7 @@ public class ConnectionBlocked extends Connection {
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         var context = (AmqpProtoContext) event.getContext();
-        AmqpProxy proxy = (AmqpProxy) context.getProxy();
+        var proxy = (AmqpProxy) context.getProxy();
         ProxyConnection connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
 

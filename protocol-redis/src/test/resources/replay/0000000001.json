@@ -3,7 +3,7 @@
   "connectionId": 1,
   "index": 1,
   "input": {
-    "type": "CLIENT",
+    "type": "Resp3Message",
     "data": [
       "CLIENT",
       "SETINFO",
@@ -12,10 +12,10 @@
     ]
   },
   "output": {
-    "type": "String",
+    "type": "Resp3Response",
     "data": "OK"
   },
   "durationMs": 1,
-  "type": "CLIENT",
+  "type": "Resp3Message",
   "caller": "RESP3"
 }

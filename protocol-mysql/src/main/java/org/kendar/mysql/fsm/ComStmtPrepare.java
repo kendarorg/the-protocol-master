@@ -1,7 +1,6 @@
 package org.kendar.mysql.fsm;
 
 import org.kendar.mysql.buffers.MySQLBBuffer;
-import org.kendar.mysql.constants.CapabilityFlag;
 import org.kendar.mysql.constants.CommandType;
 import org.kendar.mysql.executor.MySQLExecutor;
 import org.kendar.mysql.executor.MySQLProtoContext;

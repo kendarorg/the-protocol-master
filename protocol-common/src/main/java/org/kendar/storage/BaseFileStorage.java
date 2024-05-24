@@ -1,6 +1,7 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -179,5 +180,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
 
     protected abstract Map<String, String> buildTag(StorageItem<I, O> item);
 
-
+    public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type) {
+        return null;
+    }
 }

@@ -15,7 +15,7 @@ a set of java libraries, aimed at various tasks (and an executable jar if you wa
 * Run queries against a pre-recorded sequence of commands to simulate a real data
   storage, without the need of a real server (in the making)
 
-The whole project is covered with Jacoco (64% coverage actually)
+The whole project is covered with Jacoco (77% coverage actually)
 
 For this to become real an event based state machine has been developed, with
 several database wire protocol implementations:
@@ -142,11 +142,11 @@ SELECT
  2 AS TEST
 </pre>
 
-## The state machine
+## The state machine-Behaviour tree
 
 ### TLDR
 
-The state machine (or better the Turing Machine, having memory) is based on
+The state machine (or better the Behaviour tree fsm) is based on
 
 * States (extending ProtoState) able to interact with events
 * Events (extending BaseEvent) to invoke action on states
@@ -166,4 +166,13 @@ without errors then the "executed incoming buffer" is purged from the received b
 The events are immediatly executed. If no bytes are present or there are not enough
 bytes to read, the events queue is seeked for "BytesEvent" and then the execution is
 retried.
+
+## Suggestion for run and compilation
+
+You can build the whole system at home, but to avoid messing with timeouts
+
+* Maven clean & install each project separately
+* Run the jacoco tu check the coverage
+
+
 

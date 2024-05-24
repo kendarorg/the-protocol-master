@@ -260,12 +260,18 @@ public class PostgresExecutor {
             resultSet.getRecords().clear();
             resultSet.getMetadata().clear();
         }
+        if (resultSet == null) {
+            resultSet = new SelectResult();
+            resultSet.setIntResult(true);
+            resultSet.setCount(0);
+        }
         if (!resultSet.isIntResult()) {
 
             var fields = identifyFields(resultSet);
             result.add(new RowDescription(fields));
 
             for (var byteRow : resultSet.getRecords()) {
+                protoContext.updateLastAccess();
                 result.add(new DataRow(byteRow, fields));
             }
             result.add(new CommandComplete(String.format(operation + " %d", resultSet.getRecords().size())));

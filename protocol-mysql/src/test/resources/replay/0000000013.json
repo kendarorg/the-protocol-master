@@ -8,31 +8,15 @@
   },
   "output": {
     "selectResult": {
-      "records": [
-        [
-          "1"
-        ]
-      ],
-      "metadata": [
-        {
-          "columnName": "GENERATED_KEY",
-          "columnLabel": "GENERATED_KEY",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "",
-          "columnDisplaySize": 20,
-          "columnType": "BIGINT",
-          "precision": 20
-        }
-      ],
+      "records": [],
+      "metadata": [],
       "count": 1,
-      "intResult": false,
-      "lastInsertedId": 0
+      "intResult": true,
+      "lastInsertedId": 1
     },
     "intResult": 0
   },
-  "durationMs": 7,
+  "durationMs": 6,
   "type": "QUERY",
   "caller": "JDBC"
 }

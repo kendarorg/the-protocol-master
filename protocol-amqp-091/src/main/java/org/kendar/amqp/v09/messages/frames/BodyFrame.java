@@ -5,7 +5,7 @@ import org.kendar.amqp.v09.dtos.FrameType;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
-import org.kendar.amqp.v09.utils.ProxySocket;
+import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
@@ -18,7 +18,7 @@ import java.util.Iterator;
 public class BodyFrame extends Frame {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BodyFrame.class);
-    private static final Logger logPs = LoggerFactory.getLogger(ProxySocket.class.getName());
+    private static final Logger logPs = LoggerFactory.getLogger(AmqpProxySocket.class.getName());
     private byte[] contentBytes;
     private String contentString;
     private int consumeId;

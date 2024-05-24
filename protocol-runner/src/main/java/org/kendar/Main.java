@@ -34,7 +34,10 @@ public class Main {
     private static TcpServer protocolServer;
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
-
+        if (protocolServer != null) {
+            protocolServer.stop();
+            Sleeper.sleep(1000);
+        }
         Options options = getOptions();
 
         try {
