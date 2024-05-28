@@ -211,8 +211,6 @@ public class ComplexOperationsTest extends BasicTest {
                 + " LANGUAGE plpgsql");
         stmt.close();
 
-
-        //Sleeper.sleep(1000000000);
         stmt = c.prepareStatement("select * from hello_3(?)");
         ((PreparedStatement) stmt).setString(1, "pippo");
         // ((PreparedStatement)stmt).setString(2,null);

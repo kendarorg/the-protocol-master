@@ -1,4 +1,4 @@
-package org.kenndar.runner;
+package org.kendar.runner;
 
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.postgres.PostgresProtocol;
@@ -35,7 +35,6 @@ public class BasicTest {
 
     }
 
-
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("org.postgresql.Driver",
@@ -56,7 +55,9 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
     }
 
     public static void afterEachBase() {

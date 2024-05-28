@@ -33,10 +33,14 @@ import java.util.regex.Pattern;
 public class Main {
     private static TcpServer protocolServer;
 
+    public static boolean isRunning(){
+        if(protocolServer==null)return false;
+        return protocolServer.isRunning();
+    }
+
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
         if (protocolServer != null) {
             protocolServer.stop();
-            Sleeper.sleep(1000);
         }
         Options options = getOptions();
 
@@ -133,6 +137,7 @@ public class Main {
         try {
             if (line != null && line.trim().equalsIgnoreCase("q")) {
                 System.out.println("Exiting");
+                stop();
                 return false;
             } else {
                 System.out.println("Command not recognized: " + line.trim());
@@ -141,6 +146,7 @@ public class Main {
         } catch (Exception ex) {
             System.out.println("Exiting");
             System.err.println(ex);
+            stop();
             return false;
         }
     }
@@ -191,7 +197,9 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
     }
 
     private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws IOException {
@@ -248,7 +256,9 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
     }
 
     private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
@@ -268,7 +278,9 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
     }
 
     private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
@@ -289,6 +301,12 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
+    }
+
+    public static void stop() {
+        protocolServer.stop();
     }
 }

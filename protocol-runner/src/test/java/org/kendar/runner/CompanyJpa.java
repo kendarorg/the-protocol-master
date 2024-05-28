@@ -1,4 +1,4 @@
-package org.kenndar.runner;
+package org.kendar.runner;
 
 import javax.persistence.*;
 

@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"SqlSourceToSinkFlow", "rawtypes"})
 public class MysqlImage extends BaseImage<MysqlImage, MySQLContainer> {
@@ -73,6 +74,7 @@ public class MysqlImage extends BaseImage<MysqlImage, MySQLContainer> {
     protected void preStart() {
 
         container = new MySQLContainer<>(DockerImageName.parse("mysql:8"));
+        container.withTmpFs(Map.of("/var/lib/mysql", "rw"));
         container.setEnv(List.of("MYSQL_ROOT_PASSWORD=test"));
     }
 

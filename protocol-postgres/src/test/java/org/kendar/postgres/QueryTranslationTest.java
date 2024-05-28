@@ -69,7 +69,9 @@ public class QueryTranslationTest extends BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
 
 
         Connection c = getProxyConnection();

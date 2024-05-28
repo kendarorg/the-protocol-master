@@ -34,7 +34,9 @@ public class ReplayerTest {
 
         try {
             protocolServer.start();
-            Sleeper.sleep(1000);
+            while(!protocolServer.isRunning()) {
+                Sleeper.sleep(100);
+            }
 
             final JedisPoolConfig poolConfig = new JedisPoolConfig();
             final JedisPool jedisPool = new JedisPool(poolConfig, "127.0.0.1", FAKE_PORT, 0);

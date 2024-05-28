@@ -5,21 +5,18 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.kendar.testcontainer.images.MysqlImage;
-import org.kendar.testcontainer.images.PostgreslImage;
-import org.kendar.testcontainer.images.RabbitMqImage;
-import org.kendar.testcontainer.images.RedisImage;
+import org.kendar.testcontainer.images.*;
 import org.kendar.testcontainer.utils.Utils;
 import org.testcontainers.containers.Network;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.nio.file.Path;
 import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ContainersTest {
     @Test
@@ -132,6 +129,29 @@ public class ContainersTest {
                 assertEquals("{name=John, surname=Smith, company=Redis, age=29}", jedis.hgetAll("user-session:123").toString());
                 // Prints: {name=John, surname=Smith, company=Redis, age=29}
             }
+        }
+    }
+
+    @Test
+    @Disabled("Only callable directly")
+    void testJava() throws Exception {
+        var dockerHost = Utils.getDockerHost();
+        assertNotNull(dockerHost);
+        var network = Network.newNetwork();
+
+        try (var javaImage = new JavaImage()){
+            javaImage
+                    .withDir("/test")
+                    .withFile(Path.of("..","protocol-runner","target","protocol-runner.jar").toString(),"/test/protocol-runner.jar")
+                    .withCmd(Path.of("..","protocol-test","src","test","resources","run.sh").toString(),"/test/run.sh")
+                    .withNetwork(network)
+                    .withAliases("java.sample.test")
+                    .start();
+            Thread.sleep(2000);
+            var logs = javaImage.getLogs();
+            assertTrue(logs.contains("protocol-runner.jar"));
+            assertTrue(logs.contains("run.sh"));
+
         }
     }
 }
