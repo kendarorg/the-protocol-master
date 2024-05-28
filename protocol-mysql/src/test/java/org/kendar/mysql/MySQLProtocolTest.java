@@ -172,7 +172,7 @@ public class MySQLProtocolTest extends BasicTest {
 
 
         var stmt = c.createStatement();
-        stmt.executeUpdate("CREATE TABLE COMPANY_1 " +
+        stmt.executeUpdate("CREATE TABLE COMPANY_71 " +
                 "(ID INT PRIMARY KEY NOT NULL," +
                 " DENOMINATION TEXT, " +
                 " AGE INT NOT NULL, " +
@@ -181,14 +181,14 @@ public class MySQLProtocolTest extends BasicTest {
         stmt.close();
 
 
-        var pstmt = c.prepareStatement("INSERT INTO COMPANY_1 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+        var pstmt = c.prepareStatement("INSERT INTO COMPANY_71 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
                 "VALUES (10,?, 42, 'Ping Road 22', 25000.7);");
         pstmt.setString(1, "Test Ltd");
         //pstmt.setString(1,null);
         pstmt.execute();
         stmt.close();
 
-        pstmt = c.prepareStatement("SELECT DENOMINATION FROM COMPANY_1 WHERE ID=?;");
+        pstmt = c.prepareStatement("SELECT DENOMINATION FROM COMPANY_71 WHERE ID=?;");
         pstmt.setInt(1, 10);
         var resultset = pstmt.executeQuery();
         while (resultset.next()) {
