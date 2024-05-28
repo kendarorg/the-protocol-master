@@ -1,5 +1,6 @@
 package org.kendar.redis.fsm;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
@@ -97,16 +98,17 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         var context = (Resp3Context) event.getContext();
         var proxy = (Resp3Proxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-
+        var storage = proxy.getStorage();
         var request = (Map<String,Object>)context.getValue("REQUEST");
 
         if (event.getData() instanceof List) {
             if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().
                     equalsIgnoreCase("message")) {
-                var storage = proxy.getStorage();
+
                 var res = "{\"type\":\"RESPONSE\",\"data\":" +
                         mapper.serialize(event.getData()) + "}";
 
+                request.clear();
 
                 storage.write(
                         context.getContextId(),
@@ -116,6 +118,26 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
 
             }
 
+        }
+        if(!request.isEmpty()){
+            var res = "{\"type\":\"" + event.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
+            long end = System.currentTimeMillis();
+            /*context.setValue("REQUEST", (Map<String,Object>)Map.of(
+                "index",index,
+                "contextId",context.getContextId(),
+                "req",mapper.toJsonNode(req),
+                "start",start,
+                "class",of.getClass().getSimpleName(),
+                "caller",getCaller()
+        ));*/
+            storage.write(
+                    (long)request.get("index"),
+                    context.getContextId(),
+                    (JsonNode) request.get("req")
+                    , mapper.toJsonNode(res)
+                    , end-(long)request.get("start"),
+                    (String)request.get("class"),
+                    (String)request.get("caller"));
         }
         return iteratorOfList(event);
 //        if (!this.proxy) {
