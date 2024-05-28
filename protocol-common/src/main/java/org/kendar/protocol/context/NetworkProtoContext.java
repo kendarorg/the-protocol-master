@@ -9,6 +9,7 @@ import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.events.ProxyBytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -53,6 +54,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * Storage for the bytes not consumed
      */
     private BytesEvent remainingBytes;
+    private ProxyBytesEvent proxyRemainingBytes;
 
     public NetworkProtoContext(ProtoDescriptor descriptor) {
         super(descriptor);
@@ -66,8 +68,14 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     private static ProtoState continueOrThrowMissingHandler(BaseEvent event) {
         var message = "Missing event handler for " + event.getClass().getSimpleName();
-        if (event instanceof BytesEvent) {
+        if (event instanceof BytesEvent ) {
             var remainingBytes = (BytesEvent) event;
+            if (remainingBytes.getBuffer().size() == 0) {
+                return null;
+            }
+            message += " " + remainingBytes.getBuffer().toHexStringUpToLength(20);
+        }else if (event instanceof ProxyBytesEvent ) {
+            var remainingBytes = (ProxyBytesEvent) event;
             if (remainingBytes.getBuffer().size() == 0) {
                 return null;
             }
@@ -209,6 +217,12 @@ public abstract class NetworkProtoContext extends ProtoContext {
                 remainingBytes.getBuffer().truncate();
                 sendSync(remainingBytes);
             }
+        }else if (currentEvent instanceof ProxyBytesEvent) {
+            var remainingBytes = (ProxyBytesEvent) currentEvent;
+            if (remainingBytes.getBuffer().size() >= remainingBytes.getBuffer().getPosition()) {
+                remainingBytes.getBuffer().truncate();
+                sendSync(remainingBytes);
+            }
         }
     }
 
@@ -232,6 +246,17 @@ public abstract class NetworkProtoContext extends ProtoContext {
                     remainingBytes.getBuffer().setPosition(0);
                     currentEvent = remainingBytes;
                     remainingBytes = null;
+
+                }
+            }else if (currentEvent instanceof ProxyBytesEvent) {
+                var be = (ProxyBytesEvent) currentEvent;
+                if (proxyRemainingBytes != null && proxyRemainingBytes.getBuffer().size() > 0) {
+                    log.trace("[SERVER][RX] Adding to remaining bytes");
+                    proxyRemainingBytes.getBuffer().setPosition(proxyRemainingBytes.getBuffer().size());
+                    proxyRemainingBytes.getBuffer().write(be.getBuffer().getAll());
+                    proxyRemainingBytes.getBuffer().setPosition(0);
+                    currentEvent = proxyRemainingBytes;
+                    proxyRemainingBytes = null;
 
                 }
             }

@@ -4,6 +4,7 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.events.ProxyBytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -68,90 +69,99 @@ public abstract class NetworkProxySocket {
                                     //FLW02 RETRIEVE THE DATA
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
-                                    var bb = new BBuffer();
-                                    bb.write(byteArray);
+//                                    var bb = new BBuffer();
+//                                    bb.write(byteArray);
                                     //System.out.println("[XXXX] "+bb.toHexStringUpToLength(0,12));
 
-                                    try {
-                                        semaphore.acquire();
-                                        tempBuffer.setPosition(tempBuffer.size());
-                                        //FLW03 APPEND TO EXISTING BUFFER
-                                        tempBuffer.write(byteArray);
-                                        tempBuffer.setPosition(0);
-
-                                        log.trace("[PROXY ][RX] Bytes: " + byteArray.length);
-                                        //FLW04 GENERICFRAME AN EXPECTED RESPONSE
-                                        var gf = getStateToRetrieveOneSingleMessage();
-                                        //FLW05 BYTESEVENT from tmpBuffer (response specific to this flow)
+//                                    try {
+//                                        semaphore.acquire();
 
 
-                                        var eventsToTry = new ArrayList<BaseEvent>();
-                                        var be = new BytesEvent(context, null, tempBuffer);
-//                                        eventsToTry.add(bytesEvent);
-//                                        eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
-                                        boolean run = true;
-                                        while (run && tempBuffer.size() > 0) {
-                                            context.setActive();
-                                            run = false;
+                                        //TODO[24] BEG
+                                        var pbe = context.buildBuffer();
+                                        pbe.write(byteArray);
+                                        pbe.setPosition(0);
+                                        var proxyBytesEvent = new ProxyBytesEvent(context,null,pbe);
+                                        context.send(proxyBytesEvent);
+                                        //TODO[24] END
+//                                        tempBuffer.setPosition(tempBuffer.size());
+//                                        //FLW03 APPEND TO EXISTING BUFFER
+//                                        tempBuffer.write(byteArray);
+//                                        tempBuffer.setPosition(0);
+//
+//                                        log.trace("[PROXY ][RX] Bytes: " + byteArray.length);
+//                                        //FLW04 GENERICFRAME AN EXPECTED RESPONSE
+//                                        var gf = getStateToRetrieveOneSingleMessage();
+//                                        //FLW05 BYTESEVENT from tmpBuffer (response specific to this flow)
+//
+//
+//                                        var eventsToTry = new ArrayList<BaseEvent>();
+//                                        var be = new BytesEvent(context, null, tempBuffer);
+////                                        eventsToTry.add(bytesEvent);
+////                                        eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
+//                                        boolean run = true;
+//                                        while (run && tempBuffer.size() > 0) {
+//                                            context.setActive();
+//                                            run = false;
+//
+//                                            for (int i = 0; i < availableStates().size(); i++) {
+//                                                possible = availableStates().get(i);
+//
+//                                                //for (var be : eventsToTry) {
+//                                                //Check if can run with a bytes event
+//                                                if (possible.canRunEvent(be)) {
+//
+//                                                    stepsToInvoke = possible.executeEvent(be);
+//                                                    tempBuffer.truncate();
+//                                                    //FLW08 run the steps (sending back data)
+//                                                    context.runSteps(stepsToInvoke, possible, be);
+//                                                    log.debug("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
+//                                                    run = true;
+//                                                    break;
+//                                                }
+//                                                //}
+//                                                if (run) {
+//                                                    break;
+//                                                }
+//                                            }
+//                                            //FLW11 IF NOTHING FOUND (build a new bytesevent to send back)
+//                                            if (!run && gf.canRunEvent(be)) {
+//                                                var event = gf.split(be);
+//                                                var internalRun = false;
+//                                                for (var item : buildPossibleEvents(context, event.getBuffer())) {
+//                                                    for (int i = 0; i < availableStates().size(); i++) {
+//                                                        possible = availableStates().get(i);
+//                                                        if (possible.canRunEvent(item)) {
+//
+//                                                            stepsToInvoke = possible.executeEvent(item);
+//                                                            tempBuffer.truncate();
+//                                                            //FLW08 run the steps (sending back data)
+//                                                            context.runSteps(stepsToInvoke, possible, item);
+//                                                            log.debug("[PROXY ][RX][5]: " + possible.getClass().getSimpleName());
+//                                                            internalRun = true;
+//                                                            break;
+//                                                        }
+//                                                    }
+//                                                    if (internalRun == true) {
+//                                                        break;
+//                                                    }
+//                                                }
+//                                                //This bytes event is one containing exactly one frame
+//
+//                                                if (internalRun == false) {
+//                                                    log.debug("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
+//                                                    inputQueue.add(event);
+//                                                    tempBuffer.truncate();
+//                                                }
+//
+//                                                run = true;
+//                                            }
+//                                        }
+//                                        semaphore.release();
 
-                                            for (int i = 0; i < availableStates().size(); i++) {
-                                                possible = availableStates().get(i);
-
-                                                //for (var be : eventsToTry) {
-                                                //Check if can run with a bytes event
-                                                if (possible.canRunEvent(be)) {
-
-                                                    stepsToInvoke = possible.executeEvent(be);
-                                                    tempBuffer.truncate();
-                                                    //FLW08 run the steps (sending back data)
-                                                    context.runSteps(stepsToInvoke, possible, be);
-                                                    log.debug("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
-                                                    run = true;
-                                                    break;
-                                                }
-                                                //}
-                                                if (run) {
-                                                    break;
-                                                }
-                                            }
-                                            //FLW11 IF NOTHING FOUND (build a new bytesevent to send back)
-                                            if (!run && gf.canRunEvent(be)) {
-                                                var event = gf.split(be);
-                                                var internalRun = false;
-                                                for (var item : buildPossibleEvents(context, event.getBuffer())) {
-                                                    for (int i = 0; i < availableStates().size(); i++) {
-                                                        possible = availableStates().get(i);
-                                                        if (possible.canRunEvent(item)) {
-
-                                                            stepsToInvoke = possible.executeEvent(item);
-                                                            tempBuffer.truncate();
-                                                            //FLW08 run the steps (sending back data)
-                                                            context.runSteps(stepsToInvoke, possible, item);
-                                                            log.debug("[PROXY ][RX][5]: " + possible.getClass().getSimpleName());
-                                                            internalRun = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (internalRun == true) {
-                                                        break;
-                                                    }
-                                                }
-                                                //This bytes event is one containing exactly one frame
-
-                                                if (internalRun == false) {
-                                                    log.debug("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
-                                                    inputQueue.add(event);
-                                                    tempBuffer.truncate();
-                                                }
-
-                                                run = true;
-                                            }
-                                        }
-                                        semaphore.release();
-
-                                    } catch (InterruptedException e) {
-                                        throw new RuntimeException(e);
-                                    }
+//                                    } catch (InterruptedException e) {
+//                                        throw new RuntimeException(e);
+//                                    }
                                 }
 
                                 attachment.clear();

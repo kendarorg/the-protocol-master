@@ -4,11 +4,13 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.events.ProxyBytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.InterruptProtoState;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.NetworkProxySplitterState;
+import org.kendar.redis.fsm.events.ProxyResp3Message;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.redis.parser.Resp3Input;
 import org.kendar.redis.parser.Resp3ParseException;
@@ -60,6 +62,28 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
         return true;
     }
 
+    public boolean canRun(ProxyBytesEvent event) {
+        var rb = event.getBuffer();
+        var oldPos = rb.getPosition();
+        rb.setPosition(0);
+        var allBytes = rb.getAll();
+        if (allBytes.length == 0) {
+            return false;
+        }
+        var str = new String(allBytes);
+        var input = Resp3Input.of(str);
+        try {
+            Object result = parser.parse(input);
+            rb.setPosition(0);
+        } catch (Resp3ParseException ex) {
+            if (ex.isMissingData()) {
+                rb.setPosition(0);
+                throw new AskMoreDataException();
+            }
+        }
+        return true;
+    }
+
     public Iterator<ProtoStep> execute(BytesEvent event) {
         var rb = event.getBuffer();
         var oldPos = rb.getPosition();
@@ -78,14 +102,35 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
             }
         }
 
+        log.debug("[SERVER ][RX]: " + mapper.serialize(result));
+        event.getContext().send(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
+        return iteratorOfEmpty();
 
-        if (!this.proxy) {
-            log.debug("[SERVER ][RX]: " + mapper.serialize(result));
-            event.getContext().send(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
-            return iteratorOfEmpty();
-        } else {
-            return iteratorOfList(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
+    }
+
+    public Iterator<ProtoStep> execute(ProxyBytesEvent event) {
+        var rb = event.getBuffer();
+        var oldPos = rb.getPosition();
+        rb.setPosition(oldPos);
+        var allBytes = rb.getRemaining();
+        var str = new String(allBytes);
+        var input = Resp3Input.of(str);
+        Object result = null;
+        try {
+            result = parser.parse(input);
+            rb.setPosition(oldPos + input.getIndex());
+        } catch (Resp3ParseException ex) {
+            if (ex.isMissingData()) {
+                rb.setPosition(0);
+                throw new AskMoreDataException();
+            }
         }
+
+
+            log.debug("[SERVER ][RX]: " + mapper.serialize(result));
+            event.getContext().send(new ProxyResp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
+            return iteratorOfEmpty();
+
 
     }
 
