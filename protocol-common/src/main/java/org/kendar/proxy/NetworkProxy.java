@@ -18,6 +18,7 @@ import java.net.*;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -150,6 +151,14 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         sock.write(of, protocol.buildBuffer());
         var res = "{\"type\":null,\"data\":null}";
         long end = System.currentTimeMillis();
+        context.setValue("REQUEST", (Map<String,Object>)Map.of(
+                "index",index,
+                "contextId",context.getContextId(),
+                "req",mapper.toJsonNode(req),
+                "start",start,
+                "class",of.getClass().getSimpleName(),
+                "caller",getCaller()
+        ));
         storage.write(
                 index,
                 context.getContextId(),

@@ -313,8 +313,10 @@ public abstract class ProtoContext {
      * @param event
      * @return
      */
+    private static int count=0;
     private ProtoState findThePossibleNextState(BaseEvent event) {
         //Check if there are interrupts
+        count++;
         var possible = findPossibleInterrupt(event);
         ProtoState foundedState = null;
         //noinspection OptionalIsPresent

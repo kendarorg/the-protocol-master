@@ -215,13 +215,17 @@ public abstract class NetworkProtoContext extends ProtoContext {
             var remainingBytes = (BytesEvent) currentEvent;
             if (remainingBytes.getBuffer().size() >= remainingBytes.getBuffer().getPosition()) {
                 remainingBytes.getBuffer().truncate();
-                sendSync(remainingBytes);
+                if(remainingBytes.getBuffer().size()>0) {
+                    sendSync(remainingBytes);
+                }
             }
         }else if (currentEvent instanceof ProxyBytesEvent) {
             var remainingBytes = (ProxyBytesEvent) currentEvent;
             if (remainingBytes.getBuffer().size() >= remainingBytes.getBuffer().getPosition()) {
                 remainingBytes.getBuffer().truncate();
-                sendSync(remainingBytes);
+                if(remainingBytes.getBuffer().size()>0) {
+                    sendSync(remainingBytes);
+                }
             }
         }
     }
@@ -251,7 +255,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
             }else if (currentEvent instanceof ProxyBytesEvent) {
                 var be = (ProxyBytesEvent) currentEvent;
                 if (proxyRemainingBytes != null && proxyRemainingBytes.getBuffer().size() > 0) {
-                    log.trace("[SERVER][RX] Adding to remaining bytes");
+                    log.trace("[SERVER][RX5] Adding to remaining bytes");
                     proxyRemainingBytes.getBuffer().setPosition(proxyRemainingBytes.getBuffer().size());
                     proxyRemainingBytes.getBuffer().write(be.getBuffer().getAll());
                     proxyRemainingBytes.getBuffer().setPosition(0);
@@ -321,12 +325,12 @@ public abstract class NetworkProtoContext extends ProtoContext {
     @Override
     public void runSteps(Iterator<ProtoStep> stepsToInvoke, ProtoState executor, BaseEvent event) {
         lastAccess.set(getNow());
-        executorService.execute(() -> {
+        //executorService.execute(() -> {
             lastAccess.set(getNow());
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
                 super.runSteps(stepsToInvoke, executor, event);
             }
-        });
+        //});
     }
 
     public void setActive() {

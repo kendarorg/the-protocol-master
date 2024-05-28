@@ -102,7 +102,7 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
             }
         }
 
-        log.debug("[SERVER ][RX]: " + mapper.serialize(result));
+        log.debug("[SERVER ][RX1]: " + mapper.serialize(result));
         event.getContext().send(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
         return iteratorOfEmpty();
 
@@ -121,13 +121,13 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
             rb.setPosition(oldPos + input.getIndex());
         } catch (Resp3ParseException ex) {
             if (ex.isMissingData()) {
-                rb.setPosition(0);
+                rb.setPosition(oldPos);
                 throw new AskMoreDataException();
             }
         }
 
 
-            log.debug("[SERVER ][RX]: " + mapper.serialize(result));
+            log.debug("[SERVER ][RX2]: " + mapper.serialize(result));
             event.getContext().send(new ProxyResp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
             return iteratorOfEmpty();
 

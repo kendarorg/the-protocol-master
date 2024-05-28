@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
     protected static final JsonMapper mapper = new JsonMapper();
@@ -67,18 +68,7 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         return true;
     }
 
-    public boolean canRun(ProxyResp3Message event) {
-        if (isProxyed() && event.getData() instanceof List) {
-            if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("message")) {
-                return true;
-            }
 
-        }
-        if (isProxyed()) {
-            return false;
-        }
-        return true;
-    }
 
     public Iterator<ProtoStep> execute(Resp3Message event) {
         var context = (Resp3Context) event.getContext();
@@ -91,13 +81,28 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         ));
     }
 
+    public boolean canRun(ProxyResp3Message event) {
+
+//        if(event.getData() instanceof List<?>) {
+//            if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().
+//                    equalsIgnoreCase("message")) {
+//                return true;
+//            }
+//        }
+
+        return true;
+    }
+
     public Iterator<ProtoStep> execute(ProxyResp3Message event) {
         var context = (Resp3Context) event.getContext();
         var proxy = (Resp3Proxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
+        var request = (Map<String,Object>)context.getValue("REQUEST");
+
         if (event.getData() instanceof List) {
-            if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("message")) {
+            if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().
+                    equalsIgnoreCase("message")) {
                 var storage = proxy.getStorage();
                 var res = "{\"type\":\"RESPONSE\",\"data\":" +
                         mapper.serialize(event.getData()) + "}";
@@ -108,11 +113,11 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
                         null
                         , mapper.toJsonNode(res)
                         , 0, "RESPONSE", "RESP3");
-                return iteratorOfList(event);
+
             }
 
         }
-        return iteratorOfEmpty();
+        return iteratorOfList(event);
 //        if (!this.proxy) {
 //            return iteratorOfRunnable(() -> proxy.execute(context,
 //                    connection,
