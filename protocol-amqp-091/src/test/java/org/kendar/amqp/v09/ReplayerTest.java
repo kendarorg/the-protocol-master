@@ -68,9 +68,10 @@ public class ReplayerTest {
         var protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
         try {
-            Sleeper.sleep(1000);
-
 
             ConnectionFactory connectionFactory = new ConnectionFactory();
             connectionFactory.enableHostnameVerification();
@@ -150,7 +151,9 @@ public class ReplayerTest {
 
         protocolServer.start();
         try {
-            Sleeper.sleep(1000);
+            while(!protocolServer.isRunning()) {
+                Sleeper.sleep(100);
+            }
 
 
             ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -222,7 +225,9 @@ public class ReplayerTest {
 
         protocolServer.start();
         try {
-            Sleeper.sleep(1000);
+            while(!protocolServer.isRunning()) {
+                Sleeper.sleep(100);
+            }
 
 
             ConnectionFactory connectionFactory = new ConnectionFactory();

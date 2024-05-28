@@ -158,6 +158,7 @@ public class TcpServer {
     }
 
     public boolean isRunning() {
+        if(this.server==null) return false;
         return this.server.isOpen();
     }
 }

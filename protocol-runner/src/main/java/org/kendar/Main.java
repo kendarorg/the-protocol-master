@@ -41,7 +41,6 @@ public class Main {
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
         if (protocolServer != null) {
             protocolServer.stop();
-            Sleeper.sleep(1000);
         }
         Options options = getOptions();
 
@@ -198,7 +197,9 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
     }
 
     private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws IOException {
@@ -255,7 +256,9 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
     }
 
     private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
@@ -275,7 +278,9 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
     }
 
     private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
@@ -296,7 +301,9 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
     }
 
     public static void stop() {

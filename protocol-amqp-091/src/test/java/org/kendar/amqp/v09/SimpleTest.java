@@ -236,7 +236,9 @@ public class SimpleTest extends BasicTest {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
 
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
         ConnectionFactory connectionFactory = new ConnectionFactory();
         // connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;

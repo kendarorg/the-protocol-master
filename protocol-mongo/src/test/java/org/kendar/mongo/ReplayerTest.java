@@ -50,7 +50,9 @@ public class ReplayerTest {
         var protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(1000);
+        while(!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
 
         var c = getProxyConnectionWithServerApis();
         var db = c.getDatabase("admin");

@@ -28,7 +28,9 @@ public class ReplayerTest {
 
         protocolServer.start();
         try {
-            Sleeper.sleep(1000);
+            while(!protocolServer.isRunning()) {
+                Sleeper.sleep(100);
+            }
 
 
             HibernateSessionFactory.initialize("org.postgresql.Driver",
