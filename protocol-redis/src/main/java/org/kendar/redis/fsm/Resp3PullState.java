@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
     protected static final JsonMapper mapper = new JsonMapper();
@@ -99,7 +100,12 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         var proxy = (Resp3Proxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
         var storage = proxy.getStorage();
-        var request = (Map<String,Object>)context.getValue("REQUEST");
+        var requestContext = context.getValue("REQUEST",new Stack<Map<String,Object>>());
+
+        Map<String,Object> request = null;
+        if(!requestContext.isEmpty()) {
+            request = requestContext.pop();
+        }
 
         if (event.getData() instanceof List) {
             if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().
@@ -108,7 +114,9 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
                 var res = "{\"type\":\"RESPONSE\",\"data\":" +
                         mapper.serialize(event.getData()) + "}";
 
-                request.clear();
+                if(request!=null) {
+                    request.clear();
+                }
 
                 storage.write(
                         context.getContextId(),
@@ -119,7 +127,7 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
             }
 
         }
-        if(!request.isEmpty()){
+        if(request!=null && !request.isEmpty()){
             var res = "{\"type\":\"" + event.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
             long end = System.currentTimeMillis();
             /*context.setValue("REQUEST", (Map<String,Object>)Map.of(
