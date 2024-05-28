@@ -325,12 +325,12 @@ public abstract class NetworkProtoContext extends ProtoContext {
     @Override
     public void runSteps(Iterator<ProtoStep> stepsToInvoke, ProtoState executor, BaseEvent event) {
         lastAccess.set(getNow());
-        //executorService.execute(() -> {
+        executorService.execute(() -> {
             lastAccess.set(getNow());
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
                 super.runSteps(stepsToInvoke, executor, event);
             }
-        //});
+        });
     }
 
     public void setActive() {
