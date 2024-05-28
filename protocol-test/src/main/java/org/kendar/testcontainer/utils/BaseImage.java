@@ -89,4 +89,8 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
         this.network = network;
         return (T) this;
     }
+
+    public String getLogs() {
+        return container.getLogs();
+    }
 }

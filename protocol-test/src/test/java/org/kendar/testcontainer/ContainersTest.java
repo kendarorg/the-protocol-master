@@ -16,8 +16,7 @@ import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ContainersTest {
     @Test
@@ -144,11 +143,14 @@ public class ContainersTest {
             javaImage
                     .withDir("/test")
                     .withFile(Path.of("..","protocol-runner","target","protocol-runner.jar").toString(),"/test/protocol-runner.jar")
-                    .withCmd(Path.of("..","protocol-test","run.sh").toString(),"/test/run.sh")
+                    .withCmd(Path.of("..","protocol-test","src","test","resources","run.sh").toString(),"/test/run.sh")
                     .withNetwork(network)
-                    .withAliases("mysql.sample.test", "mysql.proxy.test")
+                    .withAliases("java.sample.test")
                     .start();
             Thread.sleep(2000);
+            var logs = javaImage.getLogs();
+            assertTrue(logs.contains("protocol-runner.jar"));
+            assertTrue(logs.contains("run.sh"));
 
         }
     }
