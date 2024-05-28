@@ -33,6 +33,11 @@ import java.util.regex.Pattern;
 public class Main {
     private static TcpServer protocolServer;
 
+    public static boolean isRunning(){
+        if(protocolServer==null)return false;
+        return protocolServer.isRunning();
+    }
+
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
         if (protocolServer != null) {
             protocolServer.stop();
@@ -133,6 +138,7 @@ public class Main {
         try {
             if (line != null && line.trim().equalsIgnoreCase("q")) {
                 System.out.println("Exiting");
+                stop();
                 return false;
             } else {
                 System.out.println("Command not recognized: " + line.trim());
@@ -141,6 +147,7 @@ public class Main {
         } catch (Exception ex) {
             System.out.println("Exiting");
             System.err.println(ex);
+            stop();
             return false;
         }
     }
@@ -290,5 +297,9 @@ public class Main {
 
         protocolServer.start();
         Sleeper.sleep(1000);
+    }
+
+    public static void stop() {
+        protocolServer.stop();
     }
 }

@@ -3,6 +3,7 @@ package org.kendar.server;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,9 @@ public class TcpServer {
     public void stop() {
         try {
             server.close();
+            while(server.isOpen()){
+                Sleeper.sleep(200);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -151,5 +155,9 @@ public class TcpServer {
                 }
             }
         }
+    }
+
+    public boolean isRunning() {
+        return this.server.isOpen();
     }
 }

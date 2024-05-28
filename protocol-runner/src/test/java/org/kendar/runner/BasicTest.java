@@ -1,4 +1,4 @@
-package org.kenndar.runner;
+package org.kendar.runner;
 
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.postgres.PostgresProtocol;
@@ -34,7 +34,6 @@ public class BasicTest {
 
 
     }
-
 
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new PostgresProtocol(FAKE_PORT);

@@ -135,7 +135,7 @@ public class ContainersTest {
 
     @Test
     @Disabled("Only callable directly")
-    void testJAva() throws Exception {
+    void testJava() throws Exception {
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
         var network = Network.newNetwork();
