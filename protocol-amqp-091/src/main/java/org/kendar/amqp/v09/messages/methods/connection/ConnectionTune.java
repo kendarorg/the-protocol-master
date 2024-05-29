@@ -65,9 +65,14 @@ public class ConnectionTune extends Connection {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.channelMax = rb.getShort();
-        this.frameMax = rb.getInt();
-        this.hearthBeat = rb.getShort();
+        var channelMax = rb.getShort();
+        var frameMax = rb.getInt();
+        var hearthBeat = rb.getShort();
+
+        var conTuneOk = new ConnectionTuneOk();
+        conTuneOk.setChannelMax(channelMax);
+        conTuneOk.setHearthBeat(hearthBeat);
+        conTuneOk.setFrameMax(frameMax);
         return iteratorOfList(this);
     }
 

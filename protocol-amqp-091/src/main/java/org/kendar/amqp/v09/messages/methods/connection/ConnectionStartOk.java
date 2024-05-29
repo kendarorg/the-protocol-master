@@ -100,9 +100,9 @@ public class ConnectionStartOk extends Connection {
 
 
         var response = new ConnectionTune();
-        response.setChannelMax((short) 0);
-        response.setFrameMax(131072);
-        response.setHearthBeat((short) 0);
+//        response.setChannelMax((short) 0);
+//        response.setFrameMax(131072);
+//        response.setHearthBeat((short) 0);
 
         //var conTune =
         return iteratorOfRunnable(() -> proxy.sendAndExpect(event,context,
@@ -110,24 +110,24 @@ public class ConnectionStartOk extends Connection {
                 connStartOk,
                 response
         ));
-        var conTuneOk = new ConnectionTuneOk();
+ //       var conTuneOk = new ConnectionTuneOk();
 //        TODOERR conTuneOk.setChannelMax(conTune.getChannelMax());
 //        conTuneOk.setHearthBeat(conTune.getHearthBeat());
 //        conTuneOk.setFrameMax(conTune.getFrameMax());
 
 
-        return iteratorOfRunnable(() -> {
-                    proxy.sendAndSave(event,context,
-                            connection,
-                            conTuneOk);
+//        return iteratorOfRunnable(() -> {
+//                    proxy.sendAndSave(event,context,
+//                            connection,
+//                            conTuneOk);
 
 //                 TODOERR    var response2 = new ConnectionTune();
 //                    response2.setChannelMax((short) 0);
 //                    response2.setFrameMax(131072);
 //                    response2.setHearthBeat((short) 0);
 //                    return response2;
-                }
-        );
+              //  }
+       // );
     }
 
     public String[] getAuth() {

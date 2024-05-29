@@ -57,6 +57,8 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
         initialize(
                 new ProtoStateSequence(
                         new ProtocolHeader(BytesEvent.class),
+                        new ConnectionStart(ProxyAmqpFrame.class),
+                        new ConnectionTune(ProxyAmqpFrame.class),
                         new ConnectionStartOk(AmqpFrame.class),
                         new ConnectionTune(ProxyAmqpFrame.class),
                         new ConnectionTuneOk(AmqpFrame.class),
