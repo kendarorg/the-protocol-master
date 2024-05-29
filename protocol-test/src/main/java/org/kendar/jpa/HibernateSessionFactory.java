@@ -105,4 +105,8 @@ public class HibernateSessionFactory {
         function.apply(em);
         em.close();
     }
+
+    public static Class<?>[] getDbTablesList() {
+        return dbTablesList;
+    }
 }

@@ -42,7 +42,7 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        proxy.execute(context,
+        proxy.sendBytesAndExpect(context,
                 connection, BBuffer.of(new byte[]{'A', 'M', 'Q', 'P', 0, 0, 9, 1}),
                 new ConnectionStart());
 
@@ -62,8 +62,6 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
         capabilities.put("publisher_confirms", true);
         capabilities.put("consumer_cancel_notify", true);
 
-        //class id b_10
-        //method id s_10
         var response = new ConnectionStart();
         response.setServerProperties(toSendBack);
         response.setMechanisms(new String[]{"AMQPLAIN", "PLAIN"});

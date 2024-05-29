@@ -98,7 +98,7 @@ public class ExchangeDelete extends Exchange {
         var deleteOk = new ExchangeDeleteOk();
         deleteOk.setChannel(channel);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 queueDeclare,
                 deleteOk

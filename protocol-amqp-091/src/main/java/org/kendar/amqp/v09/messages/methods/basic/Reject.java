@@ -61,7 +61,7 @@ public class Reject extends Basic {
         toSend.setDeliveryTag(rb.getLong());
         toSend.setRequeue(rb.get() > 0);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndForget(context,
                 connection,
                 toSend
         ));

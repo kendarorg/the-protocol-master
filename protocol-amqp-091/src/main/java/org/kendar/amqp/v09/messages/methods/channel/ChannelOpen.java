@@ -56,7 +56,7 @@ public class ChannelOpen extends Channel {
         chok.setChannel(channel);
         chok.setReserved1(reserved1);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                         connection,
                         channelOpen,
                         chok

@@ -55,7 +55,7 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        while(!protocolServer.isRunning()) {
+        while (!protocolServer.isRunning()) {
             Sleeper.sleep(100);
         }
     }

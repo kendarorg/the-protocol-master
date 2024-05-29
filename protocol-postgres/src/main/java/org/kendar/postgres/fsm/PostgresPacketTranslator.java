@@ -20,7 +20,6 @@ public class PostgresPacketTranslator extends ProtoState implements InterruptPro
 
     public boolean canRun(BytesEvent event) {
         var inputBuffer = event.getBuffer();
-        //inputBuffer.setPosition(0);
         if (inputBuffer.size() < 5) {
             return false;
         }

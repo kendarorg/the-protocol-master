@@ -35,7 +35,6 @@ public class Bind extends PostgresState {
         var postgresContext = (PostgresProtoContext) protoContext;
         var portal = message.getString();
         var statementName = message.getString();
-        var statement = (Parse) postgresContext.getValue("STATEMENT_" + statementName);
         var formatCodesCount = message.getShort();
         var formatCodes = new ArrayList<Short>();
         short parameterValuesCount;
@@ -44,7 +43,6 @@ public class Bind extends PostgresState {
         }
         parameterValuesCount = message.getShort();
         var parse = (Parse) postgresContext.getValue("STATEMENT_" + statementName);
-        var parameterBytes = new ArrayList<byte[]>();
 
         var parameterValues = new ArrayList<BindingParameter>();
 

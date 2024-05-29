@@ -8,18 +8,11 @@ import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpQueryContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
-import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
 public class MongoExecutor {
     private static final JsonMapper mapper = new JsonMapper();
-    private final Proxy proxy;
-
-    public MongoExecutor(Proxy proxy) {
-
-        this.proxy = proxy;
-    }
 
     private String getDb(OpMsgContent data) {
 

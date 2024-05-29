@@ -11,6 +11,7 @@ import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.mysql.MySqlFileStorage;
 import org.kendar.postgres.PostgresProtocol;
+import org.kendar.protocol.context.ProtoContext;
 import org.kendar.redis.Resp3FileStorage;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
@@ -33,8 +34,8 @@ import java.util.regex.Pattern;
 public class Main {
     private static TcpServer protocolServer;
 
-    public static boolean isRunning(){
-        if(protocolServer==null)return false;
+    public static boolean isRunning() {
+        if (protocolServer == null) return false;
         return protocolServer.isRunning();
     }
 
@@ -53,6 +54,7 @@ public class Main {
             var login = cmd.getOptionValue("xl");
             var password = cmd.getOptionValue("xw");
             var logLevel = cmd.getOptionValue("v");
+            var callDurationTimes = cmd.hasOption("cdt");
             var jdbcForcedSchema = cmd.getOptionValue("js");
             var jdbcReplaceQueries = cmd.getOptionValue("jr");
             var timeout = cmd.getOptionValue("t");
@@ -64,7 +66,7 @@ public class Main {
                 timeoutSec = Integer.parseInt(timeout);
             }
 
-            //ProtoContext.setTimeout(timeoutSec);
+            ProtoContext.setTimeout(timeoutSec);
 
             LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
@@ -86,19 +88,19 @@ public class Main {
             }
             if (protocol.equalsIgnoreCase("mysql")) {
                 if (port == -1) port = 3306;
-                runMysql(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries);
+                runMysql(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("postgres")) {
                 if (port == -1) port = 5432;
-                runPostgres(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries);
+                runPostgres(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("mongo")) {
                 if (port == -1) port = 27017;
-                runMongo(port, logsDir, connectionString, login, password, replayFromLog);
+                runMongo(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("amqp091")) {
                 if (port == -1) port = 5672;
-                runAmqp091(port, logsDir, connectionString, login, password, replayFromLog);
+                runAmqp091(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("redis")) {
                 if (port == -1) port = 6379;
-                runRedis(port, logsDir, connectionString, login, password, replayFromLog);
+                runRedis(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
             } else {
                 throw new Exception("missing protocol (p)");
             }
@@ -125,6 +127,7 @@ public class Main {
         options.addOption("pl", false, "[all] Replay from log/replay directory");
         options.addOption("v", true, "[all] Log level (default ERROR)");
         options.addOption("t", true, "[all] Set timeout in seconds towards proxied system (default 30s)");
+        options.addOption("cdt", false, "[all] Respect call duration timing");
         options.addOption("js", true, "[jdbc] Set schema");
         options.addOption("jr", true, "[jdbc] Replace queries");
         return options;
@@ -157,20 +160,20 @@ public class Main {
 
 
     private static void runPostgres(int port, String logsDir, String connectionString, String forcedSchema,
-                                    String login, String password, boolean replayFromLog, String jdbcReplaceQueries) throws IOException {
+                                    String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
         runJdbc("postgres", "org.postgresql.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog, jdbcReplaceQueries);
+                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
     }
 
     private static void runMysql(int port, String logsDir, String connectionString, String forcedSchema,
-                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries) throws IOException {
+                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
         runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog, jdbcReplaceQueries);
+                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
     }
 
     private static void runJdbc(String type, String driver, int port, String logsDir,
                                 String connectionString, String forcedSchema,
-                                String login, String password, boolean replayFromLog, String jdbcReplaceQueries) throws IOException {
+                                String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
         var baseProtocol = new PostgresProtocol(port);
         var proxy = new JdbcProxy(driver,
                 connectionString, forcedSchema,
@@ -195,9 +198,9 @@ public class Main {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
-
+        protocolServer.useCallDurationTimes(callDurationTimes);
         protocolServer.start();
-        while(!protocolServer.isRunning()) {
+        while (!protocolServer.isRunning()) {
             Sleeper.sleep(100);
         }
     }
@@ -240,7 +243,7 @@ public class Main {
         proxy.setQueryReplacement(items);
     }
 
-    private static void runMongo(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
+    private static void runMongo(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
         var baseProtocol = new MongoProtocol(port);
         var proxy = new MongoProxy(connectionString);
         if (logsDir != null) {
@@ -254,14 +257,14 @@ public class Main {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
-
+        protocolServer.useCallDurationTimes(callDurationTimes);
         protocolServer.start();
-        while(!protocolServer.isRunning()) {
+        while (!protocolServer.isRunning()) {
             Sleeper.sleep(100);
         }
     }
 
-    private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
+    private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
         var baseProtocol = new AmqpProtocol(port);
         var proxy = new AmqpProxy(connectionString, login, password);
         if (logsDir != null) {
@@ -276,14 +279,14 @@ public class Main {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
-
+        protocolServer.useCallDurationTimes(callDurationTimes);
         protocolServer.start();
-        while(!protocolServer.isRunning()) {
+        while (!protocolServer.isRunning()) {
             Sleeper.sleep(100);
         }
     }
 
-    private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
+    private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
         var baseProtocol = new Resp3Protocol(port);
         var proxy = new Resp3Proxy(connectionString, login, password);
         if (logsDir != null) {
@@ -301,7 +304,7 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        while(!protocolServer.isRunning()) {
+        while (!protocolServer.isRunning()) {
             Sleeper.sleep(100);
         }
     }

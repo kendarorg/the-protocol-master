@@ -78,7 +78,7 @@ public class QueuePurge extends Queue {
         queueDeclare.setNoWait(noWait);
         queueDeclare.setQueueName(queueName);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 queueDeclare,
                 new QueuePurgeOk()

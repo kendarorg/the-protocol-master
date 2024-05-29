@@ -98,7 +98,7 @@ public class ConnectionClose extends Connection {
             result.setChannel(channel);
             var fproxy = proxy;
             var fconn = connection;
-            return iteratorOfRunnable(() -> fproxy.execute(context,
+            return iteratorOfRunnable(() -> fproxy.sendAndExpect(context,
                             fconn,
                             chClose,
                             result,

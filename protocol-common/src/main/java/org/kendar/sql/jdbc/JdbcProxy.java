@@ -315,7 +315,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             } else {
                 runThroughSingleResult(insert, parameterValues, statement, result, count);
             }
-            //}
+
             long end = System.currentTimeMillis();
             storage.write(connectionId, query, result, parameterValues, end - start, "QUERY");
             return result;

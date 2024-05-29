@@ -35,7 +35,7 @@ public class ProxyedBehaviour {
             return Frame.iteratorOfList(toSend);
         }
         return iteratorOfRunnable(() -> {
-            proxy.execute(context, connection, toSend);
+            proxy.sendAndForget(context, connection, toSend);
         });
     }
 }

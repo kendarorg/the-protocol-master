@@ -102,7 +102,7 @@ public class ExchangeBind extends Exchange {
         queueDeclare.setNoWait(noWait);
         queueDeclare.setDestination(destination);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 queueDeclare,
                 new ExchangeBindOk()

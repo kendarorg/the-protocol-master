@@ -6,7 +6,6 @@ import org.kendar.amqp.v09.utils.AmqpStorage;
 import org.kendar.storage.BaseFileStorage;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
-import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +27,6 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
     private final List<StorageItem<JsonNode, JsonNode>> outItems = new ArrayList<>();
     private final Object lockObject = new Object();
     private final Object responseLockObject = new Object();
-    private final JsonMapper mapper = new JsonMapper();
     private boolean initialized = false;
     private List<CompactLine> index;
 

@@ -26,7 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class MySQLExecutor {
@@ -54,7 +57,6 @@ public class MySQLExecutor {
     private static Iterator<ProtoStep> executeCommit(String parse, ProtoContext protoContext) {
         var mysqlContext = (MySQLProtoContext) protoContext;
         ((JdbcProxy) mysqlContext.getProxy()).executeCommit(protoContext);
-        var res = new ArrayList<ReturnMessage>();
         protoContext.setValue("TRANSACTION", false);
         var ok = new OkPacket();
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());
@@ -64,7 +66,6 @@ public class MySQLExecutor {
     private static Iterator<ProtoStep> executeRollback(String parse, ProtoContext protoContext) {
         var mysqlContext = (MySQLProtoContext) protoContext;
         ((JdbcProxy) mysqlContext.getProxy()).executeRollback(protoContext);
-        var res = new ArrayList<ReturnMessage>();
         protoContext.setValue("TRANSACTION", false);
         var ok = new OkPacket();
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());
@@ -74,7 +75,6 @@ public class MySQLExecutor {
     private static Iterator<ProtoStep> executeBegin(String parse, ProtoContext protoContext) {
         var mysqlContext = (MySQLProtoContext) protoContext;
         ((JdbcProxy) mysqlContext.getProxy()).executeBegin(protoContext);
-        var res = new ArrayList<ReturnMessage>();
         protoContext.setValue("TRANSACTION", true);
         var ok = new OkPacket();
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_IN_TRANS.getCode());
@@ -210,8 +210,7 @@ public class MySQLExecutor {
         if (maxRecords == 0) {
             maxRecords = Integer.MAX_VALUE;
         }
-        //TODO CONVERT CALLS TO JDBC AGAIN
-        var matcher = parsed.getValue();//PostgresCallConverter.convertToJdbc(parsed.getValue(),binding.getParameterValues());
+        var matcher = parsed.getValue();
         SelectResult resultSet = null;
         if (!matcher.equalsIgnoreCase(parsed.getValue())) {
             resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(protoContext.getContextId(),
@@ -238,19 +237,10 @@ public class MySQLExecutor {
         }
 
         if (!resultSet.isIntResult()) {
-            Optional<Boolean> metadataFollows = Optional.of(true);
-//            if (CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_OPTIONAL_RESULTSET_METADATA)) {
-//                metadataFollows = Optional.of(true);
-//            }
-            //if(CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(),CapabilityFlag.RES)){
-            //    metadataFollows = Optional.of(true);
-            //}
             var packetNumber = 0;
 
             result.add(new ColumnsCount(resultSet.getMetadata()).
                     withPacketNumber(++packetNumber));
-//            var showMetadata = true;// (metadataFollows.isPresent()&&metadataFollows.get()) && !metadataFollows.isEmpty();
-//            if (showMetadata) {
             for (var field : resultSet.getMetadata()) {
                 result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, false).
                         withPacketNumber(++packetNumber));
@@ -300,7 +290,6 @@ public class MySQLExecutor {
     public Iterator<ProtoStep> prepareStatement(MySQLProtoContext protoContext, String query) {
         parser = (SqlStringParser) protoContext.getValue("PARSER");
         var result = new ArrayList<ReturnMessage>();
-        var parsed = parser.getTypes(query);
         var connection = protoContext.getValue("CONNECTION");
         var c = ((Connection) ((ProxyConnection) connection).getConnection());
         try {
@@ -310,7 +299,6 @@ public class MySQLExecutor {
             var parameterMetaData = ps.getParameterMetaData();
             for (var i = 0; i < parameterMetaData.getParameterCount(); i++) {
                 var isByte = JdbcProxy.isByteOut(parameterMetaData.getParameterClassName(i + 1));
-                var nn = (i + 1) + "";
                 fields.add(new ProxyMetadata(
                         "?",
                         "",

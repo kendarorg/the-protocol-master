@@ -17,7 +17,6 @@ import java.util.Iterator;
 
 public class BodyFrame extends Frame {
     protected static final JsonMapper mapper = new JsonMapper();
-    private static final Logger log = LoggerFactory.getLogger(BodyFrame.class);
     private static final Logger logPs = LoggerFactory.getLogger(AmqpProxySocket.class.getName());
     private byte[] contentBytes;
     private String contentString;
@@ -95,7 +94,7 @@ public class BodyFrame extends Frame {
             bf.setConsumeId(basicConsume.getConsumeId());
         }
 
-        return iteratorOfRunnable(() -> proxy.execute(context, connection, bf));
+        return iteratorOfRunnable(() -> proxy.sendAndForget(context, connection, bf));
     }
 
     public byte[] getContentBytes() {

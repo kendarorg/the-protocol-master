@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class JavaImage extends BaseImage<JavaImage, GenericContainer> {
 
-    private final Map<String,String> paths = new HashMap<>();
+    private final Map<String, String> paths = new HashMap<>();
     private final List<String> dirs = new ArrayList<>();
     private String cmd;
 
@@ -25,14 +25,14 @@ public class JavaImage extends BaseImage<JavaImage, GenericContainer> {
         return this;
     }
 
-    public JavaImage withCmd(String source,String destDir) {
-        paths.put(Path.of(source).toAbsolutePath().toString(),destDir);
+    public JavaImage withCmd(String source, String destDir) {
+        paths.put(Path.of(source).toAbsolutePath().toString(), destDir);
         this.cmd = destDir;
         return this;
     }
 
-    public JavaImage withFile(String source,String destination) {
-        paths.put(Path.of(source).toAbsolutePath().toString(),destination);
+    public JavaImage withFile(String source, String destination) {
+        paths.put(Path.of(source).toAbsolutePath().toString(), destination);
         return this;
     }
 
@@ -44,13 +44,13 @@ public class JavaImage extends BaseImage<JavaImage, GenericContainer> {
                         .withDockerfileFromBuilder(builder -> {
                                     builder
                                             .from("amazoncorretto:11.0.23");
-                                            for (var dir : dirs) {
-                                                builder.run("mkdir -p " + dir);
-                                            }
-                                            builder.cmd("sh", "-c",cmd).build();
+                                    for (var dir : dirs) {
+                                        builder.run("mkdir -p " + dir);
+                                    }
+                                    builder.cmd("sh", "-c", cmd).build();
                                 }
                         ));
-        for(var path:paths.entrySet()){
+        for (var path : paths.entrySet()) {
             container.withCopyFileToContainer(
                     MountableFile.forHostPath(
                             Path.of(path.getKey()).normalize(), 777),

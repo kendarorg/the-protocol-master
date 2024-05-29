@@ -298,7 +298,7 @@ public class HeaderFrame extends Frame {
                     , 0, "RESPONSE", "AMQP");
             return iteratorOfList(hf);
         }
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndForget(context,
                 connection,
                 hf
         ));

@@ -46,7 +46,7 @@ public class CmdSaslStart extends StandardOpMsgCommand {
             var login = "";
             var nonce = "";
             MongoProtoContext protoContext = (MongoProtoContext) event.getContext();
-            var executor = new MongoExecutor(protoContext.getProxy());
+            var executor = new MongoExecutor();
 
             var bd = BsonDocument.parse(event.getData().getSections().get(0).getDocuments().get(0));
             var binaryData = bd.getBinary("payload").getData();

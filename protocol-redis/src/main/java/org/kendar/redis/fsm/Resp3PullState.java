@@ -91,20 +91,10 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
             return iteratorOfEmpty();
 
         }
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 event,
                 new Resp3Response()
         ));
-//        if (!this.proxy) {
-//            return iteratorOfRunnable(() -> proxy.execute(context,
-//                    connection,
-//                    event,
-//                    new Resp3PullState().asProxy()
-//            ));
-//        } else {
-//            this.event = event;
-//            return iteratorOfList(event);
-//        }
     }
 }

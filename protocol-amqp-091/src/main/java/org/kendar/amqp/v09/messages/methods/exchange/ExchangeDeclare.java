@@ -150,7 +150,7 @@ public class ExchangeDeclare extends Exchange {
 
         var exchangeDeclareOk = new ExchangeDeclareOk();
         exchangeDeclareOk.setChannel(channel);
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 exchangeDec,
                 exchangeDeclareOk

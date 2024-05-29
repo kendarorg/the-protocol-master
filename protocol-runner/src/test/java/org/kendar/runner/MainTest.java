@@ -59,7 +59,7 @@ public class MainTest extends BasicTest {
             });
         });
         serverThread.start();
-        while(!Main.isRunning()){
+        while (!Main.isRunning()) {
             Sleeper.sleep(100);
         }
 
@@ -118,7 +118,7 @@ public class MainTest extends BasicTest {
             });
         });
         serverThread.start();
-        while(!Main.isRunning()){
+        while (!Main.isRunning()) {
             Sleeper.sleep(100);
         }
 
@@ -175,7 +175,7 @@ public class MainTest extends BasicTest {
             });
         });
         serverThread.start();
-        while(!Main.isRunning()){
+        while (!Main.isRunning()) {
             Sleeper.sleep(100);
         }
 
@@ -212,7 +212,6 @@ public class MainTest extends BasicTest {
     @Test
     void testTimeout() throws Exception {
         var timestampForThisRun = "" + new Date().getTime();
-        //RECORDING
         var args = new String[]{
                 "-p", "postgres",
                 "-l", "" + FAKE_PORT,
@@ -231,7 +230,7 @@ public class MainTest extends BasicTest {
             });
         });
         serverThread.start();
-        while(!Main.isRunning()){
+        while (!Main.isRunning()) {
             Sleeper.sleep(100);
         }
 
@@ -279,7 +278,6 @@ public class MainTest extends BasicTest {
     @Test
     void testErrorSelect() throws Exception {
         var timestampForThisRun = "" + new Date().getTime();
-        //RECORDING
         var args = new String[]{
                 "-p", "postgres",
                 "-l", "" + FAKE_PORT,
@@ -297,7 +295,7 @@ public class MainTest extends BasicTest {
             });
         });
         serverThread.start();
-        while(!Main.isRunning()){
+        while (!Main.isRunning()) {
             Sleeper.sleep(100);
         }
 

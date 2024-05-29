@@ -33,7 +33,7 @@ public class CmdGeneric extends StandardOpMsgCommand {
     protected Iterator<ProtoStep> executeInternal(OpMsgRequest event) {
         try {
             MongoProtoContext protoContext = (MongoProtoContext) event.getContext();
-            var executor = new MongoExecutor(protoContext.getProxy());
+            var executor = new MongoExecutor();
 
             var toSend = executor.runGenericOpMsg(protoContext, event.getData(), event.getPrevState());
 

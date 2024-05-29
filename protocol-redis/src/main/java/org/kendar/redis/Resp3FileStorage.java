@@ -6,7 +6,6 @@ import org.kendar.redis.utils.Resp3Storage;
 import org.kendar.storage.BaseFileStorage;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
-import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +18,11 @@ import java.util.stream.Collectors;
 public class Resp3FileStorage extends BaseFileStorage<JsonNode, JsonNode> implements Resp3Storage {
     private static final Logger log = LoggerFactory.getLogger(Resp3FileStorage.class);
 
-    private static final List<String> toAvoid = List.of();
     private final List<StorageItem<JsonNode, JsonNode>> inMemoryDb = new ArrayList<>();
     private final List<StorageItem<JsonNode, JsonNode>> compareData = new ArrayList<>();
     private final List<StorageItem<JsonNode, JsonNode>> outItems = new ArrayList<>();
     private final Object lockObject = new Object();
     private final Object responseLockObject = new Object();
-    private final JsonMapper mapper = new JsonMapper();
     private boolean initialized = false;
     private List<CompactLine> index;
 

@@ -116,18 +116,16 @@ public class ContainersTest {
             try (Jedis jedis = pool.getResource()) {
                 // Store & Retrieve a simple string
                 jedis.set("foo", "bar");
-                assertEquals("bar", jedis.get("foo").toString()); // prints bar
+                assertEquals("bar", jedis.get("foo").toString());
 
                 // Store & Retrieve a HashMap
                 Map<String, String> hash = new HashMap<>();
-                ;
                 hash.put("name", "John");
                 hash.put("surname", "Smith");
                 hash.put("company", "Redis");
                 hash.put("age", "29");
                 jedis.hset("user-session:123", hash);
                 assertEquals("{name=John, surname=Smith, company=Redis, age=29}", jedis.hgetAll("user-session:123").toString());
-                // Prints: {name=John, surname=Smith, company=Redis, age=29}
             }
         }
     }
@@ -139,11 +137,11 @@ public class ContainersTest {
         assertNotNull(dockerHost);
         var network = Network.newNetwork();
 
-        try (var javaImage = new JavaImage()){
+        try (var javaImage = new JavaImage()) {
             javaImage
                     .withDir("/test")
-                    .withFile(Path.of("..","protocol-runner","target","protocol-runner.jar").toString(),"/test/protocol-runner.jar")
-                    .withCmd(Path.of("..","protocol-test","src","test","resources","run.sh").toString(),"/test/run.sh")
+                    .withFile(Path.of("..", "protocol-runner", "target", "protocol-runner.jar").toString(), "/test/protocol-runner.jar")
+                    .withCmd(Path.of("..", "protocol-test", "src", "test", "resources", "run.sh").toString(), "/test/run.sh")
                     .withNetwork(network)
                     .withAliases("java.sample.test")
                     .start();

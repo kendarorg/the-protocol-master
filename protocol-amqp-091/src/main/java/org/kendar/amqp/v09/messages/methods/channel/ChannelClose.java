@@ -91,7 +91,7 @@ public class ChannelClose extends Channel {
         var result = new ChannelCloseOk();
         result.setChannel(channel);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 chClose,
                 result,

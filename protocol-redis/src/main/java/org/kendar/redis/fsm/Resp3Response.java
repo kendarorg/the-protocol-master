@@ -8,7 +8,6 @@ import org.kendar.proxy.ProxyConnection;
 import org.kendar.redis.Resp3Context;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.fsm.events.Resp3Message;
-import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 public class Resp3Response extends ProtoState implements NetworkReturnMessage {
-    protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(Resp3Response.class);
     private Resp3Message event;
     private boolean proxy;
@@ -63,15 +61,5 @@ public class Resp3Response extends ProtoState implements NetworkReturnMessage {
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
         this.event = event;
         return iteratorOfEmpty();
-//        if (!this.proxy) {
-//            return iteratorOfRunnable(() -> proxy.execute(context,
-//                    connection,
-//                    event,
-//                    new Resp3PullState().asProxy()
-//            ));
-//        } else {
-//            this.event = event;
-//            return iteratorOfList(event);
-//        }
     }
 }

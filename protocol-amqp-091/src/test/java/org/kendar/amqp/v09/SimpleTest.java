@@ -236,7 +236,7 @@ public class SimpleTest extends BasicTest {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
 
-        while(!protocolServer.isRunning()) {
+        while (!protocolServer.isRunning()) {
             Sleeper.sleep(100);
         }
         ConnectionFactory connectionFactory = new ConnectionFactory();

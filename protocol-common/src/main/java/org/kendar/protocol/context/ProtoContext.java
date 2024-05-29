@@ -31,9 +31,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class ProtoContext {
 
+    private static final AtomicInteger timeout = new AtomicInteger(30);
+    private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
     private static ConcurrentHashMap<Integer, ProtoContext> contextsCache;
-    private static AtomicInteger timeout;
-    private static Logger log = LoggerFactory.getLogger(ProtoContext.class);
     private static Thread contextCleaner;
     private static volatile boolean runClean = false;
     /**
@@ -76,6 +76,8 @@ public abstract class ProtoContext {
      * The last state used
      */
     private ProtoState currentState;
+    private boolean useCallDurationTimes;
+
     public ProtoContext(ProtoDescriptor descriptor) {
         this.contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
         this.descriptor = descriptor;
@@ -85,8 +87,6 @@ public abstract class ProtoContext {
     }
 
     public static void initializeStatic() {
-
-        timeout = new AtomicInteger(30);
         runClean = false;
         if (contextCleaner != null) {
             if (contextCleaner.isAlive()) {
@@ -730,5 +730,13 @@ public abstract class ProtoContext {
                 .filter(s -> s.canHandle(currentEvent.getClass()))
                 .filter(s -> s.canRunEvent(currentEvent))
                 .findFirst();
+    }
+
+    public boolean isUseCallDurationTimes() {
+        return useCallDurationTimes;
+    }
+
+    public void setUseCallDurationTimes(boolean useCallDurationTimes) {
+        this.useCallDurationTimes = useCallDurationTimes;
     }
 }

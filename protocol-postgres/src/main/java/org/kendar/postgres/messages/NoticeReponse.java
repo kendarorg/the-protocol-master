@@ -5,11 +5,8 @@ import org.kendar.protocol.messages.NetworkReturnMessage;
 
 public class NoticeReponse implements NetworkReturnMessage {
 
-    private final int pid;
+    public NoticeReponse() {
 
-    public NoticeReponse(int pid) {
-
-        this.pid = pid;
     }
 
     @Override

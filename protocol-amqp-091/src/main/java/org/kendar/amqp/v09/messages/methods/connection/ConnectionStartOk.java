@@ -104,7 +104,7 @@ public class ConnectionStartOk extends Connection {
         response.setFrameMax(131072);
         response.setHearthBeat((short) 0);
         var conTuneOk = new ConnectionTuneOk();
-        var conTune = proxy.execute(context,
+        var conTune = proxy.sendAndExpect(context,
                 connection,
                 connStartOk,
                 response
@@ -115,7 +115,7 @@ public class ConnectionStartOk extends Connection {
 
 
         return iteratorOfRunnable(() -> {
-                    proxy.execute(context,
+                    proxy.sendAndForget(context,
                             connection,
                             conTuneOk);
 

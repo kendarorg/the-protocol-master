@@ -19,8 +19,6 @@ public class RowDescription implements NetworkReturnMessage {
 
     @Override
     public void write(BBuffer buffer) {
-
-        //var length = 4 + 2 + fields.stream().mapToInt(Field::length).sum();
         buffer.write((byte) 'T');
         var position = buffer.getPosition();
         buffer.writeInt(0);

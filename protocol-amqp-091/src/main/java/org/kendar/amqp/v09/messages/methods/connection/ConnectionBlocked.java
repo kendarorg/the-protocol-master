@@ -9,12 +9,10 @@ import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
 public class ConnectionBlocked extends Connection {
-    protected static final JsonMapper mapper = new JsonMapper();
     private String reason;
     private int consumeId;
 

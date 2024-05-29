@@ -82,7 +82,7 @@ public class ConnectionOpen extends Connection {
         result.setReserved1(reserved1);
 
         return iteratorOfRunnable(() -> {
-                    var message = proxy.execute(context,
+                    var message = proxy.sendAndExpect(context,
                             connection,
                             conOpen,
                             result

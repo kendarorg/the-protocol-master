@@ -34,7 +34,7 @@ public class SSLRequest extends ProtoState {
         var pidValue = pid.getPid();
 
         inputBuffer.truncate(8);
-        return iteratorOfList(new NoticeReponse(pidValue));
+        return iteratorOfList(new NoticeReponse());
 
     }
 }

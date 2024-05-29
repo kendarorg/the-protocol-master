@@ -102,7 +102,7 @@ public class QueueBind extends Queue {
         queueDeclare.setNoWait(noWait);
         queueDeclare.setQueueName(destination);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 queueDeclare,
                 new QueueBindOk()

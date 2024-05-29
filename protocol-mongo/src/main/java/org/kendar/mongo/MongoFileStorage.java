@@ -46,12 +46,8 @@ public class MongoFileStorage extends BaseFileStorage<JsonNode, JsonNode> implem
             var item = inMemoryDb.values().stream()
                     .filter(a -> {
                         var req = (JsonNode) a.getInput();
-                        return
-//                    req.getQuery().equalsIgnoreCase(query) &&
-//                            type.equalsIgnoreCase(a.getType()) &&
-//                            parameterValues.size()==req.getParameterValues().size() &&
-                                type.equalsIgnoreCase(a.getType()) &&
-                                        a.getCaller().equalsIgnoreCase("MONGODB");
+                        return type.equalsIgnoreCase(a.getType()) &&
+                                a.getCaller().equalsIgnoreCase("MONGODB");
                     }).findFirst();
             if (item.isPresent()) {
                 inMemoryDb.remove(item.get().getIndex());

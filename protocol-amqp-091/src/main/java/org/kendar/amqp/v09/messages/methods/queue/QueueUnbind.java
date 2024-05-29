@@ -89,7 +89,7 @@ public class QueueUnbind extends Queue {
         queueDeclare.setRoutingKey(routingKey);
         queueDeclare.setQueueName(destination);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 queueDeclare,
                 new QueueUnbindOk()

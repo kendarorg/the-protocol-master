@@ -8,14 +8,10 @@ import org.kendar.amqp.v09.utils.ProxyedBehaviour;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
 public class ConnectionUnblocked extends Connection {
-
-
-    protected static final JsonMapper mapper = new JsonMapper();
     private int consumeId;
 
     public ConnectionUnblocked() {

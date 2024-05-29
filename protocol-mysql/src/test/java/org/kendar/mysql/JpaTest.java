@@ -35,7 +35,7 @@ public class JpaTest extends BasicTest {
 
     @Test
     void simpleJpaTest() throws Exception {
-        while(!protocolServer.isRunning()) {
+        while (!protocolServer.isRunning()) {
             Sleeper.sleep(100);
         }
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",

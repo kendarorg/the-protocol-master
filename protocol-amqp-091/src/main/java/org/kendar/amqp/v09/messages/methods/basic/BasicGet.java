@@ -83,7 +83,7 @@ public class BasicGet extends Basic {
         queueDeclare.noAck = (noAck);
         queueDeclare.queue = (exchange);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 queueDeclare,
                 new BasicGetOk()

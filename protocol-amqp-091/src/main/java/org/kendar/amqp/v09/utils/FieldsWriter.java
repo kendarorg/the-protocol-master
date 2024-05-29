@@ -110,7 +110,6 @@ public class FieldsWriter {
 
     public static void writeTable(Map<String, Object> table, BBuffer io) {
         if (table == null) {
-            // Convenience.
             io.writeInt((int) 0);
         } else {
             var countPos = io.getPosition();

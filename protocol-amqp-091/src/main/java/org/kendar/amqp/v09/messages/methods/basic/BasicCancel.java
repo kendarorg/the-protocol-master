@@ -82,7 +82,7 @@ public class BasicCancel extends Basic {
             return iteratorOfList(toSend);
         }
         return iteratorOfRunnable(() -> {
-            proxy.execute(context, connection, basicConsume, new BasicCancelOk());
+            proxy.sendAndExpect(context, connection, basicConsume, new BasicCancelOk());
         });
     }
 

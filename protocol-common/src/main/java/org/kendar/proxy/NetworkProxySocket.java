@@ -70,7 +70,6 @@ public abstract class NetworkProxySocket {
                                     attachment.get(byteArray);
                                     var bb = new BBuffer();
                                     bb.write(byteArray);
-                                    //System.out.println("[XXXX] "+bb.toHexStringUpToLength(0,12));
 
                                     try {
                                         semaphore.acquire();
@@ -84,11 +83,7 @@ public abstract class NetworkProxySocket {
                                         var gf = getStateToRetrieveOneSingleMessage();
                                         //FLW05 BYTESEVENT from tmpBuffer (response specific to this flow)
 
-
-                                        var eventsToTry = new ArrayList<BaseEvent>();
                                         var be = new BytesEvent(context, null, tempBuffer);
-//                                        eventsToTry.add(bytesEvent);
-//                                        eventsToTry.addAll(buildPossibleEvents(context, tempBuffer));
                                         boolean run = true;
                                         while (run && tempBuffer.size() > 0) {
                                             context.setActive();
@@ -96,8 +91,6 @@ public abstract class NetworkProxySocket {
 
                                             for (int i = 0; i < availableStates().size(); i++) {
                                                 possible = availableStates().get(i);
-
-                                                //for (var be : eventsToTry) {
                                                 //Check if can run with a bytes event
                                                 if (possible.canRunEvent(be)) {
 
@@ -109,7 +102,6 @@ public abstract class NetworkProxySocket {
                                                     run = true;
                                                     break;
                                                 }
-                                                //}
                                                 if (run) {
                                                     break;
                                                 }

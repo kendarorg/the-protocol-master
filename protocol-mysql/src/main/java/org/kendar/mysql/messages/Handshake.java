@@ -86,10 +86,10 @@ public class Handshake extends MySQLReturnMessage {
     @Override
     public void writeResponse(MySQLBBuffer resultBuffer) {
         resultBuffer.write(protocolNumber);
-        resultBuffer.write( //"5.6.40-log".getBytes(StandardCharsets.US_ASCII));
+        resultBuffer.write(
                 serverVersion.getBytes(StandardCharsets.US_ASCII));
         resultBuffer.write((byte) 0x00);
-        resultBuffer.writeUB4(//55978868);
+        resultBuffer.writeUB4(
                 threadId);
         resultBuffer.write(new byte[]{'B', 'W', 'p', 'M', 'm', 'a', '}', 's', 0x00});
         resultBuffer.writeUB2(serverCapabilities);

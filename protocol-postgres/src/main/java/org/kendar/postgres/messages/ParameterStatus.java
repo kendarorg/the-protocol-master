@@ -19,8 +19,8 @@ public class ParameterStatus implements NetworkReturnMessage {
     public void write(BBuffer resultBuffer) {
         var k = key.getBytes(StandardCharsets.UTF_8);
         var v = value.getBytes(StandardCharsets.UTF_8);
-        resultBuffer.write((byte) 'S'); // 'R' for AuthenticationRequest
-        resultBuffer.writeInt(0); // Length
+        resultBuffer.write((byte) 'S');
+        resultBuffer.writeInt(0);
         resultBuffer.write(k);
         resultBuffer.write((byte) 0);
         resultBuffer.write(v);

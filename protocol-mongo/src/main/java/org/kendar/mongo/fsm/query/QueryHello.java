@@ -21,7 +21,7 @@ public class QueryHello extends ProtoState {
 
     private static Iterator<ProtoStep> getProtoSteps(OpQueryRequest event) {
         MongoProtoContext protoContext = (MongoProtoContext) event.getContext();
-        var executor = new MongoExecutor(protoContext.getProxy());
+        var executor = new MongoExecutor();
         var toSend = executor.runHelloOpQuery(protoContext, event.getData(), event.getPrevState());
 
         return iteratorOfList(toSend);

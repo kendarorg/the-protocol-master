@@ -5,6 +5,7 @@ import org.kendar.protocol.events.BaseEvent;
 public class EventContainer {
     private BaseEvent event;
     private int length;
+
     public EventContainer() {
 
     }

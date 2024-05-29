@@ -55,7 +55,6 @@ public class PostgresExecutor {
         var res = new ArrayList<ReturnMessage>();
         protoContext.setValue("TRANSACTION", false);
 
-        //res.add(new RunNow());
         if (postgresContext.getValue("STATEMENT_" + parse.getStatementName() + "_PARSED") == null) {
             res.add(new ParseComplete());
         }
@@ -71,10 +70,7 @@ public class PostgresExecutor {
         protoContext.setValue("TRANSACTION", false);
 
 
-        //if(postgresContext.getValue("STATEMENT_"+parse.getStatementName()+"_PARSED")==null)
-        {
-            res.add(new ParseComplete());
-        }
+        res.add(new ParseComplete());
         res.add(new BindComplete());
         res.add(new CommandComplete("ROLLBACK"));
         return new ExecutorResult(ProtoState.iteratorOfList(res.toArray(new ReturnMessage[0]))).runNow();

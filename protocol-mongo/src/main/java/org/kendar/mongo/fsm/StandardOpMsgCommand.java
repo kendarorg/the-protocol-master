@@ -14,7 +14,6 @@ public abstract class StandardOpMsgCommand extends ProtoState {
 
 
     public boolean canRun(OpMsgRequest event) {
-        var canRun = false;
         var lsatOp = event.getData();
         for (var section : lsatOp.getSections()) {
             for (var doc : section.getDocuments()) {

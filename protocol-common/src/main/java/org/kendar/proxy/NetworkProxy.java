@@ -10,8 +10,7 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.storage.Storage;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
 import java.net.*;
@@ -23,7 +22,6 @@ import java.util.concurrent.Executors;
 
 public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extends Proxy<T> {
     protected static final JsonMapper mapper = new JsonMapper();
-    private static final Logger log = LoggerFactory.getLogger(NetworkProxy.class);
     protected String connectionString;
     protected String userId;
     protected String password;
@@ -131,7 +129,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param connection
      * @param of
      */
-    public <K extends NetworkReturnMessage> void execute(NetworkProtoContext context, ProxyConnection connection, K of) {
+    public <K extends NetworkReturnMessage> void sendAndForget(NetworkProtoContext context, ProxyConnection connection, K of) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
@@ -184,13 +182,13 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param <K>
      * @return
      */
-    public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
-                                                                     ProxyConnection connection, K of, T toRead) {
-        return execute(context, connection, of, toRead, false);
+    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(NetworkProtoContext context,
+                                                                           ProxyConnection connection, K of, T toRead) {
+        return sendAndExpect(context, connection, of, toRead, false);
     }
 
-    public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
-                                                                     ProxyConnection connection, K of, T toRead, boolean optional) {
+    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(NetworkProtoContext context,
+                                                                           ProxyConnection connection, K of, T toRead, boolean optional) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
@@ -202,6 +200,9 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             sendBackResponses(storage.readResponses(item.getIndex()));
 
             var out = item.getOutput();
+            if (context.isUseCallDurationTimes()) {
+                Sleeper.sleep(item.getDurationMs());
+            }
             return (T) buildState(context, out, toRead.getClass());
 
         }
@@ -246,11 +247,11 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param <J>
      * @return
      */
-    public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead) {
-        return execute(context, connection, of, toRead, false);
+    public <J extends ProtoState> J sendBytesAndExpect(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead) {
+        return sendBytesAndExpect(context, connection, of, toRead, false);
     }
 
-    public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead, boolean optional) {
+    public <J extends ProtoState> J sendBytesAndExpect(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead, boolean optional) {
         var req = "{\"type\":\"byte[]\",\"data\":{\"bytes\":\"" + Base64.getEncoder().encode(of.getAll()) + "\"}}";
         var jsonReq = mapper.toJsonNode(req);
 
@@ -262,6 +263,9 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             }
             sendBackResponses(storage.readResponses(item.getIndex()));
             var out = item.getOutput();
+            if (context.isUseCallDurationTimes()) {
+                Sleeper.sleep(item.getDurationMs());
+            }
             return (J) buildState(context, out, toRead.getClass());
 
         }

@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleProxyServer {
     private static final Logger log = LoggerFactory.getLogger(SimpleProxyServer.class);
-    public static boolean write = false;
 
     public static String toHexByteArray(byte[] byteArray, int bytesRead) {
         StringBuilder hex = new StringBuilder();
@@ -44,7 +43,7 @@ public class SimpleProxyServer {
             System.out.println("Starting proxy for " + host + ":" + remoteport
                     + " on port " + localport);
             // And start running the server
-            runServer(host, remoteport, localport, remoteHost); // never returns
+            runServer(host, remoteport, localport, remoteHost);
         } catch (Exception e) {
             System.err.println(e);
         }

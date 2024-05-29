@@ -163,7 +163,7 @@ public class BasicConsume extends Basic {
         context.setValue("BASIC_CONSUME_CI_" + basicConsume.getConsumeId(), basicConsume);
 
         //Send back the consume ok
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 basicConsume,
                 new BasicConsumeOk()

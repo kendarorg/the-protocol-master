@@ -8,13 +8,11 @@ import org.kendar.amqp.v09.utils.ProxyedBehaviour;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
 public class BasicAck extends Basic {
 
-    protected static final JsonMapper mapper = new JsonMapper();
     private long deliveryTag;
     private boolean multiple;
     private int consumeId;

@@ -4,12 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
-import redis.clients.jedis.Connection;
-import redis.clients.jedis.Protocol;
-import redis.clients.jedis.util.RedisInputStream;
-import redis.clients.jedis.util.RedisOutputStream;
 
-import java.io.BufferedReader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +12,10 @@ import java.util.regex.Pattern;
 
 
 public class Resp3Parser {
-    /**
-     * The following contains all rules
-     */
-    Protocol protocol;
-    Connection connection;
-    RedisInputStream input;
-    RedisOutputStream output;
-    private BufferedReader reader;
+
 
     static boolean isUpper(String input) {
         for (char c : input.toCharArray()) {
-            //  don't write in this way: if (!Character.isUpperCase(c))
             if (Character.isLowerCase(c)) {
                 return false;
             }
@@ -401,7 +388,6 @@ public class Resp3Parser {
             var arrayNode = (ArrayNode) jsonNode;
             var type = "*";
             var size = 0;
-            var content = new ArrayList<String>();
             for (var item : arrayNode) {
                 if (item.asText().equalsIgnoreCase("@@ARRAY@@")) {
                     type = "*";

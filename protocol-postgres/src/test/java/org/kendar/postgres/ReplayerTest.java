@@ -28,7 +28,7 @@ public class ReplayerTest {
 
         protocolServer.start();
         try {
-            while(!protocolServer.isRunning()) {
+            while (!protocolServer.isRunning()) {
                 Sleeper.sleep(100);
             }
 

@@ -103,7 +103,7 @@ public class QueueDelete extends Queue {
         queueDeleteOk.setChannel(channel);
         queueDeleteOk.setMessageCount(0);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 queueDeclare,
                 queueDeleteOk,

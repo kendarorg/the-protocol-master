@@ -38,6 +38,7 @@ public class TcpServer {
      * Listener socket
      */
     private AsynchronousServerSocketChannel server;
+    private boolean callDurationTimes;
 
     public TcpServer(NetworkProtoDescriptor protoDescriptor) {
         this.protoDescriptor = protoDescriptor;
@@ -49,7 +50,7 @@ public class TcpServer {
     public void stop() {
         try {
             server.close();
-            while(server.isOpen()){
+            while (server.isOpen()) {
                 Sleeper.sleep(200);
             }
         } catch (IOException e) {
@@ -127,6 +128,7 @@ public class TcpServer {
                                     attachment.get(byteArray);
                                     log.trace("[SERVER][RX]: " + byteArray.length);
                                     var bb = context.buildBuffer();
+                                    context.setUseCallDurationTimes(callDurationTimes);
                                     bb.write(byteArray);
                                     //Generate a BytesEvent and send it
                                     context.send(new BytesEvent(context, null, bb));
@@ -158,7 +160,12 @@ public class TcpServer {
     }
 
     public boolean isRunning() {
-        if(this.server==null) return false;
+        if (this.server == null) return false;
         return this.server.isOpen();
+    }
+
+    public void useCallDurationTimes(boolean callDurationTimes) {
+
+        this.callDurationTimes = callDurationTimes;
     }
 }

@@ -21,7 +21,7 @@ import java.util.List;
 
 public class Resp3ProxySocket extends NetworkProxySocket {
     private static final Logger log = LoggerFactory.getLogger(Resp3ProxySocket.class.getName());
-    private Resp3MessageTranslator translator = new Resp3MessageTranslator().asProxy();
+    private final Resp3MessageTranslator translator = new Resp3MessageTranslator().asProxy();
 
     public Resp3ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
         super(context, inetSocketAddress, group);

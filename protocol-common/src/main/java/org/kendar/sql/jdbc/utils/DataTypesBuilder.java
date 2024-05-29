@@ -33,7 +33,6 @@ public class DataTypesBuilder {
 
 
         var rs = connection.getMetaData().getTypeInfo();
-        var md = rs.getMetaData();
         var allDtd = new ArrayList<DataTypeDescriptor>();
         while (rs.next()) {
             var dtd = new DataTypeDescriptor();
