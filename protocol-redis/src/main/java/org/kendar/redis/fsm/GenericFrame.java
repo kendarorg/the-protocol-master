@@ -2,6 +2,7 @@ package org.kendar.redis.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.protocol.events.BaseBytesEvent;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.states.ProtoState;
@@ -67,7 +68,7 @@ public class GenericFrame extends ProtoState implements NetworkReturnMessage, Ne
     }
 
     @Override
-    public BytesEvent split(BytesEvent input) {
-        return execute(input);
+    public BytesEvent split(BaseBytesEvent input) {
+        return execute((BytesEvent) input);
     }
 }

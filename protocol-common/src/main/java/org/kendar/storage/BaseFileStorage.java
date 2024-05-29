@@ -2,6 +2,7 @@ package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -96,7 +97,11 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
             try {
                 var fileContent = Files.readString(Path.of(targetDir, fileName));
                 result.add((StorageItem<I, O>) mapper.deserialize(fileContent, getTypeReference()));
-            } catch (IOException e) {
+            } catch (MismatchedInputException e) {
+                log.error(Path.of(targetDir, fileName).toString());
+                throw new RuntimeException(e);
+            }catch (IOException e) {
+                log.error(Path.of(targetDir, fileName).toString());
                 throw new RuntimeException(e);
             }
         }

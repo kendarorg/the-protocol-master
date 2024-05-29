@@ -42,7 +42,7 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        proxy.execute(context,
+        proxy.sendBytesAndExpect(event,context,
                 connection, BBuffer.of(new byte[]{'A', 'M', 'Q', 'P', 0, 0, 9, 1}),
                 new ConnectionStart());
 

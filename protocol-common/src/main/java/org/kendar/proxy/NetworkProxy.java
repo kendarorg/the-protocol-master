@@ -12,6 +12,7 @@ import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.kendar.protocol.events.BaseEvent;
 
 import java.io.IOException;
 import java.net.*;
@@ -127,13 +128,13 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
 
     /**
-     * Execute with no return
+     * Execute with no return, simply se
      *
      * @param context
      * @param connection
      * @param of
      */
-    public <K extends NetworkReturnMessage> void execute(NetworkProtoContext context, ProxyConnection connection, K of) {
+    public <K extends NetworkReturnMessage> void sendAndSave(BaseEvent event, NetworkProtoContext context, ProxyConnection connection, K of) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
@@ -152,16 +153,15 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         sock.write(of, protocol.buildBuffer());
         var res = "{\"type\":null,\"data\":null}";
         long end = System.currentTimeMillis();
-        var requestContext = context.getValue("REQUEST",new Stack<Map<String,Object>>());
-        requestContext.push(Map.of(
-                "index",index,
-                "contextId",context.getContextId(),
-                "req",mapper.toJsonNode(req),
-                "start",start,
-                "class",of.getClass().getSimpleName(),
-                "caller",getCaller()
-        ));
-        context.setValue("REQUEST",requestContext);
+//        var requestContext = context.getValue("REQUEST",new Stack<Map<String,Object>>());
+//        requestContext.push(Map.of(
+//                "index",index,
+//                "contextId",context.getContextId(),
+//                "req",mapper.toJsonNode(req),
+//                "start",start,
+//                "class",of.getClass().getSimpleName()
+//        ));
+//        context.setValue(event.getTagKeyValues()+"REQUEST",requestContext);
         storage.write(
                 index,
                 context.getContextId(),
@@ -196,25 +196,28 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param <K>
      * @return
      */
-    public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
-                                                                     ProxyConnection connection, K of, T toRead) {
-        return execute(context, connection, of, toRead, false);
+    public <T extends ProtoState, K extends ReturnMessage> void sendAndExpect(BaseEvent event, NetworkProtoContext context,
+                                                        ProxyConnection connection, K of, T toRead) {
+        sendAndExpect(event,context, connection, of, toRead,false);
     }
 
-    public <T extends ProtoState, K extends ReturnMessage> T execute(NetworkProtoContext context,
-                                                                     ProxyConnection connection, K of, T toRead, boolean optional) {
+    public <T extends ProtoState, K extends ReturnMessage> void sendAndExpect(BaseEvent event, NetworkProtoContext context,
+                                                        ProxyConnection connection, K of, T toRead, boolean optional) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
             if (item.getOutput() == null && item.getInput() == null) {
                 sendBackResponses(storage.readResponses(item.getIndex()));
-                return toRead;
+                return;// TODOERROR toRead;
             }
             sendBackResponses(storage.readResponses(item.getIndex()));
 
             var out = item.getOutput();
-            return (T) buildState(context, out, toRead.getClass());
+            // TODOERROR
+            var state = (T) buildState(context, out, toRead.getClass());
+            context.write((ReturnMessage) state);
+            return;
 
         }
         var index = storage.generateIndex();
@@ -224,28 +227,27 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         var sock = (NetworkProxySocket) connection.getConnection();
         var bufferToWrite = protocol.buildBuffer();
         sock.write(of, bufferToWrite);
-        sock.read(toRead, optional);
+        //sock.read(toRead, optional);
 
-        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
-        long end = System.currentTimeMillis();
+//        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
+//        long end = System.currentTimeMillis();
 
-        var requestContext = context.getValue("REQUEST",new Stack<Map<String,Object>>());
+        var requestContext = context.getValue(event.getTagKeyValues()+"REQUEST",new Stack<Map<String,Object>>());
         requestContext.push(Map.of(
                 "index",index,
                 "contextId",context.getContextId(),
                 "req",mapper.toJsonNode(req),
                 "start",start,
-                "class",of.getClass().getSimpleName(),
-                "caller",getCaller()
+                "class",of.getClass().getSimpleName()
         ));
-        context.setValue("REQUEST",requestContext);
-        storage.write(
-                index,
-                context.getContextId(),
-                jsonReq
-                , mapper.toJsonNode(res)
-                , (end - start), of.getClass().getSimpleName(), getCaller());
-        return toRead;
+        context.setValue(event.getTagKeyValues()+"REQUEST",requestContext);
+//        storage.write(
+//                index,
+//                context.getContextId(),
+//                jsonReq
+//                , mapper.toJsonNode(res)
+//                , (end - start), of.getClass().getSimpleName(), getCaller());
+//        return toRead;
     }
 
     /**
@@ -268,11 +270,11 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param <J>
      * @return
      */
-    public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead) {
-        return execute(context, connection, of, toRead, false);
+    public <J extends ProtoState> void sendBytesAndExpect(BaseEvent event, NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead) {
+        sendBytesAndExpect(event,context, connection, of, toRead,false);
     }
 
-    public <J extends ProtoState> J execute(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead, boolean optional) {
+    public <J extends ProtoState> void sendBytesAndExpect(BaseEvent event, NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead, boolean optional) {
         var req = "{\"type\":\"byte[]\",\"data\":{\"bytes\":\"" + Base64.getEncoder().encode(of.getAll()) + "\"}}";
         var jsonReq = mapper.toJsonNode(req);
 
@@ -280,39 +282,38 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             var item = storage.read(jsonReq, "byte[]");
             if (item.getOutput() == null && item.getInput() == null) {
                 sendBackResponses(storage.readResponses(item.getIndex()));
-                return toRead;
+                return;
             }
             sendBackResponses(storage.readResponses(item.getIndex()));
             var out = item.getOutput();
-            return (J) buildState(context, out, toRead.getClass());
-
+            var state= (J) buildState(context, out, toRead.getClass());
+            context.write((ReturnMessage) state);
+            return;
         }
         var index = storage.generateIndex();
 
         long start = System.currentTimeMillis();
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of);
-        sock.read(toRead, optional);
 
-        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
-        long end = System.currentTimeMillis();
-        var requestContext = context.getValue("REQUEST",new Stack<Map<String,Object>>());
+        //var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
+        //long end = System.currentTimeMillis();
+        var requestContext = context.getValue(event.getTagKeyValues()+"REQUEST",new Stack<Map<String,Object>>());
         requestContext.push(Map.of(
                 "index",index,
                 "contextId",context.getContextId(),
                 "req",mapper.toJsonNode(req),
                 "start",start,
-                "class",of.getClass().getSimpleName(),
-                "caller",getCaller()
+                "class",of.getClass().getSimpleName()
         ));
-        context.setValue("REQUEST",requestContext);
-        storage.write(
+        context.setValue(event.getTagKeyValues()+"REQUEST",requestContext);
+        /*storage.write(
                 index,
                 context.getContextId(),
                 jsonReq
                 , mapper.toJsonNode(res)
                 , (end - start), "byte[]", getCaller());
-        return toRead;
+        return toRead;*/
     }
 
     /**
@@ -324,4 +325,39 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param storageItems
      */
     protected abstract void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems);
+
+    public void receive(BaseEvent event, NetworkProtoContext context) {
+        this.receive(event, context, false);
+    }
+    private static int count =0;
+    public void receive(BaseEvent event, NetworkProtoContext context,boolean push) {
+        var requestContext = context.getValue(event.getTagKeyValues()+"REQUEST",new Stack<Map<String,Object>>());
+        Map<String,Object> request = null;
+        if(!requestContext.isEmpty() && !push) {
+            request = requestContext.pop();
+        }
+
+        long end = System.currentTimeMillis();
+        if(request!=null && !request.isEmpty() && !push){
+            count++;
+            var res = "{\"type\":\"" + event.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(event)) + "}";
+            storage.write(
+                    (long)request.get("index"),
+                    context.getContextId(),
+                    (JsonNode) request.get("req")
+                    , mapper.toJsonNode(res)
+                    , end-(long)request.get("start"),
+                    (String)request.get("class"),
+                    getCaller());
+        }else if(push){
+            var res = "{\"type\":\"RESPONSE\",\"data\":" + mapper.serialize(getData(event)) + "}";
+            storage.write(
+                    context.getContextId(),
+                    null
+                    , mapper.toJsonNode(res)
+                    , 0, "RESPONSE", getCaller());
+        }else{
+            throw new RuntimeException("Unexpected Message");
+        }
+    }
 }

@@ -8,6 +8,7 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.NetworkProxy;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.redis.fsm.Resp3Response;
+import org.kendar.redis.fsm.events.ProxyResp3Message;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.redis.utils.Resp3ProxySocket;
 import org.kendar.redis.utils.Resp3Storage;
@@ -52,6 +53,9 @@ public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
     protected Object getData(Object of) {
         if (of instanceof Resp3Message) {
             return ((Resp3Message) of).getData();
+        }
+        if (of instanceof ProxyResp3Message) {
+            return ((ProxyResp3Message) of).getData();
         }
         if (of instanceof Resp3Response) {
             return getData(((Resp3Response) of).getEvent());

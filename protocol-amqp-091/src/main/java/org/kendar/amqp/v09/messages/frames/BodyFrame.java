@@ -95,7 +95,7 @@ public class BodyFrame extends Frame {
             bf.setConsumeId(basicConsume.getConsumeId());
         }
 
-        return iteratorOfRunnable(() -> proxy.execute(context, connection, bf));
+        return iteratorOfRunnable(() -> proxy.sendAndSave(event,context, connection, bf));
     }
 
     public byte[] getContentBytes() {

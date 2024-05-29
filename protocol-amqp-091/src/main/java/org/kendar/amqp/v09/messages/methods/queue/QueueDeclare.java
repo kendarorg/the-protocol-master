@@ -150,7 +150,7 @@ public class QueueDeclare extends Queue {
         queueDeclareOk.setConsumerCount(1);
         queueDeclareOk.setMessageCount(0);
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(event,context,
                 connection,
                 queueDeclare,
                 queueDeclareOk

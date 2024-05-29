@@ -1,6 +1,5 @@
 package org.kendar.redis.fsm;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
@@ -17,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
     protected static final JsonMapper mapper = new JsonMapper();
@@ -58,15 +55,6 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
     }
 
     public boolean canRun(Resp3Message event) {
-        if (isProxyed() && event.getData() instanceof List) {
-            if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("message")) {
-                return true;
-            }
-
-        }
-        if (isProxyed()) {
-            return false;
-        }
         return true;
     }
 
@@ -77,9 +65,10 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         var proxy = (Resp3Proxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        return iteratorOfRunnable(() -> proxy.execute(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(event,context,
                 connection,
-                event
+                event,
+                new Resp3Response()
         ));
     }
 
@@ -99,57 +88,22 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         var context = (Resp3Context) event.getContext();
         var proxy = (Resp3Proxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-        var storage = proxy.getStorage();
-        var requestContext = context.getValue("REQUEST",new Stack<Map<String,Object>>());
 
-        Map<String,Object> request = null;
-        if(!requestContext.isEmpty()) {
-            request = requestContext.pop();
-        }
 
         if (event.getData() instanceof List) {
             if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().
                     equalsIgnoreCase("message")) {
-
-                var res = "{\"type\":\"RESPONSE\",\"data\":" +
-                        mapper.serialize(event.getData()) + "}";
-
-                if(request!=null) {
-                    request.clear();
-                }
-
-                storage.write(
-                        context.getContextId(),
-                        null
-                        , mapper.toJsonNode(res)
-                        , 0, "RESPONSE", "RESP3");
-
+                proxy.receive(event,context,true);
+            }else{
+                proxy.receive(event,context);
             }
+        }else{
+            proxy.receive(event,context);
+        }
 
-        }
-        if(request!=null && !request.isEmpty()){
-            var res = "{\"type\":\"" + event.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(event.getData()) + "}";
-            long end = System.currentTimeMillis();
-            /*context.setValue("REQUEST", (Map<String,Object>)Map.of(
-                "index",index,
-                "contextId",context.getContextId(),
-                "req",mapper.toJsonNode(req),
-                "start",start,
-                "class",of.getClass().getSimpleName(),
-                "caller",getCaller()
-        ));*/
-            storage.write(
-                    (long)request.get("index"),
-                    context.getContextId(),
-                    (JsonNode) request.get("req")
-                    , mapper.toJsonNode(res)
-                    , end-(long)request.get("start"),
-                    (String)request.get("class"),
-                    (String)request.get("caller"));
-        }
         return iteratorOfList(event);
 //        if (!this.proxy) {
-//            return iteratorOfRunnable(() -> proxy.execute(context,
+//            return iteratorOfRunnable(() -> proxy.execute(event,context,
 //                    connection,
 //                    event,
 //                    new Resp3PullState().asProxy()

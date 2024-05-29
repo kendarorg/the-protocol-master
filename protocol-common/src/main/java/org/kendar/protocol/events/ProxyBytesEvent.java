@@ -6,15 +6,9 @@ import org.kendar.protocol.context.ProtoContext;
 /**
  * Default "bytes" kind event
  */
-public class ProxyBytesEvent extends BaseEvent {
-    private final BBuffer buffer;
+public class ProxyBytesEvent extends BaseBytesEvent{
 
     public ProxyBytesEvent(ProtoContext context, Class<?> prevState, BBuffer buffer) {
-        super(context, prevState);
-        this.buffer = buffer;
-    }
-
-    public BBuffer getBuffer() {
-        return buffer;
+        super(context, prevState,buffer);
     }
 }

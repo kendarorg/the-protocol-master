@@ -103,27 +103,29 @@ public class ConnectionStartOk extends Connection {
         response.setChannelMax((short) 0);
         response.setFrameMax(131072);
         response.setHearthBeat((short) 0);
-        var conTuneOk = new ConnectionTuneOk();
-        var conTune = proxy.execute(context,
+
+        //var conTune =
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(event,context,
                 connection,
                 connStartOk,
                 response
-        );
-        conTuneOk.setChannelMax(conTune.getChannelMax());
-        conTuneOk.setHearthBeat(conTune.getHearthBeat());
-        conTuneOk.setFrameMax(conTune.getFrameMax());
+        ));
+        var conTuneOk = new ConnectionTuneOk();
+//        TODOERR conTuneOk.setChannelMax(conTune.getChannelMax());
+//        conTuneOk.setHearthBeat(conTune.getHearthBeat());
+//        conTuneOk.setFrameMax(conTune.getFrameMax());
 
 
         return iteratorOfRunnable(() -> {
-                    proxy.execute(context,
+                    proxy.sendAndSave(event,context,
                             connection,
                             conTuneOk);
 
-                    var response2 = new ConnectionTune();
-                    response2.setChannelMax((short) 0);
-                    response2.setFrameMax(131072);
-                    response2.setHearthBeat((short) 0);
-                    return response2;
+//                 TODOERR    var response2 = new ConnectionTune();
+//                    response2.setChannelMax((short) 0);
+//                    response2.setFrameMax(131072);
+//                    response2.setHearthBeat((short) 0);
+//                    return response2;
                 }
         );
     }

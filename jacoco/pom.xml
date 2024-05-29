@@ -20,11 +20,11 @@
             <artifactId>protocol-postgres</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-amqp-091</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.kendar.protocol</groupId>-->
+<!--            <artifactId>protocol-amqp-091</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mysql</artifactId>

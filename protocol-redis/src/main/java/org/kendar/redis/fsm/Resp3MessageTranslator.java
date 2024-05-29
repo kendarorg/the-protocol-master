@@ -3,6 +3,7 @@ package org.kendar.redis.fsm;
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.events.BaseBytesEvent;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProxyBytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
@@ -16,6 +17,7 @@ import org.kendar.redis.parser.Resp3Input;
 import org.kendar.redis.parser.Resp3ParseException;
 import org.kendar.redis.parser.Resp3Parser;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +42,7 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
 
     }
 
-    public boolean canRun(BytesEvent event) {
+    private boolean canRun(BaseBytesEvent event) {
         var rb = event.getBuffer();
         var oldPos = rb.getPosition();
         rb.setPosition(0);
@@ -60,31 +62,17 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
             }
         }
         return true;
+    }
+
+    public boolean canRun(BytesEvent event) {
+        return canRun((BaseBytesEvent) event);
     }
 
     public boolean canRun(ProxyBytesEvent event) {
-        var rb = event.getBuffer();
-        var oldPos = rb.getPosition();
-        rb.setPosition(0);
-        var allBytes = rb.getAll();
-        if (allBytes.length == 0) {
-            return false;
-        }
-        var str = new String(allBytes);
-        var input = Resp3Input.of(str);
-        try {
-            Object result = parser.parse(input);
-            rb.setPosition(0);
-        } catch (Resp3ParseException ex) {
-            if (ex.isMissingData()) {
-                rb.setPosition(0);
-                throw new AskMoreDataException();
-            }
-        }
-        return true;
+        return canRun((BaseBytesEvent) event);
     }
 
-    public Iterator<ProtoStep> execute(BytesEvent event) {
+    private Iterator<ProtoStep> execute(BaseBytesEvent event, TriConsumer<BaseBytesEvent,Object,Resp3Input> callback) {
         var rb = event.getBuffer();
         var oldPos = rb.getPosition();
         rb.setPosition(oldPos);
@@ -102,36 +90,32 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
             }
         }
 
-        log.debug("[SERVER ][RX1]: " + mapper.serialize(result));
-        event.getContext().send(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
+
+        //extracted(event, result, input);
+        callback.run(event,result,input);
         return iteratorOfEmpty();
 
+
     }
 
-    public Iterator<ProtoStep> execute(ProxyBytesEvent event) {
-        var rb = event.getBuffer();
-        var oldPos = rb.getPosition();
-        rb.setPosition(oldPos);
-        var allBytes = rb.getRemaining();
-        var str = new String(allBytes);
-        var input = Resp3Input.of(str);
-        Object result = null;
-        try {
-            result = parser.parse(input);
-            rb.setPosition(oldPos + input.getIndex());
-        } catch (Resp3ParseException ex) {
-            if (ex.isMissingData()) {
-                rb.setPosition(oldPos);
-                throw new AskMoreDataException();
-            }
-        }
+    private static void extracted(BaseBytesEvent event, Object result, Resp3Input input) {
+        log.debug("[SERVER ][RX2]: " + mapper.serialize(result));
+        event.getContext().send(new ProxyResp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
+    }
 
+    public Iterator<ProtoStep> execute(BytesEvent e) {
+        return execute(e,(event,result,input)->{
+            log.debug("[SERVER ][RX1]: " + mapper.serialize(result));
+            event.getContext().send(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
+        });
 
+    }
+
+    public Iterator<ProtoStep> execute(ProxyBytesEvent e) {
+        return execute(e,(event,result,input)->{
             log.debug("[SERVER ][RX2]: " + mapper.serialize(result));
             event.getContext().send(new ProxyResp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
-            return iteratorOfEmpty();
-
-
+        });
     }
 
     public Resp3MessageTranslator asProxy() {
@@ -140,7 +124,7 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
     }
 
     @Override
-    public BytesEvent split(BytesEvent event) {
+    public BytesEvent split(BaseBytesEvent event) {
         var rb = event.getBuffer();
         var oldPos = rb.getPosition();
         rb.setPosition(oldPos);

@@ -3,9 +3,6 @@ package org.kendar;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import org.apache.commons.cli.*;
-import org.kendar.amqp.v09.AmqpFileStorage;
-import org.kendar.amqp.v09.AmqpProtocol;
-import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.mongo.MongoFileStorage;
 import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
@@ -262,25 +259,25 @@ public class Main {
     }
 
     private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {
-        var baseProtocol = new AmqpProtocol(port);
-        var proxy = new AmqpProxy(connectionString, login, password);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new AmqpProxy();
-                proxy.setStorage(new AmqpFileStorage(path));
-            } else {
-                proxy.setStorage(new AmqpFileStorage(path));
-            }
-        }
-        baseProtocol.setProxy(proxy);
-        baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
-
-        protocolServer.start();
-        while(!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+//        var baseProtocol = new AmqpProtocol(port);
+//        var proxy = new AmqpProxy(connectionString, login, password);
+//        if (logsDir != null) {
+//            var path = Path.of(logsDir);
+//            if (replayFromLog) {
+//                proxy = new AmqpProxy();
+//                proxy.setStorage(new AmqpFileStorage(path));
+//            } else {
+//                proxy.setStorage(new AmqpFileStorage(path));
+//            }
+//        }
+//        baseProtocol.setProxy(proxy);
+//        baseProtocol.initialize();
+//        protocolServer = new TcpServer(baseProtocol);
+//
+//        protocolServer.start();
+//        while(!protocolServer.isRunning()) {
+//            Sleeper.sleep(100);
+//        }
     }
 
     private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog) {

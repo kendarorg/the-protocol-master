@@ -34,8 +34,9 @@ public class ProxyedBehaviour {
                     , 0, "RESPONSE", "AMQP");
             return Frame.iteratorOfList(toSend);
         }
+
         return iteratorOfRunnable(() -> {
-            proxy.execute(context, connection, toSend);
+            proxy.sendAndSave(null,context, connection, toSend);
         });
     }
 }
