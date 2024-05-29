@@ -47,7 +47,7 @@ several database wire protocol implementations:
 You can use the "protocol-runner-VERSION.jar" to proxy all your calls and test your
 connections (and add some ISSUE to this project hopefully).
 
-Inside protocol-runner/src/test/java/org/kenndar/runner/MainTest.java you can see
+Inside protocol-runner/src/test/java/org/kendar/runner/MainTest.java you can see
 an example where a recording is made and then reporduced.
 
 Just call it like the following if using included mysql and postgres driver (adapt
