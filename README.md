@@ -172,7 +172,7 @@ retried.
 You can build the whole system at home, but to avoid messing with timeouts
 
 * Maven clean & install each project separately
-* Run the jacoco tu check the coverage
+* Run the jacoco to check the coverage
 
 
 
