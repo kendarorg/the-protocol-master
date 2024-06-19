@@ -182,13 +182,20 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param <K>
      * @return
      */
-    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(NetworkProtoContext context,
-                                                                           ProxyConnection connection, K of, T toRead) {
+    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(
+            NetworkProtoContext context,
+            ProxyConnection connection,
+            K of,
+            T toRead) {
         return sendAndExpect(context, connection, of, toRead, false);
     }
 
-    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(NetworkProtoContext context,
-                                                                           ProxyConnection connection, K of, T toRead, boolean optional) {
+    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(
+            NetworkProtoContext context,
+            ProxyConnection connection,
+            K of,
+            T toRead,
+            boolean optional) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
         if (replayer) {

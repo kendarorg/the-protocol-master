@@ -1,15 +1,23 @@
 package org.kendar.mqtt;
 
+import org.kendar.mqtt.fsm.Connect;
+import org.kendar.mqtt.fsm.MqttPacketTranslator;
+import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.states.special.ProtoStateSequence;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MqttProtocol extends NetworkProtoDescriptor {
     private static final int PORT = 1883;
     private int port = PORT;
+    public static int VERSION_5=5;
+    public static int VERSION_3=3;
+
     public static ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
 
     private MqttProtocol() {
@@ -18,14 +26,18 @@ public class MqttProtocol extends NetworkProtoDescriptor {
 
     public MqttProtocol(int port) {this();this.port = port;}
     @Override
-    public boolean isBe() {return false;}
+    public boolean isBe() {return true;}
 
     @Override
     public int getPort() {return port;}
 
     @Override
     protected void initializeProtocol() {
-
+        addInterruptState(new MqttPacketTranslator(BytesEvent.class));
+        initialize(
+                new ProtoStateSequence(
+                        new Connect(MqttPacket.class)
+                ));
     }
 
     @Override

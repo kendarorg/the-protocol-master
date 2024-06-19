@@ -16,6 +16,9 @@ public class BBuffer {
         this(BBufferEndianness.BE);
     }
 
+    public BBufferEndianness getEndianness() {
+        return endianness;
+    }
 
     public BBuffer(BBufferEndianness endianness) {
         this.endianness = endianness;
