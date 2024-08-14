@@ -9,6 +9,13 @@ import java.util.ArrayList;
 public class TaggedEvent extends BaseEvent {
     public final String data;
 
+    @Override
+    public String toString() {
+        return "TaggedEvent{" +
+                "data='" + data + '\'' +
+                '}';
+    }
+
     public TaggedEvent(ProtoContext context, Class<?> prevState, String data, String... tagsKvp) {
         super(context, prevState);
         this.data = data;
@@ -19,4 +26,6 @@ public class TaggedEvent extends BaseEvent {
             this.getTag().add(new Tag(key, value));
         }
     }
+
+
 }

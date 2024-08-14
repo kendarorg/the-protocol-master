@@ -1,14 +1,20 @@
 package org.kendar.mqtt;
 
+import org.kendar.buffers.BBuffer;
+import org.kendar.buffers.BBufferEndianness;
 import org.kendar.mqtt.fsm.Connect;
 import org.kendar.mqtt.fsm.MqttPacketTranslator;
+import org.kendar.mqtt.fsm.Publish;
 import org.kendar.mqtt.fsm.events.MqttPacket;
+import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.special.ProtoStateSequence;
+import org.kendar.protocol.states.special.ProtoStateSwitchCase;
+import org.kendar.protocol.states.special.ProtoStateWhile;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,7 +42,13 @@ public class MqttProtocol extends NetworkProtoDescriptor {
         addInterruptState(new MqttPacketTranslator(BytesEvent.class));
         initialize(
                 new ProtoStateSequence(
-                        new Connect(MqttPacket.class)
+                        new Connect(MqttPacket.class),
+                        new ProtoStateWhile(
+                                new ProtoStateSwitchCase(
+                                        new Publish(MqttPacket.class)
+                                )
+                        )
+
                 ));
     }
 
@@ -45,5 +57,9 @@ public class MqttProtocol extends NetworkProtoDescriptor {
         var result = new MqttContext(protoDescriptor);
         consumeContext.put(result.getContextId(), result);
         return result;
+    }
+
+    public BBuffer buildBuffer() {
+        return new MqttBBuffer(isBe() ? BBufferEndianness.BE : BBufferEndianness.LE);
     }
 }

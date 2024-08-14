@@ -15,4 +15,9 @@ public class PostgresPacket extends BaseEvent {
     public BBuffer getBuffer() {
         return buffer;
     }
+
+    @Override
+    public String toString() {
+        return "PostgresPacket{}";
+    }
 }

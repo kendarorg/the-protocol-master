@@ -71,7 +71,9 @@ public abstract class NetworkProtoContext extends ProtoContext {
             if (remainingBytes.getBuffer().size() == 0) {
                 return null;
             }
-            message += " " + remainingBytes.getBuffer().toHexStringUpToLength(20);
+            message = event + " " + remainingBytes.getBuffer().toHexStringUpToLength(20);
+        }else{
+            message = event.toString();
         }
         log.error("[SERVER][??] Unknown: " + message);
         throw new UnknownCommandException("Unknown command issued: " + message);

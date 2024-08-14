@@ -15,4 +15,9 @@ public class OpMsgRequest extends BaseEvent {
     public OpMsgContent getData() {
         return data;
     }
+
+    @Override
+    public String toString() {
+        return "OpMsgRequest{}";
+    }
 }

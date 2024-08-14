@@ -11,6 +11,44 @@ public class Mqtt5Property {
     public Mqtt5Property(){
 
     }
+    public void write(MqttBBuffer value){
+        value.write(type.asByte());
+        switch (type.asByte()){
+            case(0x03):
+            case(0x08):
+            case(0x12):
+            case(0x15):
+            case(0x1A):
+            case(0x1C):
+            case(0x1F):
+            case(0x26):
+                value.writeUtf8String(stringValue);
+                break;
+            case(0x09):
+            case(0x16):
+                value.writeShort((short)byteValue.length);
+                value.write(byteValue);
+                break;
+            case(0x0B):
+                value.writeVarBInteger(longValue);
+                break;
+            case(0x02):
+            case(0x11):
+            case(0x18):
+            case(0x27):
+                value.writeInt((int)longValue);
+                break;
+            case(0x13):
+            case(0x21):
+            case(0x22):
+            case(0x23):
+                value.writeShort((short) longValue);
+                break;
+            default:
+                value.write((byte)longValue);
+                break;
+        }
+    }
     public Mqtt5Property(Mqtt5PropertyType type, Object value){
 
         this.type = type;
@@ -107,5 +145,45 @@ public class Mqtt5Property {
 
     public void setStringValue(String stringValue) {
         this.stringValue = stringValue;
+    }
+
+    public void toBytes(MqttBBuffer bb){
+        bb.write(type.asByte());
+        switch (type.asByte()){
+            case(0x03):
+            case(0x08):
+            case(0x12):
+            case(0x15):
+            case(0x1A):
+            case(0x1C):
+            case(0x1F):
+            case(0x26):
+                bb.writeUtf8String(stringValue);
+                break;
+            case(0x09):
+            case(0x16):
+                bb.writeShort((short)byteValue.length);
+                bb.write(byteValue);
+                break;
+            case(0x0B):
+                bb.writeVarBInteger(longValue);
+                break;
+            case(0x02):
+            case(0x11):
+            case(0x18):
+            case(0x27):
+                bb.writeInt((int)longValue);
+                break;
+            case(0x13):
+            case(0x21):
+            case(0x22):
+            case(0x23):
+                bb.writeShort((short) longValue);
+                break;
+            default:
+                bb.write((byte)longValue);
+                break;
+        }
+
     }
 }

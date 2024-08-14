@@ -1,6 +1,8 @@
 package org.kendar.mqtt.enums;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum MqttFixedHeader {
@@ -24,11 +26,14 @@ public enum MqttFixedHeader {
     DISCONNECT(0xE0),
     AUTH(0xF0);
     private static final Map<Integer, MqttFixedHeader> BY_INT = new HashMap<>();
+    private static final List<Byte> bytes= new ArrayList<>();
 
     static {
         for (MqttFixedHeader e : values()) {
             BY_INT.put((int)e.value, e);
+            bytes.add((byte)e.value);
         }
+
     }
 
     private final byte value;
@@ -54,8 +59,17 @@ public enum MqttFixedHeader {
         return source & ~flag;
     }
 
+
+
+
     public static MqttFixedHeader of(int value) {
-        return BY_INT.get(value);
+        for (int i = bytes.size() - 1; i >= 0; i--) {
+            var by = bytes.get(i);
+            if (by != 0 && (by & value) == by) {
+                return BY_INT.get((int) by);
+            }
+        }
+        throw new RuntimeException("MISSING MESSAGE TYPE "+value);
     }
 
     public int getValue() {

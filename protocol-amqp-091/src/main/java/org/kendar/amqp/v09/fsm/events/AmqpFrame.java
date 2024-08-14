@@ -29,4 +29,11 @@ public class AmqpFrame extends BaseEvent implements TaggedObject {
     public BBuffer getBuffer() {
         return buffer;
     }
+
+    @Override
+    public String toString() {
+        return "AmqpFrame{" +
+                "channel=" + channel +
+                '}';
+    }
 }

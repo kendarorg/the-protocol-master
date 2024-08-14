@@ -31,4 +31,11 @@ public class MqttPacket extends BaseEvent implements NetworkReturnMessage {
     public MqttBBuffer getBuffer() {
         return buffer;
     }
+
+    @Override
+    public String toString() {
+        return "MqttPacket{" +
+                "fixedHeader=" + fixedHeader  +
+                '}';
+    }
 }

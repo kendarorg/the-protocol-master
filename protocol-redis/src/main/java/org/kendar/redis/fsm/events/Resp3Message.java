@@ -50,5 +50,12 @@ public class Resp3Message extends BaseEvent implements NetworkReturnMessage {
             log.error(ex.getMessage());
         }
     }
+
+    @Override
+    public String toString() {
+        return "Resp3Message{" +
+                "message='" + message + '\'' +
+                '}';
+    }
 }
 
