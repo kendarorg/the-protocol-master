@@ -51,6 +51,6 @@ public class SimpleTest extends BasicTest{
         var message = new MqttMessage("Hello World!!".getBytes(UTF_8));
         message.setQos(2);
         message.setRetained(true);
-        publisher.publish("/exit",message);
+        publisher.publish("/exit/",message);
     }
 }
