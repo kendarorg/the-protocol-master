@@ -5,6 +5,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.*;
+import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -49,8 +50,11 @@ public class SimpleTest extends BasicTest{
         publisher.connect(options);
 
         var message = new MqttMessage("Hello World!!".getBytes(UTF_8));
+        //message.setQos(2);
         message.setQos(2);
         message.setRetained(true);
         publisher.publish("/exit/",message);
+        Sleeper.sleep(1000);
+        publisher.disconnect();
     }
 }

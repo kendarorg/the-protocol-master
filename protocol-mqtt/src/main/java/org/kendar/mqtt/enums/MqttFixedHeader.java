@@ -17,7 +17,7 @@ public enum MqttFixedHeader {
     //
     PUBACK(0x40),
     PUBREC(0x50),
-    PUBREL(0x62),
+    PUBREL(0x60),
     PUBCOMP(0x70),
     SUBSCRIBE(0x82),
     SUBACK(0x90),

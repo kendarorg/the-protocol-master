@@ -99,10 +99,22 @@ public class Publish extends BaseMqttState {
             throw new RuntimeException("CANNOT HANDLE AS PROXY");
             //return iteratorOfEmpty();
         }
-        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
+        if(qos==1){
+            return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
+                    connection,
+                    publish,
+                    new PublishAck()
+            ));
+        }else if(qos==2){
+            return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
+                    connection,
+                    publish,
+                    new PublishRec()
+            ));
+        }
+        return iteratorOfRunnable(() -> proxy.sendAndForget(context,
                 connection,
-                publish,
-                new PublishAck()
+                publish
         ));
     }
 

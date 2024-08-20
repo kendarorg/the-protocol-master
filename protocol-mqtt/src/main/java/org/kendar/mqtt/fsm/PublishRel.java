@@ -8,9 +8,13 @@ import org.kendar.protocol.messages.ReturnMessage;
 
 import java.util.Iterator;
 
-public class PublishAck  extends BaseMqttState implements ReturnMessage {
-    public PublishAck(){
-        setFixedHeader(MqttFixedHeader.PUBACK);
+public class PublishRel extends BaseMqttState implements ReturnMessage {
+    public PublishRel(Class<?>... events) {
+        super(events);
+        setFixedHeader(MqttFixedHeader.PUBREL);
+    }
+    public PublishRel(){
+        setFixedHeader(MqttFixedHeader.PUBREL);
     }
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {

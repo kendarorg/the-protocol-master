@@ -50,17 +50,18 @@ public class ConnectAck extends BaseMqttState implements ReturnMessage {
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
         var bb = event.getBuffer();
+        var connect = this;
         //https://www.emqx.com/en/blog/mqtt-5-0-control-packets-01-connect-connack
         var connectAckFlag = bb.get(); //SessionPresent
         var sessionSet = (connectAckFlag & 0x01) == 0x01;
         //TODOMQTT 3.2.2.2 Connect Reason Code
         var connectReasonCode = bb.get();
-        setProperties(new ArrayList<>());
-        setSessionSet(sessionSet);
-        setConnectReasonCode(connectReasonCode);
+        connect.setProperties(new ArrayList<>());
+        connect.setSessionSet(sessionSet);
+        connect.setConnectReasonCode(connectReasonCode);
         //WAs it not varinteger
 
-        return iteratorOfList(this);
+        return iteratorOfList(connect);
     }
 
 

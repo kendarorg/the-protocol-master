@@ -105,9 +105,13 @@ public class TcpServer {
                 //Accept request
                 Future<AsynchronousSocketChannel> future = server.accept();
                 try {
+                    if(!server.isOpen()){
+                        log.info("[SERVER] Closed");
+                        break;
+                    }
                     //Initialize client wrapper
                     var client = new TcpServerChannel(future.get());
-                    log.info("[SERVER] Accepted connection from " + client.getRemoteAddress());
+                    log.trace("[SERVER] Accepted connection from " + client.getRemoteAddress());
                     //Prepare the native buffer
                     ByteBuffer buffer = ByteBuffer.allocate(4096);
                     //Create the execution context
@@ -126,7 +130,7 @@ public class TcpServer {
                                     //If there is something
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
-                                    log.trace("[SERVER][RX]: " + byteArray.length);
+                                    log.debug("[SERVER][RX]: " + byteArray.length);
                                     var bb = context.buildBuffer();
                                     context.setUseCallDurationTimes(callDurationTimes);
                                     bb.write(byteArray);

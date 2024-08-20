@@ -31,7 +31,7 @@ public class BasicTest {
         @Override
         public void onPublish(InterceptPublishMessage msg) {
             final String decodedPayload = msg.getPayload().toString(UTF_8);
-            System.out.println("Received on topic: " + msg.getTopicName() + " content: " + decodedPayload);
+            System.out.println("Received on topic: [" + msg.getTopicName() + "] content: [" + decodedPayload+"] qos:[" + msg.getQos()+"]");
         }
 
 //        @Override

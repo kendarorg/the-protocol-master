@@ -2,9 +2,7 @@ package org.kendar.mqtt;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
-import org.kendar.mqtt.fsm.Connect;
-import org.kendar.mqtt.fsm.MqttPacketTranslator;
-import org.kendar.mqtt.fsm.Publish;
+import org.kendar.mqtt.fsm.*;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -45,7 +43,10 @@ public class MqttProtocol extends NetworkProtoDescriptor {
                         new Connect(MqttPacket.class),
                         new ProtoStateWhile(
                                 new ProtoStateSwitchCase(
-                                        new Publish(MqttPacket.class)
+                                        new Publish(MqttPacket.class),
+                                        new ProtoStateWhile(
+                                                new PublishRel(MqttPacket.class)
+                                        )
                                 )
                         )
 
