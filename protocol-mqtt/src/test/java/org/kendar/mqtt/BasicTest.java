@@ -47,7 +47,7 @@ public class BasicTest {
     //protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
 
-    public static void beforeClassBase() throws IOException {
+    public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
         //var classpathLoader = new ClasspathResourceLoader();
         //final var classPathConfig = new ResourceLoaderConfig(classpathLoader);
@@ -56,6 +56,36 @@ public class BasicTest {
 
         mqttBroker = new Server();
         List<? extends InterceptHandler> userHandlers = Collections.singletonList(new PublisherListener());
+        mqttBroker.startServer(classPathConfig, userHandlers);
+
+        //Bind  a shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Stopping broker");
+            mqttBroker.stopServer();
+            System.out.println("Broker stopped");
+        }));
+//
+//        var dockerHost = Utils.getDockerHost();
+//        assertNotNull(dockerHost);
+//        var network = Network.newNetwork();
+//        rabbitContainer = new RabbitMqImage();
+//        rabbitContainer
+//                .withNetwork(network)
+//                .waitingForPort(5672)
+//                .start();
+
+
+    }
+
+    public static void beforeClassBase() throws IOException {
+        //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
+        //var classpathLoader = new ClasspathResourceLoader();
+        //final var classPathConfig = new ResourceLoaderConfig(classpathLoader);
+        var classpathLoader = new FileResourceLoader(new File("moquette.conf"));
+        final var classPathConfig = new ResourceLoaderConfig(classpathLoader);
+
+        mqttBroker = new Server();
+        List<? extends InterceptHandler> userHandlers = new ArrayList<>();
         mqttBroker.startServer(classPathConfig, userHandlers);
 
         //Bind  a shutdown hook

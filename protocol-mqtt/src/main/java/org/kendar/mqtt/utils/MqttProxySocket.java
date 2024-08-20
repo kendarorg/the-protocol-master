@@ -3,6 +3,7 @@ package org.kendar.mqtt.utils;
 import org.kendar.buffers.BBuffer;
 import org.kendar.mqtt.fsm.GenericFrame;
 import org.kendar.mqtt.fsm.MqttPacketTranslator;
+import org.kendar.mqtt.fsm.Publish;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.BaseEvent;
@@ -14,10 +15,16 @@ import org.kendar.proxy.NetworkProxySplitterState;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MqttProxySocket extends NetworkProxySocket {
     private final MqttPacketTranslator translator = new MqttPacketTranslator().asProxy();
+    private final List<ProtoState> states = new ArrayList<>(
+            Arrays.asList(
+                    new Publish().asProxy()
+            )
+    );
 
     public MqttProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
         super(context, inetSocketAddress, group);
@@ -28,7 +35,6 @@ public class MqttProxySocket extends NetworkProxySocket {
         return new GenericFrame();
     }
 
-    private final List<ProtoState> states = new ArrayList<>();
     //Arrays.asList(
     //            (ProtoState)new ConnectAck()
     //    )

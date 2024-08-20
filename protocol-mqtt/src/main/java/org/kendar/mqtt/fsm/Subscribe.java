@@ -10,33 +10,27 @@ import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 
 /**
  * https://www.emqx.com/en/blog/mqtt-5-0-control-packets-02-publish-puback
  */
-public class Publish extends BaseMqttState {
-    protected static final JsonMapper mapper = new JsonMapper();
-    private String topicName;
+public class Subscribe extends BaseMqttState {
+
     private byte[] payload;
     private short packetIdentifier;
-    private boolean dupFlag;
-    private boolean retainFlag;
-    private int qos;
 
 
-    public Publish() {
+    public Subscribe() {
         super();
-        setFixedHeader(MqttFixedHeader.PUBLISH);
+        setFixedHeader(MqttFixedHeader.SUBSCRIBE);
     }
 
-    public Publish(Class<?>... events) {
+    public Subscribe(Class<?>... events) {
         super(events);
-        setFixedHeader(MqttFixedHeader.PUBLISH);
+        setFixedHeader(MqttFixedHeader.SUBSCRIBE);
     }
 
 
@@ -48,7 +42,6 @@ public class Publish extends BaseMqttState {
 
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
-        rb.writeUtf8String(getTopicName());
         rb.writeShort(getPacketIdentifier());
         if(isVersion(MqttProtocol.VERSION_5)) {
             var tempRb = new MqttBBuffer(rb.getEndianness());
@@ -68,13 +61,9 @@ public class Publish extends BaseMqttState {
         var retainFlag = (event.getFullFlag() & (byte)1) == (byte)1;
         var qos = event.getFullFlag()>>1 & (byte)3;
 
-        var publish = new Publish();
+        var publish = new Subscribe();
         publish.setFullFlag(event.getFullFlag());
-        publish.setDupFlag(dupFlag);
-        publish.setRetainFlag(retainFlag);
-        publish.setQos(qos);
         var context = (MqttContext) event.getContext();
-        publish.setTopicName(bb.readUtf8String());
         publish.setPacketIdentifier(bb.getShort());
         publish.setProtocolVersion(context.getProtocolVersion());
         //Variable header for MQTT >=5
@@ -96,44 +85,17 @@ public class Publish extends BaseMqttState {
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
         if (isProxyed()) {
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + publish.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(publish) + "}";
-
-
-            storage.write(
-                    context.getContextId(),
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "MQTT");
-            return iteratorOfList(publish);
+            //TODOMQTT
+            throw new RuntimeException("CANNOT HANDLE AS PROXY");
+            //return iteratorOfEmpty();
         }
-        if(qos==1){
             return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                     connection,
                     publish,
-                    new PublishAck()
+                    new SubscribeAck()
             ));
-        }else if(qos==2){
-            return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
-                    connection,
-                    publish,
-                    new PublishRec()
-            ));
-        }
-        return iteratorOfRunnable(() -> proxy.sendAndForget(context,
-                connection,
-                publish
-        ));
     }
 
-    public String getTopicName() {
-        return topicName;
-    }
-
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
-    }
 
     public void setPayload(byte[] payload) {
         this.payload = payload;
@@ -151,39 +113,5 @@ public class Publish extends BaseMqttState {
         return packetIdentifier;
     }
 
-    public void setDupFlag(boolean dupFlag) {
-        this.dupFlag = dupFlag;
-    }
 
-    public boolean isDupFlag() {
-        return dupFlag;
-    }
-
-    public void setRetainFlag(boolean retainFlag) {
-        this.retainFlag = retainFlag;
-    }
-
-    public boolean isRetainFlag() {
-        return retainFlag;
-    }
-
-    public void setQos(int qos) {
-        this.qos = qos;
-    }
-
-    public int getQos() {
-        return qos;
-    }
-
-    @Override
-    public String toString() {
-        return "Publish{" +
-                "topicName='" + topicName + '\'' +
-                ", payload=" + Arrays.toString(payload) +
-                ", packetIdentifier=" + packetIdentifier +
-                ", dupFlag=" + dupFlag +
-                ", retainFlag=" + retainFlag +
-                ", qos=" + qos +
-                '}';
-    }
 }

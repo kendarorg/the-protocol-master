@@ -21,7 +21,7 @@ public class SimpleTest extends BasicTest{
 
     @BeforeAll
     public static void beforeClass() throws IOException {
-        beforeClassBase();
+        beforeClassBaseInternalIntercept();
 
     }
 
