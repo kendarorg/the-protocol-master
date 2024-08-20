@@ -168,7 +168,7 @@ public class Connect extends BaseMqttState{
         }
         var willFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.WILLFLAG);
         var cleanSession = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.CLEANSESSION);
-        var connectDto = new Connect(
+        var connect = new Connect(
                 fixedHeader,
                 protocolName,
                 protocolVersion,
@@ -181,26 +181,27 @@ public class Connect extends BaseMqttState{
         if(context.isVersion(MqttProtocol.VERSION_5)){
             var propertiesLength = bb.readVarBInteger();
             if(propertiesLength.getValue()>0){
-                connectDto.setProperties(new ArrayList<>());
+                connect.setProperties(new ArrayList<>());
                 var start = bb.getPosition();
                 var end = start+propertiesLength.getValue();
                 while(bb.getPosition()<end){
                     var propertyType = Mqtt5PropertyType.of(bb.get());
-                    connectDto.getProperties().add(new Mqtt5Property(propertyType,bb));
+                    connect.getProperties().add(new Mqtt5Property(propertyType,bb));
                 }
             }
         }
+        connect.setFullFlag(event.getFullFlag());
         //Payload
-        connectDto.setClientId(bb.readUtf8String());
+        connect.setClientId(bb.readUtf8String());
         if(willFlag){
-            connectDto.setWillTopic(bb.readUtf8String());
-            connectDto.setWillMessage(bb.readUtf8String());
+            connect.setWillTopic(bb.readUtf8String());
+            connect.setWillMessage(bb.readUtf8String());
         }
         if(userNameFlag){
-            connectDto.setUserName(bb.readUtf8String());
+            connect.setUserName(bb.readUtf8String());
         }
         if(passwordFlag){
-            connectDto.setPassword(bb.readUtf8String());
+            connect.setPassword(bb.readUtf8String());
         }
         if(cleanSession){
             //TODOMQTT clean all sessions for connection
@@ -214,7 +215,7 @@ public class Connect extends BaseMqttState{
         }
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
-                connectDto,
+                connect,
                 new ConnectAck()
         ));
     }

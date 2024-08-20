@@ -15,24 +15,12 @@ import java.util.List;
 public abstract class BaseMqttState extends ProtoState implements NetworkReturnMessage {
     private List<Mqtt5Property> properties;
     private byte fullFlag;
-
-    public List<Mqtt5Property> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(List<Mqtt5Property> properties) {
-        this.properties = properties;
-    }
-
+    private int protocolVersion;
     private MqttFixedHeader fixedHeader;
     private boolean proxyed;
-    public boolean isProxyed() {
-        return proxyed;
-    }
 
-    public BaseMqttState asProxy() {
-        this.proxyed = true;
-        return this;
+    public boolean isVersion(int expectedVersion) {
+        return protocolVersion==expectedVersion;
     }
 
     public BaseMqttState() {
@@ -43,10 +31,35 @@ public abstract class BaseMqttState extends ProtoState implements NetworkReturnM
         super(events);
     }
 
+    public int getProtocolVersion() {
+        return protocolVersion;
+    }
+
+    public void setProtocolVersion(int protocolVersion) {
+        this.protocolVersion = protocolVersion;
+    }
+
+    public List<Mqtt5Property> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(List<Mqtt5Property> properties) {
+        this.properties = properties;
+    }
+
+    public boolean isProxyed() {
+        return proxyed;
+    }
+
+    public BaseMqttState asProxy() {
+        this.proxyed = true;
+        return this;
+    }
+
     @Override
     public void write(BBuffer rb) {
         var mqttRb = (MqttBBuffer) rb;
-        mqttRb.write(getFixedHeader().asByte());
+        mqttRb.write(getFullFlag());
 
         var tmpMqttBuffer = new MqttBBuffer(rb.getEndianness());
         writeFrameContent(tmpMqttBuffer);
@@ -67,7 +80,7 @@ public abstract class BaseMqttState extends ProtoState implements NetworkReturnM
 
     public Iterator<ProtoStep> execute(MqttPacket event) {
         setFullFlag(event.getFullFlag());
-        return executeFrame(event.getFixedHeader(), event.getBuffer(),event);
+        return executeFrame(event.getFixedHeader(), event.getBuffer(), event);
     }
 
     protected abstract Iterator<ProtoStep> executeFrame(
@@ -81,11 +94,11 @@ public abstract class BaseMqttState extends ProtoState implements NetworkReturnM
         this.fixedHeader = fixedHeader;
     }
 
-    public void setFullFlag(byte fullFlag) {
-        this.fullFlag = fullFlag;
-    }
-
     public byte getFullFlag() {
         return fullFlag;
+    }
+
+    public void setFullFlag(byte fullFlag) {
+        this.fullFlag = fullFlag;
     }
 }
