@@ -92,4 +92,28 @@ public class SimpleTest extends BasicTest{
         assertEquals(MqttQoS.AT_LEAST_ONCE,founded.getQos());
         assertEquals(MESSAGE_CONTENT,founded.getPayload().toString(UTF_8));
     }
+
+    @Test
+    void qos0Test() throws MqttException {
+        String publisherId = UUID.randomUUID().toString();
+        var publisher = new MqttClient("tcp://localhost:1884",publisherId);
+
+        var options = new MqttConnectOptions();
+        options.setAutomaticReconnect(true);
+        options.setCleanSession(true);
+        options.setConnectionTimeout(10);
+        publisher.connect(options);
+
+        var message = new MqttMessage(MESSAGE_CONTENT.getBytes(UTF_8));
+        //message.setQos(2);
+        message.setQos(0);
+        message.setRetained(true);
+        publisher.publish(TOPIC_NAME,message);
+        Sleeper.sleep(1000);
+        publisher.disconnect();
+        assertEquals(1,moquetteMessages.size());
+        var founded = moquetteMessages.get(0);
+        assertEquals(MqttQoS.AT_MOST_ONCE,founded.getQos());
+        assertEquals(MESSAGE_CONTENT,founded.getPayload().toString(UTF_8));
+    }
 }
