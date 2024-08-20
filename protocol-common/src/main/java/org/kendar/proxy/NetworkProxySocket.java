@@ -205,7 +205,7 @@ public abstract class NetworkProxySocket {
         log.debug("[SERVER][EX]: " + protoState.getClass().getSimpleName());
         BaseEvent founded = null;
         try {
-            long maxCount = System.currentTimeMillis() + 1000;
+            long maxCount = System.currentTimeMillis() + 2000;
             //FLW13 SEEK A SPECIFIC MESSAGE
             while (founded == null && maxCount > System.currentTimeMillis()) {
                 context.setActive();

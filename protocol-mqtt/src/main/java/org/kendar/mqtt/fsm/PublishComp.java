@@ -2,7 +2,6 @@ package org.kendar.mqtt.fsm;
 
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.MqttProtocol;
-import org.kendar.mqtt.MqttProxy;
 import org.kendar.mqtt.enums.Mqtt5PropertyType;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.dtos.Mqtt5Property;
@@ -10,22 +9,20 @@ import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
-import org.kendar.proxy.ProxyConnection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class PublishRel extends BaseMqttState implements ReturnMessage {
+public class PublishComp extends BaseMqttState implements ReturnMessage {
     private short packetIdentifier;
     private byte reasonCode;
 
-    public PublishRel(Class<?>... events) {
+    public PublishComp(Class<?>... events) {
         super(events);
-        setFixedHeader(MqttFixedHeader.PUBREL);
+        setFixedHeader(MqttFixedHeader.PUBCOMP);
     }
-
-    public PublishRel(){
-        setFixedHeader(MqttFixedHeader.PUBREL);
+    public PublishComp(){
+        setFixedHeader(MqttFixedHeader.PUBCOMP);
     }
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
@@ -49,12 +46,10 @@ public class PublishRel extends BaseMqttState implements ReturnMessage {
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
+
         var context = (MqttContext) event.getContext();
-        var publishRec = new PublishRel();
-        //System.out.println(bb.toHexStringUpToLength(0,10));
-
-            publishRec.setPacketIdentifier(bb.getShort());
-
+        var publishRec = this;
+        publishRec.setPacketIdentifier(bb.getShort());
         publishRec.setFullFlag(event.getFullFlag());
 
         publishRec.setProtocolVersion(context.getProtocolVersion());
@@ -71,20 +66,7 @@ public class PublishRel extends BaseMqttState implements ReturnMessage {
                 }
             }
         }
-        var proxy = (MqttProxy) context.getProxy();
-        var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-
-        if (isProxyed()) {
-            //TODOMQTT
-            throw new RuntimeException("CANNOT HANDLE AS PROXY");
-            //return iteratorOfEmpty();
-        }
-
-        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
-                connection,
-                publishRec,
-                new PublishComp()
-        ));
+        return iteratorOfList(publishRec);
     }
 
     public void setPacketIdentifier(short packetIdentifier) {

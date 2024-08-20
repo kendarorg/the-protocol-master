@@ -55,6 +55,6 @@ public class SimpleTest extends BasicTest{
         message.setRetained(true);
         publisher.publish("/exit/",message);
         Sleeper.sleep(1000);
-        publisher.disconnect();
+        //publisher.disconnect();
     }
 }
