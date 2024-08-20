@@ -14,6 +14,7 @@ import java.util.List;
 
 public abstract class BaseMqttState extends ProtoState implements NetworkReturnMessage {
     private List<Mqtt5Property> properties;
+    private byte fullFlag;
 
     public List<Mqtt5Property> getProperties() {
         return properties;
@@ -65,6 +66,7 @@ public abstract class BaseMqttState extends ProtoState implements NetworkReturnM
     protected abstract boolean canRunFrame(MqttPacket event);
 
     public Iterator<ProtoStep> execute(MqttPacket event) {
+        setFullFlag(event.getFullFlag());
         return executeFrame(event.getFixedHeader(), event.getBuffer(),event);
     }
 
@@ -77,5 +79,13 @@ public abstract class BaseMqttState extends ProtoState implements NetworkReturnM
 
     public void setFixedHeader(MqttFixedHeader fixedHeader) {
         this.fixedHeader = fixedHeader;
+    }
+
+    public void setFullFlag(byte fullFlag) {
+        this.fullFlag = fullFlag;
+    }
+
+    public byte getFullFlag() {
+        return fullFlag;
     }
 }

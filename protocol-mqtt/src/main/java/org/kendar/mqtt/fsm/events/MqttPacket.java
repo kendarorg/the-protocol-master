@@ -11,12 +11,20 @@ public class MqttPacket extends BaseEvent implements NetworkReturnMessage {
     private final MqttFixedHeader fixedHeader;
     private final MqttBBuffer buffer;
 
+    public byte getFullFlag() {
+        return fullFlag;
+    }
+
+    private final byte fullFlag;
+
     public MqttPacket(ProtoContext context, Class<?> prevState,
                       MqttFixedHeader fixedHeader,
-                      MqttBBuffer buffer) {
+                      MqttBBuffer buffer,
+                      byte fullFlag) {
         super(context, prevState);
         this.fixedHeader = fixedHeader;
         this.buffer = buffer;
+        this.fullFlag = fullFlag;
     }
 
     @Override

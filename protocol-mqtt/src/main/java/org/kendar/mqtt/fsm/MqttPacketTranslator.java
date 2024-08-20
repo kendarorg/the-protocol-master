@@ -54,8 +54,8 @@ public class MqttPacketTranslator  extends ProtoState implements NetworkReturnMe
     public Iterator<ProtoStep> execute(BytesEvent event) {
         count++;
         var rb = (MqttBBuffer)event.getBuffer();
-        var byteValue = rb.get();
-        var flag = MqttFixedHeader.of(byteValue);
+        var fullFlag = rb.get();
+        var flag = MqttFixedHeader.of(fullFlag);
 
         var varBValue = rb.readVarBInteger();
         var data = rb.getBytes((int) varBValue.getValue());
@@ -66,10 +66,10 @@ public class MqttPacketTranslator  extends ProtoState implements NetworkReturnMe
         bb.write(data);
         bb.setPosition(0);
         if(!proxy) {
-            event.getContext().send(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb));
+            event.getContext().send(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb,fullFlag));
             return iteratorOfEmpty();
         }else{
-            return iteratorOfList(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb));
+            return iteratorOfList(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb,fullFlag));
         }
     }
 }

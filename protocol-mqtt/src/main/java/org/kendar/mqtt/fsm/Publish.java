@@ -10,6 +10,7 @@ import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -20,6 +21,9 @@ public class Publish extends BaseMqttState {
     private String topicName;
     private byte[] payload;
     private short packetIdentifier;
+    private boolean dupFlag;
+    private boolean retainFlag;
+    private int qos;
 
     public Publish() {
         super();
@@ -44,7 +48,15 @@ public class Publish extends BaseMqttState {
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
+        var dupFlag = (event.getFullFlag() & (byte)8) == (byte)8;
+        var retainFlag = (event.getFullFlag() & (byte)1) == (byte)1;
+        var qos = event.getFullFlag()>>1 & (byte)3;
+
         var publish = new Publish();
+        publish.setFullFlag(event.getFullFlag());
+        publish.setDupFlag(dupFlag);
+        publish.setRetainFlag(retainFlag);
+        publish.setQos(qos);
         var context = (MqttContext) event.getContext();
         publish.setTopicName(bb.readUtf8String());
         publish.setPacketIdentifier(bb.getShort());
@@ -87,5 +99,41 @@ public class Publish extends BaseMqttState {
 
     public short getPacketIdentifier() {
         return packetIdentifier;
+    }
+
+    public void setDupFlag(boolean dupFlag) {
+        this.dupFlag = dupFlag;
+    }
+
+    public boolean isDupFlag() {
+        return dupFlag;
+    }
+
+    public void setRetainFlag(boolean retainFlag) {
+        this.retainFlag = retainFlag;
+    }
+
+    public boolean isRetainFlag() {
+        return retainFlag;
+    }
+
+    public void setQos(int qos) {
+        this.qos = qos;
+    }
+
+    public int getQos() {
+        return qos;
+    }
+
+    @Override
+    public String toString() {
+        return "Publish{" +
+                "topicName='" + topicName + '\'' +
+                ", payload=" + Arrays.toString(payload) +
+                ", packetIdentifier=" + packetIdentifier +
+                ", dupFlag=" + dupFlag +
+                ", retainFlag=" + retainFlag +
+                ", qos=" + qos +
+                '}';
     }
 }

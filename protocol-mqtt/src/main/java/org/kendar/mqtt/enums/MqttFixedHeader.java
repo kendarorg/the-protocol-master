@@ -10,9 +10,11 @@ public enum MqttFixedHeader {
     CONNECT(0x10),
     CONNACK(0x20),
     PUBLISH(0x30),
-    PUBLISH_RETAIN(0x31),
-    PUBLISH_QOS(0x36),
-    PUBLISH_DUP(0x38),
+    //                        00110101
+//    PUBLISH_RETAIN(0x31),   00110001
+//    PUBLISH_QOS(0x36),      00110110
+//    PUBLISH_DUP(0x38),      00111000
+    //
     PUBACK(0x40),
     PUBREC(0x50),
     PUBREL(0x62),
