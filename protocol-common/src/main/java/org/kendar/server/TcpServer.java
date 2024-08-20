@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousChannelGroup;
-import java.nio.channels.AsynchronousServerSocketChannel;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
+import java.nio.channels.*;
 import java.util.concurrent.*;
 
 /**
@@ -105,10 +102,6 @@ public class TcpServer {
                 //Accept request
                 Future<AsynchronousSocketChannel> future = server.accept();
                 try {
-                    if(!server.isOpen()){
-                        log.info("[SERVER] Closed");
-                        break;
-                    }
                     //Initialize client wrapper
                     var client = new TcpServerChannel(future.get());
                     log.trace("[SERVER] Accepted connection from " + client.getRemoteAddress());
@@ -130,7 +123,7 @@ public class TcpServer {
                                     //If there is something
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
-                                    log.debug("[SERVER][RX]: " + byteArray.length);
+                                    log.debug("[SERVER][RX][2]: " + byteArray.length);
                                     var bb = context.buildBuffer();
                                     context.setUseCallDurationTimes(callDurationTimes);
                                     bb.write(byteArray);

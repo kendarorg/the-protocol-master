@@ -11,7 +11,6 @@ import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.special.ProtoStateSequence;
-import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,18 +37,18 @@ public class MqttProtocol extends NetworkProtoDescriptor {
     @Override
     protected void initializeProtocol() {
         addInterruptState(new MqttPacketTranslator(BytesEvent.class));
+        addInterruptState(new Disconnect(MqttPacket.class));
         initialize(
                 new ProtoStateSequence(
                         new Connect(MqttPacket.class),
                         new ProtoStateWhile(
-                                new ProtoStateSwitchCase(
+                                new ProtoStateSequence(
                                         new Publish(MqttPacket.class),
                                         new ProtoStateWhile(
                                                 new PublishRel(MqttPacket.class)
                                         )
                                 )
                         )
-
                 ));
     }
 

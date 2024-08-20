@@ -10,27 +10,29 @@ import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
+import org.kendar.protocol.states.InterruptProtoState;
+import org.kendar.protocol.states.Stop;
 import org.kendar.proxy.ProxyConnection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class PublishRel extends BaseMqttState implements ReturnMessage {
-    private short packetIdentifier;
+public class Disconnect extends BaseMqttState implements ReturnMessage, InterruptProtoState {
+
     private byte reasonCode;
 
-    public PublishRel(Class<?>... events) {
+    public Disconnect(Class<?>... events) {
         super(events);
-        setFixedHeader(MqttFixedHeader.PUBREL);
+        setFixedHeader(MqttFixedHeader.DISCONNECT);
     }
 
-    public PublishRel() {
-        setFixedHeader(MqttFixedHeader.PUBREL);
+    public Disconnect() {
+        setFixedHeader(MqttFixedHeader.DISCONNECT);
     }
 
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
-        rb.writeShort(getPacketIdentifier());
+
         if (isVersion(MqttProtocol.VERSION_5)) {
             rb.write(getReasonCode());
             var tempRb = new MqttBBuffer(rb.getEndianness());
@@ -45,16 +47,15 @@ public class PublishRel extends BaseMqttState implements ReturnMessage {
 
     @Override
     protected boolean canRunFrame(MqttPacket event) {
-
-        return event.getFixedHeader()==MqttFixedHeader.PUBREL;
+        return true;
     }
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
         var context = (MqttContext) event.getContext();
-        var publishRel = new PublishRel();
+        var publishRel = new Disconnect();
+        //System.out.println(bb.toHexStringUpToLength(0,10));
 
-        publishRel.setPacketIdentifier(bb.getShort());
 
         publishRel.setFullFlag(event.getFullFlag());
 
@@ -80,20 +81,14 @@ public class PublishRel extends BaseMqttState implements ReturnMessage {
             throw new RuntimeException("CANNOT HANDLE AS PROXY");
             //return iteratorOfEmpty();
         }
-
-        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
-                connection,
-                publishRel,
-                new PublishComp()
-        ));
-    }
-
-    public short getPacketIdentifier() {
-        return packetIdentifier;
-    }
-
-    public void setPacketIdentifier(short packetIdentifier) {
-        this.packetIdentifier = packetIdentifier;
+        context.disconnect(connection);
+        return iteratorOfRunner(()->{
+            proxy.sendAndForget(context,
+                    connection,
+                    publishRel
+            );
+            return new Stop();
+        });
     }
 
     public byte getReasonCode() {

@@ -1,5 +1,6 @@
 package org.kendar.mqtt;
 
+import io.netty.handler.codec.mqtt.MqttQoS;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -11,8 +12,13 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.assertEquals;
 
 public class SimpleTest extends BasicTest{
+
+    public static final String MESSAGE_CONTENT = "Hello World!!";
+    public static final String TOPIC_NAME = "/exit/";
+
     @BeforeAll
     public static void beforeClass() throws IOException {
         beforeClassBase();
@@ -39,7 +45,7 @@ public class SimpleTest extends BasicTest{
     }
 
     @Test
-    void simpleTest() throws MqttException {
+    void qos2Test() throws MqttException {
         String publisherId = UUID.randomUUID().toString();
         var publisher = new MqttClient("tcp://localhost:1884",publisherId);
 
@@ -49,12 +55,16 @@ public class SimpleTest extends BasicTest{
         options.setConnectionTimeout(10);
         publisher.connect(options);
 
-        var message = new MqttMessage("Hello World!!".getBytes(UTF_8));
+        var message = new MqttMessage(MESSAGE_CONTENT.getBytes(UTF_8));
         //message.setQos(2);
         message.setQos(2);
         message.setRetained(true);
-        publisher.publish("/exit/",message);
+        publisher.publish(TOPIC_NAME,message);
         Sleeper.sleep(1000);
-        //publisher.disconnect();
+        publisher.disconnect();
+        assertEquals(1,moquetteMessages.size());
+        var founded = moquetteMessages.get(0);
+        assertEquals(MqttQoS.EXACTLY_ONCE,founded.getQos());
+        assertEquals(MESSAGE_CONTENT,founded.getPayload().toString(UTF_8));
     }
 }

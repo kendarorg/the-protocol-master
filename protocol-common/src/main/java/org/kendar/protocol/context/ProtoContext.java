@@ -281,7 +281,11 @@ public abstract class ProtoContext {
                 return true;
             }
 
-            log.debug("[SERVER][RX]: {} Tags: {}", foundedState.getClass().getSimpleName(), currentEvent.getTagKeyValues());
+            if(currentEvent.getTagKeyValues()!=null && !currentEvent.getTagKeyValues().isEmpty()) {
+                log.debug("[SERVER][RX][1]: {} Tags: {}", foundedState.getClass().getSimpleName(), currentEvent.getTagKeyValues());
+            }else{
+                log.debug("[SERVER][RX][3]: {}", foundedState.getClass().getSimpleName());
+            }
             currentState = foundedState;
 
             //Invoke the execution

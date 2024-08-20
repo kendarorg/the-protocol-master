@@ -10,6 +10,8 @@ import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.InterruptProtoState;
 import org.kendar.protocol.states.ProtoState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
@@ -50,6 +52,7 @@ public class MqttPacketTranslator  extends ProtoState implements NetworkReturnMe
         return true;
     }
 
+    private static final Logger log = LoggerFactory.getLogger(MqttPacketTranslator.class);
     private static int count =0;
     public Iterator<ProtoStep> execute(BytesEvent event) {
         count++;
@@ -60,6 +63,7 @@ public class MqttPacketTranslator  extends ProtoState implements NetworkReturnMe
         var varBValue = rb.readVarBInteger();
         var data = rb.getBytes((int) varBValue.getValue());
 
+        log.trace("[MQTT] Founded flag: {} with var length: {}", flag, varBValue.getValue());
 
 
         var bb = new MqttBBuffer(rb.getEndianness());
