@@ -4,6 +4,7 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.context.Tag;
 import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 
@@ -20,8 +21,12 @@ public class MqttPacket extends BaseEvent implements NetworkReturnMessage {
     public MqttPacket(ProtoContext context, Class<?> prevState,
                       MqttFixedHeader fixedHeader,
                       MqttBBuffer buffer,
-                      byte fullFlag) {
+                      byte fullFlag,
+                      String packetIdentifier) {
         super(context, prevState);
+        if(packetIdentifier!=null){
+            getTag().add(Tag.of("PACKET", packetIdentifier).get(0));
+        }
         this.fixedHeader = fixedHeader;
         this.buffer = buffer;
         this.fullFlag = fullFlag;

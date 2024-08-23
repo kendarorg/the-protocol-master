@@ -78,7 +78,7 @@ public abstract class NetworkProxySocket {
                                         tempBuffer.write(byteArray);
                                         tempBuffer.setPosition(0);
 
-                                        log.trace("[PROXY ][RX] Bytes: " + byteArray.length);
+                                        log.trace("[TP<SR][RX] received bytes: " + byteArray.length);
                                         //FLW04 GENERICFRAME AN EXPECTED RESPONSE
                                         var gf = getStateToRetrieveOneSingleMessage();
                                         //FLW05 BYTESEVENT from tmpBuffer (response specific to this flow)
@@ -98,7 +98,7 @@ public abstract class NetworkProxySocket {
                                                     tempBuffer.truncate();
                                                     //FLW08 run the steps (sending back data)
                                                     context.runSteps(stepsToInvoke, possible, be);
-                                                    log.debug("[PROXY ][RX][1]: " + possible.getClass().getSimpleName());
+                                                    log.debug("[TP<SR][RX][1]: " + possible.getClass().getSimpleName());
                                                     run = true;
                                                     break;
                                                 }
@@ -119,7 +119,7 @@ public abstract class NetworkProxySocket {
                                                             tempBuffer.truncate();
                                                             //FLW08 run the steps (sending back data)
                                                             context.runSteps(stepsToInvoke, possible, item);
-                                                            log.debug("[PROXY ][RX][5]: " + possible.getClass().getSimpleName());
+                                                            log.debug("[TP<SR][RX][5]: " + possible.getClass().getSimpleName());
                                                             internalRun = true;
                                                             break;
                                                         }
@@ -131,7 +131,7 @@ public abstract class NetworkProxySocket {
                                                 //This bytes event is one containing exactly one frame
 
                                                 if (internalRun == false) {
-                                                    log.debug("[PROXY ][RX][3]: " + gf.getClass().getSimpleName());
+                                                    log.debug("[TP<SR][RX][3]: event " + gf.getClass().getSimpleName());
                                                     inputQueue.add(event);
                                                     tempBuffer.truncate();
                                                 }
@@ -158,7 +158,7 @@ public abstract class NetworkProxySocket {
                         @Override
                         public void failed(Throwable exc, ByteBuffer buffer) {
                             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.getContextId() + "")) {
-                                log.trace("[PROXY ][RX] Fail to read message from server", exc);
+                                log.trace("[TP<SR][RX] Fail to read message from server", exc);
                             }
                         }
 
@@ -196,13 +196,13 @@ public abstract class NetworkProxySocket {
         buffer.truncate(0);
         returnMessage.write(buffer);
         write(buffer);
-        log.debug("[PROXY ][TX]: " + returnMessage.getClass().getSimpleName());
+        log.debug("[TP>SR][TX]: " + returnMessage.getClass().getSimpleName());
     }
 
 
     public List<ReturnMessage> read(ProtoState protoState, boolean optional) {
 
-        log.debug("[SERVER][EX]: " + protoState.getClass().getSimpleName());
+        log.debug("[CL<TP][EX][0]: " + protoState.getClass().getSimpleName());
         BaseEvent founded = null;
         try {
             long maxCount = System.currentTimeMillis() + 2000;
@@ -253,7 +253,7 @@ public abstract class NetworkProxySocket {
                 returnMessage.add(it.next().run());
             }
         }
-        log.debug("[PROXY ][RX]: " + protoState.getClass().getSimpleName());
+        log.debug("[CL<TP][EX]: founded:" + protoState.getClass().getSimpleName());
         return returnMessage;
     }
 

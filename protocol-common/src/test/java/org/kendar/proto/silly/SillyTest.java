@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.buffers.BBuffer;
 import org.kendar.proto.fsm.*;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.special.ProtoStateSequence;
@@ -31,6 +32,7 @@ public class SillyTest {
 
     @Test
     void testExplode2() throws ExecutionException, InterruptedException {
+
         var protocol = new SillyProtocol() {
             @Override
             public ProtoState doTestInitialize() {
@@ -47,7 +49,7 @@ public class SillyTest {
             }
         };
         protocol.initializeProtocol();
-        var context = (SillyContext) protocol.createContext(protocol);
+        var context = (SillyContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
 
         assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
 
@@ -92,7 +94,7 @@ public class SillyTest {
         };
         protocol.addInterruptStateTest(new Interrupt(BytesEvent.class));
         protocol.initializeProtocol();
-        var context = (SillyContext) protocol.createContext(protocol);
+        var context = (SillyContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
 
         assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'}))));
 
@@ -123,7 +125,7 @@ public class SillyTest {
             }
         };
         protocol.initializeProtocol();
-        var context = (SillyContext) protocol.createContext(protocol);
+        var context = (SillyContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
 
         assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'}))));
 
@@ -163,7 +165,7 @@ public class SillyTest {
             }
         };
         protocol.initializeProtocol();
-        var context = (SillyContext) protocol.createContext(protocol);
+        var context = (SillyContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
         Sleeper.sleep(500);
         assertTrue(context.send(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'}))).get());
         Sleeper.sleep(500);
@@ -199,7 +201,7 @@ public class SillyTest {
             }
         };
         protocol.initializeProtocol();
-        var context = (SillyContext) protocol.createContext(protocol);
+        var context = (SillyContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
         assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer()))); //l1
 
         assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer()))); //l2
@@ -235,7 +237,7 @@ public class SillyTest {
             }
         };
         protocol.initializeProtocol();
-        var context = (SillyContext) protocol.createContext(protocol);
+        var context = (SillyContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
 
         assertTrue(context.sendSync(new BytesEvent(context, null, new BBuffer())));
 
@@ -280,7 +282,7 @@ public class SillyTest {
         };
         protocol.addInterruptStateTest(new Interrupt(BytesEvent.class));
         protocol.initializeProtocol();
-        var context = (SillyContext) protocol.createContext(protocol);
+        var context = (SillyContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
 
         assertTrue(context.sendSync(new BytesEvent(context, null, BBuffer.of(new byte[]{'1'}))));
 

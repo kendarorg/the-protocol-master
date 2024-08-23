@@ -69,7 +69,7 @@ public abstract class ProtoDescriptor {
      * @param start
      */
     private void buildProtocolDescription(ProtoState start) {
-        log.warn("[SERVER] Not implemented ProtoDescriptor::buildProtocolDescription");
+        log.warn("[CL>TP] Not implemented ProtoDescriptor::buildProtocolDescription");
     }
 
     /**
@@ -123,8 +123,12 @@ public abstract class ProtoDescriptor {
      *
      * @return
      */
-    public ProtoContext buildContext() {
-        return createContext(this);
+    public ProtoContext buildContext(int contextId) {
+        return createContext(this,contextId);
+    }
+
+    public ProtoContext buildContext(){
+        return buildContext(ProtoDescriptor.getCounter("CONTEXT_ID"));
     }
 
     /**
@@ -133,8 +137,11 @@ public abstract class ProtoDescriptor {
      * @param protoDescriptor
      * @return
      */
-    protected abstract ProtoContext createContext(ProtoDescriptor protoDescriptor);
+    protected abstract ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId);
 
+    protected ProtoContext createContext(ProtoDescriptor protoContext) {
+        return createContext(protoContext, ProtoDescriptor.getCounter("CONTEXT_ID"));
+    }
 
     /**
      * Retrieve the list of interrupts

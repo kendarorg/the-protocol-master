@@ -78,8 +78,8 @@ public abstract class ProtoContext {
     private ProtoState currentState;
     private boolean useCallDurationTimes;
 
-    public ProtoContext(ProtoDescriptor descriptor) {
-        this.contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
+    public ProtoContext(ProtoDescriptor descriptor,int contextId) {
+        this.contextId = contextId;
         this.descriptor = descriptor;
         this.root = descriptor.getTaggedStates();
         lastAccess.set(getNow());
@@ -271,7 +271,7 @@ public abstract class ProtoContext {
     public boolean reactToEvent(BaseEvent currentEvent) {
         try {
             lastAccess.set(getNow());
-            log.trace("[SERVER] RunFsmCycle");
+            log.trace("[CL>TP] RunFsmCycle");
             //Prepartion for the execution
             preExecute(currentEvent);
             //Find what should execute
@@ -282,9 +282,9 @@ public abstract class ProtoContext {
             }
 
             if(currentEvent.getTagKeyValues()!=null && !currentEvent.getTagKeyValues().isEmpty()) {
-                log.debug("[SERVER][RX][1]: {} Tags: {}", foundedState.getClass().getSimpleName(), currentEvent.getTagKeyValues());
+                log.debug("[CL>TP][RX][1]: {} Tags: {}", foundedState.getClass().getSimpleName(), currentEvent.getTagKeyValues());
             }else{
-                log.debug("[SERVER][RX][3]: {}", foundedState.getClass().getSimpleName());
+                log.debug("[CL>TP][RX][3]: {}", foundedState.getClass().getSimpleName());
             }
             currentState = foundedState;
 
@@ -332,7 +332,7 @@ public abstract class ProtoContext {
             return null;
         }
         if (foundedState instanceof FailedState) {
-            throw new FailedStateException("[SERVER] State: FailedState", foundedState, event);
+            throw new FailedStateException("[CL<TP] State: FailedState", foundedState, event);
         }
         return foundedState;
     }
@@ -360,7 +360,7 @@ public abstract class ProtoContext {
                 var stepResult = steps.run();
                 if (stepResult == null) continue;
                 //Write somwhere the result
-                log.debug("[SERVER][TX]: {} Tags: {}", stepResult.getClass().getSimpleName(), event.getTagKeyValues());
+                log.debug("[CL<TP][TX]: {} Tags: {}", stepResult.getClass().getSimpleName(), event.getTagKeyValues());
                 write(stepResult);
             }
         }

@@ -24,8 +24,8 @@ public class MqttContext extends NetworkProtoContext {
         return protocolVersion==expectedVersion;
     }
 
-    public MqttContext(ProtoDescriptor descriptor) {
-        super(descriptor);
+    public MqttContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor,contextId);
     }
 
     @Override

@@ -8,8 +8,8 @@ import org.kendar.proxy.ProxyConnection;
 public class AmqpProtoContext extends NetworkProtoContext {
     private short channel = 1;
 
-    public AmqpProtoContext(ProtoDescriptor descriptor) {
-        super(descriptor);
+    public AmqpProtoContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
     }
 
     @Override

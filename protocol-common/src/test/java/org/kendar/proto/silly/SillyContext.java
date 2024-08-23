@@ -11,12 +11,13 @@ import java.util.List;
 public class SillyContext extends ProtoContext {
     private List<ReturnMessage> result = new ArrayList<>();
 
-    public SillyContext(ProtoDescriptor descriptor, ClientServerChannel client) {
-        super(descriptor);
+    public SillyContext(ProtoDescriptor descriptor, ClientServerChannel client,
+                        int contextId) {
+        super(descriptor,contextId);
     }
 
-    public SillyContext(SillyProtocol descriptor) {
-        super(descriptor);
+    public SillyContext(SillyProtocol descriptor,int contextId) {
+        super(descriptor,contextId);
     }
 
     public List<ReturnMessage> getResult() {

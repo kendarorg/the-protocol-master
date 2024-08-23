@@ -109,7 +109,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
 
 
     @Override
-    protected ProtoContext createContext(ProtoDescriptor protoDescriptor) {
-        return new AmqpProtoContext(this);
+    protected ProtoContext createContext(ProtoDescriptor protoDescriptor,int contextId) {
+        return new AmqpProtoContext(this,contextId);
     }
 }

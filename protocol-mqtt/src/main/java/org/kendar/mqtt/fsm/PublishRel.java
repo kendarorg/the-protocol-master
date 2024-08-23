@@ -11,6 +11,7 @@ import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.utils.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,6 +50,8 @@ public class PublishRel extends BaseMqttState implements ReturnMessage {
         return event.getFixedHeader()==MqttFixedHeader.PUBREL;
     }
 
+    protected static final JsonMapper mapper = new JsonMapper();
+
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
         var context = (MqttContext) event.getContext();
@@ -74,12 +77,6 @@ public class PublishRel extends BaseMqttState implements ReturnMessage {
         }
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-
-        if (isProxyed()) {
-            //TODOMQTT
-            throw new RuntimeException("CANNOT HANDLE AS PROXY");
-            //return iteratorOfEmpty();
-        }
 
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,

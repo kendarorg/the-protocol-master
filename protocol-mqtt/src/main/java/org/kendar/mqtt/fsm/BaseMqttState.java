@@ -12,7 +12,8 @@ import org.kendar.protocol.states.ProtoState;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class BaseMqttState extends ProtoState implements NetworkReturnMessage {
+public abstract class BaseMqttState extends ProtoState implements
+        NetworkReturnMessage {
     private List<Mqtt5Property> properties;
     private byte fullFlag;
     private int protocolVersion;
@@ -71,9 +72,7 @@ public abstract class BaseMqttState extends ProtoState implements NetworkReturnM
     protected abstract void writeFrameContent(MqttBBuffer rb);
 
     public boolean canRun(MqttPacket event) {
-        return MqttFixedHeader.isFlagSet(
-                event.getFixedHeader().getValue(),
-                getFixedHeader());
+        return event.getFixedHeader().getValue() == getFixedHeader().getValue();
     }
 
     protected abstract boolean canRunFrame(MqttPacket event);

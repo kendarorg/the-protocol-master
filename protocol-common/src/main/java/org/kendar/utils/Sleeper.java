@@ -1,5 +1,7 @@
 package org.kendar.utils;
 
+import java.util.function.BooleanSupplier;
+
 /**
  * No thread lock wait
  */
@@ -20,6 +22,26 @@ public class Sleeper {
         } catch (Exception ex) {
 
         }
+    }
+
+    @SuppressWarnings("CatchMayIgnoreException")
+    public static void sleep(long timeoutMillis, BooleanSupplier booleanSupplier) {
+        try {
+            Object obj = new Object();
+            var times = (int)timeoutMillis/100;
+            for (int i = 0; i < 100; i++) {
+                synchronized (obj) {
+                    obj.wait(times);
+                }
+                if(booleanSupplier.getAsBoolean()) {
+                    return;
+                }
+            }
+
+        } catch (Exception ex) {
+
+        }
+        throw new RuntimeException("Sleeper sleep timed out");
     }
 
     /**

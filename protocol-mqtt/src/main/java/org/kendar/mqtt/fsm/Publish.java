@@ -43,7 +43,7 @@ public class Publish extends BaseMqttState {
 
     @Override
     protected boolean canRunFrame(MqttPacket event) {
-        return true;
+        return event.getFixedHeader()==MqttFixedHeader.PUBLISH;
     }
 
     @Override

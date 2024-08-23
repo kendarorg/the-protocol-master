@@ -2,6 +2,7 @@ package org.kendar.mqtt.fsm;
 
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.MqttProtocol;
+import org.kendar.mqtt.MqttProxy;
 import org.kendar.mqtt.enums.Mqtt5PropertyType;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.dtos.Mqtt5Property;
@@ -9,6 +10,7 @@ import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
+import org.kendar.proxy.ProxyConnection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -65,6 +67,15 @@ public class PublishComp extends BaseMqttState implements ReturnMessage {
                     publishRec.getProperties().add(new Mqtt5Property(propertyType, bb));
                 }
             }
+        }
+        if(isProxyed()){
+            var proxy = (MqttProxy) context.getProxy();
+            var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
+
+            return iteratorOfRunnable(() -> proxy.sendAndForget(context,
+                    connection,
+                    publishRec
+            ));
         }
         return iteratorOfList(publishRec);
     }

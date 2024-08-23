@@ -198,6 +198,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             boolean optional) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
+
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
             if (item.getOutput() == null && item.getInput() == null) {
