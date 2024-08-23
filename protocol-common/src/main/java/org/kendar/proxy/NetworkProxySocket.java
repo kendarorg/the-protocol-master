@@ -253,7 +253,7 @@ public abstract class NetworkProxySocket {
                 returnMessage.add(it.next().run());
             }
         }
-        log.debug("[CL<TP][EX]: founded:" + protoState.getClass().getSimpleName());
+        log.debug("[CL<TP][EX]: Founded: " + protoState.getClass().getSimpleName());
         return returnMessage;
     }
 

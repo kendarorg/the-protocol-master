@@ -71,6 +71,7 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
         bb.write(data);
         bb.setPosition(0);
         String packetIdentifier = null;
+
         switch (flag) {
             case PUBLISH:
                 bb.readUtf8String();
@@ -102,10 +103,7 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
             event.getContext().send(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb, fullFlag, packetIdentifier));
             return iteratorOfEmpty();
         } else {
-            if (packetIdentifier != null && packetIdentifier.equalsIgnoreCase("1")
-                    && flag == MqttFixedHeader.PUBACK) {
-                System.out.println();
-            }
+
             log.trace("[TP<SR][  ]: Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(), packetIdentifier);
             return iteratorOfList(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb, fullFlag, packetIdentifier));
         }

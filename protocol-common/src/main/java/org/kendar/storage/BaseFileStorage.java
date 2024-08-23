@@ -169,11 +169,11 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
             }
             Files.writeString(Path.of(targetDir, "index.json"), mapper.serializePretty(compactLines));
         } catch (IOException e) {
-            log.error("[TMP  ][WR] Unable to write index file");
+            log.error("[TPM  ][WR] Unable to write index file");
             throw new RuntimeException(e);
         }
 
-        log.debug("[TMP  ][WR] Optimized recording");
+        log.debug("[TPM  ][WR] Optimized recording");
     }
 
     protected abstract boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<I, O> item, List<StorageItem<I, O>> loadedData);

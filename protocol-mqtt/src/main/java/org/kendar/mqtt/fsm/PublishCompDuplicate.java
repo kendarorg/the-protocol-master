@@ -2,7 +2,6 @@ package org.kendar.mqtt.fsm;
 
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.MqttProtocol;
-import org.kendar.mqtt.MqttProxy;
 import org.kendar.mqtt.enums.Mqtt5PropertyType;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.dtos.Mqtt5Property;
@@ -10,22 +9,21 @@ import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
-import org.kendar.proxy.ProxyConnection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class PublishRec extends BaseMqttState implements ReturnMessage {
+public class PublishCompDuplicate extends BaseMqttState implements ReturnMessage {
     private short packetIdentifier;
     private byte reasonCode;
 
-    public PublishRec(Class<?>... events) {
+    public PublishCompDuplicate(Class<?>... events) {
         super(events);
-        setFixedHeader(MqttFixedHeader.PUBREC);
+        setFixedHeader(MqttFixedHeader.PUBCOMP);
     }
 
-    public PublishRec() {
-        setFixedHeader(MqttFixedHeader.PUBREC);
+    public PublishCompDuplicate() {
+        setFixedHeader(MqttFixedHeader.PUBCOMP);
     }
 
     @Override
@@ -70,17 +68,7 @@ public class PublishRec extends BaseMqttState implements ReturnMessage {
                 }
             }
         }
-        if (isProxyed()) {
-            var proxy = (MqttProxy) context.getProxy();
-            var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-
-            return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
-                    connection,
-                    publishRec,
-                    new PublishRel().asProxy()
-            ));
-        }
-        return iteratorOfList(publishRec);
+        return iteratorOfEmpty();
     }
 
     public short getPacketIdentifier() {

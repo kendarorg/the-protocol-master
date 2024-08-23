@@ -65,7 +65,8 @@ public class MqttProtocol extends NetworkProtoDescriptor {
                                                 new ProtoStateSequence(
                                                         new PublishRec(MqttPacket.class).asProxy(),
                                                         new PublishComp(MqttPacket.class).asProxy()
-                                                )
+                                                ),
+                                                new PublishCompDuplicate(MqttPacket.class)
                                         )
                                 )
                         )
