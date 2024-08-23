@@ -102,7 +102,7 @@ public class TcpServer {
             server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
             server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
-            log.info("[CL>TP] Listening on " + HOST + ":" + protoDescriptor.getPort());
+            log.info("[CL>TP][IN] Listening on " + HOST + ":" + protoDescriptor.getPort());
 
             //noinspection InfiniteLoopStatement
             while (true) {
@@ -132,7 +132,7 @@ public class TcpServer {
                                     //If there is something
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
-                                    log.debug("[CL>TP][RX][2] bytes: " + byteArray.length);
+                                    log.debug("[CL>TP][RX]: Received bytes: " + byteArray.length);
                                     var bb = context.buildBuffer();
                                     context.setUseCallDurationTimes(callDurationTimes);
                                     bb.write(byteArray);

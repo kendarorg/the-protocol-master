@@ -282,9 +282,9 @@ public abstract class ProtoContext {
             }
 
             if (currentEvent.getTagKeyValues() != null && !currentEvent.getTagKeyValues().isEmpty()) {
-                log.debug("[CL>TP][RX][1]: {} Tags: {}", foundedState.getClass().getSimpleName(), currentEvent.getTagKeyValues());
+                log.debug("[CL>TP][RX]: Executing {} Tags: {}", foundedState.getClass().getSimpleName(), currentEvent.getTagKeyValues());
             } else {
-                log.debug("[CL>TP][RX][3]: {}", foundedState.getClass().getSimpleName());
+                log.debug("[CL>TP][RX]: Executing {}", foundedState.getClass().getSimpleName());
             }
             currentState = foundedState;
 
@@ -332,7 +332,7 @@ public abstract class ProtoContext {
             return null;
         }
         if (foundedState instanceof FailedState) {
-            throw new FailedStateException("[CL<TP] State: FailedState", foundedState, event);
+            throw new FailedStateException("[CL<TP][!!]: State: FailedState", foundedState, event);
         }
         return foundedState;
     }
@@ -360,7 +360,7 @@ public abstract class ProtoContext {
                 var stepResult = steps.run();
                 if (stepResult == null) continue;
                 //Write somwhere the result
-                log.debug("[CL<TP][TX]: {} Tags: {}", stepResult.getClass().getSimpleName(), event.getTagKeyValues());
+                log.debug("[CL<TP][TX]: Responding {} Tags: {}", stepResult.getClass().getSimpleName(), event.getTagKeyValues());
                 write(stepResult);
             }
         }

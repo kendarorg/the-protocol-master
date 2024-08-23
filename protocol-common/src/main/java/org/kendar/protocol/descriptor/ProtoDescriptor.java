@@ -69,7 +69,7 @@ public abstract class ProtoDescriptor {
      * @param start
      */
     private void buildProtocolDescription(ProtoState start) {
-        log.warn("[CL>TP] Not implemented ProtoDescriptor::buildProtocolDescription");
+        log.warn("[TPM  ][IN] Not implemented ProtoDescriptor::buildProtocolDescription");
     }
 
     /**

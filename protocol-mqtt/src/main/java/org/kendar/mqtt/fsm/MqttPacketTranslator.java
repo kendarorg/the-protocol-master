@@ -98,7 +98,7 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
 
 
         if (!proxy) {
-            log.trace("[CL>TP] Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(), packetIdentifier);
+            log.trace("[CL>TP][  ]: Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(), packetIdentifier);
             event.getContext().send(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb, fullFlag, packetIdentifier));
             return iteratorOfEmpty();
         } else {
@@ -106,7 +106,7 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
                     && flag == MqttFixedHeader.PUBACK) {
                 System.out.println();
             }
-            log.trace("[TP<SR] Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(), packetIdentifier);
+            log.trace("[TP<SR][  ]: Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(), packetIdentifier);
             return iteratorOfList(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb, fullFlag, packetIdentifier));
         }
     }

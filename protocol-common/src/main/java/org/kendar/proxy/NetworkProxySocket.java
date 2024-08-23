@@ -119,7 +119,7 @@ public abstract class NetworkProxySocket {
                                                             tempBuffer.truncate();
                                                             //FLW08 run the steps (sending back data)
                                                             context.runSteps(stepsToInvoke, possible, item);
-                                                            log.debug("[TP<SR][RX][5]: " + possible.getClass().getSimpleName());
+                                                            log.debug("[TP<SR][RX]: Possible return step: " + possible.getClass().getSimpleName());
                                                             internalRun = true;
                                                             break;
                                                         }
@@ -131,7 +131,7 @@ public abstract class NetworkProxySocket {
                                                 //This bytes event is one containing exactly one frame
 
                                                 if (internalRun == false) {
-                                                    log.debug("[TP<SR][RX][3]: event " + gf.getClass().getSimpleName());
+                                                    log.debug("[TP<SR][RX]: Event added to queue: " + event.getClass().getSimpleName());
                                                     inputQueue.add(event);
                                                     tempBuffer.truncate();
                                                 }
@@ -196,13 +196,13 @@ public abstract class NetworkProxySocket {
         buffer.truncate(0);
         returnMessage.write(buffer);
         write(buffer);
-        log.debug("[TP>SR][TX]: " + returnMessage.getClass().getSimpleName());
+        log.debug("[TP>SR][TX]: Forwarding " + returnMessage.getClass().getSimpleName());
     }
 
 
     public List<ReturnMessage> read(ProtoState protoState, boolean optional) {
 
-        log.debug("[CL<TP][EX][0]: " + protoState.getClass().getSimpleName());
+        log.debug("[CL<TP][EX]: Expecting " + protoState.getClass().getSimpleName());
         BaseEvent founded = null;
         try {
             long maxCount = System.currentTimeMillis() + 2000;
