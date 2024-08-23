@@ -34,12 +34,12 @@ Add first to the pom.xml the dependencies on the main projects.
 
 ### MqttProtocol class
 
-Create the protocol file e.g. "MqttProtocol" extending 
+Create the protocol file e.g. "MqttProtocol" extending
 "NetworkProtoDescriptor". We are creating a network based communication!
 
 This is the definition of the protocol.
 
-The byte ordering follows the [Big Endian](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html) 
+The byte ordering follows the [Big Endian](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html)
 and the default port is 1883.
 
 * Constructor with and without ports
@@ -108,25 +108,26 @@ proxy or an action to perform
 
 ### The base MqttPacket
 
-All the packets arriving from the clients are in the form of a BytesEvent. Basically an empowered byte[]. 
+All the packets arriving from the clients are in the form of a BytesEvent. Basically an empowered byte[].
 This is directly the data sent from the socket from the client to tpm
 
 For most protocols bytes are packed in a specific way, usually starting with the length. For Mqtt this
 is the "main" packet format
 
 * Fixed Header
-  * 4 bits Packet Type 
-  * 4 bits Flags 
-  * 1-4 bytes as [Variable Byte Integer](snippets/variablebyteinteger.md)
+    * 4 bits Packet Type
+    * 4 bits Flags
+    * 1-4 bytes as [Variable Byte Integer](snippets/variablebyteinteger.md)
 * x bytes Variable Header, this varies for each message Type
 * x bytes Payload, this of course varies for each message
 
 #### Fixed header
 
-The first 8 bytes will be handled [as a flag](https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc511988498) 
+The first 8 bytes will be
+handled [as a flag](https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html#_Toc511988498)
 inside a specific "flag" enum: MqttFixedHeader
 
-Looking at the code we add the method to read/write the flag 
+Looking at the code we add the method to read/write the flag
 
 <pre>
 public enum MqttFixedHeader {
@@ -141,16 +142,16 @@ public enum MqttFixedHeader {
 </pre>
 
 The first thing would be to translate the bytes to a MqttPacket. For this we can add
-a special "interruptState" implementing InterruptProtoState. This means that this 
+a special "interruptState" implementing InterruptProtoState. This means that this
 state is in reality a filter that translates the packets
 
-Since we will be using this very same format we add NetworkProxySplitterState that 
+Since we will be using this very same format we add NetworkProxySplitterState that
 is used when receiving data from the real server to understand if the packet has
 all the required data.
 
-This event or "packet" will extend the "BaseEvent" and, since the format is 
+This event or "packet" will extend the "BaseEvent" and, since the format is
 common for the return data, the "NetworkReturnMessage" the latter require
-the write method to be implemented. This method writes the buffer that will 
+the write method to be implemented. This method writes the buffer that will
 be sent back to the client
 
 <pre>
@@ -159,7 +160,7 @@ be sent back to the client
 
 #### The variable length integer
 
-To ease the development the BBuffer used will be a new MqttBBuffer, containing 
+To ease the development the BBuffer used will be a new MqttBBuffer, containing
 methods specific for the protocol
 
 <pre>

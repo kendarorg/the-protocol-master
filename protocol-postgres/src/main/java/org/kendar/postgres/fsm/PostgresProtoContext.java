@@ -27,9 +27,9 @@ public class PostgresProtoContext extends NetworkProtoContext {
     private final AtomicBoolean cancel = new AtomicBoolean(false);
     private List<Iterator<ProtoStep>> toSync = new ArrayList<>();
 
-    public PostgresProtoContext(ProtoDescriptor descriptor,int contextId) {
+    public PostgresProtoContext(ProtoDescriptor descriptor, int contextId) {
 
-        super(descriptor,contextId);
+        super(descriptor, contextId);
         pid = getNewPid();
         pids.put(pid, this);
     }

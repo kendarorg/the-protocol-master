@@ -98,8 +98,8 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
      * @param client
      * @return
      */
-    public ProtoContext buildContext(ClientServerChannel client,int contextId) {
-        var context = (NetworkProtoContext) createContext(this,contextId);
+    public ProtoContext buildContext(ClientServerChannel client, int contextId) {
+        var context = (NetworkProtoContext) createContext(this, contextId);
         context.setClient(client);
         if (hasProxy()) {
             var conn = proxyInstance.connect(context);

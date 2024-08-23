@@ -9,7 +9,11 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.proxy.ProxyConnection;
 
 public class MqttContext extends NetworkProtoContext {
-    private  int protocolVersion;
+    private int protocolVersion;
+
+    public MqttContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
+    }
 
     public int getProtocolVersion() {
         return protocolVersion;
@@ -21,11 +25,7 @@ public class MqttContext extends NetworkProtoContext {
     }
 
     public boolean isVersion(int expectedVersion) {
-        return protocolVersion==expectedVersion;
-    }
-
-    public MqttContext(ProtoDescriptor descriptor, int contextId) {
-        super(descriptor,contextId);
+        return protocolVersion == expectedVersion;
     }
 
     @Override

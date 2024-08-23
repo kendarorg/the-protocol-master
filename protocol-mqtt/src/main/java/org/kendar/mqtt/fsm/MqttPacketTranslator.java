@@ -19,8 +19,8 @@ import java.util.List;
 
 public class MqttPacketTranslator extends ProtoState implements NetworkReturnMessage, InterruptProtoState {
     private static final Logger log = LoggerFactory.getLogger(MqttPacketTranslator.class);
-    private static int count = 0;
     private static final List<MqttFixedHeader> packetIdAwareMessages = new ArrayList<MqttFixedHeader>();
+    private static int count = 0;
     private boolean proxy;
 
     public MqttPacketTranslator() {
@@ -74,41 +74,40 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
         switch (flag) {
             case PUBLISH:
                 bb.readUtf8String();
-                packetIdentifier = "P"+ bb.getShort();
+                packetIdentifier = "P" + bb.getShort();
                 bb.setPosition(0);
                 break;
             case PUBCOMP:
             case PUBACK:
             case PUBREC:
             case PUBREL:
-                packetIdentifier = "P"+bb.getShort();
+                packetIdentifier = "P" + bb.getShort();
                 bb.setPosition(0);
                 break;
             case SUBSCRIBE:
             case SUBACK:
-                packetIdentifier = "S"+bb.getShort();
+                packetIdentifier = "S" + bb.getShort();
                 bb.setPosition(0);
                 break;
             case UNSUBSCRIBE:
             case UNSUBACK:
-                packetIdentifier = "U"+bb.getShort();
+                packetIdentifier = "U" + bb.getShort();
                 bb.setPosition(0);
                 break;
         }
 
 
-
         if (!proxy) {
-            log.trace("[CL>TP] Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(),packetIdentifier);
-            event.getContext().send(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb, fullFlag,packetIdentifier));
+            log.trace("[CL>TP] Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(), packetIdentifier);
+            event.getContext().send(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb, fullFlag, packetIdentifier));
             return iteratorOfEmpty();
         } else {
-            if(packetIdentifier!=null && packetIdentifier.equalsIgnoreCase("1")
-            &&flag == MqttFixedHeader.PUBACK){
+            if (packetIdentifier != null && packetIdentifier.equalsIgnoreCase("1")
+                    && flag == MqttFixedHeader.PUBACK) {
                 System.out.println();
             }
-            log.trace("[TP<SR] Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(),packetIdentifier);
-            return iteratorOfList(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb, fullFlag,packetIdentifier));
+            log.trace("[TP<SR] Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(), packetIdentifier);
+            return iteratorOfList(new MqttPacket(event.getContext(), event.getPrevState(), flag, bb, fullFlag, packetIdentifier));
         }
     }
 }

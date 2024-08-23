@@ -14,7 +14,7 @@ import java.util.UUID;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
-public class SimpleTest extends BasicTest{
+public class SimpleTest extends BasicTest {
 
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/exit/";
@@ -47,7 +47,7 @@ public class SimpleTest extends BasicTest{
     @Test
     void qos2Test() throws MqttException {
         String publisherId = UUID.randomUUID().toString();
-        var publisher = new MqttClient("tcp://localhost:1884",publisherId);
+        var publisher = new MqttClient("tcp://localhost:1884", publisherId);
 
         var options = new MqttConnectOptions();
         options.setAutomaticReconnect(true);
@@ -59,20 +59,20 @@ public class SimpleTest extends BasicTest{
         //message.setQos(2);
         message.setQos(2);
         message.setRetained(true);
-        publisher.publish(TOPIC_NAME,message);
+        publisher.publish(TOPIC_NAME, message);
         Sleeper.sleep(1000);
         publisher.disconnect();
-        assertEquals(1,moquetteMessages.size());
+        assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);
-        assertEquals(MqttQoS.EXACTLY_ONCE,founded.getQos());
-        assertEquals(MESSAGE_CONTENT,founded.getPayload().toString(UTF_8));
+        assertEquals(MqttQoS.EXACTLY_ONCE, founded.getQos());
+        assertEquals(MESSAGE_CONTENT, founded.getPayload().toString(UTF_8));
     }
 
 
     @Test
     void qos1Test() throws MqttException {
         String publisherId = UUID.randomUUID().toString();
-        var publisher = new MqttClient("tcp://localhost:1884",publisherId);
+        var publisher = new MqttClient("tcp://localhost:1884", publisherId);
 
         var options = new MqttConnectOptions();
         options.setAutomaticReconnect(true);
@@ -84,19 +84,19 @@ public class SimpleTest extends BasicTest{
         //message.setQos(2);
         message.setQos(1);
         message.setRetained(true);
-        publisher.publish(TOPIC_NAME,message);
+        publisher.publish(TOPIC_NAME, message);
         Sleeper.sleep(1000);
         publisher.disconnect();
-        assertEquals(1,moquetteMessages.size());
+        assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);
-        assertEquals(MqttQoS.AT_LEAST_ONCE,founded.getQos());
-        assertEquals(MESSAGE_CONTENT,founded.getPayload().toString(UTF_8));
+        assertEquals(MqttQoS.AT_LEAST_ONCE, founded.getQos());
+        assertEquals(MESSAGE_CONTENT, founded.getPayload().toString(UTF_8));
     }
 
     @Test
     void qos0Test() throws MqttException {
         String publisherId = UUID.randomUUID().toString();
-        var publisher = new MqttClient("tcp://localhost:1884",publisherId);
+        var publisher = new MqttClient("tcp://localhost:1884", publisherId);
 
         var options = new MqttConnectOptions();
         options.setAutomaticReconnect(true);
@@ -108,12 +108,12 @@ public class SimpleTest extends BasicTest{
         //message.setQos(2);
         message.setQos(0);
         message.setRetained(true);
-        publisher.publish(TOPIC_NAME,message);
+        publisher.publish(TOPIC_NAME, message);
         Sleeper.sleep(1000);
         publisher.disconnect();
-        assertEquals(1,moquetteMessages.size());
+        assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);
-        assertEquals(MqttQoS.AT_MOST_ONCE,founded.getQos());
-        assertEquals(MESSAGE_CONTENT,founded.getPayload().toString(UTF_8));
+        assertEquals(MqttQoS.AT_MOST_ONCE, founded.getQos());
+        assertEquals(MESSAGE_CONTENT, founded.getPayload().toString(UTF_8));
     }
 }

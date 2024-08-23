@@ -71,6 +71,6 @@ public class MongoProtocol extends NetworkProtoDescriptor {
     @Override
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor,
                                          int contextId) {
-        return new MongoProtoContext(this,contextId);
+        return new MongoProtoContext(this, contextId);
     }
 }

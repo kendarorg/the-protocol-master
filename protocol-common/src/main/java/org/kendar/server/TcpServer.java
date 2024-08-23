@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
+import java.nio.channels.AsynchronousChannelGroup;
+import java.nio.channels.AsynchronousServerSocketChannel;
+import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.CompletionHandler;
 import java.util.concurrent.*;
 
 /**
@@ -106,15 +109,15 @@ public class TcpServer {
                 //Accept request
                 Future<AsynchronousSocketChannel> future = server.accept();
                 var contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
-                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")){
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
 
                     //Initialize client wrapper
                     var client = new TcpServerChannel(future.get());
-                    log.trace("[SERVER] Accepted connection from " + client.getRemoteAddress());
+                    log.trace("[CL>TP] Accepted connection from " + client.getRemoteAddress());
                     //Prepare the native buffer
                     ByteBuffer buffer = ByteBuffer.allocate(4096);
                     //Create the execution context
-                    var context = (NetworkProtoContext) protoDescriptor.buildContext(client,contextId);
+                    var context = (NetworkProtoContext) protoDescriptor.buildContext(client, contextId);
                     //Send the greetings
                     if (protoDescriptor.sendImmediateGreeting()) {
                         context.sendGreetings();
@@ -123,7 +126,7 @@ public class TcpServer {
                     client.read(buffer, 30000, TimeUnit.MILLISECONDS, buffer, new CompletionHandler<>() {
                         @Override
                         public void completed(Integer result, ByteBuffer attachment) {
-                            try {
+                            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
                                 attachment.flip();
                                 if (result != -1 || attachment.remaining() > 0) {
                                     //If there is something
@@ -151,7 +154,9 @@ public class TcpServer {
 
                         @Override
                         public void failed(Throwable exc, ByteBuffer attachment) {
-                            log.trace("Connection failed", exc);
+                            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
+                                log.trace("Connection failed", exc);
+                            }
                         }
                     });
 

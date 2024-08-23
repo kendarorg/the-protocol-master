@@ -13,11 +13,11 @@ public class SillyContext extends ProtoContext {
 
     public SillyContext(ProtoDescriptor descriptor, ClientServerChannel client,
                         int contextId) {
-        super(descriptor,contextId);
+        super(descriptor, contextId);
     }
 
-    public SillyContext(SillyProtocol descriptor,int contextId) {
-        super(descriptor,contextId);
+    public SillyContext(SillyProtocol descriptor, int contextId) {
+        super(descriptor, contextId);
     }
 
     public List<ReturnMessage> getResult() {

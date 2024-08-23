@@ -40,19 +40,18 @@ public class Publish extends BaseMqttState {
     }
 
 
-
     @Override
     protected boolean canRunFrame(MqttPacket event) {
-        return event.getFixedHeader()==MqttFixedHeader.PUBLISH;
+        return event.getFixedHeader() == MqttFixedHeader.PUBLISH;
     }
 
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.writeUtf8String(getTopicName());
         rb.writeShort(getPacketIdentifier());
-        if(isVersion(MqttProtocol.VERSION_5)) {
+        if (isVersion(MqttProtocol.VERSION_5)) {
             var tempRb = new MqttBBuffer(rb.getEndianness());
-            for(var pp:getProperties()){
+            for (var pp : getProperties()) {
                 pp.write(tempRb);
             }
             var all = tempRb.getAll();
@@ -64,9 +63,9 @@ public class Publish extends BaseMqttState {
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
-        var dupFlag = (event.getFullFlag() & (byte)8) == (byte)8;
-        var retainFlag = (event.getFullFlag() & (byte)1) == (byte)1;
-        var qos = event.getFullFlag()>>1 & (byte)3;
+        var dupFlag = (event.getFullFlag() & (byte) 8) == (byte) 8;
+        var retainFlag = (event.getFullFlag() & (byte) 1) == (byte) 1;
+        var qos = event.getFullFlag() >> 1 & (byte) 3;
 
         var publish = new Publish();
         publish.setFullFlag(event.getFullFlag());
@@ -78,7 +77,7 @@ public class Publish extends BaseMqttState {
         publish.setPacketIdentifier(bb.getShort());
         publish.setProtocolVersion(context.getProtocolVersion());
         //Variable header for MQTT >=5
-        if(publish.isVersion(MqttProtocol.VERSION_5)) {
+        if (publish.isVersion(MqttProtocol.VERSION_5)) {
             var propertiesLength = bb.readVarBInteger();
             if (propertiesLength.getValue() > 0) {
                 publish.setProperties(new ArrayList<>());
@@ -108,13 +107,13 @@ public class Publish extends BaseMqttState {
                     , 0, "RESPONSE", "MQTT");
             return iteratorOfList(publish);
         }
-        if(qos==1){
+        if (qos == 1) {
             return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                     connection,
                     publish,
                     new PublishAck()
             ));
-        }else if(qos==2){
+        } else if (qos == 2) {
             return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                     connection,
                     publish,
@@ -135,44 +134,44 @@ public class Publish extends BaseMqttState {
         this.topicName = topicName;
     }
 
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
-    }
-
     public byte[] getPayload() {
         return payload;
     }
 
-    public void setPacketIdentifier(short packetIdentifier) {
-        this.packetIdentifier = packetIdentifier;
+    public void setPayload(byte[] payload) {
+        this.payload = payload;
     }
 
     public short getPacketIdentifier() {
         return packetIdentifier;
     }
 
-    public void setDupFlag(boolean dupFlag) {
-        this.dupFlag = dupFlag;
+    public void setPacketIdentifier(short packetIdentifier) {
+        this.packetIdentifier = packetIdentifier;
     }
 
     public boolean isDupFlag() {
         return dupFlag;
     }
 
-    public void setRetainFlag(boolean retainFlag) {
-        this.retainFlag = retainFlag;
+    public void setDupFlag(boolean dupFlag) {
+        this.dupFlag = dupFlag;
     }
 
     public boolean isRetainFlag() {
         return retainFlag;
     }
 
-    public void setQos(int qos) {
-        this.qos = qos;
+    public void setRetainFlag(boolean retainFlag) {
+        this.retainFlag = retainFlag;
     }
 
     public int getQos() {
         return qos;
+    }
+
+    public void setQos(int qos) {
+        this.qos = qos;
     }
 
     @Override

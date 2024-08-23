@@ -21,6 +21,6 @@ public abstract class TaggedProtocol extends ProtoDescriptor {
     @Override
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor,
                                          int contextId) {
-        return new TaggedContext(this,contextId);
+        return new TaggedContext(this, contextId);
     }
 }

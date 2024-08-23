@@ -28,12 +28,12 @@ public enum MqttFixedHeader {
     DISCONNECT(0xE0),
     AUTH(0xF0);
     private static final Map<Integer, MqttFixedHeader> BY_INT = new HashMap<>();
-    private static final List<Byte> bytes= new ArrayList<>();
+    private static final List<Byte> bytes = new ArrayList<>();
 
     static {
         for (MqttFixedHeader e : values()) {
-            BY_INT.put((int)e.value, e);
-            bytes.add((byte)e.value);
+            BY_INT.put((int) e.value, e);
+            bytes.add((byte) e.value);
         }
 
     }
@@ -42,7 +42,7 @@ public enum MqttFixedHeader {
 
     MqttFixedHeader(int value) {
 
-        this.value = (byte)value;
+        this.value = (byte) value;
     }
 
     public static boolean isFlagSet(int source, int flag) {
@@ -62,8 +62,6 @@ public enum MqttFixedHeader {
     }
 
 
-
-
     public static MqttFixedHeader of(int value) {
         for (int i = bytes.size() - 1; i >= 0; i--) {
             var by = bytes.get(i);
@@ -71,7 +69,7 @@ public enum MqttFixedHeader {
                 return BY_INT.get((int) by);
             }
         }
-        throw new RuntimeException("MISSING MESSAGE TYPE "+value);
+        throw new RuntimeException("MISSING MESSAGE TYPE " + value);
     }
 
     public int getValue() {

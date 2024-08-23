@@ -15,7 +15,7 @@ import org.kendar.proxy.ProxyConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Connect extends BaseMqttState{
+public class Connect extends BaseMqttState {
     private String protocolName;
     private int protocolVersion;
     private int connectFlags;
@@ -27,8 +27,9 @@ public class Connect extends BaseMqttState{
     private String password;
     private String willTopic;
     private String willMessage;
+
     public Connect(MqttFixedHeader fixedHeader, String protocolName, int protocolVersion,
-                      int connectFlags, short keepAlive, int willQos, boolean willRetain) {
+                   int connectFlags, short keepAlive, int willQos, boolean willRetain) {
         setFixedHeader(MqttFixedHeader.CONNECT);
 
         this.protocolName = protocolName;
@@ -38,6 +39,7 @@ public class Connect extends BaseMqttState{
         this.willQos = willQos;
         this.willRetain = willRetain;
     }
+
     public Connect() {
         super();
         setFixedHeader(MqttFixedHeader.CONNECT);
@@ -148,26 +150,26 @@ public class Connect extends BaseMqttState{
         var bb = event.getBuffer();
         //Variable header
         var protocolName = bb.readUtf8String();
-        var protocolVersion = (int)bb.get();
+        var protocolVersion = (int) bb.get();
 
-        var connectFlags =(int) bb.get();
+        var connectFlags = (int) bb.get();
         var keepAlive = bb.getShort();
         var context = (MqttContext) event.getContext();
         context.setProtocolVersion(protocolVersion);
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        var userNameFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.USERNAME);
-        var passwordFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.PASSWORD);
-        var willRetainFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.WILLRETAIN);
+        var userNameFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.USERNAME);
+        var passwordFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.PASSWORD);
+        var willRetainFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.WILLRETAIN);
         var willQos = 0;
-        if(ConnectFlag.isFlagSet(connectFlags,ConnectFlag.WILLQOSONE)){
-            willQos=1;
-        }else if(ConnectFlag.isFlagSet(connectFlags,ConnectFlag.WILLQOSTWO)){
-            willQos=2;
+        if (ConnectFlag.isFlagSet(connectFlags, ConnectFlag.WILLQOSONE)) {
+            willQos = 1;
+        } else if (ConnectFlag.isFlagSet(connectFlags, ConnectFlag.WILLQOSTWO)) {
+            willQos = 2;
         }
-        var willFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.WILLFLAG);
-        var cleanSession = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.CLEANSESSION);
+        var willFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.WILLFLAG);
+        var cleanSession = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.CLEANSESSION);
         var connect = new Connect(
                 fixedHeader,
                 protocolName,
@@ -178,32 +180,32 @@ public class Connect extends BaseMqttState{
                 willRetainFlag
         );
         //Variable header for MQTT >=5
-        if(context.isVersion(MqttProtocol.VERSION_5)){
+        if (context.isVersion(MqttProtocol.VERSION_5)) {
             var propertiesLength = bb.readVarBInteger();
-            if(propertiesLength.getValue()>0){
+            if (propertiesLength.getValue() > 0) {
                 connect.setProperties(new ArrayList<>());
                 var start = bb.getPosition();
-                var end = start+propertiesLength.getValue();
-                while(bb.getPosition()<end){
+                var end = start + propertiesLength.getValue();
+                while (bb.getPosition() < end) {
                     var propertyType = Mqtt5PropertyType.of(bb.get());
-                    connect.getProperties().add(new Mqtt5Property(propertyType,bb));
+                    connect.getProperties().add(new Mqtt5Property(propertyType, bb));
                 }
             }
         }
         connect.setFullFlag(event.getFullFlag());
         //Payload
         connect.setClientId(bb.readUtf8String());
-        if(willFlag){
+        if (willFlag) {
             connect.setWillTopic(bb.readUtf8String());
             connect.setWillMessage(bb.readUtf8String());
         }
-        if(userNameFlag){
+        if (userNameFlag) {
             connect.setUserName(bb.readUtf8String());
         }
-        if(passwordFlag){
+        if (passwordFlag) {
             connect.setPassword(bb.readUtf8String());
         }
-        if(cleanSession){
+        if (cleanSession) {
             //TODOMQTT clean all sessions for connection
             //throw new RuntimeException("CLEAN SESSION");
         }
@@ -223,19 +225,19 @@ public class Connect extends BaseMqttState{
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
 
-        var willFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.WILLFLAG);
-        var userNameFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.USERNAME);
-        var passwordFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.PASSWORD);
-        var willRetainFlag = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.WILLRETAIN);
-        var cleanSession = ConnectFlag.isFlagSet(connectFlags,ConnectFlag.CLEANSESSION);
+        var willFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.WILLFLAG);
+        var userNameFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.USERNAME);
+        var passwordFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.PASSWORD);
+        var willRetainFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.WILLRETAIN);
+        var cleanSession = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.CLEANSESSION);
         rb.writeUtf8String(protocolName);
-        rb.write((byte)protocolVersion);
-        rb.write((byte)connectFlags);
+        rb.write((byte) protocolVersion);
+        rb.write((byte) connectFlags);
         rb.writeShort(keepAlive);
 
-        if(protocolVersion == MqttProtocol.VERSION_5){
+        if (protocolVersion == MqttProtocol.VERSION_5) {
             var rbProperties = new MqttBBuffer(rb.getEndianness());
-            for(var prop:getProperties()){
+            for (var prop : getProperties()) {
                 prop.toBytes(rbProperties);
             }
             var allBytes = rbProperties.getAll();
@@ -243,17 +245,17 @@ public class Connect extends BaseMqttState{
             rb.write(allBytes);
         }
         rb.writeUtf8String(clientId);
-        if(willFlag){
+        if (willFlag) {
             rb.writeUtf8String(willTopic);
             rb.writeUtf8String(willMessage);
         }
-        if(userNameFlag){
+        if (userNameFlag) {
             rb.writeUtf8String(userName);
         }
-        if(passwordFlag){
+        if (passwordFlag) {
             rb.writeUtf8String(password);
         }
-        if(cleanSession){
+        if (cleanSession) {
             //TODOMQTT clean all sessions for connection
             //throw new RuntimeException("CLEAN SESSION");
         }

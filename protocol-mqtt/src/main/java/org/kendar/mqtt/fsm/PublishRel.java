@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class PublishRel extends BaseMqttState implements ReturnMessage {
+    protected static final JsonMapper mapper = new JsonMapper();
     private short packetIdentifier;
     private byte reasonCode;
 
@@ -47,10 +48,8 @@ public class PublishRel extends BaseMqttState implements ReturnMessage {
     @Override
     protected boolean canRunFrame(MqttPacket event) {
 
-        return event.getFixedHeader()==MqttFixedHeader.PUBREL;
+        return event.getFixedHeader() == MqttFixedHeader.PUBREL;
     }
-
-    protected static final JsonMapper mapper = new JsonMapper();
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {

@@ -84,7 +84,7 @@ public class SubscribeTest extends BasicTest {
             Sleeper.sleep(500);
 
             System.out.println("========================");
-        }else{
+        } else {
             throw new RuntimeException("NOT CONNETED");
         }
         Sleeper.sleep(7000, () -> messages.size() > 0);

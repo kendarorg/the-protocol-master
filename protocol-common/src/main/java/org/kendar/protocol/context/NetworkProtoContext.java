@@ -54,8 +54,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     private BytesEvent remainingBytes;
 
-    public NetworkProtoContext(ProtoDescriptor descriptor,int contextId) {
-        super(descriptor,contextId);
+    public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
     }
 
     /**
@@ -72,11 +72,11 @@ public abstract class NetworkProtoContext extends ProtoContext {
                 return null;
             }
             message = event + " " + remainingBytes.getBuffer().toHexStringUpToLength(20);
-        }else{
+        } else {
             message = event.toString();
         }
-        if(!event.getTag().isEmpty()){
-            message+=" tags:"+event.getTagKeyValues();
+        if (!event.getTag().isEmpty()) {
+            message += " tags:" + event.getTagKeyValues();
         }
         log.error("[SERVER][??] Unknown: " + message);
         throw new UnknownCommandException("Unknown command issued: " + message);

@@ -16,7 +16,7 @@ public class ConnectAck extends BaseMqttState implements ReturnMessage {
     private boolean sessionSet;
     private byte connectReasonCode;
 
-    public ConnectAck(){
+    public ConnectAck() {
         setFixedHeader(MqttFixedHeader.CONNACK);
     }
 
@@ -37,10 +37,9 @@ public class ConnectAck extends BaseMqttState implements ReturnMessage {
     }
 
 
-
     @Override
     protected boolean canRunFrame(MqttPacket event) {
-        return (MqttFixedHeader.isFlagSet(event.getFixedHeader().getValue(),MqttFixedHeader.CONNACK));
+        return (MqttFixedHeader.isFlagSet(event.getFixedHeader().getValue(), MqttFixedHeader.CONNACK));
     }
 
     @Override
@@ -67,7 +66,7 @@ public class ConnectAck extends BaseMqttState implements ReturnMessage {
 
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
-        rb.write((byte) (sessionSet?0x01:0x00));
+        rb.write((byte) (sessionSet ? 0x01 : 0x00));
         rb.write((byte) (connectReasonCode));
     }
 }

@@ -8,22 +8,21 @@ import java.nio.charset.StandardCharsets;
 
 public class MqttBBuffer extends BBuffer {
 
-    public MqttBBuffer(BBufferEndianness endianness){
-        super(endianness);
-    }
-
     public static final int VARIABLE_BYTE_INT_MAX = 268_435_455;
 
-
+    public MqttBBuffer(BBufferEndianness endianness) {
+        super(endianness);
+    }
 
     public int writeVarBInteger(long number) {
         if (this.position == -1) {
             this.position = 0;
         }
-        var writtenLen = writeVarBInteger(number,this.position);
-        this.position+=writtenLen;
+        var writtenLen = writeVarBInteger(number, this.position);
+        this.position += writtenLen;
         return writtenLen;
     }
+
     public int writeVarBInteger(long number, int offset) {
 
         int numBytes = 0;
@@ -40,7 +39,7 @@ public class MqttBBuffer extends BBuffer {
             numBytes++;
         } while ((no > 0) && (numBytes < 4));
         var toWrite = baos.toByteArray();
-        write(toWrite,offset);
+        write(toWrite, offset);
         return toWrite.length;
     }
 
@@ -66,8 +65,8 @@ public class MqttBBuffer extends BBuffer {
                     + ". Read value was: " + value);
         }
 
-        this.position+=count;
-        return new VarBValue(value,count);
+        this.position += count;
+        return new VarBValue(value, count);
     }
 
     public VarBValue readVarBInteger(int offset) {
@@ -88,29 +87,29 @@ public class MqttBBuffer extends BBuffer {
                     + ". Read value was: " + value);
         }
 
-        return new VarBValue(value,count);
+        return new VarBValue(value, count);
     }
 
-    public int writeUtf8String(int offset,String value){
+    public int writeUtf8String(int offset, String value) {
         var data = value.getBytes(StandardCharsets.UTF_8);
-        writeShort((short) data.length,offset);
-        write(data,offset+2);
-        return data.length+offset+2;
+        writeShort((short) data.length, offset);
+        write(data, offset + 2);
+        return data.length + offset + 2;
     }
 
-    public void writeUtf8String(String value){
+    public void writeUtf8String(String value) {
         var data = value.getBytes(StandardCharsets.UTF_8);
         writeShort((short) data.length);
         write(data);
     }
 
-    public String readUtf8String(int offset){
+    public String readUtf8String(int offset) {
         var length = getShort(offset);
-        var data = getBytes(length,offset+2);
+        var data = getBytes(length, offset + 2);
         return new String(data);
     }
 
-    public String readUtf8String(){
+    public String readUtf8String() {
         var length = getShort();
         var data = getBytes(length);
         return new String(data);

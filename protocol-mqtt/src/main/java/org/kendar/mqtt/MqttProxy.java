@@ -51,6 +51,6 @@ public class MqttProxy extends NetworkProxy<MqttStorage> {
 
     @Override
     protected void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
-System.out.println("TEST");
+        System.out.println("TEST");
     }
 }

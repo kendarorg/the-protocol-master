@@ -36,7 +36,7 @@ public enum Mqtt5PropertyType {
 
     static {
         for (Mqtt5PropertyType e : values()) {
-            BY_INT.put((int)e.value, e);
+            BY_INT.put((int) e.value, e);
         }
     }
 
@@ -44,7 +44,7 @@ public enum Mqtt5PropertyType {
 
     Mqtt5PropertyType(int value) {
 
-        this.value = (byte)value;
+        this.value = (byte) value;
     }
 
     public static boolean isFlagSet(int source, int flag) {

@@ -78,7 +78,7 @@ public abstract class ProtoContext {
     private ProtoState currentState;
     private boolean useCallDurationTimes;
 
-    public ProtoContext(ProtoDescriptor descriptor,int contextId) {
+    public ProtoContext(ProtoDescriptor descriptor, int contextId) {
         this.contextId = contextId;
         this.descriptor = descriptor;
         this.root = descriptor.getTaggedStates();
@@ -281,9 +281,9 @@ public abstract class ProtoContext {
                 return true;
             }
 
-            if(currentEvent.getTagKeyValues()!=null && !currentEvent.getTagKeyValues().isEmpty()) {
+            if (currentEvent.getTagKeyValues() != null && !currentEvent.getTagKeyValues().isEmpty()) {
                 log.debug("[CL>TP][RX][1]: {} Tags: {}", foundedState.getClass().getSimpleName(), currentEvent.getTagKeyValues());
-            }else{
+            } else {
                 log.debug("[CL>TP][RX][3]: {}", foundedState.getClass().getSimpleName());
             }
             currentState = foundedState;

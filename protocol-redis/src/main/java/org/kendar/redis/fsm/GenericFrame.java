@@ -44,7 +44,6 @@ public class GenericFrame extends ProtoState implements NetworkReturnMessage, Ne
         var rb = event.getBuffer();
 
 
-
         var allBytes = rb.getAll();
         var str = new String(allBytes);
         var input = Resp3Input.of(str);

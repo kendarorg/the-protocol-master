@@ -20,16 +20,16 @@ public abstract class BaseMqttState extends ProtoState implements
     private MqttFixedHeader fixedHeader;
     private boolean proxyed;
 
-    public boolean isVersion(int expectedVersion) {
-        return protocolVersion==expectedVersion;
-    }
-
     public BaseMqttState() {
         super();
     }
 
     public BaseMqttState(Class<?>... events) {
         super(events);
+    }
+
+    public boolean isVersion(int expectedVersion) {
+        return protocolVersion == expectedVersion;
     }
 
     public int getProtocolVersion() {

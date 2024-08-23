@@ -124,10 +124,10 @@ public abstract class ProtoDescriptor {
      * @return
      */
     public ProtoContext buildContext(int contextId) {
-        return createContext(this,contextId);
+        return createContext(this, contextId);
     }
 
-    public ProtoContext buildContext(){
+    public ProtoContext buildContext() {
         return buildContext(ProtoDescriptor.getCounter("CONTEXT_ID"));
     }
 

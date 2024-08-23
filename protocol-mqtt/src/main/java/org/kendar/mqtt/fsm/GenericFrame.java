@@ -9,14 +9,14 @@ import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.NetworkProxySplitterState;
 
-public class GenericFrame  extends ProtoState implements NetworkReturnMessage, NetworkProxySplitterState {
+public class GenericFrame extends ProtoState implements NetworkReturnMessage, NetworkProxySplitterState {
     @Override
     public void write(BBuffer resultBuffer) {
         throw new RuntimeException();
     }
 
     public boolean canRun(BytesEvent event) {
-        var rb = (MqttBBuffer)event.getBuffer();
+        var rb = (MqttBBuffer) event.getBuffer();
         rb.setPosition(0);
         if (rb.size() < 1) {
             return false;
@@ -25,7 +25,7 @@ public class GenericFrame  extends ProtoState implements NetworkReturnMessage, N
         var byteValue = rb.get();
         var flag = MqttFixedHeader.of(byteValue);
         var varBValue = rb.readVarBInteger();
-        if(rb.size()<(1+varBValue.getLength()+varBValue.getValue())){
+        if (rb.size() < (1 + varBValue.getLength() + varBValue.getValue())) {
             rb.setPosition(0);
             throw new AskMoreDataException();
         }
@@ -34,24 +34,24 @@ public class GenericFrame  extends ProtoState implements NetworkReturnMessage, N
     }
 
     public BytesEvent execute(BytesEvent event) {
-        var rb = (MqttBBuffer)event.getBuffer();
+        var rb = (MqttBBuffer) event.getBuffer();
         rb.setPosition(0);
 
         //First get the
         var byteValue = rb.get();
         var flag = MqttFixedHeader.of(byteValue);
         var varBValue = rb.readVarBInteger();
-        if(rb.size()<(1+varBValue.getLength()+varBValue.getValue())){
+        if (rb.size() < (1 + varBValue.getLength() + varBValue.getValue())) {
             rb.setPosition(0);
             throw new AskMoreDataException();
-        }else{
-            var content = rb.getBytes((int)varBValue.getValue());
+        } else {
+            var content = rb.getBytes((int) varBValue.getValue());
             var newBr = new MqttBBuffer(rb.getEndianness());
             newBr.write(byteValue);
             newBr.writeVarBInteger(content.length);
             newBr.write(content);
             newBr.setPosition(0);
-            return new BytesEvent(null,null,newBr);
+            return new BytesEvent(null, null, newBr);
         }
     }
 

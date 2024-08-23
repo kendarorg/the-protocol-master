@@ -11,11 +11,6 @@ import org.kendar.protocol.messages.NetworkReturnMessage;
 public class MqttPacket extends BaseEvent implements NetworkReturnMessage {
     private final MqttFixedHeader fixedHeader;
     private final MqttBBuffer buffer;
-
-    public byte getFullFlag() {
-        return fullFlag;
-    }
-
     private final byte fullFlag;
 
     public MqttPacket(ProtoContext context, Class<?> prevState,
@@ -24,12 +19,16 @@ public class MqttPacket extends BaseEvent implements NetworkReturnMessage {
                       byte fullFlag,
                       String packetIdentifier) {
         super(context, prevState);
-        if(packetIdentifier!=null){
+        if (packetIdentifier != null) {
             getTag().add(Tag.of("PACKET", packetIdentifier).get(0));
         }
         this.fixedHeader = fixedHeader;
         this.buffer = buffer;
         this.fullFlag = fullFlag;
+    }
+
+    public byte getFullFlag() {
+        return fullFlag;
     }
 
     @Override
@@ -48,7 +47,7 @@ public class MqttPacket extends BaseEvent implements NetworkReturnMessage {
     @Override
     public String toString() {
         return "MqttPacket{" +
-                "fixedHeader=" + fixedHeader  +
+                "fixedHeader=" + fixedHeader +
                 '}';
     }
 }

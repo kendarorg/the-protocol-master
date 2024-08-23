@@ -13,11 +13,11 @@ public class TaggedContext extends ProtoContext {
 
     public TaggedContext(ProtoDescriptor descriptor, ClientServerChannel client,
                          int contextId) {
-        super(descriptor,contextId);
+        super(descriptor, contextId);
     }
 
-    public TaggedContext(ProtoDescriptor descriptor,int contextId) {
-        super(descriptor,contextId);
+    public TaggedContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
     }
 
     @Override

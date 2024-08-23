@@ -6,8 +6,8 @@ import org.kendar.proxy.ProxyConnection;
 import org.kendar.redis.utils.Resp3ProxySocket;
 
 public class Resp3Context extends NetworkProtoContext {
-    public Resp3Context(ProtoDescriptor descriptor,int contextId) {
-        super(descriptor,contextId);
+    public Resp3Context(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
     }
 
     @Override

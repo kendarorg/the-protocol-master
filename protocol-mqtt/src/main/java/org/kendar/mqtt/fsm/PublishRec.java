@@ -23,20 +23,22 @@ public class PublishRec extends BaseMqttState implements ReturnMessage {
         super(events);
         setFixedHeader(MqttFixedHeader.PUBREC);
     }
-    public PublishRec(){
+
+    public PublishRec() {
         setFixedHeader(MqttFixedHeader.PUBREC);
     }
+
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.writeShort(getPacketIdentifier());
-        if(isVersion(MqttProtocol.VERSION_5)) {
+        if (isVersion(MqttProtocol.VERSION_5)) {
             rb.write(getReasonCode());
             var tempRb = new MqttBBuffer(rb.getEndianness());
-            for(var pp:getProperties()){
+            for (var pp : getProperties()) {
                 pp.write(tempRb);
             }
             var all = tempRb.getAll();
-            rb.write((byte)all.length);
+            rb.write((byte) all.length);
             rb.write(all);
         }
     }
@@ -55,9 +57,9 @@ public class PublishRec extends BaseMqttState implements ReturnMessage {
         publishRec.setFullFlag(event.getFullFlag());
 
         publishRec.setProtocolVersion(context.getProtocolVersion());
-        if(publishRec.isVersion(MqttProtocol.VERSION_5)) {
+        if (publishRec.isVersion(MqttProtocol.VERSION_5)) {
             publishRec.setReasonCode(bb.get());
-            var propertiesLength = (int)bb.get();
+            var propertiesLength = (int) bb.get();
             if (propertiesLength > 0) {
                 publishRec.setProperties(new ArrayList<>());
                 var start = bb.getPosition();
@@ -68,7 +70,7 @@ public class PublishRec extends BaseMqttState implements ReturnMessage {
                 }
             }
         }
-        if(isProxyed()){
+        if (isProxyed()) {
             var proxy = (MqttProxy) context.getProxy();
             var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
@@ -81,19 +83,19 @@ public class PublishRec extends BaseMqttState implements ReturnMessage {
         return iteratorOfList(publishRec);
     }
 
-    public void setPacketIdentifier(short packetIdentifier) {
-        this.packetIdentifier = packetIdentifier;
-    }
-
     public short getPacketIdentifier() {
         return packetIdentifier;
     }
 
-    public void setReasonCode(byte reasonCode) {
-        this.reasonCode = reasonCode;
+    public void setPacketIdentifier(short packetIdentifier) {
+        this.packetIdentifier = packetIdentifier;
     }
 
     public byte getReasonCode() {
         return reasonCode;
+    }
+
+    public void setReasonCode(byte reasonCode) {
+        this.reasonCode = reasonCode;
     }
 }

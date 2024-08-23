@@ -16,7 +16,7 @@ public enum ConnectFlag {
 
     static {
         for (ConnectFlag e : values()) {
-            BY_INT.put((int)e.value, e);
+            BY_INT.put((int) e.value, e);
         }
     }
 
@@ -24,7 +24,7 @@ public enum ConnectFlag {
 
     ConnectFlag(int value) {
 
-        this.value = (byte)value;
+        this.value = (byte) value;
     }
 
     public static boolean isFlagSet(int source, int flag) {

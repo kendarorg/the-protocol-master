@@ -20,32 +20,11 @@ import java.util.List;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class BasicTest {
-    private static Server mqttBroker;
-    protected static List<InterceptPublishMessage> moquetteMessages = new ArrayList<>();
-
-    static class PublisherListener extends AbstractInterceptHandler {
-
-        @Override
-        public String getID() {
-            return "EmbeddedLauncherPublishListener";
-        }
-
-        @Override
-        public void onPublish(InterceptPublishMessage msg) {
-            final String decodedPayload = msg.getPayload().toString(UTF_8);
-            System.out.println("Received on topic: [" + msg.getTopicName() + "] content: [" + decodedPayload+"] qos:[" + msg.getQos()+"]");
-            moquetteMessages.add(msg);
-        }
-
-//        @Override
-//        public void onSessionLoopError(Throwable error) {
-//            System.out.println("Session event loop reported error: " + error);
-//        }
-    }
-
     protected static final int FAKE_PORT = 1884;
+    protected static List<InterceptPublishMessage> moquetteMessages = new ArrayList<>();
     //protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
+    private static Server mqttBroker;
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -107,8 +86,7 @@ public class BasicTest {
 
     }
 
-
-    public static void beforeEachBase(TestInfo testInfo)  {
+    public static void beforeEachBase(TestInfo testInfo) {
 
         moquetteMessages.clear();
         var baseProtocol = new MqttProtocol(FAKE_PORT);
@@ -141,5 +119,25 @@ public class BasicTest {
 
     public static void afterClassBase() throws Exception {
         mqttBroker.stopServer();
+    }
+
+    static class PublisherListener extends AbstractInterceptHandler {
+
+        @Override
+        public String getID() {
+            return "EmbeddedLauncherPublishListener";
+        }
+
+        @Override
+        public void onPublish(InterceptPublishMessage msg) {
+            final String decodedPayload = msg.getPayload().toString(UTF_8);
+            System.out.println("Received on topic: [" + msg.getTopicName() + "] content: [" + decodedPayload + "] qos:[" + msg.getQos() + "]");
+            moquetteMessages.add(msg);
+        }
+
+//        @Override
+//        public void onSessionLoopError(Throwable error) {
+//            System.out.println("Session event loop reported error: " + error);
+//        }
     }
 }

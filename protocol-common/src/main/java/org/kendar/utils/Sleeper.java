@@ -28,12 +28,12 @@ public class Sleeper {
     public static void sleep(long timeoutMillis, BooleanSupplier booleanSupplier) {
         try {
             Object obj = new Object();
-            var times = (int)timeoutMillis/100;
+            var times = (int) timeoutMillis / 100;
             for (int i = 0; i < 100; i++) {
                 synchronized (obj) {
                     obj.wait(times);
                 }
-                if(booleanSupplier.getAsBoolean()) {
+                if (booleanSupplier.getAsBoolean()) {
                     return;
                 }
             }

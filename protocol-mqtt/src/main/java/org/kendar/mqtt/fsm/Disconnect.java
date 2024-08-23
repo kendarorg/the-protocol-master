@@ -82,7 +82,7 @@ public class Disconnect extends BaseMqttState implements ReturnMessage, Interrup
             //return iteratorOfEmpty();
         }
         context.disconnect(connection);
-        return iteratorOfRunner(()->{
+        return iteratorOfRunner(() -> {
             proxy.sendAndForget(context,
                     connection,
                     publishRel
