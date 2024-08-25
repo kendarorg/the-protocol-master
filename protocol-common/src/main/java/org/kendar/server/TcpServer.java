@@ -50,7 +50,7 @@ public class TcpServer {
      * Stop the server
      */
     public void stop() {
-        try {
+        try{
             server.close();
             while (server.isOpen()) {
                 Sleeper.sleep(200);
@@ -58,11 +58,13 @@ public class TcpServer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            var proxy = protoDescriptor.getProxy();
-            if (proxy != null && !proxy.isReplayer()) {
-                var storage = protoDescriptor.getProxy().getStorage();
-                if (storage != null) {
-                    storage.optimize();
+            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
+                var proxy = protoDescriptor.getProxy();
+                if (proxy != null && !proxy.isReplayer()) {
+                    var storage = protoDescriptor.getProxy().getStorage();
+                    if (storage != null) {
+                        storage.optimize();
+                    }
                 }
             }
         }
