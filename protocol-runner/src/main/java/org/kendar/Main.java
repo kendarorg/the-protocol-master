@@ -9,6 +9,9 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.mongo.MongoFileStorage;
 import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
+import org.kendar.mqtt.MqttFileStorage;
+import org.kendar.mqtt.MqttProtocol;
+import org.kendar.mqtt.MqttProxy;
 import org.kendar.mysql.MySqlFileStorage;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.context.ProtoContext;
@@ -101,6 +104,9 @@ public class Main {
             } else if (protocol.equalsIgnoreCase("redis")) {
                 if (port == -1) port = 6379;
                 runRedis(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
+            }else if (protocol.equalsIgnoreCase("mqtt")) {
+                if (port == -1) port = 1883;
+                runMqtt(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
             } else {
                 throw new Exception("missing protocol (p)");
             }
@@ -119,8 +125,8 @@ public class Main {
         Options options = new Options();
         options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091/redis)");
         options.addOption("l", true, "[all] Select listening port");
-        options.addOption("xl", true, "[mysql/mongo/postgres/amqp091] Select remote login");
-        options.addOption("xw", true, "[mysql/mongo/postgres/amqp091] Select remote password");
+        options.addOption("xl", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote login");
+        options.addOption("xw", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote password");
         options.addOption("xc", true, "[all] Select remote connection string (for redis use redis://host:port");
         options.addOption("xd", true, "[all] Select log/replay directory (you can set a {timestamp} value\n" +
                 "that will be replaced with the current timestamp)");
@@ -297,6 +303,29 @@ public class Main {
                 });
             } else {
                 proxy.setStorage(new Resp3FileStorage(path));
+            }
+        }
+        baseProtocol.setProxy(proxy);
+        baseProtocol.initialize();
+        protocolServer = new TcpServer(baseProtocol);
+
+        protocolServer.start();
+        while (!protocolServer.isRunning()) {
+            Sleeper.sleep(100);
+        }
+    }
+
+    private static void runMqtt(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
+        var baseProtocol = new MqttProtocol(port);
+        var proxy = new MqttProxy(connectionString, login, password);
+        if (logsDir != null) {
+            var path = Path.of(logsDir);
+            if (replayFromLog) {
+                proxy = new MqttProxy();
+                proxy.setStorage(new MqttFileStorage(path) {
+                });
+            } else {
+                proxy.setStorage(new MqttFileStorage(path));
             }
         }
         baseProtocol.setProxy(proxy);
