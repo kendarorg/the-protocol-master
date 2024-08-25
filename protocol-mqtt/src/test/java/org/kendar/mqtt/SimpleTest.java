@@ -116,4 +116,21 @@ public class SimpleTest extends BasicTest {
         assertEquals(MqttQoS.AT_MOST_ONCE, founded.getQos());
         assertEquals(MESSAGE_CONTENT, founded.getPayload().toString(UTF_8));
     }
+
+
+    @Test
+    void pingTest() throws MqttException {
+        String publisherId = UUID.randomUUID().toString();
+        var publisher = new MqttClient2("tcp://localhost:1884", publisherId);
+
+        var options = new MqttConnectOptions();
+        options.setAutomaticReconnect(true);
+        options.setCleanSession(true);
+        options.setConnectionTimeout(10);
+        publisher.connect(options);
+
+        publisher.pingreq();
+        Sleeper.sleep(1000);
+        publisher.disconnect();
+    }
 }

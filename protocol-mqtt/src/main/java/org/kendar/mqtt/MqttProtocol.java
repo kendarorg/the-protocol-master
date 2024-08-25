@@ -53,22 +53,26 @@ public class MqttProtocol extends NetworkProtoDescriptor {
                 new ProtoStateSequence(
                         new Connect(MqttPacket.class),
                         new ProtoStateWhile(
-                                new Tagged(
-                                        Tag.ofKeys("PACKET"),
-                                        new ProtoStateSwitchCase(
-                                                new ProtoStateSequence(
-                                                        new Publish(MqttPacket.class),
-                                                        new PublishRel(MqttPacket.class).asOptional()
-                                                ),
-                                                new Subscribe(MqttPacket.class),
-                                                new PublishAck(MqttPacket.class).asOptional(),
-                                                new ProtoStateSequence(
-                                                        new PublishRec(MqttPacket.class).asProxy(),
-                                                        new PublishComp(MqttPacket.class).asProxy()
-                                                ),
-                                                new PublishCompDuplicate(MqttPacket.class)
-                                        )
+                                new ProtoStateSwitchCase(
+                                        new Tagged(
+                                                Tag.ofKeys("PACKET"),
+                                                new ProtoStateSwitchCase(
+                                                        new ProtoStateSequence(
+                                                                new Publish(MqttPacket.class),
+                                                                new PublishRel(MqttPacket.class).asOptional()
+                                                        ),
+                                                        new Subscribe(MqttPacket.class),
+                                                        new PublishAck(MqttPacket.class),
+                                                        new ProtoStateSequence(
+                                                                new PublishRec(MqttPacket.class).asProxy(),
+                                                                new PublishComp(MqttPacket.class).asProxy()
+                                                        ),
+                                                        new PublishCompDuplicate(MqttPacket.class)
+                                                )
+                                        ),
+                                        new PingReq(MqttPacket.class)
                                 )
+
                         )
                 ));
 
