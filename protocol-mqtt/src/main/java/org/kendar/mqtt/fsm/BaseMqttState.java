@@ -72,6 +72,7 @@ public abstract class BaseMqttState extends ProtoState implements
     protected abstract void writeFrameContent(MqttBBuffer rb);
 
     public boolean canRun(MqttPacket event) {
+
         return event.getFixedHeader().getValue() == getFixedHeader().getValue();
     }
 

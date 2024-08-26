@@ -121,7 +121,7 @@ public class SimpleTest extends BasicTest {
     @Test
     void pingTest() throws MqttException {
         String publisherId = UUID.randomUUID().toString();
-        var publisher = new MqttClient2("tcp://localhost:1884", publisherId);
+        var publisher = new MqttClientHack("tcp://localhost:1884", publisherId);
 
         var options = new MqttConnectOptions();
         options.setAutomaticReconnect(true);

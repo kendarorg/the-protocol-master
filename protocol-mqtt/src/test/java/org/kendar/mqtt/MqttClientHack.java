@@ -9,13 +9,13 @@ import org.eclipse.paho.client.mqttv3.internal.wire.MqttPingReq;
 
 import java.lang.reflect.Field;
 
-public class MqttClient2 extends MqttClient {
+public class MqttClientHack extends MqttClient {
 
-    public MqttClient2(String serverURI, String clientId,   MqttClientPersistence persistence) throws MqttException {
+    public MqttClientHack(String serverURI, String clientId, MqttClientPersistence persistence) throws MqttException {
         super(serverURI, clientId, persistence);
     }
 
-    public MqttClient2(String serverURI, String publisherId) throws MqttException {
+    public MqttClientHack(String serverURI, String publisherId) throws MqttException {
         super(serverURI, publisherId);
     }
 

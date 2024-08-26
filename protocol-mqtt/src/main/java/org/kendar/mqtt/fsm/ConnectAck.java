@@ -39,7 +39,8 @@ public class ConnectAck extends BaseMqttState implements ReturnMessage {
 
     @Override
     protected boolean canRunFrame(MqttPacket event) {
-        return (MqttFixedHeader.isFlagSet(event.getFixedHeader().getValue(), MqttFixedHeader.CONNACK));
+        return (MqttFixedHeader.isFlagSet(event.getFixedHeader().getValue(),
+                MqttFixedHeader.CONNACK));
     }
 
     @Override

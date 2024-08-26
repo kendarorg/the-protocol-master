@@ -81,27 +81,10 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
             case PUBCOMP:
             case PUBACK:
             case PUBREL:
-            case PUBREC: {
-                var position = rb.getPosition();
-                var oldPid = bb.getShort();
-                short newPid = oldPid;
-
-//                if (proxy==false) {
-//                    if (flag == MqttFixedHeader.PUBREC) {
-//                        event.getContext().setValue("PUBREC", oldPid);
-//                    } else if (flag == MqttFixedHeader.PUBCOMP) {
-//                        newPid = (short) event.getContext().getValue("PUBREC");
-//                    }
-//                }
-//                if(newPid!=oldPid) {
-//                    bb.setPosition(position);
-//                    bb.writeShort(newPid);
-//                }
-                packetIdentifier = "P" + newPid;
+            case PUBREC:
+                packetIdentifier = "P" + bb.getShort();
                 bb.setPosition(0);
-            }
-
-            break;
+                break;
             case SUBSCRIBE:
             case SUBACK:
                 packetIdentifier = "S" + bb.getShort();

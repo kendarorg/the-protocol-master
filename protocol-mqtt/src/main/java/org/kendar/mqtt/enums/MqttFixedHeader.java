@@ -46,7 +46,7 @@ public enum MqttFixedHeader {
     }
 
     public static boolean isFlagSet(int source, int flag) {
-        return (source & flag) == flag;
+        return ((short)source & (short)flag) == (short)flag;
     }
 
     public static boolean isFlagSet(int source, MqttFixedHeader flag) {
