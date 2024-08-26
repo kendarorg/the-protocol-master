@@ -35,11 +35,6 @@ public class Subscribe extends BaseMqttState {
 
 
     @Override
-    protected boolean canRunFrame(MqttPacket event) {
-        return true;
-    }
-
-    @Override
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.writeShort(getPacketIdentifier());
         if (isVersion(MqttProtocol.VERSION_5)) {

@@ -41,11 +41,6 @@ public class Publish extends BaseMqttState {
 
 
     @Override
-    protected boolean canRunFrame(MqttPacket event) {
-        return event.getFixedHeader() == MqttFixedHeader.PUBLISH;
-    }
-
-    @Override
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.writeUtf8String(getTopicName());
         rb.writeShort(getPacketIdentifier());

@@ -44,12 +44,6 @@ public class Disconnect extends BaseMqttState implements ReturnMessage, Interrup
             rb.write(all);
         }
     }
-
-    @Override
-    protected boolean canRunFrame(MqttPacket event) {
-        return true;
-    }
-
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
         var context = (MqttContext) event.getContext();

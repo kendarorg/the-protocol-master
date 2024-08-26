@@ -45,11 +45,6 @@ public class PublishRel extends BaseMqttState implements ReturnMessage {
         }
     }
 
-    @Override
-    protected boolean canRunFrame(MqttPacket event) {
-
-        return event.getFixedHeader() == MqttFixedHeader.PUBREL;
-    }
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {

@@ -51,12 +51,6 @@ public class Connect extends BaseMqttState {
     }
 
 
-    @Override
-    protected boolean canRunFrame(MqttPacket event) {
-
-        return true;
-    }
-
     public String getProtocolName() {
         return protocolName;
     }

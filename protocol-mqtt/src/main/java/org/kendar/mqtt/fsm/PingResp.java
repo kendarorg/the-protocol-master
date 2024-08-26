@@ -31,11 +31,6 @@ public class PingResp extends BaseMqttState implements ReturnMessage, InterruptP
     }
 
     @Override
-    protected boolean canRunFrame(MqttPacket event) {
-        return event.getFixedHeader() == MqttFixedHeader.PINGRESP;
-    }
-
-    @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
         var context = (MqttContext) event.getContext();
         var publishRel = new PingResp();

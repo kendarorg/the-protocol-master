@@ -29,11 +29,6 @@ public class PingReq extends BaseMqttState implements ReturnMessage, InterruptPr
     }
 
     @Override
-    protected boolean canRunFrame(MqttPacket event) {
-        return event.getFixedHeader() == MqttFixedHeader.PINGREQ;
-    }
-
-    @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
         var context = (MqttContext) event.getContext();
         var pingReq = new PingReq();

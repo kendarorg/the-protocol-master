@@ -76,8 +76,6 @@ public abstract class BaseMqttState extends ProtoState implements
         return event.getFixedHeader().getValue() == getFixedHeader().getValue();
     }
 
-    protected abstract boolean canRunFrame(MqttPacket event);
-
     public Iterator<ProtoStep> execute(MqttPacket event) {
         setFullFlag(event.getFullFlag());
         return executeFrame(event.getFixedHeader(), event.getBuffer(), event);

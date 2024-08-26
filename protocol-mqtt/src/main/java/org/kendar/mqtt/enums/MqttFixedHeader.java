@@ -45,22 +45,6 @@ public enum MqttFixedHeader {
         this.value = (byte) value;
     }
 
-    public static boolean isFlagSet(int source, int flag) {
-        return ((short)source & (short)flag) == (short)flag;
-    }
-
-    public static boolean isFlagSet(int source, MqttFixedHeader flag) {
-        return isFlagSet(source, flag.getValue());
-    }
-
-    public static int setFlag(int source, int flag) {
-        return source |= flag;
-    }
-
-    public static int unsetFlag(int source, int flag) {
-        return source & ~flag;
-    }
-
 
     public static MqttFixedHeader of(int value) {
         for (int i = bytes.size() - 1; i >= 0; i--) {
