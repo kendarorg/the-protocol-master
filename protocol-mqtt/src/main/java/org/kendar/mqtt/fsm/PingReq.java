@@ -32,14 +32,11 @@ public class PingReq extends BaseMqttState implements ReturnMessage, InterruptPr
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
         var context = (MqttContext) event.getContext();
         var pingReq = new PingReq();
-        //System.out.println(bb.toHexStringUpToLength(0,10));
-
 
         pingReq.setFullFlag(event.getFullFlag());
 
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-
 
         return iteratorOfRunner(() ->
             proxy.sendAndExpect(context,

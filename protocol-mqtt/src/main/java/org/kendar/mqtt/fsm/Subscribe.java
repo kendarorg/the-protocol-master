@@ -51,9 +51,6 @@ public class Subscribe extends BaseMqttState {
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
-        var dupFlag = (event.getFullFlag() & (byte) 8) == (byte) 8;
-        var retainFlag = (event.getFullFlag() & (byte) 1) == (byte) 1;
-        var qos = event.getFullFlag() >> 1 & (byte) 3;
 
         var publish = new Subscribe();
         publish.setFullFlag(event.getFullFlag());
@@ -78,11 +75,6 @@ public class Subscribe extends BaseMqttState {
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        if (isProxyed()) {
-            //TODOMQTT
-            throw new RuntimeException("CANNOT HANDLE AS PROXY");
-            //return iteratorOfEmpty();
-        }
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 publish,

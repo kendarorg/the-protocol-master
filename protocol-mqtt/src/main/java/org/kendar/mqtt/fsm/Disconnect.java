@@ -48,9 +48,6 @@ public class Disconnect extends BaseMqttState implements ReturnMessage, Interrup
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
         var context = (MqttContext) event.getContext();
         var publishRel = new Disconnect();
-        //System.out.println(bb.toHexStringUpToLength(0,10));
-
-
         publishRel.setFullFlag(event.getFullFlag());
 
         publishRel.setProtocolVersion(context.getProtocolVersion());
@@ -70,11 +67,7 @@ public class Disconnect extends BaseMqttState implements ReturnMessage, Interrup
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        if (isProxyed()) {
-            //TODOMQTT
-            throw new RuntimeException("CANNOT HANDLE AS PROXY");
-            //return iteratorOfEmpty();
-        }
+
         context.disconnect(connection);
         return iteratorOfRunner(() -> {
             proxy.sendAndForget(context,

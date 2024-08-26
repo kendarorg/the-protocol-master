@@ -47,9 +47,8 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
         if (rb.size() < 1) {
             return false;
         }
-        //First get the
-        var byteValue = rb.get();
-        var flag = MqttFixedHeader.of(byteValue);
+        //First jump the flag
+        rb.get();
         var varBValue = rb.readVarBInteger();
         if (rb.size() < (1 + varBValue.getLength() + varBValue.getValue())) {
             rb.setPosition(0);

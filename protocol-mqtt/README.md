@@ -5,7 +5,8 @@ at the moment)
 
 ## Missing features
 
-Authentication (AUTH packet)
+* Authentication (AUTH packet)
+* Session Clean
 
 ## Documentation used
 

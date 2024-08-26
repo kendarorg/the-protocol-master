@@ -2,7 +2,6 @@ package org.kendar.mqtt.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
-import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
@@ -21,9 +20,8 @@ public class GenericFrame extends ProtoState implements NetworkReturnMessage, Ne
         if (rb.size() < 1) {
             return false;
         }
-        //First get the
-        var byteValue = rb.get();
-        var flag = MqttFixedHeader.of(byteValue);
+        //First get the flag
+        rb.get();
         var varBValue = rb.readVarBInteger();
         if (rb.size() < (1 + varBValue.getLength() + varBValue.getValue())) {
             rb.setPosition(0);
@@ -37,9 +35,8 @@ public class GenericFrame extends ProtoState implements NetworkReturnMessage, Ne
         var rb = (MqttBBuffer) event.getBuffer();
         rb.setPosition(0);
 
-        //First get the
+        //First get the flag
         var byteValue = rb.get();
-        var flag = MqttFixedHeader.of(byteValue);
         var varBValue = rb.readVarBInteger();
         if (rb.size() < (1 + varBValue.getLength() + varBValue.getValue())) {
             rb.setPosition(0);

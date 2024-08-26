@@ -93,8 +93,6 @@ public class Publish extends BaseMqttState {
             var storage = proxy.getStorage();
             var res = "{\"type\":\"" + publish.getClass().getSimpleName() + "\",\"data\":" +
                     mapper.serialize(publish) + "}";
-
-
             storage.write(
                     context.getContextId(),
                     null

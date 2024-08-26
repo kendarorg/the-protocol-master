@@ -41,7 +41,6 @@ public class PublishCompDuplicate extends BaseMqttState implements ReturnMessage
         }
     }
 
-
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
 

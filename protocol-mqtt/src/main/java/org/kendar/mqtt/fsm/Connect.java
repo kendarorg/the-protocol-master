@@ -204,11 +204,6 @@ public class Connect extends BaseMqttState {
             //throw new RuntimeException("CLEAN SESSION");
         }
 
-        if (isProxyed()) {
-            //TODOMQTT
-            throw new RuntimeException("CANNOT HANDLE AS PROXY");
-            //return iteratorOfEmpty();
-        }
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 connect,
@@ -248,10 +243,6 @@ public class Connect extends BaseMqttState {
         }
         if (passwordFlag) {
             rb.writeUtf8String(password);
-        }
-        if (cleanSession) {
-            //TODOMQTT clean all sessions for connection
-            //throw new RuntimeException("CLEAN SESSION");
         }
     }
 }
