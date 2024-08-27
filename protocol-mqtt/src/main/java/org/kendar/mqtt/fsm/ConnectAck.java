@@ -6,7 +6,6 @@ import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ConnectAck extends BaseMqttState implements ReturnMessage {
@@ -37,15 +36,16 @@ public class ConnectAck extends BaseMqttState implements ReturnMessage {
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer rb, MqttPacket event) {
         var bb = event.getBuffer();
-        var connect = this;
+        var connect = new ConnectAck();
         //https://www.emqx.com/en/blog/mqtt-5-0-control-packets-01-connect-connack
         var connectAckFlag = bb.get(); //SessionPresent
         var sessionSet = (connectAckFlag & 0x01) == 0x01;
         //TODOMQTT 3.2.2.2 Connect Reason Code
         var connectReasonCode = bb.get();
-        connect.setProperties(new ArrayList<>());
+        readProperties(connect,bb);
         connect.setSessionSet(sessionSet);
         connect.setConnectReasonCode(connectReasonCode);
+        connect.setFullFlag(event.getFullFlag());
         //WAs it not varinteger
 
         return iteratorOfList(connect);
@@ -56,5 +56,6 @@ public class ConnectAck extends BaseMqttState implements ReturnMessage {
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.write((byte) (sessionSet ? 0x01 : 0x00));
         rb.write((byte) (connectReasonCode));
+        writeProperties(rb);
     }
 }

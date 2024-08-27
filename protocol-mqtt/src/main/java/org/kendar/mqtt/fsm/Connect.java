@@ -1,23 +1,18 @@
 package org.kendar.mqtt.fsm;
 
 import org.kendar.mqtt.MqttContext;
-import org.kendar.mqtt.MqttProtocol;
 import org.kendar.mqtt.MqttProxy;
 import org.kendar.mqtt.enums.ConnectFlag;
-import org.kendar.mqtt.enums.Mqtt5PropertyType;
 import org.kendar.mqtt.enums.MqttFixedHeader;
-import org.kendar.mqtt.fsm.dtos.Mqtt5Property;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Connect extends BaseMqttState {
     private String protocolName;
-    private int protocolVersion;
     private int connectFlags;
     private short keepAlive;
     private int willQos;
@@ -33,7 +28,7 @@ public class Connect extends BaseMqttState {
         setFixedHeader(MqttFixedHeader.CONNECT);
 
         this.protocolName = protocolName;
-        this.protocolVersion = protocolVersion;
+        this.setProtocolVersion(protocolVersion);
         this.connectFlags = connectFlags;
         this.keepAlive = keepAlive;
         this.willQos = willQos;
@@ -59,13 +54,6 @@ public class Connect extends BaseMqttState {
         this.protocolName = protocolName;
     }
 
-    public int getProtocolVersion() {
-        return protocolVersion;
-    }
-
-    public void setProtocolVersion(int protocolVersion) {
-        this.protocolVersion = protocolVersion;
-    }
 
     public int getConnectFlags() {
         return connectFlags;
@@ -174,18 +162,8 @@ public class Connect extends BaseMqttState {
                 willRetainFlag
         );
         //Variable header for MQTT >=5
-        if (context.isVersion(MqttProtocol.VERSION_5)) {
-            var propertiesLength = bb.readVarBInteger();
-            if (propertiesLength.getValue() > 0) {
-                connect.setProperties(new ArrayList<>());
-                var start = bb.getPosition();
-                var end = start + propertiesLength.getValue();
-                while (bb.getPosition() < end) {
-                    var propertyType = Mqtt5PropertyType.of(bb.get());
-                    connect.getProperties().add(new Mqtt5Property(propertyType, bb));
-                }
-            }
-        }
+        readProperties( connect, bb);
+
         connect.setFullFlag(event.getFullFlag());
         //Payload
         connect.setClientId(bb.readUtf8String());
@@ -211,6 +189,7 @@ public class Connect extends BaseMqttState {
         ));
     }
 
+
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
 
@@ -220,19 +199,10 @@ public class Connect extends BaseMqttState {
         var willRetainFlag = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.WILLRETAIN);
         var cleanSession = ConnectFlag.isFlagSet(connectFlags, ConnectFlag.CLEANSESSION);
         rb.writeUtf8String(protocolName);
-        rb.write((byte) protocolVersion);
+        rb.write((byte) getProtocolVersion());
         rb.write((byte) connectFlags);
         rb.writeShort(keepAlive);
-
-        if (protocolVersion == MqttProtocol.VERSION_5) {
-            var rbProperties = new MqttBBuffer(rb.getEndianness());
-            for (var prop : getProperties()) {
-                prop.toBytes(rbProperties);
-            }
-            var allBytes = rbProperties.getAll();
-            rb.writeVarBInteger(allBytes.length);
-            rb.write(allBytes);
-        }
+        writeProperties(rb);
         rb.writeUtf8String(clientId);
         if (willFlag) {
             rb.writeUtf8String(willTopic);

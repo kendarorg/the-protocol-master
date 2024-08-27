@@ -13,10 +13,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousChannelGroup;
-import java.nio.channels.AsynchronousServerSocketChannel;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
+import java.nio.channels.*;
 import java.util.concurrent.*;
 
 /**
@@ -50,7 +47,7 @@ public class TcpServer {
      * Stop the server
      */
     public void stop() {
-        try{
+        try {
             server.close();
             while (server.isOpen()) {
                 Sleeper.sleep(200);
@@ -79,7 +76,9 @@ public class TcpServer {
                 try {
                     run();
                 } catch (IOException | ExecutionException | InterruptedException e) {
-                    throw new RuntimeException(e);
+                    if(!(e.getCause() instanceof AsynchronousCloseException)) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         });
@@ -97,6 +96,7 @@ public class TcpServer {
         //Executor for the asynchronous requests
         ExecutorService executor = Executors.newCachedThreadPool();
         AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(executor);
+        ProtoDescriptor.cleanCounters();
 
         try (AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group)) {
             this.server = server;
@@ -110,14 +110,16 @@ public class TcpServer {
             while (true) {
                 //Accept request
                 Future<AsynchronousSocketChannel> future = server.accept();
+
+                //Initialize client wrapper
+                var client = new TcpServerChannel(future.get());
+                //Prepare the native buffer
+                ByteBuffer buffer = ByteBuffer.allocate(4096);
+
                 var contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
                 try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
 
-                    //Initialize client wrapper
-                    var client = new TcpServerChannel(future.get());
                     log.trace("[CL>TP] Accepted connection from " + client.getRemoteAddress());
-                    //Prepare the native buffer
-                    ByteBuffer buffer = ByteBuffer.allocate(4096);
                     //Create the execution context
                     var context = (NetworkProtoContext) protoDescriptor.buildContext(client, contextId);
                     //Send the greetings
@@ -162,7 +164,7 @@ public class TcpServer {
                         }
                     });
 
-                } catch (ExecutionException e) {
+                } catch (Exception e) {
                     log.trace("Execution exception", e);
                 }
             }

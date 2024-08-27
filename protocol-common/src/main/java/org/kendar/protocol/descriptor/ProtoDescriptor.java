@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class ProtoDescriptor {
 
+
     private static final ConcurrentHashMap<String, AtomicInteger> counters = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(ProtoDescriptor.class);
     /**
@@ -33,14 +34,19 @@ public abstract class ProtoDescriptor {
 
     public static int getCounter(String id) {
         id = id.toUpperCase();
-        return counters.computeIfAbsent(id, (key) ->
+        var result = counters.computeIfAbsent(id, (key) ->
                 new AtomicInteger(0)).incrementAndGet();
+        return result;
     }
 
     public static String getCounterString(String id) {
         id = id.toUpperCase();
         return "" + counters.computeIfAbsent(id, (key) ->
                 new AtomicInteger(0)).incrementAndGet();
+    }
+
+    public static void cleanCounters() {
+        counters.clear();
     }
 
     /**

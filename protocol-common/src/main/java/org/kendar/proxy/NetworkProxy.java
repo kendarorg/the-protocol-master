@@ -221,7 +221,13 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         var sock = (NetworkProxySocket) connection.getConnection();
         var bufferToWrite = protocol.buildBuffer();
         sock.write(of, bufferToWrite);
-        sock.read(toRead, optional);
+        var returnMessages = sock.read(toRead, optional);
+        for(var item : returnMessages) {
+            if(toRead.getClass()==item.getClass()) {
+                toRead = (T) item;
+                break;
+            }
+        }
 
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();
