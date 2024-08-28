@@ -76,7 +76,7 @@ java -cp "ojdbc11.jar;protocol-runner.jar" \
 <pre>
 usage: runner
  -l <arg>    [all] Select listening port
- -p <arg>    Select protocol (mysql/mongo/postgres/amqp091/redis)
+ -p <arg>    Select protocol (mysql/mongo/postgres/amqp091/redis/mqtt)
  -pl         [all] Replay from log/replay directory
  -t <arg>    [all] Set timeout in seconds towards proxied system (default
              30s)
@@ -86,8 +86,8 @@ usage: runner
  -xd <arg>   [all] Select log/replay directory (you can set a {timestamp}
              value
              that will be replaced with the current timestamp)
- -xl <arg>   [mysql/mongo/postgres/amqp091] Select remote login
- -xw <arg>   [mysql/mongo/postgres/amqp091] Select remote password
+ -xl <arg>   [mysql/mongo/postgres/amqp091/mqtt] Select remote login
+ -xw <arg>   [mysql/mongo/postgres/amqp091/mqtt] Select remote password
  -jr <arg>   [jdbc] Replace queries
  -js <arg>   [jdbc] Set schema
 </pre>

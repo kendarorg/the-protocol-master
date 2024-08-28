@@ -7,6 +7,7 @@ at the moment)
 
 * Authentication (AUTH packet)
 * Session Clean
+* SSL
 
 ## Documentation used
 
@@ -15,6 +16,11 @@ at the moment)
 * https://cedalo.com/blog/mqtt-packet-guide/ Very clear wire-protocol level
 * https://vasters.com/archive/2017-01-09-From-MQTT-to-AMQP-and-back.html
 * https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html
+
+## Connection String 
+
+* The connection string for the proxy is tcp://[host]:[port]
+* User id and password currently blank
 
 ## Interesting informations
 
