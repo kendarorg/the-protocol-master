@@ -56,8 +56,9 @@ public class Resp3Protocol extends NetworkProtoDescriptor {
     }
 
     @Override
-    protected ProtoContext createContext(ProtoDescriptor protoDescriptor) {
-        var result = new Resp3Context(protoDescriptor);
+    protected ProtoContext createContext(ProtoDescriptor protoDescriptor,
+                                         int contextId) {
+        var result = new Resp3Context(protoDescriptor, contextId);
         consumeContext.put(result.getContextId(), result);
         return result;
     }

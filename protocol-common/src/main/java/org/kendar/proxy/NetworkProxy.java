@@ -182,15 +182,23 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param <K>
      * @return
      */
-    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(NetworkProtoContext context,
-                                                                           ProxyConnection connection, K of, T toRead) {
+    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(
+            NetworkProtoContext context,
+            ProxyConnection connection,
+            K of,
+            T toRead) {
         return sendAndExpect(context, connection, of, toRead, false);
     }
 
-    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(NetworkProtoContext context,
-                                                                           ProxyConnection connection, K of, T toRead, boolean optional) {
+    public <T extends ProtoState, K extends ReturnMessage> T sendAndExpect(
+            NetworkProtoContext context,
+            ProxyConnection connection,
+            K of,
+            T toRead,
+            boolean optional) {
         var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
         var jsonReq = mapper.toJsonNode(req);
+
         if (replayer) {
             var item = storage.read(jsonReq, of.getClass().getSimpleName());
             if (item.getOutput() == null && item.getInput() == null) {
@@ -213,7 +221,13 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         var sock = (NetworkProxySocket) connection.getConnection();
         var bufferToWrite = protocol.buildBuffer();
         sock.write(of, bufferToWrite);
-        sock.read(toRead, optional);
+        var returnMessages = sock.read(toRead, optional);
+        for (var item : returnMessages) {
+            if (toRead.getClass() == item.getClass()) {
+                toRead = (T) item;
+                break;
+            }
+        }
 
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();

@@ -24,8 +24,8 @@ public class MySQLProtoContext extends NetworkProtoContext {
     private int clientCapabilities;
     private int packetNumber = -1;
 
-    public MySQLProtoContext(ProtoDescriptor descriptor) {
-        super(descriptor);
+    public MySQLProtoContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
     }
 
     public int getClientCapabilities() {

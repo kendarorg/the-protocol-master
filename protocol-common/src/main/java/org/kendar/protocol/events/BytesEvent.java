@@ -17,4 +17,9 @@ public class BytesEvent extends BaseEvent {
     public BBuffer getBuffer() {
         return buffer;
     }
+
+    @Override
+    public String toString() {
+        return "BytesEvent{}";
+    }
 }

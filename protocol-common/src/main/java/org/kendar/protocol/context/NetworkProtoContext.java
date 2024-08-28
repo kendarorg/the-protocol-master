@@ -54,8 +54,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     private BytesEvent remainingBytes;
 
-    public NetworkProtoContext(ProtoDescriptor descriptor) {
-        super(descriptor);
+    public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
     }
 
     /**
@@ -71,7 +71,12 @@ public abstract class NetworkProtoContext extends ProtoContext {
             if (remainingBytes.getBuffer().size() == 0) {
                 return null;
             }
-            message += " " + remainingBytes.getBuffer().toHexStringUpToLength(20);
+            message = event + " " + remainingBytes.getBuffer().toHexStringUpToLength(20);
+        } else {
+            message = event.toString();
+        }
+        if (!event.getTag().isEmpty()) {
+            message += " tags:" + event.getTagKeyValues();
         }
         log.error("[SERVER][??] Unknown: " + message);
         throw new UnknownCommandException("Unknown command issued: " + message);
@@ -96,12 +101,13 @@ public abstract class NetworkProtoContext extends ProtoContext {
         response.put(resultBuffer.toArray());
         //To send
         response.flip();
+        log.trace("[CL<TP][TX]: Sending back: " + returnMessage.getClass().getSimpleName());
         var res = client.write(response);
         if (res != null) {
             try {
                 res.get();
             } catch (InterruptedException | ExecutionException e) {
-                log.error("[SERVER][TX] Cannot write message: " + returnMessage.getClass().getSimpleName() + " " + e.getMessage());
+                log.error("[CL<TP][TX] Cannot write message: " + returnMessage.getClass().getSimpleName() + " " + e.getMessage());
                 throw new ConnectionExeception("Cannot write on channel");
             }
         }
@@ -281,7 +287,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
         try {
             client.close();
         } catch (IOException e) {
-            log.warn("[SERVER] Closed connection: " + executor.getClass().getSimpleName());
+            log.warn("[CL>TP] Closed connection: " + executor.getClass().getSimpleName());
         }
         super.postStop(executor);
     }

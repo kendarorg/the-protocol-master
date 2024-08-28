@@ -22,4 +22,11 @@ public class CommandEvent extends BaseEvent {
     public CommandType getCommandType() {
         return commandType;
     }
+
+    @Override
+    public String toString() {
+        return "CommandEvent{" +
+                "commandType=" + commandType +
+                '}';
+    }
 }

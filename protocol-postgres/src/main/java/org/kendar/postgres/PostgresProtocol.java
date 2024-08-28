@@ -50,8 +50,8 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     }
 
     @Override
-    public ProtoContext createContext(ProtoDescriptor protoDescriptor) {
-        var result = new PostgresProtoContext(this);
+    public ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId) {
+        var result = new PostgresProtoContext(this, contextId);
         result.setValue("PARSER", parser);
         return result;
     }

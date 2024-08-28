@@ -19,7 +19,7 @@ public abstract class SillyProtocol extends ProtoDescriptor {
 
 
     @Override
-    protected ProtoContext createContext(ProtoDescriptor protoDescriptor) {
-        return new SillyContext(this);
+    protected ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId) {
+        return new SillyContext(this, contextId);
     }
 }

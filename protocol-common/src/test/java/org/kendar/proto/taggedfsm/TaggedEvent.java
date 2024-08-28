@@ -19,4 +19,13 @@ public class TaggedEvent extends BaseEvent {
             this.getTag().add(new Tag(key, value));
         }
     }
+
+    @Override
+    public String toString() {
+        return "TaggedEvent{" +
+                "data='" + data + '\'' +
+                '}';
+    }
+
+
 }

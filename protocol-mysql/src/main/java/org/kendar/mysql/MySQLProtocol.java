@@ -48,8 +48,9 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
     }
 
     @Override
-    protected ProtoContext createContext(ProtoDescriptor protoDescriptor) {
-        var result = new MySQLProtoContext(this);
+    protected ProtoContext createContext(ProtoDescriptor protoDescriptor,
+                                         int contextId) {
+        var result = new MySQLProtoContext(this, contextId);
         result.setValue("PARSER", parser);
         return result;
     }

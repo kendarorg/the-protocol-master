@@ -11,12 +11,13 @@ import java.util.List;
 public class TaggedContext extends ProtoContext {
     private List<ReturnMessage> result = new ArrayList<>();
 
-    public TaggedContext(ProtoDescriptor descriptor, ClientServerChannel client) {
-        super(descriptor);
+    public TaggedContext(ProtoDescriptor descriptor, ClientServerChannel client,
+                         int contextId) {
+        super(descriptor, contextId);
     }
 
-    public TaggedContext(ProtoDescriptor descriptor) {
-        super(descriptor);
+    public TaggedContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
     }
 
     @Override

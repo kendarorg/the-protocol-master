@@ -6,6 +6,7 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.server.ClientServerChannel;
+import org.slf4j.MDC;
 
 /**
  * Descriptor for network protocol
@@ -27,10 +28,12 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
      */
     @Override
     public void initialize() {
-        if (hasProxy()) {
-            proxyInstance.initialize();
+        try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
+            if (hasProxy()) {
+                proxyInstance.initialize();
+            }
+            super.initialize();
         }
-        super.initialize();
     }
 
     /**
@@ -95,8 +98,8 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
      * @param client
      * @return
      */
-    public ProtoContext buildContext(ClientServerChannel client) {
-        var context = (NetworkProtoContext) createContext(this);
+    public ProtoContext buildContext(ClientServerChannel client, int contextId) {
+        var context = (NetworkProtoContext) createContext(this, contextId);
         context.setClient(client);
         if (hasProxy()) {
             var conn = proxyInstance.connect(context);

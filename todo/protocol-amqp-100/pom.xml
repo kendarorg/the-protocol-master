@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>todo</artifactId>
-        <version>1.3.4</version>
+        <version>1.4.0</version>
     </parent>
 
     <artifactId>protocol-amqp-100</artifactId>

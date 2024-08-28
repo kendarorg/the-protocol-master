@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>1.3.4</version>
+        <version>1.4.0</version>
     </parent>
 
     <artifactId>jacoco</artifactId>
@@ -81,6 +81,12 @@
                                             <include name="*.exec"/>
                                         </fileset>
                                         <fileset dir="${basedir}/../protocol-postgres/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-mqtt/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-redis/target">
                                             <include name="*.exec"/>
                                         </fileset>
                                     </executiondata>

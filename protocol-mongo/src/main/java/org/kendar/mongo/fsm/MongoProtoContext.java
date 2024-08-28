@@ -8,8 +8,8 @@ import org.kendar.proxy.ProxyConnection;
 
 public class MongoProtoContext extends NetworkProtoContext {
 
-    public MongoProtoContext(ProtoDescriptor descriptor) {
-        super(descriptor);
+    public MongoProtoContext(ProtoDescriptor descriptor, int contextId) {
+        super(descriptor, contextId);
         setValue("MONGO_PID", new ProcessId(getNewPid()));
     }
 

@@ -16,4 +16,9 @@ public class OpQueryRequest extends BaseEvent {
     public OpQueryContent getData() {
         return data;
     }
+
+    @Override
+    public String toString() {
+        return "OpQueryRequest{}";
+    }
 }

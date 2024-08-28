@@ -1,5 +1,6 @@
 package org.kendar.protocol.states;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BaseEvent;
@@ -34,6 +35,7 @@ public abstract class ProtoState {
     /**
      * If the state is optional it can fail without error
      */
+    @JsonIgnore
     private boolean optional;
 
     public ProtoState(Class<?>... messages) {

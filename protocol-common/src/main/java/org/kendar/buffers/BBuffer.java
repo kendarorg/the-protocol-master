@@ -16,7 +16,6 @@ public class BBuffer {
         this(BBufferEndianness.BE);
     }
 
-
     public BBuffer(BBufferEndianness endianness) {
         this.endianness = endianness;
     }
@@ -88,6 +87,10 @@ public class BBuffer {
         var bb = new BBuffer();
         bb.write(bytes);
         return bb;
+    }
+
+    public BBufferEndianness getEndianness() {
+        return endianness;
     }
 
     public boolean isBe() {

@@ -27,10 +27,12 @@ public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
 
     public Resp3Proxy(String connectionString, String userId, String password) {
         super(connectionString, userId, password);
+        Resp3Protocol.consumeContext.clear();
     }
 
     public Resp3Proxy() {
         super();
+        Resp3Protocol.consumeContext.clear();
     }
 
     @Override
