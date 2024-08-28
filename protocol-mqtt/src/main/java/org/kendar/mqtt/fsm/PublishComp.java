@@ -35,14 +35,14 @@ public class PublishComp extends BasePropertiesMqttState implements ReturnMessag
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
 
         var context = (MqttContext) event.getContext();
-        var publishRec = new PublishComp();
-        publishRec.setPacketIdentifier(bb.getShort());
-        publishRec.setFullFlag(event.getFullFlag());
+        var publishComp = new PublishComp();
+        publishComp.setPacketIdentifier(bb.getShort());
+        publishComp.setFullFlag(event.getFullFlag());
 
-        publishRec.setProtocolVersion(context.getProtocolVersion());
-        if (publishRec.isVersion(MqttProtocol.VERSION_5)) {
-            publishRec.setReasonCode(bb.get());
-            readProperties(publishRec, bb);
+        publishComp.setProtocolVersion(context.getProtocolVersion());
+        if (publishComp.isVersion(MqttProtocol.VERSION_5)) {
+            publishComp.setReasonCode(bb.get());
+            readProperties(publishComp, bb);
         }
         if (isProxyed()) {
             var proxy = (MqttProxy) context.getProxy();
@@ -50,10 +50,10 @@ public class PublishComp extends BasePropertiesMqttState implements ReturnMessag
 
             return iteratorOfRunnable(() -> proxy.sendAndForget(context,
                     connection,
-                    publishRec
+                    publishComp
             ));
         }
-        return iteratorOfList(publishRec);
+        return iteratorOfList(publishComp);
     }
 
     public short getPacketIdentifier() {

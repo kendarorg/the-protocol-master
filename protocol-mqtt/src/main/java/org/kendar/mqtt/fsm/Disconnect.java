@@ -41,13 +41,18 @@ public class Disconnect extends BasePropertiesMqttState implements ReturnMessage
         var context = (MqttContext) event.getContext();
         var disconnect = new Disconnect();
         disconnect.setFullFlag(event.getFullFlag());
+        var proxy = (MqttProxy) context.getProxy();
+        if (proxy != null && proxy.isReplayer()) {
+            return iteratorOfList(new Stop());
+        }
+
+
 
         disconnect.setProtocolVersion(context.getProtocolVersion());
         if (disconnect.isVersion(MqttProtocol.VERSION_5)) {
             disconnect.setReasonCode(bb.get());
             readProperties(disconnect, bb);
         }
-        var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
 
