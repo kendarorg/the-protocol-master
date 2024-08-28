@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class SubscribeTest extends BasicTest {
 
     public static final String MESSAGE_CONTENT = "Hello World!!";

@@ -101,6 +101,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
         response.put(resultBuffer.toArray());
         //To send
         response.flip();
+        log.trace("[CL<TP][TX]: Sending back: " + returnMessage.getClass().getSimpleName());
         var res = client.write(response);
         if (res != null) {
             try {

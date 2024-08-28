@@ -14,6 +14,7 @@ import java.util.UUID;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class SimpleTest extends BasicTest {
 
     public static final String MESSAGE_CONTENT = "Hello World!!";

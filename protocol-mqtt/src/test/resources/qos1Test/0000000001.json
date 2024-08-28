@@ -1,0 +1,33 @@
+{
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 1,
+  "input" : {
+    "type" : "Connect",
+    "data" : {
+      "uuid" : "3",
+      "protocolVersion" : 4,
+      "fullFlag" : 16,
+      "fixedHeader" : "CONNECT",
+      "protocolName" : "MQTT",
+      "connectFlags" : 2,
+      "keepAlive" : 60,
+      "willQos" : 0,
+      "willRetain" : false,
+      "clientId" : "7d39c267-1dee-4972-b0d9-2fd39d2b9b45"
+    }
+  },
+  "output" : {
+    "type" : "ConnectAck",
+    "data" : {
+      "uuid" : "6",
+      "fullFlag" : 32,
+      "fixedHeader" : "CONNACK",
+      "sessionSet" : false,
+      "connectReasonCode" : 0
+    }
+  },
+  "durationMs" : 8,
+  "type" : "Connect",
+  "caller" : "MQTT"
+}

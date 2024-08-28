@@ -1,0 +1,27 @@
+{
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 2,
+  "input" : {
+    "type" : "Subscribe",
+    "data" : {
+      "uuid" : "10",
+      "fullFlag" : -126,
+      "fixedHeader" : "SUBSCRIBE",
+      "payload" : "AAsvc3Vic2NyaWJlLwA=",
+      "packetIdentifier" : 1
+    }
+  },
+  "output" : {
+    "type" : "SubscribeAck",
+    "data" : {
+      "uuid" : "13",
+      "fullFlag" : -112,
+      "fixedHeader" : "SUBACK",
+      "packetIdentifier" : 1
+    }
+  },
+  "durationMs" : 11,
+  "type" : "Subscribe",
+  "caller" : "MQTT"
+}

@@ -57,9 +57,6 @@ public class BasicTest {
     }
 
     public static void beforeClassBase() throws IOException {
-        //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
-        //var classpathLoader = new ClasspathResourceLoader();
-        //final var classPathConfig = new ResourceLoaderConfig(classpathLoader);
         var classpathLoader = new FileResourceLoader(new File("moquette.conf"));
         final var classPathConfig = new ResourceLoaderConfig(classpathLoader);
 
@@ -73,17 +70,6 @@ public class BasicTest {
             mqttBroker.stopServer();
             System.out.println("Broker stopped");
         }));
-//
-//        var dockerHost = Utils.getDockerHost();
-//        assertNotNull(dockerHost);
-//        var network = Network.newNetwork();
-//        rabbitContainer = new RabbitMqImage();
-//        rabbitContainer
-//                .withNetwork(network)
-//                .waitingForPort(5672)
-//                .start();
-
-
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
@@ -140,4 +126,5 @@ public class BasicTest {
 //            System.out.println("Session event loop reported error: " + error);
 //        }
     }
+
 }

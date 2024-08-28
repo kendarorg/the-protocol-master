@@ -1,5 +1,5 @@
 * ConnectAck reason code translation
-* Replay
+* Reduce the size of recording
 
 ### DONE
 
