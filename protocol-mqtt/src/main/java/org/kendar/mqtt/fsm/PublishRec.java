@@ -12,7 +12,7 @@ import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
 
-public class PublishRec extends BaseMqttState implements ReturnMessage {
+public class PublishRec extends BasePropertiesMqttState implements ReturnMessage {
     private short packetIdentifier;
     private byte reasonCode;
 

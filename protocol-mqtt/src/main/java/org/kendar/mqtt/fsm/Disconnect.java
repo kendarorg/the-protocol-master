@@ -14,7 +14,7 @@ import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
 
-public class Disconnect extends BaseMqttState implements ReturnMessage, InterruptProtoState {
+public class Disconnect extends BasePropertiesMqttState implements ReturnMessage, InterruptProtoState {
 
     private byte reasonCode;
 

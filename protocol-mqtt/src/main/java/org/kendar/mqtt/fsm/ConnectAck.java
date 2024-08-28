@@ -1,5 +1,6 @@
 package org.kendar.mqtt.fsm;
 
+import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
@@ -8,7 +9,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 
 import java.util.Iterator;
 
-public class ConnectAck extends BaseMqttState implements ReturnMessage {
+public class ConnectAck extends BasePropertiesMqttState implements ReturnMessage {
     private boolean sessionSet;
     private byte connectReasonCode;
 
@@ -45,6 +46,7 @@ public class ConnectAck extends BaseMqttState implements ReturnMessage {
         readProperties(connect,bb);
         connect.setSessionSet(sessionSet);
         connect.setConnectReasonCode(connectReasonCode);
+        connect.setProtocolVersion(((MqttContext)event.getContext()).getProtocolVersion());
         connect.setFullFlag(event.getFullFlag());
         //WAs it not varinteger
 

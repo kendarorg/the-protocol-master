@@ -9,7 +9,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 
 import java.util.Iterator;
 
-public class SubscribeAck extends BaseMqttState implements ReturnMessage {
+public class SubscribeAck extends BasePropertiesMqttState implements ReturnMessage {
     private short packetIdentifier;
 
     public SubscribeAck(Class<?>... events) {

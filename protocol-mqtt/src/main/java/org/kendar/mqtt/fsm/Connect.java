@@ -11,7 +11,7 @@ import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
 
-public class Connect extends BaseMqttState {
+public class Connect extends BasePropertiesMqttState {
     private String protocolName;
     private int connectFlags;
     private short keepAlive;
@@ -22,6 +22,7 @@ public class Connect extends BaseMqttState {
     private String password;
     private String willTopic;
     private String willMessage;
+    private int protocolVersion;
 
     public Connect(MqttFixedHeader fixedHeader, String protocolName, int protocolVersion,
                    int connectFlags, short keepAlive, int willQos, boolean willRetain) {
@@ -214,5 +215,17 @@ public class Connect extends BaseMqttState {
         if (passwordFlag) {
             rb.writeUtf8String(password);
         }
+    }
+
+    @Override
+    public int getProtocolVersion() {
+
+        return protocolVersion;
+    }
+
+    @Override
+    public void setProtocolVersion(int protocolVersion) {
+        super.setProtocolVersion(protocolVersion);
+        this.protocolVersion = protocolVersion;
     }
 }

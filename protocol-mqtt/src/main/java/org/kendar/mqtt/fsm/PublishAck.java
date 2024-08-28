@@ -10,7 +10,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 
 import java.util.Iterator;
 
-public class PublishAck extends BaseMqttState implements ReturnMessage {
+public class PublishAck extends BasePropertiesMqttState implements ReturnMessage {
     private short packetIdentifier;
     private byte reasonCode;
 

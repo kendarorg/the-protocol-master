@@ -15,7 +15,7 @@ import java.util.Iterator;
 /**
  * https://www.emqx.com/en/blog/mqtt-5-0-control-packets-02-publish-puback
  */
-public class Publish extends BaseMqttState {
+public class Publish extends BasePropertiesMqttState {
     protected static final JsonMapper mapper = new JsonMapper();
     private String topicName;
     private byte[] payload;

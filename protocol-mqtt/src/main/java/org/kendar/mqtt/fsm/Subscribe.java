@@ -13,7 +13,7 @@ import java.util.Iterator;
 /**
  * https://www.emqx.com/en/blog/mqtt-5-0-control-packets-02-publish-puback
  */
-public class Subscribe extends BaseMqttState {
+public class Subscribe extends BasePropertiesMqttState {
 
     private byte[] payload;
     private short packetIdentifier;

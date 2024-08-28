@@ -13,7 +13,7 @@ import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
-public class PublishRel extends BaseMqttState implements ReturnMessage {
+public class PublishRel extends BasePropertiesMqttState implements ReturnMessage {
     protected static final JsonMapper mapper = new JsonMapper();
     private short packetIdentifier;
     private byte reasonCode;

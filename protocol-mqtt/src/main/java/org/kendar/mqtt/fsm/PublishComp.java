@@ -12,7 +12,7 @@ import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
 
-public class PublishComp extends BaseMqttState implements ReturnMessage {
+public class PublishComp extends BasePropertiesMqttState implements ReturnMessage {
     private short packetIdentifier;
     private byte reasonCode;
 
