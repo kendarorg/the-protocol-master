@@ -37,7 +37,7 @@ public class SubscribeAck extends BasePropertiesMqttState implements ReturnMessa
         subscribeAck.setFullFlag(event.getFullFlag());
 
         subscribeAck.setProtocolVersion(context.getProtocolVersion());
-        readProperties( subscribeAck, bb);
+        readProperties(subscribeAck, bb);
         return iteratorOfList(subscribeAck);
     }
 

@@ -13,22 +13,12 @@ import java.util.Iterator;
 
 public abstract class BaseMqttState extends ProtoState implements
         NetworkReturnMessage {
-    private byte fullFlag;
     @JsonIgnore
     protected int protocolVersion;
+    private byte fullFlag;
     private MqttFixedHeader fixedHeader;
     @JsonIgnore
     private boolean proxyed;
-
-
-    public boolean isVersion(int expectedVersion) {
-        return protocolVersion == expectedVersion;
-    }
-
-    public int getProtocolVersion() {
-        return protocolVersion;
-    }
-
 
 
     public BaseMqttState() {
@@ -39,6 +29,13 @@ public abstract class BaseMqttState extends ProtoState implements
         super(events);
     }
 
+    public boolean isVersion(int expectedVersion) {
+        return protocolVersion == expectedVersion;
+    }
+
+    public int getProtocolVersion() {
+        return protocolVersion;
+    }
 
     public void setProtocolVersion(int protocolVersion) {
         this.protocolVersion = protocolVersion;

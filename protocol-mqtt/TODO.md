@@ -1,8 +1,9 @@
 * ConnectAck reason code translation
-* MqttStorage, clean with dto or something
+* Replay
 
 ### DONE
 
+* MqttStorage, clean with dto or something
 * Replayer test for redis
 * MqttContext disconnect
 * Strange connectionid value

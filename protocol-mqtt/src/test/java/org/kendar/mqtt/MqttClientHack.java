@@ -19,7 +19,7 @@ public class MqttClientHack extends MqttClient {
         super(serverURI, publisherId);
     }
 
-    public void pingreq()  throws MqttException {
+    public void pingreq() throws MqttException {
 
         try {
             MqttDeliveryToken token = new MqttDeliveryToken(getClientId());
@@ -30,10 +30,10 @@ public class MqttClientHack extends MqttClient {
             privateField.setAccessible(true);
 
             // Store the value of private field in variable
-            var name = (ClientComms)privateField.get(aClient);
+            var name = (ClientComms) privateField.get(aClient);
 
             name.sendNoWait(pingMsg, token);
-        }catch (NoSuchFieldException |IllegalAccessException ex){
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
             throw new MqttException(ex);
         }
 

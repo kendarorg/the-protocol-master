@@ -222,8 +222,8 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         var bufferToWrite = protocol.buildBuffer();
         sock.write(of, bufferToWrite);
         var returnMessages = sock.read(toRead, optional);
-        for(var item : returnMessages) {
-            if(toRead.getClass()==item.getClass()) {
+        for (var item : returnMessages) {
+            if (toRead.getClass() == item.getClass()) {
                 toRead = (T) item;
                 break;
             }

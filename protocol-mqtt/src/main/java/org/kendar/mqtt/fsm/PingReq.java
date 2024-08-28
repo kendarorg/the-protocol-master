@@ -39,11 +39,11 @@ public class PingReq extends BaseMqttState implements ReturnMessage, InterruptPr
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
         return iteratorOfRunner(() ->
-            proxy.sendAndExpect(context,
-                    connection,
-                    pingReq,
-                    new PingResp()
-            )
+                proxy.sendAndExpect(context,
+                        connection,
+                        pingReq,
+                        new PingResp()
+                )
         );
     }
 }

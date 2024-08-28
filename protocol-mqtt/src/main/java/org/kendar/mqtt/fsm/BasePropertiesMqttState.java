@@ -10,6 +10,7 @@ import java.util.List;
 
 public abstract class BasePropertiesMqttState extends BaseMqttState {
     private List<Mqtt5Property> properties;
+
     public BasePropertiesMqttState() {
         super();
     }

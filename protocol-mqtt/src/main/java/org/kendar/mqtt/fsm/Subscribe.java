@@ -46,7 +46,7 @@ public class Subscribe extends BasePropertiesMqttState {
         publish.setPacketIdentifier(bb.getShort());
         publish.setProtocolVersion(context.getProtocolVersion());
         //Variable header for MQTT >=5
-        readProperties( publish, bb);
+        readProperties(publish, bb);
 
         publish.setPayload(bb.getRemaining());
 

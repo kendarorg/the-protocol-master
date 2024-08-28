@@ -104,7 +104,7 @@ public class Main {
             } else if (protocol.equalsIgnoreCase("redis")) {
                 if (port == -1) port = 6379;
                 runRedis(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
-            }else if (protocol.equalsIgnoreCase("mqtt")) {
+            } else if (protocol.equalsIgnoreCase("mqtt")) {
                 if (port == -1) port = 1883;
                 runMqtt(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
             } else {
@@ -148,9 +148,11 @@ public class Main {
                 System.out.println("Exiting");
                 stop();
                 return false;
-            } else {
+            } else if(line!=null){
                 System.out.println("Command not recognized: " + line.trim());
                 return true;
+            }else{
+                return false;
             }
         } catch (Exception ex) {
             System.out.println("Exiting");
@@ -199,7 +201,7 @@ public class Main {
         }
         if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
 
-            handleReplacementQueries(jdbcReplaceQueries, (JdbcProxy) proxy);
+            handleReplacementQueries(jdbcReplaceQueries, proxy);
         }
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

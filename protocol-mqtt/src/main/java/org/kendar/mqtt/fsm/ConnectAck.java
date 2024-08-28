@@ -43,10 +43,10 @@ public class ConnectAck extends BasePropertiesMqttState implements ReturnMessage
         var sessionSet = (connectAckFlag & 0x01) == 0x01;
         //TODOMQTT 3.2.2.2 Connect Reason Code
         var connectReasonCode = bb.get();
-        readProperties(connect,bb);
+        readProperties(connect, bb);
         connect.setSessionSet(sessionSet);
         connect.setConnectReasonCode(connectReasonCode);
-        connect.setProtocolVersion(((MqttContext)event.getContext()).getProtocolVersion());
+        connect.setProtocolVersion(((MqttContext) event.getContext()).getProtocolVersion());
         connect.setFullFlag(event.getFullFlag());
         //WAs it not varinteger
 

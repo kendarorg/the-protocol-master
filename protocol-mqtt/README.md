@@ -18,7 +18,7 @@ at the moment)
 
 ## Interesting informations
 
-At the moment the test is based on the moquette MQTT server, since it can be 
+At the moment the test is based on the moquette MQTT server, since it can be
 embedded directly into any java application and does not require testcontainers
 
 The client used is the paho mqtt client for Java, it's the simplest I have
@@ -26,6 +26,6 @@ found. There is only a small trick to force the creation of a PINGREQ packet
 that involve a couple of reflection tricks (check the MqttClientHack class in the
 test section)
 
-When the Paho client does not know what packet identifier it should generate, 
-simply create a new one. This happened for example when during development i 
+When the Paho client does not know what packet identifier it should generate,
+simply create a new one. This happened for example when during development i
 had not set the packet Identifier when returning a PUBREL packet

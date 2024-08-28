@@ -163,7 +163,7 @@ public class Connect extends BasePropertiesMqttState {
                 willRetainFlag
         );
         //Variable header for MQTT >=5
-        readProperties( connect, bb);
+        readProperties(connect, bb);
 
         connect.setFullFlag(event.getFullFlag());
         //Payload

@@ -76,7 +76,7 @@ public class TcpServer {
                 try {
                     run();
                 } catch (IOException | ExecutionException | InterruptedException e) {
-                    if(!(e.getCause() instanceof AsynchronousCloseException)) {
+                    if (!(e.getCause() instanceof AsynchronousCloseException)) {
                         throw new RuntimeException(e);
                     }
                 }

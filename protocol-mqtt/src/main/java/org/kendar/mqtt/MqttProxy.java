@@ -18,9 +18,10 @@ import java.util.List;
 
 public class MqttProxy extends NetworkProxy<MqttStorage> {
 
-    public MqttProxy(){
-        super(null,null,null);
+    public MqttProxy() {
+        super(null, null, null);
     }
+
     public MqttProxy(String connectionString, String userId, String password) {
         super(connectionString, userId, password);
     }

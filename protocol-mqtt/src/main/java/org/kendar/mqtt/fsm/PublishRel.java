@@ -46,14 +46,14 @@ public class PublishRel extends BasePropertiesMqttState implements ReturnMessage
         publishRel.setProtocolVersion(context.getProtocolVersion());
         if (publishRel.isVersion(MqttProtocol.VERSION_5)) {
             publishRel.setReasonCode(bb.get());
-            readProperties( publishRel, bb);
+            readProperties(publishRel, bb);
         }
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        if(isProxyed()){
+        if (isProxyed()) {
             return iteratorOfList(publishRel);
-        }else {
+        } else {
             var finalPublishRel = publishRel;
             return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                     connection,

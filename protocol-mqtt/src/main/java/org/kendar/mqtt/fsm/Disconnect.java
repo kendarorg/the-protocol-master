@@ -35,6 +35,7 @@ public class Disconnect extends BasePropertiesMqttState implements ReturnMessage
             writeProperties(rb);
         }
     }
+
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
         var context = (MqttContext) event.getContext();
@@ -44,7 +45,7 @@ public class Disconnect extends BasePropertiesMqttState implements ReturnMessage
         disconnect.setProtocolVersion(context.getProtocolVersion());
         if (disconnect.isVersion(MqttProtocol.VERSION_5)) {
             disconnect.setReasonCode(bb.get());
-            readProperties( disconnect, bb);
+            readProperties(disconnect, bb);
         }
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
