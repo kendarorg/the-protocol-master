@@ -83,6 +83,12 @@
                                         <fileset dir="${basedir}/../protocol-postgres/target">
                                             <include name="*.exec"/>
                                         </fileset>
+                                        <fileset dir="${basedir}/../protocol-mqtt/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-redis/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
                                     </executiondata>
                                     <structure name="Integration Tests Coverage Report">
                                         <sourcefiles encoding="UTF-8">

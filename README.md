@@ -37,6 +37,9 @@ several database wire protocol implementations:
     * Support for subscriptions
     * Support for push parsing
     * RESP2 and RESP3 supported out of the box
+* [Mqtt](protocol-mqtt/README.md)
+    * Support QOS 1,2,3
+    * Support 3.x and 5.x protocols
 
 ## If you like it Buy me a coffe :)
 
