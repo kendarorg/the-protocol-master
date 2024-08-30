@@ -39,8 +39,9 @@ public class ConnectionOpenOk extends Connection {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.reserved1 = ShortStringHelper.read(rb);
-        return iteratorOfList(this);
+        var result = new ConnectionOpenOk();
+        result.setReserved1(ShortStringHelper.read(rb));
+        return iteratorOfList(result);
     }
 
 

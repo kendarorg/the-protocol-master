@@ -90,11 +90,12 @@ public class ConnectionStart extends Connection {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.versionMajor = rb.get();
-        this.versionMinor = rb.get();
-        this.serverProperties = FieldsReader.readTable(rb);
-        this.mechanisms = LongStringHelper.read(rb).split(" ");
-        this.locales = LongStringHelper.read(rb).split(" ");
-        return iteratorOfList(this);
+        var result = new ConnectionStart();
+        result.setVersionMajor(rb.get());
+        result.setVersionMinor(rb.get());
+        result.setServerProperties(FieldsReader.readTable(rb));
+        result.setMechanisms(LongStringHelper.read(rb).split(" "));
+        result.setLocales( LongStringHelper.read(rb).split(" "));
+        return iteratorOfList(result);
     }
 }

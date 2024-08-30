@@ -65,10 +65,11 @@ public class ConnectionTune extends Connection {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.channelMax = rb.getShort();
-        this.frameMax = rb.getInt();
-        this.hearthBeat = rb.getShort();
-        return iteratorOfList(this);
+        var result = new ConnectionTune();
+        result.setChannelMax(rb.getShort());
+        result.setFrameMax(rb.getInt());
+        result.setHearthBeat(rb.getShort());
+        return iteratorOfList(result);
     }
 
 

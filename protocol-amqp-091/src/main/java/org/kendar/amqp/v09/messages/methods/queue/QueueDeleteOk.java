@@ -41,8 +41,9 @@ public class QueueDeleteOk extends Queue {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.setChannel(channel);
-        this.messageCount = rb.getInt();
-        return iteratorOfList(this);
+        var result = new QueueDeleteOk();
+        result.setChannel(channel);
+        result.setMessageCount(rb.getInt());
+        return iteratorOfList(result);
     }
 }

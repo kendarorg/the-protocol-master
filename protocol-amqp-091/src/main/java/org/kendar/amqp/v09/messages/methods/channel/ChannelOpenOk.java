@@ -39,11 +39,11 @@ public class ChannelOpenOk extends Channel {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
+        var result = new ChannelOpenOk();
+        result.setChannel(channel);
+        result.setReserved1(LongStringHelper.read(rb));
 
-        this.setChannel(channel);
-        this.reserved1 = LongStringHelper.read(rb);
 
-
-        return iteratorOfList(this);
+        return iteratorOfList(result);
     }
 }

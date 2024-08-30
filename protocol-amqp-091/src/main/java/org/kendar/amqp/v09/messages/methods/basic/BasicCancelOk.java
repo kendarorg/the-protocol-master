@@ -51,9 +51,9 @@ public class BasicCancelOk extends Basic {
 
         var bd = new BasicCancelOk();
         bd.setChannel(channel);
-        bd.consumerTag = ShortStringHelper.read(rb);
+        bd.setConsumerTag(ShortStringHelper.read(rb));
         //DOUBT Should'nt we send the newly created BasicCancelOk
 
-        return iteratorOfList(this);
+        return iteratorOfList(bd);
     }
 }

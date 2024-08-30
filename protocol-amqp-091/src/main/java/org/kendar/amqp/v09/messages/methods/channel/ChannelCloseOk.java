@@ -26,7 +26,8 @@ public class ChannelCloseOk extends Channel {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.setChannel(channel);
-        return iteratorOfList(this);
+        var result = new ChannelCloseOk();
+        result.setChannel(channel);
+        return iteratorOfList(result);
     }
 }

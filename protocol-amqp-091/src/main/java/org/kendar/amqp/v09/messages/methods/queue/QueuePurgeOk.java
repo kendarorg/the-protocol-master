@@ -41,8 +41,9 @@ public class QueuePurgeOk extends Queue {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.setChannel(channel);
-        this.messageCount = rb.getInt();
-        return iteratorOfList(this);
+        var result = new QueuePurgeOk();
+        result.setMessageCount(rb.getInt());
+        result.setChannel(channel);
+        return iteratorOfList(result);
     }
 }

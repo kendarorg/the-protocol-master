@@ -91,13 +91,13 @@ public class BasicGetOk extends Basic {
 
         var bd = new BasicGetOk();
         bd.setChannel(channel);
-        bd.deliveryTag = rb.getLong();
-        bd.redelivered = rb.get() > 0;
-        bd.exchange = ShortStringHelper.read(rb);
-        bd.routingKey = ShortStringHelper.read(rb);
-        bd.messageCount = rb.getInt();
+        bd.setDeliveryTag(rb.getLong());
+        bd.setRedelivered(rb.get() > 0);
+        bd.setExchange(ShortStringHelper.read(rb));
+        bd.setRoutingKey(ShortStringHelper.read(rb));
+        bd.setMessageCount(rb.getInt());
 
 
-        return iteratorOfList(this);
+        return iteratorOfList(bd);
     }
 }
