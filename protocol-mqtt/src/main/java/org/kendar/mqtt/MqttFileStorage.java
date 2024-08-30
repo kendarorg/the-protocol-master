@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class MqttFileStorage extends BaseFileStorage<JsonNode, JsonNode> implements MqttStorage {
     private static final Logger log = LoggerFactory.getLogger(MqttFileStorage.class);
-    private static final List<String> toAvoid = List.of("Disconnect","PingReq");
+    private static final List<String> toAvoid = List.of("Disconnect", "PingReq");
     private final List<StorageItem<JsonNode, JsonNode>> inMemoryDb = new ArrayList<>();
     private final List<StorageItem<JsonNode, JsonNode>> compareData = new ArrayList<>();
     private final List<StorageItem<JsonNode, JsonNode>> outItems = new ArrayList<>();

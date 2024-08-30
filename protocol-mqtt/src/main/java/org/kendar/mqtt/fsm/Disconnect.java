@@ -47,7 +47,6 @@ public class Disconnect extends BasePropertiesMqttState implements ReturnMessage
         }
 
 
-
         disconnect.setProtocolVersion(context.getProtocolVersion());
         if (disconnect.isVersion(MqttProtocol.VERSION_5)) {
             disconnect.setReasonCode(bb.get());

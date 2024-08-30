@@ -95,7 +95,7 @@ public class ConnectionStart extends Connection {
         result.setVersionMinor(rb.get());
         result.setServerProperties(FieldsReader.readTable(rb));
         result.setMechanisms(LongStringHelper.read(rb).split(" "));
-        result.setLocales( LongStringHelper.read(rb).split(" "));
+        result.setLocales(LongStringHelper.read(rb).split(" "));
         return iteratorOfList(result);
     }
 }

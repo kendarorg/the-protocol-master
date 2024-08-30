@@ -66,7 +66,7 @@ public class QueueDeclareOk extends Queue {
         result.setChannel(channel);
         result.setQueueName(ShortStringHelper.read(rb));
         result.setMessageCount(rb.getInt());
-        result.setConsumerCount( rb.getInt());
+        result.setConsumerCount(rb.getInt());
         return iteratorOfList(result);
     }
 }

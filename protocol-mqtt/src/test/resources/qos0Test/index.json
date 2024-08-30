@@ -1,35 +1,40 @@
-[ {
-  "index" : 1,
-  "type" : "Connect",
-  "caller" : "MQTT",
-  "durationMs" : 64,
-  "tags" : {
-    "output" : "ConnectAck",
-    "input" : "Connect"
+[
+  {
+    "index": 1,
+    "type": "Connect",
+    "caller": "MQTT",
+    "durationMs": 64,
+    "tags": {
+      "output": "ConnectAck",
+      "input": "Connect"
+    }
+  },
+  {
+    "index": 2,
+    "type": "Subscribe",
+    "caller": "MQTT",
+    "durationMs": 11,
+    "tags": {
+      "output": "SubscribeAck",
+      "input": "Subscribe"
+    }
+  },
+  {
+    "index": 3,
+    "type": "Publish",
+    "caller": "MQTT",
+    "durationMs": 0,
+    "tags": {
+      "input": "Publish"
+    }
+  },
+  {
+    "index": 4,
+    "type": "RESPONSE",
+    "caller": "MQTT",
+    "durationMs": 0,
+    "tags": {
+      "output": "Publish"
+    }
   }
-}, {
-  "index" : 2,
-  "type" : "Subscribe",
-  "caller" : "MQTT",
-  "durationMs" : 11,
-  "tags" : {
-    "output" : "SubscribeAck",
-    "input" : "Subscribe"
-  }
-}, {
-  "index" : 3,
-  "type" : "Publish",
-  "caller" : "MQTT",
-  "durationMs" : 0,
-  "tags" : {
-    "input" : "Publish"
-  }
-}, {
-  "index" : 4,
-  "type" : "RESPONSE",
-  "caller" : "MQTT",
-  "durationMs" : 0,
-  "tags" : {
-    "output" : "Publish"
-  }
-} ]
+]

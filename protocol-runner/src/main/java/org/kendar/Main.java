@@ -148,10 +148,10 @@ public class Main {
                 System.out.println("Exiting");
                 stop();
                 return false;
-            } else if(line!=null){
+            } else if (line != null) {
                 System.out.println("Command not recognized: " + line.trim());
                 return true;
-            }else{
+            } else {
                 return false;
             }
         } catch (Exception ex) {

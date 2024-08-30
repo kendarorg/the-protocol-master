@@ -81,7 +81,7 @@ public class ReplayerTest {
             var mesg = messages.get(0);
             assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
             assertEquals(0, mesg.getQos());
-        }finally {
+        } finally {
             protocolServer.stop();
         }
 
@@ -128,7 +128,7 @@ public class ReplayerTest {
             var mesg = messages.get(0);
             assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
             assertEquals(1, mesg.getQos());
-        }finally {
+        } finally {
             protocolServer.stop();
         }
     }
@@ -175,7 +175,7 @@ public class ReplayerTest {
             var mesg = messages.get(0);
             assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
             assertEquals(2, mesg.getQos());
-        }finally {
+        } finally {
             protocolServer.stop();
         }
 

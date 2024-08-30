@@ -23,6 +23,8 @@ import java.util.List;
 
 public class MqttProxy extends NetworkProxy<MqttStorage> {
 
+    private static final Logger log = LoggerFactory.getLogger(MqttProxy.class);
+
     public MqttProxy() {
         super();
     }
@@ -59,8 +61,6 @@ public class MqttProxy extends NetworkProxy<MqttStorage> {
         return mapper.deserialize(out.get("data").toString(), aClass);
     }
 
-    private static final Logger log = LoggerFactory.getLogger(MqttProxy.class);
-
     @Override
     protected void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
         if (storageItems.isEmpty()) return;
@@ -79,7 +79,7 @@ public class MqttProxy extends NetworkProxy<MqttStorage> {
                     fr = pb;
                     break;
                 default:
-                    throw new RuntimeException("MISSING "+clazz);
+                    throw new RuntimeException("MISSING " + clazz);
 
             }
             if (fr != null) {
