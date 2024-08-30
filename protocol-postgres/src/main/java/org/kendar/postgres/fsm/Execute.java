@@ -32,16 +32,16 @@ public class Execute extends PostgresState {
         var portal = message.getString();
         var maxRecords = message.getInt();
         var bindMessage = (Binding) postgresContext.getValue("PORTAL_" + portal);
-        Parse parseMessage = null;
+
         if (bindMessage == null) {
             bindMessage = new Binding(null, null, new ArrayList<>(), new ArrayList<>());
         }
-        parseMessage = (Parse) postgresContext.getValue(bindMessage.getStatement());
+        var parseMessage = (Parse) postgresContext.getValue(bindMessage.getStatement());
         parseMessage.getBinds().remove("PORTAL_" + portal);
         var executor = new PostgresExecutor();
 
 
-        log.debug("[SERVER][STMTEXEC]: Max:" + maxRecords + " Query:" + parseMessage.getQuery());
+        log.debug("[SERVER][STMTEXEC]: Max:{} Query:{}", maxRecords, parseMessage.getQuery());
         var res = executor.executePortal(
                 protoContext, parseMessage, bindMessage, maxRecords,
                 bindMessage.isDescribable() || parseMessage.isDescribable(),

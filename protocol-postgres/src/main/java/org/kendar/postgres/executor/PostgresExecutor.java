@@ -151,7 +151,7 @@ public class PostgresExecutor {
         } catch (RuntimeException e) {
             var uuid = UUID.randomUUID().toString();
             log.error("[SERVER] Runtime Error {} {}", uuid, e.getMessage());
-            log.error("[SERVER] Runtime Error " + uuid, e);
+            log.error("[SERVER] Runtime Error {}", uuid, e);
 
             return new ExecutorResult(ProtoState.iteratorOfList(new ErrorResponse(e.getMessage()))).runNow();
         }
@@ -236,7 +236,7 @@ public class PostgresExecutor {
             maxRecords = Integer.MAX_VALUE;
         }
         var matcher = PostgresCallConverter.convertToJdbc(parsed.getValue(), binding.getParameterValues());
-        SelectResult resultSet = null;
+        SelectResult resultSet;
         if (!matcher.equalsIgnoreCase(parsed.getValue())) {
             resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(
                     protoContext.getContextId(), parsed.getType() == SqlStringType.INSERT,

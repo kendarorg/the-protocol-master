@@ -26,6 +26,6 @@ public class ComStmtPrepareOk extends MySQLReturnMessage {
         resultBuffer.writeUB2((int) resultFields);
         resultBuffer.writeUB2((int) parameterFields);
         resultBuffer.write((byte) 0x00);
-        resultBuffer.writeUB2((int) 0x00);
+        resultBuffer.writeUB2(0x00);
     }
 }

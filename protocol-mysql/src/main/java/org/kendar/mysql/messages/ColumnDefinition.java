@@ -58,7 +58,7 @@ public class ColumnDefinition extends MySQLReturnMessage {
     }
 
     private int toMysql(JDBCType columnType) {
-        MySQLType value = MySQLType.MYSQL_TYPE_VARCHAR;
+        MySQLType value;
         switch (columnType) {
             case BOOLEAN:
             case BIT:

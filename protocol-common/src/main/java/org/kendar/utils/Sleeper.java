@@ -44,6 +44,25 @@ public class Sleeper {
         throw new RuntimeException("Sleeper sleep timed out");
     }
 
+    public static void sleepNoException(long timeoutMillis, BooleanSupplier booleanSupplier) {
+        try {
+            Object obj = new Object();
+            var times = (int) timeoutMillis / 100;
+            for (int i = 0; i < 100; i++) {
+                synchronized (obj) {
+                    obj.wait(times);
+                }
+                if (booleanSupplier.getAsBoolean()) {
+                    return;
+                }
+            }
+
+        } catch (Exception ex) {
+
+        }
+        System.out.println("Sleeper sleep timed out with no answer");
+    }
+
     /**
      * Give control to other threads
      */

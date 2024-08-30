@@ -80,7 +80,7 @@ public class Resp3MessageTranslator extends ProtoState implements NetworkReturnM
 
 
         if (!this.proxy) {
-            log.debug("[SERVER ][RX]: " + mapper.serialize(result));
+            log.debug("[SERVER ][RX]: {}", mapper.serialize(result));
             event.getContext().send(new Resp3Message(event.getContext(), event.getPrevState(), result, input.getPreString()));
             return iteratorOfEmpty();
         } else {

@@ -241,7 +241,7 @@ public class Resp3Parser {
         } catch (Resp3ParseException ex) {
             throw new Resp3ParseException("Invalid bulk string length", ex.isMissingData());
         }
-        String content = null;
+        String content;
         if (length == -1) {
             return new RespVerbatimString();
         }

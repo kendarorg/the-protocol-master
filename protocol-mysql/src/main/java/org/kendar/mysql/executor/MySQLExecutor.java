@@ -137,7 +137,7 @@ public class MySQLExecutor {
         } catch (RuntimeException e) {
             var uuid = UUID.randomUUID().toString();
             log.error("[SERVER] Runtime Error {} {}", uuid, e.getMessage());
-            log.error("[SERVER] Runtime Error " + uuid, e);
+            log.error("[SERVER] Runtime Error {}", uuid, e);
 
             return runExceptionInternal(protoContext, e);
         }
@@ -211,7 +211,7 @@ public class MySQLExecutor {
             maxRecords = Integer.MAX_VALUE;
         }
         var matcher = parsed.getValue();
-        SelectResult resultSet = null;
+        SelectResult resultSet;
         if (!matcher.equalsIgnoreCase(parsed.getValue())) {
             resultSet = ((JdbcProxy) protoContext.getProxy()).executeQuery(protoContext.getContextId(),
                     parsed.getType() == SqlStringType.INSERT,

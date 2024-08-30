@@ -37,7 +37,7 @@ public class Query extends PostgresState {
         var bindMessage = new Binding("STATEMENT_" + fakePortalStatement, "PORTAL_" + fakePortalStatement, new ArrayList<>(), new ArrayList<>());
         var parseMessage = new Parse("STATEMENT_" + fakePortalStatement, query, new ArrayList<>(), new ArrayList<>());
 
-        log.debug("[SERVER][QUERY]:" + parseMessage.getQuery());
+        log.debug("[SERVER][QUERY]:{}", parseMessage.getQuery());
         var res = executor.executePortal(
                 protoContext, parseMessage, bindMessage, Integer.MAX_VALUE,
                 true, true);
