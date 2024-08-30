@@ -452,7 +452,7 @@ public abstract class ProtoContext {
         var eventTags = event.getTagKeyValues();
         ProtoState result = null;
         //While there is something to do
-        while (true) {
+        do {
             //If nothing to do
             if (executionStack.get(eventTags).empty()) {
                 return new FailedState("Machine interrupted");
@@ -487,10 +487,7 @@ public abstract class ProtoContext {
                 result = executeSequence(currentStateInstance, event, depth);
             }
             //If it's a good thing stop it
-            if (!isFailed(result)) {
-                break;
-            }
-        }
+        } while (isFailed(result));
         return result;
     }
 

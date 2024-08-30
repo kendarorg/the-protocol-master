@@ -5,7 +5,6 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
-import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.amqp.v09.utils.FieldsReader;
 import org.kendar.amqp.v09.utils.FieldsWriter;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
@@ -130,7 +129,6 @@ public class BasicConsume extends Basic {
         var context = (AmqpProtoContext) event.getContext();
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
-        var sock = (AmqpProxySocket) connection.getConnection();
 
         this.setChannel(channel);
         var reserved1 = rb.getShort();
@@ -158,7 +156,7 @@ public class BasicConsume extends Basic {
         AmqpProtocol.consumeContext.put(basicConsume.getConsumeId(), context);
 
         context.setValue("BASIC_CONSUME_CH_" + channel, basicConsume);
-        log.debug("CTX:" + context.getContextId() + " CHAN:" + channel + " CNS_ID:" + basicConsume.getConsumeId());
+        log.debug("CTX:{} CHAN:{} CNS_ID:{}", context.getContextId(), channel, basicConsume.getConsumeId());
 
         context.setValue("BASIC_CONSUME_CI_" + basicConsume.getConsumeId(), basicConsume);
 

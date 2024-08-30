@@ -24,9 +24,7 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
         var inputBuffer = event.getBuffer();
         inputBuffer.setPosition(0);
         var canRun = false;
-        if (inputBuffer.size() < 8) {
-            canRun = false;
-        } else {
+        if (inputBuffer.size() >= 8) {
             var bytes = inputBuffer.getBytes(8);
             canRun = bytes[0] == 'A' && bytes[1] == 'M' && bytes[2] == 'Q' && bytes[3] == 'P'
                     && bytes[4] == 0x00

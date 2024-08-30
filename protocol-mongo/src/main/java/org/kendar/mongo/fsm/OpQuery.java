@@ -33,7 +33,7 @@ public class OpQuery extends MongoState {
         BsonBinaryReader bsonReader = new BsonBinaryReader(byteBuffer);
         BsonDocument document = documentCodec.decode(bsonReader, DecoderContext.builder().build());
         var json = document.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        log.debug("[SERVER][PARSE] " + json);
+        log.debug("[SERVER][PARSE] {}", json);
         return json;
     }
 

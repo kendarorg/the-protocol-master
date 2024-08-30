@@ -19,8 +19,8 @@ import org.kendar.protocol.states.special.Tagged;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MqttProtocol extends NetworkProtoDescriptor {
+    public static final int VERSION_5 = 5;
     private static final int PORT = 1883;
-    public static int VERSION_5 = 5;
     public static int VERSION_3 = 3;
     public static ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
     private int port = PORT;

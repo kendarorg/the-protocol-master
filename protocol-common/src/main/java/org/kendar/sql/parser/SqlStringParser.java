@@ -169,6 +169,7 @@ public class SqlStringParser {
                     if (c == '-' && (i + 1) < length && input.charAt(i + 1) == '-') {
                         tokens.add(sb.toString());
                         sb = new StringBuilder();
+                        //noinspection ConstantValue It's a loop in loop
                         while ((i < length) && (c != '\n' && c != '\r' && c != '\f')) {
                             sb.append(c);
                             i++;
@@ -213,7 +214,7 @@ public class SqlStringParser {
                     if (c == '#') {
                         tokens.add(sb.toString());
                         sb = new StringBuilder();
-                        //Wrong suggestion!
+                        //noinspection ConstantValue It's a loop in loop
                         while ((i < length) && (c != '\n' && c != '\r' && c != '\f')) {
                             sb.append(c);
                             i++;

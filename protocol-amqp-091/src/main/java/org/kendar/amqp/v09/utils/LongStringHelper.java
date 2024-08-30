@@ -14,7 +14,7 @@ public class LongStringHelper {
 
     public static String read(BBuffer io) {
         var length = io.getInt();
-        var bytes = io.getBytes((int) length);
+        var bytes = io.getBytes(length);
         return new String(bytes);
     }
 

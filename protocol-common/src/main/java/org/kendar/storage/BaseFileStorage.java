@@ -66,8 +66,8 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
                 targetDir = Path.of(currentRelativePath.toString(), targetDir).toString();
             }
             if (!Files.exists(Path.of(targetDir))) {
-                if(!Path.of(targetDir).toFile().mkdirs()){
-                    log.error("Error creating target dir {}",targetDir);
+                if (!Path.of(targetDir).toFile().mkdirs()) {
+                    log.error("Error creating target dir {}", targetDir);
                 }
             }
             new Thread(this::writeOnFile).start();
