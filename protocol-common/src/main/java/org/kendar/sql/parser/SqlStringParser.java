@@ -74,7 +74,7 @@ public class SqlStringParser {
                 }
             }
         } catch (Exception ex) {
-            log.error("Unable to split query: " + input);
+            log.error("Unable to split query: {}", input);
             result.clear();
             if (input.endsWith(";")) {
                 input = input.substring(0, input.length() - 1);

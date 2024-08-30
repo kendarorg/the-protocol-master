@@ -34,9 +34,8 @@ public abstract class ProtoDescriptor {
 
     public static int getCounter(String id) {
         id = id.toUpperCase();
-        var result = counters.computeIfAbsent(id, (key) ->
+        return counters.computeIfAbsent(id, (key) ->
                 new AtomicInteger(0)).incrementAndGet();
-        return result;
     }
 
     public static String getCounterString(String id) {

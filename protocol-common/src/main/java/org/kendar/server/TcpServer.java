@@ -104,7 +104,7 @@ public class TcpServer {
             server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
             server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
-            log.info("[CL>TP][IN] Listening on " + HOST + ":" + protoDescriptor.getPort());
+            log.info("[CL>TP][IN] Listening on " + HOST + ":{}", protoDescriptor.getPort());
 
             //noinspection InfiniteLoopStatement
             while (true) {
@@ -119,7 +119,7 @@ public class TcpServer {
                 var contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
                 try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
 
-                    log.trace("[CL>TP] Accepted connection from " + client.getRemoteAddress());
+                    log.trace("[CL>TP] Accepted connection from {}", client.getRemoteAddress());
                     //Create the execution context
                     var context = (NetworkProtoContext) protoDescriptor.buildContext(client, contextId);
                     //Send the greetings
@@ -136,7 +136,7 @@ public class TcpServer {
                                     //If there is something
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
-                                    log.debug("[CL>TP][RX]: Received bytes: " + byteArray.length);
+                                    log.debug("[CL>TP][RX]: Received bytes: {}", byteArray.length);
                                     var bb = context.buildBuffer();
                                     context.setUseCallDurationTimes(callDurationTimes);
                                     bb.write(byteArray);

@@ -308,7 +308,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                 statement = parametrizedStatementBuilder.ps;
             }
 
-            context.setValue("EXECUTING_NOW", (Statement) statement);
+            context.setValue("EXECUTING_NOW", statement);
             var count = new AtomicLong(0);
             if (statement.execute()) {
                 runThroughRecordset(maxRecords, statement, result, count);
