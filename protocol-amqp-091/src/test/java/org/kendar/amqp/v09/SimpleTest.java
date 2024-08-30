@@ -141,7 +141,7 @@ public class SimpleTest extends BasicTest {
         connection.close();
 
 
-        Sleeper.sleep(100);
+        Sleeper.sleep(1000,()->messages.size()==3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
@@ -223,7 +223,7 @@ public class SimpleTest extends BasicTest {
         connection.close();
 
 
-        Sleeper.sleep(100);
+        Sleeper.sleep(1000,()->messages.size()==3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
@@ -236,9 +236,7 @@ public class SimpleTest extends BasicTest {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
 
-        while (!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        Sleeper.sleep(5000,()->protocolServer.isRunning());
         ConnectionFactory connectionFactory = new ConnectionFactory();
         // connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;

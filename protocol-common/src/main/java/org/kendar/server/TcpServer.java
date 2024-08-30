@@ -49,9 +49,7 @@ public class TcpServer {
     public void stop() {
         try {
             server.close();
-            while (server.isOpen()) {
-                Sleeper.sleep(200);
-            }
+            Sleeper.sleepNoException(2000,()->!server.isOpen());
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

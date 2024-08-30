@@ -66,7 +66,7 @@ public class PubSubTest extends BasicTest {
         subscriber.unsubscribe();
         jedisPool.returnResource(subscriberJedis);
         jedisPool.returnResource(publisherJedis);
-        Sleeper.sleep(500);
+        Sleeper.sleep(1000, () ->  subscriber.results.size()==3);
         assertEquals(3, subscriber.results.size());
         assertTrue(subscriber.results.containsKey("FIRST"));
         assertTrue(subscriber.results.containsKey("SECOND"));

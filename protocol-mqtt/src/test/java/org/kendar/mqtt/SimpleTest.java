@@ -61,7 +61,7 @@ public class SimpleTest extends BasicTest {
         message.setQos(2);
         message.setRetained(true);
         publisher.publish(TOPIC_NAME, message);
-        Sleeper.sleep(1000);
+        Sleeper.sleep(2000, () -> moquetteMessages.size() > 0);
         publisher.disconnect();
         assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);
@@ -86,7 +86,7 @@ public class SimpleTest extends BasicTest {
         message.setQos(1);
         message.setRetained(true);
         publisher.publish(TOPIC_NAME, message);
-        Sleeper.sleep(1000);
+        Sleeper.sleep(1000, () -> moquetteMessages.size() > 0);
         publisher.disconnect();
         assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);
@@ -110,7 +110,7 @@ public class SimpleTest extends BasicTest {
         message.setQos(0);
         message.setRetained(true);
         publisher.publish(TOPIC_NAME, message);
-        Sleeper.sleep(1000);
+        Sleeper.sleep(1000, () -> moquetteMessages.size() > 0);
         publisher.disconnect();
         assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);

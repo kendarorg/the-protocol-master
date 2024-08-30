@@ -13,7 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
@@ -72,8 +71,8 @@ public class ExchangeTest extends BasicTest {
         numbers.forEach((n) -> queue.sendMessage(EXCHANGE_NAME, KEY_NAME, n));
         Square sq = new Square();
         sq.listenToMessage(connectionFactory);
-        Sleeper.sleep(250);
-        assertEquals(5, Square.results.size());
+
+        Sleeper.sleep(5000, ()->Square.results.size()==5);
         assertTrue(Square.results.containsKey("Square of 1 is: 1"));
         assertTrue(Square.results.containsKey("Square of 2 is: 4"));
         assertTrue(Square.results.containsKey("Square of 3 is: 9"));

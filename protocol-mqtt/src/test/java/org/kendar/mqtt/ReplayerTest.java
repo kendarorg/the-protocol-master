@@ -55,9 +55,7 @@ public class ReplayerTest {
         try {
 
             protocolServer.start();
-            while (!protocolServer.isRunning()) {
-                Sleeper.sleep(100);
-            }
+            Sleeper.sleep(5000,()->protocolServer.isRunning());
 
             String publisherId = UUID.randomUUID().toString();
             var client = new MqttClient("tcp://localhost:1883", publisherId);
@@ -102,9 +100,7 @@ public class ReplayerTest {
 
         protocolServer.start();
         try {
-            while (!protocolServer.isRunning()) {
-                Sleeper.sleep(100);
-            }
+            Sleeper.sleep(5000,()->protocolServer.isRunning());
 
             String publisherId = UUID.randomUUID().toString();
             var client = new MqttClient("tcp://localhost:1884", publisherId);
@@ -149,9 +145,7 @@ public class ReplayerTest {
         try {
             protocolServer.start();
 
-            while (!protocolServer.isRunning()) {
-                Sleeper.sleep(100);
-            }
+            Sleeper.sleep(5000,()->protocolServer.isRunning());
 
             String publisherId = UUID.randomUUID().toString();
             var client = new MqttClient("tcp://localhost:1885", publisherId);
