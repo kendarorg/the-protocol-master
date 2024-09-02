@@ -1,8 +1,8 @@
 pipeline {
-    agent { label 'docker'}
+    agent { label 'jdk11'}
     tools {
             maven 'maven399'
-            jdk 'jdk11'
+            jdk 'javajdk'
         }
     stages {
         stage('Build') {
