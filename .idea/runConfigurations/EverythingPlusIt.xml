@@ -7,6 +7,9 @@
     <option name="TEST_SEARCH_SCOPE">
       <value defaultName="wholeProject" />
     </option>
+    <envs>
+      <env name="DOCKER_HOST" value="tcp://192.168.1.2:2375" />
+    </envs>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
