@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Build') {
             agent {
-                        docker {
+                        dockerContainer {
                             reuseNode true
                             image 'openjdk:11.0-jdk-slim'
                             args  '-v /var/run/docker.sock:/var/run/docker.sock --group-add 992'
