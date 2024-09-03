@@ -3,6 +3,7 @@ pipeline {
     tools {
             maven 'maven399'
             jdk 'javajdk'
+            git 'Default'
         }
          environment {
                 DOCKER_ARGS = "-v /var/run/docker.sock:/var/run/docker.sock"
