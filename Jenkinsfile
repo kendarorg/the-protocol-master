@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'jdk11'}
+    agent { docker { image 'jenkins/ssh-agent:jdk11' }}
     tools {
             maven 'maven399'
             jdk 'jdk11'
