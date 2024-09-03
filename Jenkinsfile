@@ -4,13 +4,14 @@ pipeline {
             maven 'maven399'
             jdk 'javajdk'
         }
+         environment {
+                DOCKER_ARGS = "-v /var/run/docker.sock:/var/run/docker.sock"
+            }
     stages {
         stage('Build') {
             agent {
                         dockerContainer {
-                            reuseNode true
                             image 'openjdk:11.0-jdk-slim'
-                            args  '-v /var/run/docker.sock:/var/run/docker.sock --group-add 992'
                         }
                     }
             steps {
