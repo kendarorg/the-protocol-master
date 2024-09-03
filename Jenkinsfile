@@ -8,7 +8,7 @@ pipeline {
         stage('Build') {
             steps {
                 withMaven {
-                    sh 'mvn -B clean install -Djunit.jupiter.execution.parallel.enabled=true'
+                    sh 'mvn -B clean install -Djunit.jupiter.execution.parallel.enabled=false'
                 }
             }
         }
