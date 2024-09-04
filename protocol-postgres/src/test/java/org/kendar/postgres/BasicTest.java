@@ -38,7 +38,7 @@ public class BasicTest {
                 Connection connect = DriverManager.getConnection(
                         postgresContainer.getJdbcUrl(),
                         postgresContainer.getUserId(), postgresContainer.getPassword());
-                System.out.println("AAAAAAAAAAAAAAAAAAAA "+connect.isValid(10));
+                System.out.println("AAAAAAAAAAAAAAAAAAAA "+connect.isValid(1));
                 break;
             } catch (SQLException e) {
                 Sleeper.sleep(100);
