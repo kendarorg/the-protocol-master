@@ -54,7 +54,7 @@ public class BasicTest {
                         replace("/test?loggerLevel=OFF",""));
 
                 var socket = new Socket("192.168.1.2", cont);
-
+                System.out.println("PORTOPEN");
                 break;
             } catch (Exception e) {
                 System.out.println("NOCONNECTION "+postgresContainer.getJdbcUrl());
