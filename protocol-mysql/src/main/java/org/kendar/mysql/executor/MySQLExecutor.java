@@ -149,7 +149,7 @@ public class MySQLExecutor {
         var pvup = parsed.getValue().toUpperCase();
         if (pvup.startsWith("SET AUTOCOMMIT=0")) {
             return executeBegin(parse, protoContext);
-        } else if (pvup.startsWith("SET AUTOCOMMIT=0")) {
+        } else if (pvup.startsWith("SET AUTOCOMMIT=1")) {
             return executeCommit(parse, protoContext);
         } else if (pvup.startsWith("ROLLBACK")) {
             return executeRollback(parse, protoContext);
