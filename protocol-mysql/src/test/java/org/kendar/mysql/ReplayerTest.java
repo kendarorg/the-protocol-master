@@ -1,5 +1,6 @@
 package org.kendar.mysql;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
@@ -17,6 +18,7 @@ public class ReplayerTest {
     protected static final int FAKE_PORT = 5455;
 
     @Test
+    @Disabled("JUST FOR REAL RUN")
     void simpleJpaTest() throws Exception {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
         var proxy = new JdbcProxy(new MySqlFileStorage(Path.of("src",
