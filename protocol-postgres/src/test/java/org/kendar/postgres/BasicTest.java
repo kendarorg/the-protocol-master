@@ -39,7 +39,7 @@ public class BasicTest {
     private static final Logger log = LoggerFactory.getLogger(BasicTest.class);
 
     public static void beforeEachBase(TestInfo testInfo) {
-        log.error(postgresContainer.getJdbcUrl());
+        log.error("JDBCURL "+postgresContainer.getJdbcUrl());
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("org.postgresql.Driver",
                 postgresContainer.getJdbcUrl(), null,
