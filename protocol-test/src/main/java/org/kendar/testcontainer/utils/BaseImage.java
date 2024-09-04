@@ -96,7 +96,7 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
 
             @Override
             public String getId() {
-                return "jenkins";
+                return "jenkins_jenkins";
             }
 
             @Override
