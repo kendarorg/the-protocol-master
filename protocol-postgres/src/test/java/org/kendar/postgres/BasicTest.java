@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.net.Socket;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -46,6 +47,23 @@ public class BasicTest {
                 Sleeper.sleep(100);
             }
         }
+        for(var i=0; i<10; i++) {
+            try {
+                var cont = Integer.parseInt(postgresContainer.getJdbcUrl().
+                        replace("jdbc:postgresql://192.168.1.2:","").
+                        replace("/test?loggerLevel=OFF",""));
+
+                var socket = new Socket("192.168.1.2", cont);
+
+                break;
+            } catch (Exception e) {
+                System.out.println("NOCONNECTION "+postgresContainer.getJdbcUrl());
+                System.out.println(e.getMessage());
+                Sleeper.sleep(100);
+            }
+        }
+
+
         System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
     }
