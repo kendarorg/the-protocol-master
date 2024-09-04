@@ -99,6 +99,7 @@ public class TcpServer {
         try (AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group)) {
             this.server = server;
             //Setup buffer and listening
+
             server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
             server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
@@ -106,6 +107,7 @@ public class TcpServer {
 
             //noinspection InfiniteLoopStatement
             while (true) {
+                try{
                 //Accept request
                 Future<AsynchronousSocketChannel> future = server.accept();
 
@@ -161,6 +163,9 @@ public class TcpServer {
                             }
                         }
                     });
+                }catch (ClosedChannelException ex){
+
+                }
 
                 } catch (Exception e) {
                     log.trace("Execution exception", e);
