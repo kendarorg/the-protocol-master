@@ -36,7 +36,8 @@ public class BasicTest {
         for(var i=0; i<10; i++) {
             try {
                 Connection connect = DriverManager.getConnection(
-                        "jdbc:mysql://localhost/some_database?user=some_user&password=some_password");
+                        postgresContainer.getJdbcUrl(),
+                        postgresContainer.getUserId(), postgresContainer.getPassword());
                 System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX "+connect.isValid(10));
                 break;
             } catch (SQLException e) {
