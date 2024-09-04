@@ -88,6 +88,7 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
 
     public T withNetwork(Network network
     ) {
+        //XXX https://stackoverflow.com/questions/32120909/how-to-pass-parameter-to-maven-test
         this.network = new Network() {
             @Override
             public Statement apply(Statement statement, Description description) {

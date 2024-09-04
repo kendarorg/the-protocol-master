@@ -32,39 +32,16 @@ public class BasicTest {
         postgresContainer
                 .withNetwork(network)
                 .start();
-//        Sleeper.sleep(1000);
-//        for(var i=0; i<10; i++) {
-//            try {
-//                Connection connect = DriverManager.getConnection(
-//                        postgresContainer.getJdbcUrl(),
-//                        postgresContainer.getUserId(), postgresContainer.getPassword());
-//                System.out.println("AAAAAAAAAAAAAAAAAAAA "+connect.isValid(1));
-//                break;
-//            } catch (SQLException e) {
-//                System.out.println("NOCONNECTION "+postgresContainer.getJdbcUrl());
-//                System.out.println(e.getMessage());
-//                Sleeper.sleep(100);
-//            }
-//        }
-//        for(var i=0; i<10; i++) {
-//            try {
-//                var cont = Integer.parseInt(postgresContainer.getJdbcUrl().
-//                        replace("jdbc:postgresql://192.168.1.2:","").
-//                        replace("/test?loggerLevel=OFF",""));
-//
-//                var socket = new Socket("192.168.1.2", cont);
-//                System.out.println("PORTOPEN");
-//                break;
-//            } catch (Exception e) {
-//                System.out.println("NOCONNECTION "+postgresContainer.getJdbcUrl());
-//                System.out.println(e.getMessage());
-//                Sleeper.sleep(100);
-//            }
-//        }
-
-
-        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-
+        Sleeper.sleep(5000,()->{
+            try {
+                Connection connect = DriverManager.getConnection(
+                        postgresContainer.getJdbcUrl(),
+                        postgresContainer.getUserId(), postgresContainer.getPassword());
+                return true;
+            } catch (SQLException e) {
+                return false;
+            }
+        });
     }
 
     private static final Logger log = LoggerFactory.getLogger(BasicTest.class);
