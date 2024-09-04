@@ -88,23 +88,30 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
 
     public T withNetwork(Network network
     ) {
-        //XXX https://stackoverflow.com/questions/32120909/how-to-pass-parameter-to-maven-test
-        this.network = new Network() {
-            @Override
-            public Statement apply(Statement statement, Description description) {
-                return null;
-            }
+        try {
+            var networkName = System.getProperty("dockerNetworkName");
+            if(networkName==null)throw new Exception();
 
-            @Override
-            public String getId() {
-                return "jenkins_jenkins";
-            }
+            //XXX https://stackoverflow.com/questions/32120909/how-to-pass-parameter-to-maven-test
+            this.network = new Network() {
+                @Override
+                public Statement apply(Statement statement, Description description) {
+                    return null;
+                }
 
-            @Override
-            public void close() {
+                @Override
+                public String getId() {
+                    return networkName;
+                }
 
-            }
-        };
+                @Override
+                public void close() {
+
+                }
+            };
+        }catch (Exception ex){
+            this.network = network;
+        }
         return (T) this;
     }
 
