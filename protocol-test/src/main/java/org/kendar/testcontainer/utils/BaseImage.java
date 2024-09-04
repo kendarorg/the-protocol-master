@@ -47,7 +47,7 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
     protected abstract void preStart();
 
     public T withAliases(String... aliases) {
-        this.aliases = List.of(aliases);
+        //this.aliases = List.of(aliases);
         return (T) this;
     }
 
@@ -86,7 +86,7 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
 
     public T withNetwork(Network network
     ) {
-        this.network = network;
+        //this.network = network;
         return (T) this;
     }
 
