@@ -2,7 +2,7 @@ pipeline {
     agent { label 'jdk11'}
    tools {
            maven 'maven399'
-           jdk 'javajdk'
+           jdk 'jdk11'
            docker 'docker'
     }
     stages {
