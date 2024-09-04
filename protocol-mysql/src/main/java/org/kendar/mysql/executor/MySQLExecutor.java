@@ -273,8 +273,10 @@ public class MySQLExecutor {
             okPacket.setStatusFlags(0x022); //TODO
             okPacket.setWarnings(0);
             okPacket.setPacketNumber(1);
-            okPacket.setLastInsertId(resultSet.getLastInsertedId());
-            okPacket.setAffectedRows(resultSet.getCount());
+            if(resultSet!=null) {
+                okPacket.setLastInsertId(resultSet.getLastInsertedId());
+                okPacket.setAffectedRows(resultSet.getCount());
+            }
             result.add(okPacket);
         }
 
