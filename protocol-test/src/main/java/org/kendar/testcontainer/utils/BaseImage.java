@@ -1,5 +1,7 @@
 package org.kendar.testcontainer.utils;
 
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -47,7 +49,7 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
     protected abstract void preStart();
 
     public T withAliases(String... aliases) {
-        //this.aliases = List.of(aliases);
+        this.aliases = List.of(aliases);
         return (T) this;
     }
 
@@ -86,7 +88,22 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
 
     public T withNetwork(Network network
     ) {
-        //this.network = network;
+        this.network = new Network() {
+            @Override
+            public Statement apply(Statement statement, Description description) {
+                return null;
+            }
+
+            @Override
+            public String getId() {
+                return "jenkins";
+            }
+
+            @Override
+            public void close() {
+
+            }
+        };
         return (T) this;
     }
 
