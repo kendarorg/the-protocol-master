@@ -190,5 +190,17 @@
       "resultsCount": "0",
       "parametersCount": "0"
     }
+  },
+  {
+    "index": 17,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 1,
+    "tags": {
+      "query": "SET autocommit=0",
+      "isIntResult": "true",
+      "resultsCount": "0",
+      "parametersCount": "0"
+    }
   }
 ]

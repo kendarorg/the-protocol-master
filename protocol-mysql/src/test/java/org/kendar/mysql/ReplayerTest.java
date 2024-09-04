@@ -45,6 +45,7 @@ public class ReplayerTest {
             lt.setSalary(500.22);
             em.persist(lt);
         });
+        Sleeper.sleep(1000);
         var atomicBoolean = new AtomicBoolean(false);
         HibernateSessionFactory.query(em -> {
             var resultset = em.createQuery("SELECT denomination FROM CompanyJpa").getResultList();
