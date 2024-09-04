@@ -28,8 +28,8 @@ public class ContainersTest {
 
         try (var mySqlContainer = new MysqlImage()) {
             mySqlContainer
-                    .withNetwork(network)
-                    .withAliases("mysql.sample.test", "mysql.proxy.test")
+//                    .withNetwork(network)
+//                    .withAliases("mysql.sample.test", "mysql.proxy.test")
                     .withInitScript("test", "mysql.sql")
                     .start();
             var connection = DriverManager.getConnection(mySqlContainer.getJdbcUrl(),
@@ -56,8 +56,8 @@ public class ContainersTest {
 
         try (var postgresContainer = new PostgreslImage()) {
             postgresContainer
-                    .withNetwork(network)
-                    .withAliases("postgres.sample.test", "postgres.proxy.test")
+                    //.withNetwork(network)
+                    //.withAliases("postgres.sample.test", "postgres.proxy.test")
                     .withInitScript("test", "postgres.sql")
                     .start();
             var connection = DriverManager.getConnection(postgresContainer.getJdbcUrl(),
@@ -83,8 +83,8 @@ public class ContainersTest {
 
         try (var rabbitContainer = new RabbitMqImage()) {
             rabbitContainer
-                    .withNetwork(network)
-                    .withAliases("rabbitmq.sample.test", "rabbitmq.proxy.test")
+                    //.withNetwork(network)
+                    //.withAliases("rabbitmq.sample.test", "rabbitmq.proxy.test")
                     .start();
             ConnectionFactory connectionFactory = new ConnectionFactory();
             connectionFactory.enableHostnameVerification();
@@ -108,8 +108,9 @@ public class ContainersTest {
         var network = Network.newNetwork();
 
         try (var redisImage = new RedisImage()) {
-            redisImage.withNetwork(network)
-                    .withAliases("redis.sample.test", "redis.proxy.test")
+            redisImage
+                    //.withNetwork(network)
+                    //.withAliases("redis.sample.test", "redis.proxy.test")
                     .start();
             JedisPool pool = new JedisPool(redisImage.getHost(), redisImage.getPort());
 
@@ -142,8 +143,8 @@ public class ContainersTest {
                     .withDir("/test")
                     .withFile(Path.of("..", "protocol-runner", "target", "protocol-runner.jar").toString(), "/test/protocol-runner.jar")
                     .withCmd(Path.of("..", "protocol-test", "src", "test", "resources", "run.sh").toString(), "/test/run.sh")
-                    .withNetwork(network)
-                    .withAliases("java.sample.test")
+//                    .withNetwork(network)
+//                    .withAliases("java.sample.test")
                     .start();
             Thread.sleep(2000);
             var logs = javaImage.getLogs();
