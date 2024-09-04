@@ -41,6 +41,7 @@ public class BasicTest {
                 System.out.println("AAAAAAAAAAAAAAAAAAAA "+connect.isValid(1));
                 break;
             } catch (SQLException e) {
+                System.out.println("NOCONNECTION "+postgresContainer.getJdbcUrl());
                 Sleeper.sleep(100);
             }
         }
