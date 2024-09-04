@@ -7,7 +7,7 @@ pipeline {
         stage('Build') {
             steps {
                 withMaven {
-                    sh 'mvn -B install -DdockerNetworkName=jenkins_jenkins'
+                    sh 'mvn --projects protocol-mysql --also-make -B install -DdockerNetworkName=jenkins_jenkins'
                 }
             }
         }
