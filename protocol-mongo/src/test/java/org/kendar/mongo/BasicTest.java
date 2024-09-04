@@ -33,7 +33,26 @@ public class BasicTest {
                 .waitingForPort(27017)
                 .start();
 
+        Sleeper.sleep(5000,()->{
+            try {
+                var settings = MongoClientSettings.builder()
+                        .applyConnectionString(new ConnectionString(
+                                mongoContainer.getConnectionString()))
+                        //.serverApi(serverApi)
+                        .build();
 
+                MongoClient mongo = MongoClients.create(settings);
+                try {
+                    mongo.listDatabaseNames().iterator().hasNext();
+                } catch (Exception e) {
+                    return false;
+                }
+                mongo.close();
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
     }
 
 

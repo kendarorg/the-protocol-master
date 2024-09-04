@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReplayerTest {
-    protected static final int FAKE_PORT = 5431;
+    protected static final int FAKE_PORT = 5455;
 
     @Test
     void simpleJpaTest() throws Exception {
