@@ -236,7 +236,7 @@ public class MySQLExecutor {
             }
         }
 
-        if (!resultSet.isIntResult()) {
+        if (resultSet!=null && !resultSet.isIntResult()) {
             var packetNumber = 0;
 
             result.add(new ColumnsCount(resultSet.getMetadata()).

@@ -35,6 +35,7 @@ public class ReplayerTest {
                 "test", "test",
                 "org.hibernate.dialect.MySQLDialect",
                 CompanyJpa.class);
+        Sleeper.sleep(1000);
 
         HibernateSessionFactory.transactional(em -> {
             var lt = new CompanyJpa();
