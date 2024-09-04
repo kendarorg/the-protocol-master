@@ -7,6 +7,8 @@ import org.kendar.sql.jdbc.storage.JdbcFileStorage;
 import org.kendar.testcontainer.images.PostgreslImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
@@ -34,12 +36,16 @@ public class BasicTest {
 
     }
 
+    private static final Logger log = LoggerFactory.getLogger(BasicTest.class);
 
     public static void beforeEachBase(TestInfo testInfo) {
+        log.error(postgresContainer.getJdbcUrl());
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("org.postgresql.Driver",
                 postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
+
+
         if (testInfo != null) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
