@@ -236,7 +236,7 @@ public class MySQLExecutor {
             }
         }
 
-        if (resultSet!=null && !resultSet.isIntResult()) {
+        if (!resultSet.isIntResult()) {
             var packetNumber = 0;
 
             result.add(new ColumnsCount(resultSet.getMetadata()).
@@ -273,10 +273,8 @@ public class MySQLExecutor {
             okPacket.setStatusFlags(0x022); //TODO
             okPacket.setWarnings(0);
             okPacket.setPacketNumber(1);
-            if(resultSet!=null) {
-                okPacket.setLastInsertId(resultSet.getLastInsertedId());
-                okPacket.setAffectedRows(resultSet.getCount());
-            }
+            okPacket.setLastInsertId(resultSet.getLastInsertedId());
+            okPacket.setAffectedRows(resultSet.getCount());
             result.add(okPacket);
         }
 
