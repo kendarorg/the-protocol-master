@@ -33,20 +33,20 @@ public class BasicTest {
         postgresContainer
                 .withNetwork(network)
                 .start();
-        Sleeper.sleep(1000);
-        for(var i=0; i<10; i++) {
-            try {
-                Connection connect = DriverManager.getConnection(
-                        postgresContainer.getJdbcUrl(),
-                        postgresContainer.getUserId(), postgresContainer.getPassword());
-                System.out.println("AAAAAAAAAAAAAAAAAAAA "+connect.isValid(1));
-                break;
-            } catch (SQLException e) {
-                System.out.println("NOCONNECTION "+postgresContainer.getJdbcUrl());
-                System.out.println(e.getMessage());
-                Sleeper.sleep(100);
-            }
-        }
+//        Sleeper.sleep(1000);
+//        for(var i=0; i<10; i++) {
+//            try {
+//                Connection connect = DriverManager.getConnection(
+//                        postgresContainer.getJdbcUrl(),
+//                        postgresContainer.getUserId(), postgresContainer.getPassword());
+//                System.out.println("AAAAAAAAAAAAAAAAAAAA "+connect.isValid(1));
+//                break;
+//            } catch (SQLException e) {
+//                System.out.println("NOCONNECTION "+postgresContainer.getJdbcUrl());
+//                System.out.println(e.getMessage());
+//                Sleeper.sleep(100);
+//            }
+//        }
         for(var i=0; i<10; i++) {
             try {
                 var cont = Integer.parseInt(postgresContainer.getJdbcUrl().
