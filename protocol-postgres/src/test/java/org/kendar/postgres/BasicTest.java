@@ -32,14 +32,24 @@ public class BasicTest {
         postgresContainer
                 .withNetwork(network)
                 .start();
-
+        Sleeper.sleep(1000);
+        for(var i=0; i<10; i++) {
+            try {
+                Connection connect = DriverManager.getConnection(
+                        "jdbc:mysql://localhost/some_database?user=some_user&password=some_password");
+                System.out.println("Connected to database "+connect.isValid(10));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        System.out.println("CANNOT CONNECT TO DB");
 
     }
 
     private static final Logger log = LoggerFactory.getLogger(BasicTest.class);
 
     public static void beforeEachBase(TestInfo testInfo) {
-        log.error("JDBCURL "+postgresContainer.getJdbcUrl());
+
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("org.postgresql.Driver",
                 postgresContainer.getJdbcUrl(), null,
