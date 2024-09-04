@@ -83,7 +83,12 @@ public class BasicTest {
     }
 
     public static void afterEachBase() {
-        protocolServer.stop();
+
+        try {
+            protocolServer.stop();
+        }catch (Exception ex){
+
+        }
     }
 
     public static void afterClassBase() throws Exception {
