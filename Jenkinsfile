@@ -1,7 +1,8 @@
 pipeline {
     agent { label 'dockeragent'}
    tools {
-           //maven 'maven399'
+           maven 'maven399'
+           jdk 'jdk11'
     }
     stages {
         stage('Build') {
