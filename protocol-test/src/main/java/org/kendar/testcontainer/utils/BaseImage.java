@@ -90,7 +90,7 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
     ) {
         try {
             var networkName = System.getProperty("dockerNetworkName");
-            if(networkName==null){
+            if(networkName==null||networkName.trim().isEmpty()){
                 this.network=network;
                 return (T) this;
             }
