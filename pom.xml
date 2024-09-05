@@ -130,6 +130,16 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>central3</id>
+            <name>Central Repository3</name>
+            <url>https://repo1.maven.org/maven2</url>
+            <!-- https://repo.maven.apache.org/maven2 -->
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <build>
