@@ -8,11 +8,11 @@ pipeline {
         stage('Build') {
             steps {
                  withMaven {
-                    //sh 'mvn --projects protocol-mysql --also-make -B install -DnotRunWithJenkins=true -DdockerNetworkName=jenkins_jenkins'
+                    sh 'mvn --projects protocol-amqp-091 --also-make -B install -DdockerNetworkName=jenkins_jenkins'
                     //sh 'mvn --projects protocol-postgres --also-make -B install -DskipTests'
                     //sh 'mvn install -DskipTests'
                     //sh 'mvn --projects protocol-postgres -B test -DdockerNetworkName=jenkins_jenkins'
-                    sh 'mvn test -DdockerNetworkName=jenkins_jenkins'
+                    //sh 'mvn test -DdockerNetworkName=jenkins_jenkins'
                 }
             }
         }

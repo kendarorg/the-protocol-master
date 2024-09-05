@@ -1,6 +1,7 @@
 package org.kendar.amqp.v09;
 
 
+import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
 import org.kendar.testcontainer.images.RabbitMqImage;
@@ -30,6 +31,18 @@ public class BasicTest {
                 .waitingForPort(5672)
                 .start();
 
+        Sleeper.sleep(60000,()->{
+            try {
+                ConnectionFactory connectionFactory = new ConnectionFactory();
+                connectionFactory.setUri(rabbitContainer.getConnectionString());
+                connectionFactory.setPassword(rabbitContainer.getAdminPassword());
+                var connection = connectionFactory.newConnection();
+                connection.isOpen();
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
 
     }
 
