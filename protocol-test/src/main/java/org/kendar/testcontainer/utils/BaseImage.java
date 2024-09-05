@@ -90,7 +90,10 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
     ) {
         try {
             var networkName = System.getProperty("dockerNetworkName");
-            if(networkName==null)throw new Exception();
+            if(networkName==null){
+                this.network=network;
+                return (T) this;
+            }
 
             //XXX https://stackoverflow.com/questions/32120909/how-to-pass-parameter-to-maven-test
             this.network = new Network() {
