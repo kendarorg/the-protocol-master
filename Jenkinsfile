@@ -13,7 +13,7 @@ pipeline {
                     //sh 'mvn install -DnotRunWithJenkins=true -DdockerNetworkName=jenkins_jenkins'
                 }
                  withMaven {
-                    sh 'mvn --projects protocol-postgres -B test'
+                    sh 'mvn --projects protocol-postgres -B test -DdockerNetworkName=jenkins_jenkins'
                 }
             }
         }
