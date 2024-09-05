@@ -7,11 +7,11 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                withMaven {
+                //withMaven {
                     //sh 'mvn --projects protocol-mysql --also-make -B install -DnotRunWithJenkins=true -DdockerNetworkName=jenkins_jenkins'
                     //sh 'mvn --projects protocol-postgres --also-make -B install -DskipTests'
-                    sh 'mvn install -DskipTests'
-                }
+                    //sh 'mvn install -DskipTests'
+                //}
                  withMaven {
                     //sh 'mvn --projects protocol-postgres -B test -DdockerNetworkName=jenkins_jenkins'
                     sh 'mvn test -DdockerNetworkName=jenkins_jenkins'
