@@ -32,7 +32,7 @@ public class BasicTest {
         postgresContainer
                 .withNetwork(network)
                 .start();
-        Sleeper.sleep(5000,()->{
+        Sleeper.sleep(60000,()->{
             try {
                 Connection connect = DriverManager.getConnection(
                         postgresContainer.getJdbcUrl(),
