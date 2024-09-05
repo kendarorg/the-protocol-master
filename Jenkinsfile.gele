@@ -1,8 +1,7 @@
 pipeline {
-    agent { label 'agent_template'}
+    agent { label 'jdk11'}
    tools {
            maven 'maven399'
-           jdk 'jdk11'
     }
     stages {
         stage('Build') {
