@@ -1,7 +1,5 @@
 package org.kendar.testcontainer.utils;
 
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -88,34 +86,34 @@ public abstract class BaseImage<T extends BaseImage, K extends GenericContainer>
 
     public T withNetwork(Network network
     ) {
-        try {
-            var networkName = System.getProperty("dockerNetworkName");
-            if(networkName==null||networkName.trim().isEmpty()){
+//        try {
+//            var networkName = System.getProperty("dockerNetworkName");
+//            if(networkName==null||networkName.trim().isEmpty()){
                 this.network=network;
                 return (T) this;
-            }
-
-            //XXX https://stackoverflow.com/questions/32120909/how-to-pass-parameter-to-maven-test
-            this.network = new Network() {
-                @Override
-                public Statement apply(Statement statement, Description description) {
-                    return null;
-                }
-
-                @Override
-                public String getId() {
-                    return networkName;
-                }
-
-                @Override
-                public void close() {
-
-                }
-            };
-        }catch (Exception ex){
-            this.network = network;
-        }
-        return (T) this;
+//            }
+//
+//            //XXX https://stackoverflow.com/questions/32120909/how-to-pass-parameter-to-maven-test
+//            this.network = new Network() {
+//                @Override
+//                public Statement apply(Statement statement, Description description) {
+//                    return null;
+//                }
+//
+//                @Override
+//                public String getId() {
+//                    return networkName;
+//                }
+//
+//                @Override
+//                public void close() {
+//
+//                }
+//            };
+//        }catch (Exception ex){
+//            this.network = network;
+//        }
+//        return (T) this;
     }
 
     public String getLogs() {
