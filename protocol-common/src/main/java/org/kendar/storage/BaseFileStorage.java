@@ -44,7 +44,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
     }
 
     protected List<CompactLine> retrieveIndexFile() {
-        String fileContent = null;
+        String fileContent;
         try {
             fileContent = Files.readString(Path.of(targetDir, "index.json"));
         } catch (IOException e) {
@@ -66,7 +66,9 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
                 targetDir = Path.of(currentRelativePath.toString(), targetDir).toString();
             }
             if (!Files.exists(Path.of(targetDir))) {
-                Path.of(targetDir).toFile().mkdirs();
+                if (!Path.of(targetDir).toFile().mkdirs()) {
+                    log.error("Error creating target dir {}", targetDir);
+                }
             }
             new Thread(this::writeOnFile).start();
         } catch (Exception e) {

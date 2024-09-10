@@ -26,7 +26,8 @@ public class QueueUnbindOk extends Queue {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.setChannel(channel);
-        return iteratorOfList(this);
+        var result = new QueueUnbindOk();
+        result.setChannel(channel);
+        return iteratorOfList(result);
     }
 }

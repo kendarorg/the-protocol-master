@@ -4,9 +4,6 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
-import org.kendar.proxy.ProxyConnection;
-import org.kendar.redis.Resp3Context;
-import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,14 +48,10 @@ public class Resp3Response extends ProtoState implements NetworkReturnMessage {
     }
 
     public boolean canRun(Resp3Message event) {
-
         return true;
     }
 
     public Iterator<ProtoStep> execute(Resp3Message event) {
-        var context = (Resp3Context) event.getContext();
-        var proxy = (Resp3Proxy) context.getProxy();
-        var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
         this.event = event;
         return iteratorOfEmpty();
     }

@@ -13,14 +13,10 @@ import org.kendar.protocol.states.ProtoState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class MqttPacketTranslator extends ProtoState implements NetworkReturnMessage, InterruptProtoState {
     private static final Logger log = LoggerFactory.getLogger(MqttPacketTranslator.class);
-    private static final List<MqttFixedHeader> packetIdAwareMessages = new ArrayList<MqttFixedHeader>();
-    private static int count = 0;
     private boolean proxy;
 
     public MqttPacketTranslator() {
@@ -59,7 +55,7 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
     }
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
-        count++;
+
         var rb = (MqttBBuffer) event.getBuffer();
         var fullFlag = rb.get();
         var flag = MqttFixedHeader.of(fullFlag);

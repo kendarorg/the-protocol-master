@@ -23,7 +23,7 @@ public class ReplayerTest {
     private static void setupCallBack(MqttClient client) {
         messages.clear();
         client.setCallback(new MqttCallback() {
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
+            public void messageArrived(String topic, MqttMessage message) {
                 System.out.println("topic: " + topic);
                 System.out.println("qos: " + message.getQos());
                 System.out.println("message content: " + new String(message.getPayload()));
@@ -55,9 +55,7 @@ public class ReplayerTest {
         try {
 
             protocolServer.start();
-            while (!protocolServer.isRunning()) {
-                Sleeper.sleep(100);
-            }
+            Sleeper.sleep(5000, protocolServer::isRunning);
 
             String publisherId = UUID.randomUUID().toString();
             var client = new MqttClient("tcp://localhost:1883", publisherId);
@@ -74,14 +72,14 @@ public class ReplayerTest {
                 message.setQos(0);
                 client.publish(TOPIC_NAME, message);
             }
-            Sleeper.sleep(1000, () -> messages.size() > 0);
+            Sleeper.sleep(1000, () -> !messages.isEmpty());
             client.disconnect();
             client.close();
             assertEquals(1, messages.size());
             var mesg = messages.get(0);
             assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
             assertEquals(0, mesg.getQos());
-        }finally {
+        } finally {
             protocolServer.stop();
         }
 
@@ -102,9 +100,7 @@ public class ReplayerTest {
 
         protocolServer.start();
         try {
-            while (!protocolServer.isRunning()) {
-                Sleeper.sleep(100);
-            }
+            Sleeper.sleep(5000, protocolServer::isRunning);
 
             String publisherId = UUID.randomUUID().toString();
             var client = new MqttClient("tcp://localhost:1884", publisherId);
@@ -121,14 +117,14 @@ public class ReplayerTest {
                 message.setQos(1);
                 client.publish(TOPIC_NAME, message);
             }
-            Sleeper.sleep(1000, () -> messages.size() > 0);
+            Sleeper.sleep(1000, () -> !messages.isEmpty());
             client.disconnect();
             client.close();
             assertEquals(1, messages.size());
             var mesg = messages.get(0);
             assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
             assertEquals(1, mesg.getQos());
-        }finally {
+        } finally {
             protocolServer.stop();
         }
     }
@@ -149,9 +145,7 @@ public class ReplayerTest {
         try {
             protocolServer.start();
 
-            while (!protocolServer.isRunning()) {
-                Sleeper.sleep(100);
-            }
+            Sleeper.sleep(5000, protocolServer::isRunning);
 
             String publisherId = UUID.randomUUID().toString();
             var client = new MqttClient("tcp://localhost:1885", publisherId);
@@ -168,14 +162,14 @@ public class ReplayerTest {
                 message.setQos(2);
                 client.publish(TOPIC_NAME, message);
             }
-            Sleeper.sleep(1000, () -> messages.size() > 0);
+            Sleeper.sleep(1000, () -> !messages.isEmpty());
             client.disconnect();
             client.close();
             assertEquals(1, messages.size());
             var mesg = messages.get(0);
             assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
             assertEquals(2, mesg.getQos());
-        }finally {
+        } finally {
             protocolServer.stop();
         }
 

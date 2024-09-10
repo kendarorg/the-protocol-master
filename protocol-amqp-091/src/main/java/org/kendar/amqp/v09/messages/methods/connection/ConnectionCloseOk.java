@@ -26,7 +26,8 @@ public class ConnectionCloseOk extends Connection {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.setChannel(channel);
-        return iteratorOfList(this);
+        var result = new ConnectionCloseOk();
+        result.setChannel(channel);
+        return iteratorOfList(result);
     }
 }

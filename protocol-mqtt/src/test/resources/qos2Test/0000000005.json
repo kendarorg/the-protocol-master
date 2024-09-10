@@ -1,28 +1,28 @@
 {
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 5,
-  "input" : {
-    "type" : "PublishRel",
-    "data" : {
-      "uuid" : "19",
-      "fullFlag" : 98,
-      "fixedHeader" : "PUBREL",
-      "packetIdentifier" : 2,
-      "reasonCode" : 0
+  "constant": false,
+  "connectionId": 1,
+  "index": 5,
+  "input": {
+    "type": "PublishRel",
+    "data": {
+      "uuid": "19",
+      "fullFlag": 98,
+      "fixedHeader": "PUBREL",
+      "packetIdentifier": 2,
+      "reasonCode": 0
     }
   },
-  "output" : {
-    "type" : "PublishComp",
-    "data" : {
-      "uuid" : "22",
-      "fullFlag" : 112,
-      "fixedHeader" : "PUBCOMP",
-      "packetIdentifier" : 2,
-      "reasonCode" : 0
+  "output": {
+    "type": "PublishComp",
+    "data": {
+      "uuid": "22",
+      "fullFlag": 112,
+      "fixedHeader": "PUBCOMP",
+      "packetIdentifier": 2,
+      "reasonCode": 0
     }
   },
-  "durationMs" : 970,
-  "type" : "PublishRel",
-  "caller" : "MQTT"
+  "durationMs": 970,
+  "type": "PublishRel",
+  "caller": "MQTT"
 }

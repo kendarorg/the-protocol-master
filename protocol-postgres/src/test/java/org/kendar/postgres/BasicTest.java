@@ -30,17 +30,28 @@ public class BasicTest {
         postgresContainer
                 .withNetwork(network)
                 .start();
-
-
+        Sleeper.sleep(60000, () -> {
+            try {
+                DriverManager.getConnection(
+                        postgresContainer.getJdbcUrl(),
+                        postgresContainer.getUserId(), postgresContainer.getPassword());
+                return true;
+            } catch (SQLException e) {
+                return false;
+            }
+        });
     }
 
-
     public static void beforeEachBase(TestInfo testInfo) {
+
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("org.postgresql.Driver",
                 postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
-        if (testInfo != null) {
+
+
+        if (testInfo != null && testInfo.getTestClass().isPresent() &&
+                testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
@@ -55,9 +66,7 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        while (!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     public static void afterEachBase() {

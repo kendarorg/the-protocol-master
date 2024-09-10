@@ -26,7 +26,8 @@ public class ExchangeUnbindOk extends Exchange {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        setChannel(channel);
-        return iteratorOfList(this);
+        var message = new ExchangeUnbindOk();
+        message.setChannel(channel);
+        return iteratorOfList(message);
     }
 }

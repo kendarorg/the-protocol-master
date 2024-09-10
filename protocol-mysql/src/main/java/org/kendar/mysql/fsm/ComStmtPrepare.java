@@ -33,7 +33,7 @@ public class ComStmtPrepare extends ProtoState {
 //        }
         var query = inputBuffer.getString(5);
 
-        log.debug("[SERVER][STMTPREP]: " + query);
+        log.debug("[SERVER][STMTPREP]: {}", query);
         var executor = new MySQLExecutor();
         return executor.prepareStatement(context, query);
     }

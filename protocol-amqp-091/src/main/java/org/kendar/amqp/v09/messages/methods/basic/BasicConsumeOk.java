@@ -39,9 +39,10 @@ public class BasicConsumeOk extends Basic {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        setChannel(channel);
-        this.tag = ShortStringHelper.read(rb);
-        return iteratorOfList(this);
+        var basicConsumeOk = new BasicConsumeOk();
+        basicConsumeOk.setChannel(channel);
+        basicConsumeOk.setTag(ShortStringHelper.read(rb));
+        return iteratorOfList(basicConsumeOk);
     }
 
 

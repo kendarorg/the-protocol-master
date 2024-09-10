@@ -57,7 +57,7 @@ public class FieldsWriter {
             case "Byte[]": {
                 io.write((byte) 'x');
                 var bv = ((byte[]) value).length;
-                io.writeLong((long) bv);
+                io.writeLong(bv);
                 io.write((byte[]) value);
                 return;
             }
@@ -95,10 +95,10 @@ public class FieldsWriter {
 
     private static void writeArray(Object[] value, BBuffer io) {
         if (value == null) {
-            io.writeInt((int) 0);
+            io.writeInt(0);
         } else {
             var countPos = io.getPosition();
-            io.writeInt((int) 0);
+            io.writeInt(0);
             var startPos = io.getPosition();
             for (Object item : value) {
                 writeField(item, io);
@@ -110,10 +110,10 @@ public class FieldsWriter {
 
     public static void writeTable(Map<String, Object> table, BBuffer io) {
         if (table == null) {
-            io.writeInt((int) 0);
+            io.writeInt(0);
         } else {
             var countPos = io.getPosition();
-            io.writeInt((int) 0);
+            io.writeInt(0);
             var startPos = io.getPosition();
             for (Map.Entry<String, Object> entry : table.entrySet()) {
                 new ShortStringHelper(entry.getKey()).write(io);

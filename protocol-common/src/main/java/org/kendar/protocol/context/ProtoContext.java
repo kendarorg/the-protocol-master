@@ -320,7 +320,7 @@ public abstract class ProtoContext {
     private ProtoState findThePossibleNextState(BaseEvent event) {
         //Check if there are interrupts
         var possible = findPossibleInterrupt(event);
-        ProtoState foundedState = null;
+        ProtoState foundedState;
         //noinspection OptionalIsPresent
         if (possible.isEmpty()) {
             foundedState = findThePossibleNextStateOnStack(event, 0);
@@ -452,7 +452,7 @@ public abstract class ProtoContext {
         var eventTags = event.getTagKeyValues();
         ProtoState result = null;
         //While there is something to do
-        while (true) {
+        do {
             //If nothing to do
             if (executionStack.get(eventTags).empty()) {
                 return new FailedState("Machine interrupted");
@@ -464,7 +464,7 @@ public abstract class ProtoContext {
             var currentStateInstance = executionStack.get(eventTags).peek();
             if (!currentStateInstance.hasState()) {
                 //Something gone horribly wrong
-                log.error("Missing state with tag " + eventTags);
+                log.error("Missing state with tag {}", eventTags);
                 return new FailedState("Missing State");
             }
             var currentState = currentStateInstance.getState();
@@ -487,10 +487,7 @@ public abstract class ProtoContext {
                 result = executeSequence(currentStateInstance, event, depth);
             }
             //If it's a good thing stop it
-            if (!isFailed(result)) {
-                break;
-            }
-        }
+        } while (isFailed(result));
         return result;
     }
 
@@ -538,7 +535,7 @@ public abstract class ProtoContext {
         while (currentInstance.canRun()) {
             //Find who's next
             var candidate = currentInstance.getNextExecutable();
-            result = getProtoState(candidate, result, event, eventTags, depth);
+            result = getProtoState(candidate, event, eventTags, depth);
             //If it's an optional state just continue
             if (isFailed(result) && candidate.isOptional()) {
                 continue;
@@ -560,22 +557,21 @@ public abstract class ProtoContext {
         return result;
     }
 
-    private ProtoState getProtoState(ProtoState candidate, ProtoState result, BaseEvent event, String eventTags, int depth) {
+    private ProtoState getProtoState(ProtoState candidate, BaseEvent event, String eventTags, int depth) {
 
         if (isNormalState(candidate)) {
             //If it's an executable return it
-            result = retrieveExecutableState(candidate, event);
+            return retrieveExecutableState(candidate, event);
         } else {
             if (shouldBlockRecursion(event, candidate)) {
                 //Can't continue
-                result = new FailedState("Blocked recursion", candidate, event);
+                return new FailedState("Blocked recursion", candidate, event);
             } else {
                 //Execute special states
                 executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
-                result = findThePossibleNextStateOnStack(event, depth + 1);
+                return findThePossibleNextStateOnStack(event, depth + 1);
             }
         }
-        return result;
     }
 
 
@@ -623,7 +619,7 @@ public abstract class ProtoContext {
         while (currentInstance.canRun()) {
             //Find who's next
             var candidate = currentInstance.getNextExecutable();
-            result = getProtoState(candidate, result, event, eventTags, depth);
+            result = getProtoState(candidate, event, eventTags, depth);
             //May be there is something more
             if (isFailed(result)) {
                 continue;
@@ -655,7 +651,7 @@ public abstract class ProtoContext {
         while (currentInstance.canRun()) {
             //Find who's next
             var candidate = currentInstance.getNextExecutable();
-            result = getProtoState(candidate, result, event, eventTags, depth);
+            result = getProtoState(candidate, event, eventTags, depth);
             //If it's an optional state just continue
             if (isFailed(result) && candidate.isOptional()) {
                 continue;
@@ -705,7 +701,7 @@ public abstract class ProtoContext {
         }
         var exceptionResults = runException(ex, state, event);
         for (var exceptionResult : exceptionResults) {
-            log.error("Message: " + exceptionResult.getClass().getSimpleName());
+            log.error("Message: {}", exceptionResult.getClass().getSimpleName());
             write(exceptionResult);
         }
     }

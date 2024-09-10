@@ -6,22 +6,19 @@ import org.kendar.amqp.v09.exchange.Queue;
 import org.kendar.amqp.v09.exchange.Square;
 import org.kendar.utils.Sleeper;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class ExchangeTest extends BasicTest {
 
-    private static String QUEUE_NAME = "square";
-    private static String EXCHANGE_NAME = "myExchange";
-    private static String KEY_NAME = "key";
+    private static final String QUEUE_NAME = "square";
+    private static final String EXCHANGE_NAME = "myExchange";
+    private static final String KEY_NAME = "key";
 
     @BeforeAll
     public static void beforeClass() {
@@ -30,7 +27,7 @@ public class ExchangeTest extends BasicTest {
     }
 
     @AfterAll
-    public static void afterClass() throws Exception {
+    public static void afterClass() {
         try {
             afterClassBase();
         } catch (Exception ex) {
@@ -49,7 +46,7 @@ public class ExchangeTest extends BasicTest {
     }
 
     @Test
-    void testExchange() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void testExchange() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         var cs = "amqp://localhost:" + FAKE_PORT;
         //cs = rabbitContainer.getConnectionString();
@@ -72,8 +69,8 @@ public class ExchangeTest extends BasicTest {
         numbers.forEach((n) -> queue.sendMessage(EXCHANGE_NAME, KEY_NAME, n));
         Square sq = new Square();
         sq.listenToMessage(connectionFactory);
-        Sleeper.sleep(250);
-        assertEquals(5, Square.results.size());
+
+        Sleeper.sleep(5000, () -> Square.results.size() == 5);
         assertTrue(Square.results.containsKey("Square of 1 is: 1"));
         assertTrue(Square.results.containsKey("Square of 2 is: 4"));
         assertTrue(Square.results.containsKey("Square of 3 is: 9"));

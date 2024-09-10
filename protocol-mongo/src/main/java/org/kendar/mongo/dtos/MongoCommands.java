@@ -161,4 +161,8 @@ public enum MongoCommands {
     MongoCommands(MongoCommandType mongoCommandType) {
         type = mongoCommandType;
     }
+
+    public MongoCommandType getType() {
+        return type;
+    }
 }

@@ -1,6 +1,7 @@
 package org.kendar.amqp.v09;
 
 
+import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
 import org.kendar.testcontainer.images.RabbitMqImage;
@@ -30,6 +31,18 @@ public class BasicTest {
                 .waitingForPort(5672)
                 .start();
 
+        Sleeper.sleep(60000, () -> {
+            try {
+                ConnectionFactory connectionFactory = new ConnectionFactory();
+                connectionFactory.setUri(rabbitContainer.getConnectionString());
+                connectionFactory.setPassword(rabbitContainer.getAdminPassword());
+                var connection = connectionFactory.newConnection();
+                connection.isOpen();
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
 
     }
 
@@ -38,7 +51,8 @@ public class BasicTest {
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy(rabbitContainer.getConnectionString(),
                 rabbitContainer.getUserId(), rabbitContainer.getPassword());
-        if (testInfo != null) {
+        if (testInfo != null && testInfo.getTestClass().isPresent() &&
+                testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
@@ -53,9 +67,7 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        while (!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     public static void afterEachBase() {

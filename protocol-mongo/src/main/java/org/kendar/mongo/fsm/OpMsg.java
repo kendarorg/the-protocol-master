@@ -33,7 +33,7 @@ public class OpMsg extends MongoState {
         BsonBinaryReader bsonReader = new BsonBinaryReader(byteBuffer);
         BsonDocument document = documentCodec.decode(bsonReader, DecoderContext.builder().build());
         var json = document.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        log.debug("[SERVER][RX]\t\t" + json);
+        log.debug("[SERVER][RX]\t\tbsonParse {}", json);
         return json;
     }
 
@@ -71,7 +71,7 @@ public class OpMsg extends MongoState {
                 var sequenceSize = inputBuffer.getInt();
                 section.setIdentifier(inputBuffer.getUtf8String());
                 log.debug("[SERVER][RX]\tSection 1");
-                log.debug("[SERVER][RX]\t\tIdentifier: " + section.getIdentifier());
+                log.debug("[SERVER][RX]\t\tIdentifier: {}", section.getIdentifier());
                 var byteBuffer = ByteBuffer.
                         wrap(inputBuffer.getBytes(sequenceSize - 4 - section.getIdentifier().length() - 1)).
                         order(ByteOrder.LITTLE_ENDIAN);

@@ -39,7 +39,8 @@ public class BasicTest {
         var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl(), null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
-        if (testInfo != null) {
+        if (testInfo != null && testInfo.getTestClass().isPresent() &&
+                testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
@@ -54,9 +55,7 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        while (!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     public static void beforeEachBasePrep(TestInfo testInfo) {
@@ -66,7 +65,8 @@ public class BasicTest {
                         "?generateSimpleParameterMetadata=true" +
                         "&useServerPrepStmts=true", null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
-        if (testInfo != null) {
+        if (testInfo != null && testInfo.getTestClass().isPresent() &&
+                testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
@@ -81,13 +81,16 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        while (!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     public static void afterEachBase() {
-        protocolServer.stop();
+
+        try {
+            protocolServer.stop();
+        } catch (Exception ex) {
+
+        }
     }
 
     public static void afterClassBase() throws Exception {

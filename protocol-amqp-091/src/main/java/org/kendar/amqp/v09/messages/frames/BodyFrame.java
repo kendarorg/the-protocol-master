@@ -54,14 +54,14 @@ public class BodyFrame extends Frame {
         String contentString = null;
         String ext = "[SERVER]";
         if (isProxyed()) ext = "[PROXY ]";
-        logPs.debug(ext + "[RX]: BodyFrame Content Length: " + contentBytes.length);
+        logPs.debug("{}[RX]: BodyFrame Content Length: {}", ext, contentBytes.length);
         if (contentType != null) {
-            logPs.debug(ext + "[RX]: BodyFrame Content type: " + contentType);
+            logPs.debug("{}[RX]: BodyFrame Content type: {}", ext, contentType);
             if (contentType.contains("text") ||
                     contentType.contains("json") ||
                     contentType.contains("xml")) {
                 contentString = new String(contentBytes);
-                logPs.debug(ext + "[RX]: BodyFrame Content: " + contentString);
+                logPs.debug("{}[RX]: BodyFrame Content: {}", ext, contentString);
             }
         }
 

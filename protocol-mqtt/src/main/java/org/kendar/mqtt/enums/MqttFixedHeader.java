@@ -33,7 +33,7 @@ public enum MqttFixedHeader {
     static {
         for (MqttFixedHeader e : values()) {
             BY_INT.put((int) e.value, e);
-            bytes.add((byte) e.value);
+            bytes.add(e.value);
         }
 
     }

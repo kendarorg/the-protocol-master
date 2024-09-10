@@ -23,6 +23,8 @@ import java.util.List;
 
 public class MqttProxy extends NetworkProxy<MqttStorage> {
 
+    private static final Logger log = LoggerFactory.getLogger(MqttProxy.class);
+
     public MqttProxy() {
         super();
     }
@@ -59,31 +61,27 @@ public class MqttProxy extends NetworkProxy<MqttStorage> {
         return mapper.deserialize(out.get("data").toString(), aClass);
     }
 
-    private static final Logger log = LoggerFactory.getLogger(MqttProxy.class);
-
     @Override
     protected void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = item.getOutput();
             var clazz = out.get("type").textValue();
-            ReturnMessage fr = null;
+            ReturnMessage fr;
             int consumeId = item.getConnectionId();
             switch (clazz) {
                 case "ConnectAck":
-                    var ca = mapper.deserialize(out.get("data").toString(), ConnectAck.class);
-                    fr = ca;
+                    fr = mapper.deserialize(out.get("data").toString(), ConnectAck.class);
                     break;
                 case "Publish":
-                    var pb = mapper.deserialize(out.get("data").toString(), Publish.class);
-                    fr = pb;
+                    fr = mapper.deserialize(out.get("data").toString(), Publish.class);
                     break;
                 default:
-                    throw new RuntimeException("MISSING "+clazz);
+                    throw new RuntimeException("MISSING " + clazz);
 
             }
             if (fr != null) {
-                log.debug("[SERVER][CB]: " + fr.getClass().getSimpleName());
+                log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
                 var ctx = MqttProtocol.consumeContext.get(consumeId);
                 ctx.write(fr);
             } else {

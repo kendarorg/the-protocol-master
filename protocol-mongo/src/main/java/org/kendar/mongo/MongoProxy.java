@@ -71,7 +71,7 @@ public class MongoProxy extends Proxy<MongoStorage> {
         if (replayer) {
             var item = storage.read((JsonNode) data.serialize(), "OP_MSG");
             var res = new OpMsgContent();
-            res.doDeserialize((JsonNode) item.getOutput(), mapper);
+            res.doDeserialize(item.getOutput(), mapper);
             res.setRequestId(protoContext.getReqResId());
             res.setResponseId(data.getRequestId());
             res.setFlags(8);
@@ -124,7 +124,7 @@ public class MongoProxy extends Proxy<MongoStorage> {
         if (replayer) {
             var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_MSG");
             var res = new OpMsgContent();
-            res.doDeserialize((JsonNode) item.getOutput(), mapper);
+            res.doDeserialize(item.getOutput(), mapper);
             res.setRequestId(protoContext.getReqResId());
             res.setResponseId(lsatOp.getRequestId());
             res.setFlags(8);
@@ -167,7 +167,7 @@ public class MongoProxy extends Proxy<MongoStorage> {
         if (replayer) {
             var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_QUERY");
             var res = new OpReplyContent();
-            res.doDeserialize((JsonNode) item.getOutput(), mapper);
+            res.doDeserialize(item.getOutput(), mapper);
             res.setRequestId(protoContext.getReqResId());
             res.setResponseId(lsatOp.getRequestId());
             res.setFlags(8);
@@ -203,5 +203,9 @@ public class MongoProxy extends Proxy<MongoStorage> {
         this.storage.write(protoContext.getContextId(),
                 (JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_QUERY", "MONGODB");
         return toSend;
+    }
+
+    public ServerApiVersion getServerApiVersion() {
+        return serverApiVersion;
     }
 }

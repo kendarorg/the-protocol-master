@@ -96,16 +96,14 @@ public class JdbcFileStorage extends BaseFileStorage<JdbcRequest, JdbcResponse> 
 
             if (item.isPresent() && !shouldNotSave) {
 
-                log.debug("[SERVER][REPFULL]  " + item.get().getIndex() + ":" + item.get().getType());
+                log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
                 inMemoryDb.remove(item.get().getIndex());
-                if (idx.isPresent()) {
-                    index.remove(idx.get());
-                }
+                idx.ifPresent(compactLine -> index.remove(compactLine));
                 return beforeSendingReadResult(item.get());
             }
 
             if (idx.isPresent()) {
-                log.debug("[SERVER][REPSHRT] " + idx.get().getIndex() + ":" + idx.get().getType());
+                log.debug("[SERVER][REPSHRT] {}:{}", idx.get().getIndex(), idx.get().getType());
                 index.remove(idx.get());
                 var si = new StorageItem<JdbcRequest, JdbcResponse>();
                 JdbcResponse resp = new JdbcResponse();

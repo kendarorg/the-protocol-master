@@ -87,11 +87,11 @@ public class BasicDeliver extends Basic {
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         var context = (AmqpProtoContext) event.getContext();
-        AmqpProxy proxy = null;
+        AmqpProxy proxy;
         ProxyConnection connection = null;
 
         proxy = (AmqpProxy) context.getProxy();
-        connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
+        event.getContext().getValue("CONNECTION");
 
         var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
 

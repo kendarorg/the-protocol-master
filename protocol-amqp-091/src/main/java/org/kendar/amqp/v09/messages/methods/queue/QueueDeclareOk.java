@@ -62,10 +62,11 @@ public class QueueDeclareOk extends Queue {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        this.setChannel(channel);
-        this.queueName = ShortStringHelper.read(rb);
-        this.messageCount = rb.getInt();
-        this.consumerCount = rb.getInt();
-        return iteratorOfList(this);
+        var result = new QueueDeclareOk();
+        result.setChannel(channel);
+        result.setQueueName(ShortStringHelper.read(rb));
+        result.setMessageCount(rb.getInt());
+        result.setConsumerCount(rb.getInt());
+        return iteratorOfList(result);
     }
 }

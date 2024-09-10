@@ -80,7 +80,6 @@ public class FieldsReader {
             }
             break;
             case 'V':
-                value = null;
                 break;
             default:
                 throw new RuntimeException

@@ -1,22 +1,22 @@
 {
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 7,
-  "input" : {
-    "type" : "PublishComp",
-    "data" : {
-      "uuid" : "32",
-      "fullFlag" : 112,
-      "fixedHeader" : "PUBCOMP",
-      "packetIdentifier" : 1,
-      "reasonCode" : 0
+  "constant": false,
+  "connectionId": 1,
+  "index": 7,
+  "input": {
+    "type": "PublishComp",
+    "data": {
+      "uuid": "32",
+      "fullFlag": 112,
+      "fixedHeader": "PUBCOMP",
+      "packetIdentifier": 1,
+      "reasonCode": 0
     }
   },
-  "output" : {
-    "type" : null,
-    "data" : null
+  "output": {
+    "type": null,
+    "data": null
   },
-  "durationMs" : 0,
-  "type" : "PublishComp",
-  "caller" : "MQTT"
+  "durationMs": 0,
+  "type": "PublishComp",
+  "caller": "MQTT"
 }

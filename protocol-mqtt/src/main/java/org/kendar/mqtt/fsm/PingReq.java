@@ -38,7 +38,7 @@ public class PingReq extends BaseMqttState implements ReturnMessage, InterruptPr
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        if(proxy!=null && proxy.isReplayer()){
+        if (proxy != null && proxy.isReplayer()) {
             var pingResp = new PingResp();
             pingResp.setFullFlag(MqttFixedHeader.PINGRESP.asByte());
             return iteratorOfList(pingResp);

@@ -19,10 +19,9 @@ public abstract class MongoState extends ProtoState {
     }
 
     public boolean canRun(BytesEvent event) {
-        var prevState = event.getPrevState();
         var inputBuffer = event.getBuffer();
         var pos = inputBuffer.getPosition();
-        var canRun = false;
+        boolean canRun;
         if (inputBuffer.size() < 16) {
             canRun = false;
         } else {

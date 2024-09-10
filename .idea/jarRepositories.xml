@@ -31,5 +31,10 @@
       <option name="name" value="Kendar Repository2" />
       <option name="url" value="https://maven.kendar.org/maven2/snapshots" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="central3" />
+      <option name="name" value="Central Repository3" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
   </component>
 </project>

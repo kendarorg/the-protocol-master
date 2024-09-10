@@ -7,6 +7,7 @@ import org.kendar.utils.Sleeper;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +30,7 @@ public class SimpleTest extends BasicTest {
     }
 
     @AfterAll
-    public static void afterClass() throws Exception {
+    public static void afterClass() {
         try {
             afterClassBase();
         } catch (Exception ex) {
@@ -60,7 +61,7 @@ public class SimpleTest extends BasicTest {
                     AMQP.BasicProperties properties,
                     byte[] body) throws IOException {
 
-                String message = new String(body, "UTF-8");
+                String message = new String(body, StandardCharsets.UTF_8);
                 messages.put(resultMessage.getAndIncrement(), message);
                 channelBlocked.basicAck(envelope.getDeliveryTag(), false);
                 // process the message
@@ -141,7 +142,7 @@ public class SimpleTest extends BasicTest {
         connection.close();
 
 
-        Sleeper.sleep(100);
+        Sleeper.sleep(1000, () -> messages.size() == 3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
@@ -166,7 +167,7 @@ public class SimpleTest extends BasicTest {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         // connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;
-        var realCs = new URI(rabbitContainer.getConnectionString());
+        //var realCs = new URI(rabbitContainer.getConnectionString());
         //cs = rabbitContainer.getConnectionString();
         Sleeper.sleep(100);
 
@@ -223,7 +224,7 @@ public class SimpleTest extends BasicTest {
         connection.close();
 
 
-        Sleeper.sleep(100);
+        Sleeper.sleep(1000, () -> messages.size() == 3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
@@ -236,9 +237,7 @@ public class SimpleTest extends BasicTest {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
 
-        while (!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
         ConnectionFactory connectionFactory = new ConnectionFactory();
         // connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;

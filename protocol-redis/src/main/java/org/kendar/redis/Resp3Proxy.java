@@ -76,7 +76,7 @@ public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
 
             int connectionId = item.getConnectionId();
             if (type.equalsIgnoreCase("RESPONSE")) {
-                log.debug("[SERVER][CB]: RESPONSE");
+                log.debug("[CL<FF][CB]: RESPONSE");
                 var ctx = Resp3Protocol.consumeContext.get(connectionId);
 
                 ReturnMessage fr = new Resp3Message(ctx, null, out.get("data"));

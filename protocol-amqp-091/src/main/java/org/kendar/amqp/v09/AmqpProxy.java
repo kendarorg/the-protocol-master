@@ -90,7 +90,7 @@ public class AmqpProxy extends NetworkProxy<AmqpStorage> {
                     break;
             }
             if (fr != null) {
-                log.debug("[SERVER][CB]: " + fr.getClass().getSimpleName());
+                log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
                 var ctx = AmqpProtocol.consumeContext.get(consumeId);
                 ctx.write(fr);
             } else {

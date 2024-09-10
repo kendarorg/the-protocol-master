@@ -26,7 +26,8 @@ public class ExchangeDeleteOk extends Exchange {
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
-        setChannel(channel);
-        return iteratorOfList(this);
+        var result = new ExchangeDeleteOk();
+        result.setChannel(channel);
+        return iteratorOfList(result);
     }
 }

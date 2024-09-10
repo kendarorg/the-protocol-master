@@ -30,7 +30,7 @@ public class ComStmtExecute extends ProtoState {
     }
 
     private static void insertType(int mysqlFieldType, JDBCType fieldType, MySQLBBuffer inputBuffer, ArrayList<BindingParameter> bindingParameters, ProxyMetadata field) {
-        Object value = null;
+        Object value;
 
         switch (fieldType) {
             case BIGINT:
@@ -199,7 +199,7 @@ public class ComStmtExecute extends ProtoState {
         var nullBitmap = inputBuffer.getBytes(nullBitmapSize);
 
         var bindingParameters = new ArrayList<BindingParameter>();
-        log.debug("[SERVER][STMTEXEC]: " + query);
+        log.debug("[SERVER][STMTEXEC]: {}", query);
         for (var i = 0; i < paramFields.size(); i++) {
             var field = paramFields.get(i);
             var isNull = BBufferUtils.getBit(nullBitmap, i) == 1;

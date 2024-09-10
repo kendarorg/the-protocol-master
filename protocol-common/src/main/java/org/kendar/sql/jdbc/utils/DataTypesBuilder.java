@@ -62,7 +62,7 @@ public class DataTypesBuilder {
     }
 
     private String getClName(DataTypeDescriptor dt) {
-        Class clazz = null;
+        Class clazz;
         var type = dt.getDataType();
         switch (type) {
             case Types.STRUCT:

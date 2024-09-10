@@ -60,10 +60,7 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
             }
 
         }
-        if (isProxyed()) {
-            return false;
-        }
-        return true;
+        return !isProxyed();
     }
 
     public Iterator<ProtoStep> execute(Resp3Message event) {

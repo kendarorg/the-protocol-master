@@ -72,7 +72,7 @@ public class Bind extends PostgresState {
         var count = message.getShort();
 
 
-        log.debug("[SERVER][STMTBIND]\tSTATEMENT_" + statementName + " Count:" + count + " Query: " + parse.getQuery());
+        log.debug("[SERVER][STMTBIND]\tSTATEMENT_{} Count:{} Query: {}", statementName, count, parse.getQuery());
         var bindMessage = new Binding("STATEMENT_" + statementName, portal, formatCodes, parameterValues);
         parse.put("PORTAL_" + portal, bindMessage);
         postgresContext.setValue("PORTAL_" + portal, bindMessage);

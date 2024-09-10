@@ -23,7 +23,6 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
             "HeaderFrame", "BasicPublish", "BodyFrame", "BasicAck", "ChannelClose", "ConnectionClose",
             "QueueDeclare", "ExchangeDeclare", "QueueDelete", "ExchangeDelete");
     private final List<StorageItem<JsonNode, JsonNode>> inMemoryDb = new ArrayList<>();
-    private final List<StorageItem<JsonNode, JsonNode>> compareData = new ArrayList<>();
     private final List<StorageItem<JsonNode, JsonNode>> outItems = new ArrayList<>();
     private final Object lockObject = new Object();
     private final Object responseLockObject = new Object();
@@ -81,16 +80,14 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
             var shouldNotSave = shouldNotSave(cl, null, null, null);
             if (item.isPresent() && !shouldNotSave) {
 
-                log.debug("[SERVER][REPFULL]  " + item.get().getIndex() + ":" + item.get().getType());
+                log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
                 inMemoryDb.remove(item.get());
-                if (idx.isPresent()) {
-                    index.remove(idx.get());
-                }
+                idx.ifPresent(compactLine -> index.remove(compactLine));
                 return item.get();
             }
 
             if (idx.isPresent()) {
-                log.debug("[SERVER][REPSHRT] " + idx.get().getIndex() + ":" + idx.get().getType());
+                log.debug("[SERVER][REPSHRT] {}:{}", idx.get().getIndex(), idx.get().getType());
                 index.remove(idx.get());
                 var sti = new StorageItem<JsonNode, JsonNode>();
                 sti.setIndex(idx.get().getIndex());
@@ -105,7 +102,6 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
     private void initializeContent() {
         if (!initialized) {
             for (var item : readAllItems()) {
-                compareData.add(item);
                 if (item.getType().equalsIgnoreCase("RESPONSE")) {
                     outItems.add(item);
                     continue;
@@ -128,8 +124,7 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
                     var outItem = outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
                     if (outItem.isPresent()) {
                         result.add(outItem.get());
-                        log.debug("[SERVER][CB] After: " + afterIndex + " Index: " + item.getIndex() + " Type: " +
-                                outItem.get().getOutput().get("type").textValue());
+                        log.debug("[SERVER][CB] After: {} Index: {} Type: {}", afterIndex, item.getIndex(), outItem.get().getOutput().get("type").textValue());
                         outItems.remove(outItem.get());
                     }
                 } else {
@@ -163,10 +158,4 @@ public class AmqpFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
         }
         return data;
     }
-
-    @Override
-    protected List<StorageItem<JsonNode, JsonNode>> readAllItems() {
-        return super.readAllItems();
-    }
-
 }

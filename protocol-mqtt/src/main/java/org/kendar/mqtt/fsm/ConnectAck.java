@@ -57,7 +57,7 @@ public class ConnectAck extends BasePropertiesMqttState implements ReturnMessage
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.write((byte) (sessionSet ? 0x01 : 0x00));
-        rb.write((byte) (connectReasonCode));
+        rb.write(connectReasonCode);
         writeProperties(rb);
     }
 }

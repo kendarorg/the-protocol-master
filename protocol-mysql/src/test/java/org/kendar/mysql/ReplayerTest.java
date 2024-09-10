@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReplayerTest {
-    protected static final int FAKE_PORT = 5431;
+    protected static final int FAKE_PORT = 5455;
 
     @Test
     void simpleJpaTest() throws Exception {
@@ -26,9 +26,7 @@ public class ReplayerTest {
         var protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        while (!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        Sleeper.sleep(5000, protocolServer::isRunning);
 
 
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",
@@ -37,6 +35,7 @@ public class ReplayerTest {
                 "test", "test",
                 "org.hibernate.dialect.MySQLDialect",
                 CompanyJpa.class);
+        Sleeper.sleep(1000);
 
         HibernateSessionFactory.transactional(em -> {
             var lt = new CompanyJpa();
@@ -46,6 +45,7 @@ public class ReplayerTest {
             lt.setSalary(500.22);
             em.persist(lt);
         });
+        Sleeper.sleep(1000);
         var atomicBoolean = new AtomicBoolean(false);
         HibernateSessionFactory.query(em -> {
             var resultset = em.createQuery("SELECT denomination FROM CompanyJpa").getResultList();

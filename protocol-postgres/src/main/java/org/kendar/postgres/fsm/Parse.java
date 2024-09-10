@@ -53,7 +53,7 @@ public class Parse extends PostgresState {
         var postgresContext = (PostgresProtoContext) protoContext;
         var statementName = inputBuffer.getString();
         var query = inputBuffer.getUtf8String();
-        log.debug("[SERVER][PARSE] Query=" + query);
+        log.debug("[SERVER][PARSE] Query={}", query);
         var paramsCount = inputBuffer.getShort();
         var oids = new ArrayList<Integer>();
         var concreteTypes = new ArrayList<JDBCType>();

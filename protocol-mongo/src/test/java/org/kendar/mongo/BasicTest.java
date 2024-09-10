@@ -33,14 +33,34 @@ public class BasicTest {
                 .waitingForPort(27017)
                 .start();
 
+        Sleeper.sleep(5000, () -> {
+            try {
+                var settings = MongoClientSettings.builder()
+                        .applyConnectionString(new ConnectionString(
+                                mongoContainer.getConnectionString()))
+                        //.serverApi(serverApi)
+                        .build();
 
+                MongoClient mongo = MongoClients.create(settings);
+                try {
+                    mongo.listDatabaseNames().iterator().hasNext();
+                } catch (Exception e) {
+                    return false;
+                }
+                mongo.close();
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
     }
 
 
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new MongoProtocol(FAKE_PORT);
         var proxy = new MongoProxy(mongoContainer.getConnectionString());
-        if (testInfo != null) {
+        if (testInfo != null && testInfo.getTestClass().isPresent() &&
+                testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
@@ -55,9 +75,7 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        while (!protocolServer.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     public static void afterEachBase() {

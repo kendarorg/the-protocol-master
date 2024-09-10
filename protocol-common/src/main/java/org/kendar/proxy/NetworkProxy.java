@@ -94,6 +94,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             return new ProxyConnection(null);
         }
         try {
+            @SuppressWarnings("resource")
             var connection = new Socket();
             connection.setSoTimeout(60 * 1000);
             connection.setKeepAlive(true);
