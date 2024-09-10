@@ -21,7 +21,7 @@ public class PubSubTest extends BasicTest {
     }
 
     @AfterAll
-    public static void afterClass() throws Exception {
+    public static void afterClass() {
         try {
             afterClassBase();
         } catch (Exception ex) {
@@ -40,20 +40,17 @@ public class PubSubTest extends BasicTest {
     }
 
     @Test
-    void pubsub() throws Exception {
+    void pubsub() {
         final JedisPoolConfig poolConfig = new JedisPoolConfig();
         final JedisPool jedisPool = new JedisPool(poolConfig, "127.0.0.1", FAKE_PORT, 0);
         final Jedis subscriberJedis = jedisPool.getResource();
         final Subscriber subscriber = new Subscriber();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    subscriberJedis.subscribe(subscriber, CHANNEL_NAME);
-                } catch (Exception e) {
-                    System.err.println("Subscribing failed.");
-                }
+        new Thread(() -> {
+            try {
+                subscriberJedis.subscribe(subscriber, CHANNEL_NAME);
+            } catch (Exception e) {
+                System.err.println("Subscribing failed.");
             }
         }).start();
 
@@ -66,7 +63,7 @@ public class PubSubTest extends BasicTest {
         subscriber.unsubscribe();
         jedisPool.returnResource(subscriberJedis);
         jedisPool.returnResource(publisherJedis);
-        Sleeper.sleep(1000, () ->  subscriber.results.size()==3);
+        Sleeper.sleep(1000, () -> subscriber.results.size() == 3);
         assertEquals(3, subscriber.results.size());
         assertTrue(subscriber.results.containsKey("FIRST"));
         assertTrue(subscriber.results.containsKey("SECOND"));

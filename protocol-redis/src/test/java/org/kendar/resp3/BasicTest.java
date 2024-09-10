@@ -40,7 +40,8 @@ public class BasicTest {
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
         var proxy = new Resp3Proxy("redis://" + redisImage.getHost() + ":" + redisImage.getPort(), null, null);
-        if (testInfo != null) {
+        if (testInfo != null&& testInfo.getTestClass().isPresent() &&
+                testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
@@ -55,7 +56,7 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     public static void afterEachBase() {

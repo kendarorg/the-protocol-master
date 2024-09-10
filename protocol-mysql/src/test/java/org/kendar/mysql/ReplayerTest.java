@@ -26,7 +26,7 @@ public class ReplayerTest {
         var protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, protocolServer::isRunning);
 
 
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",

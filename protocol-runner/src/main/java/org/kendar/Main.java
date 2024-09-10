@@ -209,7 +209,7 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
         protocolServer.useCallDurationTimes(callDurationTimes);
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws IOException {
@@ -266,7 +266,7 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
         protocolServer.useCallDurationTimes(callDurationTimes);
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
@@ -286,7 +286,7 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
         protocolServer.useCallDurationTimes(callDurationTimes);
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
@@ -307,7 +307,7 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     private static void runMqtt(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
@@ -328,7 +328,7 @@ public class Main {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     public static void stop() {

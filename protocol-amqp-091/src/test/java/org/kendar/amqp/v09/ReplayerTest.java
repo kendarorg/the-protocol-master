@@ -9,6 +9,7 @@ import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -44,7 +45,7 @@ public class ReplayerTest {
                     AMQP.BasicProperties properties,
                     byte[] body) throws IOException {
 
-                String message = new String(body, "UTF-8");
+                String message = new String(body, StandardCharsets.UTF_8);
                 messages.put(resultMessage.getAndIncrement(), message);
                 channelConsume.basicAck(envelope.getDeliveryTag(), false);
                 // process the message
@@ -68,7 +69,7 @@ public class ReplayerTest {
         var protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, protocolServer::isRunning);
         try {
 
             ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -122,7 +123,7 @@ public class ReplayerTest {
             connection.close();
 
 
-            Sleeper.sleep(1000,()->messages.size()==3);
+            Sleeper.sleep(1000, () -> messages.size() == 3);
 
             assertEquals(3, messages.size());
             assertTrue(messages.containsValue(exectedMessage + "1"));
@@ -149,7 +150,7 @@ public class ReplayerTest {
 
         protocolServer.start();
         try {
-            Sleeper.sleep(5000,()->protocolServer.isRunning());
+            Sleeper.sleep(5000, protocolServer::isRunning);
             ConnectionFactory connectionFactory = new ConnectionFactory();
             connectionFactory.enableHostnameVerification();
             var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
@@ -192,7 +193,7 @@ public class ReplayerTest {
             connection.close();
 
 
-            Sleeper.sleep(1000,()->messages.size()==3);
+            Sleeper.sleep(1000, () -> messages.size() == 3);
 
             assertEquals(3, messages.size());
             assertTrue(messages.containsValue(exectedMessage + "1"));
@@ -219,7 +220,7 @@ public class ReplayerTest {
 
         protocolServer.start();
         try {
-            Sleeper.sleep(5000,()->protocolServer.isRunning());
+            Sleeper.sleep(5000, protocolServer::isRunning);
 
             ConnectionFactory connectionFactory = new ConnectionFactory();
             connectionFactory.enableHostnameVerification();

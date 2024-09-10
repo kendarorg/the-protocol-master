@@ -135,7 +135,7 @@ public class PostgresProtocolTest extends BasicTest {
 
 
         try {
-            Sleeper.sleep(5000,()->protocolServer.isRunning());
+            Sleeper.sleep(5000, () -> protocolServer.isRunning());
 
             Connection c;
             Statement stmt;

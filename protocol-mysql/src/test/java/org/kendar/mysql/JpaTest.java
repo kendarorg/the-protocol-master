@@ -35,7 +35,7 @@ public class JpaTest extends BasicTest {
 
     @Test
     void simpleJpaTest() throws Exception {
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",
                 //postgresContainer.getJdbcUrl(),
                 String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),

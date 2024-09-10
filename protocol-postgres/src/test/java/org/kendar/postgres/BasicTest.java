@@ -7,8 +7,6 @@ import org.kendar.sql.jdbc.storage.JdbcFileStorage;
 import org.kendar.testcontainer.images.PostgreslImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
@@ -32,9 +30,9 @@ public class BasicTest {
         postgresContainer
                 .withNetwork(network)
                 .start();
-        Sleeper.sleep(60000,()->{
+        Sleeper.sleep(60000, () -> {
             try {
-                Connection connect = DriverManager.getConnection(
+                DriverManager.getConnection(
                         postgresContainer.getJdbcUrl(),
                         postgresContainer.getUserId(), postgresContainer.getPassword());
                 return true;
@@ -44,8 +42,6 @@ public class BasicTest {
         });
     }
 
-    private static final Logger log = LoggerFactory.getLogger(BasicTest.class);
-
     public static void beforeEachBase(TestInfo testInfo) {
 
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
@@ -54,7 +50,8 @@ public class BasicTest {
                 postgresContainer.getUserId(), postgresContainer.getPassword());
 
 
-        if (testInfo != null) {
+        if (testInfo != null && testInfo.getTestClass().isPresent() &&
+                testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
@@ -69,7 +66,7 @@ public class BasicTest {
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
-        Sleeper.sleep(5000,()->protocolServer.isRunning());
+        Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
     public static void afterEachBase() {
