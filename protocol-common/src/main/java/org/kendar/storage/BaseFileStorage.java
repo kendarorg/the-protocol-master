@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -161,7 +162,11 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
                     if (Files.exists(Path.of(targetDir, id + ".noop"))) {
                         Files.delete(Path.of(targetDir, id + ".noop"));
                     }
-                    Files.move(Path.of(targetDir, id), Path.of(targetDir, id + ".noop"));
+                    try {
+                        Files.move(Path.of(targetDir, id), Path.of(targetDir, id + ".noop"));
+                    }catch (NoSuchFileException ex){
+                        log.warn("[TPM  ][WR]: File did not exist at {}", Path.of(targetDir, id));
+                    }
                     continue;
                 }
                 loadedData.add(item);
