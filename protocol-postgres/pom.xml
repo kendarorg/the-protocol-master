@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.1</version>
     </parent>
 
     <artifactId>protocol-postgres</artifactId>
