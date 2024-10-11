@@ -21,8 +21,30 @@ public class ColumnDefinition extends MySQLReturnMessage {
 
     @Override
     protected void writeResponse(MySQLBBuffer resultBuffer) {
+        resultBuffer.writeWithLength("def".getBytes());//catalog
+        resultBuffer.writeWithLength("def".getBytes());//schema
+        resultBuffer.writeWithLength("def".getBytes());//table
+        resultBuffer.writeWithLength("def".getBytes());//table
+        resultBuffer.writeWithLength(field.getColumnName().getBytes());//label
+        resultBuffer.writeWithLength(field.getColumnName().getBytes());//name
+        resultBuffer.writeLength(0x0c);
+        resultBuffer.writeUB2(language.getValue());
+        resultBuffer.writeUB4(getMaxColumnDisplaySize(field.getColumnDisplaySize(),field.getColumnType()));
+        if (binary) {
+            resultBuffer.write((byte) toMysql(field.getColumnType()));
+        } else {
+            resultBuffer.write((byte) MySQLType.MYSQL_TYPE_VAR_STRING.getValue());
+        }
+        resultBuffer.writeUB2(0x00);
+        if (field.getPrecision() > 0) {
+            resultBuffer.write((byte) field.getPrecision());
+        } else {
+            resultBuffer.write((byte) 0x00);
+        }
+        resultBuffer.write((byte) 0x00);
+        resultBuffer.write((byte) 0x00);
 
-
+/*
         if (field.getCatalogName() == null || field.getCatalogName().isEmpty()) {
             resultBuffer.writeWithLength("def".getBytes());
         } else {
@@ -54,7 +76,34 @@ public class ColumnDefinition extends MySQLReturnMessage {
             resultBuffer.write((byte) 0x00);
         }
         resultBuffer.write((byte) 0x00);
-        resultBuffer.write((byte) 0x00);
+        resultBuffer.write((byte) 0x00);*/
+    }
+
+    private long getMaxColumnDisplaySize(int columnDisplaySize, JDBCType columnType) {
+        long value;
+        switch (columnType) {
+            case BOOLEAN:
+            case BIT:
+                value = 1;
+                break;
+            case BIGINT:
+            case INTEGER:
+            case SMALLINT:
+            case TINYINT:
+            case DOUBLE:
+            case FLOAT:
+            case DATE:
+            case TIME:
+            case TIME_WITH_TIMEZONE:
+            case TIMESTAMP:
+            case TIMESTAMP_WITH_TIMEZONE:
+                value = 32;
+                break;
+            default:
+                value = 999999999L;
+                break;
+        }
+        return value;
     }
 
     private int toMysql(JDBCType columnType) {
