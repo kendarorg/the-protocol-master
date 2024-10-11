@@ -25,16 +25,11 @@ public class ColumnDefinition extends MySQLReturnMessage {
         resultBuffer.writeWithLength("def".getBytes());//schema
         resultBuffer.writeWithLength("def".getBytes());//table
         resultBuffer.writeWithLength("def".getBytes());//table
-        if (field.getColumnLabel() != null && !field.getColumnLabel().isEmpty()) {
-            resultBuffer.writeWithLength(field.getColumnLabel().getBytes());//label
-            resultBuffer.writeWithLength(field.getColumnLabel().getBytes());//name
-        } else {
-            resultBuffer.writeWithLength(field.getColumnName().getBytes());//label
+        resultBuffer.writeWithLength(field.getColumnName().getBytes());//label
             resultBuffer.writeWithLength(field.getColumnName().getBytes());//name
-        }
         resultBuffer.writeLength(0x0c);
         resultBuffer.writeUB2(language.getValue());
-        resultBuffer.writeUB4(getMaxColumnDisplaySize(field.getColumnDisplaySize(), field.getColumnType()));
+        resultBuffer.writeUB4(getMaxColumnDisplaySize( field.getColumnType()));
         if (binary) {
             resultBuffer.write((byte) toMysql(field.getColumnType()));
         } else {
@@ -84,7 +79,7 @@ public class ColumnDefinition extends MySQLReturnMessage {
         resultBuffer.write((byte) 0x00);*/
     }
 
-    private long getMaxColumnDisplaySize(int columnDisplaySize, JDBCType columnType) {
+    private long getMaxColumnDisplaySize( JDBCType columnType) {
         long value;
         switch (columnType) {
             case BOOLEAN:

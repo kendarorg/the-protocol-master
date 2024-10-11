@@ -391,15 +391,11 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             for (var i = 0; i < resultSetMetaData.getColumnCount(); i++) {
 
                 var isByte = isByteOut(resultSetMetaData.getColumnClassName(i + 1));
-
+                var name = (resultSetMetaData.getColumnLabel(i + 1)==null||resultSetMetaData.getColumnLabel(i + 1).isEmpty())?
+                        resultSetMetaData.getColumnName(i + 1):resultSetMetaData.getColumnLabel(i + 1);
                 fields.add(new ProxyMetadata(
-                        resultSetMetaData.getColumnName(i + 1),
-                        resultSetMetaData.getColumnLabel(i + 1),
+                        name,
                         isByte,
-                        resultSetMetaData.getCatalogName(i + 1),
-                        resultSetMetaData.getSchemaName(i + 1),
-                        resultSetMetaData.getTableName(i + 1),
-                        resultSetMetaData.getColumnDisplaySize(i + 1),
                         resultSetMetaData.getColumnType(i + 1),
                         resultSetMetaData.getPrecision(i + 1)));
             }
