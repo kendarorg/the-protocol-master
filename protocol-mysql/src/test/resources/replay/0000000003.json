@@ -799,14 +799,8 @@
       "metadata": [
         {
           "columnName": "WORD",
-          "columnLabel": "WORD",
           "byteData": false,
-          "catalogName": "information_schema",
-          "schemaName": "",
-          "tableName": "KEYWORDS",
-          "columnDisplaySize": 128,
-          "columnType": "VARCHAR",
-          "precision": 128
+          "columnType": "VARCHAR"
         }
       ],
       "count": 262,

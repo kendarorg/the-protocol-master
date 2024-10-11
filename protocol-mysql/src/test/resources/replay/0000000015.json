@@ -15,15 +15,9 @@
       ],
       "metadata": [
         {
-          "columnName": "DENOMINATION",
-          "columnLabel": "col_0_0_",
+          "columnName": "col_0_0_",
           "byteData": false,
-          "catalogName": "test",
-          "schemaName": "",
-          "tableName": "COMPANY_JPA",
-          "columnDisplaySize": 255,
-          "columnType": "VARCHAR",
-          "precision": 255
+          "columnType": "VARCHAR"
         }
       ],
       "count": 1,

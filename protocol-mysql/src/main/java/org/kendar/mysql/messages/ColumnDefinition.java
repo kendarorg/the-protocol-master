@@ -25,8 +25,13 @@ public class ColumnDefinition extends MySQLReturnMessage {
         resultBuffer.writeWithLength("def".getBytes());//schema
         resultBuffer.writeWithLength("def".getBytes());//table
         resultBuffer.writeWithLength("def".getBytes());//table
-        resultBuffer.writeWithLength(field.getColumnName().getBytes());//label
-        resultBuffer.writeWithLength(field.getColumnName().getBytes());//name
+        if (field.getColumnLabel() != null && !field.getColumnLabel().isEmpty()) {
+            resultBuffer.writeWithLength(field.getColumnLabel().getBytes());//label
+            resultBuffer.writeWithLength(field.getColumnLabel().getBytes());//name
+        }else{
+            resultBuffer.writeWithLength(field.getColumnName().getBytes());//label
+            resultBuffer.writeWithLength(field.getColumnName().getBytes());//name
+        }
         resultBuffer.writeLength(0x0c);
         resultBuffer.writeUB2(language.getValue());
         resultBuffer.writeUB4(getMaxColumnDisplaySize(field.getColumnDisplaySize(),field.getColumnType()));

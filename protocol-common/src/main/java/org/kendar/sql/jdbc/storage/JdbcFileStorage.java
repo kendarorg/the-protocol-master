@@ -87,7 +87,8 @@ public class JdbcFileStorage extends BaseFileStorage<JdbcRequest, JdbcResponse> 
 
             var idx = index.stream()
                     .filter(a -> type.equalsIgnoreCase(a.getType()) &&
-                            a.getCaller().equalsIgnoreCase("JDBC")).findFirst();
+                            a.getCaller().equalsIgnoreCase("JDBC") &&
+                            a.getTags().get("query")!=null && a.getTags().get("query").equalsIgnoreCase(query)).findFirst();
             CompactLine cl = null;
             if (idx.isPresent()) {
                 cl = idx.get();
