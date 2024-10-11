@@ -3679,47 +3679,19 @@
       "metadata": [
         {
           "columnName": "is_array",
-          "columnLabel": "is_array",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "",
-          "columnDisplaySize": 1,
-          "columnType": "BIT",
-          "precision": 1
+          "byteData": false
         },
         {
           "columnName": "typtype",
-          "columnLabel": "typtype",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "pg_type",
-          "columnDisplaySize": 1,
-          "columnType": "CHAR",
-          "precision": 1
+          "byteData": false
         },
         {
           "columnName": "typname",
-          "columnLabel": "typname",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "pg_type",
-          "columnDisplaySize": 2147483647,
-          "columnType": "VARCHAR",
-          "precision": 2147483647
+          "byteData": false
         },
         {
           "columnName": "oid",
-          "columnLabel": "oid",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "pg_type",
-          "columnDisplaySize": 10,
-          "columnType": "BIGINT",
-          "precision": 10
+          "byteData": false
         }
       ],
       "count": 611,

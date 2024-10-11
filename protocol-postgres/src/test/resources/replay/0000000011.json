@@ -45,58 +45,23 @@
       "metadata": [
         {
           "columnName": "id",
-          "columnLabel": "id",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "company_jpa",
-          "columnDisplaySize": 20,
-          "columnType": "BIGINT",
-          "precision": 19
+          "byteData": false
         },
         {
           "columnName": "address",
-          "columnLabel": "address",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "company_jpa",
-          "columnDisplaySize": 255,
-          "columnType": "VARCHAR",
-          "precision": 255
+          "byteData": false
         },
         {
           "columnName": "age",
-          "columnLabel": "age",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "company_jpa",
-          "columnDisplaySize": 11,
-          "columnType": "INTEGER",
-          "precision": 10
+          "byteData": false
         },
         {
           "columnName": "denomination",
-          "columnLabel": "denomination",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "company_jpa",
-          "columnDisplaySize": 255,
-          "columnType": "VARCHAR",
-          "precision": 255
+          "byteData": false
         },
         {
           "columnName": "salary",
-          "columnLabel": "salary",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "company_jpa",
-          "columnDisplaySize": 25,
-          "columnType": "DOUBLE",
-          "precision": 17
+          "byteData": false
         }
       ],
       "count": 1,

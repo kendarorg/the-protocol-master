@@ -16,14 +16,7 @@
       "metadata": [
         {
           "columnName": "col_0_0_",
-          "columnLabel": "col_0_0_",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "company_jpa",
-          "columnDisplaySize": 255,
-          "columnType": "VARCHAR",
-          "precision": 255
+          "byteData": false
         }
       ],
       "count": 1,

@@ -1625,25 +1625,11 @@
       "metadata": [
         {
           "columnName": "typname",
-          "columnLabel": "typname",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "pg_type",
-          "columnDisplaySize": 2147483647,
-          "columnType": "VARCHAR",
-          "precision": 2147483647
+          "byteData": false
         },
         {
           "columnName": "oid",
-          "columnLabel": "oid",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "pg_type",
-          "columnDisplaySize": 10,
-          "columnType": "BIGINT",
-          "precision": 10
+          "byteData": false
         }
       ],
       "count": 403,

@@ -16,14 +16,7 @@
       "metadata": [
         {
           "columnName": "current_schema",
-          "columnLabel": "current_schema",
-          "byteData": false,
-          "catalogName": "",
-          "schemaName": "",
-          "tableName": "",
-          "columnDisplaySize": 2147483647,
-          "columnType": "VARCHAR",
-          "precision": 2147483647
+          "byteData": false
         }
       ],
       "count": 1,
