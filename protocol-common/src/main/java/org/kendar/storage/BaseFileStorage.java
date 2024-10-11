@@ -164,7 +164,7 @@ public abstract class BaseFileStorage<I, O> extends BaseStorage<I, O> {
                     }
                     try {
                         Files.move(Path.of(targetDir, id), Path.of(targetDir, id + ".noop"));
-                    }catch (NoSuchFileException ex){
+                    } catch (NoSuchFileException ex) {
                         log.warn("[TPM  ][WR]: File did not exist at {}", Path.of(targetDir, id));
                     }
                     continue;

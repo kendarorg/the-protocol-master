@@ -30,7 +30,6 @@ public class BasicTest {
     }
 
 
-
     public static void afterClassBase() throws Exception {
         postgresContainer.close();
     }

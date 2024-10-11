@@ -23,7 +23,8 @@ public class ProxyMetadata {
         this.columnLabel = columnName;
     }
 
-    public ProxyMetadata(String columnName, String columnLabel, boolean byteData, String catalogName, String schemaName, String tableName, int columnDisplaySize, int columnType, int precision) {
+    public ProxyMetadata(String columnName, String columnLabel, boolean byteData, String catalogName, String schemaName,
+                         String tableName, int columnDisplaySize, int columnType, int precision) {
 
         this.columnName = columnName;
         this.columnLabel = columnLabel;

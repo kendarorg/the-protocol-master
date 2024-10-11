@@ -289,7 +289,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         }
         if (replayer) {
             var storageItem = storage.read(query, parameterValues, "QUERY");
-            if(storageItem==null && query.trim().toLowerCase().startsWith("set")){
+            if (storageItem == null && query.trim().toLowerCase().startsWith("set")) {
                 var result = new SelectResult();
                 result.setCount(0);
                 result.setIntResult(true);
