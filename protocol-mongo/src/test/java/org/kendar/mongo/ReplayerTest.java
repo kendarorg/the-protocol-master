@@ -14,7 +14,7 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.kendar.server.TcpServer;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;

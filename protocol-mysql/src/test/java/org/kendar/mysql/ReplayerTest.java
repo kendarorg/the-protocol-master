@@ -5,7 +5,7 @@ import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;

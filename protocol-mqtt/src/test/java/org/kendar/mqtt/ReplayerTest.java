@@ -5,7 +5,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.kendar.server.TcpServer;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;

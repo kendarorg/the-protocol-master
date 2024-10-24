@@ -7,7 +7,7 @@ import org.kendar.redis.Resp3Proxy;
 import org.kendar.resp3.pubsub.Publisher;
 import org.kendar.resp3.pubsub.Subscriber;
 import org.kendar.server.TcpServer;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;

@@ -1,10 +1,10 @@
-package org.kendar.storage.generic;
+package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.storage.BaseStorage;
-import org.kendar.storage.CompactLine;
-import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.CallItemsQuery;
+import org.kendar.storage.generic.ResponseItemQuery;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;

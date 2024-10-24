@@ -8,7 +8,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.testcontainer.images.MongoDbImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;

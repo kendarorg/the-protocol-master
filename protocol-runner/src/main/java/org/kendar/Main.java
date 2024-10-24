@@ -21,7 +21,7 @@ import org.kendar.redis.Resp3Proxy;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.QueryReplacerItem;
 import org.kendar.utils.Sleeper;
 import org.slf4j.LoggerFactory;

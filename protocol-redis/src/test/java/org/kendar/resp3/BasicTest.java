@@ -6,7 +6,7 @@ import org.kendar.redis.Resp3StorageHandler;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.server.TcpServer;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.testcontainer.images.RedisImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;

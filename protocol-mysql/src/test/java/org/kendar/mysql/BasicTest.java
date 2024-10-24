@@ -3,7 +3,7 @@ package org.kendar.mysql;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.testcontainer.images.MysqlImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;

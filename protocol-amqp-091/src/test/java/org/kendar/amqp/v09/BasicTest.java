@@ -4,7 +4,7 @@ package org.kendar.amqp.v09;
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
-import org.kendar.storage.generic.FileStorageRepository;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.testcontainer.images.RabbitMqImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
