@@ -20,7 +20,7 @@ public class ReplayerTest {
     @Test
     void simpleJpaTest() throws Exception {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy(new MySqlFileStorage(new FileStorageRepository<>(Path.of("src",
+        var proxy = new JdbcProxy(new MySqlStorageHandler(new FileStorageRepository<>(Path.of("src",
                 "test", "resources", "replay"))));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

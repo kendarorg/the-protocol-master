@@ -12,13 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AmqpFileStorage extends BaseStorage<JsonNode, JsonNode> implements AmqpStorage {
+public class AmqpStorageHandler extends BaseStorage<JsonNode, JsonNode> implements AmqpStorage {
     private static final List<String> toAvoid = List.of("byte[]",
             "ConnectionStartOk", "ConnectionTuneOk", "ConnectionOpen", "ChannelOpen", "BasicPublish",
             "HeaderFrame", "BasicPublish", "BodyFrame", "BasicAck", "ChannelClose", "ConnectionClose",
             "QueueDeclare", "ExchangeDeclare", "QueueDelete", "ExchangeDelete");
 
-    public AmqpFileStorage(StorageRepository<JsonNode, JsonNode> repository) {
+    public AmqpStorageHandler(StorageRepository<JsonNode, JsonNode> repository) {
         super(repository);
     }
 

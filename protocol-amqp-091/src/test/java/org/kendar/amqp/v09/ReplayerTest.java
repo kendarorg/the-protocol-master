@@ -62,7 +62,7 @@ public class ReplayerTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(new FileStorageRepository<>(Path.of("src",
+        proxy.setStorage(new AmqpStorageHandler(new FileStorageRepository<>(Path.of("src",
                 "test", "resources", "test2_differentChannelAndConnection"))));
 
         baseProtocol.setProxy(proxy);
@@ -142,7 +142,7 @@ public class ReplayerTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(new FileStorageRepository<>(Path.of("src",
+        proxy.setStorage(new AmqpStorageHandler(new FileStorageRepository<>(Path.of("src",
                 "test", "resources", "test5_noPublish"))));
 
         baseProtocol.setProxy(proxy);
@@ -212,7 +212,7 @@ public class ReplayerTest {
 
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(new FileStorageRepository<>(Path.of("src",
+        proxy.setStorage(new AmqpStorageHandler(new FileStorageRepository<>(Path.of("src",
                 "test", "resources", "test3_openConnection"))));
 
         baseProtocol.setProxy(proxy);

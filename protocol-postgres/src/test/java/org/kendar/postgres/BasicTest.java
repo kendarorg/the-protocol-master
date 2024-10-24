@@ -3,7 +3,7 @@ package org.kendar.postgres;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.sql.jdbc.storage.JdbcFileStorage;
+import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.storage.generic.FileStorageRepository;
 import org.kendar.testcontainer.images.PostgreslImage;
 import org.kendar.testcontainer.utils.Utils;
@@ -57,9 +57,9 @@ public class BasicTest {
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new JdbcFileStorage(new FileStorageRepository<>(Path.of("target", "tests", className, method, dsp))));
+                proxy.setStorage(new JdbcStorageHandler(new FileStorageRepository<>(Path.of("target", "tests", className, method, dsp))));
             } else {
-                proxy.setStorage(new JdbcFileStorage(new FileStorageRepository<>(Path.of("target", "tests", className, method))));
+                proxy.setStorage(new JdbcStorageHandler(new FileStorageRepository<>(Path.of("target", "tests", className, method))));
             }
         }
         baseProtocol.setProxy(proxy);

@@ -1,7 +1,7 @@
 package org.kendar.resp3;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.redis.Resp3FileStorage;
+import org.kendar.redis.Resp3StorageHandler;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.resp3.pubsub.Publisher;
@@ -27,7 +27,7 @@ public class ReplayerTest {
     void testReplayer() {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
         var proxy = new Resp3Proxy();
-        proxy.setStorage(new Resp3FileStorage(new FileStorageRepository<>(Path.of("src",
+        proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository<>(Path.of("src",
                 "test", "resources", "replay"))));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

@@ -13,12 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JdbcFileStorage extends BaseStorage<JdbcRequest, JdbcResponse> implements JdbcStorage {
+public class JdbcStorageHandler extends BaseStorage<JdbcRequest, JdbcResponse> implements JdbcStorage {
 
 
     private static final List<String> toAvoid = List.of("SET", "CREATE", "DELETE", "DROP");
 
-    public JdbcFileStorage(StorageRepository<JdbcRequest, JdbcResponse> repository) {
+    public JdbcStorageHandler(StorageRepository<JdbcRequest, JdbcResponse> repository) {
         super(repository);
     }
 

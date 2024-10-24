@@ -1,7 +1,7 @@
 package org.kendar.mysql;
 
 import org.kendar.sql.jdbc.SelectResult;
-import org.kendar.sql.jdbc.storage.JdbcFileStorage;
+import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.storage.CompactLine;
@@ -11,7 +11,7 @@ import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 
-public class MySqlFileStorage extends JdbcFileStorage {
+public class MySqlStorageHandler extends JdbcStorageHandler {
 
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
     private static final String SELECT_TRANS_RESULT = "{\n" +
@@ -32,7 +32,7 @@ public class MySqlFileStorage extends JdbcFileStorage {
             "      \"lastInsertedId\" : 0\n" +
             "    }";
 
-    public MySqlFileStorage(StorageRepository<JdbcRequest, JdbcResponse> repository) {
+    public MySqlStorageHandler(StorageRepository<JdbcRequest, JdbcResponse> repository) {
         super(repository);
     }
 

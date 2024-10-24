@@ -1,36 +1,27 @@
-package org.kendar.redis;
+package org.kendar.mongo;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.kendar.redis.utils.Resp3Storage;
+import org.kendar.mongo.utils.MongoStorage;
 import org.kendar.storage.BaseStorage;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.StorageRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-public class Resp3FileStorage extends BaseStorage<JsonNode, JsonNode> implements Resp3Storage {
-    private static final Logger log = LoggerFactory.getLogger(Resp3FileStorage.class);
+public class MongoStorageHandler extends BaseStorage<JsonNode, JsonNode> implements MongoStorage {
 
-    public Resp3FileStorage(StorageRepository<JsonNode, JsonNode> repository) {
+
+    public MongoStorageHandler(StorageRepository<JsonNode, JsonNode> repository) {
         super(repository);
     }
 
     @Override
     public String getCaller() {
-        return "RESP3";
-    }
-
-    @Override
-    public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type) {
-        var siQuery = new CallItemsQuery();
-        siQuery.setCaller(getCaller());
-        return read(siQuery);
+        return "MONGODB";
     }
 
     @Override
@@ -49,4 +40,16 @@ public class Resp3FileStorage extends BaseStorage<JsonNode, JsonNode> implements
         return Map.of();
     }
 
+    @Override
+    public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type) {
+        var siQuery = new CallItemsQuery();
+        siQuery.setCaller(getCaller());
+        siQuery.setType(type);
+        return read(siQuery);
+    }
+
+    @Override
+    public List<StorageItem<JsonNode, JsonNode>> readResponses(long afterIndex) {
+        return List.of();
+    }
 }

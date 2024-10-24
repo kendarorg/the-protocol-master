@@ -42,7 +42,7 @@ public class ReplayerTest {
     @Test
     void testConnectionWithProtocolWithServerApis() {
         var baseProtocol = new MongoProtocol(FAKE_PORT);
-        var proxy = new MongoProxy(new MongoFileStorage(
+        var proxy = new MongoProxy(new MongoStorageHandler(
                 new FileStorageRepository<>(Path.of("src",
                         "test", "resources", "replay"))));
 

@@ -7,25 +7,15 @@ import org.kendar.storage.BaseStorage;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MqttFileStorage extends BaseStorage<JsonNode, JsonNode> implements MqttStorage {
-    private static final Logger log = LoggerFactory.getLogger(MqttFileStorage.class);
+public class MqttStorageHandler extends BaseStorage<JsonNode, JsonNode> implements MqttStorage {
     private static final List<String> toAvoid = List.of("Disconnect", "PingReq");
-    private final List<StorageItem<JsonNode, JsonNode>> inMemoryDb = new ArrayList<>();
-    private final List<StorageItem<JsonNode, JsonNode>> outItems = new ArrayList<>();
-    private final Object lockObject = new Object();
-    private final Object responseLockObject = new Object();
-    private boolean initialized = false;
-    private List<CompactLine> index;
 
-    public MqttFileStorage(StorageRepository<JsonNode, JsonNode> repository) {
+    public MqttStorageHandler(StorageRepository<JsonNode, JsonNode> repository) {
         super(repository);
     }
 
