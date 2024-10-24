@@ -81,6 +81,7 @@ public class Main {
             var logsDir = cmd.getOptionValue("xd");
             if (logsDir != null && !logsDir.isEmpty()) {
                 logsDir = logsDir.replace("{timestamp}", "" + new Date().getTime());
+                logsDir = logsDir.replace("{protocol}", protocol.trim().toLowerCase());
             }
             if (replayFromLog &&
                     (logsDir == null || logsDir.isEmpty())) {
@@ -130,8 +131,8 @@ public class Main {
         options.addOption("xl", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote login");
         options.addOption("xw", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote password");
         options.addOption("xc", true, "[all] Select remote connection string (for redis use redis://host:port");
-        options.addOption("xd", true, "[all] Select log/replay directory (you can set a {timestamp} value\n" +
-                "that will be replaced with the current timestamp)");
+        options.addOption("xd", true, "[all] Select log/replay directory (you can set a {timestamp} value " +
+                "that will be replaced with the current timestamp and/or a {protocol} value replaced with the protocol)");
         options.addOption("pl", false, "[all] Replay from log/replay directory");
         options.addOption("v", true, "[all] Log level (default ERROR)");
         options.addOption("t", true, "[all] Set timeout in seconds towards proxied system (default 30s)");
