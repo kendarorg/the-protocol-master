@@ -60,23 +60,7 @@ public class Resp3Parser {
     }
 
     private int parseInteger(Resp3Input line) throws Resp3ParseException {
-        String result = "";
-        var end = 0;
-        while (line.hasNext() && end != 2) {
-            var ch = line.charAtAndIncrement();
-            if (ch == '\r' && end == 0) {
-                end++;
-            } else if (ch == '\n' && end == 1) {
-                end++;
-            } else if (((ch >= '0' && ch <= '9') || ch == '-' || ch == '+') && end == 0) {
-                result += ch;
-            } else {
-                throw new Resp3ParseException("Invalid integer format");
-            }
-        }
-        if (end != 2) {
-            throw new Resp3ParseException("Unterminated end of integer", true);
-        }
+        String result = buildIntegerString(line);
         try {
             return Integer.parseInt(result);
         } catch (Exception ex) {
@@ -160,6 +144,15 @@ public class Resp3Parser {
 
 
     private BigInteger parseBigNumber(Resp3Input line) throws Resp3ParseException {
+        String result = buildIntegerString(line);
+        try {
+            return new BigInteger(result);
+        } catch (Exception ex) {
+            throw new Resp3ParseException("Invalid integer");
+        }
+    }
+
+    private static String buildIntegerString(Resp3Input line) throws Resp3ParseException {
         String result = "";
         var end = 0;
         while (line.hasNext() && end != 2) {
@@ -177,11 +170,7 @@ public class Resp3Parser {
         if (end != 2) {
             throw new Resp3ParseException("Unterminated end of integer", true);
         }
-        try {
-            return new BigInteger(result);
-        } catch (Exception ex) {
-            throw new Resp3ParseException("Invalid integer");
-        }
+        return result;
     }
 
     private double parseDouble(Resp3Input line) throws Resp3ParseException {
