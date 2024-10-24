@@ -15,13 +15,13 @@ import java.util.Map;
 public class MongoFileStorage extends BaseStorage<JsonNode, JsonNode> implements MongoStorage {
 
 
+    public MongoFileStorage(StorageRepository<JsonNode, JsonNode> repository) {
+        super(repository);
+    }
+
     @Override
     public String getCaller() {
         return "MONGODB";
-    }
-
-    public MongoFileStorage(StorageRepository<JsonNode, JsonNode> repository) {
-        super(repository);
     }
 
     @Override

@@ -13,13 +13,13 @@ import java.util.Map;
  * @param <O>
  */
 public class NullStorage<I, O> extends BaseStorage<I, O> {
+    public NullStorage(StorageRepository<I, O> repository) {
+        super(repository);
+    }
+
     @Override
     public String getCaller() {
         return "NULL";
-    }
-
-    public NullStorage(StorageRepository<I, O> repository) {
-        super(repository);
     }
 
     @Override

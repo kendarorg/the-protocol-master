@@ -20,12 +20,10 @@ import java.util.Map;
  */
 public abstract class BaseStorage<I, O> implements Storage<I, O> {
     protected static final JsonMapper mapper = new JsonMapper();
+    private final StorageRepository<I, O> repository;
     protected boolean useFullData = false;
     protected HashSet<Integer> completedIndexes = new HashSet<>();
     protected HashSet<Integer> completedOutIndexes = new HashSet<>();
-    private final StorageRepository<I, O> repository;
-
-    public abstract String getCaller();
 
     public BaseStorage(StorageRepository<I, O> repository) {
 
@@ -45,6 +43,8 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
         return sb.toString();
     }
 
+    public abstract String getCaller();
+
     public void write(int connectionId, I request, O response, long durationMs, String type, String caller) {
         var item = new StorageItem(connectionId, request, response, durationMs, type, getCaller());
         write(item);
@@ -55,11 +55,11 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
         write(item);
     }
 
-    public StorageItem beforeSendingReadResult(StorageItem<I,O> si, CompactLine compactLine) {
+    public StorageItem beforeSendingReadResult(StorageItem<I, O> si, CompactLine compactLine) {
         return si;
     }
 
-    protected void write(StorageItem item){
+    protected void write(StorageItem item) {
         item.setCaller(getCaller());
         repository.write(item);
     }
@@ -69,7 +69,9 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
         return this;
     }
 
-    public boolean useFullData(){return  useFullData;}
+    public boolean useFullData() {
+        return useFullData;
+    }
 
     public abstract TypeReference<?> getTypeReference();
 
@@ -94,14 +96,13 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
 
     public abstract Map<String, String> buildTag(StorageItem<I, O> item);
 
-    public StorageItem<I,O> read(I node, String type) {
+    public StorageItem<I, O> read(I node, String type) {
         var query = new CallItemsQuery();
         query.setCaller(getCaller());
         query.setType(type);
         query.setUsed(completedIndexes);
         return read(query);
     }
-
 
 
     @Override
@@ -112,7 +113,7 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
         respQuery.setStartAt(afterIndex);
         var responses = repository.readResponses(respQuery);
         var result = new ArrayList<StorageItem<I, O>>();
-        for(var response: responses) {
+        for (var response : responses) {
             completedOutIndexes.add((int) response.getIndex());
             result.add(response);
         }
@@ -120,13 +121,13 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
     }
 
     public StorageItem read(CallItemsQuery query) {
-            query.setUsed(completedIndexes);
-            query.setCaller(getCaller());
-            var result = repository.read(query);
-            if (result != null) {
-                completedIndexes.add((int) result.getIndex());
-            }
-            return result;
+        query.setUsed(completedIndexes);
+        query.setCaller(getCaller());
+        var result = repository.read(query);
+        if (result != null) {
+            completedIndexes.add((int) result.getIndex());
+        }
+        return result;
     }
 
 

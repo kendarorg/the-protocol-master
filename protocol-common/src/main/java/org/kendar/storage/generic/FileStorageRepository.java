@@ -196,9 +196,9 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
                     .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
                     .filter(a ->
                             typeMatching(query.getType(), a.getType()) &&
-                            a.getCaller().equalsIgnoreCase(query.getCaller()) &&
-                            tagsMatching(a.getTags(), query) &&
-                            query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
+                                    a.getCaller().equalsIgnoreCase(query.getCaller()) &&
+                                    tagsMatching(a.getTags(), query) &&
+                                    query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
                     ).findFirst();
 
             Optional<StorageItem<I, O>> item = Optional.empty();
@@ -236,7 +236,7 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
     }
 
     private boolean typeMatching(String type, String type1) {
-        if("RESPONSE".equalsIgnoreCase(type1)) return false;
+        if ("RESPONSE".equalsIgnoreCase(type1)) return false;
         if (type == null || type.isEmpty()) return true;
         return type.equalsIgnoreCase(type1);
     }

@@ -18,19 +18,18 @@ public class JdbcFileStorage extends BaseStorage<JdbcRequest, JdbcResponse> impl
 
     private static final List<String> toAvoid = List.of("SET", "CREATE", "DELETE", "DROP");
 
+    public JdbcFileStorage(StorageRepository<JdbcRequest, JdbcResponse> repository) {
+        super(repository);
+    }
+
     @Override
     public String getCaller() {
         return "JDBC";
     }
 
-    public JdbcFileStorage(StorageRepository<JdbcRequest, JdbcResponse> repository) {
-        super(repository);
-    }
-
-
     @Override
     public StorageItem beforeSendingReadResult(StorageItem<JdbcRequest, JdbcResponse> si, CompactLine idx) {
-        if(idx!=null) {
+        if (idx != null) {
             JdbcResponse resp = new JdbcResponse();
             if (idx.getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 resp.setIntResult(Integer.parseInt(idx.getTags().get("resultsCount")));
@@ -74,16 +73,15 @@ public class JdbcFileStorage extends BaseStorage<JdbcRequest, JdbcResponse> impl
     }
 
 
-
     @Override
     public StorageItem read(String query, List<BindingParameter> parameterValues, String type) {
 
-            var siQuery = new CallItemsQuery();
-            siQuery.setCaller(getCaller());
-            siQuery.setType(type);
-            siQuery.addTag("parametersCount",parameterValues.size());
-            siQuery.addTag("query",query);
-            return read(siQuery);
+        var siQuery = new CallItemsQuery();
+        siQuery.setCaller(getCaller());
+        siQuery.setType(type);
+        siQuery.addTag("parametersCount", parameterValues.size());
+        siQuery.addTag("query", query);
+        return read(siQuery);
     }
 
     @Override
@@ -114,10 +112,9 @@ public class JdbcFileStorage extends BaseStorage<JdbcRequest, JdbcResponse> impl
     }
 
 
-
     @Override
     public boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<JdbcRequest, JdbcResponse> item,
-                                    List<StorageItem<JdbcRequest, JdbcResponse>> loadedData) {
+                                 List<StorageItem<JdbcRequest, JdbcResponse>> loadedData) {
         if (useFullData()) return false;
         if (cl == null) return false;
         if (cl.getTags() == null || cl.getTags().get("query") == null) {

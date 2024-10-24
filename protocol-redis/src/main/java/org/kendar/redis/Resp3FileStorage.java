@@ -17,15 +17,14 @@ import java.util.Map;
 public class Resp3FileStorage extends BaseStorage<JsonNode, JsonNode> implements Resp3Storage {
     private static final Logger log = LoggerFactory.getLogger(Resp3FileStorage.class);
 
-    @Override
-    public String getCaller() {
-        return "RESP3";
-    }
-
     public Resp3FileStorage(StorageRepository<JsonNode, JsonNode> repository) {
         super(repository);
     }
 
+    @Override
+    public String getCaller() {
+        return "RESP3";
+    }
 
     @Override
     public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type) {

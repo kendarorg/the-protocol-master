@@ -311,8 +311,8 @@ public class MySQLExecutor {
             if (resultSetMetaData != null) {
                 for (var i = 0; i < resultSetMetaData.getColumnCount(); i++) {
                     var isByte = JdbcProxy.isByteOut(resultSetMetaData.getColumnClassName(i + 1));
-                    var name = (resultSetMetaData.getColumnLabel(i + 1)==null||resultSetMetaData.getColumnLabel(i + 1).isEmpty())?
-                            resultSetMetaData.getColumnName(i + 1):resultSetMetaData.getColumnLabel(i + 1);
+                    var name = (resultSetMetaData.getColumnLabel(i + 1) == null || resultSetMetaData.getColumnLabel(i + 1).isEmpty()) ?
+                            resultSetMetaData.getColumnName(i + 1) : resultSetMetaData.getColumnLabel(i + 1);
                     fields.add(new ProxyMetadata(
                             name,
                             isByte,

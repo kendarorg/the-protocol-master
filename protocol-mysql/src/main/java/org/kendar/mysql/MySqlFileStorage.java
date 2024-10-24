@@ -39,7 +39,7 @@ public class MySqlFileStorage extends JdbcFileStorage {
 
     @Override
     public boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<JdbcRequest, JdbcResponse> item,
-                                    List<StorageItem<JdbcRequest, JdbcResponse>> loadedData) {
+                                 List<StorageItem<JdbcRequest, JdbcResponse>> loadedData) {
         if (useFullData) return false;
         var shouldNotSave = super.shouldNotSave(cl, compactLines, item, loadedData);
         if (cl.getTags().get("query").toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
@@ -53,8 +53,8 @@ public class MySqlFileStorage extends JdbcFileStorage {
     }
 
     @Override
-    public StorageItem beforeSendingReadResult(StorageItem<JdbcRequest, JdbcResponse> si,CompactLine compactLine) {
-        si = super.beforeSendingReadResult(si,compactLine);
+    public StorageItem beforeSendingReadResult(StorageItem<JdbcRequest, JdbcResponse> si, CompactLine compactLine) {
+        si = super.beforeSendingReadResult(si, compactLine);
         if (si.getInput().getQuery().toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
             var selectResult = new JsonMapper().deserialize(SELECT_TRANS_RESULT, SelectResult.class);
             var realResultValue = si.getOutput().getIntResult();

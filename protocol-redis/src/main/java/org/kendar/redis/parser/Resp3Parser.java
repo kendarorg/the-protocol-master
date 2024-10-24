@@ -23,6 +23,27 @@ public class Resp3Parser {
         return true;
     }
 
+    private static String buildIntegerString(Resp3Input line) throws Resp3ParseException {
+        String result = "";
+        var end = 0;
+        while (line.hasNext() && end != 2) {
+            var ch = line.charAtAndIncrement();
+            if (ch == '\r' && end == 0) {
+                end++;
+            } else if (ch == '\n' && end == 1) {
+                end++;
+            } else if (((ch >= '0' && ch <= '9') || ch == '-' || ch == '+') && end == 0) {
+                result += ch;
+            } else {
+                throw new Resp3ParseException("Invalid integer format");
+            }
+        }
+        if (end != 2) {
+            throw new Resp3ParseException("Unterminated end of integer", true);
+        }
+        return result;
+    }
+
     private RespError parseSimpleError(Resp3Input line) throws Resp3ParseException {
         var content = parseSimpleString(line);
 
@@ -36,7 +57,6 @@ public class Resp3Parser {
         }
         return result;
     }
-
 
     private String parseSimpleString(Resp3Input line) throws Resp3ParseException {
         String result = "";
@@ -142,7 +162,6 @@ public class Resp3Parser {
         return letter == 't';
     }
 
-
     private BigInteger parseBigNumber(Resp3Input line) throws Resp3ParseException {
         String result = buildIntegerString(line);
         try {
@@ -150,27 +169,6 @@ public class Resp3Parser {
         } catch (Exception ex) {
             throw new Resp3ParseException("Invalid integer");
         }
-    }
-
-    private static String buildIntegerString(Resp3Input line) throws Resp3ParseException {
-        String result = "";
-        var end = 0;
-        while (line.hasNext() && end != 2) {
-            var ch = line.charAtAndIncrement();
-            if (ch == '\r' && end == 0) {
-                end++;
-            } else if (ch == '\n' && end == 1) {
-                end++;
-            } else if (((ch >= '0' && ch <= '9') || ch == '-' || ch == '+') && end == 0) {
-                result += ch;
-            } else {
-                throw new Resp3ParseException("Invalid integer format");
-            }
-        }
-        if (end != 2) {
-            throw new Resp3ParseException("Unterminated end of integer", true);
-        }
-        return result;
     }
 
     private double parseDouble(Resp3Input line) throws Resp3ParseException {

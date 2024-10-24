@@ -15,7 +15,7 @@ public class SqlSqlStringParserTest {
     }
 
     @Test
-    void somethingWeird(){
+    void somethingWeird() {
         var target = new SqlStringParser("$");
         var result = target.parseString("insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *");
         assertEquals(15, result.size());
@@ -126,7 +126,7 @@ public class SqlSqlStringParserTest {
     }
 
     @Test
-    void somethingWeird2(){
+    void somethingWeird2() {
         var target = new SqlStringParser("$");
         var result = target.getTypes("insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *");
         assertEquals(1, result.size());

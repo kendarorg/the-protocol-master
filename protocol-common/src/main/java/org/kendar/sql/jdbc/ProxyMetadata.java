@@ -18,7 +18,7 @@ public class ProxyMetadata {
         this.byteData = byteData;
     }
 
-    public ProxyMetadata(String columnName,  boolean byteData,  int columnType, int precision) {
+    public ProxyMetadata(String columnName, boolean byteData, int columnType, int precision) {
 
         this.columnName = columnName;
 

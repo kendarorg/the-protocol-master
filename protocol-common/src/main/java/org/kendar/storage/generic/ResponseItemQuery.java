@@ -7,29 +7,27 @@ public class ResponseItemQuery {
     private String caller;
     private long startAt;
 
-
-    public void setUsed(HashSet<Integer> used) {
-        this.used = used;
-    }
-
     public HashSet<Integer> getUsed() {
         return used;
     }
 
-
-    public void setCaller(String caller) {
-        this.caller = caller;
+    public void setUsed(HashSet<Integer> used) {
+        this.used = used;
     }
 
     public String getCaller() {
         return caller;
     }
 
-    public void setStartAt(long startAt) {
-        this.startAt = startAt;
+    public void setCaller(String caller) {
+        this.caller = caller;
     }
 
     public long getStartAt() {
         return startAt;
+    }
+
+    public void setStartAt(long startAt) {
+        this.startAt = startAt;
     }
 }
