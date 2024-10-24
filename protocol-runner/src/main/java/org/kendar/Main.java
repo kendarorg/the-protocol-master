@@ -21,6 +21,7 @@ import org.kendar.redis.Resp3Proxy;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
+import org.kendar.storage.generic.FileStorageRepository;
 import org.kendar.utils.QueryReplacerItem;
 import org.kendar.utils.Sleeper;
 import org.slf4j.LoggerFactory;
@@ -190,9 +191,9 @@ public class Main {
 
         if (logsDir != null) {
             var logsDirPath = Path.of(logsDir);
-            JdbcFileStorage storage = new JdbcFileStorage(logsDirPath);
+            JdbcFileStorage storage = new JdbcFileStorage(new FileStorageRepository<>(logsDirPath));
             if (type.equalsIgnoreCase("mysql")) {
-                storage = new MySqlFileStorage(logsDirPath);
+                storage = new MySqlFileStorage(new FileStorageRepository<>(logsDirPath));
             }
             if (replayFromLog) {
                 proxy = new JdbcProxy(storage);
@@ -256,9 +257,9 @@ public class Main {
         if (logsDir != null) {
             var path = Path.of(logsDir);
             if (replayFromLog) {
-                proxy = new MongoProxy(new MongoFileStorage(path));
+                proxy = new MongoProxy(new MongoFileStorage(new FileStorageRepository<>(path)));
             } else {
-                proxy.setStorage(new MongoFileStorage(path));
+                proxy.setStorage(new MongoFileStorage(new FileStorageRepository<>(path)));
             }
         }
         baseProtocol.setProxy(proxy);
@@ -276,9 +277,9 @@ public class Main {
             var path = Path.of(logsDir);
             if (replayFromLog) {
                 proxy = new AmqpProxy();
-                proxy.setStorage(new AmqpFileStorage(path));
+                proxy.setStorage(new AmqpFileStorage(new FileStorageRepository<>(path)));
             } else {
-                proxy.setStorage(new AmqpFileStorage(path));
+                proxy.setStorage(new AmqpFileStorage(new FileStorageRepository<>(path)));
             }
         }
         baseProtocol.setProxy(proxy);
@@ -296,10 +297,10 @@ public class Main {
             var path = Path.of(logsDir);
             if (replayFromLog) {
                 proxy = new Resp3Proxy();
-                proxy.setStorage(new Resp3FileStorage(path) {
+                proxy.setStorage(new Resp3FileStorage(new FileStorageRepository<>(path)) {
                 });
             } else {
-                proxy.setStorage(new Resp3FileStorage(path));
+                proxy.setStorage(new Resp3FileStorage(new FileStorageRepository<>(path)));
             }
         }
         baseProtocol.setProxy(proxy);
@@ -317,10 +318,10 @@ public class Main {
             var path = Path.of(logsDir);
             if (replayFromLog) {
                 proxy = new MqttProxy();
-                proxy.setStorage(new MqttFileStorage(path) {
+                proxy.setStorage(new MqttFileStorage(new FileStorageRepository<>(path)) {
                 });
             } else {
-                proxy.setStorage(new MqttFileStorage(path));
+                proxy.setStorage(new MqttFileStorage(new FileStorageRepository<>(path)));
             }
         }
         baseProtocol.setProxy(proxy);

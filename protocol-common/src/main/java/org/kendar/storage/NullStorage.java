@@ -1,6 +1,10 @@
 package org.kendar.storage;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.storage.generic.StorageRepository;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * Do-nothing storage
@@ -10,32 +14,26 @@ import java.util.List;
  */
 public class NullStorage<I, O> extends BaseStorage<I, O> {
     @Override
-    public void initialize() {
+    public String getCaller() {
+        return "NULL";
+    }
 
+    public NullStorage(StorageRepository<I, O> repository) {
+        super(repository);
     }
 
     @Override
-    public Storage<I, O> withFullData() {
-        return this;
-    }
-
-    @Override
-    public void optimize() {
-
-    }
-
-    @Override
-    public StorageItem<I, O> read(I toRead, String type) {
+    public TypeReference<?> getTypeReference() {
         return null;
     }
 
     @Override
-    public List<StorageItem<I, O>> readResponses(long afterIndex) {
-        return List.of();
+    public boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<I, O> item, List<StorageItem<I, O>> loadedData) {
+        return true;
     }
 
     @Override
-    protected void write(StorageItem item) {
-
+    public Map<String, String> buildTag(StorageItem<I, O> item) {
+        return Map.of();
     }
 }

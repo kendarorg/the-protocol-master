@@ -6,6 +6,7 @@ import org.kendar.postgres.jpa.CompanyJpa;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcFileStorage;
+import org.kendar.storage.generic.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
@@ -20,8 +21,8 @@ public class ReplayerTest {
     @Test
     void simpleJpaTest() throws Exception {
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy(new JdbcFileStorage(Path.of("src",
-                "test", "resources", "replay")));
+        var proxy = new JdbcProxy(new JdbcFileStorage(new FileStorageRepository<>(Path.of("src",
+                "test", "resources", "replay"))));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);

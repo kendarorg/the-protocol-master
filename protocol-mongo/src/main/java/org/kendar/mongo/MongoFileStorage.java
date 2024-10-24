@@ -3,73 +3,53 @@ package org.kendar.mongo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.mongo.utils.MongoStorage;
-import org.kendar.storage.BaseFileStorage;
+import org.kendar.storage.BaseStorage;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.kendar.storage.generic.CallItemsQuery;
+import org.kendar.storage.generic.StorageRepository;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class MongoFileStorage extends BaseFileStorage<JsonNode, JsonNode> implements MongoStorage {
-    private static final Logger log = LoggerFactory.getLogger(MongoFileStorage.class);
-    private final ConcurrentHashMap<Long, StorageItem<JsonNode, JsonNode>> inMemoryDb = new ConcurrentHashMap<>();
-    private final Object lockObject = new Object();
-    private boolean initialized = false;
+public class MongoFileStorage extends BaseStorage<JsonNode, JsonNode> implements MongoStorage {
 
-    public MongoFileStorage(String targetDir) {
-        super(targetDir);
+
+    @Override
+    public String getCaller() {
+        return "MONGODB";
     }
 
-    public MongoFileStorage(Path targetDir) {
-        super(targetDir);
+    public MongoFileStorage(StorageRepository<JsonNode, JsonNode> repository) {
+        super(repository);
     }
 
     @Override
-    protected TypeReference<?> getTypeReference() {
+    public TypeReference<?> getTypeReference() {
         return new TypeReference<StorageItem<JsonNode, JsonNode>>() {
         };
     }
 
     @Override
-    public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type) {
-        if (!initialized) {
-            for (var item : readAllItems()) {
-                inMemoryDb.put(item.getIndex(), item);
-            }
-            initialized = true;
-        }
-        synchronized (lockObject) {
-            var item = inMemoryDb.values().stream()
-                    .filter(a -> {
-                        var req = (JsonNode) a.getInput();
-                        return type.equalsIgnoreCase(a.getType()) &&
-                                a.getCaller().equalsIgnoreCase("MONGODB");
-                    }).findFirst();
-            if (item.isPresent()) {
-                inMemoryDb.remove(item.get().getIndex());
-                return item.get();
-            }
-
-            return null;
-        }
-    }
-
-    @Override
-    public List<StorageItem<JsonNode, JsonNode>> readResponses(long afterIndex) {
-        throw new RuntimeException("PUSH NOT IMPLEMENTED");
-    }
-
-    @Override
-    protected boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<JsonNode, JsonNode> item, List<StorageItem<JsonNode, JsonNode>> loadedData) {
+    public boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<JsonNode, JsonNode> item, List<StorageItem<JsonNode, JsonNode>> loadedData) {
         return false;
     }
 
     @Override
-    protected Map<String, String> buildTag(StorageItem<JsonNode, JsonNode> item) {
-        return null;
+    public Map<String, String> buildTag(StorageItem<JsonNode, JsonNode> item) {
+        return Map.of();
+    }
+
+    @Override
+    public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type) {
+        var siQuery = new CallItemsQuery();
+        siQuery.setCaller(getCaller());
+        siQuery.setType(type);
+        return read(siQuery);
+    }
+
+    @Override
+    public List<StorageItem<JsonNode, JsonNode>> readResponses(long afterIndex) {
+        return List.of();
     }
 }

@@ -15,6 +15,14 @@ public class SqlSqlStringParserTest {
     }
 
     @Test
+    void somethingWeird(){
+        var target = new SqlStringParser("$");
+        var result = target.parseString("insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *");
+        assertEquals(15, result.size());
+    }
+
+
+    @Test
     public void spParametersEnd() {
         var target = new SqlStringParser("$");
         var result = target.parseString("Example 'te''st' simple=$1");
@@ -115,5 +123,12 @@ public class SqlSqlStringParserTest {
         assertEquals(SqlStringType.UPDATE, result.get(0).getType());
         assertEquals("\r\n CREATE TABLE temp_table1 (intf int);", result.get(1).getValue());
         assertEquals(SqlStringType.UPDATE, result.get(1).getType());
+    }
+
+    @Test
+    void somethingWeird2(){
+        var target = new SqlStringParser("$");
+        var result = target.getTypes("insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *");
+        assertEquals(1, result.size());
     }
 }

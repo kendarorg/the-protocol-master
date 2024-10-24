@@ -6,6 +6,7 @@ import org.kendar.redis.Resp3FileStorage;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.server.TcpServer;
+import org.kendar.storage.generic.FileStorageRepository;
 import org.kendar.testcontainer.images.RedisImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
@@ -46,9 +47,9 @@ public class BasicTest {
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new Resp3FileStorage(Path.of("target", "tests", className, method, dsp)));
+                proxy.setStorage(new Resp3FileStorage(new FileStorageRepository<>(Path.of("target", "tests", className, method, dsp))));
             } else {
-                proxy.setStorage(new Resp3FileStorage(Path.of("target", "tests", className, method)));
+                proxy.setStorage(new Resp3FileStorage(new FileStorageRepository<>(Path.of("target", "tests", className, method))));
             }
         }
         baseProtocol.setProxy(proxy);

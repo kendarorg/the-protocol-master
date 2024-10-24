@@ -8,6 +8,7 @@ import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.InterceptPublishMessage;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
+import org.kendar.storage.generic.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.io.File;
@@ -84,9 +85,9 @@ public class BasicTest {
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new MqttFileStorage(Path.of("target", "tests", className, method, dsp)));
+                proxy.setStorage(new MqttFileStorage(new FileStorageRepository<>(Path.of("target", "tests", className, method, dsp))));
             } else {
-                proxy.setStorage(new MqttFileStorage(Path.of("target", "tests", className, method)));
+                proxy.setStorage(new MqttFileStorage(new FileStorageRepository<>(Path.of("target", "tests", className, method))));
             }
         }
         baseProtocol.setProxy(proxy);

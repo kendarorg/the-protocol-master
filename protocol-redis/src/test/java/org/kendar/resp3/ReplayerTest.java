@@ -7,6 +7,7 @@ import org.kendar.redis.Resp3Proxy;
 import org.kendar.resp3.pubsub.Publisher;
 import org.kendar.resp3.pubsub.Subscriber;
 import org.kendar.server.TcpServer;
+import org.kendar.storage.generic.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -26,8 +27,8 @@ public class ReplayerTest {
     void testReplayer() {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
         var proxy = new Resp3Proxy();
-        proxy.setStorage(new Resp3FileStorage(Path.of("src",
-                "test", "resources", "replay")));
+        proxy.setStorage(new Resp3FileStorage(new FileStorageRepository<>(Path.of("src",
+                "test", "resources", "replay"))));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);

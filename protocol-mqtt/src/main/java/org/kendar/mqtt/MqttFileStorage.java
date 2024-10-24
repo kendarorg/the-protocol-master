@@ -3,20 +3,19 @@ package org.kendar.mqtt;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.mqtt.utils.MqttStorage;
-import org.kendar.storage.BaseFileStorage;
+import org.kendar.storage.BaseStorage;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.StorageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public class MqttFileStorage extends BaseFileStorage<JsonNode, JsonNode> implements MqttStorage {
+public class MqttFileStorage extends BaseStorage<JsonNode, JsonNode> implements MqttStorage {
     private static final Logger log = LoggerFactory.getLogger(MqttFileStorage.class);
     private static final List<String> toAvoid = List.of("Disconnect", "PingReq");
     private final List<StorageItem<JsonNode, JsonNode>> inMemoryDb = new ArrayList<>();
@@ -26,13 +25,10 @@ public class MqttFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
     private boolean initialized = false;
     private List<CompactLine> index;
 
-    public MqttFileStorage(String targetDir) {
-        super(targetDir);
+    public MqttFileStorage(StorageRepository<JsonNode, JsonNode> repository) {
+        super(repository);
     }
 
-    public MqttFileStorage(Path targetDir) {
-        super(targetDir);
-    }
 
     private static int getConsumeId(JsonNode output, int consumeId) {
         if (output == null) return 0;
@@ -44,13 +40,18 @@ public class MqttFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
     }
 
     @Override
-    protected TypeReference<?> getTypeReference() {
+    public String getCaller() {
+        return "MQTT";
+    }
+
+    @Override
+    public TypeReference<?> getTypeReference() {
         return new TypeReference<StorageItem<JsonNode, JsonNode>>() {
         };
     }
 
     @Override
-    protected boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<JsonNode, JsonNode> item, List<StorageItem<JsonNode, JsonNode>> loadedData) {
+    public boolean shouldNotSave(CompactLine cl, List<CompactLine> compactLines, StorageItem<JsonNode, JsonNode> item, List<StorageItem<JsonNode, JsonNode>> loadedData) {
         if (useFullData) return false;
         if (cl == null) return false;
         if (cl.getTags() == null || cl.getTags().get("input") == null) {
@@ -60,79 +61,7 @@ public class MqttFileStorage extends BaseFileStorage<JsonNode, JsonNode> impleme
     }
 
     @Override
-    public StorageItem<JsonNode, JsonNode> read(JsonNode node, String type) {
-        initializeContent();
-        synchronized (lockObject) {
-            var item = inMemoryDb.stream()
-                    .filter(a -> type.equalsIgnoreCase(a.getType()) &&
-                            a.getCaller().equalsIgnoreCase("MQTT")).findFirst();
-            var idx = index.stream()
-                    .filter(a -> type.equalsIgnoreCase(a.getType()) &&
-                            a.getCaller().equalsIgnoreCase("MQTT")).findFirst();
-
-            CompactLine cl = null;
-            if (idx.isPresent()) {
-                cl = idx.get();
-            }
-            var shouldNotSave = shouldNotSave(cl, null, null, null);
-            if (item.isPresent() && !shouldNotSave) {
-
-                log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
-                inMemoryDb.remove(item.get());
-                idx.ifPresent(compactLine -> index.remove(compactLine));
-                return item.get();
-            }
-
-            if (idx.isPresent()) {
-                log.debug("[SERVER][REPSHRT] {}:{}", idx.get().getIndex(), idx.get().getType());
-                index.remove(idx.get());
-                var sti = new StorageItem<JsonNode, JsonNode>();
-                sti.setIndex(idx.get().getIndex());
-                return sti;
-            }
-
-
-            return null;
-        }
-    }
-
-    private void initializeContent() {
-        if (!initialized) {
-            for (var item : readAllItems()) {
-                if (item.getType().equalsIgnoreCase("RESPONSE")) {
-                    outItems.add(item);
-                    continue;
-                }
-                inMemoryDb.add(item);
-            }
-
-            index = retrieveIndexFile();
-            initialized = true;
-        }
-    }
-
-    @Override
-    public List<StorageItem<JsonNode, JsonNode>> readResponses(long afterIndex) {
-        initializeContent();
-        synchronized (responseLockObject) {
-            var result = new ArrayList<StorageItem<JsonNode, JsonNode>>();
-            for (var item : index.stream().filter(a -> a.getIndex() > afterIndex).collect(Collectors.toList())) {
-                if (item.getType().equalsIgnoreCase("RESPONSE")) {
-                    var outItem = outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
-                    if (outItem.isPresent()) {
-                        result.add(outItem.get());
-                        log.debug("[SERVER][CB] After: {} Index: {} Type: {}", afterIndex, item.getIndex(), outItem.get().getOutput().get("type").textValue());
-                        outItems.remove(outItem.get());
-                    }
-                } else {
-                    break;
-                }
-            }
-            return result;
-        }
-    }
-
-    protected Map<String, String> buildTag(StorageItem<JsonNode, JsonNode> item) {
+    public Map<String, String> buildTag(StorageItem<JsonNode, JsonNode> item) {
         var data = new HashMap<String, String>();
         var consumeId = 0;
         data.put("input", null);

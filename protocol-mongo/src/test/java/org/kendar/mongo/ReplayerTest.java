@@ -14,6 +14,7 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.kendar.server.TcpServer;
+import org.kendar.storage.generic.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
@@ -42,8 +43,8 @@ public class ReplayerTest {
     void testConnectionWithProtocolWithServerApis() {
         var baseProtocol = new MongoProtocol(FAKE_PORT);
         var proxy = new MongoProxy(new MongoFileStorage(
-                Path.of("src",
-                        "test", "resources", "replay")));
+                new FileStorageRepository<>(Path.of("src",
+                        "test", "resources", "replay"))));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

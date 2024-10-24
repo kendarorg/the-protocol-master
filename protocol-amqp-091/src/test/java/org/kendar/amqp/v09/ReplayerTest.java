@@ -5,6 +5,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.kendar.server.TcpServer;
+import org.kendar.storage.generic.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
@@ -61,8 +62,8 @@ public class ReplayerTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "test2_differentChannelAndConnection")));
+        proxy.setStorage(new AmqpFileStorage(new FileStorageRepository<>(Path.of("src",
+                "test", "resources", "test2_differentChannelAndConnection"))));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -141,8 +142,8 @@ public class ReplayerTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "test5_noPublish")));
+        proxy.setStorage(new AmqpFileStorage(new FileStorageRepository<>(Path.of("src",
+                "test", "resources", "test5_noPublish"))));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -211,8 +212,8 @@ public class ReplayerTest {
 
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "test3_openConnection")));
+        proxy.setStorage(new AmqpFileStorage(new FileStorageRepository<>(Path.of("src",
+                "test", "resources", "test3_openConnection"))));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
