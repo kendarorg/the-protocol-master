@@ -1,6 +1,8 @@
 ## TODO
 
 * Use the interrupt to generate "preformed" events for the state chart
+* plid parameter to identify the run
+* simple website to store the results and rest:192.168.1.2/tpm/api as storage option
 
 STATE CHARTS:
 
