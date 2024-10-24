@@ -3,25 +3,27 @@ package org.kendar;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import org.apache.commons.cli.*;
-import org.kendar.amqp.v09.AmqpStorageHandler;
 import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.AmqpProxy;
-import org.kendar.mongo.MongoStorageHandler;
+import org.kendar.amqp.v09.AmqpStorageHandler;
 import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
-import org.kendar.mqtt.MqttStorageHandler;
+import org.kendar.mongo.MongoStorageHandler;
 import org.kendar.mqtt.MqttProtocol;
 import org.kendar.mqtt.MqttProxy;
+import org.kendar.mqtt.MqttStorageHandler;
 import org.kendar.mysql.MySqlStorageHandler;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.redis.Resp3StorageHandler;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
+import org.kendar.redis.Resp3StorageHandler;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.storage.NullStorageRepository;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.QueryReplacerItem;
 import org.kendar.utils.Sleeper;
 import org.slf4j.LoggerFactory;
@@ -87,28 +89,32 @@ public class Main {
                     (logsDir == null || logsDir.isEmpty())) {
                 throw new Exception("cannot replay, missing logsDir (xd)");
             }
+            StorageRepository storage = new NullStorageRepository();
+            if (logsDir != null && !logsDir.isEmpty()) {
+                storage = new FileStorageRepository(Path.of(logsDir));
+            }
             var port = -1;
             if (portVal != null && !portVal.isEmpty()) {
                 port = Integer.parseInt(portVal);
             }
             if (protocol.equalsIgnoreCase("mysql")) {
                 if (port == -1) port = 3306;
-                runMysql(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
+                runMysql(port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("postgres")) {
                 if (port == -1) port = 5432;
-                runPostgres(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
+                runPostgres(port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("mongo")) {
                 if (port == -1) port = 27017;
-                runMongo(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
+                runMongo(port, storage, connectionString, login, password, replayFromLog, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("amqp091")) {
                 if (port == -1) port = 5672;
-                runAmqp091(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
+                runAmqp091(port, storage, connectionString, login, password, replayFromLog, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("redis")) {
                 if (port == -1) port = 6379;
-                runRedis(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
+                runRedis(port, storage, connectionString, login, password, replayFromLog, callDurationTimes);
             } else if (protocol.equalsIgnoreCase("mqtt")) {
                 if (port == -1) port = 1883;
-                runMqtt(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
+                runMqtt(port, storage, connectionString, login, password, replayFromLog, callDurationTimes);
             } else {
                 throw new Exception("missing protocol (p)");
             }
@@ -131,9 +137,10 @@ public class Main {
         options.addOption("xl", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote login");
         options.addOption("xw", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote password");
         options.addOption("xc", true, "[all] Select remote connection string (for redis use redis://host:port");
-        options.addOption("xd", true, "[all] Select log/replay directory (you can set a {timestamp} value " +
-                "that will be replaced with the current timestamp and/or a {protocol} value replaced with the protocol)");
-        options.addOption("pl", false, "[all] Replay from log/replay directory");
+        options.addOption("xd", true, "[all] Select log/replay directory "); //(or id when not using files but db/web)
+        options.addOption("lc", true, "[all] The log type: [file]"); ///db:connectionstring/rest:host:port
+        options.addOption("pl", false, "[all] Replay from log/replay source.");
+        options.addOption("plid", true, "[all] Set an id for the replay instance (default to timestamp_uuid).");
         options.addOption("v", true, "[all] Log level (default ERROR)");
         options.addOption("t", true, "[all] Set timeout in seconds towards proxied system (default 30s)");
         options.addOption("cdt", false, "[all] Respect call duration timing");
@@ -170,19 +177,19 @@ public class Main {
     }
 
 
-    private static void runPostgres(int port, String logsDir, String connectionString, String forcedSchema,
+    private static void runPostgres(int port, StorageRepository logsDir, String connectionString, String forcedSchema,
                                     String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
         runJdbc("postgres", "org.postgresql.Driver", port, logsDir, connectionString, forcedSchema,
                 login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
     }
 
-    private static void runMysql(int port, String logsDir, String connectionString, String forcedSchema,
+    private static void runMysql(int port, StorageRepository logsDir, String connectionString, String forcedSchema,
                                  String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
         runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, forcedSchema,
                 login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
     }
 
-    private static void runJdbc(String type, String driver, int port, String logsDir,
+    private static void runJdbc(String type, String driver, int port, StorageRepository logsDir,
                                 String connectionString, String forcedSchema,
                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
         var baseProtocol = new PostgresProtocol(port);
@@ -190,17 +197,14 @@ public class Main {
                 connectionString, forcedSchema,
                 login, password);
 
-        if (logsDir != null) {
-            var logsDirPath = Path.of(logsDir);
-            JdbcStorageHandler storage = new JdbcStorageHandler(new FileStorageRepository<>(logsDirPath));
-            if (type.equalsIgnoreCase("mysql")) {
-                storage = new MySqlStorageHandler(new FileStorageRepository<>(logsDirPath));
-            }
-            if (replayFromLog) {
-                proxy = new JdbcProxy(storage);
-            } else {
-                proxy.setStorage(storage);
-            }
+        JdbcStorageHandler storage = new JdbcStorageHandler(logsDir);
+        if (type.equalsIgnoreCase("mysql")) {
+            storage = new MySqlStorageHandler(logsDir);
+        }
+        if (replayFromLog) {
+            proxy = new JdbcProxy(storage);
+        } else {
+            proxy.setStorage(storage);
         }
         if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
 
@@ -252,16 +256,14 @@ public class Main {
         proxy.setQueryReplacement(items);
     }
 
-    private static void runMongo(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
+    private static void runMongo(int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
         var baseProtocol = new MongoProtocol(port);
         var proxy = new MongoProxy(connectionString);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new MongoProxy(new MongoStorageHandler(new FileStorageRepository<>(path)));
-            } else {
-                proxy.setStorage(new MongoStorageHandler(new FileStorageRepository<>(path)));
-            }
+
+        if (replayFromLog) {
+            proxy = new MongoProxy(new MongoStorageHandler(logsDir));
+        } else {
+            proxy.setStorage(new MongoStorageHandler(logsDir));
         }
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -271,17 +273,15 @@ public class Main {
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
-    private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
+    private static void runAmqp091(int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
         var baseProtocol = new AmqpProtocol(port);
         var proxy = new AmqpProxy(connectionString, login, password);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new AmqpProxy();
-                proxy.setStorage(new AmqpStorageHandler(new FileStorageRepository<>(path)));
-            } else {
-                proxy.setStorage(new AmqpStorageHandler(new FileStorageRepository<>(path)));
-            }
+
+        if (replayFromLog) {
+            proxy = new AmqpProxy();
+            proxy.setStorage(new AmqpStorageHandler(logsDir));
+        } else {
+            proxy.setStorage(new AmqpStorageHandler(logsDir));
         }
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -291,18 +291,16 @@ public class Main {
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
-    private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
+    private static void runRedis(int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
         var baseProtocol = new Resp3Protocol(port);
         var proxy = new Resp3Proxy(connectionString, login, password);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new Resp3Proxy();
-                proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository<>(path)) {
-                });
-            } else {
-                proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository<>(path)));
-            }
+
+        if (replayFromLog) {
+            proxy = new Resp3Proxy();
+            proxy.setStorage(new Resp3StorageHandler(logsDir) {
+            });
+        } else {
+            proxy.setStorage(new Resp3StorageHandler(logsDir));
         }
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -312,18 +310,16 @@ public class Main {
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
-    private static void runMqtt(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
+    private static void runMqtt(int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
         var baseProtocol = new MqttProtocol(port);
         var proxy = new MqttProxy(connectionString, login, password);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new MqttProxy();
-                proxy.setStorage(new MqttStorageHandler(new FileStorageRepository<>(path)) {
-                });
-            } else {
-                proxy.setStorage(new MqttStorageHandler(new FileStorageRepository<>(path)));
-            }
+
+        if (replayFromLog) {
+            proxy = new MqttProxy();
+            proxy.setStorage(new MqttStorageHandler(logsDir) {
+            });
+        } else {
+            proxy.setStorage(new MqttStorageHandler(logsDir));
         }
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

@@ -179,7 +179,7 @@ public class MainTest extends BasicTest {
             Sleeper.sleep(100);
         }
 
-
+        System.out.println("START SIMULATION ==============================================");
         HibernateSessionFactory.initialize("org.postgresql.Driver",
                 //postgresContainer.getJdbcUrl(),
                 String.format("jdbc:postgresql://127.0.0.1:%d/test?ssl=false", FAKE_PORT),
@@ -204,6 +204,8 @@ public class MainTest extends BasicTest {
             }
         });
 
+
+        System.out.println("COMPLETED SIMULATION ==============================================");
         runTheServer.set(false);
         Main.stop();
         assertTrue(verifyTestRun.get());
