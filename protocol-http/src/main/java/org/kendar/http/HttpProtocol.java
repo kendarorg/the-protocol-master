@@ -1,11 +1,11 @@
 package org.kendar.http;
 
 import org.kendar.http.data.RequestResponseBuilderImpl;
+import org.kendar.http.rewrite.TpmProxyServer;
 import org.kendar.storage.BaseStorage;
-import website.magyar.mitm.proxy.ProxyServer;
 
 public class HttpProtocol  {
-    ProxyServer proxyServer = null;
+    TpmProxyServer tpmProxyServer = null;
     private int port= 9092;
     private BaseStorage storage;
 
@@ -15,16 +15,17 @@ public class HttpProtocol  {
     }
     protected void start() {
         try {
-            proxyServer = new ProxyServer(port);
+            tpmProxyServer = new TpmProxyServer(port);
             var interceptor = new TpmInterceptor(new RequestResponseBuilderImpl());
-            proxyServer.start(30000);
-            proxyServer.setResponseVolatile(true);
-            proxyServer.setCaptureContent(true);
-            proxyServer.setCaptureBinaryContent(true);
-            proxyServer.addRequestInterceptor(interceptor);
-            proxyServer.addResponseInterceptor(interceptor);
-            proxyServer.getPort();
-            ProxyServer.setShouldKeepSslConnectionAlive(true);
+            tpmProxyServer.addResponderInterceptor(interceptor);
+            tpmProxyServer.start(30000);
+            tpmProxyServer.setResponseVolatile(true);
+            tpmProxyServer.setCaptureContent(true);
+            tpmProxyServer.setCaptureBinaryContent(true);
+            tpmProxyServer.addRequestInterceptor(interceptor);
+            tpmProxyServer.addResponseInterceptor(interceptor);
+            tpmProxyServer.getPort();
+            TpmProxyServer.setShouldKeepSslConnectionAlive(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

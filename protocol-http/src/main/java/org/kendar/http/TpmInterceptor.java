@@ -1,15 +1,21 @@
 package org.kendar.http;
 
+import net.lightbody.bmp.proxy.util.CappedByteArrayOutputStream;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.kendar.http.data.Request;
 import org.kendar.http.data.RequestResponseBuilderImpl;
+import org.kendar.http.data.Response;
+import org.kendar.http.rewrite.CustomResponderInterceptor;
 import org.kendar.utils.JsonMapper;
 import website.magyar.mitm.proxy.RequestInterceptor;
 import website.magyar.mitm.proxy.ResponseInterceptor;
 import website.magyar.mitm.proxy.http.MitmJavaProxyHttpRequest;
 import website.magyar.mitm.proxy.http.MitmJavaProxyHttpResponse;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TpmInterceptor implements RequestInterceptor, ResponseInterceptor {
+public class TpmInterceptor implements RequestInterceptor, ResponseInterceptor, CustomResponderInterceptor {
     private final RequestResponseBuilderImpl requestResponseBuilder;
     private ConcurrentHashMap<String, Request> requests = new ConcurrentHashMap<>();
     private static AtomicInteger counter = new AtomicInteger(0);
@@ -69,5 +75,34 @@ public class TpmInterceptor implements RequestInterceptor, ResponseInterceptor {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static final int MAX_BUFFER_SIZE = 1024 * 1024;
+    @Override
+    public MitmJavaProxyHttpResponse intercept(MitmJavaProxyHttpRequest req) {
+        var resp = new Response();
+        resp.setStatusCode(200);
+        resp.addHeader("Content-Type", "application/json");
+        resp.setResponseText("{}");
+        ByteArrayOutputStream baos =new ByteArrayOutputStream(0);;
+        String text = null;
+        if(resp.isBinaryResponse()) {
+            byte[] bytes = resp.getResponseBytes();
+            baos = new ByteArrayOutputStream(bytes.length);
+            baos.writeBytes(bytes);
+            baos.reset();
+        }else{
+            byte[] bytes = resp.getResponseText().getBytes(StandardCharsets.UTF_8);
+            baos = new ByteArrayOutputStream(bytes.length);
+            baos.writeBytes(bytes);
+            baos.reset();
+        }
+
+        var os = new CappedByteArrayOutputStream(MAX_BUFFER_SIZE);
+        HttpRequestBase method = req.getMethod();
+        return new MitmJavaProxyHttpResponse(resp.getStatusCode(), null, method,
+                req.getProxyRequest().getURI(), null, "",
+                resp.getResponseText(),  resp.getHeader("Content-Type"), "UTF-8",
+                baos, os, true);
     }
 }
