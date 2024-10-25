@@ -19,6 +19,7 @@
         <module>protocol-amqp-091</module>
         <module>protocol-redis</module>
         <module>protocol-mqtt</module>
+        <module>protocol-http</module>
         <module>jacoco</module>
         <module>todo</module>
     </modules>
