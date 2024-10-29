@@ -38,10 +38,12 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
     public NetworkProxy(String connectionString, String userId, String password) {
         try {
             this.replayer = false;
-            var uri = new URI(connectionString);
             this.connectionString = connectionString;
-            this.port = uri.getPort();
-            this.host = uri.getHost();
+            if(connectionString != null && !connectionString.isEmpty()){
+                var uri = new URI(connectionString);
+                this.port = uri.getPort();
+                this.host = uri.getHost();
+            }
             this.userId = userId;
             this.password = password;
             init();

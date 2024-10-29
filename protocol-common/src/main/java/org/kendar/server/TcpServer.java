@@ -94,7 +94,7 @@ public class TcpServer {
         //Executor for the asynchronous requests
         ExecutorService executor = Executors.newCachedThreadPool();
         AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(executor);
-        ProtoDescriptor.cleanCounters();
+        protoDescriptor.cleanCounters();
 
         try (AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group)) {
             this.server = server;
@@ -103,7 +103,7 @@ public class TcpServer {
             server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
             server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
-            log.info("[CL>TP][IN] Listening on " + HOST + ":{}", protoDescriptor.getPort());
+            log.info("[CL>TP][IN] Listening on " + HOST + ":{} {}", protoDescriptor.getPort(),protoDescriptor.getClass().getSimpleName());
 
             //noinspection InfiniteLoopStatement
             while (true) {
@@ -116,7 +116,7 @@ public class TcpServer {
                     //Prepare the native buffer
                     ByteBuffer buffer = ByteBuffer.allocate(4096);
 
-                    var contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
+                    var contextId = protoDescriptor.getCounter("CONTEXT_ID");
                     try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
 
                         log.trace("[CL>TP] Accepted connection from {}", client.getRemoteAddress());

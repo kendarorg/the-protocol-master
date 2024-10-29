@@ -1,5 +1,6 @@
 package org.kendar.sql.jdbc.storage;
 
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.sql.jdbc.BindingParameter;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.storage.Storage;
@@ -8,6 +9,8 @@ import org.kendar.storage.StorageItem;
 import java.util.List;
 
 public class NullJdbcStorage implements JdbcStorage {
+    private ProtoDescriptor descriptor;
+
     @Override
     public void initialize() {
 
@@ -46,6 +49,16 @@ public class NullJdbcStorage implements JdbcStorage {
     @Override
     public List<StorageItem<JdbcRequest, JdbcResponse>> readResponses(long afterIndex) {
         return List.of();
+    }
+
+    @Override
+    public void setDescriptor(ProtoDescriptor protocol) {
+        this.descriptor = protocol;
+    }
+
+    @Override
+    public ProtoDescriptor getDescriptor() {
+        return descriptor;
     }
 
     @Override

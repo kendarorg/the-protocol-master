@@ -18,12 +18,13 @@ import java.util.Map;
  * @param <I>
  * @param <O>
  */
-public abstract class BaseStorage<I, O> implements Storage<I, O> {
+public abstract class BaseStorage<I, O> implements Storage<I,O> {
     protected static final JsonMapper mapper = new JsonMapper();
     private final StorageRepository<I, O> repository;
     protected boolean useFullData = false;
     protected HashSet<Integer> completedIndexes = new HashSet<>();
     protected HashSet<Integer> completedOutIndexes = new HashSet<>();
+    private ProtoDescriptor descriptor;
 
     public BaseStorage(StorageRepository<I, O> repository) {
 
@@ -45,12 +46,12 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
 
     public abstract String getCaller();
 
-    public void write(int connectionId, I request, O response, long durationMs, String type, String caller) {
+    public void write(int connectionId, I request, O response, long durationMs, String type,String caller) {
         var item = new StorageItem(connectionId, request, response, durationMs, type, getCaller());
         write(item);
     }
 
-    public void write(long index, int connectionId, I request, O response, long durationMs, String type, String caller) {
+    public void write(long index, int connectionId, I request, O response, long durationMs, String type,String caller) {
         var item = new StorageItem(index, connectionId, request, response, durationMs, type, getCaller());
         write(item);
     }
@@ -76,7 +77,7 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
     public abstract TypeReference<?> getTypeReference();
 
     public long generateIndex() {
-        return ProtoDescriptor.getCounter("STORAGE_ID");
+        return getDescriptor().getCounter("STORAGE_ID");
     }
 
     /**
@@ -128,6 +129,16 @@ public abstract class BaseStorage<I, O> implements Storage<I, O> {
             completedIndexes.add((int) result.getIndex());
         }
         return result;
+    }
+
+    @Override
+    public void setDescriptor(ProtoDescriptor descriptor){
+        this.descriptor = descriptor;
+        this.repository.initialize(this);
+    }
+
+    public ProtoDescriptor getDescriptor(){
+        return descriptor;
     }
 
 

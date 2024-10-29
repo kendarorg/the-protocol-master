@@ -10,7 +10,6 @@ import org.kendar.amqp.v09.utils.FieldsWriter;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferUtils;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 import org.slf4j.Logger;
@@ -151,7 +150,7 @@ public class BasicConsume extends Basic {
         basicConsume.consumerTag = consumerTag;
         basicConsume.noLocal = noLocal;
         basicConsume.queue = queue;
-        basicConsume.setConsumeId(ProtoDescriptor.getCounter("CONSUME_ID"));
+        basicConsume.setConsumeId(context.getDescriptor().getCounter("CONSUME_ID"));
 
         AmqpProtocol.consumeContext.put(basicConsume.getConsumeId(), context);
 

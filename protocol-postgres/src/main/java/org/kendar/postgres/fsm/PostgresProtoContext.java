@@ -60,7 +60,7 @@ public class PostgresProtoContext extends NetworkProtoContext {
     }
 
     private int getNewPid() {
-        return ProtoDescriptor.getCounter("PID_COUNTER");
+        return descriptor.getCounter("PID_COUNTER");
     }
 
     public void addSync(Iterator<ProtoStep> message) {

@@ -1,5 +1,7 @@
 package org.kendar.storage;
 
+import org.kendar.protocol.descriptor.ProtoDescriptor;
+
 import java.util.List;
 
 /**
@@ -56,4 +58,8 @@ public interface Storage<I, O> {
     StorageItem<I, O> read(I toRead, String type);
 
     List<StorageItem<I, O>> readResponses(long afterIndex);
+
+    void setDescriptor(ProtoDescriptor protocol);
+
+    ProtoDescriptor getDescriptor();
 }

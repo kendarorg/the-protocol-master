@@ -1,6 +1,7 @@
 package org.kendar.mongo.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.storage.Storage;
 import org.kendar.storage.StorageItem;
 
@@ -11,6 +12,18 @@ public class NullMongoStorage implements Storage<JsonNode, JsonNode>, MongoStora
     public void initialize() {
 
     }
+
+    @Override
+    public ProtoDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    @Override
+    public void setDescriptor(ProtoDescriptor descriptor) {
+        this.descriptor = descriptor;
+    }
+
+    ProtoDescriptor descriptor;
 
     @Override
     public Storage<JsonNode, JsonNode> withFullData() {

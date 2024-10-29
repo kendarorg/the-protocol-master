@@ -40,6 +40,9 @@ public abstract class Proxy<T extends Storage> {
      */
     public void setProtocol(NetworkProtoDescriptor protocol) {
         this.protocol = protocol;
+        if(this.storage!=null){
+            this.storage.setDescriptor(protocol);
+        }
     }
 
     /**
@@ -71,6 +74,10 @@ public abstract class Proxy<T extends Storage> {
      */
     public void setStorage(T storage) {
         this.storage = storage;
+        if (protocol != null) {
+            this.storage.setDescriptor(protocol);
+        }
+
         this.storage.initialize();
     }
 }

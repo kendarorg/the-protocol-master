@@ -7,7 +7,6 @@ import org.kendar.mysql.constants.StatusFlag;
 import org.kendar.mysql.messages.Error;
 import org.kendar.mysql.messages.*;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
@@ -320,7 +319,7 @@ public class MySQLExecutor {
                             resultSetMetaData.getPrecision(i + 1)));
                 }
             }
-            int currentStatementId = ProtoDescriptor.getCounter("STATEMENT_ID");
+            int currentStatementId = protoContext.getDescriptor().getCounter("STATEMENT_ID");
             var packetNumber = 0;
             result.add(new ComStmtPrepareOk(fields, currentStatementId)
                     .withPacketNumber(++packetNumber));

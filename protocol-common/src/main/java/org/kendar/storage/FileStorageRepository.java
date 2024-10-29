@@ -34,6 +34,7 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
     private BaseStorage<I, O> baseStorage;
     private List<CompactLine> index = new ArrayList<>();
     private boolean initialized = false;
+    private ProtoDescriptor descriptor;
 
     public FileStorageRepository(String targetDir) {
 
@@ -48,6 +49,7 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
     @Override
     public void initialize(BaseStorage<I, O> baseStorage) {
         this.baseStorage = baseStorage;
+        this.descriptor = baseStorage.getDescriptor();
         try {
             if (!Path.of(targetDir).isAbsolute()) {
                 Path currentRelativePath = Paths.get("").toAbsolutePath();
@@ -80,7 +82,7 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
     }
 
     public long generateIndex() {
-        return ProtoDescriptor.getCounter("STORAGE_ID");
+        return descriptor.getCounter("STORAGE_ID");
     }
 
     @Override
@@ -103,7 +105,7 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
                 Files.writeString(Path.of(targetDir, id), result);
 
             } catch (Exception e) {
-                throw new RuntimeException();
+                log.warn("Trouble flushing "+e);
             }
         }
     }
@@ -210,7 +212,7 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
                         .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
                         .filter(a -> a.getIndex() == idx.get().getIndex()).findFirst();
             } else {
-                System.err.println("[TPM  ][WR]: Index not found!");
+                log.warn("[TPM  ][WR]: Index not found!");
             }
             var shouldNotSave = baseStorage.shouldNotSave(cl, null, null, null);
 

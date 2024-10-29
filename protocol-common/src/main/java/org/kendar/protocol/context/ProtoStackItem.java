@@ -1,6 +1,5 @@
 package org.kendar.protocol.context;
 
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.TaggedObject;
@@ -39,8 +38,8 @@ public class ProtoStackItem implements TaggedObject {
      * @param state
      * @param event
      */
-    public ProtoStackItem(ProtoState state, BaseEvent event) {
-        this.id = ProtoDescriptor.getCounterString("STACK_ID");
+    public ProtoStackItem(ProtoState state, BaseEvent event,String id) {
+        this.id = id;
         this.tags = new ArrayList<>();
         this.state = state;
         if (event != null) {

@@ -1,6 +1,7 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.storage.generic.StorageRepository;
 
 import java.util.List;
@@ -36,4 +37,5 @@ public class NullStorage<I, O> extends BaseStorage<I, O> {
     public Map<String, String> buildTag(StorageItem<I, O> item) {
         return Map.of();
     }
+
 }

@@ -14,11 +14,11 @@ public class MongoProtoContext extends NetworkProtoContext {
     }
 
     public int getNewPid() {
-        return ProtoDescriptor.getCounter("PID_COUNTER");
+        return descriptor.getCounter("PID_COUNTER");
     }
 
     public int getReqResId() {
-        return ProtoDescriptor.getCounter("REQ_ID_COUNTER");
+        return descriptor.getCounter("REQ_ID_COUNTER");
     }
 
     @Override

@@ -89,7 +89,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     @Override
     public void write(ReturnMessage rm) {
-        lastAccess.set(getNow());
+        updateLastAccess();
         var returnMessage = (NetworkReturnMessage) rm;
         //Create a new buffer fit for the destination
         var resultBuffer = buildBuffer();
@@ -228,7 +228,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
     @Override
     public boolean reactToEvent(BaseEvent currentEvent) {
         try {
-            lastAccess.set(getNow());
+            updateLastAccess();
             if (currentEvent instanceof BytesEvent) {
                 var be = (BytesEvent) currentEvent;
                 if (remainingBytes != null && remainingBytes.getBuffer().size() > 0) {
@@ -253,7 +253,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * Send the greetings to the server
      */
     public void sendGreetings() {
-        lastAccess.set(getNow());
+        updateLastAccess();
         this.send(new BytesEvent(this, NullState.class, buildBuffer()));
     }
 
@@ -301,9 +301,9 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     @Override
     public void runSteps(Iterator<ProtoStep> stepsToInvoke, ProtoState executor, BaseEvent event) {
-        lastAccess.set(getNow());
+        updateLastAccess();
         executorService.execute(() -> {
-            lastAccess.set(getNow());
+            updateLastAccess();
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
                 super.runSteps(stepsToInvoke, executor, event);
             }
@@ -311,6 +311,6 @@ public abstract class NetworkProtoContext extends ProtoContext {
     }
 
     public void setActive() {
-        lastAccess.set(getNow());
+        updateLastAccess();
     }
 }

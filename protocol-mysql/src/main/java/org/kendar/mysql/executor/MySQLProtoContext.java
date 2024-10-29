@@ -46,7 +46,7 @@ public class MySQLProtoContext extends NetworkProtoContext {
     }
 
     public int getNewPid() {
-        return ProtoDescriptor.getCounter("PID_COUNTER");
+        return descriptor.getCounter("PID_COUNTER");
     }
 
     @Override

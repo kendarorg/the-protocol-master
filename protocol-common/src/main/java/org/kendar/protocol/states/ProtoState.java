@@ -21,7 +21,11 @@ import java.util.stream.Collectors;
  * Basic state
  */
 public abstract class ProtoState {
-
+    private ProtoDescriptor descriptor;
+    public void setProtoDescriptor(ProtoDescriptor descriptor) {
+        this.descriptor = descriptor;
+        this.uuid = descriptor.getCounterString("PROTO_STATE_COUNTER");
+    }
     /**
      * List of handled messages types
      */
@@ -39,7 +43,7 @@ public abstract class ProtoState {
     private boolean optional;
 
     public ProtoState(Class<?>... messages) {
-        this.uuid = ProtoDescriptor.getCounterString("PROTO_STATE_COUNTER");
+
 
         this.messages = new HashSet<>(Arrays.asList(messages));
         Class<?> current;

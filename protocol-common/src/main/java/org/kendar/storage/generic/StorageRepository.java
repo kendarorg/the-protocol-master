@@ -17,4 +17,5 @@ public interface StorageRepository<I, O> {
     StorageItem read(CallItemsQuery query);
 
     List<StorageItem> readResponses(ResponseItemQuery query);
+
 }

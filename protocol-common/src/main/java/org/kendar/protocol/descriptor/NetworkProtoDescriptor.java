@@ -30,6 +30,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
     public void initialize() {
         try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
             if (hasProxy()) {
+                proxyInstance.setProtocol(this);
                 proxyInstance.initialize();
             }
             super.initialize();
@@ -89,6 +90,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
     public void setProxy(Proxy proxyInstance) {
         this.proxyInstance = proxyInstance;
         this.proxyInstance.setProtocol(this);
+        this.proxyInstance.getStorage().setDescriptor(this);
         this.proxy = true;
     }
 
