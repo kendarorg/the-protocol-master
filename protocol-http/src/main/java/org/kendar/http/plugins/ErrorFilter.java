@@ -1,16 +1,16 @@
 package org.kendar.http.plugins;
 
+import org.kendar.filters.ProtocolFilterDescriptor;
+import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.http.utils.filters.HttpFilterDescriptor;
-import org.kendar.http.utils.filters.HttpPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-public class ErrorFilter implements HttpFilterDescriptor {
+public class ErrorFilter extends ProtocolFilterDescriptor<Request, Response> {
 
     private static final Logger log = LoggerFactory.getLogger(ErrorFilter.class);
     private int errorCode;
@@ -18,13 +18,18 @@ public class ErrorFilter implements HttpFilterDescriptor {
     private double percentage;
 
     @Override
-    public List<HttpPhase> getPhases() {
-        return List.of(HttpPhase.PRE_CALL);
+    public List<ProtocolPhase> getPhases() {
+        return List.of(ProtocolPhase.PRE_CALL);
     }
 
     @Override
     public String getId() {
         return "error-plugin";
+    }
+
+    @Override
+    public String getProtocol() {
+        return "http";
     }
 
     @Override
@@ -35,7 +40,7 @@ public class ErrorFilter implements HttpFilterDescriptor {
     }
 
     @Override
-    public boolean handle(HttpPhase phase, Request request, Response response) {
+    public boolean handle(ProtocolPhase phase, Request request, Response response) {
         if (Math.random() < percentage) {
 
             log.info("FAKE ERR " + request.getMethod() + " " + request.buildUrl());

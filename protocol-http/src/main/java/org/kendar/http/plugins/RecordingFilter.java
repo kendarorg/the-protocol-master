@@ -1,9 +1,9 @@
 package org.kendar.http.plugins;
 
+import org.kendar.filters.ProtocolFilterDescriptor;
+import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.http.utils.filters.HttpFilterDescriptor;
-import org.kendar.http.utils.filters.HttpPhase;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class RecordingFilter implements HttpFilterDescriptor {
+public class RecordingFilter extends ProtocolFilterDescriptor<Request, Response> {
     private static final Logger log = LoggerFactory.getLogger(RecordingFilter.class);
     private final JsonMapper mapper = new JsonMapper();
     private final ConcurrentLinkedQueue<StorageItem<Request, Response>> items = new ConcurrentLinkedQueue<>();
@@ -84,13 +84,18 @@ public class RecordingFilter implements HttpFilterDescriptor {
     }
 
     @Override
-    public List<HttpPhase> getPhases() {
-        return List.of(HttpPhase.POST_CALL);
+    public List<ProtocolPhase> getPhases() {
+        return List.of(ProtocolPhase.POST_CALL);
     }
 
     @Override
     public String getId() {
         return "recording-plugin";
+    }
+
+    @Override
+    public String getProtocol() {
+        return "http";
     }
 
 
@@ -119,7 +124,7 @@ public class RecordingFilter implements HttpFilterDescriptor {
     }
 
     @Override
-    public boolean handle(HttpPhase phase, Request request, Response response) {
+    public boolean handle(ProtocolPhase phase, Request request, Response response) {
         if (recordSites.size() > 0) {
             var matchFound = false;
             for (var pat : recordSites) {

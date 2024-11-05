@@ -1,11 +1,11 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.filters.ProtocolFilterDescriptor;
+import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.MimeChecker;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.http.utils.filters.HttpFilterDescriptor;
-import org.kendar.http.utils.filters.HttpPhase;
 import org.kendar.http.utils.utils.Md5Tester;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MockFilter implements HttpFilterDescriptor {
+public class MockFilter extends ProtocolFilterDescriptor<Request, Response> {
     private static final Logger log = LoggerFactory.getLogger(MockFilter.class);
     private final List<StorageItem<Request, Response>> items = new ArrayList<>();
     private final Map<Long, String> hashes = new HashMap();
@@ -65,13 +65,18 @@ public class MockFilter implements HttpFilterDescriptor {
     }
 
     @Override
-    public List<HttpPhase> getPhases() {
-        return List.of(HttpPhase.PRE_CALL);
+    public List<ProtocolPhase> getPhases() {
+        return List.of(ProtocolPhase.PRE_CALL);
     }
 
     @Override
     public String getId() {
         return "mock-plugin";
+    }
+
+    @Override
+    public String getProtocol() {
+        return "http";
     }
 
     private void setupSitesToRecord(String recordSites) {
@@ -115,7 +120,7 @@ public class MockFilter implements HttpFilterDescriptor {
     }
 
     @Override
-    public boolean handle(HttpPhase phase, Request request, Response response) {
+    public boolean handle(ProtocolPhase phase, Request request, Response response) {
         if (matchSites.size() > 0) {
             var matchFound = false;
             for (var pat : matchSites) {

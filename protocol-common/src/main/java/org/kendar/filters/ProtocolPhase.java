@@ -7,7 +7,14 @@ public enum ProtocolPhase {
     NONE("NONE"),
     PRE_CALL("PRE_CALL"),
     CONNECT("CONNECT"),
-    POST_CALL("POST_CALL");
+    POST_CALL("POST_CALL"),
+    PRE_RENDER("PRE_RENDER"),
+    /**
+     * Always blocking
+     */
+    API("API"),
+    STATIC("STATIC"),
+    POST_RENDER("POST_RENDER");
     private final String text;
 
     /**

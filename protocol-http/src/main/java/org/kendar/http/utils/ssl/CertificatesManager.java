@@ -131,7 +131,7 @@ public class CertificatesManager {
             }
         }
 
-        if (hostsSize == registeredHosts.size()) {
+        if (hostsSize == registeredHosts.size() && port.getHttpsConfigurator()!=null) {
             return;
         }
         sslLog.debug("ADD HOST: " + String.join(",", inserted));

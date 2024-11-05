@@ -206,6 +206,7 @@ public class ServerImpl {
     }
 
     public HttpsConfigurator getHttpsConfigurator() {
+        if(this.internalSSLConfig.get()==null)return null;
         return this.internalSSLConfig.get().getHttpsConfig();
     }
 

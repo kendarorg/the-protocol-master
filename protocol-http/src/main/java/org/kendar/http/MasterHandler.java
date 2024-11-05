@@ -11,7 +11,7 @@ import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.converters.RequestResponseBuilder;
 import org.kendar.http.utils.filters.FilteringClassesHandler;
-import org.kendar.http.utils.filters.HttpPhase;
+import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.rewriter.SimpleRewriterHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,7 +190,7 @@ public class MasterHandler implements HttpHandler {
         } finally {
             try {
                 filteringClassesHandler.handle(
-                        HttpPhase.POST_RENDER, request, response, connManager);
+                        ProtocolPhase.POST_RENDER, request, response, connManager);
 
             } catch (Exception e) {
                 log.error("ERROR CALLING POST RENDER ", e);
@@ -200,19 +200,19 @@ public class MasterHandler implements HttpHandler {
 
     private void handleInternal(Request request, Response response, HttpClientConnectionManager connManager) throws Exception {
         if (filteringClassesHandler.handle(
-                HttpPhase.PRE_RENDER, request, response, connManager)) {
+                ProtocolPhase.PRE_RENDER, request, response, connManager)) {
 
             return;
         }
 
         if (filteringClassesHandler.handle(
-                HttpPhase.API, request, response, connManager)) {
+                ProtocolPhase.API, request, response, connManager)) {
             // ALWAYS WHEN CALLED
             return;
         }
 
         if (filteringClassesHandler.handle(
-                HttpPhase.STATIC, request, response, connManager)) {
+                ProtocolPhase.STATIC, request, response, connManager)) {
             response.addHeader("Cache Control", "max-age=3600,s-maxage=3600");
             response.addHeader("Last-Modified", "Wed, 21 Oct 2015 07:28:00 GMT");
             // ALWAYS WHEN CALLED
@@ -222,13 +222,13 @@ public class MasterHandler implements HttpHandler {
         var proxiedRequest = simpleProxyHandler.translate(request);
 
         if (filteringClassesHandler.handle(
-                HttpPhase.PRE_CALL, proxiedRequest, response, connManager)) {
+                ProtocolPhase.PRE_CALL, proxiedRequest, response, connManager)) {
             return;
         }
 
         externalRequester.callSite(proxiedRequest, response);
 
         filteringClassesHandler.handle(
-                HttpPhase.POST_CALL, proxiedRequest, response, connManager);
+                ProtocolPhase.POST_CALL, proxiedRequest, response, connManager);
     }
 }

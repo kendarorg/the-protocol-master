@@ -30,6 +30,11 @@
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-http</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-postgres</artifactId>
             <version>${project.version}</version>
         </dependency>
