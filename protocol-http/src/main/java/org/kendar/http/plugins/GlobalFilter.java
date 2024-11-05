@@ -18,7 +18,7 @@ import static java.lang.System.exit;
 
 public class GlobalFilter extends ProtocolFilterDescriptor<Request, Response> {
     private static final Logger log = LoggerFactory.getLogger(GlobalFilter.class);
-    private String specialApisRoot;
+    private String apis;
     private List<FilterDescriptor> filters;
     private HttpServer httpServer;
     private HttpsServer httpsServer;
@@ -42,7 +42,7 @@ public class GlobalFilter extends ProtocolFilterDescriptor<Request, Response> {
     @Override
     public void initialize(Map<String, Object> section) {
 
-        this.specialApisRoot = section.get("specialApisRoot").toString();
+        this.apis = section.get("apis").toString();
 
 
     }
@@ -63,8 +63,8 @@ public class GlobalFilter extends ProtocolFilterDescriptor<Request, Response> {
     }
 
     private boolean isPath(Request request, String api) {
-        return request.getPath().equalsIgnoreCase("/" + specialApisRoot + "/" + api) ||
-                request.getPath().equalsIgnoreCase("/" + specialApisRoot + "/" + api + "/");
+        return request.getPath().equalsIgnoreCase("/" + apis + "/" + api) ||
+                request.getPath().equalsIgnoreCase("/" + apis + "/" + api + "/");
     }
 
     @Override

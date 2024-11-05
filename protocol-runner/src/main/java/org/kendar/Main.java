@@ -235,6 +235,7 @@ public class Main {
         options.addOption("cfg", true, "Load config file");
         options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091/redis)");
         options.addOption("l", true, "[all] Select listening port");
+
         options.addOption("xl", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote login");
         options.addOption("xw", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote password");
         options.addOption("xc", true, "[all] Select remote connection string (for redis use redis://host:port");
