@@ -15,6 +15,7 @@ public class StorageItem<I, O> {
     private long durationMs;
     private String type;
     private String caller;
+    private int nth = -1;
 
     /**
      * Needed for serialization
@@ -40,6 +41,14 @@ public class StorageItem<I, O> {
         this.durationMs = durationMs;
         this.type = type;
         this.caller = caller;
+    }
+
+    public int getNth() {
+        return nth;
+    }
+
+    public void setNth(int nth) {
+        this.nth = nth;
     }
 
     public boolean isConstant() {

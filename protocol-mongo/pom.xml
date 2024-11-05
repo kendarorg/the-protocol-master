@@ -10,7 +10,11 @@
     <artifactId>protocol-mongo</artifactId>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.pf4j</groupId>
+            <artifactId>pf4j</artifactId>
+            <version>${pl4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-common</artifactId>

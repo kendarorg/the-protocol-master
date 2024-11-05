@@ -1,8 +1,12 @@
 package org.kendar.proxy;
 
+import org.kendar.filters.FilterDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.storage.Storage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base proxy implementation
@@ -19,6 +23,7 @@ public abstract class Proxy<T extends Storage> {
      * (Eventual) storage
      */
     protected T storage;
+    private List<FilterDescriptor> filters = new ArrayList<>();
 
     public boolean isReplayer() {
         return replayer;
@@ -79,5 +84,9 @@ public abstract class Proxy<T extends Storage> {
         }
 
         this.storage.initialize();
+    }
+
+    public void setFilters(List<FilterDescriptor> filters) {
+        this.filters = filters;
     }
 }

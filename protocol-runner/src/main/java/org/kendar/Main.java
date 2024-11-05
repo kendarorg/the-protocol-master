@@ -6,6 +6,8 @@ import org.apache.commons.cli.*;
 import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.AmqpStorageHandler;
+import org.kendar.filters.FilterDescriptor;
+import org.kendar.filters.ProtocolFilterDescriptor;
 import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.mongo.MongoStorageHandler;
@@ -26,14 +28,13 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.QueryReplacerItem;
 import org.kendar.utils.Sleeper;
 import org.kendar.utils.ini.Ini;
+import org.pf4j.JarPluginManager;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -62,10 +63,16 @@ public class Main {
             var configFile = cmd.getOptionValue("cfg");
             if (configFile != null){
                 var ini = new Ini();
-
                 ini.load(Path.of(configFile).toAbsolutePath().toFile());
-                for(var key:ini.getSections()) {
+                var logsDir = ini.getValue("global","datadir",String.class);
+                StorageRepository storage = setupStorage(logsDir);
 
+                var pluginsDir = ini.getValue("global", "pluginsDir", String.class, "plugins");
+                var filters = loadFilters(pluginsDir);
+
+
+                for(var key:ini.getSections()) {
+                    filters.put("A",null);
 
                     try {
                         var replayFromLog = ini.getValue(key,"shouldreplay",Boolean.class,false);
@@ -74,7 +81,6 @@ public class Main {
                         var login = ini.getValue(key,"login",String.class);
                         var password = ini.getValue(key,"password",String.class);
                         var logLevel = ini.getValue(key,"loglevel",String.class,"ERROR");
-                        var logsDir = ini.getValue(key,"datadir",String.class);
                         var callDurationTimes = ini.getValue(key,"respectcallduration",Boolean.class,false);
                         var jdbcForcedSchema = ini.getValue(key,"forcejdbcschema",String.class);
                         var jdbcReplaceQueries = ini.getValue(key,"replacequery",String.class);
@@ -82,16 +88,18 @@ public class Main {
                         var connectionString = ini.getValue(key,"connection",String.class);
 
 
+
                         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
                         var logger = loggerContext.getLogger("org.kendar");
                         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
+                        var finalStorage = storage;
                         new Thread(()->{
                             try {
                                 System.out.println("STARTING "+key);
                                 runWithParams(key, stopWhenFalse, timeout, logLevel, protocol, replayFromLog, portVal,
                                     jdbcForcedSchema, login, password, jdbcReplaceQueries,
-                                    callDurationTimes,connectionString,logsDir);
+                                    callDurationTimes,connectionString,finalStorage,filters);
                             } catch (Exception ex) {
                                 System.out.println(ex);
                                 throw new RuntimeException(ex);
@@ -112,9 +120,15 @@ public class Main {
                 var callDurationTimes = cmd.hasOption("cdt");
                 var jdbcForcedSchema = cmd.getOptionValue("js");
                 var jdbcReplaceQueries = cmd.getOptionValue("jr");
+                var logsDir = cmd.getOptionValue("xd");
                 var connectionString = cmd.getOptionValue("xc");
                 var timeout = cmd.getOptionValue("t");
-                var logsDir = cmd.getOptionValue("xd");
+                var pluginsDir = cmd.getOptionValue("pl");
+
+                var filters = loadFilters(pluginsDir);
+
+                StorageRepository storage = setupStorage(logsDir);
+
                 if (logLevel == null || logLevel.isEmpty()) {
                     logLevel = "ERROR";
                 }
@@ -130,7 +144,7 @@ public class Main {
 
                 runWithParams("DEFAULT",stopWhenFalse, timeoutSec, logLevel, protocol, replayFromLog, portVal,
                         jdbcForcedSchema, login, password, jdbcReplaceQueries,
-                        callDurationTimes,connectionString,logsDir);
+                        callDurationTimes,connectionString,storage,filters);
             }
         } catch (Exception ex) {
             HelpFormatter formatter = new HelpFormatter();
@@ -138,25 +152,50 @@ public class Main {
         }
     }
 
-    private static void runWithParams(String id, Supplier<Boolean> stopWhenFalse, int timeoutSec, String logLevel,
-                                      String protocol, boolean replayFromLog,
-                                      String portVal, String jdbcForcedSchema, String login, String password,
-                                      String jdbcReplaceQueries, boolean callDurationTimes, String connectionString, String logsDir) throws Exception {
-        //ProtoContext.setTimeout(timeoutSec);
+    private static HashMap<String, List<FilterDescriptor>> loadFilters(String pluginsDir) {
+        if(!Path.of(pluginsDir).toAbsolutePath().toFile().exists()){
+            return new HashMap<>();
+        }
+        var pluginManager = new JarPluginManager(Path.of(pluginsDir).toAbsolutePath());
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+        var filters = new HashMap<String, List<FilterDescriptor>>();
+        for(var item : pluginManager.getExtensions(ProtocolFilterDescriptor.class)){
+            var protocol = item.getProtocol().toLowerCase();
+            if(!filters.containsKey(protocol)){
+                filters.put(protocol,new ArrayList<>());
+            }
+            filters.get(protocol).add(item);
+        }
+        return filters;
+    }
 
-
+    private static StorageRepository setupStorage(String logsDir) {
 
         if (logsDir != null && !logsDir.isEmpty()) {
             logsDir = logsDir.replace("{timestamp}", "" + new Date().getTime());
-            logsDir = logsDir.replace("{protocol}", protocol.trim().toLowerCase());
-        }
-        if (replayFromLog &&
-                (logsDir == null || logsDir.isEmpty())) {
-            throw new Exception("cannot replay, missing logsDir (xd)");
         }
         StorageRepository storage = new NullStorageRepository();
         if (logsDir != null && !logsDir.isEmpty()) {
             storage = new FileStorageRepository(Path.of(logsDir));
+        }
+        return storage;
+    }
+
+    private static void runWithParams(String id, Supplier<Boolean> stopWhenFalse, int timeoutSec, String logLevel,
+                                      String protocol, boolean replayFromLog,
+                                      String portVal, String jdbcForcedSchema, String login, String password,
+                                      String jdbcReplaceQueries, boolean callDurationTimes, String connectionString,
+                                      StorageRepository storage, HashMap<String, List<FilterDescriptor>> allFilters) throws Exception {
+        //ProtoContext.setTimeout(timeoutSec);
+
+
+
+        var filters = allFilters.get(protocol.toLowerCase());
+        if(filters==null)filters=new ArrayList<>();
+        if (replayFromLog &&
+                (storage instanceof NullStorageRepository)) {
+            throw new Exception("cannot replay, missing logsDir (xd)");
         }
         var port = -1;
         if (portVal != null && !portVal.isEmpty()) {
@@ -164,22 +203,22 @@ public class Main {
         }
         if (protocol.equalsIgnoreCase("mysql")) {
             if (port == -1) port = 3306;
-            runMysql(id,port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec);
+            runMysql(id,port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec,filters);
         } else if (protocol.equalsIgnoreCase("postgres")) {
             if (port == -1) port = 5432;
-            runPostgres(id,port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec);
+            runPostgres(id,port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec,filters);
         } else if (protocol.equalsIgnoreCase("mongo")) {
             if (port == -1) port = 27017;
-            runMongo(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec);
+            runMongo(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec,filters);
         } else if (protocol.equalsIgnoreCase("amqp091")) {
             if (port == -1) port = 5672;
-            runAmqp091(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec);
+            runAmqp091(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec,filters);
         } else if (protocol.equalsIgnoreCase("redis")) {
             if (port == -1) port = 6379;
-            runRedis(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec);
+            runRedis(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec,filters);
         } else if (protocol.equalsIgnoreCase("mqtt")) {
             if (port == -1) port = 1883;
-            runMqtt(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec);
+            runMqtt(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec,filters);
         } else {
             throw new Exception("missing protocol (p)");
         }
@@ -210,6 +249,7 @@ public class Main {
         options.addOption("cdt", false, "[all] Respect call duration timing");
         options.addOption("js", true, "[jdbc] Set schema");
         options.addOption("jr", true, "[jdbc] Replace queries");
+        options.addOption("pl", true, "[all] Plugins dir (default plugins)");
         return options;
     }
 
@@ -242,21 +282,23 @@ public class Main {
 
 
     private static void runPostgres(String id, int port, StorageRepository logsDir, String connectionString, String forcedSchema,
-                                    String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes, int timeoutSec) throws IOException {
+                                    String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) throws IOException {
         runJdbc(id,"postgres", "org.postgresql.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec);
+                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec,filters);
     }
 
     private static void runMysql(String id, int port, StorageRepository logsDir, String connectionString, String forcedSchema,
-                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes, int timeoutSec) throws IOException {
+                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes, int timeoutSec,
+                                 List<FilterDescriptor> filters) throws IOException {
         runJdbc(id,"mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec);
+                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec,filters);
     }
 
     private static void runJdbc(String id,String type, String driver, int port, StorageRepository logsDir,
                                 String connectionString, String forcedSchema,
                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries,
-                                boolean callDurationTimes,int timeoutSec) throws IOException {
+                                boolean callDurationTimes,int timeoutSec,
+                                List<FilterDescriptor> filters) throws IOException {
         var baseProtocol = new PostgresProtocol(port);
         var proxy = new JdbcProxy(driver,
                 connectionString, forcedSchema,
@@ -271,6 +313,7 @@ public class Main {
         } else {
             proxy.setStorage(storage);
         }
+        proxy.setFilters(filters);
         if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
 
             handleReplacementQueries(jdbcReplaceQueries, proxy);
@@ -323,7 +366,7 @@ public class Main {
         proxy.setQueryReplacement(items);
     }
 
-    private static void runMongo(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec) {
+    private static void runMongo(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) {
         var baseProtocol = new MongoProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MongoProxy(connectionString);
@@ -333,6 +376,7 @@ public class Main {
         } else {
             proxy.setStorage(new MongoStorageHandler(logsDir));
         }
+        proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
@@ -342,7 +386,7 @@ public class Main {
         protocolServer.put(id,ps);
     }
 
-    private static void runAmqp091(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec) {
+    private static void runAmqp091(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) {
         var baseProtocol = new AmqpProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new AmqpProxy(connectionString, login, password);
@@ -353,6 +397,7 @@ public class Main {
         } else {
             proxy.setStorage(new AmqpStorageHandler(logsDir));
         }
+        proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
@@ -362,7 +407,7 @@ public class Main {
         protocolServer.put(id,ps);
     }
 
-    private static void runRedis(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec) {
+    private static void runRedis(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) {
         var baseProtocol = new Resp3Protocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new Resp3Proxy(connectionString, login, password);
@@ -374,6 +419,7 @@ public class Main {
         } else {
             proxy.setStorage(new Resp3StorageHandler(logsDir));
         }
+        proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
@@ -383,7 +429,7 @@ public class Main {
         protocolServer.put(id,ps);
     }
 
-    private static void runMqtt(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec) {
+    private static void runMqtt(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) {
         var baseProtocol = new MqttProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MqttProxy(connectionString, login, password);
@@ -395,6 +441,7 @@ public class Main {
         } else {
             proxy.setStorage(new MqttStorageHandler(logsDir));
         }
+        proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);

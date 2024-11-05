@@ -79,7 +79,6 @@ public abstract class ProtoDescriptor {
     protected void initialize(ProtoState start) {
         start.setProtoDescriptor(this);
         initializeStatic(this);
-        buildProtocolDescription(start);
         initializeTag("", start);
         initializeInternal(start, "");
     }
@@ -133,15 +132,6 @@ public abstract class ProtoDescriptor {
         contextCleaner.start();
     }
 
-    /**
-     * Build a graphviz file for the protocol description
-     *
-     * @param start
-     */
-    private void buildProtocolDescription(ProtoState start) {
-        start.setProtoDescriptor(this);
-        log.warn("[TPM  ][IN] Not implemented ProtoDescriptor::buildProtocolDescription");
-    }
 
     /**
      * Split the protocol in all the sub tags
