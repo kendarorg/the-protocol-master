@@ -15,13 +15,13 @@
         <module name="protocol-postgres" />
         <module name="protocol-mysql" />
         <module name="protocol-runner" />
+        <module name="protocol-http" />
         <module name="protocol-mqtt" />
         <module name="protocol-redis" />
         <module name="protocol-amqp-091" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="protocol-http" target="11" />
       <module name="protocol-todo" target="1.5" />
     </bytecodeTargetLevel>
   </component>

@@ -3,18 +3,32 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/jacoco/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jacoco/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-amqp-091/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-amqp-091/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-amqp-100/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-amqp-100/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-http/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-http/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-kafka/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-kafka/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-mongo/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-mongo/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-mqtt/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-mqtt/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-mysql/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-mysql/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-postgres/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-postgres/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-redis/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-redis/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-runner/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-runner/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-test/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-test/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/todo/protocol-amqp-100/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/todo/protocol-amqp-100/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/todo/protocol-kafka/src/main/java" charset="UTF-8" />

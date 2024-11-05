@@ -21,9 +21,11 @@
         <module>protocol-mqtt</module>
         <module>jacoco</module>
         <module>todo</module>
+        <module>protocol-http</module>
     </modules>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.version>1.4.0</project.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
@@ -47,6 +49,12 @@
         <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.text.version>1.10.0</commons.text.version>
         <pl4j.version>3.12.1</pl4j.version>
+        <jaxb.api.version>2.3.0</jaxb.api.version>
+        <apache.http.version>4.5.13</apache.http.version>
+        <json.schema.validator.version>1.0.66</json.schema.validator.version>
+        <pl4j.version>3.12.1</pl4j.version>
+        <commons.cli.version>1.6.0</commons.cli.version>
+        <bouncycastle.version>1.68</bouncycastle.version>
     </properties>
     <dependencies>
         <!--        <dependency>-->

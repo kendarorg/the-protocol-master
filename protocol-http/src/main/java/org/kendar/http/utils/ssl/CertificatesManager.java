@@ -1,0 +1,304 @@
+package org.kendar.http.utils.ssl;
+
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsParameters;
+import com.sun.net.httpserver.HttpsServer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.X509KeyUsage;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+public class CertificatesManager {
+
+    public static final String PASSPHRASE = "passphrase";
+    public static final String PRIVATE_CERT = "privateCert";
+    private static final Logger sslLog = LoggerFactory.getLogger("org.kendar.http.SSL");
+    private final FileResourcesUtils fileResourcesUtils;
+    private final ConcurrentHashMap<String, String> certificateHosts = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> registeredHosts = new ConcurrentHashMap<>();
+    private GeneratedCert caCertificate;
+
+    public CertificatesManager(
+            FileResourcesUtils fileResourcesUtils) {
+        this.fileResourcesUtils = fileResourcesUtils;
+        Provider aProvider = Security.getProvider("BC");
+        if (aProvider == null) {
+            updateProvider();
+        }
+    }
+
+    private static KeyStore setupKeystore(GeneratedCert domain)
+            throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+        KeyStore ksTemp = KeyStore.getInstance("jks"); //PKCS12
+        ksTemp.load(null, null); // Initialize it
+        ksTemp.setCertificateEntry("Alias", domain.certificate);
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        // save the temp keystore
+        ksTemp.store(bOut, PASSPHRASE.toCharArray());
+        // Now create the keystore to be used by jsse
+        KeyStore keyStore = KeyStore.getInstance("jks");
+        keyStore.load(new ByteArrayInputStream(bOut.toByteArray()), PASSPHRASE.toCharArray());
+        return keyStore;
+    }
+
+    private SSLContext getSslContext(List<String> hosts,String cname, String der, String key) throws Exception {
+        for (var host : hosts) {
+            certificateHosts.put(host, host);
+        }
+        var newHostsList = new ArrayList<String>(certificateHosts.keySet());
+        var root =
+                loadRootCertificate(der, key);
+
+        GeneratedCert domain =
+                createCertificate(
+                        cname,
+                        null,
+                        root,
+                        newHostsList,
+                        false);
+
+        KeyStore keyStoreTs = setupKeystore(domain);
+        // now lets do the same with the keystore
+        KeyStore keyStore = setupKeystore(domain);
+        // HERE IS THE CHAIN
+        X509Certificate[] chain = new X509Certificate[1];
+        chain[0] = domain.certificate;
+        keyStore.setKeyEntry(PRIVATE_CERT, domain.privateKey, PASSPHRASE.toCharArray(), chain);
+
+        TrustManagerFactory tmf =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(keyStoreTs);
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(keyStore, PASSPHRASE.toCharArray());
+
+        // create SSLContext to establish the secure connection
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+        return ctx;
+    }
+
+    public void setupSll(HttpsServer port, List<String> hosts,String cname, String der, String key) throws Exception {
+        var hostsSize = registeredHosts.size();
+        var inserted = new ArrayList<String>();
+        for (var host : hosts) {
+            var hstSpl = host.split("\\.");
+            if (hstSpl.length > 2) {
+                var newHost = "*";
+                for (var i = 1; i < hstSpl.length; i++) {
+                    newHost += "." + hstSpl[i];
+                }
+                if (!registeredHosts.containsKey(newHost)) {
+                    inserted.add(newHost);
+                    registeredHosts.put(newHost, newHost);
+                }
+            }
+
+            if (!registeredHosts.containsKey(host)) {
+                inserted.add(host);
+                registeredHosts.put(host, host);
+            }
+        }
+
+        if (hostsSize == registeredHosts.size()) {
+            return;
+        }
+        sslLog.debug("ADD HOST: " + String.join(",", inserted));
+        var sslContextInt = getSslContext(registeredHosts.values().stream().collect(Collectors.toList()),cname, der, key);
+        port.setHttpsConfigurator(
+                new HttpsConfigurator(sslContextInt) {
+                    @Override
+                    public void configure(HttpsParameters params) {
+                        try {
+                            // initialise the SSL context
+
+                            SSLEngine engine = sslContextInt.createSSLEngine();
+                            params.setNeedClientAuth(false);
+                            params.setCipherSuites(engine.getEnabledCipherSuites());
+                            params.setProtocols(engine.getEnabledProtocols());
+
+                            // Set the SSL parameters
+                            SSLParameters sslParameters = sslContextInt.getSupportedSSLParameters();
+                            params.setSSLParameters(sslParameters);
+
+                        } catch (Exception ex) {
+                            sslLog.error("ERROR CONFIGURING HTTPS");
+                        }
+                    }
+                });
+    }
+
+    public void updateProvider() {
+        //Security.insertProviderAt(new BouncyCastleProvider(), 1);
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    public GeneratedCert getCaCertificate() {
+        return caCertificate;
+    }
+
+
+    public GeneratedCert loadRootCertificate(String derFile, String keyFile)
+            throws CertificateException, IOException {
+        var caStream = fileResourcesUtils.getFileFromResourceAsStream(derFile);
+        var certificateFactory = CertificateFactory.getInstance("X.509");
+        var certificate = (X509Certificate) certificateFactory.generateCertificate(caStream);
+
+        var keyStream = fileResourcesUtils.getFileFromResourceAsStream(keyFile);
+
+        PEMParser pemParser = new PEMParser(new InputStreamReader(keyStream));
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+        Object object = pemParser.readObject();
+        KeyPair kp = converter.getKeyPair((PEMKeyPair) object);
+        var privateKey = kp.getPrivate();
+
+        caCertificate = new GeneratedCert(privateKey, certificate);
+        return caCertificate;
+    }
+
+    private GeneratedCert createSNACertificate(String cnName,
+                                               String rootDomain,
+                                               GeneratedCert issuer,
+                                               List<String> childDomains) throws Exception {
+
+        // Generate the key-pair with the official Java API's
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        KeyPair certKeyPair = keyGen.generateKeyPair();
+        X500Name name = new X500Name(cnName);
+
+        // If you issue more than just test certificates, you might want a decent serial number schema
+        // ^.^
+        BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        Instant now = Instant.now();
+        Instant validFrom = now.minus(360, ChronoUnit.DAYS);
+        Instant validUntil = now.plus(360, ChronoUnit.DAYS);
+
+        // If there is no issuer, we self-sign our certificate.
+        X500Name issuerName;
+        PrivateKey issuerKey;
+        if (issuer == null) {
+            issuerName = name;
+            issuerKey = certKeyPair.getPrivate();
+        } else {
+            issuerName = new X500Name(issuer.certificate.getSubjectDN().getName());
+            issuerKey = issuer.privateKey;
+        }
+
+        // The cert builder to build up our certificate information
+        JcaX509v3CertificateBuilder builder =
+                new JcaX509v3CertificateBuilder(
+                        issuerName,
+                        serialNumber,
+                        Date.from(validFrom),
+                        Date.from(validUntil),
+                        name,
+                        certKeyPair.getPublic());
+
+        // Make the cert to a Cert Authority to sign more certs when needed
+
+        byte[] bytes = new byte[20];
+        SecureRandom.getInstanceStrong().nextBytes(bytes);
+        SubjectKeyIdentifier securityKeyIdentifier =
+                new SubjectKeyIdentifier(bytes);
+        builder.addExtension(Extension.subjectKeyIdentifier, false, securityKeyIdentifier);
+
+        // Modern browsers demand the DNS name entry
+        if (rootDomain != null) {
+            builder.addExtension(
+                    Extension.subjectAlternativeName,
+                    false,
+                    new GeneralNames(new GeneralName(GeneralName.dNSName, rootDomain)));
+        } else if (childDomains.size() > 0) {
+            var generalNames = new GeneralName[childDomains.size()];
+            for (int i = 0; i < childDomains.size(); i++) {
+                generalNames[i] = new GeneralName(GeneralName.dNSName, childDomains.get(i));
+            }
+
+            // GeneralNames subjectAltNames = GeneralNames.getInstance(generalNames);
+            builder.addExtension(Extension.subjectAlternativeName, false, new GeneralNames(generalNames));
+        }
+        if (issuer != null) {
+            byte[] extvalue =
+                    //issuer.certificate.getExtensionValue(Extension.authorityKeyIdentifier.getId());
+                    issuer.certificate.getExtensionValue(Extension.subjectKeyIdentifier.getId());
+            if (extvalue != null) {
+                byte[] filteredByteArray =
+                        Arrays.copyOfRange(extvalue, extvalue.length - 20, extvalue.length);
+
+                AuthorityKeyIdentifier authorityKeyIdentifier =
+                        new AuthorityKeyIdentifier(filteredByteArray);
+                builder.addExtension(Extension.authorityKeyIdentifier, false, authorityKeyIdentifier);
+            }
+            builder.addExtension(
+                    new ASN1ObjectIdentifier("2.5.29.19"), false, new BasicConstraints(false));
+            builder.addExtension(
+                    Extension.extendedKeyUsage,
+                    false,
+                    new ExtendedKeyUsage(
+                            new KeyPurposeId[]{KeyPurposeId.id_kp_serverAuth, KeyPurposeId.id_kp_clientAuth}));
+
+            builder.addExtension(
+                    Extension.keyUsage,
+                    false,
+                    new X509KeyUsage(
+                            X509KeyUsage.digitalSignature
+                                    | X509KeyUsage.nonRepudiation
+                                    | X509KeyUsage.keyEncipherment
+                                    | X509KeyUsage.dataEncipherment));
+        }
+
+        // Finally, sign the certificate:
+        ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(issuerKey);
+        //ContentSigner signer = new JcaContentSignerBuilder("SHA256").build(issuerKey);
+        X509CertificateHolder certHolder = builder.build(signer);
+        X509Certificate cert = new JcaX509CertificateConverter().getCertificate(certHolder);
+
+        return new GeneratedCert(certKeyPair.getPrivate(), cert);
+    }
+
+    public GeneratedCert createCertificate(
+            String cnName,
+            String rootDomain,
+            GeneratedCert issuer,
+            List<String> childDomains,
+            boolean isCa)
+            throws Exception {
+        if (!isCa) {
+            return createSNACertificate(cnName, rootDomain, issuer, childDomains);
+        } else {
+            sslLog.error("ERROR LOADING CERTIFICATE");
+            throw new Exception("Miss");
+        }
+    }
+}

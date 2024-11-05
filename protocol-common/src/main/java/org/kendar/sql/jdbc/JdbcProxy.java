@@ -1,10 +1,12 @@
 package org.kendar.sql.jdbc;
 
+import org.kendar.filters.ProtocolPhase;
 import org.kendar.iterators.QueryResultIterator;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcStorage;
 import org.kendar.sql.jdbc.storage.NullJdbcStorage;
 import org.kendar.sql.parser.SqlStringParser;
@@ -298,11 +300,16 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             return storageItem.getOutput().getSelectResult();
         }
         try {
-            long start = System.currentTimeMillis();
             var result = new SelectResult();
+            var jdbcCall = new JdbcCall(query, parameterValues);
+            for(var filter:getFilters(ProtocolPhase.PRE_CALL,jdbcCall, result)){
+                if(filter.handle(ProtocolPhase.PRE_CALL,jdbcCall,result)){
+                    return result;
+                }
+            }
+            long start = System.currentTimeMillis();
 
             PreparedStatement statement;
-            ResultSet resultSet;
 
             var c = ((Connection) ((ProxyConnection) connection).getConnection());
             if (parameterValues.isEmpty()) {
@@ -323,6 +330,11 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             }
 
             long end = System.currentTimeMillis();
+            for(var filter:getFilters(ProtocolPhase.POST_CALL,jdbcCall, result)){
+                if(filter.handle(ProtocolPhase.POST_CALL,jdbcCall,result)){
+                    break;
+                }
+            }
             storage.write(connectionId, query, result, parameterValues, end - start, "QUERY");
             return result;
         } catch (SQLException e) {
