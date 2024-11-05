@@ -1,5 +1,6 @@
 package org.kendar.mongo;
 
+import org.kendar.mongo.proxy.DocumentContainer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -13,6 +14,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
+import org.kendar.filters.ProtocolPhase;
 import org.kendar.iterators.ProcessId;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpMsgSection;
@@ -105,7 +107,30 @@ public class MongoProxy extends Proxy<MongoStorage> {
 
 
         var database = mongoClient.getDatabase(db);
+        var cmdContainer = new DocumentContainer(protoContext.getReqResId(), data.getRequestId());
+
+        for(var filter:getFilters(ProtocolPhase.PRE_CALL,command, cmdContainer)){
+            if(filter.handle(ProtocolPhase.PRE_CALL,command,cmdContainer)){
+                var toSend = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
+                OpMsgSection section = new OpMsgSection();
+                section.getDocuments().add(cmdContainer.getCommandResult().toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build()));
+                toSend.getSections().add(section);
+                return toSend;
+            }
+        }
         Document commandResult = database.runCommand(command);
+        cmdContainer.setResult(commandResult);
+
+        for(var filter:getFilters(ProtocolPhase.POST_CALL,command, cmdContainer)){
+            if(filter.handle(ProtocolPhase.POST_CALL,command,cmdContainer)){
+                var toSend2 = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
+                OpMsgSection section2 = new OpMsgSection();
+                section2.getDocuments().add(cmdContainer.getCommandResult().toJson(JsonWriterSettings.builder().
+                        outputMode(JsonMode.EXTENDED).build()));
+                toSend2.getSections().add(section2);
+                return toSend2;
+            }
+        }
 
         var toSend = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
         OpMsgSection section = new OpMsgSection();
@@ -115,6 +140,7 @@ public class MongoProxy extends Proxy<MongoStorage> {
 
         this.storage.write(protoContext.getContextId(),
                 (JsonNode) data.serialize(), (JsonNode) toSend.serialize(), end - start, "OP_MSG", "MONGODB");
+
         return toSend;
     }
 

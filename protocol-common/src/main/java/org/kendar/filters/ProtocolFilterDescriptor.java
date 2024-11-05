@@ -1,12 +1,6 @@
 package org.kendar.filters;
 
-import org.kendar.storage.StorageItem;
-
-import java.util.List;
-
-public interface ProtocolFilterDescriptor extends FilterDescriptor{
-    List<ProtocolPhase> getPhases();
-
+public abstract class ProtocolFilterDescriptor<T,K> implements FilterDescriptor{
 
 
     /**
@@ -15,5 +9,5 @@ public interface ProtocolFilterDescriptor extends FilterDescriptor{
      * @param response
      * @return true when is blocking
      */
-    boolean handle(ProtocolPhase phase, StorageItem in, StorageItem out);
+    public abstract boolean handle(ProtocolPhase phase, T in, K out);
 }

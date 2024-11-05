@@ -2,6 +2,7 @@ package org.kendar.proxy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.buffers.BBuffer;
+import org.kendar.filters.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
@@ -102,6 +103,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             connection.setKeepAlive(true);
             connection.setTcpNoDelay(true);
             connection.connect(new InetSocketAddress(InetAddress.getByName(host), port));
+
             return new ProxyConnection(buildProxyConnection(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group));
         } catch (IOException e) {
@@ -144,19 +146,33 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             sendBackResponses(storage.readResponses(item.getIndex()));
             return;
         }
+
+        for(var filter:getFilters(ProtocolPhase.PRE_CALL,of, new Object())){
+            if(filter.handle(ProtocolPhase.PRE_CALL,of,null)){
+                return;
+            }
+        }
+
         var index = storage.generateIndex();
         long start = System.currentTimeMillis();
 
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of, protocol.buildBuffer());
-        var res = "{\"type\":null,\"data\":null}";
+        var jsonRes = mapper.toJsonNode("{\"type\":null,\"data\":null}");
         long end = System.currentTimeMillis();
+        for(var filter:getFilters(ProtocolPhase.POST_CALL,of, new Object())){
+            if(filter.handle(ProtocolPhase.POST_CALL,of,null)){
+                break;
+            }
+        }
         storage.write(
                 index,
                 context.getContextId(),
-                mapper.toJsonNode(req)
-                , mapper.toJsonNode(res)
+                jsonReq
+                ,jsonRes
                 , (end - start), of.getClass().getSimpleName(), getCaller());
+
+
     }
 
     /**
@@ -217,6 +233,12 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             return (T) buildState(context, out, toRead.getClass());
 
         }
+
+        for(var filter:getFilters(ProtocolPhase.PRE_CALL,of, toRead)){
+            if(filter.handle(ProtocolPhase.PRE_CALL,of,toRead)){
+                return toRead;
+            }
+        }
         var index = storage.generateIndex();
 
         long start = System.currentTimeMillis();
@@ -228,6 +250,12 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         for (var item : returnMessages) {
             if (toRead.getClass() == item.getClass()) {
                 toRead = (T) item;
+                break;
+            }
+        }
+
+        for(var filter:getFilters(ProtocolPhase.POST_CALL,of, toRead)){
+            if(filter.handle(ProtocolPhase.POST_CALL,of,toRead)){
                 break;
             }
         }
@@ -288,10 +316,22 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         }
         var index = storage.generateIndex();
 
+        for(var filter:getFilters(ProtocolPhase.PRE_CALL,of, toRead)){
+            if(filter.handle(ProtocolPhase.PRE_CALL,of,toRead)){
+                return toRead;
+            }
+        }
+
         long start = System.currentTimeMillis();
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of);
         sock.read(toRead, optional);
+
+        for(var filter:getFilters(ProtocolPhase.POST_CALL,of, toRead)){
+            if(filter.handle(ProtocolPhase.POST_CALL,of,toRead)){
+                break;
+            }
+        }
 
         var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
         long end = System.currentTimeMillis();
@@ -301,6 +341,8 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
                 jsonReq
                 , mapper.toJsonNode(res)
                 , (end - start), "byte[]", getCaller());
+
+
         return toRead;
     }
 

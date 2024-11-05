@@ -7,7 +7,6 @@ import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.AmqpStorageHandler;
 import org.kendar.filters.FilterDescriptor;
-import org.kendar.filters.ProtocolFilterDescriptor;
 import org.kendar.mongo.MongoProtocol;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.mongo.MongoStorageHandler;
@@ -160,7 +159,7 @@ public class Main {
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         var filters = new HashMap<String, List<FilterDescriptor>>();
-        for(var item : pluginManager.getExtensions(ProtocolFilterDescriptor.class)){
+        for(var item : pluginManager.getExtensions(FilterDescriptor.class)){
             var protocol = item.getProtocol().toLowerCase();
             if(!filters.containsKey(protocol)){
                 filters.put(protocol,new ArrayList<>());
