@@ -25,10 +25,10 @@
     </modules>
 
     <properties>
-        <revision>1.4.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
+        <revision>2.0.0</revision>
         <testcontainers.version>1.20.1</testcontainers.version>
         <testcontainers.redis.version>1.6.4</testcontainers.redis.version>
         <junit.jupiter.version>RELEASE</junit.jupiter.version>
