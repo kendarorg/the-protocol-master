@@ -2,8 +2,8 @@ package org.kendar.http.plugins;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
-import org.kendar.filters.FilterDescriptor;
-import org.kendar.filters.ProtocolFilterDescriptor;
+import org.kendar.filters.PluginDescriptor;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
@@ -16,10 +16,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.System.exit;
 
-public class GlobalFilter extends ProtocolFilterDescriptor<Request, Response> {
-    private static final Logger log = LoggerFactory.getLogger(GlobalFilter.class);
+public class GlobalPlugin extends ProtocolPluginDescriptor<Request, Response> {
+    private static final Logger log = LoggerFactory.getLogger(GlobalPlugin.class);
     private String apis;
-    private List<FilterDescriptor> filters;
+    private List<PluginDescriptor> filters;
     private HttpServer httpServer;
     private HttpsServer httpsServer;
     private AtomicBoolean shutdownVariable;
@@ -79,7 +79,7 @@ public class GlobalFilter extends ProtocolFilterDescriptor<Request, Response> {
         }
     }
 
-    public void setFilters(List<FilterDescriptor> filters) {
+    public void setFilters(List<PluginDescriptor> filters) {
         this.filters = filters;
     }
 

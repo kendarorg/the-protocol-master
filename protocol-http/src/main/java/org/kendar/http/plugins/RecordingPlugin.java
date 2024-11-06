@@ -1,6 +1,6 @@
 package org.kendar.http.plugins;
 
-import org.kendar.filters.ProtocolFilterDescriptor;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
@@ -20,8 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class RecordingFilter extends ProtocolFilterDescriptor<Request, Response> {
-    private static final Logger log = LoggerFactory.getLogger(RecordingFilter.class);
+public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response> {
+    private static final Logger log = LoggerFactory.getLogger(RecordingPlugin.class);
     private final JsonMapper mapper = new JsonMapper();
     private final ConcurrentLinkedQueue<StorageItem<Request, Response>> items = new ConcurrentLinkedQueue<>();
     private final List<CompactLine> lines = new ArrayList<>();

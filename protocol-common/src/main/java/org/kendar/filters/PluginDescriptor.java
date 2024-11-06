@@ -5,7 +5,7 @@ import org.pf4j.ExtensionPoint;
 import java.util.List;
 import java.util.Map;
 
-public interface FilterDescriptor extends ExtensionPoint {
+public interface PluginDescriptor extends ExtensionPoint {
     List<ProtocolPhase> getPhases();
 
     String getId();
@@ -16,5 +16,5 @@ public interface FilterDescriptor extends ExtensionPoint {
 
     void terminate();
 
-    FilterDescriptor clone();
+    PluginDescriptor clone();
 }

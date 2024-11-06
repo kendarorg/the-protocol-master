@@ -1,7 +1,7 @@
 package org.kendar.proxy;
 
-import org.kendar.filters.FilterDescriptor;
-import org.kendar.filters.ProtocolFilterDescriptor;
+import org.kendar.filters.PluginDescriptor;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -26,7 +26,7 @@ public abstract class Proxy<T extends Storage> {
      * Descriptor (of course network like)
      */
     private NetworkProtoDescriptor protocol;
-    private Map<String, Map<ProtocolPhase, List<ProtocolFilterDescriptor>>> toFilter = new ConcurrentHashMap<>();
+    private Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> toFilter = new ConcurrentHashMap<>();
     private Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
 
     public boolean isReplayer() {
@@ -90,7 +90,7 @@ public abstract class Proxy<T extends Storage> {
         this.storage.initialize();
     }
 
-    public void setFilters(List<FilterDescriptor> filters) {
+    public void setFilters(List<PluginDescriptor> filters) {
         for (var filter : filters) {
             var clazz = filter.getClass();
             var handle = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase("handle")).findFirst();
@@ -107,14 +107,14 @@ public abstract class Proxy<T extends Storage> {
                         if (!map.containsKey(phase)) {
                             map.put(phase, new ArrayList<>());
                         }
-                        map.get(phase).add((ProtocolFilterDescriptor) filter);
+                        map.get(phase).add((ProtocolPluginDescriptor) filter);
                     }
                 }
             }
         }
     }
 
-    public <I, J> List<ProtocolFilterDescriptor> getFilters(ProtocolPhase phase, I in, J out) {
+    public <I, J> List<ProtocolPluginDescriptor> getFilters(ProtocolPhase phase, I in, J out) {
         var data = in.getClass().getName() + "," + out.getClass().getName();
         var forData = toFilter.get(data);
         if (forData != null) {

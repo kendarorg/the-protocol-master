@@ -3,7 +3,8 @@ package org.kendar;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import org.kendar.command.*;
-import org.kendar.filters.FilterDescriptor;
+import org.kendar.filters.AlwaysActivePlugin;
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class Main {
-    private static final Logger log = LoggerFactory.getLogger(OldMain.class);
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
     private static OptionsManager om;
 
@@ -83,15 +84,15 @@ public class Main {
         return storage;
     }
 
-    private static HashMap<String, List<FilterDescriptor>> loadFilters(String pluginsDir) {
+    private static HashMap<String, List<PluginDescriptor>> loadFilters(String pluginsDir) {
         if (!Path.of(pluginsDir).toAbsolutePath().toFile().exists()) {
             return new HashMap<>();
         }
         var pluginManager = new JarPluginManager(Path.of(pluginsDir).toAbsolutePath());
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
-        var filters = new HashMap<String, List<FilterDescriptor>>();
-        for (var item : pluginManager.getExtensions(FilterDescriptor.class)) {
+        var filters = new HashMap<String, List<PluginDescriptor>>();
+        for (var item : pluginManager.getExtensions(PluginDescriptor.class)) {
             var protocol = item.getProtocol().toLowerCase();
             if (!filters.containsKey(protocol)) {
                 filters.put(protocol, new ArrayList<>());
@@ -102,16 +103,16 @@ public class Main {
     }
 
 
-    private static ArrayList<FilterDescriptor> loadCorrectFiltersForProtocol(String id, String protocol, HashMap<String, List<FilterDescriptor>> allFilters, Ini ini) {
+    private static ArrayList<PluginDescriptor> loadCorrectFiltersForProtocol(String id, String protocol, HashMap<String, List<PluginDescriptor>> allFilters, Ini ini) {
         var availableFilters = allFilters.get(protocol.toLowerCase());
         if (availableFilters == null) availableFilters = new ArrayList<>();
-        var filters = new ArrayList<FilterDescriptor>();
+        var filters = new ArrayList<PluginDescriptor>();
         if (ini != null) {
 
             for (var availableFilter : availableFilters) {
                 var sectionId = id + "-" + availableFilter.getId();
                 var section = ini.getSection(sectionId);
-                if (section != null && !section.isEmpty()) {
+                if ((section != null && !section.isEmpty())||availableFilter instanceof AlwaysActivePlugin) {
                     var clonedFilter = availableFilter.clone();
                     filters.add(clonedFilter);
                 }

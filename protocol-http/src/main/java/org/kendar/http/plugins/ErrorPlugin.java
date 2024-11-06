@@ -1,6 +1,6 @@
 package org.kendar.http.plugins;
 
-import org.kendar.filters.ProtocolFilterDescriptor;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public class ErrorFilter extends ProtocolFilterDescriptor<Request, Response> {
+public class ErrorPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
-    private static final Logger log = LoggerFactory.getLogger(ErrorFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(ErrorPlugin.class);
     private int errorCode;
     private String errorMessage;
     private double percentage;

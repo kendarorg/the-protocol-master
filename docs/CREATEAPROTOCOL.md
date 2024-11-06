@@ -22,12 +22,12 @@ Add first to the pom.xml the dependencies on the main projects.
     <dependency>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-common</artifactId>
-        <version>${project.version}</version>
+        <version>${revision}</version>
     </dependency>
     <dependency>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-test</artifactId>
-        <version>${project.version}</version>
+        <version>${revision}</version>
         <scope>test</scope>
     </dependency>
 </pre>

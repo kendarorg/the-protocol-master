@@ -1,6 +1,6 @@
 package org.kendar.filters;
 
-public abstract class ProtocolFilterDescriptor<T, K> implements FilterDescriptor {
+public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor {
 
 
     /**
@@ -11,7 +11,7 @@ public abstract class ProtocolFilterDescriptor<T, K> implements FilterDescriptor
      */
     public abstract boolean handle(ProtocolPhase phase, T in, K out);
 
-    public FilterDescriptor clone() {
+    public PluginDescriptor clone() {
         try {
             return this.getClass().getDeclaredConstructor().newInstance();
         } catch (Exception e) {

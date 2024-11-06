@@ -6,7 +6,7 @@
 
     <groupId>org.kendar.protocol</groupId>
     <artifactId>protocol-master</artifactId>
-    <version>1.4.1</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -22,11 +22,12 @@
         <module>jacoco</module>
         <module>todo</module>
         <module>protocol-http</module>
+        <module>sample-plugins</module>
     </modules>
 
     <properties>
+        <revision>1.4.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.version>1.4.0</project.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
         <testcontainers.version>1.20.1</testcontainers.version>

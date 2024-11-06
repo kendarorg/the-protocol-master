@@ -1,7 +1,7 @@
 package org.kendar.command;
 
 import org.apache.commons.cli.*;
-import org.kendar.filters.FilterDescriptor;
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ini.Ini;
@@ -16,7 +16,7 @@ public abstract class CommonProtocol {
 
     public abstract String getDefaultPort();
 
-    public abstract void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<FilterDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception;
+    public abstract void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception;
 
     protected Options getCommonOptions(Options options) {
         options.addOption(Option.builder().option("port").optionalArg(true).

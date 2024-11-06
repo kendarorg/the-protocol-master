@@ -1,7 +1,7 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.filters.ProtocolFilterDescriptor;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.MimeChecker;
 import org.kendar.http.utils.Request;
@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MockFilter extends ProtocolFilterDescriptor<Request, Response> {
-    private static final Logger log = LoggerFactory.getLogger(MockFilter.class);
+public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
+    private static final Logger log = LoggerFactory.getLogger(MockPlugin.class);
     final JsonMapper mapper = new JsonMapper();
     final ConcurrentHashMap<Long, Long> calls = new ConcurrentHashMap<>();
     private final List<StorageItem<Request, Response>> items = new ArrayList<>();

@@ -4,12 +4,13 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
 import org.apache.commons.cli.Options;
 import org.kendar.HttpTcpServer;
-import org.kendar.filters.FilterDescriptor;
+import org.kendar.filters.AlwaysActivePlugin;
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.http.MasterHandler;
-import org.kendar.http.plugins.ErrorFilter;
-import org.kendar.http.plugins.GlobalFilter;
-import org.kendar.http.plugins.MockFilter;
-import org.kendar.http.plugins.RecordingFilter;
+import org.kendar.http.plugins.ErrorPlugin;
+import org.kendar.http.plugins.GlobalPlugin;
+import org.kendar.http.plugins.MockPlugin;
+import org.kendar.http.plugins.RecordingPlugin;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
@@ -102,7 +103,7 @@ public class HttpProtocol extends CommonProtocol {
     }
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String sectionKey, Ini ini, String protocol,
-                      StorageRepository storage, ArrayList<FilterDescriptor> filters, Supplier<Boolean> stopWhenFalseAction) {
+                      StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalseAction) {
         var ps = new HttpTcpServer(null);
         try {
 
@@ -120,8 +121,8 @@ public class HttpProtocol extends CommonProtocol {
 
             ps.setIsRunning(() -> stopWhenFalse.get());
 
-            var port = ini.getValue(sectionKey, "http.port", Integer.class, 8085);
-            var httpsPort = ini.getValue(sectionKey, "https.port", Integer.class, port + 400);
+            var port = ini.getValue(sectionKey, "http.port", Integer.class, 4080);
+            var httpsPort = ini.getValue(sectionKey, "https.port", Integer.class, 4443);
             var proxyPort = ini.getValue(sectionKey, "port.proxy", Integer.class, 9999);
 //        log.info("LISTEN HTTP: " + port);
 //        log.info("LISTEN HTTPS: " + httpsPort);
@@ -145,8 +146,8 @@ public class HttpProtocol extends CommonProtocol {
                 httpServer.stop(0);
             });
 
-            var der = ini.getValue(sectionKey + "-ssl", "der", String.class, "resources://certificates/ca.der");
-            var key = ini.getValue(sectionKey + "-ssl", "key", String.class, "resources://certificates/ca.key");
+            var der = ini.getValue(sectionKey + "-ssl", "der", String.class, "resource://certificates/ca.der");
+            var key = ini.getValue(sectionKey + "-ssl", "key", String.class, "resource://certificates/ca.key");
             var cname = ini.getValue(sectionKey + "-ssl", "cname", String.class, "C=US,O=Local Development,CN=local.org");
 
             var httpsServer = createHttpsServer(certificatesManager, sslAddress, backlog, cname, der, key);
@@ -173,23 +174,22 @@ public class HttpProtocol extends CommonProtocol {
                     ignoringHosts("push.services.mozilla.com");
             ps.setStop(() -> {
                 waiterBlock.set(false);
-                proxy.stop();
+                proxy.terminate();
                 httpsServer.stop(0);
                 httpServer.stop(0);
             });
             new Thread(proxy).start();
 
-            var globalFilter = new GlobalFilter();
+            var globalFilter = new GlobalPlugin();
 
             filters.add(globalFilter);
-            filters.add(new RecordingFilter());
-            filters.add(new ErrorFilter());
-            filters.add(new MockFilter());
+            filters.add(new RecordingPlugin());
+            filters.add(new ErrorPlugin());
+            filters.add(new MockPlugin());
             for (var i = filters.size() - 1; i >= 0; i--) {
                 var filter = filters.get(i);
                 var section = ini.getSection(sectionKey + "-" + filter.getId());
-                if (!filter.getId().equalsIgnoreCase("global") &&
-                        !ini.getValue(sectionKey + "-" + filter.getId(), "active", Boolean.class, false)) {
+                if (notGoodFilter(sectionKey, ini, filter) && !(filter instanceof AlwaysActivePlugin)) {
                     filters.remove(i);
                     continue;
                 }
@@ -228,6 +228,11 @@ public class HttpProtocol extends CommonProtocol {
 
             }
         }
+    }
+
+    private static boolean notGoodFilter(String sectionKey, Ini ini, PluginDescriptor filter) {
+        return !filter.getId().equalsIgnoreCase("global") &&
+                !ini.getValue(sectionKey + "-" + filter.getId(), "active", Boolean.class, false);
     }
 
     @Override

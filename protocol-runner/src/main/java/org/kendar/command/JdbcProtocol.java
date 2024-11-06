@@ -2,7 +2,7 @@ package org.kendar.command;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.kendar.filters.FilterDescriptor;
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.mysql.MySQLProtocol;
 import org.kendar.mysql.MySqlStorageHandler;
 import org.kendar.postgres.PostgresProtocol;
@@ -94,7 +94,7 @@ public class JdbcProtocol extends CommonProtocol {
         return protocol;
     }
 
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository repo, ArrayList<FilterDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository repo, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
         NetworkProtoDescriptor baseProtocol = null;
         String driver = "";
         if (protocol.equalsIgnoreCase("postgres")) {

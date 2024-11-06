@@ -4,7 +4,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.AmqpStorageHandler;
-import org.kendar.filters.FilterDescriptor;
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
@@ -44,7 +44,7 @@ public class Amqp091Protocol extends CommonProtocol {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<FilterDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
         var port = ini.getValue(key, "port", Integer.class, 5672);
         var timeoutSec = ini.getValue(key, "timeout", Integer.class, 30);
         var connectionString = ini.getValue(key, "connection", String.class);

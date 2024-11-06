@@ -1,7 +1,7 @@
 package org.kendar.command;
 
 import org.apache.commons.cli.*;
-import org.kendar.filters.FilterDescriptor;
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ini.Ini;
@@ -53,7 +53,7 @@ public class OptionsManager {
             } else {
                 isExecute = true;
 
-                var datadir = cmd.getOptionValue("datadir");
+                var datadir = cmd.getOptionValue("datadir","data");
                 var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
                 var protocol = cmd.getOptionValue("protocol");
                 var loglevel = cmd.getOptionValue("loglevel", "ERROR");
@@ -89,7 +89,7 @@ public class OptionsManager {
         founded.run(args, isExecute, go, options);
     }
 
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<FilterDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
         var pr = protocols.get(protocol);
         pr.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);
     }

@@ -1,13 +1,11 @@
 package org.kendar.runner;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.kendar.Main;
 import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.Date;
@@ -17,9 +15,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MainTest extends BasicTest {
+public class StandardProtocolsTest extends BasicTest {
 
     private AtomicBoolean runTheServer = new AtomicBoolean(true);
+
+    @BeforeEach
+    public void beforeEach() throws IOException {
+        runTheServer.set(true);
+    }
 
     @BeforeAll
     public static void beforeClass() {

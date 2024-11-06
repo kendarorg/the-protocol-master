@@ -77,11 +77,10 @@ public class ProxyServer extends Thread {
                             httpRedirect, httpsRedirect, dnsResolver, ignore).run());
                 }
             } catch (IOException e) {
-                e.printStackTrace();  // TODO: implement catch
+
             }
         } catch (IOException e) {
-            e.printStackTrace();  // TODO: implement catch
-            return;
+
         }
     }
 

@@ -1,7 +1,7 @@
 package org.kendar.command;
 
 import org.apache.commons.cli.Options;
-import org.kendar.filters.FilterDescriptor;
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.Resp3StorageHandler;
@@ -28,7 +28,7 @@ public class RedisProtocol extends CommonProtocol {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<FilterDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
         var port = ini.getValue(key, "port", Integer.class, 6379);
         var timeoutSec = ini.getValue(key, "timeout", Integer.class, 30);
         var connectionString = ini.getValue(key, "connection", String.class);
