@@ -94,6 +94,10 @@ public class OptionsManager {
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
         var pr = protocols.get(protocol);
+        var datadir = Path.of(ini.getValue("global","datadir").toString()).toAbsolutePath().toFile();
+        if(!datadir.exists()){
+            datadir.mkdir();
+        }
         pr.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);
     }
 }

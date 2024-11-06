@@ -12,7 +12,7 @@ public interface PluginDescriptor extends ExtensionPoint {
 
     String getProtocol();
 
-    void initialize(Map<String, Object> section);
+    void initialize(Map<String, Object> section, Map<String, Object> global);
 
     void terminate();
 

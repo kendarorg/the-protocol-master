@@ -32,7 +32,7 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
     }
 
     @Override
-    public void initialize(Map<String, Object> section) {
+    public void initialize(Map<String, Object> section, Map<String, Object> global) {
 
     }
 

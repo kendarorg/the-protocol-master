@@ -223,6 +223,7 @@ public class HttpProtocol extends CommonProtocol {
             filters.add(new RecordingPlugin());
             filters.add(new ErrorPlugin());
             filters.add(new MockPlugin());
+            var global = ini.getSection("global");
             for (var i = filters.size() - 1; i >= 0; i--) {
                 var filter = filters.get(i);
                 var section = ini.getSection(sectionKey + "-" + filter.getId());
@@ -231,7 +232,7 @@ public class HttpProtocol extends CommonProtocol {
                     continue;
                 }
                 //log.info("EXTENSION: " + filter.getId());
-                filter.initialize(section);
+                filter.initialize(section,global);
             }
             globalFilter.setFilters(filters);
             globalFilter.setServer(httpServer, httpsServer);
@@ -261,6 +262,7 @@ public class HttpProtocol extends CommonProtocol {
             protocolServer.put(sectionKey, ps);
         } catch (Exception ex) {
             try {
+                log.error(ex.getMessage(),ex);
                 var sr = protocolServer.get(sectionKey);
                 sr.stop();
             } catch (Exception xx) {

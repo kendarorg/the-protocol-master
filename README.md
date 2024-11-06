@@ -26,6 +26,7 @@ several database wire protocol implementations:
     * Simulate errors for chaos engineering
     * Simulate API behaviours
     * Mock responses
+    * Record everything
 * [PostgresSQL](protocol-postgres/README.md)  Usable for most db (for hibernate you should set the final db dialect of
   course)
     * Support for simple and extended query protocol
@@ -52,6 +53,20 @@ several database wire protocol implementations:
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/kendarorg/1)
 
 ## Using it out of the box
+
+Http Recording everything using a proxy (set the proxy to http, port 9999)
+
+```
+java -jar protocol-runner.jar -datadir recording -protocol http -record
+```
+
+Postgres Recording everything connecting to the localhost postgres at 7715 redirecting to postgresql://wetheaver/test
+The connection string would be jdbc:postgresql://localhost:7715/test
+
+```
+java -jar protocol-runner.jar -datadir recording -protocol postgres -record -port 7715 \
+  -connection jdbc:postgresql://wetheaver:1771/test -login reallogin -password realpassword
+```
 
 You can use the "protocol-runner-VERSION.jar" to proxy all your calls and test your
 connections (and add some ISSUE to this project hopefully).

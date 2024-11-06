@@ -74,6 +74,7 @@
                 <version>${maven.jar.version}</version>
                 <executions>
                     <execution>
+                        <!-- package all dependencies in one-->
                         <id>copy-jar-dependencies-to-target</id>
                         <phase>package</phase>
                         <goals>
@@ -93,6 +94,7 @@
                     </execution>
 
                     <execution>
+                        <!-- copy on plugins -->
                         <id>copy-jar-to-global-libs</id>
                         <phase>install</phase>
                         <goals>

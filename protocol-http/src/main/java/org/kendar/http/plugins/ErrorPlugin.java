@@ -33,7 +33,7 @@ public class ErrorPlugin extends ProtocolPluginDescriptor<Request, Response> {
     }
 
     @Override
-    public void initialize(Map<String, Object> section) {
+    public void initialize(Map<String, Object> section, Map<String, Object> global) {
         this.errorCode = Integer.parseInt(section.get("errorCode").toString());
         this.errorMessage = section.get("errorMessage").toString();
         this.percentage = (double) Integer.parseInt(section.get("percentage").toString()) / 100;

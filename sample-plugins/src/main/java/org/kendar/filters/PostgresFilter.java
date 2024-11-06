@@ -35,7 +35,7 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
     }
 
     @Override
-    public void initialize(Map<String, Object> section) {
+    public void initialize(Map<String, Object> section, Map<String, Object> global) {
 
     }
 

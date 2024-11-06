@@ -89,10 +89,10 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
     }
 
     @Override
-    public void initialize(Map<String, Object> section) {
+    public void initialize(Map<String, Object> section, Map<String, Object> global) {
         typeReference = new TypeReference<>() {
         };
-        var recordingPath = (String) section.get("datadir");
+        var recordingPath = (String) global.get("datadir");
         setupSitesToRecord((String) section.get("matchSites"));
         blockExternal = Boolean.parseBoolean((String) section.get("blockExternal"));
         recordingPath = recordingPath.replace("{milliseconds}", Calendar.getInstance().getTimeInMillis() + "");
