@@ -28,3 +28,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 target
+
+### The protocol master
+/plugins/*.jar

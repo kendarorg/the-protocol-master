@@ -147,6 +147,16 @@
             <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <!-- For amqp filter-->
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-amqp-091</artifactId>
+            <version>${revision}</version>
+            <!-- !!! VERY IMPORTANT -->
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
+
 
 </project>
