@@ -4,6 +4,7 @@ package org.kendar.server.exchange;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpPrincipal;
+import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.server.events.WriteFinishedEvent;
 import org.kendar.server.streams.*;
 import org.kendar.server.utils.ServerImpl;
@@ -239,7 +240,7 @@ public class ExchangeImpl {
                     o.setWrappedStream(new UndefLengthOutputStream(this, ros));
                     close = true;
                 } else {
-                    rspHdrs.set("Transfer-encoding", "chunked");
+                    rspHdrs.set(ConstantsHeader.TRANSFER_ENCODING, "chunked");
                     o.setWrappedStream(new ChunkedOutputStream(this, ros));
                 }
             } else {
@@ -248,7 +249,7 @@ public class ExchangeImpl {
                     contentLen = 0;
                 }
                 if (!noContentLengthHeader) {
-                    rspHdrs.set("Content-length", Long.toString(contentLen));
+                    rspHdrs.set(ConstantsHeader.CONTENT_LENGTH, Long.toString(contentLen));
                 }
                 o.setWrappedStream(new FixedLengthOutputStream(this, ros, contentLen));
             }

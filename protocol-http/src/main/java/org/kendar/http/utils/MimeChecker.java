@@ -1,5 +1,6 @@
 package org.kendar.http.utils;
 
+import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 
 import java.util.Locale;
@@ -12,13 +13,13 @@ public class MimeChecker {
     };
 
     public static boolean isBinary(Request request) {
-        var cnt = request.getHeaders().get("Content-Type");
+        var cnt = request.getHeaders().get(ConstantsHeader.CONTENT_TYPE);
         if (cnt == null || cnt.isEmpty()) return false;
         return isBinary(cnt.get(0), "");
     }
 
     public static boolean isBinary(Response request) {
-        var cnt = request.getHeaders().get("Content-Type");
+        var cnt = request.getHeaders().get(ConstantsHeader.CONTENT_TYPE);
         if (cnt == null || cnt.isEmpty()) return false;
         return isBinary(cnt.get(0), "");
     }

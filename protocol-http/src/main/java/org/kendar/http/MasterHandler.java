@@ -83,7 +83,7 @@ public class MasterHandler implements HttpHandler {
         var ignoreContentLength = shouldIgnoreContentLength(response.getStatusCode());
         for (var header : response.getHeaders().entrySet()) {
             for (var h : header.getValue()) {
-                if (header.getKey().equalsIgnoreCase("content-length")) {
+                if (header.getKey().equalsIgnoreCase(ConstantsHeader.CONTENT_LENGTH)) {
                     if (ignoreContentLength) {
                         continue;
                     }

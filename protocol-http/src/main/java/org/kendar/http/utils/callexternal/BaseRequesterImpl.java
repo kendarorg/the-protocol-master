@@ -64,8 +64,8 @@ public abstract class BaseRequesterImpl implements BaseRequester {
             throws Exception {
 
         var contentEncoding = "";
-        if (null != request.getHeader("content-encoding")) {
-            contentEncoding = request.getFirstHeader("content-encoding").toLowerCase(Locale.ROOT);
+        if (null != request.getHeader(ConstantsHeader.CONTENT_ENCODING)) {
+            contentEncoding = request.getFirstHeader(ConstantsHeader.CONTENT_ENCODING).toLowerCase(Locale.ROOT);
         }
         if (contentEncoding == null) contentEncoding = "";
 
@@ -101,7 +101,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
             if (request.getHeaders() != null) {
                 for (var header : request.getHeaders().entrySet()) {
                     if (!header.getKey().equalsIgnoreCase("host")
-                            && !header.getKey().equalsIgnoreCase("content-length")) {
+                            && !header.getKey().equalsIgnoreCase(ConstantsHeader.CONTENT_LENGTH)) {
                         for (var item : header.getValue()) {
                             fullRequest.addHeader(header.getKey(), item);
                         }

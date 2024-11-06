@@ -1,6 +1,7 @@
 package org.kendar.server.streams;
 
 
+import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.server.events.WriteFinishedEvent;
 import org.kendar.server.exchange.ExchangeImpl;
 
@@ -17,7 +18,7 @@ public class FixedLengthOutputStream extends FilterOutputStream {
     public FixedLengthOutputStream(ExchangeImpl t, OutputStream src, long len) {
         super(src);
         if (len < 0L) {
-            throw new IllegalArgumentException("Content-Length: " + len);
+            throw new IllegalArgumentException(ConstantsHeader.CONTENT_LENGTH+": " + len);
         } else {
             this.t = t;
             this.remaining = len;

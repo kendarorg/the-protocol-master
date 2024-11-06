@@ -1,6 +1,7 @@
 package org.kendar.server.streams;
 
 
+import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.server.exchange.ExchangeImpl;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ public class FixedLengthInputStream extends LeftOverInputStream {
     public FixedLengthInputStream(ExchangeImpl t, InputStream src, long len) {
         super(t, src);
         if (len < 0L) {
-            throw new IllegalArgumentException("Content-Length: " + len);
+            throw new IllegalArgumentException(ConstantsHeader.CONTENT_LENGTH+": " + len);
         } else {
             this.remaining = len;
         }

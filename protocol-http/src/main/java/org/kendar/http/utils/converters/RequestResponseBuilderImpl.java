@@ -73,8 +73,8 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
 
             var data = IOUtils.toByteArray(exchange.getRequestBody());
             var contentEncoding = "";
-            if (null != result.getHeader("content-encoding")) {
-                contentEncoding = result.getFirstHeader("content-encoding").toLowerCase(Locale.ROOT);
+            if (null != result.getHeader(ConstantsHeader.CONTENT_ENCODING)) {
+                contentEncoding = result.getFirstHeader(ConstantsHeader.CONTENT_ENCODING).toLowerCase(Locale.ROOT);
             }
             if (contentEncoding == null) contentEncoding = "";
 
@@ -195,7 +195,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
 
                 if (brotli) {
                     response.setResponseText(Base64.getEncoder().encodeToString(IOUtils.toByteArray(new BrotliInputStream(in))));
-                    response.removeHeader("content-encoding");
+                    response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
                 } else {
                     response.setResponseText(Base64.getEncoder().encodeToString(IOUtils.toByteArray(in)));
                 }
@@ -203,7 +203,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
                 String responseText = null;
                 if (brotli) {
                     responseText = IOUtils.toString(new BrotliInputStream(in), StandardCharsets.UTF_8);
-                    response.removeHeader("content-encoding");
+                    response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
                 } else if (responseEntity.getContentType() != null && responseEntity.getContentType().getValue().equalsIgnoreCase(ConstantsMime.JSON_SMILE)) {
                     responseText = JsonSmile.smileToJSON(IOUtils.toByteArray(in)).toPrettyString();
                 } else {
@@ -216,11 +216,11 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
         }
         response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
         for (var header : httpResponse.getAllHeaders()) {
-            if (header.getName().equalsIgnoreCase("transfer-encoding")) continue;
+            if (header.getName().equalsIgnoreCase(ConstantsHeader.TRANSFER_ENCODING)) continue;
             response.addHeader(header.getName(), header.getValue());
         }
         if (brotli) {
-            response.removeHeader("content-encoding");
+            response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.kendar.server.utils;
 
 import com.sun.net.httpserver.*;
+import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.server.config.ServerConfig;
 import org.kendar.server.events.Event;
 import org.kendar.server.events.WriteFinishedEvent;
@@ -805,15 +806,15 @@ public class ServerImpl {
                     }
                 }
                 /* checks for unsupported combinations of lengths and encodings */
-                if (headers.containsKey("Content-Length") &&
-                        (headers.containsKey("Transfer-encoding") || headers.get("Content-Length").size() > 1)) {
+                if (headers.containsKey(ConstantsHeader.CONTENT_LENGTH) &&
+                        (headers.containsKey(ConstantsHeader.TRANSFER_ENCODING) || headers.get(ConstantsHeader.CONTENT_LENGTH).size() > 1)) {
                     reject(Code.HTTP_BAD_REQUEST, requestLine,
                             "Conflicting or malformed headers detected");
                     return;
                 }
                 long clen = 0L;
                 String headerValue = null;
-                List<String> teValueList = headers.get("Transfer-encoding");
+                List<String> teValueList = headers.get(ConstantsHeader.TRANSFER_ENCODING);
                 if (teValueList != null && !teValueList.isEmpty()) {
                     headerValue = teValueList.get(0);
                 }
@@ -826,7 +827,7 @@ public class ServerImpl {
                         return;
                     }
                 } else {
-                    headerValue = headers.getFirst("Content-Length");
+                    headerValue = headers.getFirst(ConstantsHeader.CONTENT_LENGTH);
                     if (headerValue != null) {
                         clen = Long.parseLong(headerValue);
                         if (clen < 0) {
@@ -953,11 +954,11 @@ public class ServerImpl {
                         .append(code).append(Code.msg(code)).append("\r\n");
 
                 if (text != null && text.length() != 0) {
-                    builder.append("Content-Length: ")
+                    builder.append(ConstantsHeader.CONTENT_LENGTH+": ")
                             .append(text.length()).append("\r\n")
-                            .append("Content-Type: text/html\r\n");
+                            .append(ConstantsHeader.CONTENT_TYPE+": text/html\r\n");
                 } else {
-                    builder.append("Content-Length: 0\r\n");
+                    builder.append(ConstantsHeader.CONTENT_LENGTH+": 0\r\n");
                     text = "";
                 }
                 if (closeNow) {
