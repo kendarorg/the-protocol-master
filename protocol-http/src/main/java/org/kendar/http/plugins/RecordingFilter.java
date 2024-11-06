@@ -25,8 +25,8 @@ public class RecordingFilter extends ProtocolFilterDescriptor<Request, Response>
     private final JsonMapper mapper = new JsonMapper();
     private final ConcurrentLinkedQueue<StorageItem<Request, Response>> items = new ConcurrentLinkedQueue<>();
     private final List<CompactLine> lines = new ArrayList<>();
-    private Path repository;
     private final AtomicLong counter = new AtomicLong(0);
+    private Path repository;
     private List<Pattern> recordSites = new ArrayList<>();
 
     public static String padLeftZeros(String inputString, int length) {

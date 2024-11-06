@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 
 public class MockFilter extends ProtocolFilterDescriptor<Request, Response> {
     private static final Logger log = LoggerFactory.getLogger(MockFilter.class);
-    private final List<StorageItem<Request, Response>> items = new ArrayList<>();
-    private final Map<Long, String> hashes = new HashMap();
     final JsonMapper mapper = new JsonMapper();
     final ConcurrentHashMap<Long, Long> calls = new ConcurrentHashMap<>();
+    private final List<StorageItem<Request, Response>> items = new ArrayList<>();
+    private final Map<Long, String> hashes = new HashMap();
     private Path repository;
     private TypeReference<StorageItem<Request, Response>> typeReference;
     private boolean blockExternal = true;
@@ -242,7 +242,7 @@ public class MockFilter extends ProtocolFilterDescriptor<Request, Response> {
                 matchedQuery.addAndGet(1);
             }
         }
-        if(possiblePath.length==0){
+        if (possiblePath.length == 0) {
             matchedQuery.addAndGet(1);
         }
     }

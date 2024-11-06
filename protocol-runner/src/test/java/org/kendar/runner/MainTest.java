@@ -298,13 +298,13 @@ public class MainTest extends BasicTest {
     }
 
     private void startAndHandleUnexpectedErrors(String[] args) {
-        AtomicReference exception =new AtomicReference(null);
+        AtomicReference exception = new AtomicReference(null);
         var serverThread = new Thread(() -> {
             Main.execute(args, () -> {
                 try {
                     Sleeper.sleep(100);
                     return runTheServer.get();
-                }catch (Exception e){
+                } catch (Exception e) {
                     exception.set(e);
                     return false;
                 }
@@ -313,7 +313,7 @@ public class MainTest extends BasicTest {
         });
         serverThread.start();
         while (!Main.isRunning()) {
-            if(exception.get()!=null){
+            if (exception.get() != null) {
                 throw new RuntimeException((Throwable) exception.get());
             }
             Sleeper.sleep(100);

@@ -1,9 +1,9 @@
 package org.kendar.mysql;
 
 import org.kendar.sql.jdbc.SelectResult;
-import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;

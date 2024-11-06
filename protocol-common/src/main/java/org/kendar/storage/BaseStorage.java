@@ -18,7 +18,7 @@ import java.util.Map;
  * @param <I>
  * @param <O>
  */
-public abstract class BaseStorage<I, O> implements Storage<I,O> {
+public abstract class BaseStorage<I, O> implements Storage<I, O> {
     protected static final JsonMapper mapper = new JsonMapper();
     private final StorageRepository<I, O> repository;
     protected boolean useFullData = false;
@@ -46,12 +46,12 @@ public abstract class BaseStorage<I, O> implements Storage<I,O> {
 
     public abstract String getCaller();
 
-    public void write(int connectionId, I request, O response, long durationMs, String type,String caller) {
+    public void write(int connectionId, I request, O response, long durationMs, String type, String caller) {
         var item = new StorageItem(connectionId, request, response, durationMs, type, getCaller());
         write(item);
     }
 
-    public void write(long index, int connectionId, I request, O response, long durationMs, String type,String caller) {
+    public void write(long index, int connectionId, I request, O response, long durationMs, String type, String caller) {
         var item = new StorageItem(index, connectionId, request, response, durationMs, type, getCaller());
         write(item);
     }
@@ -131,14 +131,14 @@ public abstract class BaseStorage<I, O> implements Storage<I,O> {
         return result;
     }
 
-    @Override
-    public void setDescriptor(ProtoDescriptor descriptor){
-        this.descriptor = descriptor;
-        this.repository.initialize(this);
+    public ProtoDescriptor getDescriptor() {
+        return descriptor;
     }
 
-    public ProtoDescriptor getDescriptor(){
-        return descriptor;
+    @Override
+    public void setDescriptor(ProtoDescriptor descriptor) {
+        this.descriptor = descriptor;
+        this.repository.initialize(this);
     }
 
 

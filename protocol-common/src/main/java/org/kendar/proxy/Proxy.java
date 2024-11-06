@@ -17,15 +17,17 @@ import java.util.regex.Pattern;
  * @param <T>
  */
 public abstract class Proxy<T extends Storage> {
-    /**
-     * Descriptor (of course network like)
-     */
-    private NetworkProtoDescriptor protocol;
     protected boolean replayer;
     /**
      * (Eventual) storage
      */
     protected T storage;
+    /**
+     * Descriptor (of course network like)
+     */
+    private NetworkProtoDescriptor protocol;
+    private Map<String, Map<ProtocolPhase, List<ProtocolFilterDescriptor>>> toFilter = new ConcurrentHashMap<>();
+    private Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
 
     public boolean isReplayer() {
         return replayer;
@@ -47,7 +49,7 @@ public abstract class Proxy<T extends Storage> {
      */
     public void setProtocol(NetworkProtoDescriptor protocol) {
         this.protocol = protocol;
-        if(this.storage!=null){
+        if (this.storage != null) {
             this.storage.setDescriptor(protocol);
         }
     }
@@ -88,26 +90,22 @@ public abstract class Proxy<T extends Storage> {
         this.storage.initialize();
     }
 
-
-    private Map<String,Map<ProtocolPhase,List<ProtocolFilterDescriptor>>> toFilter = new ConcurrentHashMap<>();
-    private Pattern pattern = Pattern.compile( "(.*)\\((.*)\\)");
-
     public void setFilters(List<FilterDescriptor> filters) {
-        for(var filter:filters){
+        for (var filter : filters) {
             var clazz = filter.getClass();
-            var handle = Arrays.stream(clazz.getMethods()).filter(m->m.getName().equalsIgnoreCase("handle")).findFirst();
+            var handle = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase("handle")).findFirst();
 
-            if(handle.isPresent()){
+            if (handle.isPresent()) {
                 var matcher = pattern.matcher(handle.get().toString());
-                if(matcher.find()){
+                if (matcher.find()) {
                     var pars = matcher.group(2);
-                    if(!toFilter.containsKey(pars)){
-                        toFilter.put(pars,new HashMap<>());
+                    if (!toFilter.containsKey(pars)) {
+                        toFilter.put(pars, new HashMap<>());
                     }
                     var map = toFilter.get(pars);
-                    for(var phase:filter.getPhases()){
-                        if(!map.containsKey(phase)){
-                            map.put(phase,new ArrayList<>());
+                    for (var phase : filter.getPhases()) {
+                        if (!map.containsKey(phase)) {
+                            map.put(phase, new ArrayList<>());
                         }
                         map.get(phase).add((ProtocolFilterDescriptor) filter);
                     }
@@ -116,12 +114,12 @@ public abstract class Proxy<T extends Storage> {
         }
     }
 
-    public <I,J> List<ProtocolFilterDescriptor> getFilters(ProtocolPhase phase,I in,J out) {
-        var data = in.getClass().getName()+","+out.getClass().getName();
+    public <I, J> List<ProtocolFilterDescriptor> getFilters(ProtocolPhase phase, I in, J out) {
+        var data = in.getClass().getName() + "," + out.getClass().getName();
         var forData = toFilter.get(data);
-        if(forData!=null){
+        if (forData != null) {
             var forPhase = forData.get(phase);
-            if(forPhase!=null){
+            if (forPhase != null) {
                 return forPhase;
             }
         }

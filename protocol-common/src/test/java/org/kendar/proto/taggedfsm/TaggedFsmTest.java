@@ -2,7 +2,6 @@ package org.kendar.proto.taggedfsm;
 
 import org.junit.jupiter.api.Test;
 import org.kendar.protocol.context.Tag;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateWhile;

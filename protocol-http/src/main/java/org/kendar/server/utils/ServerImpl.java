@@ -61,8 +61,8 @@ public class ServerImpl {
     private final Set<HttpConnection> rspConnections;
     private final Object lolock = new Object();
     private final System.Logger logger;
-    ServerImpl.Dispatcher dispatcher;
     private final AtomicReference<InternalSSLConfig> internalSSLConfig = new AtomicReference<>();
+    ServerImpl.Dispatcher dispatcher;
     private String protocol;
     private boolean https;
     private Executor executor;
@@ -206,7 +206,7 @@ public class ServerImpl {
     }
 
     public HttpsConfigurator getHttpsConfigurator() {
-        if(this.internalSSLConfig.get()==null)return null;
+        if (this.internalSSLConfig.get() == null) return null;
         return this.internalSSLConfig.get().getHttpsConfig();
     }
 
@@ -715,10 +715,10 @@ public class ServerImpl {
     class Exchange implements Runnable {
         final SocketChannel chan;
         final HttpConnection connection;
+        final String protocol;
         HttpContextImpl context;
         InputStream rawin;
         OutputStream rawout;
-        final String protocol;
         ExchangeImpl tx;
         HttpContextImpl ctx;
         boolean rejected = false;

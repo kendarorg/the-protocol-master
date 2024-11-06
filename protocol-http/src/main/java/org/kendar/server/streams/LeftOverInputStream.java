@@ -12,9 +12,9 @@ import java.io.InputStream;
 public abstract class LeftOverInputStream extends FilterInputStream {
     final ExchangeImpl t;
     final ServerImpl server;
+    final byte[] one = new byte[1];
     protected boolean closed = false;
     protected boolean eof = false;
-    final byte[] one = new byte[1];
 
     public LeftOverInputStream(ExchangeImpl t, InputStream src) {
         super(src);

@@ -40,6 +40,7 @@ public class HttpConnection {
     volatile HttpConnection.State state;
 
     ;
+
     public HttpConnection() {
     }
 

@@ -38,7 +38,7 @@ public class ProtoStackItem implements TaggedObject {
      * @param state
      * @param event
      */
-    public ProtoStackItem(ProtoState state, BaseEvent event,String id) {
+    public ProtoStackItem(ProtoState state, BaseEvent event, String id) {
         this.id = id;
         this.tags = new ArrayList<>();
         this.state = state;

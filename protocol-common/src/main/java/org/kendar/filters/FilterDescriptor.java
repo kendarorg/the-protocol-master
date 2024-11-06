@@ -9,10 +9,12 @@ public interface FilterDescriptor extends ExtensionPoint {
     List<ProtocolPhase> getPhases();
 
     String getId();
+
     String getProtocol();
 
     void initialize(Map<String, Object> section);
 
     void terminate();
+
     FilterDescriptor clone();
 }

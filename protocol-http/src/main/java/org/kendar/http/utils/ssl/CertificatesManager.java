@@ -71,7 +71,7 @@ public class CertificatesManager {
         return keyStore;
     }
 
-    private SSLContext getSslContext(List<String> hosts,String cname, String der, String key) throws Exception {
+    private SSLContext getSslContext(List<String> hosts, String cname, String der, String key) throws Exception {
         for (var host : hosts) {
             certificateHosts.put(host, host);
         }
@@ -109,7 +109,7 @@ public class CertificatesManager {
         return ctx;
     }
 
-    public void setupSll(HttpsServer port, List<String> hosts,String cname, String der, String key) throws Exception {
+    public void setupSll(HttpsServer port, List<String> hosts, String cname, String der, String key) throws Exception {
         var hostsSize = registeredHosts.size();
         var inserted = new ArrayList<String>();
         for (var host : hosts) {
@@ -131,11 +131,11 @@ public class CertificatesManager {
             }
         }
 
-        if (hostsSize == registeredHosts.size() && port.getHttpsConfigurator()!=null) {
+        if (hostsSize == registeredHosts.size() && port.getHttpsConfigurator() != null) {
             return;
         }
         sslLog.debug("ADD HOST: " + String.join(",", inserted));
-        var sslContextInt = getSslContext(registeredHosts.values().stream().collect(Collectors.toList()),cname, der, key);
+        var sslContextInt = getSslContext(registeredHosts.values().stream().collect(Collectors.toList()), cname, der, key);
         port.setHttpsConfigurator(
                 new HttpsConfigurator(sslContextInt) {
                     @Override

@@ -25,6 +25,7 @@ public class IniTest {
 
 
     public EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
     @BeforeEach
     void setUp() {
         temporaryFolder = new TemporaryFolder();
@@ -84,8 +85,8 @@ public class IniTest {
     public void getAndSpecifyTypeConvertChar() throws IOException {
         Ini ini = new Ini();
         ini.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("samples/sample.ini"));
-        assertEquals('a', (char)ini.getValue("Char", "charKey", char.class));
-        assertEquals('b', (char)ini.getValue("Char", "characterKey", Character.class));
+        assertEquals('a', (char) ini.getValue("Char", "charKey", char.class));
+        assertEquals('b', (char) ini.getValue("Char", "characterKey", Character.class));
     }
 
     @Test
@@ -166,7 +167,7 @@ public class IniTest {
                 "#test=123\n" +
                 "[section0]\n" +
                 "hello = world\n" +
-                "\n", writer.toString().replaceAll("\r\n","\n"));
+                "\n", writer.toString().replaceAll("\r\n", "\n"));
     }
 
     @Test
@@ -249,7 +250,7 @@ public class IniTest {
     @Test
     public void nullInputStream() throws IOException {
         Ini ini = new Ini();
-        assertThrows(FileNotFoundException.class,()->ini.load((InputStream) null));
+        assertThrows(FileNotFoundException.class, () -> ini.load((InputStream) null));
     }
 
     @Test
@@ -286,6 +287,7 @@ public class IniTest {
                 .put("FTP_TimeOut", 5L)
                 .build());
     }
+
     @Test
     public void handleEscapedCharacters() throws IOException {
         Ini ini = new Ini();
@@ -330,7 +332,7 @@ public class IniTest {
         ini.putValue("g", "x", 1);
 
         StringWriter writer = new StringWriter();
-        ini.store(writer , "");
+        ini.store(writer, "");
         assertEquals(normalizeNewlines("[z]\n" +
                 "z = 1\n" +
                 "y = 1\n" +
@@ -362,8 +364,8 @@ public class IniTest {
         ini.putValue("z", "a", "string");
 
         assertEquals(new ImmutableMap.Builder<String, Double>()
-                  .put("z", 4.4).build(), ini.getSectionWithKeysThatMatchFunction(
-                          "z", entry -> Double.class.isInstance(entry.getValue())));
+                .put("z", 4.4).build(), ini.getSectionWithKeysThatMatchFunction(
+                "z", entry -> Double.class.isInstance(entry.getValue())));
 
     }
 

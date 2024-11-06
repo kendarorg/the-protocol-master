@@ -59,7 +59,7 @@ public interface Storage<I, O> {
 
     List<StorageItem<I, O>> readResponses(long afterIndex);
 
-    void setDescriptor(ProtoDescriptor protocol);
-
     ProtoDescriptor getDescriptor();
+
+    void setDescriptor(ProtoDescriptor protocol);
 }

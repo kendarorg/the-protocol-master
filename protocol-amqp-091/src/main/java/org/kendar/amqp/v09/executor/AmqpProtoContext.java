@@ -32,11 +32,11 @@ public class AmqpProtoContext extends NetworkProtoContext {
         return channels;
     }
 
-    public void setConsumeId(int consumeId) {
-        this.consumeId = consumeId;
-    }
-
     public int getConsumeId() {
         return consumeId;
+    }
+
+    public void setConsumeId(int consumeId) {
+        this.consumeId = consumeId;
     }
 }

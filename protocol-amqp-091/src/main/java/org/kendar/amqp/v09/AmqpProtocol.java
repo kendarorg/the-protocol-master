@@ -37,9 +37,8 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
 
     private static final boolean IS_BIG_ENDIAN = true;
     private static final int PORT = 5672;
+    AtomicBoolean running = new AtomicBoolean(true);
     private ConcurrentHashMap<Integer, AmqpProtoContext> consumeContext;
-
-
     private int port = PORT;
 
     private AmqpProtocol() {
@@ -101,13 +100,13 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     }
 
     public void start() {
-        new Thread(()->sendHeartbeat()).start();
+        new Thread(() -> sendHeartbeat()).start();
     }
 
     private void sendHeartbeat() {
-        while(running.get()){
-            for(var ctx:consumeContext.values()){
-                for(var ch:ctx.getChannels()){
+        while (running.get()) {
+            for (var ctx : consumeContext.values()) {
+                for (var ch : ctx.getChannels()) {
                     var hb = new HearthBeatFrame();
                     hb.setChannel(ch);
                     hb.setProtoDescriptor(this);
@@ -117,8 +116,6 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
             Sleeper.sleep(30000);
         }
     }
-
-    AtomicBoolean running = new AtomicBoolean(true);
 
     @Override
     public void terminate() {

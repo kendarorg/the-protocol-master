@@ -7,6 +7,12 @@ public class DocumentContainer {
     private final int requestId;
     private Document commandResult;
 
+    public DocumentContainer(int reqResId, int requestId) {
+
+        this.reqResId = reqResId;
+        this.requestId = requestId;
+    }
+
     public int getReqResId() {
         return reqResId;
     }
@@ -21,12 +27,6 @@ public class DocumentContainer {
 
     public void setCommandResult(Document commandResult) {
         this.commandResult = commandResult;
-    }
-
-    public DocumentContainer(int reqResId, int requestId) {
-
-        this.reqResId = reqResId;
-        this.requestId = requestId;
     }
 
     public void setResult(Document commandResult) {

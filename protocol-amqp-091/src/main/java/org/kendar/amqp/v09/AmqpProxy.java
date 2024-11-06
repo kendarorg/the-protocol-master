@@ -91,7 +91,7 @@ public class AmqpProxy extends NetworkProxy<AmqpStorage> {
             }
             if (fr != null) {
                 log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
-                var ctx = ((AmqpProtocol)getProtocol()).getConsumeContext().get(consumeId);
+                var ctx = ((AmqpProtocol) getProtocol()).getConsumeContext().get(consumeId);
                 ctx.write(fr);
             } else {
                 throw new RuntimeException("MISSING CLASS " + clazz);

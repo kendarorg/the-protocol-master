@@ -35,7 +35,40 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-public class HttpProtocol extends CommonProtocol{
+public class HttpProtocol extends CommonProtocol {
+    private static HttpsServer createHttpsServer(CertificatesManager certificatesManager, InetSocketAddress sslAddress, int backlog, String cname, String der, String key) throws Exception {
+        var httpsServer = new KendarHttpsServer(sslAddress, backlog);
+
+        certificatesManager.setupSll(httpsServer, List.of(), cname, der, key);
+        return httpsServer;
+    }
+
+    private static SimpleRewriterConfig loadRewritersConfiguration(String key, Ini ini) {
+        var proxyConfig = new SimpleRewriterConfig();
+        for (var id = 0; id < 255; id++) {
+            var when = ini.getValue(key + "-rewriter", "rewrite." + id + ".when", String.class);
+            var where = ini.getValue(key + "-rewriter", "rewrite." + id + ".where", String.class);
+            var test = ini.getValue(key + "-rewriter", "rewrite." + id + ".test", String.class);
+            if (when == null || where == null) {
+                continue;
+            }
+            var remoteServerStatus = new RemoteServerStatus(id + "",
+                    when,
+                    where,
+                    test);
+            if (test == null || test.isEmpty()) {
+                remoteServerStatus.setRunning(true);
+                remoteServerStatus.setForce(true);
+            } else {
+
+                remoteServerStatus.setRunning(false);
+                remoteServerStatus.setForce(false);
+            }
+            proxyConfig.getProxies().add(remoteServerStatus);
+        }
+        return proxyConfig;
+    }
+
     @Override
     public void run(String[] args, boolean isExecute, Ini go, Options options) throws Exception {
         options.addOption("http", true, "Http port (def 4080)");
@@ -55,10 +88,9 @@ public class HttpProtocol extends CommonProtocol{
 
         options.addOption("showError", true, "The error to show (404/500 etc)");
         options.addOption("errorPercent", true, "The error percent to generate (default 50)");
-        if(!isExecute)return;
-        setData(args,options,go);
+        if (!isExecute) return;
+        setData(args, options, go);
     }
-
 
     private void setData(String[] args, Options options, Ini ini) throws Exception {
 
@@ -188,47 +220,14 @@ public class HttpProtocol extends CommonProtocol{
 
 
             protocolServer.put(sectionKey, ps);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             try {
                 var sr = protocolServer.get(sectionKey);
                 sr.stop();
-            }catch (Exception xx){
+            } catch (Exception xx) {
 
             }
         }
-    }
-
-    private static HttpsServer createHttpsServer(CertificatesManager certificatesManager, InetSocketAddress sslAddress, int backlog, String cname, String der, String key) throws Exception {
-        var httpsServer = new KendarHttpsServer(sslAddress, backlog);
-
-        certificatesManager.setupSll(httpsServer, List.of(),cname, der, key);
-        return httpsServer;
-    }
-
-    private static SimpleRewriterConfig loadRewritersConfiguration(String key, Ini ini) {
-        var proxyConfig = new SimpleRewriterConfig();
-        for (var id = 0; id < 255; id++) {
-            var when = ini.getValue(key+"-rewriter", "rewrite." + id + ".when", String.class);
-            var where = ini.getValue(key+"-rewriter", "rewrite." + id + ".where", String.class);
-            var test = ini.getValue(key+"-rewriter", "rewrite." + id + ".test", String.class);
-            if (when == null || where == null) {
-                continue;
-            }
-            var remoteServerStatus = new RemoteServerStatus(id + "",
-                    when,
-                    where,
-                    test);
-            if(test==null||test.isEmpty()) {
-                remoteServerStatus.setRunning(true);
-                remoteServerStatus.setForce(true);
-            }else{
-
-                remoteServerStatus.setRunning(false);
-                remoteServerStatus.setForce(false);
-            }
-            proxyConfig.getProxies().add(remoteServerStatus);
-        }
-        return proxyConfig;
     }
 
     @Override

@@ -5,11 +5,12 @@ import java.net.URISyntaxException;
 
 public class ProxyRequest {
 
-    private String path;
-    private int port;
     private final String verb;
     private final String protocol;
+    private String path;
+    private int port;
     private String host;
+
     public ProxyRequest(String request) throws URISyntaxException {
 
 

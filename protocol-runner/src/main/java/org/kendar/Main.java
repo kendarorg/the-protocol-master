@@ -104,14 +104,14 @@ public class Main {
 
     private static ArrayList<FilterDescriptor> loadCorrectFiltersForProtocol(String id, String protocol, HashMap<String, List<FilterDescriptor>> allFilters, Ini ini) {
         var availableFilters = allFilters.get(protocol.toLowerCase());
-        if(availableFilters==null)availableFilters=new ArrayList<>();
+        if (availableFilters == null) availableFilters = new ArrayList<>();
         var filters = new ArrayList<FilterDescriptor>();
-        if(ini !=null) {
+        if (ini != null) {
 
             for (var availableFilter : availableFilters) {
-                var sectionId = id +"-"+availableFilter.getId();
+                var sectionId = id + "-" + availableFilter.getId();
                 var section = ini.getSection(sectionId);
-                if(section!=null && !section.isEmpty()){
+                if (section != null && !section.isEmpty()) {
                     var clonedFilter = availableFilter.clone();
                     filters.add(clonedFilter);
                 }
@@ -121,14 +121,13 @@ public class Main {
     }
 
 
-
     public static boolean isRunning() {
-        return protocolServer.values().stream().anyMatch(v->v.isRunning());
+        return protocolServer.values().stream().anyMatch(v -> v.isRunning());
     }
 
 
     public static void execute(Ini ini, Supplier<Boolean> stopWhenFalse) {
-        if(ini==null)return;
+        if (ini == null) return;
         var logsDir = ini.getValue("global", "datadir", String.class);
         StorageRepository storage = setupStorage(logsDir);
 
@@ -145,9 +144,9 @@ public class Main {
                 var protocol = ini.getValue(key, "protocol", String.class);
                 if (protocol == null || protocol.isEmpty()) continue;
                 var filters = loadCorrectFiltersForProtocol(key, protocol, allFilters, ini);
-                new Thread(()-> {
+                new Thread(() -> {
                     try {
-                        om.start(protocolServer,key,ini,protocol,storage,filters,stopWhenFalse);
+                        om.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);
                     } catch (Exception e) {
                         protocolServer.remove(key);
                         throw new RuntimeException(e);

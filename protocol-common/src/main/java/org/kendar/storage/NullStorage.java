@@ -1,7 +1,6 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.storage.generic.StorageRepository;
 
 import java.util.List;

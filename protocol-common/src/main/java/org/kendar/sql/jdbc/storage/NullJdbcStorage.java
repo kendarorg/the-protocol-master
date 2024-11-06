@@ -52,13 +52,13 @@ public class NullJdbcStorage implements JdbcStorage {
     }
 
     @Override
-    public void setDescriptor(ProtoDescriptor protocol) {
-        this.descriptor = protocol;
+    public ProtoDescriptor getDescriptor() {
+        return descriptor;
     }
 
     @Override
-    public ProtoDescriptor getDescriptor() {
-        return descriptor;
+    public void setDescriptor(ProtoDescriptor protocol) {
+        this.descriptor = protocol;
     }
 
     @Override

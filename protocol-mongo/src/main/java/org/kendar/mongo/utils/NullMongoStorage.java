@@ -8,6 +8,8 @@ import org.kendar.storage.StorageItem;
 import java.util.List;
 
 public class NullMongoStorage implements Storage<JsonNode, JsonNode>, MongoStorage {
+    ProtoDescriptor descriptor;
+
     @Override
     public void initialize() {
 
@@ -22,8 +24,6 @@ public class NullMongoStorage implements Storage<JsonNode, JsonNode>, MongoStora
     public void setDescriptor(ProtoDescriptor descriptor) {
         this.descriptor = descriptor;
     }
-
-    ProtoDescriptor descriptor;
 
     @Override
     public Storage<JsonNode, JsonNode> withFullData() {

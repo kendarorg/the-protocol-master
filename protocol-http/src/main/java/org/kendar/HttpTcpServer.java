@@ -17,6 +17,7 @@ public class HttpTcpServer extends TcpServer {
     public boolean isRunning() {
         return runnig.get();
     }
+
     public void stop() {
         stop.run();
     }

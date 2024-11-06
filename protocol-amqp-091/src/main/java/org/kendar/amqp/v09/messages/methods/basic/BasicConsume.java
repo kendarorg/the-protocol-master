@@ -126,7 +126,7 @@ public class BasicConsume extends Basic {
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         var context = (AmqpProtoContext) event.getContext();
-        var protocol = (AmqpProtocol)context.getDescriptor();
+        var protocol = (AmqpProtocol) context.getDescriptor();
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 

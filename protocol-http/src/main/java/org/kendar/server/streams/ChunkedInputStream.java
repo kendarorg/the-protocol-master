@@ -17,6 +17,7 @@ public class ChunkedInputStream extends LeftOverInputStream {
     private final static int MAX_CHUNK_HEADER_SIZE = 2050;
     private int remaining;
     private boolean needToReadHeader = true;
+
     public ChunkedInputStream(ExchangeImpl t, InputStream src) {
         super(t, src);
     }

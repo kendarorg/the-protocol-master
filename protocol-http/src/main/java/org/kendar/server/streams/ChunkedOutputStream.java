@@ -14,10 +14,10 @@ public class ChunkedOutputStream extends FilterOutputStream {
     /* allow 4 bytes for chunk-size plus 4 for CRLFs */
     final static int OFFSET = 6; /* initial <=4 bytes for len + CRLF */
     final ExchangeImpl t;
+    private final byte[] buf = new byte[CHUNK_SIZE + OFFSET + 2];
     private boolean closed = false;
     private int pos = OFFSET;
     private int count = 0;
-    private final byte[] buf = new byte[CHUNK_SIZE + OFFSET + 2];
 
     public ChunkedOutputStream(ExchangeImpl t, OutputStream src) {
         super(src);

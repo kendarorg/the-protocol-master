@@ -103,7 +103,7 @@ public class TcpServer {
             server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
             server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
-            log.info("[CL>TP][IN] Listening on " + HOST + ":{} {}", protoDescriptor.getPort(),protoDescriptor.getClass().getSimpleName());
+            log.info("[CL>TP][IN] Listening on " + HOST + ":{} {}", protoDescriptor.getPort(), protoDescriptor.getClass().getSimpleName());
 
             //noinspection InfiniteLoopStatement
             while (true) {
@@ -171,7 +171,7 @@ public class TcpServer {
                     log.trace("Execution exception", e);
                 }
             }
-        }finally {
+        } finally {
             protoDescriptor.terminate();
         }
     }

@@ -22,7 +22,24 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Simple protocol descriptor
  */
 public abstract class ProtoDescriptor {
+    /**
+     * A map of [tag keys][states] one for each "tag" branch
+     */
+    protected final Map<String, ProtoState> taggedStates = new HashMap<>();
     private final AtomicInteger timeout = new AtomicInteger(30);
+    private final ConcurrentHashMap<String, AtomicInteger> counters = new ConcurrentHashMap<>();
+    private final Logger log = LoggerFactory.getLogger(ProtoDescriptor.class);
+    /**
+     * Interrupt states, these are evaluated always, BEFORE the standard events
+     */
+    private final List<ProtoState> interrupts = new ArrayList<>();
+    private ConcurrentHashMap<Integer, ProtoContext> contextsCache;
+    private Thread contextCleaner;
+    private volatile boolean runClean = false;
+
+    public static long getNow() {
+        return System.currentTimeMillis() / 1000;
+    }
 
     public void setTimeout(int timeout) {
         this.timeout.set(timeout);
@@ -31,21 +48,6 @@ public abstract class ProtoDescriptor {
     public ConcurrentHashMap<Integer, ProtoContext> getContextsCache() {
         return contextsCache;
     }
-
-    private ConcurrentHashMap<Integer, ProtoContext> contextsCache;
-    private Thread contextCleaner;
-    private volatile boolean runClean = false;
-
-    private final ConcurrentHashMap<String, AtomicInteger> counters = new ConcurrentHashMap<>();
-    private final Logger log = LoggerFactory.getLogger(ProtoDescriptor.class);
-    /**
-     * A map of [tag keys][states] one for each "tag" branch
-     */
-    protected final Map<String, ProtoState> taggedStates = new HashMap<>();
-    /**
-     * Interrupt states, these are evaluated always, BEFORE the standard events
-     */
-    private final List<ProtoState> interrupts = new ArrayList<>();
 
     public int getCounter(String id) {
         id = id.toUpperCase();
@@ -81,12 +83,6 @@ public abstract class ProtoDescriptor {
         initializeStatic(this);
         initializeTag("", start);
         initializeInternal(start, "");
-    }
-
-
-
-    public static long getNow() {
-        return System.currentTimeMillis() / 1000;
     }
 
     private void contextsClean() {
@@ -128,7 +124,7 @@ public abstract class ProtoDescriptor {
         }
         runClean = true;
         contextsCache = new ConcurrentHashMap<>();
-        contextCleaner = new Thread(()->contextsClean());
+        contextCleaner = new Thread(() -> contextsClean());
         contextCleaner.start();
     }
 

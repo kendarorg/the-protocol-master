@@ -13,15 +13,9 @@ import java.util.function.Function;
  * Created for http://stackoverflow.com/q/16351413/1266906.
  */
 public class ProxyServer extends Thread {
-    private final int port;
     public final HashSet<String> ignore = new HashSet<>();
-    private int httpRedirect = -1;
-    private int httpsRedirect = -1;
-    private Function<String, String> dnsResolver = s -> {
-        return s;
-    };
-
-//    public static void main(String[] args) {
+    private final int port;
+    //    public static void main(String[] args) {
 //        (new ProxyServer()).run();
 //    }
 //
@@ -29,6 +23,12 @@ public class ProxyServer extends Thread {
 //        super("Server Thread");
 //    }
     private final ExecutorService executor = Executors.newCachedThreadPool();
+    ServerSocket serverSocket = null;
+    private int httpRedirect = -1;
+    private int httpsRedirect = -1;
+    private Function<String, String> dnsResolver = s -> {
+        return s;
+    };
 
     public ProxyServer(int port) {
 
@@ -55,7 +55,7 @@ public class ProxyServer extends Thread {
         return this;
     }
 
-    public void terminate(){
+    public void terminate() {
 
         try {
             serverSocket.close();
@@ -64,7 +64,6 @@ public class ProxyServer extends Thread {
         }
     }
 
-    ServerSocket serverSocket = null;
     @Override
     public void run() {
 

@@ -5,13 +5,13 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpsExchange;
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.*;
 import org.kendar.http.utils.callexternal.ExternalRequester;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.converters.RequestResponseBuilder;
 import org.kendar.http.utils.filters.FilteringClassesHandler;
-import org.kendar.filters.ProtocolPhase;
 import org.kendar.http.utils.rewriter.SimpleRewriterHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,7 +176,7 @@ public class MasterHandler implements HttpHandler {
                 }
             }
 
-            log.info("REQ " + request.getMethod() + " " + request.buildUrl().substring(0,Math.min(request.buildUrl().length(),60)));
+            log.info("REQ " + request.getMethod() + " " + request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
 
             handleInternal(request, response, connManager);
             sendResponse(response, httpExchange);

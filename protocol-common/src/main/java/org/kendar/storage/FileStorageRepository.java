@@ -105,7 +105,7 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
                 Files.writeString(Path.of(targetDir, id), result);
 
             } catch (Exception e) {
-                log.warn("Trouble flushing "+e);
+                log.warn("Trouble flushing " + e);
             }
         }
     }

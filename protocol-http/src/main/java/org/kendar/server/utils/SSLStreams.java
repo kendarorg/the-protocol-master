@@ -18,12 +18,11 @@ public class SSLStreams {
     final SocketChannel chan;
     final ServerImpl server;
     final SSLEngine engine;
+    /* held by thread doing the hand-shake on this connection */
+    final Lock handshaking = new ReentrantLock();
     SSLStreams.EngineWrapper wrapper;
     SSLStreams.OutputStream os;
     SSLStreams.InputStream is;
-
-    /* held by thread doing the hand-shake on this connection */
-    final Lock handshaking = new ReentrantLock();
     int app_buf_size;
     int packet_buf_size;
 
@@ -472,14 +471,12 @@ public class SSLStreams {
      */
     class InputStream extends java.io.InputStream {
 
-        ByteBuffer bbuf;
         final boolean closed = false;
-
+        final byte[] single = new byte[1];
+        ByteBuffer bbuf;
         /* this stream eof */
         boolean eof = false;
-
         boolean needData = true;
-        final byte[] single = new byte[1];
 
         InputStream() {
             bbuf = allocate(SSLStreams.BufType.APPLICATION);
@@ -585,8 +582,8 @@ public class SSLStreams {
      */
     class OutputStream extends java.io.OutputStream {
         final ByteBuffer buf;
-        boolean closed = false;
         final byte[] single = new byte[1];
+        boolean closed = false;
 
         OutputStream() {
             buf = allocate(SSLStreams.BufType.APPLICATION);

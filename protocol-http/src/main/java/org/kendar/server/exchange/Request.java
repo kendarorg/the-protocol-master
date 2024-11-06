@@ -22,13 +22,13 @@ public class Request {
     final static byte CR = 13;
     final static byte LF = 10;
     final char[] buf = new char[BUF_LEN];
+    private final InputStream is;
+    private final OutputStream os;
     int pos;
     StringBuffer lineBuf;
     Headers hdrs = null;
     private String startLine;
     private SocketChannel chan;
-    private final InputStream is;
-    private final OutputStream os;
 
     public Request(InputStream rawInputStream, OutputStream rawout) throws IOException {
         is = rawInputStream;
@@ -208,11 +208,11 @@ public class Request {
         final SocketChannel channel;
         final ByteBuffer chanbuf;
         final byte[] one;
+        final ServerImpl server;
         ByteBuffer markBuf; /* reads may be satisfied from this buffer */
         boolean marked;
         boolean reset;
         int readlimit;
-        final ServerImpl server;
         private boolean closed = false, eof = false;
 
         public ReadStream(ServerImpl server, SocketChannel chan) throws IOException {
@@ -335,11 +335,11 @@ public class Request {
 
     public static class WriteStream extends java.io.OutputStream {
         final SocketChannel channel;
+        final ServerImpl server;
         ByteBuffer buf;
         SelectionKey key;
         boolean closed;
         byte[] one;
-        final ServerImpl server;
 
         public WriteStream(ServerImpl server, SocketChannel channel) throws IOException {
             this.channel = channel;

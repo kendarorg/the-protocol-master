@@ -63,7 +63,7 @@ import java.util.regex.Pattern;
 
 public class OldMain {
     private static final Logger log = LoggerFactory.getLogger(OldMain.class);
-    private static ConcurrentHashMap<String,TcpServer> protocolServer = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
 
     public static boolean isRunning(String key) {
         if (!protocolServer.containsKey(key.toUpperCase())) return false;
@@ -71,11 +71,11 @@ public class OldMain {
     }
 
     public static boolean isRunning() {
-        return protocolServer.values().stream().anyMatch(v->v.isRunning());
+        return protocolServer.values().stream().anyMatch(v -> v.isRunning());
     }
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
-        if(isRunning("DEFAULT")){
+        if (isRunning("DEFAULT")) {
             protocolServer.get("DEFAULT").stop();
         }
         Options options = getOptions();
@@ -84,7 +84,7 @@ public class OldMain {
             CommandLineParser parser = new DefaultParser();
             CommandLine cmd = parser.parse(options, args);
             var configFile = cmd.getOptionValue("cfg");
-            if (configFile != null){
+            if (configFile != null) {
                 runWithConfig(stopWhenFalse, configFile);
             } else {
                 runWithCommand(stopWhenFalse, cmd);
@@ -127,25 +127,24 @@ public class OldMain {
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
 
-        runWithParams("DEFAULT", stopWhenFalse, timeoutSec,  protocol, replayFromLog, portVal,
+        runWithParams("DEFAULT", stopWhenFalse, timeoutSec, protocol, replayFromLog, portVal,
                 jdbcForcedSchema, login, password, jdbcReplaceQueries,
-                callDurationTimes,connectionString,storage,filters, null);
+                callDurationTimes, connectionString, storage, filters, null);
     }
 
 
-
     private static HashMap<String, List<FilterDescriptor>> loadFilters(String pluginsDir) {
-        if(!Path.of(pluginsDir).toAbsolutePath().toFile().exists()){
+        if (!Path.of(pluginsDir).toAbsolutePath().toFile().exists()) {
             return new HashMap<>();
         }
         var pluginManager = new JarPluginManager(Path.of(pluginsDir).toAbsolutePath());
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
         var filters = new HashMap<String, List<FilterDescriptor>>();
-        for(var item : pluginManager.getExtensions(FilterDescriptor.class)){
+        for (var item : pluginManager.getExtensions(FilterDescriptor.class)) {
             var protocol = item.getProtocol().toLowerCase();
-            if(!filters.containsKey(protocol)){
-                filters.put(protocol,new ArrayList<>());
+            if (!filters.containsKey(protocol)) {
+                filters.put(protocol, new ArrayList<>());
             }
             filters.get(protocol).add(item);
         }
@@ -183,22 +182,22 @@ public class OldMain {
         }
         if (protocol.equalsIgnoreCase("mysql")) {
             if (port == -1) port = 3306;
-            runMysql(id,port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec,filters);
+            runMysql(id, port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes, timeoutSec, filters);
         } else if (protocol.equalsIgnoreCase("postgres")) {
             if (port == -1) port = 5432;
-            runPostgres(id,port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec,filters);
+            runPostgres(id, port, storage, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes, timeoutSec, filters);
         } else if (protocol.equalsIgnoreCase("mongo")) {
             if (port == -1) port = 27017;
-            runMongo(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec,filters);
+            runMongo(id, port, storage, connectionString, login, password, replayFromLog, callDurationTimes, timeoutSec, filters);
         } else if (protocol.equalsIgnoreCase("amqp091")) {
             if (port == -1) port = 5672;
-            runAmqp091(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec,filters);
+            runAmqp091(id, port, storage, connectionString, login, password, replayFromLog, callDurationTimes, timeoutSec, filters);
         } else if (protocol.equalsIgnoreCase("redis")) {
             if (port == -1) port = 6379;
-            runRedis(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec,filters);
+            runRedis(id, port, storage, connectionString, login, password, replayFromLog, callDurationTimes, timeoutSec, filters);
         } else if (protocol.equalsIgnoreCase("mqtt")) {
             if (port == -1) port = 1883;
-            runMqtt(id,port, storage, connectionString, login, password, replayFromLog, callDurationTimes,timeoutSec,filters);
+            runMqtt(id, port, storage, connectionString, login, password, replayFromLog, callDurationTimes, timeoutSec, filters);
         } else {
             throw new Exception("missing protocol (p)");
         }
@@ -213,14 +212,14 @@ public class OldMain {
 
     private static ArrayList<FilterDescriptor> loadCorrectFiltersForProtocol(String id, String protocol, HashMap<String, List<FilterDescriptor>> allFilters, Ini ini) {
         var availableFilters = allFilters.get(protocol.toLowerCase());
-        if(availableFilters==null)availableFilters=new ArrayList<>();
+        if (availableFilters == null) availableFilters = new ArrayList<>();
         var filters = new ArrayList<FilterDescriptor>();
-        if(ini !=null) {
+        if (ini != null) {
 
             for (var availableFilter : availableFilters) {
-                var sectionId = id +"-"+availableFilter.getId();
+                var sectionId = id + "-" + availableFilter.getId();
                 var section = ini.getSection(sectionId);
-                if(section!=null && !section.isEmpty()){
+                if (section != null && !section.isEmpty()) {
                     var clonedFilter = availableFilter.clone();
                     filters.add(clonedFilter);
                 }
@@ -282,21 +281,21 @@ public class OldMain {
 
     private static void runPostgres(String id, int port, StorageRepository logsDir, String connectionString, String forcedSchema,
                                     String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) throws IOException {
-        runJdbc(id,"postgres", "org.postgresql.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec,filters);
+        runJdbc(id, "postgres", "org.postgresql.Driver", port, logsDir, connectionString, forcedSchema,
+                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes, timeoutSec, filters);
     }
 
     private static void runMysql(String id, int port, StorageRepository logsDir, String connectionString, String forcedSchema,
                                  String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes, int timeoutSec,
                                  List<FilterDescriptor> filters) throws IOException {
-        runJdbc(id,"mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes,timeoutSec,filters);
+        runJdbc(id, "mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, forcedSchema,
+                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes, timeoutSec, filters);
     }
 
-    private static void runJdbc(String id,String type, String driver, int port, StorageRepository logsDir,
+    private static void runJdbc(String id, String type, String driver, int port, StorageRepository logsDir,
                                 String connectionString, String forcedSchema,
                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries,
-                                boolean callDurationTimes,int timeoutSec,
+                                boolean callDurationTimes, int timeoutSec,
                                 List<FilterDescriptor> filters) throws IOException {
         var baseProtocol = new PostgresProtocol(port);
         var proxy = new JdbcProxy(driver,
@@ -324,7 +323,7 @@ public class OldMain {
         ps.useCallDurationTimes(callDurationTimes);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(id,ps);
+        protocolServer.put(id, ps);
     }
 
     private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws IOException {
@@ -382,7 +381,7 @@ public class OldMain {
         ps.useCallDurationTimes(callDurationTimes);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(id,ps);
+        protocolServer.put(id, ps);
     }
 
     private static void runAmqp091(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) {
@@ -403,7 +402,7 @@ public class OldMain {
         ps.useCallDurationTimes(callDurationTimes);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(id,ps);
+        protocolServer.put(id, ps);
     }
 
     private static void runRedis(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) {
@@ -425,7 +424,7 @@ public class OldMain {
         ps.useCallDurationTimes(callDurationTimes);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(id,ps);
+        protocolServer.put(id, ps);
     }
 
     private static void runMqtt(String id, int port, StorageRepository logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes, int timeoutSec, List<FilterDescriptor> filters) {
@@ -447,11 +446,11 @@ public class OldMain {
         ps.useCallDurationTimes(callDurationTimes);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(id,ps);
+        protocolServer.put(id, ps);
     }
 
     public static void stop() {
-        for(var server:protocolServer.values()){
+        for (var server : protocolServer.values()) {
             server.stop();
         }
     }
@@ -459,7 +458,7 @@ public class OldMain {
     private static void runWithConfig(Supplier<Boolean> stopWhenFalse, String configFile) throws IOException {
         var ini = new Ini();
         ini.load(Path.of(configFile).toAbsolutePath().toFile());
-        var logsDir = ini.getValue("global","datadir",String.class);
+        var logsDir = ini.getValue("global", "datadir", String.class);
         StorageRepository storage = setupStorage(logsDir);
 
         var pluginsDir = ini.getValue("global", "pluginsDir", String.class, "plugins");
@@ -470,17 +469,17 @@ public class OldMain {
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
 
-        for(var key:ini.getSections()) {
+        for (var key : ini.getSections()) {
             try {
-                var protocol = ini.getValue(key,"protocol",String.class);
-                if(protocol==null || protocol.isEmpty())continue;
+                var protocol = ini.getValue(key, "protocol", String.class);
+                if (protocol == null || protocol.isEmpty()) continue;
 
-                if(!protocol.equalsIgnoreCase("http")) {
+                if (!protocol.equalsIgnoreCase("http")) {
                     runWithConfigNonHttp(stopWhenFalse, key, ini, storage, protocol, filters);
-                }else{
-                    runWithConfigHttp(stopWhenFalse,key,ini,storage,protocol,filters);
+                } else {
+                    runWithConfigHttp(stopWhenFalse, key, ini, storage, protocol, filters);
                 }
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 System.out.println(ex);
             }
         }
@@ -499,15 +498,13 @@ public class OldMain {
         var connectionString = ini.getValue(key, "connection", String.class);
 
 
-
-
         var finalStorage = storage;
         new Thread(() -> {
             try {
                 System.out.println("STARTING " + key);
                 runWithParams(key, stopWhenFalse, timeout, protocol, replayFromLog, portVal,
                         jdbcForcedSchema, login, password, jdbcReplaceQueries,
-                        callDurationTimes, connectionString, finalStorage, filters,ini);
+                        callDurationTimes, connectionString, finalStorage, filters, ini);
             } catch (Exception ex) {
                 System.out.println(ex);
                 throw new RuntimeException(ex);
@@ -518,9 +515,9 @@ public class OldMain {
     private static SimpleRewriterConfig loadRewritersConfiguration(String key, Ini ini) {
         var proxyConfig = new SimpleRewriterConfig();
         for (var id = 0; id < 255; id++) {
-            var when = ini.getValue(key+"-rewriter", "rewrite." + id + ".when", String.class);
-            var where = ini.getValue(key+"-rewriter", "rewrite." + id + ".where", String.class);
-            var test = ini.getValue(key+"-rewriter", "rewrite." + id + ".test", String.class);
+            var when = ini.getValue(key + "-rewriter", "rewrite." + id + ".when", String.class);
+            var where = ini.getValue(key + "-rewriter", "rewrite." + id + ".where", String.class);
+            var test = ini.getValue(key + "-rewriter", "rewrite." + id + ".test", String.class);
             if (when == null || where == null) {
                 continue;
             }
@@ -528,10 +525,10 @@ public class OldMain {
                     when,
                     where,
                     test);
-            if(test==null||test.isEmpty()) {
+            if (test == null || test.isEmpty()) {
                 remoteServerStatus.setRunning(true);
                 remoteServerStatus.setForce(true);
-            }else{
+            } else {
 
                 remoteServerStatus.setRunning(false);
                 remoteServerStatus.setForce(false);
@@ -544,7 +541,7 @@ public class OldMain {
     private static HttpsServer createHttpsServer(CertificatesManager certificatesManager, InetSocketAddress sslAddress, int backlog, String cname, String der, String key) throws Exception {
         var httpsServer = new KendarHttpsServer(sslAddress, backlog);
 
-        certificatesManager.setupSll(httpsServer, List.of(),cname, der, key);
+        certificatesManager.setupSll(httpsServer, List.of(), cname, der, key);
         return httpsServer;
     }
 
@@ -564,7 +561,7 @@ public class OldMain {
 
 
         // initialise the HTTP server
-        var proxyConfig = loadRewritersConfiguration(sectionKey,ini);
+        var proxyConfig = loadRewritersConfiguration(sectionKey, ini);
         var dnsHandler = new DnsMultiResolverImpl();
         var connectionBuilder = new ConnectionBuilderImpl(dnsHandler);
         var requestResponseBuilder = new RequestResponseBuilderImpl();
@@ -572,18 +569,18 @@ public class OldMain {
         var certificatesManager = new CertificatesManager(new FileResourcesUtils());
         var httpServer = HttpServer.create(address, backlog);
 
-        var der = ini.getValue(sectionKey+"-ssl", "der", String.class, "resources://certificates/ca.der");
-        var key = ini.getValue(sectionKey+"-ssl", "key", String.class, "resources://certificates/ca.key");
-        var cname = ini.getValue(sectionKey+"-ssl", "cname", String.class,"C=US,O=Local Development,CN=local.org");
+        var der = ini.getValue(sectionKey + "-ssl", "der", String.class, "resources://certificates/ca.der");
+        var key = ini.getValue(sectionKey + "-ssl", "key", String.class, "resources://certificates/ca.key");
+        var cname = ini.getValue(sectionKey + "-ssl", "cname", String.class, "C=US,O=Local Development,CN=local.org");
 
-        var httpsServer = createHttpsServer(certificatesManager,sslAddress, backlog,cname, der, key);
+        var httpsServer = createHttpsServer(certificatesManager, sslAddress, backlog, cname, der, key);
 
 
         var proxy = new ProxyServer(proxyPort)
                 .withHttpRedirect(port).withHttpsRedirect(httpsPort)
                 .withDnsResolver(host -> {
                     try {
-                        certificatesManager.setupSll(httpsServer, List.of(host),cname, der, key);
+                        certificatesManager.setupSll(httpsServer, List.of(host), cname, der, key);
                     } catch (Exception e) {
                         return host;
                     }
@@ -604,9 +601,9 @@ public class OldMain {
         filters.add(new MockFilter());
         for (var i = filters.size() - 1; i >= 0; i--) {
             var filter = filters.get(i);
-            var section = ini.getSection(sectionKey+"-"+filter.getId());
+            var section = ini.getSection(sectionKey + "-" + filter.getId());
             if (!filter.getId().equalsIgnoreCase("global") &&
-                    !ini.getValue(sectionKey+"-"+filter.getId(), "active", Boolean.class, false)) {
+                    !ini.getValue(sectionKey + "-" + filter.getId(), "active", Boolean.class, false)) {
                 filters.remove(i);
                 continue;
             }
@@ -634,8 +631,8 @@ public class OldMain {
         }
         httpsServer.start();
         httpServer.start();
-        new Thread(()->{
-            while(stopWhenFalseFunction.get()){
+        new Thread(() -> {
+            while (stopWhenFalseFunction.get()) {
                 Sleeper.sleep(100);
             }
             stopWhenFalse.set(false);

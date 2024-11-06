@@ -31,7 +31,6 @@ import static org.kendar.protocol.descriptor.ProtoDescriptor.getNow;
  */
 public abstract class ProtoContext {
 
-    private final Logger log = LoggerFactory.getLogger(ProtoContext.class);
     /**
      * Stores the variable relatives to the current instance execution
      */
@@ -51,15 +50,8 @@ public abstract class ProtoContext {
      * Flag to stop the execution
      */
     protected final AtomicBoolean run = new AtomicBoolean(true);
+    private final Logger log = LoggerFactory.getLogger(ProtoContext.class);
     private final AtomicLong lastAccess = new AtomicLong(getNow());
-
-    public long getLastAccess(){
-        return lastAccess.get();
-    }
-
-
-
-
     /**
      * Contains the -DECLARATION- of the protocol
      */
@@ -81,11 +73,6 @@ public abstract class ProtoContext {
      */
     private ProtoState currentState;
     private boolean useCallDurationTimes;
-
-    public ProtoDescriptor getDescriptor() {
-        return descriptor;
-    }
-
     public ProtoContext(ProtoDescriptor descriptor, int contextId) {
         this.contextId = contextId;
         this.descriptor = descriptor;
@@ -134,6 +121,14 @@ public abstract class ProtoContext {
             result = new FailedState("Unable to run event", candidate, event);
         }
         return result;
+    }
+
+    public long getLastAccess() {
+        return lastAccess.get();
+    }
+
+    public ProtoDescriptor getDescriptor() {
+        return descriptor;
     }
 
     public void updateLastAccess() {
@@ -357,7 +352,7 @@ public abstract class ProtoContext {
         //Prepare the tagged stack
         if (!executionStack.containsKey(tag)) {
             executionStack.put(tag, new Stack<>());
-            executionStack.get(tag).add(new ProtoStackItem(root.get(tagKey), event,descriptor.getCounterString("STACK_ID")));
+            executionStack.get(tag).add(new ProtoStackItem(root.get(tagKey), event, descriptor.getCounterString("STACK_ID")));
         }
         //Cleanup the recursion blocker
         recursionBlocker = new HashSet<>();
@@ -525,7 +520,7 @@ public abstract class ProtoContext {
                 return new FailedState("Blocked recursion", candidate, event);
             } else {
                 //Execute special states
-                executionStack.get(eventTags).add(new ProtoStackItem(candidate, event,descriptor.getCounterString("STACK_ID")));
+                executionStack.get(eventTags).add(new ProtoStackItem(candidate, event, descriptor.getCounterString("STACK_ID")));
                 return findThePossibleNextStateOnStack(event, depth + 1);
             }
         }

@@ -1,6 +1,5 @@
 package org.kendar.mongo;
 
-import org.kendar.mongo.proxy.DocumentContainer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -21,6 +20,7 @@ import org.kendar.mongo.dtos.OpMsgSection;
 import org.kendar.mongo.dtos.OpQueryContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
+import org.kendar.mongo.proxy.DocumentContainer;
 import org.kendar.mongo.utils.MongoStorage;
 import org.kendar.mongo.utils.NullMongoStorage;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -109,8 +109,8 @@ public class MongoProxy extends Proxy<MongoStorage> {
         var database = mongoClient.getDatabase(db);
         var cmdContainer = new DocumentContainer(protoContext.getReqResId(), data.getRequestId());
 
-        for(var filter:getFilters(ProtocolPhase.PRE_CALL,command, cmdContainer)){
-            if(filter.handle(ProtocolPhase.PRE_CALL,command,cmdContainer)){
+        for (var filter : getFilters(ProtocolPhase.PRE_CALL, command, cmdContainer)) {
+            if (filter.handle(ProtocolPhase.PRE_CALL, command, cmdContainer)) {
                 var toSend = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
                 OpMsgSection section = new OpMsgSection();
                 section.getDocuments().add(cmdContainer.getCommandResult().toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build()));
@@ -121,8 +121,8 @@ public class MongoProxy extends Proxy<MongoStorage> {
         Document commandResult = database.runCommand(command);
         cmdContainer.setResult(commandResult);
 
-        for(var filter:getFilters(ProtocolPhase.POST_CALL,command, cmdContainer)){
-            if(filter.handle(ProtocolPhase.POST_CALL,command,cmdContainer)){
+        for (var filter : getFilters(ProtocolPhase.POST_CALL, command, cmdContainer)) {
+            if (filter.handle(ProtocolPhase.POST_CALL, command, cmdContainer)) {
                 var toSend2 = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
                 OpMsgSection section2 = new OpMsgSection();
                 section2.getDocuments().add(cmdContainer.getCommandResult().toJson(JsonWriterSettings.builder().

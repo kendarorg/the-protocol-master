@@ -40,7 +40,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         try {
             this.replayer = false;
             this.connectionString = connectionString;
-            if(connectionString != null && !connectionString.isEmpty()){
+            if (connectionString != null && !connectionString.isEmpty()) {
                 var uri = new URI(connectionString);
                 this.port = uri.getPort();
                 this.host = uri.getHost();
@@ -147,8 +147,8 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             return;
         }
 
-        for(var filter:getFilters(ProtocolPhase.PRE_CALL,of, new Object())){
-            if(filter.handle(ProtocolPhase.PRE_CALL,of,null)){
+        for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, new Object())) {
+            if (filter.handle(ProtocolPhase.PRE_CALL, of, null)) {
                 return;
             }
         }
@@ -160,8 +160,8 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         sock.write(of, getProtocol().buildBuffer());
         var jsonRes = mapper.toJsonNode("{\"type\":null,\"data\":null}");
         long end = System.currentTimeMillis();
-        for(var filter:getFilters(ProtocolPhase.POST_CALL,of, new Object())){
-            if(filter.handle(ProtocolPhase.POST_CALL,of,null)){
+        for (var filter : getFilters(ProtocolPhase.POST_CALL, of, new Object())) {
+            if (filter.handle(ProtocolPhase.POST_CALL, of, null)) {
                 break;
             }
         }
@@ -169,7 +169,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
                 index,
                 context.getContextId(),
                 jsonReq
-                ,jsonRes
+                , jsonRes
                 , (end - start), of.getClass().getSimpleName(), getCaller());
 
 
@@ -234,8 +234,8 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
 
         }
 
-        for(var filter:getFilters(ProtocolPhase.PRE_CALL,of, toRead)){
-            if(filter.handle(ProtocolPhase.PRE_CALL,of,toRead)){
+        for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (filter.handle(ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
         }
@@ -254,8 +254,8 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             }
         }
 
-        for(var filter:getFilters(ProtocolPhase.POST_CALL,of, toRead)){
-            if(filter.handle(ProtocolPhase.POST_CALL,of,toRead)){
+        for (var filter : getFilters(ProtocolPhase.POST_CALL, of, toRead)) {
+            if (filter.handle(ProtocolPhase.POST_CALL, of, toRead)) {
                 break;
             }
         }
@@ -316,8 +316,8 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         }
         var index = storage.generateIndex();
 
-        for(var filter:getFilters(ProtocolPhase.PRE_CALL,of, toRead)){
-            if(filter.handle(ProtocolPhase.PRE_CALL,of,toRead)){
+        for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (filter.handle(ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
         }
@@ -327,8 +327,8 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         sock.write(of);
         sock.read(toRead, optional);
 
-        for(var filter:getFilters(ProtocolPhase.POST_CALL,of, toRead)){
-            if(filter.handle(ProtocolPhase.POST_CALL,of,toRead)){
+        for (var filter : getFilters(ProtocolPhase.POST_CALL, of, toRead)) {
+            if (filter.handle(ProtocolPhase.POST_CALL, of, toRead)) {
                 break;
             }
         }

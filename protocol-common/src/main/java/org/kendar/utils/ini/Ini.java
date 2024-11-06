@@ -11,13 +11,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,8 +26,8 @@ import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 public class Ini {
 
     private static final String NO_SECTION = "_NO_SECTION";
-    private static Pattern SECTION_PATTERN  = Pattern.compile( "\\s*\\[([^]]*)\\]\\s*" );
-    private static Pattern  KEY_VALUE_PATTER = Pattern.compile( "\\s*([^=]*)=(.*)" );
+    private static Pattern SECTION_PATTERN = Pattern.compile("\\s*\\[([^]]*)\\]\\s*");
+    private static Pattern KEY_VALUE_PATTER = Pattern.compile("\\s*([^=]*)=(.*)");
     private static Pattern COMMENT_LINE = Pattern.compile("^[;|#].*");
     private Map<String, Map<String, Object>> resultMap = new LinkedHashMap<>();
 
@@ -45,8 +39,23 @@ public class Ini {
 
     }
 
+    private static void writeComments(final BufferedWriter bw, final String comments)
+            throws IOException {
+        if (StringUtils.isNotEmpty(comments)) {
+            try (BufferedReader bufferedReader = new BufferedReader(new StringReader(comments))) {
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    bw.write("#");
+                    IOUtils.write(line, bw);
+                    bw.newLine();
+                }
+            }
+        }
+    }
+
     /**
      * default constructor with an {@link InputStream}
+     *
      * @param inputStream the ini file as an input stream
      * @throws IOException thrown when there is an error processing the ini.
      */
@@ -63,6 +72,7 @@ public class Ini {
 
     /**
      * default constructor with {@link File}
+     *
      * @param file the ini file
      * @throws IOException thrown when there is an error processing the ini.
      */
@@ -72,24 +82,26 @@ public class Ini {
 
     /**
      * default constructor with {@link String}
+     *
      * @param string the contents of the ini file
      * @throws IOException thrown when there is an error processing the ini.
      */
-    public void load(final String string) throws  IOException {
+    public void load(final String string) throws IOException {
         load(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
     }
 
     /**
      * merge this {@link Ini} with another {@link Ini}.  If there are any merge conflicts the passed in {@link Ini}
      * will take precedence.
-     * @param ini  the ini to merge
+     *
+     * @param ini the ini to merge
      */
     public void merge(final Ini ini) {
         Collection<String> sectionKeys = firstNonNull(ini.getSections(), Collections.emptyList());
         for (String sectionKey : sectionKeys) {
             Map<String, Object> section = firstNonNull(ini.getSection(sectionKey), Collections.emptyMap());
             Set<Map.Entry<String, Object>> entrySet = section.entrySet();
-            for (Map.Entry<String, Object> entry : entrySet ) {
+            for (Map.Entry<String, Object> entry : entrySet) {
                 putValue(sectionKey, entry.getKey(), entry.getValue());
             }
         }
@@ -106,7 +118,7 @@ public class Ini {
         String multilineValue = null;
         String key = null;
         Map<String, StringSubstitutor> stringStringSubstitutorPerSection = new HashMap<>();
-        while ((line = bufferedReader.readLine()) != null ) {
+        while ((line = bufferedReader.readLine()) != null) {
 
             final Matcher commentMatcher = COMMENT_LINE.matcher(line);
             if (commentMatcher.matches()) {
@@ -138,10 +150,10 @@ public class Ini {
                     continue;
                 }
             } else if (line.endsWith("\\")) {
-                multilineValue+= line.replaceAll("\\\\$", "\n");
+                multilineValue += line.replaceAll("\\\\$", "\n");
                 continue;
-            } else if (multilineValue != null){
-                multilineValue+= line.replaceAll("\\\\$", "\n");
+            } else if (multilineValue != null) {
+                multilineValue += line.replaceAll("\\\\$", "\n");
             }
 
 
@@ -202,8 +214,9 @@ public class Ini {
 
     /**
      * return true if the section and section key exists, false otherwise
+     *
      * @param section the desired section
-     * @param key the key in the section
+     * @param key     the key in the section
      * @return true if the section and section key exists, false otherwise
      */
     public boolean hasKey(final String section, final String key) {
@@ -212,8 +225,9 @@ public class Ini {
 
     /**
      * return a value from the nested structure as an object
+     *
      * @param section the desired section
-     * @param key the desired key in the section
+     * @param key     the desired key in the section
      * @return the value from the nested structure and cast it to the specified type.
      */
     public Object getValue(final String section, final String key) {
@@ -222,20 +236,21 @@ public class Ini {
 
     /**
      * return a value from the nested structure and cast it to the specified type.
+     *
      * @param section the desired section
-     * @param key the key in the section
-     * @param type the desired type
-     * @param <T> the generic for the type
+     * @param key     the key in the section
+     * @param type    the desired type
+     * @param <T>     the generic for the type
      * @return the value from the nested structure and cast it to the specified type.
      */
     public <T> T getValue(final String section, final String key, final Class<T> type) {
         return cast(resultMap.getOrDefault(section, new LinkedHashMap<>()).get(key), type);
     }
 
-    public <T> T getValue(final String section, final String key, final Class<T> type,T defaultValue) {
+    public <T> T getValue(final String section, final String key, final Class<T> type, T defaultValue) {
         var result = cast(resultMap.getOrDefault(section, new LinkedHashMap<>()).get(key), type);
-        if(result==null){
-            return (T)defaultValue;
+        if (result == null) {
+            return (T) defaultValue;
         }
         return result;
     }
@@ -254,15 +269,15 @@ public class Ini {
             return (T) o;
         } else if (Number.class.isInstance(o)) {
             if (Long.class.isAssignableFrom(type) || long.class.isAssignableFrom(type)) {
-                return (T) (Long) ((Number)o).longValue();
+                return (T) (Long) ((Number) o).longValue();
             } else if (Integer.class.isAssignableFrom(type) || int.class.isAssignableFrom(type)) {
-                return (T) (Integer) ((Number)o).intValue();
+                return (T) (Integer) ((Number) o).intValue();
             } else if (Double.class.isAssignableFrom(type) || double.class.isAssignableFrom(type)) {
-                return (T) (Double) ((Number)o).doubleValue();
+                return (T) (Double) ((Number) o).doubleValue();
             } else if (Float.class.isAssignableFrom(type) || float.class.isAssignableFrom(type)) {
-                return (T) (Float) ((Number)o).floatValue();
+                return (T) (Float) ((Number) o).floatValue();
             } else if (Short.class.isAssignableFrom(type) || short.class.isAssignableFrom(type)) {
-                return (T) (Short) ((Number)o).shortValue();
+                return (T) (Short) ((Number) o).shortValue();
             } else if (Byte.class.isAssignableFrom(type) || byte.class.isAssignableFrom(type)) {
                 return (T) (Byte) ((Number) o).byteValue();
             }
@@ -278,6 +293,7 @@ public class Ini {
 
     /**
      * get the sections from the ini file.
+     *
      * @return the sections as a collection.
      */
     public Collection<String> getSections() {
@@ -286,6 +302,7 @@ public class Ini {
 
     /**
      * get the keys from a particular section.
+     *
      * @param section the desired section
      * @return the keys for a section or an empty collection.
      */
@@ -295,6 +312,7 @@ public class Ini {
 
     /**
      * return the section as a map.
+     *
      * @param section the desired section
      * @return null if not found
      */
@@ -305,8 +323,10 @@ public class Ini {
         }
         return Collections.unmodifiableMap(map);
     }
+
     /**
      * return the section as a map; sorted by key
+     *
      * @param section the desired section
      * @return null if not found
      */
@@ -318,22 +338,22 @@ public class Ini {
         return Collections.unmodifiableMap(new TreeMap<>(map));
     }
 
-
     /**
      * get a subset of a section where all the keys match the provided prefix
+     *
      * @param section the desired section
-     * @param prefix that the key starts with
+     * @param prefix  that the key starts with
      * @return a subset of a section where all the keys match the provided prefix
      */
     public Map<String, Object> getSectionWithKeysWithPrefix(final String section, final String prefix) {
         return getSectionWithKeysThatMatchFunction(section, entry -> entry.getKey().startsWith(prefix));
     }
 
-
     /**
      * get a subset of a section where all the keys match the provided filter
+     *
      * @param section
-     * @param filter the filter that the Map.Entry in she specified section must match
+     * @param filter  the filter that the Map.Entry in she specified section must match
      * @return
      */
     public Map<String, Object> getSectionWithKeysThatMatchFunction(final String section,
@@ -344,11 +364,11 @@ public class Ini {
                 .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
     }
 
-
     /**
      * get a subset of a section where all the keys match the provided prefix
+     *
      * @param section the desired section
-     * @param regex that matches the key
+     * @param regex   that matches the key
      * @return a subset of a section where all the keys match the provided prefix
      */
     public Map<String, Object> getSectionWithKeysWithRegex(final String section, final String regex) {
@@ -358,9 +378,10 @@ public class Ini {
 
     /**
      * store new values in the ini
+     *
      * @param section the desired section
-     * @param key the key in the section
-     * @param value the value to store for that key
+     * @param key     the key in the section
+     * @param value   the value to store for that key
      */
     public void putValue(final String section, final String key, final Object value) {
         resultMap.computeIfAbsent(section, s -> new LinkedHashMap<>()).put(key, value);
@@ -368,6 +389,7 @@ public class Ini {
 
     /**
      * put multiple key/value pairs into a section.
+     *
      * @param sectionEntries
      */
     public void putValues(final String sectionKey, Map<String, Object> sectionEntries) {
@@ -376,8 +398,9 @@ public class Ini {
 
     /**
      * store the ini to an outputstream
+     *
      * @param outputStream the outputstream to write to
-     * @param comments the comments to put at the top of the file
+     * @param comments     the comments to put at the top of the file
      * @throws IOException if there is an error writing to the outputstream
      */
     public void store(final OutputStream outputStream, final String comments) throws IOException {
@@ -387,7 +410,8 @@ public class Ini {
 
     /**
      * store the ini to a writer
-     * @param writer the writer to use
+     *
+     * @param writer   the writer to use
      * @param comments commments to put at the top of the file.
      * @throws IOException if there is an error writing to the writer
      */
@@ -412,24 +436,11 @@ public class Ini {
         }
     }
 
-    private static void writeComments(final BufferedWriter bw, final String comments)
-            throws IOException {
-        if (StringUtils.isNotEmpty(comments)) {
-            try (BufferedReader bufferedReader = new BufferedReader(new StringReader(comments))) {
-                String line = null;
-                while((line = bufferedReader.readLine()) != null) {
-                    bw.write("#");
-                    IOUtils.write(line, bw);
-                    bw.newLine();
-                }
-            }
-        }
-    }
-
     /**
      * Removes the specified section.
-     *
+     * <p>
      * The ini object will not contain a mapping for the specified section once the call returns.
+     *
      * @param section the section to remove
      * @return the previous value associated with key, or null if there was no mapping for key.
      */
@@ -440,8 +451,9 @@ public class Ini {
     /**
      * Removes the specified key in the specified section.
      * The ini object will not contain a mapping for the specified section once the call returns.
+     *
      * @param section the section to remove
-     * @param key the key in that section to remove
+     * @param key     the key in that section to remove
      * @return the previous value associated with key, or null if there was no mapping for key.
      */
     public Object removeSectionKey(final String section, final String key) {

@@ -21,7 +21,7 @@ public class FilteringClassesHandlerImpl implements FilteringClassesHandler {
     @Override
     public boolean handle(ProtocolPhase phase, Request request, Response response, HttpClientConnectionManager connectionManager) throws InvocationTargetException, IllegalAccessException {
         for (var handler : handlers.stream().filter(h -> h.getPhases().contains(phase)).collect(Collectors.toList())) {
-            var pfd = (ProtocolFilterDescriptor)handler;
+            var pfd = (ProtocolFilterDescriptor) handler;
             if (pfd.handle(phase, request, response)) {
                 return true;
             }

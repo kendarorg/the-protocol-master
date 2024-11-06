@@ -302,8 +302,8 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         try {
             var result = new SelectResult();
             var jdbcCall = new JdbcCall(query, parameterValues);
-            for(var filter:getFilters(ProtocolPhase.PRE_CALL,jdbcCall, result)){
-                if(filter.handle(ProtocolPhase.PRE_CALL,jdbcCall,result)){
+            for (var filter : getFilters(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
+                if (filter.handle(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
                     return result;
                 }
             }
@@ -330,8 +330,8 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             }
 
             long end = System.currentTimeMillis();
-            for(var filter:getFilters(ProtocolPhase.POST_CALL,jdbcCall, result)){
-                if(filter.handle(ProtocolPhase.POST_CALL,jdbcCall,result)){
+            for (var filter : getFilters(ProtocolPhase.POST_CALL, jdbcCall, result)) {
+                if (filter.handle(ProtocolPhase.POST_CALL, jdbcCall, result)) {
                     break;
                 }
             }

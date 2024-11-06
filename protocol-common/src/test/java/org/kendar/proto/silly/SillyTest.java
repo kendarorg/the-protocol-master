@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.buffers.BBuffer;
 import org.kendar.proto.fsm.*;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.special.ProtoStateSequence;
