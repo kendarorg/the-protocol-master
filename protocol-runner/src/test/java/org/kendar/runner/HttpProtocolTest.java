@@ -19,6 +19,8 @@ import org.kendar.runner.utils.SimpleHttpServer;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.Socket;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -36,6 +38,16 @@ public class HttpProtocolTest {
     static int FAKE_PORT_HTTPS = 8487;
     static int FAKE_PORT_PROXY = 9999;
 
+    private static boolean listening(int port) throws IllegalStateException {
+        try (Socket ignored = new Socket("localhost", port)) {
+            return false;
+        } catch (ConnectException e) {
+            return true;
+        } catch (IOException e) {
+            throw new IllegalStateException("Error while trying to check open port", e);
+        }
+    }
+
     private final AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     @BeforeEach
@@ -47,7 +59,11 @@ public class HttpProtocolTest {
     public void afterEach() {
         runTheServer.set(false);
         Main.stop();
-        Sleeper.sleep(100);
+        Sleeper.sleep(500,()->{
+            var res = listening(8087)||listening(8487)||listening(9999);
+            return res;
+        });
+        System.out.println("COMPLETED");
     }
 
     private void startAndHandleUnexpectedErrors(String[] args) {
@@ -74,7 +90,7 @@ public class HttpProtocolTest {
     }
 
     @Test
-    void simpleTest() throws IOException {
+    void asimpleTest() throws IOException {
         var simpleServer = new SimpleHttpServer();
         simpleServer.start(8456);
         var timestampForThisRun = "" + new Date().getTime();
@@ -89,6 +105,10 @@ public class HttpProtocolTest {
                 "-proxy", "" + FAKE_PORT_PROXY
         };
         startAndHandleUnexpectedErrors(args);
+        Sleeper.sleep(1000,()->{
+            var res = listening(8087)&&listening(8487)&&listening(9999);
+            return !res;
+        });
 
         var proxy = new HttpHost("localhost", FAKE_PORT_PROXY, "http");
         var routePlanner = new DefaultProxyRoutePlanner(proxy);

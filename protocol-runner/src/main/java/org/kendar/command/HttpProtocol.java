@@ -27,6 +27,8 @@ import org.kendar.server.TcpServer;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
 import org.kendar.utils.ini.Ini;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class HttpProtocol extends CommonProtocol {
+    private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
     private static HttpsServer createHttpsServer(CertificatesManager certificatesManager, InetSocketAddress sslAddress, int backlog, String cname, String der, String key) throws Exception {
         var httpsServer = new KendarHttpsServer(sslAddress, backlog);
 
@@ -120,6 +123,7 @@ public class HttpProtocol extends CommonProtocol {
             });
 
             ps.setIsRunning(() -> stopWhenFalse.get());
+            log.debug("Started waiter");
 
             var port = ini.getValue(sectionKey, "http.port", Integer.class, 4080);
             var httpsPort = ini.getValue(sectionKey, "https.port", Integer.class, 4443);
@@ -139,8 +143,9 @@ public class HttpProtocol extends CommonProtocol {
             var connectionBuilder = new ConnectionBuilderImpl(dnsHandler);
             var requestResponseBuilder = new RequestResponseBuilderImpl();
 
-            var certificatesManager = new CertificatesManager(new FileResourcesUtils());
+
             var httpServer = HttpServer.create(address, backlog);
+            log.debug("Http created");
             ps.setStop(() -> {
                 waiterBlock.set(false);
                 httpServer.stop(0);
@@ -150,7 +155,9 @@ public class HttpProtocol extends CommonProtocol {
             var key = ini.getValue(sectionKey + "-ssl", "key", String.class, "resource://certificates/ca.key");
             var cname = ini.getValue(sectionKey + "-ssl", "cname", String.class, "C=US,O=Local Development,CN=local.org");
 
+            var certificatesManager = new CertificatesManager(new FileResourcesUtils());
             var httpsServer = createHttpsServer(certificatesManager, sslAddress, backlog, cname, der, key);
+            log.debug("Https created");
             ps.setStop(() -> {
                 waiterBlock.set(false);
                 httpsServer.stop(0);
@@ -178,6 +185,7 @@ public class HttpProtocol extends CommonProtocol {
                 httpsServer.stop(0);
                 httpServer.stop(0);
             });
+            log.debug("Proxy created");
             new Thread(proxy).start();
 
             var globalFilter = new GlobalPlugin();
@@ -199,6 +207,7 @@ public class HttpProtocol extends CommonProtocol {
             globalFilter.setFilters(filters);
             globalFilter.setServer(httpServer, httpsServer);
             globalFilter.setShutdownVariable(stopWhenFalse);
+            log.debug("Filters added");
             var handler = new MasterHandler(
                     new FilteringClassesHandlerImpl(filters),
                     new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
@@ -217,6 +226,7 @@ public class HttpProtocol extends CommonProtocol {
             }
             httpsServer.start();
             httpServer.start();
+            log.debug("Servers started");
 
 
             protocolServer.put(sectionKey, ps);
