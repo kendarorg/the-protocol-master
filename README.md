@@ -14,12 +14,18 @@ a set of java libraries, aimed at various tasks (and an executable jar if you wa
   for NO-SQL forwarding to the specific ones like MongoDB or AMQP
 * Run queries against a pre-recorded sequence of commands to simulate a real data
   storage, without the need of a real server (in the making)
+* Adding custom Java plugins
 
-The whole project is covered with Jacoco (77% coverage actually)
+The whole project is covered with Jacoco (66% coverage actually)
 
 For this to become real an event based state machine has been developed, with
 several database wire protocol implementations:
 
+* [Http](protocol-http/README.md)
+    * Support Http and Https mitm
+    * Simulate errors for chaos engineering
+    * Simulate API behaviours
+    * Mock responses
 * [PostgresSQL](protocol-postgres/README.md)  Usable for most db (for hibernate you should set the final db dialect of
   course)
     * Support for simple and extended query protocol

@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import static org.kendar.command.CommonProtocol.createOpt;
+
 public class OptionsManager {
     private Map<String, CommonProtocol> protocols = new HashMap<>();
 
@@ -24,12 +26,12 @@ public class OptionsManager {
 
     private static Options getMainOptions() {
         Options options = new Options();
-        options.addOption("cfg", true, "Load config file");
-        options.addOption("pluginsDir", true, "Plugins directory");
-        options.addOption("datadir", true, "Data directory/connection string");
-        options.addOption("loglevel", true, "Log4j log level");
-        options.addOption("logType", true, "The log type: default [none|file]");
-        options.addOption("protocol", true, "Protocol (http|mqtt|amqp091|mysql|postgres|redis|mongo");
+        options.addOption(createOpt("cfg",null, true, "Load config file"));
+        options.addOption(createOpt("pld","pluginsDir", true, "Plugins directory"));
+        options.addOption(createOpt("dd","datadir", true, "Data directory/connection string"));
+        options.addOption(createOpt("ll","loglevel", true, "Log4j log level"));
+        options.addOption(createOpt("lt","logType", true, "The log type: default [none|file]"));
+        options.addOption(createOpt("p","protocol", true, "Protocol (http|mqtt|amqp091|mysql|postgres|redis|mongo"));
         options.addOption(Option.builder().option("help").optionalArg(true).desc("Show contestual help").build());
         return options;
     }

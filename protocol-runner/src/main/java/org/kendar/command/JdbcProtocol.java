@@ -76,8 +76,8 @@ public class JdbcProtocol extends CommonProtocol {
 
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
-        options.addOption("schema", true, "Set schema");
-        options.addOption("replaceQueryFile", true, "Replace queries file");
+        options.addOption(createOpt("js","schema", true, "Set schema"));
+        options.addOption(createOpt("jr","replaceQueryFile", true, "Replace queries file"));
         if (!isExecute) return;
         setCommonData(args, options, go);
     }

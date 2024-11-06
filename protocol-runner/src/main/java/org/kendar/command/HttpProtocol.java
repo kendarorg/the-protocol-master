@@ -81,12 +81,12 @@ public class HttpProtocol extends CommonProtocol {
 
     @Override
     public void run(String[] args, boolean isExecute, Ini go, Options options) throws Exception {
-        options.addOption("http", true, "Http port (def 4080)");
-        options.addOption("https", true, "Https port (def 4443)");
-        options.addOption("proxy", true, "Http/s proxy port (def 9999)");
-        options.addOption("apis", true, "The base url for special TPM controllers (def specialApisRoot)");
+        options.addOption(createOpt("ht","http", true, "Http port (def 4080)"));
+        options.addOption(createOpt("hs","https", true, "Https port (def 4443)"));
+        options.addOption(createOpt("prx","proxy", true, "Http/s proxy port (def 9999)"));
+        options.addOption(createOpt("ap","apis", true, "The base url for special TPM controllers (def specialApisRoot)"));
 
-        options.addOption("cname", true, "Root cname");
+        options.addOption(createOpt("jcns","cname", true, "Root cname"));
         options.addOption("der", true, "Root certificate");
         options.addOption("key", true, "Root certificate keys");
 
@@ -94,7 +94,7 @@ public class HttpProtocol extends CommonProtocol {
         options.addOption("record", false, "Set if recording");
 
         options.addOption("replay", false, "Set if replaying");
-        options.addOption("blockExternal", false, "Set if should block external sites replaying");
+        options.addOption(createOpt("be","blockExternal", false, "Set if should block external sites replaying"));
 
         options.addOption("showError", true, "The error to show (404/500 etc)");
         options.addOption("errorPercent", true, "The error percent to generate (default 50)");

@@ -19,14 +19,33 @@ public abstract class CommonProtocol {
     public abstract void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception;
 
     protected Options getCommonOptions(Options options) {
-        options.addOption(Option.builder().option("port").optionalArg(true).
-                desc("TPM Listening port default " + getDefaultPort()).build());
-        options.addOption("connection", true, "Select remote connection string (for redis use redis://host:port");
-        options.addOption("replay", false, "Replay from log/replay source.");
-        options.addOption("plid", true, "Set an id for the replay instance (default to timestamp_uuid).");
-        options.addOption("timeout", true, "Set timeout in seconds towards proxied system (default 30s)");
-        options.addOption("cdt", false, "Respect call duration timing");
+        options.addOption(createOpt("po", "port", true, "Listening port"));
+        options.addOption(createOpt("pc", "connection", true, "Select remote connection string (for redis use redis://host:port"));
+        options.addOption(createOpt("pr", "replay", false, "Replay from log/replay source."));
+        options.addOption(createOpt("plid",null, true, "Set an id for the replay instance (default to timestamp_uuid)."));
+        options.addOption(createOpt("pt","timeout", true, "Set timeout in seconds towards proxied system (default 30s)"));
+        options.addOption(createOpt("cdt","respectcallduration", false, "Respect call duration timing"));
         return options;
+    }
+
+    public static Option createOpt(String shortVersion, String longVersion, boolean hasArg, String description) {
+        return createOpt(shortVersion, longVersion, hasArg, description, null);
+    }
+
+    public static Option createOpt(String shortVersion, String longVersion, boolean hasArg, String description, Boolean optionalArg) {
+        var res = Option.builder();
+        if (shortVersion != null) {
+            res.option(shortVersion);
+        }
+        if (longVersion != null) {
+            res.longOpt(longVersion);
+        }
+        res.hasArg(hasArg).
+                desc(description);
+        if (optionalArg != null) {
+            res.optionalArg(optionalArg);
+        }
+        return res.build();
     }
 
     protected void setCommonData(String[] args, Options options, Ini ini) throws Exception {
@@ -56,8 +75,8 @@ public abstract class CommonProtocol {
     }
 
     protected void optionLoginPassword(Options options) {
-        options.addOption("login", true, "Select remote login");
-        options.addOption("password", true, "Select remote password");
+        options.addOption(createOpt("pu","login", true, "Select remote login"));
+        options.addOption(createOpt("pw","password", true, "Select remote password"));
     }
 
     protected void parseExtra(Ini result, CommandLine cmd) {
