@@ -21,8 +21,9 @@ public abstract class CommonProtocol {
     protected Options getCommonOptions(Options options) {
         options.addOption(createOpt("po", "port", true, "Listening port"));
         options.addOption(createOpt("pc", "connection", true, "Select remote connection string (for redis use redis://host:port"));
-        options.addOption(createOpt("pr", "replay", false, "Replay from log/replay source."));
-        options.addOption(createOpt("plid",null, true, "Set an id for the replay instance (default to timestamp_uuid)."));
+        options.addOption(createOpt("prp", "replay", false, "Replay from log/replay source."));
+        options.addOption(createOpt("prc", "record", false, "Record to log/replay source."));
+        options.addOption(createOpt("plid","replayid", true, "Set an id for the replay instance (default to timestamp_uuid)."));
         options.addOption(createOpt("pt","timeout", true, "Set timeout in seconds towards proxied system (default 30s)"));
         options.addOption(createOpt("cdt","respectcallduration", false, "Respect call duration timing"));
         return options;
@@ -59,11 +60,14 @@ public abstract class CommonProtocol {
             ini.putValue(section, "replay", cmd.hasOption("replay"));
             ini.putValue(section, "respectcallduration", cmd.hasOption("cdt"));
             ini.putValue(section, "replayid", cmd.getOptionValue("plid", UUID.randomUUID().toString()));
-        } else {
+        }else {
             if (cmd.getOptionValue("connection") == null) {
                 throw new Exception();
             }
             ini.putValue(section, "connection", cmd.getOptionValue("connection"));
+        }
+        if (cmd.hasOption("record")) {
+            ini.putValue(section, "record", cmd.hasOption("record"));
         }
         ini.putValue(section, "timeout", Integer.parseInt(cmd.getOptionValue("timeout", "30")));
         parseExtra(ini, cmd);

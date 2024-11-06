@@ -4,6 +4,7 @@
 * Add HTTP protocol
 * Add filters explanation
 * Publish on vn central
+* respectcallduration on http
 
 * Use the interrupt to generate "preformed" events for the state chart
 * plid parameter to identify the run

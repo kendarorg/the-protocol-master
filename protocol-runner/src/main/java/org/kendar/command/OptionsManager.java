@@ -72,6 +72,7 @@ public class OptionsManager {
                 return ini;
             }
         } catch (Exception ex) {
+            System.err.println("ERROR: "+ex.getMessage());
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("runner", options);
         }

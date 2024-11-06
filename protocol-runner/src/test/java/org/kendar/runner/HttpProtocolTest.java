@@ -41,9 +41,9 @@ public class HttpProtocolTest {
 
     private static boolean listening(int port) throws IllegalStateException {
         try (Socket ignored = new Socket("localhost", port)) {
-            return false;
-        } catch (ConnectException e) {
             return true;
+        } catch (ConnectException e) {
+            return false;
         } catch (IOException e) {
             throw new IllegalStateException("Error while trying to check open port", e);
         }
@@ -52,15 +52,16 @@ public class HttpProtocolTest {
     @BeforeEach
     public void beforeEach() throws IOException {
         runTheServer.set(true);
+        Sleeper.sleep(500);
     }
 
     @AfterEach
     public void afterEach() {
         runTheServer.set(false);
         Main.stop();
-        Sleeper.sleep(500, () -> {
+        Sleeper.sleep(5000, () -> {
             var res = listening(8087) || listening(8487) || listening(9999);
-            return res;
+            return !res;
         });
         System.out.println("COMPLETED");
     }
@@ -106,7 +107,7 @@ public class HttpProtocolTest {
         startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000, () -> {
             var res = listening(8087) && listening(8487) && listening(9999);
-            return !res;
+            return res;
         });
 
         var proxy = new HttpHost("localhost", FAKE_PORT_PROXY, "http");
@@ -139,6 +140,10 @@ public class HttpProtocolTest {
                 "-proxy", "" + FAKE_PORT_PROXY
         };
         startAndHandleUnexpectedErrors(args);
+        Sleeper.sleep(1000, () -> {
+            var res = listening(8087) && listening(8487) && listening(9999);
+            return res;
+        });
 
         final var sslContext = new SSLContextBuilder()
                 .loadTrustMaterial(null, (x509CertChain, authType) -> true)

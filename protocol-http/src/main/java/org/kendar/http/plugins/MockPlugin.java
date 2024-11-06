@@ -92,7 +92,7 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
     public void initialize(Map<String, Object> section) {
         typeReference = new TypeReference<>() {
         };
-        var recordingPath = (String) section.get("recordingPath");
+        var recordingPath = (String) section.get("datadir");
         setupSitesToRecord((String) section.get("matchSites"));
         blockExternal = Boolean.parseBoolean((String) section.get("blockExternal"));
         recordingPath = recordingPath.replace("{milliseconds}", Calendar.getInstance().getTimeInMillis() + "");

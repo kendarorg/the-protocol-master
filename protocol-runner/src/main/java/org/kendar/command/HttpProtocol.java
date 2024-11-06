@@ -2,6 +2,9 @@ package org.kendar.command;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.kendar.HttpTcpServer;
 import org.kendar.filters.AlwaysActivePlugin;
@@ -33,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -85,25 +89,44 @@ public class HttpProtocol extends CommonProtocol {
         options.addOption(createOpt("hs","https", true, "Https port (def 4443)"));
         options.addOption(createOpt("prx","proxy", true, "Http/s proxy port (def 9999)"));
         options.addOption(createOpt("ap","apis", true, "The base url for special TPM controllers (def specialApisRoot)"));
+        options.addOption(createOpt("prp", "replay", false, "Replay from log/replay source."));
+        options.addOption(createOpt("prc", "record", false, "Record to log/replay source."));
+        options.addOption(createOpt("plid","replayid", true, "Set an id for the replay instance (default to timestamp_uuid)."));
+        options.addOption(createOpt("ae","allowExternal", false, "Allow external calls during replay ."));
 
-        options.addOption(createOpt("jcns","cname", true, "Root cname"));
+        options.addOption(createOpt("cn","cname", true, "Root cname"));
         options.addOption("der", true, "Root certificate");
         options.addOption("key", true, "Root certificate keys");
 
-
-        options.addOption("record", false, "Set if recording");
-
-        options.addOption("replay", false, "Set if replaying");
         options.addOption(createOpt("be","blockExternal", false, "Set if should block external sites replaying"));
 
         options.addOption("showError", true, "The error to show (404/500 etc)");
         options.addOption("errorPercent", true, "The error percent to generate (default 50)");
         if (!isExecute) return;
-        setData(args, options, go);
+        setCommonData(args, options, go);
     }
 
-    private void setData(String[] args, Options options, Ini ini) throws Exception {
+    protected void setCommonData(String[] args, Options options, Ini ini) throws Exception {
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+        var section = cmd.getOptionValue("protocol");
+        ini.putValue(section, "port.http", Integer.parseInt(cmd.getOptionValue("http", "4080")));
+        ini.putValue(section, "port.https", Integer.parseInt(cmd.getOptionValue("https", "4443")));
+        ini.putValue(section, "port.proxy", Integer.parseInt(cmd.getOptionValue("proxy", "9999")));
+        ini.putValue(section, "apis", cmd.getOptionValue("apis", "specialApisRoot"));
+        ini.putValue(section+"-ssl", "cname", cmd.getOptionValue("cname", "C=US,O=Local Development,CN=local.org"));
+        ini.putValue(section+"-ssl", "der", cmd.getOptionValue("der", "resource://certificates/ca.der"));
+        ini.putValue(section+"-ssl", "key", cmd.getOptionValue("key", "resource://certificates/ca.key"));
 
+        if (cmd.hasOption("replay")) {
+            ini.putValue(section+"-mock-plugin", "active", true);
+            ini.putValue(section+"-mock-plugin", "replay", cmd.hasOption("replay"));
+            ini.putValue(section+"-mock-plugin", "respectcallduration", cmd.hasOption("cdt"));
+            ini.putValue(section+"-mock-plugin", "replayid", cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
+            ini.putValue(section+"-mock-plugin", "blockExternal", !cmd.hasOption("allowExternal"));
+        }else if (cmd.hasOption("record")) {
+            ini.putValue(section+"-recording-plugin", "active", true);
+        }
     }
 
     @Override
@@ -131,8 +154,8 @@ public class HttpProtocol extends CommonProtocol {
             ps.setIsRunning(() -> stopWhenFalse.get());
             log.debug("Started waiter");
 
-            var port = ini.getValue(sectionKey, "http.port", Integer.class, 4080);
-            var httpsPort = ini.getValue(sectionKey, "https.port", Integer.class, 4443);
+            var port = ini.getValue(sectionKey, "port.http", Integer.class, 4080);
+            var httpsPort = ini.getValue(sectionKey, "port.https", Integer.class, 4443);
             var proxyPort = ini.getValue(sectionKey, "port.proxy", Integer.class, 9999);
 //        log.info("LISTEN HTTP: " + port);
 //        log.info("LISTEN HTTPS: " + httpsPort);

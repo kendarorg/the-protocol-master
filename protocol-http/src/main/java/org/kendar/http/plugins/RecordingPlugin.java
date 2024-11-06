@@ -101,7 +101,7 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
 
     @Override
     public void initialize(Map<String, Object> section) {
-        var recordingPath = (String) section.get("recordingPath");
+        var recordingPath = (String) section.get("datadir");
         setupSitesToRecord((String) section.get("recordSites"));
         recordingPath = recordingPath.replace("{milliseconds}", Calendar.getInstance().getTimeInMillis() + "");
         repository = Path.of(recordingPath);
