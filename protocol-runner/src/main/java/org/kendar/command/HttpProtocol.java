@@ -71,8 +71,23 @@ public class HttpProtocol extends CommonProtocol{
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String sectionKey, Ini ini, String protocol,
                       StorageRepository storage, ArrayList<FilterDescriptor> filters, Supplier<Boolean> stopWhenFalseAction) {
+        var ps = new HttpTcpServer(null);
         try {
+
             AtomicBoolean stopWhenFalse = new AtomicBoolean(true);
+            AtomicBoolean waiterBlock = new AtomicBoolean(true);
+
+            ps.setRunner(() -> {
+                new Thread(() -> {
+                    while (stopWhenFalseAction.get() && waiterBlock.get()) {
+                        Sleeper.sleep(100);
+                    }
+                    stopWhenFalse.set(false);
+                }).start();
+            });
+
+            ps.setIsRunning(() -> stopWhenFalse.get());
+
             var port = ini.getValue(sectionKey, "http.port", Integer.class, 8085);
             var httpsPort = ini.getValue(sectionKey, "https.port", Integer.class, port + 400);
             var proxyPort = ini.getValue(sectionKey, "port.proxy", Integer.class, 9999);
@@ -93,13 +108,21 @@ public class HttpProtocol extends CommonProtocol{
 
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
             var httpServer = HttpServer.create(address, backlog);
+            ps.setStop(() -> {
+                waiterBlock.set(false);
+                httpServer.stop(0);
+            });
 
             var der = ini.getValue(sectionKey + "-ssl", "der", String.class, "resources://certificates/ca.der");
             var key = ini.getValue(sectionKey + "-ssl", "key", String.class, "resources://certificates/ca.key");
             var cname = ini.getValue(sectionKey + "-ssl", "cname", String.class, "C=US,O=Local Development,CN=local.org");
 
             var httpsServer = createHttpsServer(certificatesManager, sslAddress, backlog, cname, der, key);
-
+            ps.setStop(() -> {
+                waiterBlock.set(false);
+                httpsServer.stop(0);
+                httpServer.stop(0);
+            });
 
             var proxy = new ProxyServer(proxyPort)
                     .withHttpRedirect(port).withHttpsRedirect(httpsPort)
@@ -116,6 +139,12 @@ public class HttpProtocol extends CommonProtocol{
                     ignoringHosts("firefox.settings.services.mozilla.com").
                     ignoringHosts("incoming.telemetry.mozilla.org").
                     ignoringHosts("push.services.mozilla.com");
+            ps.setStop(() -> {
+                waiterBlock.set(false);
+                proxy.stop();
+                httpsServer.stop(0);
+                httpServer.stop(0);
+            });
             new Thread(proxy).start();
 
             var globalFilter = new GlobalFilter();
@@ -157,21 +186,7 @@ public class HttpProtocol extends CommonProtocol{
             httpsServer.start();
             httpServer.start();
 
-            var ps = new HttpTcpServer(null);
-            ps.setRunner(() -> {
-                new Thread(() -> {
-                    while (stopWhenFalseAction.get()) {
-                        Sleeper.sleep(100);
-                    }
-                    stopWhenFalse.set(false);
-                }).start();
-            });
-            ps.setIsRunning(() -> stopWhenFalse.get());
-            ps.setStop(() -> {
-                proxy.terminate();
-                httpsServer.stop(0);
-                httpServer.stop(0);
-            });
+
             protocolServer.put(sectionKey, ps);
         }catch (Exception ex){
             try {
