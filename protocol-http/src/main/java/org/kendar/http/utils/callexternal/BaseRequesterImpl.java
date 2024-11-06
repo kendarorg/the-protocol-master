@@ -138,7 +138,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                     } else {
                         var type = part.getContentType();
                         if (type == null) {
-                            type = "text/plain";
+                            type = ConstantsMime.TEXT;
                         }
                         builder.addTextBody(
                                 part.getFieldName(), part.getStringData(), ContentType.create(type));

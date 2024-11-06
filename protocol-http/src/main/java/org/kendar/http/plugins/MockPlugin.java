@@ -7,6 +7,7 @@ import org.kendar.http.utils.MimeChecker;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
+import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.utils.Md5Tester;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
@@ -143,7 +144,7 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
         }
         if (blockExternal) {
             response.setStatusCode(404);
-            response.addHeader(ConstantsHeader.CONTENT_TYPE, "text/plain");
+            response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
             response.setResponseText("Page Not Found: " + request.getMethod() + " on " + request.buildUrl());
             return true;
         }
