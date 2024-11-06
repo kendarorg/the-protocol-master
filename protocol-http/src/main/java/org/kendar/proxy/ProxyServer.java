@@ -55,9 +55,21 @@ public class ProxyServer extends Thread {
         return this;
     }
 
+    public void terminate(){
+
+        try {
+            serverSocket.close();
+        } catch (Exception e) {
+
+        }
+    }
+
+    ServerSocket serverSocket = null;
     @Override
     public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+
+        try (var ss = new ServerSocket(port)) {
+            serverSocket = ss;
             Socket socket;
             try {
                 while ((socket = serverSocket.accept()) != null) {
