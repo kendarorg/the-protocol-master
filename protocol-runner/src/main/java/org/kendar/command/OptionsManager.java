@@ -36,7 +36,7 @@ public class OptionsManager {
         var options = getMainOptions();
         try {
             CommandLineParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args);
+            CommandLine cmd = parser.parse(options, args,true);
             var isExecute = false;
             if (cmd.hasOption("cfg")) {
                 var ini = new Ini();
@@ -45,25 +45,25 @@ public class OptionsManager {
                 return ini;
             }else if (cmd.hasOption("help")) {
                 var helpValue = cmd.getOptionValue("help");
-                checkOptions(cmd,"help");
+                checkOptions(helpValue);
                 runWithParams(args, helpValue, isExecute,null,options);
                 throw new Exception();
             }else{
                 isExecute = true;
 
                 var datadir = cmd.getOptionValue("datadir");
-                var pluginsDir = cmd.getOptionValue("pluginsDir");
+                var pluginsDir = cmd.getOptionValue("pluginsDir","plugins");
                 var protocol = cmd.getOptionValue("protocol");
                 var loglevel = cmd.getOptionValue("loglevel","ERROR");
                 var logType = cmd.getOptionValue("logType","file");
-                checkOptions(cmd,"datadir","pluginsDir","protocol");
+                checkOptions(datadir,pluginsDir,protocol);
                 var ini = new Ini();
                 ini.putValue("global","datadir",datadir);
                 ini.putValue("global","pluginsDir",pluginsDir);
                 ini.putValue("global","loglevel",loglevel);
                 ini.putValue("global","logType",logType);
 
-                ini.putValue("["+protocol+"]","protocol",protocol);
+                ini.putValue(protocol,"protocol",protocol);
                 runWithParams(args,protocol, isExecute,ini, options);
                 return ini;
             }
@@ -74,9 +74,9 @@ public class OptionsManager {
         return null;
     }
 
-    private void checkOptions(CommandLine cmd, String ... args) throws Exception {
+    private void checkOptions(String ... args) throws Exception {
         for(var arg:args){
-            if(cmd.getOptionValue(arg)==null){
+            if(arg==null){
                 throw new Exception();
             }
         }

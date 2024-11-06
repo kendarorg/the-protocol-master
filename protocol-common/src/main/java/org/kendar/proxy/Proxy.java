@@ -20,7 +20,7 @@ public abstract class Proxy<T extends Storage> {
     /**
      * Descriptor (of course network like)
      */
-    public NetworkProtoDescriptor protocol;
+    private NetworkProtoDescriptor protocol;
     protected boolean replayer;
     /**
      * (Eventual) storage

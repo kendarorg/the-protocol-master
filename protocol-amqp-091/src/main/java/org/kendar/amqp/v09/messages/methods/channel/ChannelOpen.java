@@ -51,6 +51,7 @@ public class ChannelOpen extends Channel {
         var channelOpen = new ChannelOpen();
         channelOpen.setChannel(channel);
         channelOpen.setReserved1(reserved1);
+        context.getChannels().add(channel);
 
         var chok = new ChannelOpenOk();
         chok.setChannel(channel);

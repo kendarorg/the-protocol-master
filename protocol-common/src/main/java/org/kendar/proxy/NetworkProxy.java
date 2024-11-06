@@ -157,7 +157,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         long start = System.currentTimeMillis();
 
         var sock = (NetworkProxySocket) connection.getConnection();
-        sock.write(of, protocol.buildBuffer());
+        sock.write(of, getProtocol().buildBuffer());
         var jsonRes = mapper.toJsonNode("{\"type\":null,\"data\":null}");
         long end = System.currentTimeMillis();
         for(var filter:getFilters(ProtocolPhase.POST_CALL,of, new Object())){
@@ -244,7 +244,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
         long start = System.currentTimeMillis();
 
         var sock = (NetworkProxySocket) connection.getConnection();
-        var bufferToWrite = protocol.buildBuffer();
+        var bufferToWrite = getProtocol().buildBuffer();
         sock.write(of, bufferToWrite);
         var returnMessages = sock.read(toRead, optional);
         for (var item : returnMessages) {

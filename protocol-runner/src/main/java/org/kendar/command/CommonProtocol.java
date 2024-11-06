@@ -32,8 +32,8 @@ public abstract class CommonProtocol {
     protected void setCommonData(String[] args, Options options, Ini ini) throws Exception {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
-        var section = "[" + cmd.getOptionValue("protocol") + "]";
-        ini.putValue(section, "listen", Integer.parseInt(cmd.getOptionValue("port", getDefaultPort())));
+        var section = cmd.getOptionValue("protocol");
+        ini.putValue(section, "port", Integer.parseInt(cmd.getOptionValue("port", getDefaultPort())));
         ini.putValue(section, "protocol", cmd.getOptionValue("protocol"));
 
         if (cmd.hasOption("replay")) {
@@ -41,12 +41,12 @@ public abstract class CommonProtocol {
             ini.putValue(section, "respectcallduration", cmd.hasOption("cdt"));
             ini.putValue(section, "replayid", cmd.getOptionValue("plid", UUID.randomUUID().toString()));
         } else {
-            if (cmd.getOptionValue("xc") == null) {
+            if (cmd.getOptionValue("connection") == null) {
                 throw new Exception();
             }
             ini.putValue(section, "connection", cmd.getOptionValue("connection"));
         }
-        ini.putValue(section, "timeout", Integer.parseInt(cmd.getOptionValue("timeout", getDefaultPort())));
+        ini.putValue(section, "timeout", Integer.parseInt(cmd.getOptionValue("timeout", "30")));
         parseExtra(ini, cmd);
     }
 

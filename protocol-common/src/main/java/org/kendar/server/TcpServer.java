@@ -2,7 +2,6 @@ package org.kendar.server;
 
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -95,6 +94,7 @@ public class TcpServer {
         ExecutorService executor = Executors.newCachedThreadPool();
         AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(executor);
         protoDescriptor.cleanCounters();
+        protoDescriptor.start();
 
         try (AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group)) {
             this.server = server;
@@ -171,6 +171,8 @@ public class TcpServer {
                     log.trace("Execution exception", e);
                 }
             }
+        }finally {
+            protoDescriptor.terminate();
         }
     }
 

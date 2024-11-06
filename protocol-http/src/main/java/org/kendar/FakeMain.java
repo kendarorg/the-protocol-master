@@ -1,6 +1,6 @@
 package org.kendar;
 
-public class Main {
+public class FakeMain {
 
    /* private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static GlobalFilter globalFilter;

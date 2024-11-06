@@ -45,7 +45,7 @@ public class JdbcProtocol extends CommonProtocol{
         setCommonData(args,options,go);
     }
     protected void parseExtra(Ini result, CommandLine cmd){
-        var section = "["+cmd.getOptionValue("protocol")+"]";
+        var section = cmd.getOptionValue("protocol");
         parseLoginPassword(result, cmd, section);
         result.putValue(section,"schema",cmd.getOptionValue("schema"));
         result.putValue(section,"replaceQueryFile",cmd.getOptionValue("replaceQueryFile"));
@@ -99,9 +99,9 @@ public class JdbcProtocol extends CommonProtocol{
         String driver = "";
         if(protocol.equalsIgnoreCase("postgres")) {
             driver = "org.postgresql.Driver";
-            baseProtocol = new PostgresProtocol(ini.getValue(key,"port",Integer.class));
+            baseProtocol = new PostgresProtocol(ini.getValue(key,"port",Integer.class,5432 ));
         }else if(protocol.equalsIgnoreCase("mysql")) {
-            baseProtocol = new MySQLProtocol(ini.getValue(key,"port",Integer.class));
+            baseProtocol = new MySQLProtocol(ini.getValue(key,"port",Integer.class,3306 ));
         }
 
         var proxy = new JdbcProxy(driver,
@@ -112,22 +112,22 @@ public class JdbcProtocol extends CommonProtocol{
         if (protocol.equalsIgnoreCase("mysql")) {
             storage = new MySqlStorageHandler(repo);
         }
-        if (ini.getValue(key,"replay",Boolean.class)) {
+        if (ini.getValue(key,"replay",Boolean.class,false )) {
             proxy = new JdbcProxy(storage);
         } else {
             proxy.setStorage(storage);
         }
         proxy.setFilters(filters);
-        var jdbcReplaceQueries = ini.getValue(key,"replaceQueryFile",String.class);
+        var jdbcReplaceQueries = ini.getValue(key,"replaceQueryFile",String.class,null);
         if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
 
             handleReplacementQueries(jdbcReplaceQueries, proxy);
         }
         baseProtocol.setProxy(proxy);
-        baseProtocol.setTimeout(ini.getValue(key,"timeout",Integer.class));
+        baseProtocol.setTimeout(ini.getValue(key,"timeout",Integer.class,30));
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        ps.useCallDurationTimes(ini.getValue(key,"respectcallduration",Boolean.class));
+        ps.useCallDurationTimes(ini.getValue(key,"respectcallduration",Boolean.class,false));
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key,ps);

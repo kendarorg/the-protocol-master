@@ -1,33 +1,13 @@
 package org.kendar.command;
 
-import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.cli.Options;
 import org.kendar.filters.FilterDescriptor;
-import org.kendar.http.MasterHandler;
-import org.kendar.http.plugins.ErrorFilter;
-import org.kendar.http.plugins.GlobalFilter;
-import org.kendar.http.plugins.MockFilter;
-import org.kendar.http.plugins.RecordingFilter;
-import org.kendar.http.utils.ConnectionBuilderImpl;
-import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
-import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
-import org.kendar.http.utils.dns.DnsMultiResolverImpl;
-import org.kendar.http.utils.filters.FilteringClassesHandlerImpl;
-import org.kendar.http.utils.rewriter.SimpleRewriterHandlerImpl;
-import org.kendar.http.utils.ssl.CertificatesManager;
-import org.kendar.http.utils.ssl.FileResourcesUtils;
-import org.kendar.proxy.ProxyServer;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.generic.StorageRepository;
-import org.kendar.utils.Sleeper;
 import org.kendar.utils.ini.Ini;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class HttpProtocol extends CommonProtocol{
@@ -65,7 +45,7 @@ public class HttpProtocol extends CommonProtocol{
     }
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<FilterDescriptor> filters, Supplier<Boolean> stopWhenFalseAction) {
-        AtomicBoolean stopWhenFalse = new AtomicBoolean(true);
+   /*     AtomicBoolean stopWhenFalse = new AtomicBoolean(true);
         var port = ini.getValue(sectionKey, "http.port", Integer.class, 8085);
         var httpsPort = ini.getValue(sectionKey, "https.port", Integer.class, port + 400);
         var proxyPort = ini.getValue(sectionKey, "port.proxy", Integer.class, 9999);
@@ -154,7 +134,7 @@ public class HttpProtocol extends CommonProtocol{
                 Sleeper.sleep(100);
             }
             stopWhenFalse.set(false);
-        }).start();
+        }).start();*/
     }
 
     @Override

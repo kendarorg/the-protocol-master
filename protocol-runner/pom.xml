@@ -108,7 +108,7 @@
                         <configuration>
                             <finalName>protocol-runner</finalName>
                             <mainClass>
-                                org.kendar.Main
+                                org.kendar.OldMain
                             </mainClass>
                         </configuration>
                     </execution>

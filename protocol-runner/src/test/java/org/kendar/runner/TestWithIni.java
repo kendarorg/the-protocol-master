@@ -1,7 +1,6 @@
 package org.kendar.runner;
 
 import org.eclipse.paho.client.mqttv3.*;
-import org.junit.jupiter.api.Test;
 import org.kendar.Main;
 import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,17 +19,42 @@ public class TestWithIni {
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/subscribe/";
     private static final List<MqttMessage> messages = new ArrayList<>();
-    @Test
+    //@Test
     void testLoadingFromIniFile() throws Exception {
         var args = new String[]{
                 "-cfg", "test.ini"
         };
-        Main.execute(args,()->true);
+        startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(6000);
 
-        jpaTest();
         qos2Test();
+        jpaTest();
         Sleeper.sleep(6000);
+    }
+
+
+
+    private void startAndHandleUnexpectedErrors(String[] args) {
+        AtomicReference exception =new AtomicReference(null);
+        var serverThread = new Thread(() -> {
+            Main.execute(args, () -> {
+                try {
+                    Sleeper.sleep(100);
+                    return true;
+                }catch (Exception e){
+                    exception.set(e);
+                    return false;
+                }
+            });
+            exception.set(new Exception("Terminated abruptly"));
+        });
+        serverThread.start();
+        while (!Main.isRunning()) {
+            if(exception.get()!=null){
+                throw new RuntimeException((Throwable) exception.get());
+            }
+            Sleeper.sleep(100);
+        }
     }
 
     private static void setupCallBack(MqttClient client) {

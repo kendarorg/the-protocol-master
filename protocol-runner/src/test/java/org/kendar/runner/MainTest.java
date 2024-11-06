@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,25 +44,16 @@ public class MainTest extends BasicTest {
         var timestampForThisRun = "" + new Date().getTime();
         //RECORDING
         var args = new String[]{
-                "-p", "postgres",
-                "-l", "" + FAKE_PORT,
-                "-xl", postgresContainer.getUserId(),
-                "-xw", postgresContainer.getPassword(),
-                "-xc", postgresContainer.getJdbcUrl(),
-                "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
-                "-v", "DEBUG"
+                "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-loglevel", "DEBUG",
+                "-protocol", "postgres",
+                "-port", "" + FAKE_PORT,
+                "-login", postgresContainer.getUserId(),
+                "-password", postgresContainer.getPassword(),
+                "-connection", postgresContainer.getJdbcUrl()
         };
 
-        var serverThread = new Thread(() -> {
-            Main.execute(args, () -> {
-                Sleeper.sleep(100);
-                return runTheServer.get();
-            });
-        });
-        serverThread.start();
-        while (!Main.isRunning()) {
-            Sleeper.sleep(100);
-        }
+        startAndHandleUnexpectedErrors(args);
 
 
         Connection c = getProxyConnection();
@@ -102,25 +94,18 @@ public class MainTest extends BasicTest {
         var timestampForThisRun = "" + new Date().getTime();
         //RECORDING
         var args = new String[]{
-                "-p", "postgres",
-                "-l", "" + FAKE_PORT,
-                "-xl", postgresContainer.getUserId(),
-                "-xw", postgresContainer.getPassword(),
-                "-xc", postgresContainer.getJdbcUrl(),
-                "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
-                "-v", "DEBUG"
+
+                "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-loglevel", "DEBUG",
+                "-protocol", "postgres",
+                "-port", "" + FAKE_PORT,
+                "-login", postgresContainer.getUserId(),
+                "-password", postgresContainer.getPassword(),
+                "-connection", postgresContainer.getJdbcUrl()
         };
 
-        var serverThread = new Thread(() -> {
-            Main.execute(args, () -> {
-                Sleeper.sleep(100);
-                return runTheServer.get();
-            });
-        });
-        serverThread.start();
-        while (!Main.isRunning()) {
-            Sleeper.sleep(100);
-        }
+
+        startAndHandleUnexpectedErrors(args);
 
 
         HibernateSessionFactory.initialize("org.postgresql.Driver",
@@ -158,26 +143,18 @@ public class MainTest extends BasicTest {
         verifyTestRun.set(false);
 
         var replayArgs = new String[]{
-                "-p", "postgres",
-                "-l", "" + FAKE_PORT,
-                "-xl", postgresContainer.getUserId(),
-                "-xw", postgresContainer.getPassword(),
-                "-xc", postgresContainer.getJdbcUrl(),
-                "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
-                "-pl",
-                "-v", "DEBUG"
+                "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-loglevel", "DEBUG",
+                "-protocol", "postgres",
+                "-port", "" + FAKE_PORT,
+                "-login", postgresContainer.getUserId(),
+                "-password", postgresContainer.getPassword(),
+                "-connection", postgresContainer.getJdbcUrl(),
+                "-replay"
         };
 
-        serverThread = new Thread(() -> {
-            Main.execute(replayArgs, () -> {
-                Sleeper.sleep(100);
-                return runTheServer.get();
-            });
-        });
-        serverThread.start();
-        while (!Main.isRunning()) {
-            Sleeper.sleep(100);
-        }
+
+        startAndHandleUnexpectedErrors(replayArgs);
 
         System.out.println("START SIMULATION ==============================================");
         HibernateSessionFactory.initialize("org.postgresql.Driver",
@@ -215,26 +192,19 @@ public class MainTest extends BasicTest {
     void testTimeout() throws Exception {
         var timestampForThisRun = "" + new Date().getTime();
         var args = new String[]{
-                "-p", "postgres",
-                "-l", "" + FAKE_PORT,
-                "-xl", postgresContainer.getUserId(),
-                "-xw", postgresContainer.getPassword(),
-                "-xc", postgresContainer.getJdbcUrl(),
-                "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
-                "-v", "DEBUG",
-                "-t", "4"
+
+                "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-loglevel", "DEBUG",
+                "-protocol", "postgres",
+                "-timeout", "4",
+                "-port", "" + FAKE_PORT,
+                "-login", postgresContainer.getUserId(),
+                "-password", postgresContainer.getPassword(),
+                "-connection", postgresContainer.getJdbcUrl(),
         };
 
-        var serverThread = new Thread(() -> {
-            Main.execute(args, () -> {
-                Sleeper.sleep(100);
-                return runTheServer.get();
-            });
-        });
-        serverThread.start();
-        while (!Main.isRunning()) {
-            Sleeper.sleep(100);
-        }
+
+        startAndHandleUnexpectedErrors(args);
 
 
         Connection c = getProxyConnection();
@@ -281,25 +251,17 @@ public class MainTest extends BasicTest {
     void testErrorSelect() throws Exception {
         var timestampForThisRun = "" + new Date().getTime();
         var args = new String[]{
-                "-p", "postgres",
-                "-l", "" + FAKE_PORT,
-                "-xl", postgresContainer.getUserId(),
-                "-xw", postgresContainer.getPassword(),
-                "-xc", postgresContainer.getJdbcUrl(),
-                "-xd", Path.of("target", "tests", timestampForThisRun).toString(),
-                "-v", "DEBUG"
+                "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-loglevel", "DEBUG",
+                "-protocol", "postgres",
+                "-port", "" + FAKE_PORT,
+                "-login", postgresContainer.getUserId(),
+                "-password", postgresContainer.getPassword(),
+                "-connection", postgresContainer.getJdbcUrl()
         };
 
-        var serverThread = new Thread(() -> {
-            Main.execute(args, () -> {
-                Sleeper.sleep(100);
-                return runTheServer.get();
-            });
-        });
-        serverThread.start();
-        while (!Main.isRunning()) {
-            Sleeper.sleep(100);
-        }
+
+        startAndHandleUnexpectedErrors(args);
 
 
         Connection c = getProxyConnection();
@@ -333,5 +295,28 @@ public class MainTest extends BasicTest {
 
         runTheServer.set(false);
         Main.stop();
+    }
+
+    private void startAndHandleUnexpectedErrors(String[] args) {
+        AtomicReference exception =new AtomicReference(null);
+        var serverThread = new Thread(() -> {
+            Main.execute(args, () -> {
+                try {
+                    Sleeper.sleep(100);
+                    return runTheServer.get();
+                }catch (Exception e){
+                    exception.set(e);
+                    return false;
+                }
+            });
+            exception.set(new Exception("Terminated abruptly"));
+        });
+        serverThread.start();
+        while (!Main.isRunning()) {
+            if(exception.get()!=null){
+                throw new RuntimeException((Throwable) exception.get());
+            }
+            Sleeper.sleep(100);
+        }
     }
 }

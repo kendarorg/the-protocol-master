@@ -237,4 +237,12 @@ public abstract class ProtoDescriptor {
     public Map<String, ProtoState> getTaggedStates() {
         return taggedStates;
     }
+
+    public void terminate() {
+
+    }
+
+    public void start() {
+
+    }
 }

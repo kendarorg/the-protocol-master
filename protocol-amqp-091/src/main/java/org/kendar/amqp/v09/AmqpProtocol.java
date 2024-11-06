@@ -19,7 +19,6 @@ import org.kendar.amqp.v09.messages.methods.exchange.ExchangeDeclare;
 import org.kendar.amqp.v09.messages.methods.exchange.ExchangeDelete;
 import org.kendar.amqp.v09.messages.methods.exchange.ExchangeUnbind;
 import org.kendar.amqp.v09.messages.methods.queue.*;
-import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -29,14 +28,17 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
+import org.kendar.utils.Sleeper;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AmqpProtocol extends NetworkProtoDescriptor {
 
     private static final boolean IS_BIG_ENDIAN = true;
     private static final int PORT = 5672;
-    public static ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
+    private ConcurrentHashMap<Integer, AmqpProtoContext> consumeContext;
+
 
     private int port = PORT;
 
@@ -95,6 +97,32 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
                         new ConnectionClose(AmqpFrame.class)
                 )
         );
+
+    }
+
+    public void start() {
+        new Thread(()->sendHeartbeat()).start();
+    }
+
+    private void sendHeartbeat() {
+        while(running.get()){
+            for(var ctx:consumeContext.values()){
+                for(var ch:ctx.getChannels()){
+                    var hb = new HearthBeatFrame();
+                    hb.setChannel(ch);
+                    hb.setProtoDescriptor(this);
+                    ctx.write(hb);
+                }
+            }
+            Sleeper.sleep(30000);
+        }
+    }
+
+    AtomicBoolean running = new AtomicBoolean(true);
+
+    @Override
+    public void terminate() {
+        running.set(false);
     }
 
     @Override
@@ -111,5 +139,9 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     @Override
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId) {
         return new AmqpProtoContext(this, contextId);
+    }
+
+    public ConcurrentHashMap<Integer, AmqpProtoContext> getConsumeContext() {
+        return consumeContext;
     }
 }
