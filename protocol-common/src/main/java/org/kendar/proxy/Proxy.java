@@ -1,8 +1,8 @@
 package org.kendar.proxy;
 
 import org.kendar.filters.PluginDescriptor;
-import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.storage.Storage;

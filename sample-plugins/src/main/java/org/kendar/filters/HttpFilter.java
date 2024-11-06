@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @Extension
-public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> implements AlwaysActivePlugin{
+public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> implements AlwaysActivePlugin {
     @Override
     public boolean handle(ProtocolPhase phase, Request in, Response out) {
         return false;

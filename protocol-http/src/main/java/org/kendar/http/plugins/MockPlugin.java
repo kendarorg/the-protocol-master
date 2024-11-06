@@ -1,8 +1,8 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.utils.MimeChecker;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;

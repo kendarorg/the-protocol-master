@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @Extension
-public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectResult> implements AlwaysActivePlugin{
+public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectResult> implements AlwaysActivePlugin {
     @Override
     public boolean handle(ProtocolPhase phase, JdbcCall in, SelectResult out) {
         return false;
@@ -16,6 +16,7 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
 
     /**
      * Only PRE_CALL and POST_CALL for things different from http
+     *
      * @return
      */
     @Override

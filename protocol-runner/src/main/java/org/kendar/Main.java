@@ -112,7 +112,7 @@ public class Main {
             for (var availableFilter : availableFilters) {
                 var sectionId = id + "-" + availableFilter.getId();
                 var section = ini.getSection(sectionId);
-                if ((section != null && !section.isEmpty())||availableFilter instanceof AlwaysActivePlugin) {
+                if ((section != null && !section.isEmpty()) || availableFilter instanceof AlwaysActivePlugin) {
                     var clonedFilter = availableFilter.clone();
                     filters.add(clonedFilter);
                 }

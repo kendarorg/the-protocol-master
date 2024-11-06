@@ -53,7 +53,7 @@ public class OptionsManager {
             } else {
                 isExecute = true;
 
-                var datadir = cmd.getOptionValue("datadir","data");
+                var datadir = cmd.getOptionValue("datadir", "data");
                 var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
                 var protocol = cmd.getOptionValue("protocol");
                 var loglevel = cmd.getOptionValue("loglevel", "ERROR");

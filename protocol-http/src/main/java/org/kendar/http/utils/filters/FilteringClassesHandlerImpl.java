@@ -2,8 +2,8 @@ package org.kendar.http.utils.filters;
 
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.kendar.filters.PluginDescriptor;
-import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 

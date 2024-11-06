@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 @Extension
-public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, ChannelOpenOk> implements AlwaysActivePlugin{
+public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, ChannelOpenOk> implements AlwaysActivePlugin {
 
 
     /**
      * Only PRE_CALL and POST_CALL for things different from http
+     *
      * @return
      */
     @Override

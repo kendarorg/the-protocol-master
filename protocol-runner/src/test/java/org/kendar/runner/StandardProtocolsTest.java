@@ -19,11 +19,6 @@ public class StandardProtocolsTest extends BasicTest {
 
     private AtomicBoolean runTheServer = new AtomicBoolean(true);
 
-    @BeforeEach
-    public void beforeEach() throws IOException {
-        runTheServer.set(true);
-    }
-
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();
@@ -33,6 +28,11 @@ public class StandardProtocolsTest extends BasicTest {
     @AfterAll
     public static void afterClass() throws Exception {
         afterClassBase();
+    }
+
+    @BeforeEach
+    public void beforeEach() throws IOException {
+        runTheServer.set(true);
     }
 
     @AfterEach

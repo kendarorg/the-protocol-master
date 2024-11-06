@@ -37,6 +37,7 @@ public class HttpProtocolTest {
     static int FAKE_PORT_HTTP = 8087;
     static int FAKE_PORT_HTTPS = 8487;
     static int FAKE_PORT_PROXY = 9999;
+    private final AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     private static boolean listening(int port) throws IllegalStateException {
         try (Socket ignored = new Socket("localhost", port)) {
@@ -48,8 +49,6 @@ public class HttpProtocolTest {
         }
     }
 
-    private final AtomicBoolean runTheServer = new AtomicBoolean(true);
-
     @BeforeEach
     public void beforeEach() throws IOException {
         runTheServer.set(true);
@@ -59,8 +58,8 @@ public class HttpProtocolTest {
     public void afterEach() {
         runTheServer.set(false);
         Main.stop();
-        Sleeper.sleep(500,()->{
-            var res = listening(8087)||listening(8487)||listening(9999);
+        Sleeper.sleep(500, () -> {
+            var res = listening(8087) || listening(8487) || listening(9999);
             return res;
         });
         System.out.println("COMPLETED");
@@ -105,8 +104,8 @@ public class HttpProtocolTest {
                 "-proxy", "" + FAKE_PORT_PROXY
         };
         startAndHandleUnexpectedErrors(args);
-        Sleeper.sleep(1000,()->{
-            var res = listening(8087)&&listening(8487)&&listening(9999);
+        Sleeper.sleep(1000, () -> {
+            var res = listening(8087) && listening(8487) && listening(9999);
             return !res;
         });
 

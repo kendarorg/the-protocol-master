@@ -40,6 +40,7 @@ import java.util.function.Supplier;
 
 public class HttpProtocol extends CommonProtocol {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
+
     private static HttpsServer createHttpsServer(CertificatesManager certificatesManager, InetSocketAddress sslAddress, int backlog, String cname, String der, String key) throws Exception {
         var httpsServer = new KendarHttpsServer(sslAddress, backlog);
 
@@ -71,6 +72,11 @@ public class HttpProtocol extends CommonProtocol {
             proxyConfig.getProxies().add(remoteServerStatus);
         }
         return proxyConfig;
+    }
+
+    private static boolean notGoodFilter(String sectionKey, Ini ini, PluginDescriptor filter) {
+        return !filter.getId().equalsIgnoreCase("global") &&
+                !ini.getValue(sectionKey + "-" + filter.getId(), "active", Boolean.class, false);
     }
 
     @Override
@@ -238,11 +244,6 @@ public class HttpProtocol extends CommonProtocol {
 
             }
         }
-    }
-
-    private static boolean notGoodFilter(String sectionKey, Ini ini, PluginDescriptor filter) {
-        return !filter.getId().equalsIgnoreCase("global") &&
-                !ini.getValue(sectionKey + "-" + filter.getId(), "active", Boolean.class, false);
     }
 
     @Override
