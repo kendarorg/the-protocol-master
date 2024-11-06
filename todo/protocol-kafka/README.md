@@ -1,3 +1,0 @@
-## Kafka Protocol
-
-## Documentation used

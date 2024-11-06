@@ -20,7 +20,6 @@
         <module>protocol-redis</module>
         <module>protocol-mqtt</module>
         <module>jacoco</module>
-        <module>todo</module>
         <module>protocol-http</module>
         <module>sample-plugins</module>
     </modules>

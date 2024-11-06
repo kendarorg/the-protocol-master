@@ -24,6 +24,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="protocol-todo" target="1.5" />
+      <module name="todo" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
