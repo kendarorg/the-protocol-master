@@ -37,7 +37,7 @@ public abstract class CommonProtocol {
         ini.putValue(section, "protocol", cmd.getOptionValue("protocol"));
 
         if (cmd.hasOption("replay")) {
-            ini.putValue(section, "shouldreplay", cmd.hasOption("replay"));
+            ini.putValue(section, "replay", cmd.hasOption("replay"));
             ini.putValue(section, "respectcallduration", cmd.hasOption("cdt"));
             ini.putValue(section, "replayid", cmd.getOptionValue("plid", UUID.randomUUID().toString()));
         } else {

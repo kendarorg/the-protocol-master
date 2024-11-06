@@ -487,7 +487,7 @@ public class OldMain {
     }
 
     private static void runWithConfigNonHttp(Supplier<Boolean> stopWhenFalse, String key, Ini ini, StorageRepository storage, String protocol, HashMap<String, List<FilterDescriptor>> filters) {
-        var replayFromLog = ini.getValue(key, "shouldreplay", Boolean.class, false);
+        var replayFromLog = ini.getValue(key, "replay", Boolean.class, false);
         var portVal = ini.getValue(key, "listen", String.class);
         var login = ini.getValue(key, "login", String.class);
         var password = ini.getValue(key, "password", String.class);
