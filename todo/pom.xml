@@ -8,7 +8,9 @@
     <artifactId>todo</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
-
+    <properties>
+        <revision>1.4.1</revision>
+    </properties>
 
     <modules>
         <module>protocol-amqp-100</module>
