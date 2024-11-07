@@ -179,4 +179,48 @@ public class HttpProtocolTest {
         }
         assertTrue(content.toLowerCase().contains("<title>google</title>"));
     }
+
+    @Test
+    void googleTestIni() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        var timestampForThisRun = "" + new Date().getTime();
+
+        var args = new String[]{
+
+                "-cfg", Path.of("google.json").toString()
+        };
+        startAndHandleUnexpectedErrors(args);
+        Sleeper.sleep(1000, () -> {
+            var res = listening(12080) && listening(12443) && listening(12081);
+            return res;
+        });
+
+        final var sslContext = new SSLContextBuilder()
+                .loadTrustMaterial(null, (x509CertChain, authType) -> true)
+                .build();
+
+        var proxy = new HttpHost("localhost", 12081, "http");
+        var routePlanner = new DefaultProxyRoutePlanner(proxy);
+        var httpclient = HttpClients.custom()
+                .setSSLContext(sslContext)
+                .setConnectionManager(
+                        new PoolingHttpClientConnectionManager(
+                                RegistryBuilder.<ConnectionSocketFactory>create()
+                                        .register("http", PlainConnectionSocketFactory.INSTANCE)
+                                        .register("https", new SSLConnectionSocketFactory(sslContext,
+                                                NoopHostnameVerifier.INSTANCE))
+                                        .build()
+                        )).
+                setRoutePlanner(routePlanner).build();
+        var httpget = new HttpGet("https://www.google.com");
+        var httpresponse = httpclient.execute(httpget);
+        var sc = new Scanner(httpresponse.getEntity().getContent());
+
+        //Printing the status line
+        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+        var content = "";
+        while (sc.hasNext()) {
+            content += sc.nextLine();
+        }
+        assertTrue(content.toLowerCase().contains("<title>google</title>"));
+    }
 }

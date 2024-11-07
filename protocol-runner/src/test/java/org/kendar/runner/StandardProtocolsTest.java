@@ -47,7 +47,7 @@ public class StandardProtocolsTest extends BasicTest {
         var timestampForThisRun = "" + new Date().getTime();
         //RECORDING
         var args = new String[]{
-                "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-datadir", Path.of("target", "tests", timestampForThisRun).toAbsolutePath().toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "postgres",
                 "-port", "" + FAKE_PORT,

@@ -1,0 +1,54 @@
+{
+  "pluginsDir": "plugins",
+  "logLevel": "DEBUG",
+  "dataDir": "target/tests/{timestamp}",
+  "protocols": {
+    "http-01": {
+      "protocol": "http",
+      "http": 12080,
+      "https": 12443,
+      "proxy": 12081,
+      "apis": "specialApisRoot",
+      "ssl": {
+        "der": "resource://certificates/ca.der",
+        "key": "resource://certificates/ca.key",
+        "cname": "C=US,O=Local Development,CN=local.org",
+        "hosts": [
+        ]
+      },
+      "rewrites": [
+        {
+          "when": "http://localhost/google",
+          "then": "https://www.microsoft.com"
+        },
+        {
+          "when": "http://localhost/microsoft",
+          "then": "https://www.microsoft.com"
+        },
+        {
+          "when": "http://localhost/fake",
+          "then": "http://localhost:999",
+          "forceActive": true
+        }
+      ],
+      "plugins": {
+        "error-plugin": {
+          "errorCode": 0,
+          "errorMessage": "ERROR",
+          "percentage": 0
+        },
+        "mock-plugin": {
+          "replay": false,
+          "replayId": "replay{timestamp}",
+          "respectCallDuration": true,
+          "blockExternal": true,
+          "matchSites": []
+        },
+        "record-plugin": {
+          "record": false,
+          "recordSites": []
+        }
+      }
+    }
+  }
+}
