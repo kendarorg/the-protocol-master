@@ -69,16 +69,21 @@ public class HttpProtocolTest {
     private void startAndHandleUnexpectedErrors(String[] args) {
         AtomicReference exception = new AtomicReference(null);
         var serverThread = new Thread(() -> {
-            Main.execute(args, () -> {
-                try {
-                    Sleeper.sleep(100);
-                    return runTheServer.get();
-                } catch (Exception e) {
-                    exception.set(e);
-                    return false;
-                }
-            });
-            exception.set(new Exception("Terminated abruptly"));
+            try {
+                Main.execute(args, () -> {
+                    try {
+                        Sleeper.sleep(100);
+                        return runTheServer.get();
+                    } catch (Exception e) {
+                        exception.set(e);
+                        return false;
+                    }
+                });
+                exception.set(new Exception("Terminated abruptly"));
+            }catch (Exception e){
+                exception.set(new Exception("Terminated error",e));
+            }
+
         });
         serverThread.start();
         while (!Main.isRunning()) {

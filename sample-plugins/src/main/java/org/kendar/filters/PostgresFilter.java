@@ -1,11 +1,13 @@
 package org.kendar.filters;
 
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.pf4j.Extension;
 
 import java.util.List;
-import java.util.Map;
 
 @Extension
 public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectResult> implements AlwaysActivePlugin {
@@ -35,12 +37,23 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
     }
 
     @Override
-    public PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global) {
-        return this;
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+        return null;
     }
+
 
     @Override
     public void terminate() {
+
+    }
+
+    @Override
+    public Class<?> getSettingClass() {
+        return PostgresFilterSettings.class;
+    }
+
+    @Override
+    public void setSettings(PluginSettings plugin) {
 
     }
 }
