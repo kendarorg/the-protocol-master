@@ -54,6 +54,7 @@ public abstract class CommonProtocol {
                                  ByteProtocolSettings section) throws Exception {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
+        ini.getProtocols().put(getId(),section);
         section.setPort(Integer.parseInt(cmd.getOptionValue("port", getDefaultPort())));
         section.setProtocol(cmd.getOptionValue("protocol"));
         section.setConnectionString(cmd.getOptionValue("connection"));

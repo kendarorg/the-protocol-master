@@ -7,6 +7,9 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.kendar.command.*;
 import org.kendar.filters.PluginDescriptor;
+import org.kendar.http.plugins.ErrorPlugin;
+import org.kendar.http.plugins.MockPlugin;
+import org.kendar.http.plugins.RecordingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -46,10 +49,8 @@ public class Main {
         var options = OptionsManager.getMainOptions();
         HashMap<String, List<PluginDescriptor>> filters = new HashMap<>();
         CommandLine cmd = parser.parse(options, args, true);
-        if (cmd.hasOption("pluginsDir")) {
             var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
             filters = loadFilters(pluginsDir);
-        }
 
         var ini = om.run(cmd, args, filters);
         execute(ini, stopWhenFalse, filters);
@@ -111,6 +112,12 @@ public class Main {
             }
             filters.get(protocol).add(item);
         }
+        if(!filters.containsKey("http")){
+            filters.put("http", new ArrayList<>());
+        }
+        filters.get("http").addAll(List.of(
+                new RecordingPlugin(),
+                new ErrorPlugin(),new MockPlugin()));
         return filters;
     }
 

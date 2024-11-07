@@ -104,6 +104,8 @@ public class HttpProtocol extends CommonProtocol {
                                  HttpProtocolSettings section) throws Exception {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
+        ini.getProtocols().put(getId(),section);
+        section.setProtocol(getId());
         section.setHttp(Integer.parseInt(cmd.getOptionValue("http", "4080")));
         section.setHttps(Integer.parseInt(cmd.getOptionValue("https", "4443")));
         section.setProxy(Integer.parseInt(cmd.getOptionValue("proxy", "9999")));
@@ -227,9 +229,7 @@ public class HttpProtocol extends CommonProtocol {
             log.debug("Proxy created");
             new Thread(proxy).start();
 
-            filters.add(new RecordingPlugin());
-            filters.add(new ErrorPlugin());
-            filters.add(new MockPlugin());
+
             for (var i = filters.size() - 1; i >= 0; i--) {
                 var filter = filters.get(i);
                 filter.initialize(ini, pset);
