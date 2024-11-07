@@ -1,0 +1,86 @@
+{
+  "pluginsDir": "plugins",
+  "logLevel": "ERROR",
+  "dataDir": "data",
+  "protocols": {
+    "postgres-01": {
+      "protocol": "postgres",
+      "port": 5432,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connection": "jdbc:mysql://localhost:3306",
+      "simulation": {
+        "replay": false,
+        "record": false,
+        "mock": false,
+        "RespectCallDuration": true,
+        "ReplayId": "replay{timestamp}"
+      }
+    },
+    "mqtt-01": {
+      "protocol": "mqtt",
+      "port": 1885,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connection": "tcp://localhost:1885",
+      "simulation": {
+        "replay": false,
+        "record": false,
+        "mock": false,
+        "respectCallDuration": true,
+        "replayId": "replay{timestamp}"
+      }
+    },
+    "http-01": {
+      "protocol": "http",
+      "http": 8085,
+      "https": 8485,
+      "proxy": 9999,
+      "apis": "specialApisRoot",
+      "ssl": {
+        "der": "resource://certificates/ca.der",
+        "key": "resource://certificates/ca.key",
+        "cname": "C=US,O=Local Development,CN=local.org",
+        "hosts": [
+          "*.google.com",
+          "www.google.com"
+        ]
+      },
+      "rewrites": [
+        {
+          "when": "http://localhost/google",
+          "then": "https://www.microsoft.com"
+        },
+        {
+          "when": "http://localhost/microsoft",
+          "then": "https://www.microsoft.com"
+        },
+        {
+          "when": "http://localhost/fake",
+          "then": "http://localhost:999",
+          "forceActive": true
+        }
+      ],
+      "plugins": {
+        "error-plugin": {
+          "errorCode": 0,
+          "errorMessage": "ERROR",
+          "percentage": 0
+        },
+        "mock-plugin": {
+          "replay": false,
+          "replayId": "replay{timestamp}",
+          "respectCallDuration": true,
+          "blockExternal": true,
+          "matchSites": []
+        },
+        "record-plugin": {
+          "record": false,
+          "recordSites": []
+        }
+      }
+    }
+  }
+}

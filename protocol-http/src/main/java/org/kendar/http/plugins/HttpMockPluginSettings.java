@@ -8,7 +8,7 @@ import java.util.List;
 public class HttpMockPluginSettings extends PluginSettings {
     private boolean replay;
     private String replayId;
-    private boolean respectTimings;
+    private boolean respectCallDuration;
     private boolean blockExternal;
     private List<String> matchSites = new ArrayList<>();
 
@@ -36,12 +36,12 @@ public class HttpMockPluginSettings extends PluginSettings {
         this.replayId = replayId;
     }
 
-    public boolean isRespectTimings() {
-        return respectTimings;
+    public boolean isRespectCallDuration() {
+        return respectCallDuration;
     }
 
-    public void setRespectTimings(boolean respectTimings) {
-        this.respectTimings = respectTimings;
+    public void setRespectCallDuration(boolean respectCallDuration) {
+        this.respectCallDuration = respectCallDuration;
     }
 
     public void setBlockExternal(boolean blockExternal) {

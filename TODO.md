@@ -6,6 +6,7 @@
 * Publish on vn central
 * respectcallduration on http
 * REplace forcequeryfiles with "intercept" for jdbc  handleReplacementQueries()
+* Add replayId with timestamp
 
 * Use the interrupt to generate "preformed" events for the state chart
 * plid parameter to identify the run

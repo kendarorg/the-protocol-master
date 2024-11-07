@@ -1,9 +1,21 @@
 package org.kendar.http.settings;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HttpSSLSettings {
     private String cname;
     private String der;
     private String key;
+    private List<String> hosts = new ArrayList<String>();
+
+    public List<String> getHosts() {
+        return hosts;
+    }
+
+    public void setHosts(List<String> hosts) {
+        this.hosts = hosts;
+    }
 
     public void setCname(String cname) {
         this.cname = cname;

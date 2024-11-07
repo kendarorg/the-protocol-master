@@ -1,0 +1,37 @@
+{
+  "pluginsDir": "plugins",
+  "logLevel": "ERROR",
+  "dataDir": "data",
+  "protocols": {
+    "postgres-01": {
+      "protocol": "postgres",
+      "port": 5432,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connection": "jdbc:mysql://localhost:3306",
+      "simulation": {
+        "replay": false,
+        "record": false,
+        "mock": false,
+        "RespectCallDuration": true,
+        "ReplayId": "replay{timestamp}"
+      }
+    },
+    "mqtt-01": {
+      "protocol": "mqtt",
+      "port": 1885,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connection": "tcp://localhost:1885",
+      "simulation": {
+        "replay": false,
+        "record": false,
+        "mock": false,
+        "RespectCallDuration": true,
+        "ReplayId": "replay{timestamp}"
+      }
+    }
+  }
+}

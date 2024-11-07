@@ -44,10 +44,12 @@ import java.util.function.Supplier;
 public class HttpProtocol extends CommonProtocol {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
 
-    private static HttpsServer createHttpsServer(CertificatesManager certificatesManager, InetSocketAddress sslAddress, int backlog, String cname, String der, String key) throws Exception {
+    private static HttpsServer createHttpsServer(CertificatesManager certificatesManager,
+                                                 InetSocketAddress sslAddress, int backlog, String cname, String der,
+                                                 String key, List<String> hosts) throws Exception {
         var httpsServer = new KendarHttpsServer(sslAddress, backlog);
 
-        certificatesManager.setupSll(httpsServer, List.of(), cname, der, key);
+        certificatesManager.setupSll(httpsServer, hosts, cname, der, key);
         return httpsServer;
     }
 
@@ -120,7 +122,7 @@ public class HttpProtocol extends CommonProtocol {
             var pl = new HttpMockPluginSettings();
             pl.setPlugin("mock-plugin");
             pl.setReplay(true);
-            pl.setRespectTimings(cmd.hasOption("cdt"));
+            pl.setRespectCallDuration(cmd.hasOption("cdt"));
             pl.setReplayId(cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
             pl.setBlockExternal(!cmd.hasOption("allowExternal"));
             section.getPlugins().put("mock-plugin", pl);
@@ -197,7 +199,8 @@ public class HttpProtocol extends CommonProtocol {
             var cname = OptionsManager.getOrDefault(settings.getSSL().getCname(), "C=US,O=Local Development,CN=local.org");
 
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
-            var httpsServer = createHttpsServer(certificatesManager, sslAddress, backlog, cname, sslDer, sslKey);
+            var httpsServer = createHttpsServer(certificatesManager,
+                    sslAddress, backlog, cname, sslDer, sslKey,settings.getSSL().getHosts());
             log.debug("Https created");
             ps.setStop(() -> {
                 waiterBlock.set(false);
