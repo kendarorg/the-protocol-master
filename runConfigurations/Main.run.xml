@@ -2,7 +2,7 @@
   <configuration default="false" name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="org.kendar.Main" />
     <module name="protocol-runner" />
-    <option name="PROGRAM_PARAMETERS" value="-datadir fuffa -protocol http -record" />
+    <option name="PROGRAM_PARAMETERS" value="-datadir fuffa -protocol http -replay " />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.kendar.*" />

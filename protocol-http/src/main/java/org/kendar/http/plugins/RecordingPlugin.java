@@ -1,5 +1,6 @@
 package org.kendar.http.plugins;
 
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
 import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.utils.Request;
@@ -26,8 +27,17 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
     private final ConcurrentLinkedQueue<StorageItem<Request, Response>> items = new ConcurrentLinkedQueue<>();
     private final List<CompactLine> lines = new ArrayList<>();
     private final AtomicLong counter = new AtomicLong(0);
+    private boolean active;
     private Path repository;
     private List<Pattern> recordSites = new ArrayList<>();
+
+    public RecordingPlugin(Map<String, Object> http) {
+        try {
+            active = http.get("record").toString().equalsIgnoreCase("true");
+        }catch (Exception e){
+            active = false;
+        }
+    }
 
     public static String padLeftZeros(String inputString, int length) {
         if (inputString.length() >= length) {
@@ -100,9 +110,9 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
 
 
     @Override
-    public void initialize(Map<String, Object> section, Map<String, Object> global) {
+    public PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global) {
         var recordingPath = (String) global.get("datadir");
-        setupSitesToRecord((String) section.get("recordSites"));
+        setupSitesToRecord((String) section.get("record.recordSites"));
         recordingPath = recordingPath.replace("{milliseconds}", Calendar.getInstance().getTimeInMillis() + "");
         repository = Path.of(recordingPath);
 
@@ -114,6 +124,7 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
             }
         }
         new Thread(this::flush).start();
+        return this;
     }
 
     private void setupSitesToRecord(String recordSites) {
@@ -162,5 +173,9 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean isActive() {
+        return active;
     }
 }

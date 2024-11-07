@@ -30,8 +30,8 @@ public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> impl
     }
 
     @Override
-    public void initialize(Map<String, Object> section, Map<String, Object> global) {
-
+    public PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global) {
+        return this;
     }
 
     @Override

@@ -54,7 +54,9 @@ several database wire protocol implementations:
 
 ## Using it out of the box
 
-Http Recording everything using a proxy (set the proxy to http, port 9999)
+* Inside directory "recording"
+* For protocol "http" (and https)
+* Record all request response
 
 ```
 java -jar protocol-runner.jar -datadir recording -protocol http -record

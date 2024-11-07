@@ -100,8 +100,9 @@ public class HttpProtocol extends CommonProtocol {
 
         options.addOption(createOpt("be","blockExternal", false, "Set if should block external sites replaying"));
 
-        options.addOption("showError", true, "The error to show (404/500 etc)");
-        options.addOption("errorPercent", true, "The error percent to generate (default 50)");
+        options.addOption("showError", true, "The error to show (404/500 etc) default 0/none");
+        options.addOption("errorPercent", true, "The error percent to generate (default 0)");
+        options.addOption("errorMessage", true, "The error message");
         if (!isExecute) return;
         setCommonData(args, options, go);
     }
@@ -114,18 +115,23 @@ public class HttpProtocol extends CommonProtocol {
         ini.putValue(section, "port.https", Integer.parseInt(cmd.getOptionValue("https", "4443")));
         ini.putValue(section, "port.proxy", Integer.parseInt(cmd.getOptionValue("proxy", "9999")));
         ini.putValue(section, "apis", cmd.getOptionValue("apis", "specialApisRoot"));
-        ini.putValue(section+"-ssl", "cname", cmd.getOptionValue("cname", "C=US,O=Local Development,CN=local.org"));
-        ini.putValue(section+"-ssl", "der", cmd.getOptionValue("der", "resource://certificates/ca.der"));
-        ini.putValue(section+"-ssl", "key", cmd.getOptionValue("key", "resource://certificates/ca.key"));
+        ini.putValue(section, "ssl.cname", cmd.getOptionValue("cname", "C=US,O=Local Development,CN=local.org"));
+        ini.putValue(section, "ssl.der", cmd.getOptionValue("der", "resource://certificates/ca.der"));
+        ini.putValue(section, "ssl.key", cmd.getOptionValue("key", "resource://certificates/ca.key"));
+
 
         if (cmd.hasOption("replay")) {
-            ini.putValue(section+"-mock-plugin", "active", true);
-            ini.putValue(section+"-mock-plugin", "replay", cmd.hasOption("replay"));
-            ini.putValue(section+"-mock-plugin", "respectcallduration", cmd.hasOption("cdt"));
-            ini.putValue(section+"-mock-plugin", "replayid", cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
-            ini.putValue(section+"-mock-plugin", "blockExternal", !cmd.hasOption("allowExternal"));
+            ini.putValue(section, "replay", true);
+            ini.putValue(section, "replay.respectcallduration", cmd.hasOption("cdt"));
+            ini.putValue(section, "replay.replayid", cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
+            ini.putValue(section, "replay.blockExternal", !cmd.hasOption("allowExternal"));
         }else if (cmd.hasOption("record")) {
-            ini.putValue(section+"-recording-plugin", "active", true);
+            ini.putValue(section, "record", true);
+        }
+        if(cmd.hasOption("showError")&&cmd.hasOption("errorPercent")) {
+            ini.putValue(section, "error.showError", Integer.parseInt(cmd.getOptionValue("showError","0")));
+            ini.putValue(section, "error.errorPercent", Integer.parseInt(cmd.getOptionValue("errorPercent","0")));
+            ini.putValue(section, "error.errorMessage", cmd.getOptionValue("errorMessage","Error"));
         }
     }
 
@@ -180,9 +186,9 @@ public class HttpProtocol extends CommonProtocol {
                 httpServer.stop(0);
             });
 
-            var der = ini.getValue(sectionKey + "-ssl", "der", String.class, "resource://certificates/ca.der");
-            var key = ini.getValue(sectionKey + "-ssl", "key", String.class, "resource://certificates/ca.key");
-            var cname = ini.getValue(sectionKey + "-ssl", "cname", String.class, "C=US,O=Local Development,CN=local.org");
+            var der = ini.getValue(sectionKey, "ssl.der", String.class, "resource://certificates/ca.der");
+            var key = ini.getValue(sectionKey, "ssl.key", String.class, "resource://certificates/ca.key");
+            var cname = ini.getValue(sectionKey, "ssl.cname", String.class, "C=US,O=Local Development,CN=local.org");
 
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
             var httpsServer = createHttpsServer(certificatesManager, sslAddress, backlog, cname, der, key);
@@ -220,9 +226,6 @@ public class HttpProtocol extends CommonProtocol {
             var globalFilter = new GlobalPlugin();
 
             filters.add(globalFilter);
-            filters.add(new RecordingPlugin());
-            filters.add(new ErrorPlugin());
-            filters.add(new MockPlugin());
             var global = ini.getSection("global");
             for (var i = filters.size() - 1; i >= 0; i--) {
                 var filter = filters.get(i);
@@ -234,6 +237,18 @@ public class HttpProtocol extends CommonProtocol {
                 //log.info("EXTENSION: " + filter.getId());
                 filter.initialize(section,global);
             }
+
+            var httpSection = ini.getSection(sectionKey);
+            var rpl = new RecordingPlugin(httpSection);
+            if(rpl.isActive())filters.add(rpl.initialize(httpSection,global));
+
+            var ep = new ErrorPlugin(httpSection);
+            if(ep.isActive())filters.add(ep.initialize(httpSection,global));
+
+
+            var mp = new MockPlugin(httpSection);
+            if(mp.isActive())filters.add(mp.initialize(httpSection,global));
+
             globalFilter.setFilters(filters);
             globalFilter.setServer(httpServer, httpsServer);
             globalFilter.setShutdownVariable(stopWhenFalse);

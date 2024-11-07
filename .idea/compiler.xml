@@ -6,10 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="protocol-amqp-100" />
         <module name="protocol-common" />
         <module name="protocol-mongo" />
-        <module name="protocol-kafka" />
         <module name="protocol-test" />
         <module name="jacoco" />
         <module name="protocol-postgres" />
@@ -23,6 +21,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="protocol-amqp-100" target="11" />
+      <module name="protocol-kafka" target="11" />
       <module name="protocol-todo" target="1.5" />
       <module name="todo" target="1.5" />
     </bytecodeTargetLevel>

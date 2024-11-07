@@ -40,11 +40,10 @@ public class GlobalPlugin extends ProtocolPluginDescriptor<Request, Response> {
     }
 
     @Override
-    public void initialize(Map<String, Object> section, Map<String, Object> global) {
+    public PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global) {
 
         this.apis = section.get("apis").toString();
-
-
+        return this;
     }
 
     @Override

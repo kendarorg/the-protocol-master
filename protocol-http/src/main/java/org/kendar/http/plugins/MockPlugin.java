@@ -1,6 +1,7 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.filters.PluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
 import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.utils.MimeChecker;
@@ -31,10 +32,19 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
     final ConcurrentHashMap<Long, Long> calls = new ConcurrentHashMap<>();
     private final List<StorageItem<Request, Response>> items = new ArrayList<>();
     private final Map<Long, String> hashes = new HashMap();
+    private boolean active;
     private Path repository;
     private TypeReference<StorageItem<Request, Response>> typeReference;
     private boolean blockExternal = true;
     private List<Pattern> matchSites;
+
+    public MockPlugin(Map<String, Object> http) {
+        try {
+            active = http.get("replay").toString().equalsIgnoreCase("true");
+        }catch (Exception ex){
+            active =false;
+        }
+    }
 
     private static void writeHeaderParameter(Response response, HashMap<String, String> parameters) {
         for (var kvp : response.getHeaders().entrySet()) {
@@ -89,12 +99,12 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
     }
 
     @Override
-    public void initialize(Map<String, Object> section, Map<String, Object> global) {
+    public PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global) {
         typeReference = new TypeReference<>() {
         };
         var recordingPath = (String) global.get("datadir");
-        setupSitesToRecord((String) section.get("matchSites"));
-        blockExternal = Boolean.parseBoolean((String) section.get("blockExternal"));
+        setupSitesToRecord((String) section.get("replay.matchSites"));
+        blockExternal = Boolean.parseBoolean((String) section.get("replay.blockExternal").toString());
         recordingPath = recordingPath.replace("{milliseconds}", Calendar.getInstance().getTimeInMillis() + "");
         repository = Path.of(recordingPath);
 
@@ -119,6 +129,7 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
                 }
             }
         }
+        return this;
     }
 
     @Override
@@ -321,5 +332,9 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
                 }
             }
         }
+    }
+
+    public boolean isActive() {
+        return active;
     }
 }
