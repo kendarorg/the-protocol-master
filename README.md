@@ -62,12 +62,17 @@ several database wire protocol implementations:
 java -jar protocol-runner.jar -datadir recording -protocol http -record
 ```
 
-Postgres Recording everything connecting to the localhost postgres at 7715 redirecting to postgresql://wetheaver/test
-The connection string would be jdbc:postgresql://localhost:7715/test
+* Inside directory "recording"
+* For protocol postgres
+* Fake a postgres db listening on 7715
+* Forward requests to remotedb:5432
+* With login reallogin and password realpassword
+* Record all query and responses
 
 ```
-java -jar protocol-runner.jar -datadir recording -protocol postgres -record -port 7715 \
-  -connection jdbc:postgresql://wetheaver:1771/test -login reallogin -password realpassword
+java -jar protocol-runner.jar -datadir recording -protocol postgres -port 7715 \
+  -connection jdbc:postgresql://remotedb:5432 -login reallogin -password realpassword \
+  -record
 ```
 
 You can use the "protocol-runner-VERSION.jar" to proxy all your calls and test your

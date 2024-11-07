@@ -5,6 +5,9 @@ import org.kendar.filters.ProtocolPhase;
 import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
@@ -27,17 +30,11 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
     private final ConcurrentLinkedQueue<StorageItem<Request, Response>> items = new ConcurrentLinkedQueue<>();
     private final List<CompactLine> lines = new ArrayList<>();
     private final AtomicLong counter = new AtomicLong(0);
-    private boolean active;
+
     private Path repository;
     private List<Pattern> recordSites = new ArrayList<>();
+    private HttpRecordPluginSettings settings;
 
-    public RecordingPlugin(Map<String, Object> http) {
-        try {
-            active = http.get("record").toString().equalsIgnoreCase("true");
-        }catch (Exception e){
-            active = false;
-        }
-    }
 
     public static String padLeftZeros(String inputString, int length) {
         if (inputString.length() >= length) {
@@ -108,11 +105,10 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
         return "http";
     }
 
-
     @Override
-    public PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global) {
-        var recordingPath = (String) global.get("datadir");
-        setupSitesToRecord((String) section.get("record.recordSites"));
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+        var recordingPath = global.getDataDir();
+        setupSitesToRecord(settings.getRecordSites());
         recordingPath = recordingPath.replace("{milliseconds}", Calendar.getInstance().getTimeInMillis() + "");
         repository = Path.of(recordingPath);
 
@@ -127,9 +123,8 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
         return this;
     }
 
-    private void setupSitesToRecord(String recordSites) {
-        if (recordSites == null) recordSites = "";
-        this.recordSites = List.of(recordSites.split(",")).stream()
+    private void setupSitesToRecord(List<String> recordSites) {
+        this.recordSites = recordSites.stream()
                 .map(s -> s.trim()).filter(s -> s.length() > 0)
                 .map(s -> Pattern.compile(s)).collect(Collectors.toList());
     }
@@ -175,7 +170,13 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
         }
     }
 
-    public boolean isActive() {
-        return active;
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpRecordPluginSettings.class;
+    }
+
+    @Override
+    public void setSettings(PluginSettings plugin) {
+        settings = (HttpRecordPluginSettings) plugin;
     }
 }

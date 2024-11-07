@@ -1,9 +1,11 @@
 package org.kendar.filters;
 
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.pf4j.ExtensionPoint;
 
 import java.util.List;
-import java.util.Map;
 
 public interface PluginDescriptor extends ExtensionPoint {
     List<ProtocolPhase> getPhases();
@@ -12,9 +14,13 @@ public interface PluginDescriptor extends ExtensionPoint {
 
     String getProtocol();
 
-    PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global);
+    PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol);
 
     void terminate();
 
     PluginDescriptor clone();
+
+    Class<?> getSettingClass();
+
+    void setSettings(PluginSettings plugin);
 }

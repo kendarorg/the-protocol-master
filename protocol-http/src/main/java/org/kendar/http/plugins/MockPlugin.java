@@ -10,6 +10,9 @@ import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.utils.Md5Tester;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -32,19 +35,13 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
     final ConcurrentHashMap<Long, Long> calls = new ConcurrentHashMap<>();
     private final List<StorageItem<Request, Response>> items = new ArrayList<>();
     private final Map<Long, String> hashes = new HashMap();
-    private boolean active;
+
     private Path repository;
     private TypeReference<StorageItem<Request, Response>> typeReference;
     private boolean blockExternal = true;
     private List<Pattern> matchSites;
+    private HttpMockPluginSettings settings;
 
-    public MockPlugin(Map<String, Object> http) {
-        try {
-            active = http.get("replay").toString().equalsIgnoreCase("true");
-        }catch (Exception ex){
-            active =false;
-        }
-    }
 
     private static void writeHeaderParameter(Response response, HashMap<String, String> parameters) {
         for (var kvp : response.getHeaders().entrySet()) {
@@ -91,20 +88,13 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
         return "http";
     }
 
-    private void setupSitesToRecord(String recordSites) {
-        if (recordSites == null) recordSites = "";
-        this.matchSites = List.of(recordSites.split(",")).stream()
-                .map(s -> s.trim()).filter(s -> s.length() > 0)
-                .map(s -> Pattern.compile(s)).collect(Collectors.toList());
-    }
-
     @Override
-    public PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global) {
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         typeReference = new TypeReference<>() {
         };
-        var recordingPath = (String) global.get("datadir");
-        setupSitesToRecord((String) section.get("replay.matchSites"));
-        blockExternal = Boolean.parseBoolean((String) section.get("replay.blockExternal").toString());
+        var recordingPath = global.getDataDir();
+        setupSitesToRecord(settings.getMatchSites());
+        blockExternal = settings.isBlockExternal();
         recordingPath = recordingPath.replace("{milliseconds}", Calendar.getInstance().getTimeInMillis() + "");
         repository = Path.of(recordingPath);
 
@@ -131,6 +121,14 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
         }
         return this;
     }
+
+    private void setupSitesToRecord(List<String> recordSites) {
+        this.matchSites = recordSites.stream()
+                .map(s -> s.trim()).filter(s -> s.length() > 0)
+                .map(s -> Pattern.compile(s)).collect(Collectors.toList());
+    }
+
+
 
     @Override
     public boolean handle(ProtocolPhase phase, Request request, Response response) {
@@ -165,6 +163,16 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
     @Override
     public void terminate() {
 
+    }
+
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpMockPluginSettings.class;
+    }
+
+    @Override
+    public void setSettings(PluginSettings plugin) {
+        settings = (HttpMockPluginSettings)plugin;
     }
 
     private boolean findMatch(Request request, Response response, String contentHash) {
@@ -332,9 +340,5 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
                 }
             }
         }
-    }
-
-    public boolean isActive() {
-        return active;
     }
 }

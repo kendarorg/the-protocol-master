@@ -5,13 +5,16 @@ import com.sun.net.httpserver.HttpsServer;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.filters.ProtocolPhase;
 import org.kendar.filters.ProtocolPluginDescriptor;
+import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.System.exit;
@@ -40,9 +43,9 @@ public class GlobalPlugin extends ProtocolPluginDescriptor<Request, Response> {
     }
 
     @Override
-    public PluginDescriptor initialize(Map<String, Object> section, Map<String, Object> global) {
-
-        this.apis = section.get("apis").toString();
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+        var setttings = (HttpProtocolSettings)protocol;
+        this.apis = setttings.getApis();
         return this;
     }
 
@@ -76,6 +79,16 @@ public class GlobalPlugin extends ProtocolPluginDescriptor<Request, Response> {
             httpsServer.stop(0);
             exit(0);
         }
+    }
+
+    @Override
+    public Class<?> getSettingClass() {
+        return null;
+    }
+
+    @Override
+    public void setSettings(PluginSettings plugin) {
+
     }
 
     public void setFilters(List<PluginDescriptor> filters) {

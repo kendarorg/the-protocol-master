@@ -3,20 +3,21 @@ package org.kendar.command;
 import org.apache.commons.cli.*;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.*;
 import org.kendar.storage.generic.StorageRepository;
-import org.kendar.utils.ini.Ini;
 
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public abstract class CommonProtocol {
-    public abstract void run(String[] args, boolean isExecute, Ini go, Options options) throws Exception;
+    public abstract void run(String[] args, boolean isExecute, GlobalSettings go,
+                             Options options,
+                             HashMap<String, List<PluginDescriptor>> filters) throws Exception;
 
     public abstract String getDefaultPort();
 
-    public abstract void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception;
+    //public abstract void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, Object filters, Supplier<Boolean> stopWhenFalse) throws Exception;
 
     protected Options getCommonOptions(Options options) {
         options.addOption(createOpt("po", "port", true, "Listening port"));
@@ -49,33 +50,34 @@ public abstract class CommonProtocol {
         return res.build();
     }
 
-    protected void setCommonData(String[] args, Options options, Ini ini) throws Exception {
+    protected void setCommonData(String[] args, Options options, GlobalSettings ini,
+                                 ByteProtocolSettings section) throws Exception {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
-        var section = cmd.getOptionValue("protocol");
-        ini.putValue(section, "port", Integer.parseInt(cmd.getOptionValue("port", getDefaultPort())));
-        ini.putValue(section, "protocol", cmd.getOptionValue("protocol"));
-
+        section.setPort(Integer.parseInt(cmd.getOptionValue("port", getDefaultPort())));
+        section.setProtocol(cmd.getOptionValue("protocol"));
+        section.setConnectionString(cmd.getOptionValue("connection"));
+        section.setTimeoutSeconds(Integer.parseInt(cmd.getOptionValue("timeout", "30")));
+        DefaultSimulationSettings simulation =null;
         if (cmd.hasOption("replay")) {
-            ini.putValue(section, "replay", cmd.hasOption("replay"));
-            ini.putValue(section, "respectcallduration", cmd.hasOption("cdt"));
-            ini.putValue(section, "replayid", cmd.getOptionValue("plid", UUID.randomUUID().toString()));
-        }else {
-            if (cmd.getOptionValue("connection") == null) {
-                throw new Exception();
-            }
-            ini.putValue(section, "connection", cmd.getOptionValue("connection"));
+            simulation= new DefaultSimulationSettings();
+            simulation.setReplay(cmd.hasOption("replay"));
+            simulation.setRespectCallDuration(cmd.hasOption("cdt"));
+            simulation.setReplayId(cmd.getOptionValue("plid", UUID.randomUUID().toString()));
+        }else if (cmd.hasOption("record")) {
+            simulation= new DefaultSimulationSettings();
+            simulation.setRecord(cmd.hasOption("record"));
+        }else if (cmd.hasOption("mock")) {
+            simulation= new DefaultSimulationSettings();
+            simulation.setMock(cmd.hasOption("mock"));
         }
-        if (cmd.hasOption("record")) {
-            ini.putValue(section, "record", cmd.hasOption("record"));
-        }
-        ini.putValue(section, "timeout", Integer.parseInt(cmd.getOptionValue("timeout", "30")));
-        parseExtra(ini, cmd);
+        section.setSimulation(simulation);
+        parseExtra(section, cmd);
     }
 
-    protected void parseLoginPassword(Ini result, CommandLine cmd, String section) {
-        result.putValue(section, "login", cmd.getOptionValue("login"));
-        result.putValue(section, "password", cmd.getOptionValue("password"));
+    protected void parseLoginPassword(ByteProtocolSettingsWithLogin protocol, CommandLine cmd) {
+        protocol.setLogin(cmd.getOptionValue("login"));
+        protocol.setPassword(cmd.getOptionValue("password"));
     }
 
     protected void optionLoginPassword(Options options) {
@@ -83,9 +85,16 @@ public abstract class CommonProtocol {
         options.addOption(createOpt("pw","password", true, "Select remote password"));
     }
 
-    protected void parseExtra(Ini result, CommandLine cmd) {
+    protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
 
     }
 
+    public abstract void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
+                               GlobalSettings ini, ProtocolSettings protocol,
+                               StorageRepository storage, List<PluginDescriptor> filters,
+                               Supplier<Boolean> stopWhenFalse) throws Exception;
+
     public abstract String getId();
+
+    public abstract Class<?> getSettingsClass();
 }

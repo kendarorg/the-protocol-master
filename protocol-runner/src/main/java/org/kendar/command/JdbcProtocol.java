@@ -8,16 +8,22 @@ import org.kendar.mysql.MySqlStorageHandler;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.ByteProtocolSettings;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
+import org.kendar.sql.jdbc.JdbcProtocolSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.QueryReplacerItem;
 import org.kendar.utils.Sleeper;
-import org.kendar.utils.ini.Ini;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -72,21 +78,22 @@ public class JdbcProtocol extends CommonProtocol {
         return protocol.equalsIgnoreCase("mysql") ? "3306" : "5432";
     }
 
-    public void run(String[] args, boolean isExecute, Ini go, Options mainOptions) throws Exception {
-
+    @Override
+    public void run(String[] args, boolean isExecute, GlobalSettings go, Options mainOptions,
+                    HashMap<String, List<PluginDescriptor>> filters) throws Exception {
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
         options.addOption(createOpt("js","schema", true, "Set schema"));
         options.addOption(createOpt("jr","replaceQueryFile", true, "Replace queries file"));
         if (!isExecute) return;
-        setCommonData(args, options, go);
+        setCommonData(args, options, go, new JdbcProtocolSettings());
     }
 
-    protected void parseExtra(Ini result, CommandLine cmd) {
-        var section = cmd.getOptionValue("protocol");
-        parseLoginPassword(result, cmd, section);
-        result.putValue(section, "schema", cmd.getOptionValue("schema"));
-        result.putValue(section, "replaceQueryFile", cmd.getOptionValue("replaceQueryFile"));
+    protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
+        parseLoginPassword((ByteProtocolSettingsWithLogin)result, cmd);
+        var sets= (JdbcProtocolSettings)result;
+
+        sets.setForceSchema(OptionsManager.getOrDefault(cmd.getOptionValue("schema"),""));
     }
 
     @Override
@@ -94,40 +101,55 @@ public class JdbcProtocol extends CommonProtocol {
         return protocol;
     }
 
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository repo, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
+    @Override
+    public Class<?> getSettingsClass() {
+        return JdbcProtocolSettings.class;
+    }
+
+    @Override
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
+                      GlobalSettings ini, ProtocolSettings protocolSettings,
+                      StorageRepository repo, List<PluginDescriptor> filters,
+                      Supplier<Boolean> stopWhenFalse) throws Exception {
         NetworkProtoDescriptor baseProtocol = null;
+        var realSttings = (JdbcProtocolSettings)protocolSettings;
         String driver = "";
-        if (protocol.equalsIgnoreCase("postgres")) {
+        if (protocolSettings.getProtocol().equalsIgnoreCase("postgres")) {
             driver = "org.postgresql.Driver";
-            baseProtocol = new PostgresProtocol(ini.getValue(key, "port", Integer.class, 5432));
-        } else if (protocol.equalsIgnoreCase("mysql")) {
-            baseProtocol = new MySQLProtocol(ini.getValue(key, "port", Integer.class, 3306));
+            baseProtocol = new PostgresProtocol(
+                    OptionsManager.getOrDefault(realSttings.getPort(),5432)
+            );
+        } else if (protocolSettings.getProtocol().equalsIgnoreCase("mysql")) {
+            baseProtocol = new MySQLProtocol(
+                    OptionsManager.getOrDefault(realSttings.getPort(),3306));
         }
 
         var proxy = new JdbcProxy(driver,
-                ini.getValue(key, "connection", String.class), ini.getValue(key, "schema", String.class),
-                ini.getValue(key, "login", String.class), ini.getValue(key, "password", String.class));
+                realSttings.getConnectionString(), realSttings.getForceSchema(),
+                realSttings.getLogin(), realSttings.getPassword());
 
         JdbcStorageHandler storage = new JdbcStorageHandler(repo);
-        if (protocol.equalsIgnoreCase("mysql")) {
+        if (protocolSettings.getProtocol().equalsIgnoreCase("mysql")) {
             storage = new MySqlStorageHandler(repo);
         }
-        if (ini.getValue(key, "replay", Boolean.class, false)) {
+        if (realSttings.getSimulation()!=null && realSttings.getSimulation().isReplay()) {
             proxy = new JdbcProxy(storage);
         } else {
             proxy.setStorage(storage);
         }
         proxy.setFilters(filters);
-        var jdbcReplaceQueries = ini.getValue(key, "replaceQueryFile", String.class, null);
-        if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
-
-            handleReplacementQueries(jdbcReplaceQueries, proxy);
-        }
+//        var jdbcReplaceQueries = ini.getValue(key, "replaceQueryFile", String.class, null);
+//        if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
+//
+//            handleReplacementQueries(jdbcReplaceQueries, proxy);
+//        }
         baseProtocol.setProxy(proxy);
-        baseProtocol.setTimeout(ini.getValue(key, "timeout", Integer.class, 30));
+        baseProtocol.setTimeout(OptionsManager.getOrDefault(realSttings.getTimeoutSeconds(),30));
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        ps.useCallDurationTimes(ini.getValue(key, "respectcallduration", Boolean.class, false));
+        if (realSttings.getSimulation()!=null && realSttings.getSimulation().isReplay()) {
+            ps.useCallDurationTimes(realSttings.getSimulation().isRespectCallDuration());
+        }
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

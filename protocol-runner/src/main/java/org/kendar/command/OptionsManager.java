@@ -3,12 +3,14 @@ package org.kendar.command;
 import org.apache.commons.cli.*;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
+import org.kendar.settings.SettingsManager;
 import org.kendar.storage.generic.StorageRepository;
-import org.kendar.utils.ini.Ini;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -24,7 +26,7 @@ public class OptionsManager {
         }
     }
 
-    private static Options getMainOptions() {
+    public static Options getMainOptions() {
         Options options = new Options();
         options.addOption(createOpt("cfg",null, true, "Load config file"));
         options.addOption(createOpt("pld","pluginsDir", true, "Plugins directory"));
@@ -36,21 +38,18 @@ public class OptionsManager {
         return options;
     }
 
-    public Ini run(String[] args) {
+    public GlobalSettings run(CommandLine cmd,String[] args, HashMap<String, List<PluginDescriptor>> filters) {
         var options = getMainOptions();
         try {
-            CommandLineParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args, true);
+
             var isExecute = false;
             if (cmd.hasOption("cfg")) {
-                var ini = new Ini();
                 var configFile = cmd.getOptionValue("cfg");
-                ini.load(Path.of(configFile).toAbsolutePath().toFile());
-                return ini;
+                return SettingsManager.load(configFile);
             } else if (cmd.hasOption("help")) {
                 var helpValue = cmd.getOptionValue("help");
                 checkOptions(helpValue);
-                runWithParams(args, helpValue, isExecute, null, options);
+                runWithParams(args, helpValue, isExecute, null, options, filters);
                 throw new Exception();
             } else {
                 isExecute = true;
@@ -61,14 +60,12 @@ public class OptionsManager {
                 var loglevel = cmd.getOptionValue("loglevel", "ERROR");
                 var logType = cmd.getOptionValue("logType", "file");
                 checkOptions(datadir, pluginsDir, protocol);
-                var ini = new Ini();
-                ini.putValue("global", "datadir", datadir);
-                ini.putValue("global", "pluginsDir", pluginsDir);
-                ini.putValue("global", "loglevel", loglevel);
-                ini.putValue("global", "logType", logType);
-
-                ini.putValue(protocol, "protocol", protocol);
-                runWithParams(args, protocol, isExecute, ini, options);
+                var ini = new GlobalSettings();
+                ini.setDataDir(datadir);
+                ini.setPluginsDir(pluginsDir);
+                ini.setLogLevel(loglevel);
+                ini.setLogType(logType);
+                runWithParams(args, protocol, isExecute, ini, options,filters);
                 return ini;
             }
         } catch (Exception ex) {
@@ -87,17 +84,32 @@ public class OptionsManager {
         }
     }
 
-    private void runWithParams(String[] args, String protocol, boolean isExecute, Ini go, Options options) throws Exception {
+    private void runWithParams(String[] args, String protocol, boolean isExecute,
+                               GlobalSettings go, Options options,
+                               HashMap<String, List<PluginDescriptor>> filters) throws Exception {
         var founded = protocols.get(protocol);
-        founded.run(args, isExecute, go, options);
+        founded.run(args, isExecute, go, options,filters);
     }
 
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
-        var pr = protocols.get(protocol);
-        var datadir = Path.of(ini.getValue("global","datadir").toString()).toAbsolutePath().toFile();
+    public static <T> T getOrDefault(Object value,T defaultValue){
+        if(value == null){
+            return defaultValue;
+        }
+        return (T) value;
+    }
+
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
+                      GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> filters,
+                      Supplier<Boolean> stopWhenFalse) throws Exception {
+        var pr = protocols.get(protocol.getProtocol());
+        var datadir = Path.of(ini.getDataDir()).toAbsolutePath().toFile();
         if(!datadir.exists()){
             datadir.mkdir();
         }
         pr.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);
+    }
+
+    public CommonProtocol getManagerFor(ProtocolSettings protocol) {
+        return protocols.get(protocol.getProtocol());
     }
 }

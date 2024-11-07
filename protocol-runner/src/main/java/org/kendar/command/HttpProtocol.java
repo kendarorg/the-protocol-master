@@ -7,13 +7,11 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.kendar.HttpTcpServer;
-import org.kendar.filters.AlwaysActivePlugin;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.http.MasterHandler;
-import org.kendar.http.plugins.ErrorPlugin;
-import org.kendar.http.plugins.GlobalPlugin;
-import org.kendar.http.plugins.MockPlugin;
-import org.kendar.http.plugins.RecordingPlugin;
+import org.kendar.http.plugins.*;
+import org.kendar.http.settings.HttpProtocolSettings;
+import org.kendar.http.settings.HttpSSLSettings;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
@@ -27,14 +25,15 @@ import org.kendar.http.utils.ssl.FileResourcesUtils;
 import org.kendar.proxy.ProxyServer;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
-import org.kendar.utils.ini.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,86 +51,88 @@ public class HttpProtocol extends CommonProtocol {
         return httpsServer;
     }
 
-    private static SimpleRewriterConfig loadRewritersConfiguration(String key, Ini ini) {
+
+    private static SimpleRewriterConfig loadRewritersConfiguration(HttpProtocolSettings settings) {
         var proxyConfig = new SimpleRewriterConfig();
-        for (var id = 0; id < 255; id++) {
-            var when = ini.getValue(key + "-rewriter", "rewrite." + id + ".when", String.class);
-            var where = ini.getValue(key + "-rewriter", "rewrite." + id + ".where", String.class);
-            var test = ini.getValue(key + "-rewriter", "rewrite." + id + ".test", String.class);
-            if (when == null || where == null) {
+        for(var i=0;i<settings.getRewrites().size();i++){
+            var rw = settings.getRewrites().get(i);
+            if(rw.getWhen()==null||rw.getThen()==null){
                 continue;
             }
-            var remoteServerStatus = new RemoteServerStatus(id + "",
-                    when,
-                    where,
-                    test);
-            if (test == null || test.isEmpty()) {
+            var remoteServerStatus = new RemoteServerStatus(i + "",
+                    rw.getWhen(),
+                    rw.getThen(),
+                    rw.getTest());
+            if (rw.getTest() == null || rw.getTest().isEmpty()) {
                 remoteServerStatus.setRunning(true);
                 remoteServerStatus.setForce(true);
             } else {
-
-                remoteServerStatus.setRunning(false);
-                remoteServerStatus.setForce(false);
+                remoteServerStatus.setRunning(true);
+                remoteServerStatus.setForce(rw.isForceActive());
             }
             proxyConfig.getProxies().add(remoteServerStatus);
         }
         return proxyConfig;
     }
 
-    private static boolean notGoodFilter(String sectionKey, Ini ini, PluginDescriptor filter) {
-        return !filter.getId().equalsIgnoreCase("global") &&
-                !ini.getValue(sectionKey + "-" + filter.getId(), "active", Boolean.class, false);
-    }
-
     @Override
-    public void run(String[] args, boolean isExecute, Ini go, Options options) throws Exception {
-        options.addOption(createOpt("ht","http", true, "Http port (def 4080)"));
-        options.addOption(createOpt("hs","https", true, "Https port (def 4443)"));
-        options.addOption(createOpt("prx","proxy", true, "Http/s proxy port (def 9999)"));
-        options.addOption(createOpt("ap","apis", true, "The base url for special TPM controllers (def specialApisRoot)"));
+    public void run(String[] args, boolean isExecute, GlobalSettings go,
+                    Options options, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
+        options.addOption(createOpt("ht", "http", true, "Http port (def 4080)"));
+        options.addOption(createOpt("hs", "https", true, "Https port (def 4443)"));
+        options.addOption(createOpt("prx", "proxy", true, "Http/s proxy port (def 9999)"));
+        options.addOption(createOpt("ap", "apis", true, "The base url for special TPM controllers (def specialApisRoot)"));
         options.addOption(createOpt("prp", "replay", false, "Replay from log/replay source."));
         options.addOption(createOpt("prc", "record", false, "Record to log/replay source."));
-        options.addOption(createOpt("plid","replayid", true, "Set an id for the replay instance (default to timestamp_uuid)."));
-        options.addOption(createOpt("ae","allowExternal", false, "Allow external calls during replay ."));
+        options.addOption(createOpt("plid", "replayid", true, "Set an id for the replay instance (default to timestamp_uuid)."));
+        options.addOption(createOpt("ae", "allowExternal", false, "Allow external calls during replay ."));
 
-        options.addOption(createOpt("cn","cname", true, "Root cname"));
+        options.addOption(createOpt("cn", "cname", true, "Root cname"));
         options.addOption("der", true, "Root certificate");
         options.addOption("key", true, "Root certificate keys");
 
-        options.addOption(createOpt("be","blockExternal", false, "Set if should block external sites replaying"));
+        options.addOption(createOpt("be", "blockExternal", false, "Set if should block external sites replaying"));
 
         options.addOption("showError", true, "The error to show (404/500 etc) default 0/none");
         options.addOption("errorPercent", true, "The error percent to generate (default 0)");
         options.addOption("errorMessage", true, "The error message");
         if (!isExecute) return;
-        setCommonData(args, options, go);
+        setCommonData(args, options, go, new HttpProtocolSettings());
     }
 
-    protected void setCommonData(String[] args, Options options, Ini ini) throws Exception {
+    protected void setCommonData(String[] args, Options options, GlobalSettings ini,
+                                 HttpProtocolSettings section) throws Exception {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
-        var section = cmd.getOptionValue("protocol");
-        ini.putValue(section, "port.http", Integer.parseInt(cmd.getOptionValue("http", "4080")));
-        ini.putValue(section, "port.https", Integer.parseInt(cmd.getOptionValue("https", "4443")));
-        ini.putValue(section, "port.proxy", Integer.parseInt(cmd.getOptionValue("proxy", "9999")));
-        ini.putValue(section, "apis", cmd.getOptionValue("apis", "specialApisRoot"));
-        ini.putValue(section, "ssl.cname", cmd.getOptionValue("cname", "C=US,O=Local Development,CN=local.org"));
-        ini.putValue(section, "ssl.der", cmd.getOptionValue("der", "resource://certificates/ca.der"));
-        ini.putValue(section, "ssl.key", cmd.getOptionValue("key", "resource://certificates/ca.key"));
-
+        section.setHttp(Integer.parseInt(cmd.getOptionValue("http", "4080")));
+        section.setHttps(Integer.parseInt(cmd.getOptionValue("https", "4443")));
+        section.setProxy(Integer.parseInt(cmd.getOptionValue("proxy", "9999")));
+        section.setApis(cmd.getOptionValue("apis", "specialApisRoot"));
+        var sslSettings = new HttpSSLSettings();
+        sslSettings.setCname(cmd.getOptionValue("cname", "C=US,O=Local Development,CN=local.org"));
+        sslSettings.setDer(cmd.getOptionValue("der", "resource://certificates/ca.der"));
+        sslSettings.setKey(cmd.getOptionValue("key", "resource://certificates/ca.key"));
+        section.setSSL(sslSettings);
 
         if (cmd.hasOption("replay")) {
-            ini.putValue(section, "replay", true);
-            ini.putValue(section, "replay.respectcallduration", cmd.hasOption("cdt"));
-            ini.putValue(section, "replay.replayid", cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
-            ini.putValue(section, "replay.blockExternal", !cmd.hasOption("allowExternal"));
-        }else if (cmd.hasOption("record")) {
-            ini.putValue(section, "record", true);
+            var pl = new HttpMockPluginSettings();
+            pl.setPlugin("mock-plugin");
+            pl.setReplay(true);
+            pl.setRespectTimings(cmd.hasOption("cdt"));
+            pl.setReplayId(cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
+            pl.setBlockExternal(!cmd.hasOption("allowExternal"));
+            section.getPlugins().put("mock-plugin", pl);
+        } else if (cmd.hasOption("record")) {
+            var pl = new HttpRecordPluginSettings();
+            pl.setPlugin("recording-plugin");
+            pl.setRecord(true);
+            section.getPlugins().put("recording-plugin", pl);
         }
-        if(cmd.hasOption("showError")&&cmd.hasOption("errorPercent")) {
-            ini.putValue(section, "error.showError", Integer.parseInt(cmd.getOptionValue("showError","0")));
-            ini.putValue(section, "error.errorPercent", Integer.parseInt(cmd.getOptionValue("errorPercent","0")));
-            ini.putValue(section, "error.errorMessage", cmd.getOptionValue("errorMessage","Error"));
+        if (cmd.hasOption("showError") && cmd.hasOption("errorPercent")) {
+            var pl = new HttpErrorPluginSettings();
+            pl.setShowError(Integer.parseInt(cmd.getOptionValue("showError", "0")));
+            pl.setErrorPercent(Integer.parseInt(cmd.getOptionValue("errorPercent", "0")));
+            pl.setErrorMessage(cmd.getOptionValue("errorMessage", "Error"));
         }
     }
 
@@ -140,8 +141,11 @@ public class HttpProtocol extends CommonProtocol {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String sectionKey, Ini ini, String protocol,
-                      StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalseAction) {
+    @Override
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
+                      String sectionKey, GlobalSettings ini, ProtocolSettings pset, StorageRepository storage,
+                      List<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalseAction) throws Exception {
+        var settings = (HttpProtocolSettings) pset;
         var ps = new HttpTcpServer(null);
         try {
 
@@ -160,9 +164,9 @@ public class HttpProtocol extends CommonProtocol {
             ps.setIsRunning(() -> stopWhenFalse.get());
             log.debug("Started waiter");
 
-            var port = ini.getValue(sectionKey, "port.http", Integer.class, 4080);
-            var httpsPort = ini.getValue(sectionKey, "port.https", Integer.class, 4443);
-            var proxyPort = ini.getValue(sectionKey, "port.proxy", Integer.class, 9999);
+            var port = OptionsManager.getOrDefault(settings.getHttp(), 4080);
+            var httpsPort = OptionsManager.getOrDefault(settings.getHttps(),  4443);
+            var proxyPort = OptionsManager.getOrDefault(settings.getProxy(),  9999);
 //        log.info("LISTEN HTTP: " + port);
 //        log.info("LISTEN HTTPS: " + httpsPort);
 //        log.info("LISTEN PROXY: " + proxyPort);
@@ -173,7 +177,7 @@ public class HttpProtocol extends CommonProtocol {
 
 
             // initialise the HTTP server
-            var proxyConfig = loadRewritersConfiguration(sectionKey, ini);
+            var proxyConfig = loadRewritersConfiguration(settings);
             var dnsHandler = new DnsMultiResolverImpl();
             var connectionBuilder = new ConnectionBuilderImpl(dnsHandler);
             var requestResponseBuilder = new RequestResponseBuilderImpl();
@@ -186,12 +190,12 @@ public class HttpProtocol extends CommonProtocol {
                 httpServer.stop(0);
             });
 
-            var der = ini.getValue(sectionKey, "ssl.der", String.class, "resource://certificates/ca.der");
-            var key = ini.getValue(sectionKey, "ssl.key", String.class, "resource://certificates/ca.key");
-            var cname = ini.getValue(sectionKey, "ssl.cname", String.class, "C=US,O=Local Development,CN=local.org");
+            var sslDer = OptionsManager.getOrDefault(settings.getSSL().getDer(), "resource://certificates/ca.der");
+            var sslKey = OptionsManager.getOrDefault(settings.getSSL().getKey(), "resource://certificates/ca.key");
+            var cname = OptionsManager.getOrDefault(settings.getSSL().getCname(), "C=US,O=Local Development,CN=local.org");
 
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
-            var httpsServer = createHttpsServer(certificatesManager, sslAddress, backlog, cname, der, key);
+            var httpsServer = createHttpsServer(certificatesManager, sslAddress, backlog, cname, sslDer, sslKey);
             log.debug("Https created");
             ps.setStop(() -> {
                 waiterBlock.set(false);
@@ -203,7 +207,7 @@ public class HttpProtocol extends CommonProtocol {
                     .withHttpRedirect(port).withHttpsRedirect(httpsPort)
                     .withDnsResolver(host -> {
                         try {
-                            certificatesManager.setupSll(httpsServer, List.of(host), cname, der, key);
+                            certificatesManager.setupSll(httpsServer, List.of(host), cname, sslDer, sslKey);
                         } catch (Exception e) {
                             return host;
                         }
@@ -223,31 +227,17 @@ public class HttpProtocol extends CommonProtocol {
             log.debug("Proxy created");
             new Thread(proxy).start();
 
-            var globalFilter = new GlobalPlugin();
-
-            filters.add(globalFilter);
-            var global = ini.getSection("global");
+            filters.add(new RecordingPlugin());
+            filters.add(new ErrorPlugin());
+            filters.add(new MockPlugin());
             for (var i = filters.size() - 1; i >= 0; i--) {
                 var filter = filters.get(i);
-                var section = ini.getSection(sectionKey + "-" + filter.getId());
-                if (notGoodFilter(sectionKey, ini, filter) && !(filter instanceof AlwaysActivePlugin)) {
-                    filters.remove(i);
-                    continue;
-                }
-                //log.info("EXTENSION: " + filter.getId());
-                filter.initialize(section,global);
+                filter.initialize(ini, pset);
             }
 
-            var httpSection = ini.getSection(sectionKey);
-            var rpl = new RecordingPlugin(httpSection);
-            if(rpl.isActive())filters.add(rpl.initialize(httpSection,global));
-
-            var ep = new ErrorPlugin(httpSection);
-            if(ep.isActive())filters.add(ep.initialize(httpSection,global));
-
-
-            var mp = new MockPlugin(httpSection);
-            if(mp.isActive())filters.add(mp.initialize(httpSection,global));
+            var globalFilter = new GlobalPlugin();
+            globalFilter.initialize(ini,pset);
+            filters.add(globalFilter);
 
             globalFilter.setFilters(filters);
             globalFilter.setServer(httpServer, httpsServer);
@@ -277,7 +267,7 @@ public class HttpProtocol extends CommonProtocol {
             protocolServer.put(sectionKey, ps);
         } catch (Exception ex) {
             try {
-                log.error(ex.getMessage(),ex);
+                log.error(ex.getMessage(), ex);
                 var sr = protocolServer.get(sectionKey);
                 sr.stop();
             } catch (Exception xx) {
@@ -289,5 +279,10 @@ public class HttpProtocol extends CommonProtocol {
     @Override
     public String getId() {
         return "http";
+    }
+
+    @Override
+    public Class<?> getSettingsClass() {
+        return HttpProtocolSettings.class;
     }
 }

@@ -2,15 +2,18 @@ package org.kendar;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.kendar.command.*;
-import org.kendar.filters.AlwaysActivePlugin;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
-import org.kendar.utils.ini.Ini;
 import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +28,11 @@ public class Main {
     private static final ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
     private static OptionsManager om;
 
-    public static void main(String[] args) {
+    public static void main(String[] args)throws Exception {
         execute(args, Main::stopWhenQuitCommand);
     }
 
-    public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
+    public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
         om = new OptionsManager(
                 new Amqp091Protocol(),
                 new MongoProtocol(),
@@ -39,8 +42,17 @@ public class Main {
                 new MqttProtocol(),
                 new RedisProtocol()
         );
-        var ini = om.run(args);
-        execute(ini, stopWhenFalse);
+        CommandLineParser parser = new DefaultParser();
+        var options = OptionsManager.getMainOptions();
+        HashMap<String, List<PluginDescriptor>> filters = new HashMap<>();
+        CommandLine cmd = parser.parse(options, args, true);
+        if (cmd.hasOption("pluginsDir")) {
+            var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
+            filters = loadFilters(pluginsDir);
+        }
+
+        var ini = om.run(cmd, args, filters);
+        execute(ini, stopWhenFalse, filters);
     }
 
     public static void stop() {
@@ -103,53 +115,38 @@ public class Main {
     }
 
 
-    private static ArrayList<PluginDescriptor> loadCorrectFiltersForProtocol(String id, String protocol, HashMap<String, List<PluginDescriptor>> allFilters, Ini ini) {
-        var availableFilters = allFilters.get(protocol.toLowerCase());
-        if (availableFilters == null) availableFilters = new ArrayList<>();
-        var filters = new ArrayList<PluginDescriptor>();
-        if (ini != null) {
-
-            for (var availableFilter : availableFilters) {
-                var sectionId = id + "-" + availableFilter.getId();
-                var section = ini.getSection(sectionId);
-                if ((section != null && !section.isEmpty()) || availableFilter instanceof AlwaysActivePlugin) {
-                    var clonedFilter = availableFilter.clone();
-                    filters.add(clonedFilter);
-                }
-            }
-        }
-        return filters;
-    }
-
-
     public static boolean isRunning() {
         return protocolServer.values().stream().anyMatch(v -> v.isRunning());
     }
 
 
-    public static void execute(Ini ini, Supplier<Boolean> stopWhenFalse) {
+    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<PluginDescriptor>> allFilters) {
         if (ini == null) return;
-        var logsDir = ini.getValue("global", "datadir", String.class);
+        var logsDir = OptionsManager.getOrDefault(ini.getDataDir(), "data");
         StorageRepository storage = setupStorage(logsDir);
 
-        var pluginsDir = ini.getValue("global", "pluginsDir", String.class, "plugins");
-        var allFilters = loadFilters(pluginsDir);
-        var logLevel = ini.getValue("global", "loglevel", String.class, "ERROR");
+        var pluginsDir = OptionsManager.getOrDefault(ini.getPluginsDir(), "plugins");
+        if (allFilters == null || allFilters.isEmpty()) {
+            allFilters = loadFilters(pluginsDir);
+        }
+        var logLevel = OptionsManager.getOrDefault(ini.getLogLevel(), "ERROR");
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
 
-        for (var key : ini.getSections()) {
+        for (var item : ini.getProtocols().entrySet()) {
             try {
-                var protocol = ini.getValue(key, "protocol", String.class);
-                if (protocol == null || protocol.isEmpty()) continue;
-                var filters = loadCorrectFiltersForProtocol(key, protocol, allFilters, ini);
+                var protocol = ini.getProtocolForKey(item.getKey());
+                if (protocol == null) continue;
+                var protocolManager = om.getManagerFor(protocol);
+                var filters = loadAvailableFiltersForProtocol(protocol, ini, allFilters);
+                var protocolFullSettings = ini.getProtocol(item.getKey(),protocolManager.getSettingsClass());
                 new Thread(() -> {
                     try {
-                        om.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);
+                        om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, filters, stopWhenFalse);
                     } catch (Exception e) {
-                        protocolServer.remove(key);
+                        protocolServer.remove(item);
                         throw new RuntimeException(e);
                     }
                 }).start();
@@ -161,5 +158,24 @@ public class Main {
         while (stopWhenFalse.get()) {
             Sleeper.sleep(100);
         }
+    }
+
+    private static List<PluginDescriptor> loadAvailableFiltersForProtocol(ProtocolSettings protocol, GlobalSettings global,
+                                                          HashMap<String, List<PluginDescriptor>> allFilters) {
+        var availableFilters = allFilters.get(protocol.getProtocol());
+        if (availableFilters == null) availableFilters = new ArrayList<>();
+        var simplePlugins = protocol.getSimplePlugins();
+        var filters = new ArrayList<PluginDescriptor>();
+
+        for(var simplePlugin:simplePlugins.entrySet()){
+            var availableFilter = availableFilters.stream().filter(av->av.getId().equalsIgnoreCase(simplePlugin.getValue().getPlugin())).findFirst();
+            if(availableFilter.isPresent()){
+                var realFilter = availableFilter.get().clone();
+                realFilter.setSettings(protocol.getPlugin(simplePlugin.getKey(),realFilter.getSettingClass()));
+                filters.add(realFilter);
+
+            }
+        }
+        return filters;
     }
 }

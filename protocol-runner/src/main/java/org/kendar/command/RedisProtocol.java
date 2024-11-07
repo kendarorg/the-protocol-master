@@ -6,20 +6,24 @@ import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.Resp3StorageHandler;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.ByteProtocolSettings;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
-import org.kendar.utils.ini.Ini;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class RedisProtocol extends CommonProtocol {
     @Override
-    public void run(String[] args, boolean isExecute, Ini go, Options mainOptions) throws Exception {
+    public void run(String[] args, boolean isExecute, GlobalSettings go, Options mainOptions,
+                    HashMap<String, List<PluginDescriptor>> filters) throws Exception {
         var options = getCommonOptions(mainOptions);
         if (!isExecute) return;
-        setCommonData(args, options, go);
+        setCommonData(args, options, go,new ByteProtocolSettings());
     }
 
     @Override
@@ -28,20 +32,21 @@ public class RedisProtocol extends CommonProtocol {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
-        var port = ini.getValue(key, "port", Integer.class, 6379);
-        var timeoutSec = ini.getValue(key, "timeout", Integer.class, 30);
-        var connectionString = ini.getValue(key, "connection", String.class);
-        var login = ini.getValue(key, "login", String.class);
-        var password = ini.getValue(key, "password", String.class);
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
+                      GlobalSettings ini, ProtocolSettings protocol,
+                      StorageRepository storage, List<PluginDescriptor> filters,
+                      Supplier<Boolean> stopWhenFalse) throws Exception {
+        var protocolSettings = (ByteProtocolSettings) protocol;
+        var port = OptionsManager.getOrDefault(protocolSettings.getPort(),6379);
+        var timeoutSec = OptionsManager.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
+        var connectionString = OptionsManager.getOrDefault(protocolSettings.getConnectionString(),"");
         var baseProtocol = new Resp3Protocol(port);
         baseProtocol.setTimeout(timeoutSec);
-        var proxy = new Resp3Proxy(connectionString, login, password);
+        var proxy = new Resp3Proxy(connectionString, null, null);
 
-        if (ini.getValue(key, "replay", Boolean.class, false)) {
+        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
             proxy = new Resp3Proxy();
-            proxy.setStorage(new Resp3StorageHandler(storage) {
-            });
+            proxy.setStorage(new Resp3StorageHandler(storage));
         } else {
             proxy.setStorage(new Resp3StorageHandler(storage));
         }
@@ -49,7 +54,9 @@ public class RedisProtocol extends CommonProtocol {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        ps.useCallDurationTimes(ini.getValue(key, "respectcallduration", Boolean.class, false));
+        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
+            ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
+        }
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);
@@ -58,6 +65,11 @@ public class RedisProtocol extends CommonProtocol {
     @Override
     public String getId() {
         return "redis";
+    }
+
+    @Override
+    public Class<?> getSettingsClass() {
+        return ByteProtocolSettings.class;
     }
 
 

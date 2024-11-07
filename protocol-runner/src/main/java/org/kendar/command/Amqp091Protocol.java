@@ -6,11 +6,15 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.AmqpStorageHandler;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.ByteProtocolSettings;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
-import org.kendar.utils.ini.Ini;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -18,23 +22,28 @@ public class Amqp091Protocol extends CommonProtocol {
 
 
     @Override
-    public void run(String[] args, boolean isExecute, Ini go, Options mainOptions) throws Exception {
+    public void run(String[] args, boolean isExecute, GlobalSettings go,
+                    Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
 
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
         if (!isExecute) return;
-        setCommonData(args, options, go);
+        setCommonData(args, options, go,new ByteProtocolSettings());
     }
 
 
-    protected void parseExtra(Ini result, CommandLine cmd) {
-        var section = cmd.getOptionValue("protocol");
-        parseLoginPassword(result, cmd, section);
+    protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
+        parseLoginPassword((ByteProtocolSettingsWithLogin)result, cmd);
     }
 
     @Override
     public String getId() {
         return "amqp091";
+    }
+
+    @Override
+    public Class<?> getSettingsClass() {
+        return ByteProtocolSettingsWithLogin.class;
     }
 
 
@@ -44,20 +53,22 @@ public class Amqp091Protocol extends CommonProtocol {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, Ini ini, String protocol, StorageRepository storage, ArrayList<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
-        var port = ini.getValue(key, "port", Integer.class, 5672);
-        var timeoutSec = ini.getValue(key, "timeout", Integer.class, 30);
-        var connectionString = ini.getValue(key, "connection", String.class);
-        var login = ini.getValue(key, "login", String.class);
-        var password = ini.getValue(key, "password", String.class);
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
+
+        var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;
+
+        var port = OptionsManager.getOrDefault(protocolSettings.getPort(), 5672);
+        var timeoutSec = OptionsManager.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
+        var connectionString = OptionsManager.getOrDefault(protocolSettings.getConnectionString(),"");
+        var login = OptionsManager.getOrDefault(protocolSettings.getLogin(),"");
+        var password = OptionsManager.getOrDefault(protocolSettings.getPassword(),"");
         var baseProtocol = new org.kendar.amqp.v09.AmqpProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new AmqpProxy(connectionString, login, password);
 
-        if (ini.getValue(key, "replay", Boolean.class, false)) {
+        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
             proxy = new AmqpProxy();
-            proxy.setStorage(new AmqpStorageHandler(storage) {
-            });
+            proxy.setStorage(new AmqpStorageHandler(storage));
         } else {
             proxy.setStorage(new AmqpStorageHandler(storage));
         }
@@ -65,7 +76,9 @@ public class Amqp091Protocol extends CommonProtocol {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        ps.useCallDurationTimes(ini.getValue(key, "respectcallduration", Boolean.class, false));
+        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
+            ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
+        }
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);
