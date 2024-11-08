@@ -12,7 +12,7 @@ import java.util.function.Function;
 /**
  * Created for http://stackoverflow.com/q/16351413/1266906.
  */
-public class ProxyServer extends Thread {
+public class ProxyServer {
     public final HashSet<String> ignore = new HashSet<>();
     private final int port;
     //    public static void main(String[] args) {
@@ -64,24 +64,26 @@ public class ProxyServer extends Thread {
         }
     }
 
-    @Override
-    public void run() {
+    public void start() {
 
-        try (var ss = new ServerSocket(port)) {
-            serverSocket = ss;
-            Socket socket;
-            try {
-                while ((socket = serverSocket.accept()) != null) {
-                    var lambdasocket = socket;
-                    executor.submit(() -> new ProxyServerHandler(executor, lambdasocket,
-                            httpRedirect, httpsRedirect, dnsResolver, ignore).run());
+        new Thread(()->{
+            try (var ss = new ServerSocket(port)) {
+                serverSocket = ss;
+                Socket socket;
+                try {
+                    while ((socket = serverSocket.accept()) != null) {
+                        var lambdasocket = socket;
+                        executor.submit(() -> new ProxyServerHandler(executor, lambdasocket,
+                                httpRedirect, httpsRedirect, dnsResolver, ignore).run());
+                    }
+                } catch (IOException e) {
+
                 }
             } catch (IOException e) {
 
             }
-        } catch (IOException e) {
+        }).start();
 
-        }
     }
 
 

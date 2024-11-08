@@ -37,7 +37,7 @@
           "errorMessage": "ERROR",
           "percentage": 0
         },
-        "mock-plugin": {
+        "replay-plugin": {
           "replay": false,
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,

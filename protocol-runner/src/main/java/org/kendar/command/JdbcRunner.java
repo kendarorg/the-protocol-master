@@ -1,5 +1,6 @@
 package org.kendar.command;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.kendar.filters.PluginDescriptor;
@@ -12,64 +13,36 @@ import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.sql.jdbc.JdbcProtocolSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
+import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.QueryReplacerItem;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-public class JdbcProtocol extends CommonProtocol {
+public class JdbcRunner extends CommonRunner {
+    private static TypeReference<List<QueryReplacerItem>> replaceItemsList= new TypeReference<>() {
+    };
     private final String protocol;
 
-    public JdbcProtocol(String id) {
+    public JdbcRunner(String id) {
 
         this.protocol = id;
     }
-
+private static JsonMapper mapper = new JsonMapper();
     private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws Exception {
-        var lines = Files.readAllLines(Path.of(jdbcReplaceQueries));
-        var items = new ArrayList<QueryReplacerItem>();
-        QueryReplacerItem replacerItem = new QueryReplacerItem();
-        boolean find = false;
-        for (var line : lines) {
-            if (line.toLowerCase().startsWith("#regexfind")) {
-                if (replacerItem.getToFind() != null) {
-                    items.add(replacerItem);
-                    replacerItem = new QueryReplacerItem();
-                }
-                replacerItem.setRegex(true);
-                replacerItem.setToFind("");
-                find = true;
-            } else if (line.toLowerCase().startsWith("#find")) {
-                if (replacerItem.getToFind() != null) {
-                    items.add(replacerItem);
-                    replacerItem = new QueryReplacerItem();
-                }
-                replacerItem.setToFind("");
-                find = true;
-            } else if (line.toLowerCase().startsWith("#replace")) {
-                replacerItem.setToReplace("");
-                find = false;
-            } else {
-                if (find) {
-                    replacerItem.setToFind(replacerItem.getToFind() + line + "\n");
-                } else {
-                    replacerItem.setToReplace(replacerItem.getToReplace() + line + "\n");
-                }
-            }
-        }
-        if (replacerItem.getToFind() != null && !replacerItem.getToFind().isEmpty()) {
-            items.add(replacerItem);
-        }
+        var lines = new String(Files.readAllBytes(Path.of(jdbcReplaceQueries).toAbsolutePath()));
+
+        var items = (List<QueryReplacerItem>)mapper.deserialize(lines,replaceItemsList);
+
         proxy.setQueryReplacement(items);
     }
 
@@ -93,7 +66,8 @@ public class JdbcProtocol extends CommonProtocol {
         parseLoginPassword((ByteProtocolSettingsWithLogin)result, cmd);
         var sets= (JdbcProtocolSettings)result;
 
-        sets.setForceSchema(OptionsManager.getOrDefault(cmd.getOptionValue("schema"),""));
+        sets.setForceSchema(ProtocolsRunner.getOrDefault(cmd.getOptionValue("schema"),""));
+        sets.setReplaceQueryFile(ProtocolsRunner.getOrDefault(cmd.getOptionValue("replaceQueryFile"),""));
     }
 
     @Override
@@ -117,11 +91,11 @@ public class JdbcProtocol extends CommonProtocol {
         if (protocolSettings.getProtocol().equalsIgnoreCase("postgres")) {
             driver = "org.postgresql.Driver";
             baseProtocol = new PostgresProtocol(
-                    OptionsManager.getOrDefault(realSttings.getPort(),5432)
+                    ProtocolsRunner.getOrDefault(realSttings.getPort(),5432)
             );
         } else if (protocolSettings.getProtocol().equalsIgnoreCase("mysql")) {
             baseProtocol = new MySQLProtocol(
-                    OptionsManager.getOrDefault(realSttings.getPort(),3306));
+                    ProtocolsRunner.getOrDefault(realSttings.getPort(),3306));
         }
 
         var proxy = new JdbcProxy(driver,
@@ -138,13 +112,13 @@ public class JdbcProtocol extends CommonProtocol {
             proxy.setStorage(storage);
         }
         proxy.setFilters(filters);
-//        var jdbcReplaceQueries = ini.getValue(key, "replaceQueryFile", String.class, null);
-//        if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
-//
-//            handleReplacementQueries(jdbcReplaceQueries, proxy);
-//        }
+        var jdbcReplaceQueries = ((JdbcProtocolSettings) protocolSettings).getReplaceQueryFile();
+        if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
+
+            handleReplacementQueries(jdbcReplaceQueries, proxy);
+        }
         baseProtocol.setProxy(proxy);
-        baseProtocol.setTimeout(OptionsManager.getOrDefault(realSttings.getTimeoutSeconds(),30));
+        baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(),30));
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
         if (realSttings.getSimulation()!=null && realSttings.getSimulation().isReplay()) {

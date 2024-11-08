@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.Resp3StorageHandler;
+import org.kendar.redis.plugins.RedisRecordingPlugin;
 import org.kendar.resp3.pubsub.Publisher;
 import org.kendar.resp3.pubsub.Subscriber;
 import org.kendar.server.TcpServer;
@@ -14,6 +15,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,6 +31,9 @@ public class ReplayerTest {
         var proxy = new Resp3Proxy();
         proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository<>(Path.of("src",
                 "test", "resources", "replay"))));
+        var rec = new RedisRecordingPlugin();
+        rec.setActive(true);
+        proxy.setFilters(List.of(rec));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);

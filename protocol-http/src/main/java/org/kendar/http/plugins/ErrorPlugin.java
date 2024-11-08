@@ -5,6 +5,7 @@ import org.kendar.filters.ProtocolPhase;
 import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
+import org.kendar.proxy.FilterContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -41,7 +42,8 @@ public class ErrorPlugin extends ProtocolPluginDescriptor<Request, Response> {
     }
 
     @Override
-    public boolean handle(ProtocolPhase phase, Request request, Response response) {
+    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request request, Response response) {
+        if(!isActive())return false;
         if (Math.random() < percentage) {
 
             log.info("FAKE ERR " + request.getMethod() + " " + request.buildUrl());
@@ -64,6 +66,7 @@ public class ErrorPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
     @Override
     public void setSettings(PluginSettings plugin) {
+        super.setSettings(plugin);
         var settings = (HttpErrorPluginSettings) plugin;
         this.errorCode = settings.getShowError();
         this.errorMessage = settings.getErrorMessage();

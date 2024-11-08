@@ -4,6 +4,7 @@ import org.kendar.filters.ProtocolPhase;
 import org.kendar.iterators.QueryResultIterator;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
+import org.kendar.proxy.FilterContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
@@ -29,7 +30,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     private final String forcedSchema;
     private final String login;
     private final String password;
-    private ArrayList<QueryReplacerItem> queryReplacements = new ArrayList<>();
+    private List<QueryReplacerItem> queryReplacements = new ArrayList<>();
 
     public JdbcProxy(JdbcStorage jdbcStorage) {
         this(null, null, null, null, null);
@@ -301,13 +302,14 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         }
         try {
             var result = new SelectResult();
+            long start = System.currentTimeMillis();
+            var filterContext = new FilterContext("JDBC","QUERY",start, context);
             var jdbcCall = new JdbcCall(query, parameterValues);
             for (var filter : getFilters(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
-                if (filter.handle(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
+                if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, jdbcCall, result)) {
                     return result;
                 }
             }
-            long start = System.currentTimeMillis();
 
             PreparedStatement statement;
 
@@ -331,7 +333,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
 
             long end = System.currentTimeMillis();
             for (var filter : getFilters(ProtocolPhase.POST_CALL, jdbcCall, result)) {
-                if (filter.handle(ProtocolPhase.POST_CALL, jdbcCall, result)) {
+                if (filter.handle(filterContext, ProtocolPhase.POST_CALL, jdbcCall, result)) {
                     break;
                 }
             }
@@ -485,7 +487,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         }
     }
 
-    public void setQueryReplacement(ArrayList<QueryReplacerItem> items) {
+    public void setQueryReplacement(List<QueryReplacerItem> items) {
         queryReplacements = items;
     }
 }

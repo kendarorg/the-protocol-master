@@ -1,5 +1,6 @@
 package org.kendar.filters;
 
+import org.kendar.proxy.FilterContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -12,7 +13,7 @@ import java.util.List;
 @Extension
 public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectResult> implements AlwaysActivePlugin {
     @Override
-    public boolean handle(ProtocolPhase phase, JdbcCall in, SelectResult out) {
+    public boolean handle(FilterContext filterContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         return false;
     }
 
@@ -54,6 +55,7 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
 
     @Override
     public void setSettings(PluginSettings plugin) {
+        super.setSettings(plugin);
 
     }
 }

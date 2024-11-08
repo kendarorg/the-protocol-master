@@ -24,6 +24,7 @@ import org.kendar.mongo.proxy.DocumentContainer;
 import org.kendar.mongo.utils.MongoStorage;
 import org.kendar.mongo.utils.NullMongoStorage;
 import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.proxy.FilterContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
@@ -109,8 +110,10 @@ public class MongoProxy extends Proxy<MongoStorage> {
         var database = mongoClient.getDatabase(db);
         var cmdContainer = new DocumentContainer(protoContext.getReqResId(), data.getRequestId());
 
+        var filterContext = new FilterContext("JDBC","OP_MSG",start, protoContext);
+
         for (var filter : getFilters(ProtocolPhase.PRE_CALL, command, cmdContainer)) {
-            if (filter.handle(ProtocolPhase.PRE_CALL, command, cmdContainer)) {
+            if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, command, cmdContainer)) {
                 var toSend = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
                 OpMsgSection section = new OpMsgSection();
                 section.getDocuments().add(cmdContainer.getCommandResult().toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build()));
@@ -122,7 +125,7 @@ public class MongoProxy extends Proxy<MongoStorage> {
         cmdContainer.setResult(commandResult);
 
         for (var filter : getFilters(ProtocolPhase.POST_CALL, command, cmdContainer)) {
-            if (filter.handle(ProtocolPhase.POST_CALL, command, cmdContainer)) {
+            if (filter.handle(filterContext, ProtocolPhase.POST_CALL, command, cmdContainer)) {
                 var toSend2 = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
                 OpMsgSection section2 = new OpMsgSection();
                 section2.getDocuments().add(cmdContainer.getCommandResult().toJson(JsonWriterSettings.builder().

@@ -5,7 +5,7 @@ import org.kendar.settings.PluginSettings;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HttpMockPluginSettings extends PluginSettings {
+public class HttpReplayPluginSettings extends PluginSettings {
     private boolean replay;
     private String replayId;
     private boolean respectCallDuration;

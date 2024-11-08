@@ -1,16 +1,26 @@
 ## TODO
 
-* Update parameters for documentation
-* Add HTTP protocol
-* Add filters explanation
-* Publish on vn central
-* respectcallduration on http
-* REplace forcequeryfiles with "intercept" for jdbc  handleReplacementQueries()
-* Add replayId with timestamp
+### Docs
+* Replacequery example
+* Change all the parameter names
+* Explain filter
+### Code
+* Recording and replay plugin should use the right storage
+* Use anonymous "Object" instead of JsonNode for saving
+* Check if should use filters even for Protocol
+* Add an api to list the plugins
+* Add an api for start/stop record/replay/mock
+* For mock set the nth call
+* Remove any reference to spring boot
+* respectCallDuration on http
+* User replayId (with timestamp)
+* Store Jsons as json in Request/Response/Multipart
+* Store other stuffs as external objects in Request/Response/Multipart
+* Publish on maven central
+* Change Supplier<Boolean> stopWhenFalseAction to a callback to register for
 
-* Use the interrupt to generate "preformed" events for the state chart
-* plid parameter to identify the run
-* simple website to store the results and rest:192.168.1.2/tpm/api as storage option
+
+
 
 STATE CHARTS:
 

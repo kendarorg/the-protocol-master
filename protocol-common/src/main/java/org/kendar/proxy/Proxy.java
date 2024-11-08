@@ -115,8 +115,23 @@ public abstract class Proxy<T extends Storage> {
     }
 
     public <I, J> List<ProtocolPluginDescriptor> getFilters(ProtocolPhase phase, I in, J out) {
-        var data = in.getClass().getName() + "," + out.getClass().getName();
-        var forData = toFilter.get(data);
+        var data = String.join(",",
+                FilterContext.class.getName(),
+                ProtocolPhase.class.getName(),
+                in.getClass().getName() , out.getClass().getName());
+        var anonymousData = String.join(",",
+                FilterContext.class.getName(),
+                ProtocolPhase.class.getName(),
+                Object.class.getName(),Object.class.getName());
+        var forData = toFilter.get(anonymousData);
+        //Handle Object,Object data
+        if (forData != null) {
+            var forPhase = forData.get(phase);
+            if (forPhase != null) {
+                return forPhase;
+            }
+        }
+        forData = toFilter.get(data);
         if (forData != null) {
             var forPhase = forData.get(phase);
             if (forPhase != null) {

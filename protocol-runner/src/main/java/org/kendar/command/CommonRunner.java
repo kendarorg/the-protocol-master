@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-public abstract class CommonProtocol {
+public abstract class CommonRunner {
     public abstract void run(String[] args, boolean isExecute, GlobalSettings go,
                              Options options,
                              HashMap<String, List<PluginDescriptor>> filters) throws Exception;

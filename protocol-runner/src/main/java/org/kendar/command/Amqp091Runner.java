@@ -2,9 +2,9 @@ package org.kendar.command;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.kendar.amqp.v09.AmqpProxy;
+import org.kendar.amqp.v09.AmqpStorageHandler;
 import org.kendar.filters.PluginDescriptor;
-import org.kendar.mqtt.MqttProxy;
-import org.kendar.mqtt.MqttStorageHandler;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-public class MqttProtocol extends CommonProtocol {
+public class Amqp091Runner extends CommonRunner {
+
+
     @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go,
                     Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
@@ -26,8 +28,9 @@ public class MqttProtocol extends CommonProtocol {
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
         if (!isExecute) return;
-        setCommonData(args, options, go,new ByteProtocolSettingsWithLogin());
+        setCommonData(args, options, go,new ByteProtocolSettings());
     }
+
 
     protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
         parseLoginPassword((ByteProtocolSettingsWithLogin)result, cmd);
@@ -35,7 +38,7 @@ public class MqttProtocol extends CommonProtocol {
 
     @Override
     public String getId() {
-        return "mqtt";
+        return "amqp091";
     }
 
     @Override
@@ -43,9 +46,10 @@ public class MqttProtocol extends CommonProtocol {
         return ByteProtocolSettingsWithLogin.class;
     }
 
+
     @Override
     public String getDefaultPort() {
-        return "1883";
+        return "5672";
     }
 
     @Override
@@ -53,20 +57,20 @@ public class MqttProtocol extends CommonProtocol {
 
         var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;
 
-        var port = OptionsManager.getOrDefault(protocolSettings.getPort(), 1883);
-        var timeoutSec = OptionsManager.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
-        var connectionString = OptionsManager.getOrDefault(protocolSettings.getConnectionString(),"");
-        var login = OptionsManager.getOrDefault(protocolSettings.getLogin(),"");
-        var password = OptionsManager.getOrDefault(protocolSettings.getPassword(),"");
-        var baseProtocol = new org.kendar.mqtt.MqttProtocol(port);
+        var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 5672);
+        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
+        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(),"");
+        var login = ProtocolsRunner.getOrDefault(protocolSettings.getLogin(),"");
+        var password = ProtocolsRunner.getOrDefault(protocolSettings.getPassword(),"");
+        var baseProtocol = new org.kendar.amqp.v09.AmqpProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
-        var proxy = new MqttProxy(connectionString, login, password);
+        var proxy = new AmqpProxy(connectionString, login, password);
 
         if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
-            proxy = new MqttProxy();
-            proxy.setStorage(new MqttStorageHandler(storage));
+            proxy = new AmqpProxy();
+            proxy.setStorage(new AmqpStorageHandler(storage));
         } else {
-            proxy.setStorage(new MqttStorageHandler(storage));
+            proxy.setStorage(new AmqpStorageHandler(storage));
         }
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);

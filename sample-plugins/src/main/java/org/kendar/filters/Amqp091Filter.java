@@ -2,6 +2,7 @@ package org.kendar.filters;
 
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpen;
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpenOk;
+import org.kendar.proxy.FilterContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -50,11 +51,12 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
 
     @Override
     public void setSettings(PluginSettings plugin) {
+        super.setSettings(plugin);
 
     }
 
     @Override
-    public boolean handle(ProtocolPhase phase, ChannelOpen in, ChannelOpenOk out) {
+    public boolean handle(FilterContext filterContext, ProtocolPhase phase, ChannelOpen in, ChannelOpenOk out) {
         return false;
     }
 }

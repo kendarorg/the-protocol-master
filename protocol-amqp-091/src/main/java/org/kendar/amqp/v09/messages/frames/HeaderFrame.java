@@ -10,6 +10,7 @@ import org.kendar.amqp.v09.utils.FieldsWriter;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.proxy.FilterContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
@@ -285,6 +286,7 @@ public class HeaderFrame extends Frame {
         hf.setChannel(channel);
 
         if (isProxyed()) {
+            proxy.respond(hf,new FilterContext("AMQP","RESPONSE",-1,context));
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             hf.setConsumeId(basicConsume.getConsumeId());
             var storage = proxy.getStorage();

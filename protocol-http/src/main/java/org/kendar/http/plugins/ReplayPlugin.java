@@ -10,6 +10,7 @@ import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.utils.Md5Tester;
+import org.kendar.proxy.FilterContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -29,8 +30,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
-    private static final Logger log = LoggerFactory.getLogger(MockPlugin.class);
+public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
+    private static final Logger log = LoggerFactory.getLogger(ReplayPlugin.class);
     final JsonMapper mapper = new JsonMapper();
     final ConcurrentHashMap<Long, Long> calls = new ConcurrentHashMap<>();
     private final List<StorageItem<Request, Response>> items = new ArrayList<>();
@@ -40,7 +41,7 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
     private TypeReference<StorageItem<Request, Response>> typeReference;
     private boolean blockExternal = true;
     private List<Pattern> matchSites;
-    private HttpMockPluginSettings settings;
+    private HttpReplayPluginSettings settings;
 
 
     private static void writeHeaderParameter(Response response, HashMap<String, String> parameters) {
@@ -80,7 +81,7 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
     @Override
     public String getId() {
-        return "mock-plugin";
+        return "replay-plugin";
     }
 
     @Override
@@ -131,7 +132,8 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
 
     @Override
-    public boolean handle(ProtocolPhase phase, Request request, Response response) {
+    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request request, Response response) {
+        if(!isActive())return false;
         if (matchSites.size() > 0) {
             var matchFound = false;
             for (var pat : matchSites) {
@@ -167,12 +169,13 @@ public class MockPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
     @Override
     public Class<?> getSettingClass() {
-        return HttpMockPluginSettings.class;
+        return HttpReplayPluginSettings.class;
     }
 
     @Override
     public void setSettings(PluginSettings plugin) {
-        settings = (HttpMockPluginSettings)plugin;
+        super.setSettings(plugin);
+        settings = (HttpReplayPluginSettings)plugin;
     }
 
     private boolean findMatch(Request request, Response response, String contentHash) {

@@ -15,13 +15,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import static org.kendar.command.CommonProtocol.createOpt;
+import static org.kendar.command.CommonRunner.createOpt;
 
-public class OptionsManager {
-    private Map<String, CommonProtocol> protocols = new HashMap<>();
+public class ProtocolsRunner {
+    private Map<String, CommonRunner> protocols = new HashMap<>();
 
-    public OptionsManager(CommonProtocol... input) {
-        for (CommonProtocol protocol : input) {
+    public ProtocolsRunner(CommonRunner... input) {
+        for (CommonRunner protocol : input) {
             protocols.put(protocol.getId(), protocol);
         }
     }
@@ -35,6 +35,7 @@ public class OptionsManager {
         options.addOption(createOpt("lt","logType", true, "The log type: default [none|file]"));
         options.addOption(createOpt("p","protocol", true, "Protocol (http|mqtt|amqp091|mysql|postgres|redis|mongo"));
         options.addOption(Option.builder().option("help").optionalArg(true).desc("Show contestual help").build());
+        options.addOption(Option.builder().option("tpmapi").optionalArg(true).desc("Expose The Protocol Master apis on port").build());
         return options;
     }
 
@@ -59,12 +60,14 @@ public class OptionsManager {
                 var protocol = cmd.getOptionValue("protocol");
                 var loglevel = cmd.getOptionValue("loglevel", "ERROR");
                 var logType = cmd.getOptionValue("logType", "file");
+                var tpmApi = Integer.parseInt(cmd.getOptionValue("tpmApi", "0"));
                 checkOptions(datadir, pluginsDir, protocol);
                 var ini = new GlobalSettings();
                 ini.setDataDir(datadir);
                 ini.setPluginsDir(pluginsDir);
                 ini.setLogLevel(loglevel);
                 ini.setLogType(logType);
+                ini.setTpmApi(tpmApi);
                 runWithParams(args, protocol, isExecute, ini, options,filters);
                 return ini;
             }
@@ -109,7 +112,7 @@ public class OptionsManager {
         pr.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);
     }
 
-    public CommonProtocol getManagerFor(ProtocolSettings protocol) {
+    public CommonRunner getManagerFor(ProtocolSettings protocol) {
         return protocols.get(protocol.getProtocol());
     }
 }

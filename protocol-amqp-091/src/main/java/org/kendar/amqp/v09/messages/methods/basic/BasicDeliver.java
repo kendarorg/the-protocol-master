@@ -7,6 +7,7 @@ import org.kendar.amqp.v09.messages.methods.Basic;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.proxy.FilterContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
@@ -105,6 +106,7 @@ public class BasicDeliver extends Basic {
         bd.routingKey = ShortStringHelper.read(rb);
 
 
+        proxy.respond(bd,new FilterContext("AMQP","RESPONSE",-1,context));
         var storage = proxy.getStorage();
         var res = "{\"type\":\"" + bd.getClass().getSimpleName() + "\",\"data\":" +
                 mapper.serialize(bd) + "}";

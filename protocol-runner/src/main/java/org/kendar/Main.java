@@ -5,11 +5,12 @@ import ch.qos.logback.classic.LoggerContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.kendar.apis.ApiHandler;
 import org.kendar.command.*;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.http.plugins.ErrorPlugin;
-import org.kendar.http.plugins.MockPlugin;
 import org.kendar.http.plugins.RecordingPlugin;
+import org.kendar.http.plugins.ReplayPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -29,24 +30,24 @@ import java.util.function.Supplier;
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
-    private static OptionsManager om;
+    private static ProtocolsRunner om;
 
     public static void main(String[] args)throws Exception {
         execute(args, Main::stopWhenQuitCommand);
     }
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
-        om = new OptionsManager(
-                new Amqp091Protocol(),
-                new MongoProtocol(),
-                new HttpProtocol(),
-                new JdbcProtocol("mysql"),
-                new JdbcProtocol("postgres"),
-                new MqttProtocol(),
-                new RedisProtocol()
+        om = new ProtocolsRunner(
+                new Amqp091Runner(),
+                new MongoRunner(),
+                new HttpRunner(),
+                new JdbcRunner("mysql"),
+                new JdbcRunner("postgres"),
+                new MqttRunner(),
+                new RedisRunner()
         );
         CommandLineParser parser = new DefaultParser();
-        var options = OptionsManager.getMainOptions();
+        var options = ProtocolsRunner.getMainOptions();
         HashMap<String, List<PluginDescriptor>> filters = new HashMap<>();
         CommandLine cmd = parser.parse(options, args, true);
             var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
@@ -117,7 +118,7 @@ public class Main {
         }
         filters.get("http").addAll(List.of(
                 new RecordingPlugin(),
-                new ErrorPlugin(),new MockPlugin()));
+                new ErrorPlugin(),new ReplayPlugin()));
         return filters;
     }
 
@@ -129,18 +130,20 @@ public class Main {
 
     public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<PluginDescriptor>> allFilters) {
         if (ini == null) return;
-        var logsDir = OptionsManager.getOrDefault(ini.getDataDir(), "data");
+        var logsDir = ProtocolsRunner.getOrDefault(ini.getDataDir(), "data");
         StorageRepository storage = setupStorage(logsDir);
 
-        var pluginsDir = OptionsManager.getOrDefault(ini.getPluginsDir(), "plugins");
+        var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
         if (allFilters == null || allFilters.isEmpty()) {
             allFilters = loadFilters(pluginsDir);
         }
-        var logLevel = OptionsManager.getOrDefault(ini.getLogLevel(), "ERROR");
+        var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "ERROR");
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
+
+        var apiHandler = new ApiHandler();
 
         for (var item : ini.getProtocols().entrySet()) {
             try {
@@ -149,14 +152,15 @@ public class Main {
                 var protocolManager = om.getManagerFor(protocol);
                 var filters = loadAvailableFiltersForProtocol(protocol, ini, allFilters);
                 var protocolFullSettings = ini.getProtocol(item.getKey(),protocolManager.getSettingsClass());
-                new Thread(() -> {
-                    try {
-                        om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, filters, stopWhenFalse);
-                    } catch (Exception e) {
-                        protocolServer.remove(item);
-                        throw new RuntimeException(e);
-                    }
-                }).start();
+
+                try {
+                    om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, filters, stopWhenFalse);
+                } catch (Exception e) {
+                    protocolServer.remove(item);
+                    throw new RuntimeException(e);
+                }
+                apiHandler.addProtocol(item.getKey(),protocolManager,filters,protocolFullSettings);
+
 
             } catch (Exception ex) {
 

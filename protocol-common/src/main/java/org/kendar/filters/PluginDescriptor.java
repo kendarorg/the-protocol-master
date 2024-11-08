@@ -23,4 +23,7 @@ public interface PluginDescriptor extends ExtensionPoint {
     Class<?> getSettingClass();
 
     void setSettings(PluginSettings plugin);
+
+    void setActive(boolean active);
+    boolean isActive();
 }

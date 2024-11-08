@@ -2,6 +2,7 @@ package org.kendar.filters;
 
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
+import org.kendar.proxy.FilterContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -12,7 +13,7 @@ import java.util.List;
 @Extension
 public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> implements AlwaysActivePlugin {
     @Override
-    public boolean handle(ProtocolPhase phase, Request in, Response out) {
+    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request in, Response out) {
         return false;
     }
 
@@ -49,6 +50,7 @@ public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> impl
 
     @Override
     public void setSettings(PluginSettings plugin) {
+        super.setSettings(plugin);
 
     }
 }

@@ -6,6 +6,7 @@ import org.kendar.filters.ProtocolPhase;
 import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
+import org.kendar.proxy.FilterContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -19,10 +20,10 @@ public class FilteringClassesHandlerImpl implements FilteringClassesHandler {
     }
 
     @Override
-    public boolean handle(ProtocolPhase phase, Request request, Response response, HttpClientConnectionManager connectionManager) throws InvocationTargetException, IllegalAccessException {
+    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request request, Response response, HttpClientConnectionManager connectionManager) throws InvocationTargetException, IllegalAccessException {
         for (var handler : handlers.stream().filter(h -> h.getPhases().contains(phase)).collect(Collectors.toList())) {
             var pfd = (ProtocolPluginDescriptor) handler;
-            if (pfd.handle(phase, request, response)) {
+            if (pfd.handle(filterContext, phase, request, response)) {
                 return true;
             }
         }

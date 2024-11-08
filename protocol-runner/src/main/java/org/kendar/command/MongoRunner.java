@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-public class MongoProtocol extends CommonProtocol {
+public class MongoRunner extends CommonRunner {
     public void run(String[] args, boolean isExecute, GlobalSettings go,
                     Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
 
@@ -52,11 +52,11 @@ public class MongoProtocol extends CommonProtocol {
 
         var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;
 
-        var port = OptionsManager.getOrDefault(protocolSettings.getPort(), 1883);
-        var timeoutSec = OptionsManager.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
-        var connectionString = OptionsManager.getOrDefault(protocolSettings.getConnectionString(),"");
-        var login = OptionsManager.getOrDefault(protocolSettings.getLogin(),"");
-        var password = OptionsManager.getOrDefault(protocolSettings.getPassword(),"");
+        var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 1883);
+        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
+        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(),"");
+        var login = ProtocolsRunner.getOrDefault(protocolSettings.getLogin(),"");
+        var password = ProtocolsRunner.getOrDefault(protocolSettings.getPassword(),"");
         var baseProtocol = new org.kendar.mqtt.MqttProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MongoProxy(connectionString);

@@ -9,6 +9,7 @@ public enum ProtocolPhase {
     CONNECT("CONNECT"),
     POST_CALL("POST_CALL"),
     PRE_RENDER("PRE_RENDER"),
+    ASYNC_RESPONSE("ASYNC_RESPONSE"),
     /**
      * Always blocking
      */

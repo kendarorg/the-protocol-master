@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-public class RedisProtocol extends CommonProtocol {
+public class RedisRunner extends CommonRunner {
     @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go, Options mainOptions,
                     HashMap<String, List<PluginDescriptor>> filters) throws Exception {
@@ -37,9 +37,9 @@ public class RedisProtocol extends CommonProtocol {
                       StorageRepository storage, List<PluginDescriptor> filters,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var protocolSettings = (ByteProtocolSettings) protocol;
-        var port = OptionsManager.getOrDefault(protocolSettings.getPort(),6379);
-        var timeoutSec = OptionsManager.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
-        var connectionString = OptionsManager.getOrDefault(protocolSettings.getConnectionString(),"");
+        var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(),6379);
+        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
+        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(),"");
         var baseProtocol = new Resp3Protocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new Resp3Proxy(connectionString, null, null);

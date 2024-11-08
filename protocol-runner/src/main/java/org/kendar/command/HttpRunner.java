@@ -41,8 +41,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-public class HttpProtocol extends CommonProtocol {
-    private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
+public class HttpRunner extends CommonRunner {
+    private static final Logger log = LoggerFactory.getLogger(HttpRunner.class);
 
     private static HttpsServer createHttpsServer(CertificatesManager certificatesManager,
                                                  InetSocketAddress sslAddress, int backlog, String cname, String der,
@@ -119,21 +119,24 @@ public class HttpProtocol extends CommonProtocol {
         section.setSSL(sslSettings);
 
         if (cmd.hasOption("replay")) {
-            var pl = new HttpMockPluginSettings();
-            pl.setPlugin("mock-plugin");
+            var pl = new HttpReplayPluginSettings();
+            pl.setPlugin("replay-plugin");
+            pl.setActive(true);
             pl.setReplay(true);
             pl.setRespectCallDuration(cmd.hasOption("cdt"));
             pl.setReplayId(cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
             pl.setBlockExternal(!cmd.hasOption("allowExternal"));
-            section.getPlugins().put("mock-plugin", pl);
+            section.getPlugins().put("replay-plugin", pl);
         } else if (cmd.hasOption("record")) {
             var pl = new HttpRecordPluginSettings();
             pl.setPlugin("recording-plugin");
+            pl.setActive(true);
             pl.setRecord(true);
             section.getPlugins().put("recording-plugin", pl);
         }
         if (cmd.hasOption("showError") && cmd.hasOption("errorPercent")) {
             var pl = new HttpErrorPluginSettings();
+            pl.setActive(true);
             pl.setShowError(Integer.parseInt(cmd.getOptionValue("showError", "0")));
             pl.setErrorPercent(Integer.parseInt(cmd.getOptionValue("errorPercent", "0")));
             pl.setErrorMessage(cmd.getOptionValue("errorMessage", "Error"));
@@ -148,7 +151,8 @@ public class HttpProtocol extends CommonProtocol {
     @Override
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
                       String sectionKey, GlobalSettings ini, ProtocolSettings pset, StorageRepository storage,
-                      List<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalseAction) throws Exception {
+                      List<PluginDescriptor> filters,
+                      Supplier<Boolean> stopWhenFalseAction) throws Exception {
         var settings = (HttpProtocolSettings) pset;
         var ps = new HttpTcpServer(null);
         try {
@@ -168,9 +172,9 @@ public class HttpProtocol extends CommonProtocol {
             ps.setIsRunning(() -> stopWhenFalse.get());
             log.debug("Started waiter");
 
-            var port = OptionsManager.getOrDefault(settings.getHttp(), 4080);
-            var httpsPort = OptionsManager.getOrDefault(settings.getHttps(),  4443);
-            var proxyPort = OptionsManager.getOrDefault(settings.getProxy(),  9999);
+            var port = ProtocolsRunner.getOrDefault(settings.getHttp(), 4080);
+            var httpsPort = ProtocolsRunner.getOrDefault(settings.getHttps(),  4443);
+            var proxyPort = ProtocolsRunner.getOrDefault(settings.getProxy(),  9999);
 //        log.info("LISTEN HTTP: " + port);
 //        log.info("LISTEN HTTPS: " + httpsPort);
 //        log.info("LISTEN PROXY: " + proxyPort);
@@ -194,9 +198,9 @@ public class HttpProtocol extends CommonProtocol {
                 httpServer.stop(0);
             });
 
-            var sslDer = OptionsManager.getOrDefault(settings.getSSL().getDer(), "resource://certificates/ca.der");
-            var sslKey = OptionsManager.getOrDefault(settings.getSSL().getKey(), "resource://certificates/ca.key");
-            var cname = OptionsManager.getOrDefault(settings.getSSL().getCname(), "C=US,O=Local Development,CN=local.org");
+            var sslDer = ProtocolsRunner.getOrDefault(settings.getSSL().getDer(), "resource://certificates/ca.der");
+            var sslKey = ProtocolsRunner.getOrDefault(settings.getSSL().getKey(), "resource://certificates/ca.key");
+            var cname = ProtocolsRunner.getOrDefault(settings.getSSL().getCname(), "C=US,O=Local Development,CN=local.org");
 
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
             var httpsServer = createHttpsServer(certificatesManager,
@@ -230,7 +234,7 @@ public class HttpProtocol extends CommonProtocol {
                 httpServer.stop(0);
             });
             log.debug("Proxy created");
-            new Thread(proxy).start();
+            proxy.start();
 
 
             for (var i = filters.size() - 1; i >= 0; i--) {

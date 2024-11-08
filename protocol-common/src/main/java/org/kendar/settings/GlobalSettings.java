@@ -11,6 +11,15 @@ public class GlobalSettings {
     private String logLevel;
     private String dataDir;
     private String logType;
+    private int tpmApi;
+
+    public int getTpmApi() {
+        return tpmApi;
+    }
+
+    public void setTpmApi(int tpmApi) {
+        this.tpmApi = tpmApi;
+    }
 
     public String getLogType() {
         return logType;

@@ -8,6 +8,7 @@ import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
+import org.kendar.proxy.FilterContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -50,7 +51,7 @@ public class GlobalPlugin extends ProtocolPluginDescriptor<Request, Response> {
     }
 
     @Override
-    public boolean handle(ProtocolPhase phase, Request request, Response response) {
+    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request request, Response response) {
 
         if (isPath(request, "api/shutdown")) {
             shutdownVariable.set(true);
@@ -88,6 +89,7 @@ public class GlobalPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
     @Override
     public void setSettings(PluginSettings plugin) {
+        super.setSettings(plugin);
 
     }
 

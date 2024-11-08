@@ -4,6 +4,7 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.proxy.FilterContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.redis.Resp3Context;
 import org.kendar.redis.Resp3Proxy;
@@ -72,6 +73,7 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
             if (event.getData() instanceof List) {
                 if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("message")) {
                     var storage = proxy.getStorage();
+                    proxy.respond(event.getData(),new FilterContext("RESP3","RESPONSE",-1,context));
                     var res = "{\"type\":\"RESPONSE\",\"data\":" +
                             mapper.serialize(event.getData()) + "}";
 

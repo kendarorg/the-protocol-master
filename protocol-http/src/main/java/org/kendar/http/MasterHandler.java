@@ -13,6 +13,7 @@ import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.converters.RequestResponseBuilder;
 import org.kendar.http.utils.filters.FilteringClassesHandler;
 import org.kendar.http.utils.rewriter.SimpleRewriterHandler;
+import org.kendar.proxy.FilterContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,7 +154,7 @@ public class MasterHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) {
 
         var connManager = connectionBuilder.getConnectionManger(true, true);
-
+        var filterContext = new FilterContext("HTTP",httpExchange.getRequestMethod().toUpperCase(), System.currentTimeMillis(), null);
         Request request = null;
         Response response = new Response();
         try {
@@ -178,7 +179,7 @@ public class MasterHandler implements HttpHandler {
 
             log.info("REQ " + request.getMethod() + " " + request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
 
-            handleInternal(request, response, connManager);
+            handleInternal(filterContext,request, response, connManager);
             sendResponse(response, httpExchange);
 
         } catch (Exception rex) {
@@ -190,7 +191,7 @@ public class MasterHandler implements HttpHandler {
         } finally {
             try {
                 filteringClassesHandler.handle(
-                        ProtocolPhase.POST_RENDER, request, response, connManager);
+                        filterContext, ProtocolPhase.POST_RENDER, request, response, connManager);
 
             } catch (Exception e) {
                 log.error("ERROR CALLING POST RENDER ", e);
@@ -198,21 +199,22 @@ public class MasterHandler implements HttpHandler {
         }
     }
 
-    private void handleInternal(Request request, Response response, HttpClientConnectionManager connManager) throws Exception {
-        if (filteringClassesHandler.handle(
+    private void handleInternal(FilterContext filterContext, Request request, Response response, HttpClientConnectionManager connManager) throws Exception {
+
+        if (filteringClassesHandler.handle(filterContext,
                 ProtocolPhase.PRE_RENDER, request, response, connManager)) {
 
             return;
         }
 
         if (filteringClassesHandler.handle(
-                ProtocolPhase.API, request, response, connManager)) {
+                filterContext, ProtocolPhase.API, request, response, connManager)) {
             // ALWAYS WHEN CALLED
             return;
         }
 
         if (filteringClassesHandler.handle(
-                ProtocolPhase.STATIC, request, response, connManager)) {
+                filterContext, ProtocolPhase.STATIC, request, response, connManager)) {
             response.addHeader("Cache Control", "max-age=3600,s-maxage=3600");
             response.addHeader("Last-Modified", "Wed, 21 Oct 2015 07:28:00 GMT");
             // ALWAYS WHEN CALLED
@@ -222,13 +224,13 @@ public class MasterHandler implements HttpHandler {
         var proxiedRequest = simpleProxyHandler.translate(request);
 
         if (filteringClassesHandler.handle(
-                ProtocolPhase.PRE_CALL, proxiedRequest, response, connManager)) {
+                filterContext, ProtocolPhase.PRE_CALL, proxiedRequest, response, connManager)) {
             return;
         }
 
         externalRequester.callSite(proxiedRequest, response);
 
         filteringClassesHandler.handle(
-                ProtocolPhase.POST_CALL, proxiedRequest, response, connManager);
+                filterContext, ProtocolPhase.POST_CALL, proxiedRequest, response, connManager);
     }
 }

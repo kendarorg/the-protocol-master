@@ -8,6 +8,7 @@ import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.proxy.FilterContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -77,6 +78,8 @@ public class BodyFrame extends Frame {
 
             //If it is not a replayer do not save
             if (!proxy.isReplayer()) {
+
+                proxy.respond(bf,new FilterContext("AMQP","RESPONSE",-1,context));
                 var storage = proxy.getStorage();
                 var res = "{\"type\":\"" + bf.getClass().getSimpleName() + "\",\"data\":" +
                         mapper.serialize(bf) + "}";

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.Resp3StorageHandler;
+import org.kendar.redis.plugins.RedisRecordingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.testcontainer.images.RedisImage;
@@ -13,6 +14,7 @@ import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -52,6 +54,9 @@ public class BasicTest {
                 proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository<>(Path.of("target", "tests", className, method))));
             }
         }
+        var rec = new RedisRecordingPlugin();
+        rec.setActive(true);
+        proxy.setFilters(List.of(rec));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

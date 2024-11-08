@@ -26,7 +26,7 @@ public class BaseEvent implements TaggedObject {
     /**
      * Tags
      */
-    private ArrayList<Tag> tags = new ArrayList<>();
+    private List<Tag> tags = new ArrayList<>();
 
     public BaseEvent(ProtoContext context, Class<?> prevState) {
 
