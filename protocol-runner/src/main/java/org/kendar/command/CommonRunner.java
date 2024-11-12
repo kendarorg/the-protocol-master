@@ -74,10 +74,10 @@ public abstract class CommonRunner {
             plugin.setActive(true);
             plugin.setRespectCallDuration(cmd.hasOption("cdt"));
             plugin.setReplayId(cmd.getOptionValue("plid", UUID.randomUUID().toString()));
-            section.getPlugins().put("replay-plugin",plugin);
+            section.getPlugins().put("replay-plugin", plugin);
         } else if (cmd.hasOption("record")) {
             var plugin = new BasicRecordingPluginSettings();
-            section.getPlugins().put("record-plugin",plugin);
+            section.getPlugins().put("record-plugin", plugin);
             plugin.setPlugin("record-plugin");
             plugin.setActive(true);
         } else if (cmd.hasOption("mock")) {

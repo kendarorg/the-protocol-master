@@ -4,10 +4,11 @@ import org.kendar.settings.PluginSettings;
 
 public class BasicReplayPluginSettings extends PluginSettings {
     private boolean respectCallDuration;
+    private String replayId;
+
     public String getReplayId() {
         return replayId;
     }
-    private String replayId;
 
     public void setReplayId(String replayId) {
         this.replayId = replayId;
