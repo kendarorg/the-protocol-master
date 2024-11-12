@@ -108,6 +108,7 @@ public class HttpRunner extends CommonRunner {
         CommandLine cmd = parser.parse(options, args);
         ini.getProtocols().put(getId(),section);
         section.setProtocol(getId());
+        section.setProtocolInstanceId(getId());
         section.setHttp(Integer.parseInt(cmd.getOptionValue("http", "4080")));
         section.setHttps(Integer.parseInt(cmd.getOptionValue("https", "4443")));
         section.setProxy(Integer.parseInt(cmd.getOptionValue("proxy", "9999")));

@@ -5,7 +5,6 @@ import org.kendar.filters.ProtocolPhase;
 import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
-import org.kendar.storage.Storage;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,12 +15,8 @@ import java.util.regex.Pattern;
  *
  * @param <T>
  */
-public abstract class Proxy<T extends Storage> {
+public abstract class Proxy {
     protected boolean replayer;
-    /**
-     * (Eventual) storage
-     */
-    protected T storage;
     /**
      * Descriptor (of course network like)
      */
@@ -49,9 +44,6 @@ public abstract class Proxy<T extends Storage> {
      */
     public void setProtocol(NetworkProtoDescriptor protocol) {
         this.protocol = protocol;
-        if (this.storage != null) {
-            this.storage.setDescriptor(protocol);
-        }
     }
 
     /**
@@ -67,28 +59,7 @@ public abstract class Proxy<T extends Storage> {
      */
     public abstract void initialize();
 
-    /**
-     * Get the storage
-     *
-     * @return
-     */
-    public T getStorage() {
-        return storage;
-    }
 
-    /**
-     * Set and initialize the storage
-     *
-     * @param storage
-     */
-    public void setStorage(T storage) {
-        this.storage = storage;
-        if (protocol != null) {
-            this.storage.setDescriptor(protocol);
-        }
-
-        this.storage.initialize();
-    }
 
     public void setFilters(List<PluginDescriptor> filters) {
         for (var filter : filters) {
@@ -139,5 +110,9 @@ public abstract class Proxy<T extends Storage> {
             }
         }
         return List.of();
+    }
+
+    public void terminateFilters() {
+        throw new RuntimeException("NOT YET IMPLEMENTED");
     }
 }

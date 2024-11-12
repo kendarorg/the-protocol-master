@@ -1,10 +1,7 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.storage.generic.CallItemsQuery;
-import org.kendar.storage.generic.ResponseItemQuery;
-import org.kendar.storage.generic.StorageRepository;
+import org.kendar.storage.generic.*;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -13,28 +10,24 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
+public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
-    private static final Object lockObject = new Object();
-    private final ConcurrentHashMap<Long, StorageItem<I, O>> inMemoryDb = new ConcurrentHashMap<>();
-    private final List<StorageItem<I, O>> outItems = new ArrayList<>();
-    private final Object responseLockObject = new Object();
-    private final ConcurrentLinkedQueue<StorageItem> items = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<LineToWrite> items = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<String, ProtocolRepo> protocolRepo = new ConcurrentHashMap<>();
+    private final AtomicInteger storageCounter = new AtomicInteger(0);
+    private final TypeReference<StorageItem> typeReference = new TypeReference<>() {
+    };
     private String targetDir;
-    private BaseStorage<I, O> baseStorage;
-    private List<CompactLine> index = new ArrayList<>();
-    private boolean initialized = false;
-    private ProtoDescriptor descriptor;
 
     public FileStorageRepository(String targetDir) {
 
@@ -47,9 +40,8 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
     }
 
     @Override
-    public void initialize(BaseStorage<I, O> baseStorage) {
-        this.baseStorage = baseStorage;
-        this.descriptor = baseStorage.getDescriptor();
+    public void initialize() {
+
         try {
             if (!Path.of(targetDir).isAbsolute()) {
                 Path currentRelativePath = Paths.get("").toAbsolutePath();
@@ -66,23 +58,29 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
         }
     }
 
-    private void initializeContent() {
-        if (!initialized) {
-            for (var item : readAllItems()) {
-                if (item.getType().equalsIgnoreCase("RESPONSE")) {
-                    outItems.add(item);
-                    continue;
-                }
-                inMemoryDb.put(item.getIndex(), item);
+    private ProtocolRepo initializeContent(String protocolInstanceIdOuter) {
+        return protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
+            if (currRepo == null) {
+                currRepo = new ProtocolRepo();
             }
+            if (!currRepo.initialized) {
+                for (var item : readAllItems(protocolInstanceId)) {
+                    if (item.getType().equalsIgnoreCase("RESPONSE")) {
+                        currRepo.outItems.add(item);
+                        continue;
+                    }
+                    currRepo.inMemoryDb.put(item.getIndex(), item);
+                }
 
-            index = retrieveIndexFile();
-            initialized = true;
-        }
+                currRepo.index = retrieveIndexFile(protocolInstanceId);
+                currRepo.initialized = true;
+            }
+            return currRepo;
+        });
     }
 
     public long generateIndex() {
-        return descriptor.getCounter("STORAGE_ID");
+        return storageCounter.incrementAndGet();
     }
 
     @Override
@@ -95,11 +93,14 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
                     continue;
                 }
                 var item = items.poll();
-                if (item.getIndex() <= 0) {
-                    var valueId = generateIndex();
-                    item.setIndex(valueId);
+                //if (item.getIndex() <= 0) {
+                var valueId = generateIndex();
+                item.getCompactLine().setIndex(valueId);
+                if (item.getStorageItem() != null) {
+                    item.getStorageItem().setIndex(valueId);
                 }
-                var id = BaseStorage.padLeftZeros(String.valueOf(item.getIndex()), 10) + ".json";
+                //}
+                var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
 
                 var result = mapper.serializePretty(item);
                 Files.writeString(Path.of(targetDir, id), result);
@@ -110,16 +111,29 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
         }
     }
 
+    public static String padLeftZeros(String inputString, int length) {
+        if (inputString.length() >= length) {
+            return inputString;
+        }
+        StringBuilder sb = new StringBuilder();
+        while (sb.length() < length - inputString.length()) {
+            sb.append('0');
+        }
+        sb.append(inputString);
+
+        return sb.toString();
+    }
+
     @Override
-    public void write(StorageItem item) {
+    public void write(LineToWrite item) {
         items.add(item);
     }
 
 
-    protected List<CompactLine> retrieveIndexFile() {
+    protected List<CompactLine> retrieveIndexFile(String protocolInstanceId) {
         String fileContent;
         try {
-            fileContent = Files.readString(Path.of(targetDir, "index.json"));
+            fileContent = Files.readString(Path.of(targetDir, "index." + protocolInstanceId + ".json"));
         } catch (IOException e) {
             log.error("Missing index file!");
             throw new RuntimeException(e);
@@ -128,15 +142,16 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
         });
     }
 
-    protected List<StorageItem<I, O>> readAllItems() {
+    protected List<StorageItem> readAllItems(String protocolInstanceId) {
         var fileNames = Stream.of(new File(targetDir).listFiles())
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
+                .filter(name -> name.endsWith("." + protocolInstanceId + ".json"))
                 .sorted()
                 .collect(Collectors.toList());
-        var result = new ArrayList<StorageItem<I, O>>();
+        var result = new ArrayList<StorageItem>();
         for (var fileName : fileNames) {
-            var nameOnly = fileName.replace(".json", "");
+            var nameOnly = fileName.replace("." + protocolInstanceId + ".json", "");
             try {
                 Long.parseLong(nameOnly);
             } catch (NumberFormatException ex) {
@@ -144,7 +159,7 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
             }
             try {
                 var fileContent = Files.readString(Path.of(targetDir, fileName));
-                result.add((StorageItem<I, O>) mapper.deserialize(fileContent, baseStorage.getTypeReference()));
+                result.add(mapper.deserialize(fileContent, typeReference));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -153,34 +168,16 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
     }
 
     @Override
-    public void optimize() {
-
-
-        List<CompactLine> compactLines = new ArrayList<>();
-
-        List<StorageItem<I, O>> loadedData = new ArrayList<>();
+    public void finalizeWrite(String protocolInstanceId) {
         try {
-            for (var item : readAllItems()) {
-                var cl = new CompactLine(item, () -> baseStorage.buildTag(item));
-                compactLines.add(cl);
-                if (!baseStorage.useFullData() && baseStorage.shouldNotSave(cl, compactLines, item, loadedData)) {
-                    var id = BaseStorage.padLeftZeros(String.valueOf(cl.getIndex()), 10) + ".json";
-                    if (Files.exists(Path.of(targetDir, id + ".noop"))) {
-                        Files.delete(Path.of(targetDir, id + ".noop"));
-                    }
-                    try {
-                        Files.move(Path.of(targetDir, id), Path.of(targetDir, id + ".noop"));
-                    } catch (NoSuchFileException ex) {
-                        log.warn("[TPM  ][WR]: File did not exist at {}", Path.of(targetDir, id));
-                    }
-                    continue;
-                }
-                loadedData.add(item);
+            var repo = protocolRepo.get(protocolInstanceId);
+            var indexFile = "index." + protocolInstanceId + ".json";
+            if (Files.exists(Path.of(targetDir, indexFile))) {
+                Files.delete(Path.of(targetDir, indexFile));
             }
-            if (Files.exists(Path.of(targetDir, "index.json"))) {
-                Files.delete(Path.of(targetDir, "index.json"));
-            }
-            Files.writeString(Path.of(targetDir, "index.json"), mapper.serializePretty(compactLines));
+            Files.writeString(Path.of(targetDir, indexFile),
+                    mapper.serializePretty(repo.index));
+            protocolRepo.remove(protocolInstanceId);
         } catch (IOException e) {
             log.error("[TPM  ][WR]: Unable to write index file");
             throw new RuntimeException(e);
@@ -190,11 +187,11 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
     }
 
     @Override
-    public StorageItem read(CallItemsQuery query) {
-        synchronized (lockObject) {
-            initializeContent();
+    public LineToRead read(String protocolInstanceId, CallItemsQuery query) {
+        var ctx = initializeContent(protocolInstanceId);
+        synchronized (ctx.lockObject) {
 
-            var idx = index.stream()
+            var idx = ctx.index.stream()
                     .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
                     .filter(a ->
                             typeMatching(query.getType(), a.getType()) &&
@@ -203,34 +200,31 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
                                     query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
                     ).findFirst();
 
-            Optional<StorageItem<I, O>> item = Optional.empty();
+            Optional<StorageItem> item = Optional.empty();
 
-            CompactLine cl = null;
             if (idx.isPresent()) {
-                cl = idx.get();
-                item = inMemoryDb.values().stream()
+                item = ctx.inMemoryDb.values().stream()
                         .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
                         .filter(a -> a.getIndex() == idx.get().getIndex()).findFirst();
             } else {
                 log.warn("[TPM  ][WR]: Index not found!");
             }
-            var shouldNotSave = baseStorage.shouldNotSave(cl, null, null, null);
 
-            if (item.isPresent() && !shouldNotSave) {
+            if (item.isPresent()) {
 
                 log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
-                inMemoryDb.remove(item.get().getIndex());
-                idx.ifPresent(compactLine -> index.remove(compactLine));
-                return baseStorage.beforeSendingReadResult(item.get(), null);
+                ctx.inMemoryDb.remove(item.get().getIndex());
+                idx.ifPresent(compactLine -> ctx.index.remove(compactLine));
+                return new LineToRead(item.get(), null);
             }
 
             if (idx.isPresent()) {
                 log.debug("[SERVER][REPSHRT] {}:{}", idx.get().getIndex(), idx.get().getType());
-                index.remove(idx.get());
-                var si = new StorageItem<I, O>();
+                ctx.index.remove(idx.get());
+                var si = new StorageItem();
                 si.setIndex(idx.get().getIndex());
 
-                return baseStorage.beforeSendingReadResult(si, idx.get());
+                return new LineToRead(si, idx.get());
             }
 
             return null;
@@ -261,13 +255,14 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
     }
 
     @Override
-    public List<StorageItem> readResponses(ResponseItemQuery query) {
+    public List<StorageItem> readResponses(String protocolInstanceId, ResponseItemQuery query) {
+        var ctx = initializeContent(protocolInstanceId);
         var result = new ArrayList<StorageItem>();
-        for (var item : index.stream()
+        for (var item : ctx.index.stream()
                 .sorted(Comparator.comparingInt(value -> (int) value.getIndex())).filter(a -> a.getIndex() > query.getStartAt()).collect(Collectors.toList())) {
             if (item.getType().equalsIgnoreCase("RESPONSE")) {
                 log.debug("[CL<FF] loading response");
-                var outItem = outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
+                var outItem = ctx.outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
                 if (outItem.isPresent()) {
                     result.add(outItem.get());
                     log.debug("[CL<FF][CB] After: {} Index: {} Type: {}", query.getStartAt(), item.getIndex(), outItem.get().getType());
@@ -277,5 +272,13 @@ public class FileStorageRepository<I, O> implements StorageRepository<I, O> {
             }
         }
         return result;
+    }
+
+    private class ProtocolRepo {
+        public final Object lockObject = new Object();
+        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
+        public final List<StorageItem> outItems = new ArrayList<>();
+        public List<CompactLine> index = new ArrayList<>();
+        public boolean initialized = false;
     }
 }

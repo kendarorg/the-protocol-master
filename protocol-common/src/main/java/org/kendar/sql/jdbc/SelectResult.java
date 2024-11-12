@@ -42,4 +42,13 @@ public class SelectResult {
     public void setLastInsertedId(long lastInsertedId) {
         this.lastInsertedId = lastInsertedId;
     }
+
+    public void fill(SelectResult source) {
+        this.intResult=source.intResult;
+        this.lastInsertedId=source.lastInsertedId;
+        this.count=source.count;
+        this.metadata.addAll(source.metadata);
+        this.records.addAll(source.records);
+
+    }
 }

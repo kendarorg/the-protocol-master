@@ -57,6 +57,7 @@ public abstract class CommonRunner {
         ini.getProtocols().put(getId(),section);
         section.setPort(Integer.parseInt(cmd.getOptionValue("port", getDefaultPort())));
         section.setProtocol(cmd.getOptionValue("protocol"));
+        section.setProtocolInstanceId(getId());
         section.setConnectionString(cmd.getOptionValue("connection"));
         section.setTimeoutSeconds(Integer.parseInt(cmd.getOptionValue("timeout", "30")));
         DefaultSimulationSettings simulation =null;

@@ -6,6 +6,7 @@ import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.LineToWrite;
 
 public class RedisRecordingPlugin extends BasicRecordingPlugin
 {
@@ -38,5 +39,6 @@ public class RedisRecordingPlugin extends BasicRecordingPlugin
                 filterContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
+        storage.write(new LineToWrite(getInstanceId(),storageItem,compactLine));
     }
 }

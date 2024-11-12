@@ -48,46 +48,4 @@ public class MqttProxy extends NetworkProxy<MqttStorage> {
 
         return "MQTT";
     }
-
-    @Override
-    protected Object getData(Object of) {
-
-        return of;
-    }
-
-    @Override
-    protected Object buildState(ProtoContext context, JsonNode out, Class<? extends ProtoState> aClass) {
-
-        return mapper.deserialize(out.get("data").toString(), aClass);
-    }
-
-    @Override
-    protected void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems) {
-        if (storageItems.isEmpty()) return;
-        for (var item : storageItems) {
-            var out = item.getOutput();
-            var clazz = out.get("type").textValue();
-            ReturnMessage fr;
-            int consumeId = item.getConnectionId();
-            switch (clazz) {
-                case "ConnectAck":
-                    fr = mapper.deserialize(out.get("data").toString(), ConnectAck.class);
-                    break;
-                case "Publish":
-                    fr = mapper.deserialize(out.get("data").toString(), Publish.class);
-                    break;
-                default:
-                    throw new RuntimeException("MISSING " + clazz);
-
-            }
-            if (fr != null) {
-                log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
-                var ctx = MqttProtocol.consumeContext.get(consumeId);
-                ctx.write(fr);
-            } else {
-                throw new RuntimeException("MISSING CLASS " + clazz);
-            }
-
-        }
-    }
 }

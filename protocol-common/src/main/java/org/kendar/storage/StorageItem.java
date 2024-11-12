@@ -1,21 +1,26 @@
 package org.kendar.storage;
 
+import org.kendar.utils.JsonMapper;
+
 /**
  * Storage item
  *
  * @param <I>
  * @param <O>
  */
-public class StorageItem<I, O> {
+public class StorageItem {
+    private static final JsonMapper mapper = new JsonMapper();
     private boolean constant;
     private int connectionId;
     private long index = -1;
-    private I input;
-    private O output;
+    private Object input;
+    private Object output;
     private long durationMs;
     private String type;
     private String caller;
     private int nth = -1;
+    private Object deserializedInput;
+    private Object deserializedOutput;
 
     /**
      * Needed for serialization
@@ -24,7 +29,7 @@ public class StorageItem<I, O> {
 
     }
 
-    public StorageItem(int connectionId, I input, O output, long durationMs, String type, String caller) {
+    public StorageItem(int connectionId, Object input, Object output, long durationMs, String type, String caller) {
         this.connectionId = connectionId;
         this.input = input;
         this.output = output;
@@ -33,7 +38,7 @@ public class StorageItem<I, O> {
         this.caller = caller;
     }
 
-    public StorageItem(long index, int connectionId, I input, O output, long durationMs, String type, String caller) {
+    public StorageItem(long index, int connectionId, Object input, Object output, long durationMs, String type, String caller) {
         this.index = index;
         this.connectionId = connectionId;
         this.input = input;
@@ -41,6 +46,11 @@ public class StorageItem<I, O> {
         this.durationMs = durationMs;
         this.type = type;
         this.caller = caller;
+    }
+
+    public <T,K> void initializeIo(Class<T> typeIn,Class<K> typeOut) {
+        if(typeIn!=null && input!=null && input.getClass()!=typeIn)input = mapper.deserialize(mapper.serialize(this.getInput()), typeIn);
+        if(typeOut!=null && output!=null  && output.getClass()!=typeOut)output = mapper.deserialize(mapper.serialize(this.getOutput()), typeOut);
     }
 
     public int getNth() {
@@ -75,19 +85,19 @@ public class StorageItem<I, O> {
         this.index = index;
     }
 
-    public I getInput() {
+    public Object getInput() {
         return input;
     }
 
-    public void setInput(I input) {
+    public void setInput(Object input) {
         this.input = input;
     }
 
-    public O getOutput() {
+    public Object getOutput() {
         return output;
     }
 
-    public void setOutput(O output) {
+    public void setOutput(Object output) {
         this.output = output;
     }
 

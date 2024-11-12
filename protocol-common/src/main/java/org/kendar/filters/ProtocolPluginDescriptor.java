@@ -1,12 +1,20 @@
 package org.kendar.filters;
 
 import org.kendar.proxy.FilterContext;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 
 public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor {
 
 
     private boolean active;
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    private String instanceId;
 
     /**
      * @param request
@@ -17,6 +25,12 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
      */
     public abstract boolean handle(FilterContext filterContext, ProtocolPhase phase, T in, K out);
 
+    @Override
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+        this.instanceId = protocol.getProtocolInstanceId();
+        return this;
+    }
+
     public PluginDescriptor clone() {
         try {
             return this.getClass().getDeclaredConstructor().newInstance();
@@ -25,14 +39,20 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
         }
     }
 
-    public void setSettings(PluginSettings plugin){
+    public void setSettings(PluginSettings plugin) {
         setActive(plugin.isActive());
     }
 
-    public void setActive(boolean active){
-        this.active = active;
+    private void handleActivation(boolean active) {
+
     }
-    public boolean isActive(){
+
+    public boolean isActive() {
         return active;
+    }
+
+    public void setActive(boolean active) {
+        handleActivation(active);
+        this.active = active;
     }
 }

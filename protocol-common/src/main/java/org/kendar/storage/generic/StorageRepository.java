@@ -1,21 +1,19 @@
 package org.kendar.storage.generic;
 
-import org.kendar.storage.BaseStorage;
 import org.kendar.storage.StorageItem;
 
 import java.util.List;
 
-public interface StorageRepository<I, O> {
-    void initialize(BaseStorage<I, O> baseStorage);
+public interface StorageRepository {
+    void initialize();
 
     void flush();
 
-    void write(StorageItem item);
+    void write(LineToWrite lineToWrite);
 
-    void optimize();
+    void finalizeWrite(String instanceId);
 
-    StorageItem read(CallItemsQuery query);
+    LineToRead read(String instanceId,CallItemsQuery query);
 
-    List<StorageItem> readResponses(ResponseItemQuery query);
-
+    List<StorageItem> readResponses(String instanceId, ResponseItemQuery query);
 }

@@ -16,7 +16,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
     /**
      * Proxy instance
      */
-    private Proxy<?> proxyInstance;
+    private Proxy proxyInstance;
 
     /**
      * Whether should use the proxy
@@ -90,7 +90,6 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
     public void setProxy(Proxy proxyInstance) {
         this.proxyInstance = proxyInstance;
         this.proxyInstance.setProtocol(this);
-        this.proxyInstance.getStorage().setDescriptor(this);
         this.proxy = true;
     }
 

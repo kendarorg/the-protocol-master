@@ -8,8 +8,6 @@ import org.kendar.proxy.FilterContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
-import org.kendar.sql.jdbc.storage.JdbcStorage;
-import org.kendar.sql.jdbc.storage.NullJdbcStorage;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.utils.QueryReplacerItem;
 
@@ -24,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class JdbcProxy extends Proxy<JdbcStorage> {
+public class JdbcProxy extends Proxy {
     private final String driver;
     private final String connectionString;
     private final String forcedSchema;
@@ -32,9 +30,8 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
     private final String password;
     private List<QueryReplacerItem> queryReplacements = new ArrayList<>();
 
-    public JdbcProxy(JdbcStorage jdbcStorage) {
+    public JdbcProxy() {
         this(null, null, null, null, null);
-        setStorage(jdbcStorage);
         this.replayer = true;
 
     }
@@ -46,7 +43,6 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         this.forcedSchema = forcedSchema;
         this.login = login;
         this.password = password;
-        setStorage(new NullJdbcStorage());
 
     }
 
@@ -290,16 +286,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                 }
             }
         }
-        if (replayer) {
-            var storageItem = storage.read(query, parameterValues, "QUERY");
-            if (storageItem == null && query.trim().toLowerCase().startsWith("set")) {
-                var result = new SelectResult();
-                result.setCount(0);
-                result.setIntResult(true);
-                return result;
-            }
-            return storageItem.getOutput().getSelectResult();
-        }
+
         try {
             var result = new SelectResult();
             long start = System.currentTimeMillis();
@@ -330,14 +317,11 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             } else {
                 runThroughSingleResult(insert, parameterValues, statement, result, count);
             }
-
-            long end = System.currentTimeMillis();
             for (var filter : getFilters(ProtocolPhase.POST_CALL, jdbcCall, result)) {
                 if (filter.handle(filterContext, ProtocolPhase.POST_CALL, jdbcCall, result)) {
                     break;
                 }
             }
-            storage.write(connectionId, query, result, parameterValues, end - start, "QUERY");
             return result;
         } catch (SQLException e) {
             throw new RuntimeException(e);

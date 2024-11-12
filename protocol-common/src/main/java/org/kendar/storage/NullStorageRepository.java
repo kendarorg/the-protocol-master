@@ -1,14 +1,13 @@
 package org.kendar.storage;
 
-import org.kendar.storage.generic.CallItemsQuery;
-import org.kendar.storage.generic.ResponseItemQuery;
-import org.kendar.storage.generic.StorageRepository;
+import org.kendar.storage.generic.*;
 
 import java.util.List;
 
-public class NullStorageRepository<I, O> implements StorageRepository<I, O> {
+public class NullStorageRepository implements StorageRepository {
+
     @Override
-    public void initialize(BaseStorage<I, O> baseStorage) {
+    public void initialize() {
 
     }
 
@@ -18,22 +17,22 @@ public class NullStorageRepository<I, O> implements StorageRepository<I, O> {
     }
 
     @Override
-    public void write(StorageItem item) {
+    public void write(LineToWrite lineToWrite) {
 
     }
 
     @Override
-    public void optimize() {
+    public void finalizeWrite(String instanceId) {
 
     }
 
     @Override
-    public StorageItem read(CallItemsQuery query) {
-        throw new RuntimeException("Not implemented");
+    public LineToRead read(String instanceId, CallItemsQuery query) {
+        return null;
     }
 
     @Override
-    public List<StorageItem> readResponses(ResponseItemQuery query) {
-        throw new RuntimeException("Not implemented");
+    public List<StorageItem> readResponses(String instanceId, ResponseItemQuery query) {
+        return List.of();
     }
 }

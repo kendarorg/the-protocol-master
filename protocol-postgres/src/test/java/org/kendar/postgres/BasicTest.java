@@ -3,7 +3,6 @@ package org.kendar.postgres;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.testcontainer.images.PostgreslImage;
 import org.kendar.testcontainer.utils.Utils;

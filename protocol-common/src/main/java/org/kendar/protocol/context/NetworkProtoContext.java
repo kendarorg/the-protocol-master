@@ -47,7 +47,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
     /**
      * Proxy to call the real server
      */
-    private Proxy<?> proxy;
+    private Proxy proxy;
 
     /**
      * Storage for the bytes not consumed

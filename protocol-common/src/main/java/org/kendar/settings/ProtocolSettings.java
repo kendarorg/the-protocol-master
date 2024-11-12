@@ -8,6 +8,15 @@ import java.util.Map;
 public class ProtocolSettings {
     private static JsonMapper mapper = new JsonMapper();
     private String protocol;
+    private String protocolInstanceId;
+
+    public String getProtocolInstanceId() {
+        return protocolInstanceId;
+    }
+
+    public void setProtocolInstanceId(String protocolInstanceId) {
+        this.protocolInstanceId = protocolInstanceId;
+    }
 
     public String getProtocol() {
         return protocol;

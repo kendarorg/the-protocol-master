@@ -54,12 +54,7 @@ public class TcpServer {
         } finally {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
                 var proxy = protoDescriptor.getProxy();
-                if (proxy != null && !proxy.isReplayer()) {
-                    var storage = protoDescriptor.getProxy().getStorage();
-                    if (storage != null) {
-                        storage.optimize();
-                    }
-                }
+                proxy.terminateFilters();
             }
         }
     }

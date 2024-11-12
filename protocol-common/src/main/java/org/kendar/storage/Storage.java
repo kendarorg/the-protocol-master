@@ -55,9 +55,9 @@ public interface Storage<I, O> {
      */
     long generateIndex();
 
-    StorageItem<I, O> read(I toRead, String type);
+    StorageItem read(I toRead, String type);
 
-    List<StorageItem<I, O>> readResponses(long afterIndex);
+    List<StorageItem> readResponses(long afterIndex);
 
     ProtoDescriptor getDescriptor();
 
