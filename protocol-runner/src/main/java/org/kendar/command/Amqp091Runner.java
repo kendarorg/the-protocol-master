@@ -3,7 +3,6 @@ package org.kendar.command;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.kendar.amqp.v09.AmqpProxy;
-import org.kendar.amqp.v09.AmqpStorageHandler;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
@@ -66,19 +65,11 @@ public class Amqp091Runner extends CommonRunner {
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new AmqpProxy(connectionString, login, password);
 
-        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
-            proxy = new AmqpProxy();
-            proxy.setStorage(new AmqpStorageHandler(storage));
-        } else {
-            proxy.setStorage(new AmqpStorageHandler(storage));
-        }
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
-            ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
-        }
+
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

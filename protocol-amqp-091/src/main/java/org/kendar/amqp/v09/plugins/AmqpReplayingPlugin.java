@@ -29,6 +29,8 @@ public class AmqpReplayingPlugin extends BasicReplayingPlugin {
 
     @Override
     protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outObj, Object toread) {
+        if(outObj==null)return;
+        if(toread == null)return;
         var out = mapper.toJsonNode(outObj);
 
         var result = mapper.deserialize(out.get("data").toString(), out.getClass());

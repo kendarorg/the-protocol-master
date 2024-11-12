@@ -7,12 +7,16 @@ import org.kendar.settings.ProtocolSettings;
 
 public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor {
 
-
     private boolean active;
-    private String instanceId;
+    private String instanceId = "default";
 
     public String getInstanceId() {
         return instanceId;
+    }
+
+    public ProtocolPluginDescriptor<T, K> asActive(){
+        active = true;
+        return this;
     }
 
     /**

@@ -88,6 +88,13 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         super.initialize(global, protocol);
+        storage = (StorageRepository) global.getService("storage");
+        return this;
+    }
+
+    public BasicRecordingPlugin withStorage(StorageRepository storage){
+
+        this.storage = storage;
         return this;
     }
 

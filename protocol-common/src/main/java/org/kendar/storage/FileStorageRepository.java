@@ -36,7 +36,7 @@ public class FileStorageRepository implements StorageRepository {
 
     public FileStorageRepository(Path targetDir) {
 
-        this.targetDir = targetDir.toString();
+        this.targetDir = targetDir.toAbsolutePath().toString();
     }
 
     public static String padLeftZeros(String inputString, int length) {
@@ -152,6 +152,7 @@ public class FileStorageRepository implements StorageRepository {
         var result = new ArrayList<StorageItem>();
         for (var fileName : fileNames) {
             var nameOnly = fileName.replace("." + protocolInstanceId + ".json", "");
+            if(nameOnly.equalsIgnoreCase("index"))continue;
             try {
                 Long.parseLong(nameOnly);
             } catch (NumberFormatException ex) {
@@ -272,6 +273,11 @@ public class FileStorageRepository implements StorageRepository {
             }
         }
         return result;
+    }
+
+    @Override
+    public String getType() {
+        return "storage";
     }
 
     private class ProtocolRepo {

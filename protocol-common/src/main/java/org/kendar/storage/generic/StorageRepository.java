@@ -1,10 +1,11 @@
 package org.kendar.storage.generic;
 
+import org.kendar.Service;
 import org.kendar.storage.StorageItem;
 
 import java.util.List;
 
-public interface StorageRepository {
+public interface StorageRepository extends Service {
     void initialize();
 
     void flush();

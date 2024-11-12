@@ -3,6 +3,8 @@ package org.kendar.filters;
 import org.kendar.filters.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.FilterContext;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.ResponseItemQuery;
@@ -19,6 +21,19 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
     protected StorageRepository storage;
     protected HashSet<Integer> completedIndexes = new HashSet<>();
     protected HashSet<Integer> completedOutIndexes = new HashSet<>();
+
+    @Override
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+        super.initialize(global, protocol);
+        storage = (StorageRepository) global.getService("storage");
+        return this;
+    }
+
+    public BasicReplayingPlugin withStorage(StorageRepository storage){
+
+        this.storage = storage;
+        return this;
+    }
 
     protected boolean hasCallbacks() {
         return false;

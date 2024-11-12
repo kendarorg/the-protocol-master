@@ -112,6 +112,13 @@ public abstract class Proxy {
     }
 
     public void terminateFilters() {
-        throw new RuntimeException("NOT YET IMPLEMENTED");
+        for(var item: toFilter.entrySet()){
+            for(var phase: item.getValue().entrySet()){
+                for(var plugin: phase.getValue()){
+                    if(plugin.isActive())
+                    plugin.terminate();
+                }
+            }
+        }
     }
 }

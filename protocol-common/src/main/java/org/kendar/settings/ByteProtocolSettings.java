@@ -4,15 +4,6 @@ public class ByteProtocolSettings extends ProtocolSettings {
     private int port;
     private String connectionString;
     private int timeoutSeconds;
-    private DefaultSimulationSettings simulation;
-
-    public DefaultSimulationSettings getSimulation() {
-        return simulation;
-    }
-
-    public void setSimulation(DefaultSimulationSettings simulation) {
-        this.simulation = simulation;
-    }
 
     public int getTimeoutSeconds() {
         return timeoutSeconds;

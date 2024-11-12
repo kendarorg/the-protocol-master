@@ -35,4 +35,9 @@ public class NullStorageRepository implements StorageRepository {
     public List<StorageItem> readResponses(String instanceId, ResponseItemQuery query) {
         return List.of();
     }
+
+    @Override
+    public String getType() {
+        return "storage";
+    }
 }
