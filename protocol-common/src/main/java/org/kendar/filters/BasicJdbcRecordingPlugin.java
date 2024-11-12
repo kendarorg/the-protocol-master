@@ -38,6 +38,7 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
             res = new JdbcResponse(out);
         } else {
             res = new JdbcResponse(out.getCount());
+            res.setSelectResult(out);
         }
 
 

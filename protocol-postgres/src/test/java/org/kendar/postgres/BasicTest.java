@@ -66,6 +66,7 @@ public class BasicTest {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
             }
         }
+        storage.initialize();
         proxy.setFilters(List.of(
                 new PostgresRecordPlugin().withStorage(storage).asActive()));
         baseProtocol.setProxy(proxy);

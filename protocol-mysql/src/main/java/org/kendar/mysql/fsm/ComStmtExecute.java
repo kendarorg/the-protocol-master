@@ -193,6 +193,9 @@ public class ComStmtExecute extends ProtoState {
         var flags = inputBuffer.get();  //TODO CURSOR
         var iterationCount = inputBuffer.readUB4();
         var query = (String) context.getValue("STATEMENT_" + statementId);
+        if(query==null||query.isEmpty()){
+            return iteratorOfEmpty();
+        }
         var fields = (ArrayList<ProxyMetadata>) context.getValue("STATEMENT_FIELDS_" + statementId);
         var paramFields = fields.stream().filter(f -> f.getColumnName().equalsIgnoreCase("?")).collect(Collectors.toList());
         int nullBitmapSize = (paramFields.size() + 7) / 8;

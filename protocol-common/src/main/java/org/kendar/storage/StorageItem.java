@@ -52,14 +52,21 @@ public class StorageItem {
 
     public <T> T retrieveInAs(Class<T> clazz) {
         if (inAs == null) {
-            inAs = mapper.deserialize(input, clazz);
+            if(clazz == input.getClass()) {
+                inAs = input;
+            }else {
+                inAs = mapper.deserialize(input, clazz);
+            }
         }
         return (T) inAs;
     }
 
     public <T> T retrieveOutAs(Class<T> clazz) {
         if (outAs == null) {
-            outAs = mapper.deserialize(output, clazz);
+            if (clazz == output.getClass()) {
+                outAs = output;
+            } else
+                outAs = mapper.deserialize(output, clazz);
         }
         return (T) outAs;
     }
@@ -110,7 +117,7 @@ public class StorageItem {
     }
 
     public void setOutput(Object output) {
-        this.output = mapper.toJsonNode(input);
+        this.output = mapper.toJsonNode(output);
         outAs = null;
     }
 

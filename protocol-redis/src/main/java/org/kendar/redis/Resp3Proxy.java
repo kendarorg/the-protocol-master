@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 import java.nio.channels.AsynchronousChannelGroup;
 
 public class Resp3Proxy extends NetworkProxy {
-    public Resp3Proxy() {
+    public Resp3Proxy(){
 
     }
 

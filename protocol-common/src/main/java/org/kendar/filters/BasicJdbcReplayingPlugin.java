@@ -40,21 +40,36 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
         var query = new CallItemsQuery();
 
         query.setCaller(filterContext.getCaller());
-        query.setType(in.getClass().getSimpleName());
+        query.setType("QUERY");
         query.addTag("parametersCount", in.getParameterValues().size());
         query.addTag("query", in.getQuery());
         query.setUsed(completedIndexes);
         var lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
-        if ((lineToRead == null || lineToRead.getStorageItem() == null) && in.getQuery().trim().toLowerCase().startsWith("set")) {
+        /*if ((lineToRead == null || lineToRead.getStorageItem() == null) ||
+                in.getQuery().trim().toLowerCase().startsWith("set")) {
             out.setCount(0);
             out.setIntResult(true);
         } else {
-            var source = (SelectResult) lineToRead.getStorageItem().getOutput();
+            var source = (SelectResult) mapper.deserialize(lineToRead.getStorageItem().getOutput(),SelectResult.class);
+            if(source==null){
+                out.setCount(0);
+                out.setIntResult(true);
+            }else {
+                out.fill(source);
+            }
+        }*/
+        if ((lineToRead == null || lineToRead.getStorageItem() == null) &&
+                in.getQuery().trim().toLowerCase().startsWith("set")) {
+            out.setCount(0);
+            out.setIntResult(true);
+        } else {
+            var source = (SelectResult) mapper.deserialize(lineToRead.getStorageItem().getOutput(),SelectResult.class);
             out.fill(source);
         }
     }
 
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
+        if(lineToRead==null) return null;
         var idx = lineToRead.getCompactLine();
         var si = lineToRead.getStorageItem();
         if (idx != null) {

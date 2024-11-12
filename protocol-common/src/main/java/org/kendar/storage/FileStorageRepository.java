@@ -78,6 +78,7 @@ public class FileStorageRepository implements StorageRepository {
             }
             if (!currRepo.initialized) {
                 for (var item : readAllItems(protocolInstanceId)) {
+                    if(item==null) continue;
                     if (item.getType() == null) continue;
                     if (item.getType().equalsIgnoreCase("RESPONSE")) {
                         currRepo.outItems.add(item);
@@ -119,7 +120,7 @@ public class FileStorageRepository implements StorageRepository {
 
                 var repo = protocolRepo.get(item.getInstanceId());
                 repo.index.add(item.getCompactLine());
-                var result = mapper.serializePretty(item);
+                var result = mapper.serializePretty(item.getStorageItem());
                 if (!Files.exists(Paths.get(targetDir))) {
                     Files.createDirectories(Paths.get(targetDir));
                 }
@@ -133,6 +134,9 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void write(LineToWrite item) {
+        if(item==null){
+            log.error("Blank item");
+        }
         items.add(item);
     }
 

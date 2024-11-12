@@ -20,7 +20,7 @@ public class MySqlRecordPlugin extends BasicJdbcRecordingPlugin {
     @Override
     public Map<String, String> buildTag(StorageItem item) {
         var data = new HashMap<String, String>();
-        var input = (JdbcRequest) item.getInput();
+        var input = (JdbcRequest) item.retrieveInAs(JdbcRequest.class);
         data.put("query", null);
         data.put("isIntResult", "true");
         data.put("parametersCount", "0");
@@ -35,7 +35,7 @@ public class MySqlRecordPlugin extends BasicJdbcRecordingPlugin {
             }
         }
         if (item.getOutput() != null) {
-            var output = (JdbcResponse) item.getOutput();
+            var output = (JdbcResponse) item.retrieveOutAs(JdbcResponse.class);
             data.put("isIntResult", Boolean.toString(output.getSelectResult().isIntResult()));
             if (output.getSelectResult().isIntResult()) {
                 data.put("resultsCount", output.getIntResult() + "");

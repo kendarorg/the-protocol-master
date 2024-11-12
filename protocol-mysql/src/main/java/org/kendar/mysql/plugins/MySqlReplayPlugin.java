@@ -47,9 +47,9 @@ public class MySqlReplayPlugin extends BasicJdbcReplayingPlugin {
             req.setQuery(idx.getTags().get("query"));
             si.setInput(req);
         }
-        var jdbcRequest = (JdbcRequest) si.getInput();
+        var jdbcRequest = (JdbcRequest) si.retrieveInAs(JdbcRequest.class);
         if (jdbcRequest.getQuery().toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
-            var jdbcResponse = (JdbcResponse) si.getOutput();
+            var jdbcResponse = (JdbcResponse) si.retrieveInAs(JdbcResponse.class);
             var selectResult = new JsonMapper().deserialize(SELECT_TRANS_RESULT, SelectResult.class);
             var realResultValue = jdbcResponse.getIntResult();
             selectResult.getRecords().get(0).set(0, realResultValue + "");
