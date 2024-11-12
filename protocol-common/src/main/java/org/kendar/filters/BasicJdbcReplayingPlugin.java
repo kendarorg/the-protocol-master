@@ -58,20 +58,38 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
                 out.fill(source);
             }
         }*/
-        if ((lineToRead == null || lineToRead.getStorageItem() == null) &&
+        if (lineToRead != null && lineToRead.getStorageItem() != null
+                && lineToRead.getStorageItem().getOutput() != null){
+            var source = lineToRead.getStorageItem().retrieveOutAs(JdbcResponse.class);
+            out.fill(source.getSelectResult());
+        }else if(lineToRead.getCompactLine()!=null){// if(in.getQuery().trim().toLowerCase().startsWith("set")){
+
+            if (lineToRead.getCompactLine().getTags().get("isIntResult").equalsIgnoreCase("true")) {
+                SelectResult resultset = new SelectResult();
+                resultset.setIntResult(true);
+                resultset.setCount(Integer.parseInt(lineToRead.getCompactLine().getTags().get("resultsCount")));
+                out.fill(resultset);
+            }else if(in.getQuery().trim().toLowerCase().startsWith("set")){
+                System.out.println("a");
+            }
+        }
+        /*if ((lineToRead == null || lineToRead.getStorageItem() == null
+                || lineToRead.getStorageItem().getOutput() == null) ||
                 in.getQuery().trim().toLowerCase().startsWith("set")) {
             out.setCount(0);
             out.setIntResult(true);
         } else {
-            var source = (SelectResult) mapper.deserialize(lineToRead.getStorageItem().getOutput(),SelectResult.class);
-            out.fill(source);
-        }
+
+        }*/
     }
 
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
         if(lineToRead==null) return null;
         var idx = lineToRead.getCompactLine();
         var si = lineToRead.getStorageItem();
+        if(si!=null){
+            return lineToRead;
+        }
         if (idx != null) {
             JdbcResponse resp = new JdbcResponse();
             if (idx.getTags().get("isIntResult").equalsIgnoreCase("true")) {

@@ -51,7 +51,7 @@ public class StorageItem {
     }
 
     public <T> T retrieveInAs(Class<T> clazz) {
-        if (inAs == null) {
+        if (inAs == null && input != null) {
             if(clazz == input.getClass()) {
                 inAs = input;
             }else {
@@ -62,7 +62,7 @@ public class StorageItem {
     }
 
     public <T> T retrieveOutAs(Class<T> clazz) {
-        if (outAs == null) {
+        if (outAs == null && output!=null) {
             if (clazz == output.getClass()) {
                 outAs = output;
             } else

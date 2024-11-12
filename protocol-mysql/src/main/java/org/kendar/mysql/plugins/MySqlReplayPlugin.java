@@ -30,9 +30,25 @@ public class MySqlReplayPlugin extends BasicJdbcReplayingPlugin {
 
     @Override
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
+        if(lineToRead==null)return null;
         lineToRead = super.beforeSendingReadResult(lineToRead);
         var idx = lineToRead.getCompactLine();
         var si = lineToRead.getStorageItem();
+        if(si!=null){
+            var jdbcRequest = (JdbcRequest) si.retrieveInAs(JdbcRequest.class);
+            if (jdbcRequest.getQuery().toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
+                var jdbcResponse = (JdbcResponse) si.retrieveOutAs(JdbcResponse.class);
+                var selectResult = new JsonMapper().deserialize(SELECT_TRANS_RESULT, SelectResult.class);
+                var realResultValue = jdbcResponse.getIntResult();
+                selectResult.getRecords().get(0).set(0, realResultValue + "");
+                jdbcResponse.setSelectResult(selectResult);
+                jdbcResponse.setIntResult(0);
+                si.setInput(jdbcRequest);
+                si.setOutput(jdbcResponse);
+
+            }
+            return lineToRead;
+        }
         if (idx != null) {
             JdbcResponse resp = new JdbcResponse();
             if (idx.getTags().get("isIntResult").equalsIgnoreCase("true")) {
@@ -47,17 +63,10 @@ public class MySqlReplayPlugin extends BasicJdbcReplayingPlugin {
             req.setQuery(idx.getTags().get("query"));
             si.setInput(req);
         }
-        var jdbcRequest = (JdbcRequest) si.retrieveInAs(JdbcRequest.class);
-        if (jdbcRequest.getQuery().toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
-            var jdbcResponse = (JdbcResponse) si.retrieveInAs(JdbcResponse.class);
-            var selectResult = new JsonMapper().deserialize(SELECT_TRANS_RESULT, SelectResult.class);
-            var realResultValue = jdbcResponse.getIntResult();
-            selectResult.getRecords().get(0).set(0, realResultValue + "");
-            jdbcResponse.setSelectResult(selectResult);
-            jdbcResponse.setIntResult(0);
-            si.setInput(jdbcRequest);
-            si.setOutput(jdbcResponse);
-        }
+
+
+
+
         return lineToRead;
     }
 

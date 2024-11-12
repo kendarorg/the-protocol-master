@@ -120,12 +120,13 @@ public class FileStorageRepository implements StorageRepository {
 
                 var repo = protocolRepo.get(item.getInstanceId());
                 repo.index.add(item.getCompactLine());
-                var result = mapper.serializePretty(item.getStorageItem());
-                if (!Files.exists(Paths.get(targetDir))) {
-                    Files.createDirectories(Paths.get(targetDir));
+                if(item.getStorageItem()!=null) {
+                    var result = mapper.serializePretty(item.getStorageItem());
+                    if (!Files.exists(Paths.get(targetDir))) {
+                        Files.createDirectories(Paths.get(targetDir));
+                    }
+                    Files.writeString(Path.of(targetDir, id), result);
                 }
-                Files.writeString(Path.of(targetDir, id), result);
-
             } catch (Exception e) {
                 log.warn("Trouble flushing " + e);
             }
@@ -136,8 +137,9 @@ public class FileStorageRepository implements StorageRepository {
     public void write(LineToWrite item) {
         if(item==null){
             log.error("Blank item");
+        }else {
+            items.add(item);
         }
-        items.add(item);
     }
 
 
@@ -230,7 +232,7 @@ public class FileStorageRepository implements StorageRepository {
                 log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
                 ctx.inMemoryDb.remove(item.get().getIndex());
                 idx.ifPresent(compactLine -> ctx.index.remove(compactLine));
-                return new LineToRead(item.get(), null);
+                return new LineToRead(item.get(), idx.get());
             }
 
             if (idx.isPresent()) {
