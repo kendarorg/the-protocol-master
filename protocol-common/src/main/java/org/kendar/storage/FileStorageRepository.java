@@ -78,6 +78,7 @@ public class FileStorageRepository implements StorageRepository {
             }
             if (!currRepo.initialized) {
                 for (var item : readAllItems(protocolInstanceId)) {
+                    if(item.getType()==null)continue;
                     if (item.getType().equalsIgnoreCase("RESPONSE")) {
                         currRepo.outItems.add(item);
                         continue;
@@ -112,10 +113,16 @@ public class FileStorageRepository implements StorageRepository {
                 if (item.getStorageItem() != null) {
                     item.getStorageItem().setIndex(valueId);
                 }
+                initializeContent(item.getInstanceId());
                 //}
                 var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
 
+                var repo = protocolRepo.get(item.getInstanceId());
+                repo.index.add(item.getCompactLine());
                 var result = mapper.serializePretty(item);
+                if(!Files.exists(Paths.get(targetDir))) {
+                    Files.createDirectories(Paths.get(targetDir));
+                }
                 Files.writeString(Path.of(targetDir, id), result);
 
             } catch (Exception e) {
@@ -135,14 +142,14 @@ public class FileStorageRepository implements StorageRepository {
         try {
             fileContent = Files.readString(Path.of(targetDir, "index." + protocolInstanceId + ".json"));
         } catch (IOException e) {
-            log.error("Missing index file!");
-            throw new RuntimeException(e);
+            fileContent="[]";
         }
         return mapper.deserialize(fileContent, new TypeReference<>() {
         });
     }
 
     protected List<StorageItem> readAllItems(String protocolInstanceId) {
+        if(!Files.exists(Paths.get(targetDir))) {return new ArrayList<>();}
         var fileNames = Stream.of(new File(targetDir).listFiles())
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
@@ -172,6 +179,7 @@ public class FileStorageRepository implements StorageRepository {
     public void finalizeWrite(String protocolInstanceId) {
         try {
             var repo = protocolRepo.get(protocolInstanceId);
+            if(repo==null)return;
             var indexFile = "index." + protocolInstanceId + ".json";
             if (Files.exists(Path.of(targetDir, indexFile))) {
                 Files.delete(Path.of(targetDir, indexFile));

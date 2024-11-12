@@ -42,6 +42,10 @@ public class MongoProxy extends Proxy {
         this(connectionString, ServerApiVersion.V1);
     }
 
+    public MongoProxy() {
+
+    }
+
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
         if (replayer) {
@@ -157,7 +161,7 @@ public class MongoProxy extends Proxy {
         out.getSections().add(section);
         out.setFlags(0);
         out.setRequestId(protoContext.getReqResId());
-        out.setResponseId(lsatOp.getResponseId());
+        out.setResponseId(lsatOp.getRequestId());
         for (var filter : getFilters(ProtocolPhase.POST_CALL, lsatOp, out)) {
             if (filter.handle(filterContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
                 break;
@@ -207,10 +211,11 @@ public class MongoProxy extends Proxy {
         resultMap.put("ok", 1.0);
         //resultMap.put("saslSupportedMechs", List.of("PLAIN"));
         var json = resultMap.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        // var toSend = new OpReplyContent(8, protoContext.getReqResId(), lsatOp.getRequestId());
+        //var toSend = new OpReplyContent(8, protoContext.getReqResId(), lsatOp.getRequestId());
+        //var out2 = new OpReplyContent();
         out.setFlags(8);
         out.setRequestId(protoContext.getReqResId());
-        out.setResponseId(lsatOp.getResponseId());
+        out.setResponseId(lsatOp.getRequestId());
         out.setCursorId(0);
         out.getDocuments().add(json);
 

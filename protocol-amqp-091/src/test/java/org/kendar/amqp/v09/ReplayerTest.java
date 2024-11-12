@@ -7,6 +7,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
@@ -64,8 +65,11 @@ public class ReplayerTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setFilters(List.of(new AmqpReplayingPlugin().withStorage(new FileStorageRepository(Path.of("src",
-                "test", "resources", "test2_differentChannelAndConnection"))).asActive()));
+
+        StorageRepository storage=new FileStorageRepository(Path.of("src",
+                "test", "resources", "test2_differentChannelAndConnection"));
+        storage.initialize();
+        proxy.setFilters(List.of(new AmqpReplayingPlugin().withStorage(storage).asActive()));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -144,8 +148,10 @@ public class ReplayerTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setFilters(List.of(new AmqpReplayingPlugin().withStorage(new FileStorageRepository(Path.of("src",
-                "test", "resources", "test5_noPublish"))).asActive()));
+        StorageRepository storage=new FileStorageRepository(Path.of("src",
+                "test", "resources", "test5_noPublish"));
+        storage.initialize();
+        proxy.setFilters(List.of(new AmqpReplayingPlugin().withStorage(storage).asActive()));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -214,8 +220,10 @@ public class ReplayerTest {
 
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setFilters(List.of(new AmqpReplayingPlugin().withStorage(new FileStorageRepository(Path.of("src",
-                "test", "resources", "test3_openConnection"))).asActive()));
+        StorageRepository storage=new FileStorageRepository(Path.of("src",
+                "test", "resources", "test3_openConnection"));
+        storage.initialize();
+        proxy.setFilters(List.of(new AmqpReplayingPlugin().withStorage(storage).asActive()));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

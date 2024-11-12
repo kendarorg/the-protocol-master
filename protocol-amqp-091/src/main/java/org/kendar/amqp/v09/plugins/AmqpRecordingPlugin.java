@@ -24,6 +24,7 @@ public class AmqpRecordingPlugin extends BasicRecordingPlugin {
         return Math.max(cid.asInt(), consumeId);
     }
 
+
     @Override
     public String getProtocol() {
         return "amqp091";

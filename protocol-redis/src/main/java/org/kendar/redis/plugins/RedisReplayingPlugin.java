@@ -27,6 +27,11 @@ public class RedisReplayingPlugin extends BasicReplayingPlugin {
     }
 
     @Override
+    protected boolean hasCallbacks() {
+        return true;
+    }
+
+    @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {

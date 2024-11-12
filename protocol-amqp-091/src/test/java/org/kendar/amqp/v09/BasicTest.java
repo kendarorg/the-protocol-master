@@ -4,7 +4,6 @@ package org.kendar.amqp.v09;
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.amqp.v09.plugins.AmqpRecordingPlugin;
-import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -70,9 +69,9 @@ public class BasicTest {
                  storage = new FileStorageRepository(Path.of("target", "tests", className, method));
             }
         }
+        storage.initialize();
         proxy.setFilters(List.of(
-                new AmqpRecordingPlugin().withStorage(storage),
-                new AmqpReplayingPlugin().withStorage(storage)));
+                new AmqpRecordingPlugin().withStorage(storage).asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

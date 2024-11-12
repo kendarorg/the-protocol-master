@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.kendar.buffers.BBuffer;
 
 /**
  * Wrapper to have a single json serializer
@@ -25,7 +26,11 @@ public class JsonMapper {
 
     public String serialize(Object target) {
         try {
-            return mapper.writeValueAsString(target);
+            if(target instanceof BBuffer) {
+                return mapper.writeValueAsString((((BBuffer) target).getAll()));
+            }else{
+                return mapper.writeValueAsString(target);
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

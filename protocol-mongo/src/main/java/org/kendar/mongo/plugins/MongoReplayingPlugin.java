@@ -13,7 +13,7 @@ import java.util.List;
 public class MongoReplayingPlugin extends BasicReplayingPlugin {
     @Override
     public String getProtocol() {
-        return "mongo";
+        return "mongodb";
     }
 
 

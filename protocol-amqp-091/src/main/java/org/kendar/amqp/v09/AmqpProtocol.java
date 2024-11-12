@@ -29,6 +29,8 @@ import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
 import org.kendar.utils.Sleeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,6 +42,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     AtomicBoolean running = new AtomicBoolean(true);
     private ConcurrentHashMap<Integer, AmqpProtoContext> consumeContext;
     private int port = PORT;
+    private Logger log = LoggerFactory.getLogger(AmqpProtocol.class);
 
     private AmqpProtocol() {
         consumeContext = new ConcurrentHashMap<>();
@@ -110,7 +113,8 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
                     var hb = new HearthBeatFrame();
                     hb.setChannel(ch);
                     hb.setProtoDescriptor(this);
-                    ctx.write(hb);
+                    //ctx.write(hb);
+                    log.warn("Sending heartbeat");
                 }
             }
             Sleeper.sleep(30000);
