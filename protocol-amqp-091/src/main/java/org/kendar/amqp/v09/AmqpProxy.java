@@ -1,7 +1,6 @@
 package org.kendar.amqp.v09;
 
 import org.kendar.amqp.v09.utils.AmqpProxySocket;
-import org.kendar.amqp.v09.utils.AmqpStorage;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
 import org.kendar.proxy.NetworkProxySocket;
@@ -13,7 +12,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.AsynchronousChannelGroup;
 
-public class AmqpProxy extends NetworkProxy<AmqpStorage> {
+public class AmqpProxy extends NetworkProxy {
     private static final Logger log = LoggerFactory.getLogger(AmqpProxy.class);
 
     public AmqpProxy(String connectionString, String userId, String password) {

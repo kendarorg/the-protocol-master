@@ -5,7 +5,6 @@ import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.postgres.jpa.CompanyJpa;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 

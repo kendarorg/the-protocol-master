@@ -20,15 +20,13 @@ import org.kendar.mongo.dtos.OpQueryContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.proxy.DocumentContainer;
-import org.kendar.mongo.utils.MongoStorage;
-import org.kendar.mongo.utils.NullMongoStorage;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.FilterContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
-public class MongoProxy extends Proxy<MongoStorage> {
+public class MongoProxy extends Proxy {
     private static final JsonMapper mapper = new JsonMapper();
     private String connectionString;
     private ServerApiVersion serverApiVersion;
@@ -37,12 +35,6 @@ public class MongoProxy extends Proxy<MongoStorage> {
 
         this.connectionString = connectionString;
         this.serverApiVersion = serverApiVersion;
-        this.setStorage(new NullMongoStorage());
-    }
-
-    public MongoProxy(MongoStorage storage) {
-        replayer = true;
-        this.setStorage(storage);
     }
 
     public MongoProxy(String connectionString) {

@@ -4,14 +4,13 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.redis.utils.Resp3ProxySocket;
-import org.kendar.redis.utils.Resp3Storage;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.AsynchronousChannelGroup;
 
-public class Resp3Proxy extends NetworkProxy<Resp3Storage> {
+public class Resp3Proxy extends NetworkProxy {
 
 
     @Override
