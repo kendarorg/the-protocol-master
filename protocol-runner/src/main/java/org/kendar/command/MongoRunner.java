@@ -4,7 +4,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.mongo.MongoProxy;
-import org.kendar.mongo.MongoStorageHandler;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
@@ -48,7 +47,9 @@ public class MongoRunner extends CommonRunner {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini,
+                      ProtocolSettings protocol, StorageRepository storage,
+                      List<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
 
         var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;
 
@@ -61,18 +62,12 @@ public class MongoRunner extends CommonRunner {
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MongoProxy(connectionString);
 
-        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
-            proxy = new MongoProxy(new MongoStorageHandler(storage));
-        } else {
-            proxy.setStorage(new MongoStorageHandler(storage));
-        }
+
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
-            ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
-        }
+
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

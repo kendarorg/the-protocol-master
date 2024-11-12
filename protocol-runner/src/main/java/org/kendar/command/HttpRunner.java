@@ -126,17 +126,15 @@ public class HttpRunner extends CommonRunner {
             var pl = new HttpReplayPluginSettings();
             pl.setPlugin("replay-plugin");
             pl.setActive(true);
-            pl.setReplay(true);
             pl.setRespectCallDuration(cmd.hasOption("cdt"));
             pl.setReplayId(cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
             pl.setBlockExternal(!cmd.hasOption("allowExternal"));
             section.getPlugins().put("replay-plugin", pl);
         } else if (cmd.hasOption("record")) {
             var pl = new HttpRecordPluginSettings();
-            pl.setPlugin("recording-plugin");
+            pl.setPlugin("record-plugin");
             pl.setActive(true);
-            pl.setRecord(true);
-            section.getPlugins().put("recording-plugin", pl);
+            section.getPlugins().put("record-plugin", pl);
         }
         if (cmd.hasOption("showError") && cmd.hasOption("errorPercent")) {
             var pl = new HttpErrorPluginSettings();

@@ -21,7 +21,7 @@ public class AmqpProtoContext extends NetworkProtoContext {
     public void disconnect(Object connection) {
         ProxyConnection conn = ((ProxyConnection) getValue("CONNECTION"));
         var sock = (AmqpProxySocket) conn.getConnection();
-        if(sock != null) {
+        if (sock != null) {
             sock.close();
         }
     }

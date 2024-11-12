@@ -4,7 +4,6 @@ import org.apache.commons.cli.Options;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
-import org.kendar.redis.Resp3StorageHandler;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.GlobalSettings;
@@ -44,19 +43,10 @@ public class RedisRunner extends CommonRunner {
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new Resp3Proxy(connectionString, null, null);
 
-        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
-            proxy = new Resp3Proxy();
-            proxy.setStorage(new Resp3StorageHandler(storage));
-        } else {
-            proxy.setStorage(new Resp3StorageHandler(storage));
-        }
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
-            ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
-        }
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

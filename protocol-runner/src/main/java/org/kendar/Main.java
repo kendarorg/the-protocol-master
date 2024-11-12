@@ -132,7 +132,7 @@ public class Main {
         if (ini == null) return;
         var logsDir = ProtocolsRunner.getOrDefault(ini.getDataDir(), "data");
         StorageRepository storage = setupStorage(logsDir);
-        ini.putService(storage.getType(),storage);
+        ini.putService(storage.getType(), storage);
 
         var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
         if (allFilters == null || allFilters.isEmpty()) {

@@ -26,9 +26,9 @@ public class JsonMapper {
 
     public String serialize(Object target) {
         try {
-            if(target instanceof BBuffer) {
+            if (target instanceof BBuffer) {
                 return mapper.writeValueAsString((((BBuffer) target).getAll()));
-            }else{
+            } else {
                 return mapper.writeValueAsString(target);
             }
         } catch (JsonProcessingException e) {

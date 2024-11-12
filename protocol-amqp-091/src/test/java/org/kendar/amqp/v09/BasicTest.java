@@ -64,9 +64,9 @@ public class BasicTest {
 
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
+                storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
             } else {
-                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
+                storage = new FileStorageRepository(Path.of("target", "tests", className, method));
             }
         }
         storage.initialize();

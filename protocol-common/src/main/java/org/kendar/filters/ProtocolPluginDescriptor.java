@@ -14,7 +14,7 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
         return instanceId;
     }
 
-    public ProtocolPluginDescriptor<T, K> asActive(){
+    public ProtocolPluginDescriptor<T, K> asActive() {
         active = true;
         return this;
     }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HttpRecordPluginSettings extends BasicRecordingPluginSettings {
-    private boolean record;
+
     private List<String> recordSites = new ArrayList<>();
 
     public List<String> getRecordSites() {
@@ -15,13 +15,5 @@ public class HttpRecordPluginSettings extends BasicRecordingPluginSettings {
 
     public void setRecordSites(List<String> recordSites) {
         this.recordSites = recordSites;
-    }
-
-    public boolean isRecord() {
-        return record;
-    }
-
-    public void setRecord(boolean record) {
-        this.record = record;
     }
 }

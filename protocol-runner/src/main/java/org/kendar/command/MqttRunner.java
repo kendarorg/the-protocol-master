@@ -4,7 +4,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.mqtt.MqttProxy;
-import org.kendar.mqtt.MqttStorageHandler;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
@@ -61,20 +60,10 @@ public class MqttRunner extends CommonRunner {
         var baseProtocol = new org.kendar.mqtt.MqttProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MqttProxy(connectionString, login, password);
-
-        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
-            proxy = new MqttProxy();
-            proxy.setStorage(new MqttStorageHandler(storage));
-        } else {
-            proxy.setStorage(new MqttStorageHandler(storage));
-        }
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
-            ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
-        }
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

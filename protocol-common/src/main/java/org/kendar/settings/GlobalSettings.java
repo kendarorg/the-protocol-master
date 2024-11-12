@@ -13,21 +13,22 @@ public class GlobalSettings {
     private String logType;
     private int tpmApi;
     private Map<String, Object> protocols = new HashMap<String, Object>();
-    private Map<String,Object> services = new HashMap<>();
+    private Map<String, Object> services = new HashMap<>();
 
     public int getTpmApi() {
         return tpmApi;
     }
 
+    public void setTpmApi(int tpmApi) {
+        this.tpmApi = tpmApi;
+    }
+
     public void putService(String key, Object value) {
         services.put(key, value);
     }
+
     public Object getService(String key) {
         return services.get(key);
-    }
-
-    public void setTpmApi(int tpmApi) {
-        this.tpmApi = tpmApi;
     }
 
     public String getLogType() {

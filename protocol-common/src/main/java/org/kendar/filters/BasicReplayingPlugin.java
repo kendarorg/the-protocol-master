@@ -29,7 +29,7 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
         return this;
     }
 
-    public BasicReplayingPlugin withStorage(StorageRepository storage){
+    public BasicReplayingPlugin withStorage(StorageRepository storage) {
 
         this.storage = storage;
         return this;
@@ -65,7 +65,7 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
         query.setType(in.getClass().getSimpleName());
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
-        if(lineToRead == null) {
+        if (lineToRead == null) {
             return;
         }
 

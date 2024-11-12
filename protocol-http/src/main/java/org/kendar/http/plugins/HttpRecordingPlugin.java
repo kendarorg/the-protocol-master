@@ -68,8 +68,6 @@ public class HttpRecordingPlugin extends BasicRecordingPlugin {
     }
 
 
-
-
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         super.initialize(global, protocol);
@@ -79,7 +77,7 @@ public class HttpRecordingPlugin extends BasicRecordingPlugin {
     @Override
     public Map<String, String> buildTag(StorageItem item) {
         var in = item.retrieveInAs(Request.class);
-        var result = new HashMap<String,String>();
+        var result = new HashMap<String, String>();
         result.put("path", in.getPath());
         result.put("host", in.getHost());
         var query = String.join("&", in.getQuery().entrySet().stream().

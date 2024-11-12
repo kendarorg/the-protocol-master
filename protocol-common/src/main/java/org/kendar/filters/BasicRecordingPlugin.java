@@ -92,7 +92,7 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
         return this;
     }
 
-    public BasicRecordingPlugin withStorage(StorageRepository storage){
+    public BasicRecordingPlugin withStorage(StorageRepository storage) {
 
         this.storage = storage;
         return this;
@@ -105,7 +105,7 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
 
     @Override
     public String getId() {
-        return "recording-plugin";
+        return "record-plugin";
     }
 
     @Override

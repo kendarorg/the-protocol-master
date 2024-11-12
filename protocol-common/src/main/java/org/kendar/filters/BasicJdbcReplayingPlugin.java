@@ -6,6 +6,7 @@ import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
@@ -92,5 +93,10 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
     @Override
     public Class<?> getSettingClass() {
         return BasicReplayPluginSettings.class;
+    }
+
+    public BasicJdbcReplayingPlugin withStorage(FileStorageRepository storage) {
+        this.storage = storage;
+        return this;
     }
 }

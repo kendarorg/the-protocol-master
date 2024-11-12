@@ -83,7 +83,7 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
 
     @Override
     public String getId() {
-        return "recording-plugin";
+        return "record-plugin";
     }
 
     @Override
@@ -93,5 +93,10 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
 
     protected Object getData(Object of) {
         return of;
+    }
+
+    public BasicJdbcRecordingPlugin withStorage(StorageRepository storage) {
+        this.storage = storage;
+        return this;
     }
 }

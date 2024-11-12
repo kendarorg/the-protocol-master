@@ -29,6 +29,7 @@ public class MqttReplayingPlugin extends BasicReplayingPlugin {
     protected boolean hasCallbacks() {
         return true;
     }
+
     @Override
     protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outObj, Object toread) {
         var out = mapper.toJsonNode(outObj);

@@ -112,11 +112,11 @@ public abstract class Proxy {
     }
 
     public void terminateFilters() {
-        for(var item: toFilter.entrySet()){
-            for(var phase: item.getValue().entrySet()){
-                for(var plugin: phase.getValue()){
-                    if(plugin.isActive())
-                    plugin.terminate();
+        for (var item : toFilter.entrySet()) {
+            for (var phase : item.getValue().entrySet()) {
+                for (var plugin : phase.getValue()) {
+                    if (plugin.isActive())
+                        plugin.terminate();
                 }
             }
         }

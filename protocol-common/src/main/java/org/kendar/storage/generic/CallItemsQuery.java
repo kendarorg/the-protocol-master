@@ -18,8 +18,8 @@ public class CallItemsQuery {
     }
 
     public void setType(String type) {
-        if(type.equalsIgnoreCase("bbuffer")){
-            type="byte[]";
+        if (type.equalsIgnoreCase("bbuffer")) {
+            type = "byte[]";
         }
         this.type = type;
     }

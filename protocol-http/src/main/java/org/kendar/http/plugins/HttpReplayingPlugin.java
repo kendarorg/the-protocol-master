@@ -33,7 +33,7 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
     }
 
     private Map<String, String> buildTag(Request in) {
-        var result = new HashMap<String,String>();
+        var result = new HashMap<String, String>();
         result.put("path", in.getPath());
         result.put("host", in.getHost());
         var query = String.join("&", in.getQuery().entrySet().stream().
@@ -62,7 +62,7 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
                         return false;
                     }
                 }
-                if (blockExternal && !doSend(filterContext,request,response)) {
+                if (blockExternal && !doSend(filterContext, request, response)) {
                     response.setStatusCode(404);
                     response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
                     response.setResponseText("Page Not Found: " + request.getMethod() + " on " + request.buildUrl());
@@ -81,13 +81,13 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
 
         query.setCaller(filterContext.getCaller());
         query.setType(in.getClass().getSimpleName());
-        for(var tag:buildTag(in).entrySet()){
+        for (var tag : buildTag(in).entrySet()) {
             query.addTag(tag.getKey(), tag.getValue());
         }
 
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
-        if(lineToRead == null) {
+        if (lineToRead == null) {
             return false;
         }
 
@@ -97,8 +97,8 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
             Sleeper.sleep(item.getDurationMs());
         }
         try {
-            BeanUtils.copyProperties(out,outputItem);
-        } catch (IllegalAccessException |InvocationTargetException e) {
+            BeanUtils.copyProperties(out, outputItem);
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
         return true;

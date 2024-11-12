@@ -5,7 +5,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.mysql.MySQLProtocol;
-import org.kendar.mysql.MySqlStorageHandler;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.server.TcpServer;
@@ -15,7 +14,6 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
-import org.kendar.sql.jdbc.storage.JdbcStorageHandler;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.QueryReplacerItem;
@@ -103,15 +101,6 @@ public class JdbcRunner extends CommonRunner {
                 realSttings.getConnectionString(), realSttings.getForceSchema(),
                 realSttings.getLogin(), realSttings.getPassword());
 
-        JdbcStorageHandler storage = new JdbcStorageHandler(repo);
-        if (protocolSettings.getProtocol().equalsIgnoreCase("mysql")) {
-            storage = new MySqlStorageHandler(repo);
-        }
-        if (realSttings.getSimulation() != null && realSttings.getSimulation().isReplay()) {
-            proxy = new JdbcProxy(storage);
-        } else {
-            proxy.setStorage(storage);
-        }
         proxy.setFilters(filters);
         var jdbcReplaceQueries = ((JdbcProtocolSettings) protocolSettings).getReplaceQueryFile();
         if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
@@ -122,9 +111,6 @@ public class JdbcRunner extends CommonRunner {
         baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(), 30));
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (realSttings.getSimulation() != null && realSttings.getSimulation().isReplay()) {
-            ps.useCallDurationTimes(realSttings.getSimulation().isRespectCallDuration());
-        }
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

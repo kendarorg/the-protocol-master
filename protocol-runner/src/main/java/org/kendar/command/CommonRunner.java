@@ -2,8 +2,13 @@ package org.kendar.command;
 
 import org.apache.commons.cli.*;
 import org.kendar.filters.PluginDescriptor;
+import org.kendar.filters.settings.BasicRecordingPluginSettings;
+import org.kendar.filters.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
-import org.kendar.settings.*;
+import org.kendar.settings.ByteProtocolSettings;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 
 import java.util.HashMap;
@@ -62,20 +67,22 @@ public abstract class CommonRunner {
         section.setProtocolInstanceId(getId());
         section.setConnectionString(cmd.getOptionValue("connection"));
         section.setTimeoutSeconds(Integer.parseInt(cmd.getOptionValue("timeout", "30")));
-        DefaultSimulationSettings simulation = null;
+
         if (cmd.hasOption("replay")) {
-            simulation = new DefaultSimulationSettings();
-            simulation.setReplay(cmd.hasOption("replay"));
-            simulation.setRespectCallDuration(cmd.hasOption("cdt"));
-            simulation.setReplayId(cmd.getOptionValue("plid", UUID.randomUUID().toString()));
+            var plugin = new BasicReplayPluginSettings();
+            plugin.setPlugin("replay-plugin");
+            plugin.setActive(true);
+            plugin.setRespectCallDuration(cmd.hasOption("cdt"));
+            plugin.setReplayId(cmd.getOptionValue("plid", UUID.randomUUID().toString()));
+            section.getPlugins().put("replay-plugin",plugin);
         } else if (cmd.hasOption("record")) {
-            simulation = new DefaultSimulationSettings();
-            simulation.setRecord(cmd.hasOption("record"));
+            var plugin = new BasicRecordingPluginSettings();
+            section.getPlugins().put("record-plugin",plugin);
+            plugin.setPlugin("record-plugin");
+            plugin.setActive(true);
         } else if (cmd.hasOption("mock")) {
-            simulation = new DefaultSimulationSettings();
-            simulation.setMock(cmd.hasOption("mock"));
+            throw new RuntimeException("MISSING MOCK");
         }
-        section.setSimulation(simulation);
         parseExtra(section, cmd);
     }
 
