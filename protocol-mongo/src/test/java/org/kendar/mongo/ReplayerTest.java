@@ -46,8 +46,10 @@ public class ReplayerTest {
         var baseProtocol = new MongoProtocol(FAKE_PORT);
         var proxy = new MongoProxy();
 
-        proxy.setFilters(List.of(new MongoReplayingPlugin().withStorage(new FileStorageRepository(Path.of("src",
-                "test", "resources", "replay"))).asActive()));
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "replay"));
+        storage.initialize();
+        proxy.setFilters(List.of(new MongoReplayingPlugin().withStorage(storage).asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);

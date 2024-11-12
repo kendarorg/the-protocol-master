@@ -8,6 +8,8 @@ import org.kendar.redis.Resp3StorageHandler;
 import org.kendar.redis.plugins.RedisRecordingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.storage.NullStorageRepository;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.testcontainer.images.RedisImage;
 import org.kendar.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
@@ -43,20 +45,22 @@ public class BasicTest {
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
         var proxy = new Resp3Proxy("redis://" + redisImage.getHost() + ":" + redisImage.getPort(), null, null);
+        StorageRepository storage = new NullStorageRepository();
         if (testInfo != null && testInfo.getTestClass().isPresent() &&
                 testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
+
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository(Path.of("target", "tests", className, method, dsp))));
+                storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
             } else {
-                proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository(Path.of("target", "tests", className, method))));
+                storage = new FileStorageRepository(Path.of("target", "tests", className, method));
             }
         }
-        var rec = new RedisRecordingPlugin();
-        rec.setActive(true);
-        proxy.setFilters(List.of(rec));
+        storage.initialize();
+        proxy.setFilters(List.of(
+                new RedisRecordingPlugin().withStorage(storage).asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

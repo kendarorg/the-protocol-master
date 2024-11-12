@@ -4,6 +4,7 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.kendar.mqtt.plugins.MqttReplayingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
@@ -47,9 +48,10 @@ public class ReplayerTest {
         messages.clear();
         var baseProtocol = new MqttProtocol(1883);
         var proxy = new MqttProxy();
-        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository(Path.of("src",
-                "test", "resources", "qos0Test"))));
-
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "qos0Test"));
+        storage.initialize();
+        proxy.setFilters(List.of(new MqttReplayingPlugin().withStorage(storage).asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);
@@ -92,8 +94,11 @@ public class ReplayerTest {
         messages.clear();
         var baseProtocol = new MqttProtocol(1884);
         var proxy = new MqttProxy();
-        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository(Path.of("src",
-                "test", "resources", "qos1Test"))));
+
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "qos1Test"));
+        storage.initialize();
+        proxy.setFilters(List.of(new MqttReplayingPlugin().withStorage(storage).asActive()));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -136,8 +141,11 @@ public class ReplayerTest {
         messages.clear();
         var baseProtocol = new MqttProtocol(1885);
         var proxy = new MqttProxy();
-        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository(Path.of("src",
-                "test", "resources", "qos2Test"))));
+
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "qos2Test"));
+        storage.initialize();
+        proxy.setFilters(List.of(new MqttReplayingPlugin().withStorage(storage).asActive()));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

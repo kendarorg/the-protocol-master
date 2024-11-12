@@ -3,8 +3,7 @@ package org.kendar.resp3;
 import org.junit.jupiter.api.Test;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
-import org.kendar.redis.Resp3StorageHandler;
-import org.kendar.redis.plugins.RedisRecordingPlugin;
+import org.kendar.redis.plugins.RedisReplayingPlugin;
 import org.kendar.resp3.pubsub.Publisher;
 import org.kendar.resp3.pubsub.Subscriber;
 import org.kendar.server.TcpServer;
@@ -29,11 +28,11 @@ public class ReplayerTest {
     void testReplayer() {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
         var proxy = new Resp3Proxy();
-        proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository(Path.of("src",
-                "test", "resources", "replay"))));
-        var rec = new RedisRecordingPlugin();
-        rec.setActive(true);
-        proxy.setFilters(List.of(rec));
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "replay"));
+        storage.initialize();
+        proxy.setFilters(List.of(new RedisReplayingPlugin().withStorage(storage).asActive()));
+
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);

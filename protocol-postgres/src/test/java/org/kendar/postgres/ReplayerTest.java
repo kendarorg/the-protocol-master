@@ -3,12 +3,14 @@ package org.kendar.postgres;
 import org.junit.jupiter.api.Test;
 import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.postgres.jpa.CompanyJpa;
+import org.kendar.postgres.plugins.PostgresReplayPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,8 +22,11 @@ public class ReplayerTest {
     @Test
     void simpleJpaTest() throws Exception {
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy(new JdbcStorageHandler(new FileStorageRepository(Path.of("src",
-                "test", "resources", "replay"))));
+        var proxy = new JdbcProxy();
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "replay"));
+        storage.initialize();
+        proxy.setFilters(List.of(new PostgresReplayPlugin().withStorage(storage).asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);
