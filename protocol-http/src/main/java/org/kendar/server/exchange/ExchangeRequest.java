@@ -16,7 +16,7 @@ import java.nio.channels.SocketChannel;
 /**
  *
  */
-public class Request {
+public class ExchangeRequest {
 
     final static int BUF_LEN = 2048;
     final static byte CR = 13;
@@ -30,7 +30,7 @@ public class Request {
     private String startLine;
     private SocketChannel chan;
 
-    public Request(InputStream rawInputStream, OutputStream rawout) throws IOException {
+    public ExchangeRequest(InputStream rawInputStream, OutputStream rawout) throws IOException {
         is = rawInputStream;
         os = rawout;
         do {

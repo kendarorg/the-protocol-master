@@ -56,22 +56,22 @@ public class AmqpReplayingPlugin extends BasicReplayingPlugin {
             int consumeId = -1;
             switch (clazz) {
                 case "BasicDeliver":
-                    var bd = mapper.deserialize(out.get("data").toString(), BasicDeliver.class);
+                    var bd = mapper.deserialize(out.get("data"), BasicDeliver.class);
                     consumeId = bd.getConsumeId();
                     fr = bd;
                     break;
                 case "HeaderFrame":
-                    var hf = mapper.deserialize(out.get("data").toString(), HeaderFrame.class);
+                    var hf = mapper.deserialize(out.get("data"), HeaderFrame.class);
                     consumeId = hf.getConsumeId();
                     fr = hf;
                     break;
                 case "BodyFrame":
-                    var bf = mapper.deserialize(out.get("data").toString(), BodyFrame.class);
+                    var bf = mapper.deserialize(out.get("data"), BodyFrame.class);
                     consumeId = bf.getConsumeId();
                     fr = bf;
                     break;
                 case "BasicCancel":
-                    var bc = mapper.deserialize(out.get("data").toString(), BasicCancel.class);
+                    var bc = mapper.deserialize(out.get("data"), BasicCancel.class);
                     consumeId = bc.getConsumeId();
                     fr = bc;
                     break;

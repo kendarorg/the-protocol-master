@@ -759,17 +759,17 @@ public class ServerImpl {
                         connection.sslStreams = sslStreams;
                     } else {
                         rawin = new BufferedInputStream(
-                                new Request.ReadStream(
+                                new ExchangeRequest.ReadStream(
                                         ServerImpl.this, chan
                                 ));
-                        rawout = new Request.WriteStream(
+                        rawout = new ExchangeRequest.WriteStream(
                                 ServerImpl.this, chan
                         );
                     }
                     connection.raw = rawin;
                     connection.rawout = rawout;
                 }
-                Request req = new Request(rawin, rawout);
+                ExchangeRequest req = new ExchangeRequest(rawin, rawout);
                 requestLine = req.requestLine();
                 if (requestLine == null) {
                     /* connection closed */

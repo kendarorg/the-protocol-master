@@ -43,7 +43,7 @@ public class ExchangeImpl {
     public boolean close;
     public boolean http10 = false;
     Headers reqHdrs, rspHdrs;
-    Request req;
+    ExchangeRequest req;
     String method;
     URI uri;
     HttpConnection connection;
@@ -70,7 +70,7 @@ public class ExchangeImpl {
     private byte[] rspbuf = new byte[128]; // used by bytes()
 
     public ExchangeImpl(
-            String m, URI u, Request req, long len, HttpConnection connection
+            String m, URI u, ExchangeRequest req, long len, HttpConnection connection
     ) throws IOException {
         this.req = req;
         this.reqHdrs = new UnmodifiableHeaders(req.headers());

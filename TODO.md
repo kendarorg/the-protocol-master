@@ -9,7 +9,7 @@
 ### Code
 
 V Mysql DataTypesPsTest
-
+* verifify the serializator
 * Recording and replay plugin should use the right storage
   V Use anonymous "Object" instead of JsonNode for saving
   V Check if should use filters even for Protocol
