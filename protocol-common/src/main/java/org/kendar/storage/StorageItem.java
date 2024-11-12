@@ -52,9 +52,9 @@ public class StorageItem {
 
     public <T> T retrieveInAs(Class<T> clazz) {
         if (inAs == null && input != null) {
-            if(clazz == input.getClass()) {
+            if (clazz == input.getClass()) {
                 inAs = input;
-            }else {
+            } else {
                 inAs = mapper.deserialize(input, clazz);
             }
         }
@@ -62,7 +62,7 @@ public class StorageItem {
     }
 
     public <T> T retrieveOutAs(Class<T> clazz) {
-        if (outAs == null && output!=null) {
+        if (outAs == null && output != null) {
             if (clazz == output.getClass()) {
                 outAs = output;
             } else

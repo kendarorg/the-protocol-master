@@ -5,12 +5,25 @@ import ch.qos.logback.classic.LoggerContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.kendar.amqp.v09.plugins.AmqpRecordingPlugin;
+import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
 import org.kendar.apis.ApiHandler;
 import org.kendar.command.*;
 import org.kendar.filters.PluginDescriptor;
+import org.kendar.filters.ProtocolPluginDescriptor;
 import org.kendar.http.plugins.ErrorPlugin;
 import org.kendar.http.plugins.HttpRecordingPlugin;
 import org.kendar.http.plugins.HttpReplayingPlugin;
+import org.kendar.mongo.plugins.MongoRecordingPlugin;
+import org.kendar.mongo.plugins.MongoReplayingPlugin;
+import org.kendar.mqtt.plugins.MqttRecordingPlugin;
+import org.kendar.mqtt.plugins.MqttReplayingPlugin;
+import org.kendar.mysql.plugins.MySqlRecordPlugin;
+import org.kendar.mysql.plugins.MySqlReplayPlugin;
+import org.kendar.postgres.plugins.PostgresRecordPlugin;
+import org.kendar.postgres.plugins.PostgresReplayPlugin;
+import org.kendar.redis.plugins.RedisRecordingPlugin;
+import org.kendar.redis.plugins.RedisReplayingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -31,6 +44,7 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
     private static ProtocolsRunner om;
+    private static HashMap<String, List<PluginDescriptor>> allFilters = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
         execute(args, Main::stopWhenQuitCommand);
@@ -99,27 +113,53 @@ public class Main {
     }
 
     private static HashMap<String, List<PluginDescriptor>> loadFilters(String pluginsDir) {
+        if (!allFilters.isEmpty()) {
+            return allFilters;
+        }
         if (!Path.of(pluginsDir).toAbsolutePath().toFile().exists()) {
             return new HashMap<>();
         }
         var pluginManager = new JarPluginManager(Path.of(pluginsDir).toAbsolutePath());
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
-        var filters = new HashMap<String, List<PluginDescriptor>>();
+        allFilters = new HashMap<String, List<PluginDescriptor>>();
         for (var item : pluginManager.getExtensions(PluginDescriptor.class)) {
             var protocol = item.getProtocol().toLowerCase();
-            if (!filters.containsKey(protocol)) {
-                filters.put(protocol, new ArrayList<>());
+            if (!allFilters.containsKey(protocol)) {
+                allFilters.put(protocol, new ArrayList<>());
             }
-            filters.get(protocol).add(item);
+            allFilters.get(protocol).add(item);
         }
-        if (!filters.containsKey("http")) {
-            filters.put("http", new ArrayList<>());
-        }
-        filters.get("http").addAll(List.of(
+        addEmbedded(allFilters, "http", List.of(
                 new HttpRecordingPlugin(),
-                new ErrorPlugin(), new HttpReplayingPlugin()));
-        return filters;
+                new ErrorPlugin(),
+                new HttpReplayingPlugin()));
+        addEmbedded(allFilters, "mongodb", List.of(
+                new MongoRecordingPlugin(),
+                new MongoReplayingPlugin()));
+        addEmbedded(allFilters, "redis", List.of(
+                new RedisRecordingPlugin(),
+                new RedisReplayingPlugin()));
+        addEmbedded(allFilters, "amqp091", List.of(
+                new AmqpRecordingPlugin(),
+                new AmqpReplayingPlugin()));
+        addEmbedded(allFilters, "mqtt", List.of(
+                new MqttRecordingPlugin(),
+                new MqttReplayingPlugin()));
+        addEmbedded(allFilters, "postgres", List.of(
+                new PostgresRecordPlugin(),
+                new PostgresReplayPlugin()));
+        addEmbedded(allFilters, "mysql", List.of(
+                new MySqlRecordPlugin(),
+                new MySqlReplayPlugin()));
+        return allFilters;
+    }
+
+    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> filters, String prt, List<ProtocolPluginDescriptor<?, ?>> embeddedFilters) {
+        if (!filters.containsKey(prt)) {
+            filters.put(prt, new ArrayList<>());
+        }
+        filters.get(prt).addAll(embeddedFilters);
     }
 
 

@@ -8,20 +8,22 @@
 
 ### Code
 
+V Mysql DataTypesPsTest
+
 * Recording and replay plugin should use the right storage
-* Use anonymous "Object" instead of JsonNode for saving
-* Check if should use filters even for Protocol
+  V Use anonymous "Object" instead of JsonNode for saving
+  V Check if should use filters even for Protocol
 * Add an api to list the plugins
 * Add an api for start/stop record/replay/mock
 * For mock set the nth call
 * Remove any reference to spring boot
-* respectCallDuration on http
+  V respectCallDuration on http
 * User replayId (with timestamp)
 * Store Jsons as json in Request/Response/Multipart
 * Store other stuffs as external objects in Request/Response/Multipart
 * Publish on maven central
 * Change Supplier<Boolean> stopWhenFalseAction to a callback to register for
-* KENDARMYSQLPREPARESTATEMENT
+  V KENDARMYSQLPREPARESTATEMENT
 
 STATE CHARTS:
 

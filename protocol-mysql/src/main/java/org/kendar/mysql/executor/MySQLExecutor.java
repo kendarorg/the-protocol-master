@@ -354,13 +354,13 @@ public class MySQLExecutor {
             long end = System.currentTimeMillis();
 
             //KENDARMYSQLPREPARESTATEMENT
-//            var storage = protoContext.getProxy().getStorage();
-//
-//
-//            var selRes = new SelectResult();
-//            protoContext.setValue("STATEMENT_" + currentStatementId, query);
-//            protoContext.setValue("STATEMENT_FIELDS_" + currentStatementId, fields);
-//            //protoContext.setValue("STATEMENT_PS_"+currentStatementId,ps);
+            //var storage = protoContext.getProxy().getStorage();
+
+
+            //var selRes = new SelectResult();
+            protoContext.setValue("STATEMENT_" + currentStatementId, query);
+            protoContext.setValue("STATEMENT_FIELDS_" + currentStatementId, fields);
+            //protoContext.setValue("STATEMENT_PS_"+currentStatementId,ps);
 //            selRes.setLastInsertedId(currentStatementId);
 //            selRes.getMetadata().addAll(fields);
 //            storage.write(protoContext.getContextId(),

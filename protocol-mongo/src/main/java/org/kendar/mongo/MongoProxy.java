@@ -54,7 +54,7 @@ public class MongoProxy extends Proxy {
                     .applyConnectionString(new ConnectionString(connectionString))
                     .build();
             return new ProxyConnection(MongoClients.create(settings));
-        }catch (Exception ex){
+        } catch (Exception ex) {
             return new ProxyConnection(null);
         }
     }

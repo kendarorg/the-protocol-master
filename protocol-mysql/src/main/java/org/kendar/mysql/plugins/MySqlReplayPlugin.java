@@ -30,11 +30,11 @@ public class MySqlReplayPlugin extends BasicJdbcReplayingPlugin {
 
     @Override
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
-        if(lineToRead==null)return null;
+        if (lineToRead == null) return null;
         lineToRead = super.beforeSendingReadResult(lineToRead);
         var idx = lineToRead.getCompactLine();
         var si = lineToRead.getStorageItem();
-        if(si!=null){
+        if (si != null) {
             var jdbcRequest = (JdbcRequest) si.retrieveInAs(JdbcRequest.class);
             if (jdbcRequest.getQuery().toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
                 var jdbcResponse = (JdbcResponse) si.retrieveOutAs(JdbcResponse.class);
@@ -63,8 +63,6 @@ public class MySqlReplayPlugin extends BasicJdbcReplayingPlugin {
             req.setQuery(idx.getTags().get("query"));
             si.setInput(req);
         }
-
-
 
 
         return lineToRead;

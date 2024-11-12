@@ -59,17 +59,17 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
             }
         }*/
         if (lineToRead != null && lineToRead.getStorageItem() != null
-                && lineToRead.getStorageItem().getOutput() != null){
+                && lineToRead.getStorageItem().getOutput() != null) {
             var source = lineToRead.getStorageItem().retrieveOutAs(JdbcResponse.class);
             out.fill(source.getSelectResult());
-        }else if(lineToRead.getCompactLine()!=null){// if(in.getQuery().trim().toLowerCase().startsWith("set")){
+        } else if (lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
 
             if (lineToRead.getCompactLine().getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 SelectResult resultset = new SelectResult();
                 resultset.setIntResult(true);
                 resultset.setCount(Integer.parseInt(lineToRead.getCompactLine().getTags().get("resultsCount")));
                 out.fill(resultset);
-            }else if(in.getQuery().trim().toLowerCase().startsWith("set")){
+            } else if (in.getQuery().trim().toLowerCase().startsWith("set")) {
                 System.out.println("a");
             }
         }
@@ -84,10 +84,10 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
     }
 
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
-        if(lineToRead==null) return null;
+        if (lineToRead == null) return null;
         var idx = lineToRead.getCompactLine();
         var si = lineToRead.getStorageItem();
-        if(si!=null){
+        if (si != null) {
             return lineToRead;
         }
         if (idx != null) {
