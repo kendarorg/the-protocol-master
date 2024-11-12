@@ -86,9 +86,7 @@ public abstract class NetworkProxy extends Proxy {
      */
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
-        if (replayer) {
-            return new ProxyConnection(null);
-        }
+
         try {
             @SuppressWarnings("resource")
             var connection = new Socket();
@@ -100,7 +98,7 @@ public abstract class NetworkProxy extends Proxy {
             return new ProxyConnection(buildProxyConnection(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return new ProxyConnection(null);
         }
     }
 

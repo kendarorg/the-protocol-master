@@ -405,9 +405,7 @@ public class JdbcProxy extends Proxy {
 
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
-        if (replayer) {
-            return new ProxyConnection(null);
-        }
+
         try {
             var connection = DriverManager.
                     getConnection(getConnectionString(), getLogin(), getPassword());
@@ -416,7 +414,7 @@ public class JdbcProxy extends Proxy {
             }
             return new ProxyConnection(connection);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return new ProxyConnection(null);
         }
     }
 

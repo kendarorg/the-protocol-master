@@ -48,13 +48,15 @@ public class MongoProxy extends Proxy {
 
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
-        if (replayer) {
+
+        try {
+            var settings = MongoClientSettings.builder()
+                    .applyConnectionString(new ConnectionString(connectionString))
+                    .build();
+            return new ProxyConnection(MongoClients.create(settings));
+        }catch (Exception ex){
             return new ProxyConnection(null);
         }
-        var settings = MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString(connectionString))
-                .build();
-        return new ProxyConnection(MongoClients.create(settings));
     }
 
     @Override

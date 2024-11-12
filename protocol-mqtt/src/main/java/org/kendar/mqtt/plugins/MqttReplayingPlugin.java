@@ -34,7 +34,7 @@ public class MqttReplayingPlugin extends BasicReplayingPlugin {
     protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outObj, Object toread) {
         var out = mapper.toJsonNode(outObj);
 
-        var result = mapper.deserialize(out.get("data").toString(), outObj.getClass());
+        var result = mapper.deserialize(out.get("data").toString(), toread.getClass());
         try {
             BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException e) {

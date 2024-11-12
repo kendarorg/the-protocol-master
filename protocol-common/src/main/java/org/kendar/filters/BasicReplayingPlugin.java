@@ -62,7 +62,7 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
         var context = filterContext.getContext();
 
         query.setCaller(filterContext.getCaller());
-        query.setType(in.getClass().getSimpleName());
+        query.setType(filterContext.getType());
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
         if (lineToRead == null) {
