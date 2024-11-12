@@ -36,7 +36,7 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
         var req = "{\"type\":null,\"data\":null}";
 
         var storageItem = new StorageItem(
-                filterContext.getContext().getContextId(),
+                filterContext.getContextId(),
                 mapper.toJsonNode(req),
                 mapper.toJsonNode(res),
                 duration, "RESPONSE",
@@ -57,7 +57,7 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
             res = "{\"type\":\"" + out.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(out)) + "}";
         }
         var storageItem = new StorageItem(
-                filterContext.getContext().getContextId(),
+                filterContext.getContextId(),
                 mapper.toJsonNode(req),
                 mapper.toJsonNode(res),
                 duration,

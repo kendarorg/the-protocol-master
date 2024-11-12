@@ -102,12 +102,13 @@ public class HttpRunnerTest {
 
         var args = new String[]{
 
-                "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "http",
                 "-http", "" + FAKE_PORT_HTTP,
                 "-https", "" + FAKE_PORT_HTTPS,
-                "-proxy", "" + FAKE_PORT_PROXY
+                "-proxy", "" + FAKE_PORT_PROXY,
+                "-record"
         };
         startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000, () -> {
@@ -133,16 +134,16 @@ public class HttpRunnerTest {
 
     @Test
     void googleTest() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        var timestampForThisRun = "" + new Date().getTime();
 
         var args = new String[]{
 
-                "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-datadir", Path.of("target", "tests", "googleTest").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "http",
                 "-http", "" + FAKE_PORT_HTTP,
                 "-https", "" + FAKE_PORT_HTTPS,
-                "-proxy", "" + FAKE_PORT_PROXY
+                "-proxy", "" + FAKE_PORT_PROXY,
+                "-record"
         };
         startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000, () -> {
@@ -182,7 +183,6 @@ public class HttpRunnerTest {
 
     @Test
     void googleTestIni() throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        var timestampForThisRun = "" + new Date().getTime();
 
         var args = new String[]{
 

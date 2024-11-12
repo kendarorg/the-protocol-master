@@ -52,4 +52,9 @@ public class FilterContext {
     public void setCaller(String caller) {
         this.caller = caller;
     }
+
+    public int getContextId() {
+        if(getContext()==null) return 0;
+        return getContext().getContextId();
+    }
 }

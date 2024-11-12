@@ -43,7 +43,7 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
 
 
         var storageItem = new StorageItem(
-                filterContext.getContext().getContextId(),
+                filterContext.getContextId(),
                 req,
                 res,
                 duration,

@@ -31,7 +31,7 @@ public class RedisRecordingPlugin extends BasicRecordingPlugin {
         var res = "{\"type\":\"RESPONSE\",\"data\":" + mapper.serialize(out) + "}";
         var req = "{\"type\":null,\"data\":null}";
 
-        var storageItem = new StorageItem(filterContext.getContext().getContextId(),
+        var storageItem = new StorageItem(filterContext.getContextId(),
                 mapper.toJsonNode(req),
                 mapper.toJsonNode(res),
                 duration, filterContext.getType(),

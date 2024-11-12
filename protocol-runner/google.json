@@ -1,7 +1,7 @@
 {
   "pluginsDir": "plugins",
   "logLevel": "DEBUG",
-  "dataDir": "target/tests/{timestamp}",
+  "dataDir": "target/tests/fromini",
   "protocols": {
     "http-01": {
       "protocol": "http",

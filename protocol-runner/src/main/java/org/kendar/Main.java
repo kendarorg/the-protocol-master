@@ -116,19 +116,19 @@ public class Main {
         if (!allFilters.isEmpty()) {
             return allFilters;
         }
-        if (!Path.of(pluginsDir).toAbsolutePath().toFile().exists()) {
-            return new HashMap<>();
-        }
-        var pluginManager = new JarPluginManager(Path.of(pluginsDir).toAbsolutePath());
-        pluginManager.loadPlugins();
-        pluginManager.startPlugins();
-        allFilters = new HashMap<String, List<PluginDescriptor>>();
-        for (var item : pluginManager.getExtensions(PluginDescriptor.class)) {
-            var protocol = item.getProtocol().toLowerCase();
-            if (!allFilters.containsKey(protocol)) {
-                allFilters.put(protocol, new ArrayList<>());
+        if (Path.of(pluginsDir).toAbsolutePath().toFile().exists()) {
+
+            var pluginManager = new JarPluginManager(Path.of(pluginsDir).toAbsolutePath());
+            pluginManager.loadPlugins();
+            pluginManager.startPlugins();
+            allFilters = new HashMap<String, List<PluginDescriptor>>();
+            for (var item : pluginManager.getExtensions(PluginDescriptor.class)) {
+                var protocol = item.getProtocol().toLowerCase();
+                if (!allFilters.containsKey(protocol)) {
+                    allFilters.put(protocol, new ArrayList<>());
+                }
+                allFilters.get(protocol).add(item);
             }
-            allFilters.get(protocol).add(item);
         }
         addEmbedded(allFilters, "http", List.of(
                 new HttpRecordingPlugin(),
@@ -172,6 +172,7 @@ public class Main {
         if (ini == null) return;
         var logsDir = ProtocolsRunner.getOrDefault(ini.getDataDir(), "data");
         StorageRepository storage = setupStorage(logsDir);
+        storage.initialize();
         ini.putService(storage.getType(), storage);
 
         var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
