@@ -23,17 +23,7 @@ public class ProxyedBehaviour {
         if (input.isProxyed()) {
             var basicConsume = (ConsumeConnected) context.getValue("BASIC_CONSUME_CH_" + channel);
             ((ConsumeConnected) toSend).setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
             proxy.respond(toSend,new FilterContext("AMQP","RESPONSE",-1,context));
-            var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(toSend) + "}";
-
-
-            storage.write(
-                    context.getContextId(),
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
             return Frame.iteratorOfList(toSend);
         }
         return iteratorOfRunnable(() -> proxy.sendAndForget(context, connection, toSend));

@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response> {
     private static final Logger log = LoggerFactory.getLogger(RecordingPlugin.class);
     private final JsonMapper mapper = new JsonMapper();
-    private final ConcurrentLinkedQueue<StorageItem<Request, Response>> items = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<StorageItem> items = new ConcurrentLinkedQueue<>();
     private final List<CompactLine> lines = new ArrayList<>();
     private final AtomicLong counter = new AtomicLong(0);
 
@@ -62,14 +62,15 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
                     var valueId = generateIndex();
                     item.setIndex(valueId);
                 }
+                var in = item.retrieveInAs(Request.class);
                 var compactLine = new CompactLine();
                 compactLine.setIndex(item.getIndex());
                 compactLine.setCaller(item.getCaller());
                 compactLine.setType(item.getType());
                 compactLine.setDurationMs(item.getDurationMs());
-                compactLine.getTags().put("path", item.getInput().getPath());
-                compactLine.getTags().put("host", item.getInput().getHost());
-                var query = String.join("&", item.getInput().getQuery().entrySet().stream().
+                compactLine.getTags().put("path", in.getPath());
+                compactLine.getTags().put("host", in.getHost());
+                var query = String.join("&", in.getQuery().entrySet().stream().
                         sorted(Comparator.comparing(Map.Entry<String, String>::getKey)).
                         map(it -> it.getKey() + "=" + it.getValue()).collect(Collectors.toList()));
 
@@ -146,7 +147,7 @@ public class RecordingPlugin extends ProtocolPluginDescriptor<Request, Response>
             }
         }
         var index = counter.incrementAndGet();
-        var item = new StorageItem<Request, Response>();
+        var item = new StorageItem();
         item.setIndex(index);
         item.setCaller("HTTP");
         item.setType(request.getMethod());

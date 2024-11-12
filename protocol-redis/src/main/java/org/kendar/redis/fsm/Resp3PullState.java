@@ -72,17 +72,8 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
         if (isProxyed()) {
             if (event.getData() instanceof List) {
                 if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("message")) {
-                    var storage = proxy.getStorage();
+
                     proxy.respond(event.getData(),new FilterContext("RESP3","RESPONSE",-1,context));
-                    var res = "{\"type\":\"RESPONSE\",\"data\":" +
-                            mapper.serialize(event.getData()) + "}";
-
-
-                    storage.write(
-                            context.getContextId(),
-                            null
-                            , mapper.toJsonNode(res)
-                            , 0, "RESPONSE", "RESP3");
                     return iteratorOfList(event);
                 }
 

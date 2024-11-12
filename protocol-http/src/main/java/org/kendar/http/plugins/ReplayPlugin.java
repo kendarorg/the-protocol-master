@@ -34,11 +34,11 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
     private static final Logger log = LoggerFactory.getLogger(ReplayPlugin.class);
     final JsonMapper mapper = new JsonMapper();
     final ConcurrentHashMap<Long, Long> calls = new ConcurrentHashMap<>();
-    private final List<StorageItem<Request, Response>> items = new ArrayList<>();
+    private final List<StorageItem> items = new ArrayList<>();
     private final Map<Long, String> hashes = new HashMap();
 
     private Path repository;
-    private TypeReference<StorageItem<Request, Response>> typeReference;
+    private TypeReference<StorageItem> typeReference;
     private boolean blockExternal = true;
     private List<Pattern> matchSites;
     private HttpReplayPluginSettings settings;
@@ -110,10 +110,12 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
             if (file.isDirectory()) continue;
             if (file.getName().endsWith(".json") && !file.getName().endsWith("index.json")) {
                 try {
-                    var item = mapper.deserialize(Files.readString(file.toPath()), typeReference);
+                    var item = mapper.deserialize(Files.readString(file.toPath()), StorageItem.class);
+                    item.retrieveOutAs(Response.class);
+                    var in = item.retrieveInAs(Request.class);
                     items.add(item);
                     String contentHash;
-                    contentHash = Md5Tester.calculateMd5(item.getInput().getRequestText());
+                    contentHash = Md5Tester.calculateMd5(in.getRequestText());
                     hashes.put(item.getIndex(), contentHash);
                 } catch (IOException e) {
                     log.error("ERROR ", e);
@@ -182,7 +184,7 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
         var matchingQuery = new AtomicInteger(0);
         var foundedIndex = new AtomicLong(-1);
-        var withHost = items.stream().filter(a -> a.getInput().getHost().equalsIgnoreCase(request.getHost())).collect(Collectors.toList());
+        var withHost = items.stream().filter(a -> a.retrieveInAs(Request.class).getHost().equalsIgnoreCase(request.getHost())).collect(Collectors.toList());
         var parametric = new AtomicBoolean(false);
         withHost.forEach(a -> checkMatching(a, request, contentHash, matchingQuery, foundedIndex, parametric));
         if (foundedIndex.get() <= 0) {
@@ -198,11 +200,11 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
             }
             var foundedResponse = items.stream().filter(a -> a.getIndex() == foundedIndex.get()).findFirst();
             if (foundedResponse.isPresent()) {
-                var founded = foundedResponse.get().getOutput();
+                var founded = foundedResponse.get();
                 if (founded != null) {
-                    var foundedClone = founded.copy();
+                    var foundedClone = founded.retrieveOutAs(Response.class).copy();
                     if (parametric.get()) {
-                        loadParameters(foundedResponse.get().getInput(), request, foundedClone);
+                        loadParameters(foundedResponse.get().retrieveInAs(Request.class), request, foundedClone);
                     }
                     response.setResponseText(foundedClone.getResponseText());
                     response.setHeaders(foundedClone.getHeaders());
@@ -215,7 +217,7 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
         return false;
     }
 
-    private void checkMatching(StorageItem<Request, Response> data,
+    private void checkMatching(StorageItem data,
                                Request requestToSimulate,
                                String requestToSimulateContentHash,
                                AtomicInteger matchingQuery,
@@ -223,7 +225,7 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
                                AtomicBoolean parametric) {
         AtomicInteger matchedQuery = new AtomicInteger(0);
 
-        var possibleRequest = data.getInput();
+        var possibleRequest = data.retrieveInAs(Request.class);
         verifyHostAndPath(requestToSimulate, possibleRequest, matchedQuery, parametric);
         if (matchedQuery.get() == 0) return;
 
@@ -236,7 +238,7 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
         }
     }
 
-    private void matchContent(StorageItem<Request, Response> data, Request requestToSimulate, String requestToSimulateContentHash, Request possibleRequest, AtomicInteger matchedQuery) {
+    private void matchContent(StorageItem data, Request requestToSimulate, String requestToSimulateContentHash, Request possibleRequest, AtomicInteger matchedQuery) {
         var possibleContentHash = hashes.get(data.getIndex());
 
         if (MimeChecker.isBinary(possibleRequest) == MimeChecker.isBinary(requestToSimulate)) {

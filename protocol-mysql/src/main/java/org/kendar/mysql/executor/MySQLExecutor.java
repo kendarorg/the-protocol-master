@@ -15,8 +15,6 @@ import org.kendar.sql.jdbc.BindingParameter;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.ProxyMetadata;
 import org.kendar.sql.jdbc.SelectResult;
-import org.kendar.sql.jdbc.storage.JdbcRequest;
-import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.sql.parser.SqlParseResult;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
@@ -355,19 +353,20 @@ public class MySQLExecutor {
                     withPacketNumber(++packetNumber));
             long end = System.currentTimeMillis();
 
-            var storage = protoContext.getProxy().getStorage();
-
-
-            var selRes = new SelectResult();
-            protoContext.setValue("STATEMENT_" + currentStatementId, query);
-            protoContext.setValue("STATEMENT_FIELDS_" + currentStatementId, fields);
-            //protoContext.setValue("STATEMENT_PS_"+currentStatementId,ps);
-            selRes.setLastInsertedId(currentStatementId);
-            selRes.getMetadata().addAll(fields);
-            storage.write(protoContext.getContextId(),
-                    new JdbcRequest(query, new ArrayList<>()),
-                    new JdbcResponse(selRes),
-                    end - start, "PREPARE", "JDBC");
+            //KENDARMYSQLPREPARESTATEMENT
+//            var storage = protoContext.getProxy().getStorage();
+//
+//
+//            var selRes = new SelectResult();
+//            protoContext.setValue("STATEMENT_" + currentStatementId, query);
+//            protoContext.setValue("STATEMENT_FIELDS_" + currentStatementId, fields);
+//            //protoContext.setValue("STATEMENT_PS_"+currentStatementId,ps);
+//            selRes.setLastInsertedId(currentStatementId);
+//            selRes.getMetadata().addAll(fields);
+//            storage.write(protoContext.getContextId(),
+//                    new JdbcRequest(query, new ArrayList<>()),
+//                    new JdbcResponse(selRes),
+//                    end - start, "PREPARE", "JDBC");
 
             ps.close();
 

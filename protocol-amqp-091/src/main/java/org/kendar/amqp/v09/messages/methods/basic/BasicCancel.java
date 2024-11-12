@@ -69,18 +69,9 @@ public class BasicCancel extends Basic {
         toSend.noWait = rb.get() == 1;
 
         if (isProxyed()) {
-            proxy.respond(toSend,new FilterContext("AMQP","RESPONSE",-1,context));
             toSend.setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(toSend) + "}";
+            proxy.respond(toSend,new FilterContext("AMQP","RESPONSE",-1,context));
 
-
-            storage.write(
-                    context.getContextId(),
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
             return iteratorOfList(toSend);
         }
         return iteratorOfRunnable(() -> {

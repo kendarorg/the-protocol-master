@@ -21,6 +21,7 @@ public class StorageItem {
     private int nth = -1;
     private Object deserializedInput;
     private Object deserializedOutput;
+    private Object outAs;
 
     /**
      * Needed for serialization
@@ -48,9 +49,19 @@ public class StorageItem {
         this.caller = caller;
     }
 
-    public <T,K> void initializeIo(Class<T> typeIn,Class<K> typeOut) {
-        if(typeIn!=null && input!=null && input.getClass()!=typeIn)input = mapper.deserialize(mapper.serialize(this.getInput()), typeIn);
-        if(typeOut!=null && output!=null  && output.getClass()!=typeOut)output = mapper.deserialize(mapper.serialize(this.getOutput()), typeOut);
+    private Object inAs;
+    public <T> T retrieveInAs(Class<T> clazz) {
+        if(inAs==null){
+            inAs = mapper.deserialize(input, clazz);
+        }
+        return (T)inAs;
+    }
+
+    public <T> T retrieveOutAs(Class<T> clazz) {
+        if(outAs==null){
+            outAs = mapper.deserialize(output, clazz);
+        }
+        return (T)outAs;
     }
 
     public int getNth() {
@@ -90,7 +101,8 @@ public class StorageItem {
     }
 
     public void setInput(Object input) {
-        this.input = input;
+        this.input = mapper.toJsonNode(input);
+        inAs = null;
     }
 
     public Object getOutput() {
@@ -98,7 +110,8 @@ public class StorageItem {
     }
 
     public void setOutput(Object output) {
-        this.output = output;
+        this.output = mapper.toJsonNode(input);
+        outAs = null;
     }
 
     public long getDurationMs() {

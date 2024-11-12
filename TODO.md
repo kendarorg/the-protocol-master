@@ -18,6 +18,7 @@
 * Store other stuffs as external objects in Request/Response/Multipart
 * Publish on maven central
 * Change Supplier<Boolean> stopWhenFalseAction to a callback to register for
+* KENDARMYSQLPREPARESTATEMENT
 
 
 

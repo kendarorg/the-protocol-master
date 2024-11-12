@@ -69,14 +69,6 @@ public class Publish extends BasePropertiesMqttState {
 
         if (isProxyed()) {
             proxy.respond(publish,new FilterContext("MQTT","RESPONSE",-1,context));
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + publish.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(publish) + "}";
-            storage.write(
-                    context.getContextId(),
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "MQTT");
             return iteratorOfList(publish);
         }
         if (qos == 1) {

@@ -1,7 +1,6 @@
 package org.kendar.filters;
 
 import org.kendar.filters.settings.BasicReplayPluginSettings;
-import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.FilterContext;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
@@ -54,7 +53,6 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
         }
     }
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
-        lineToRead.getStorageItem().initializeIo(JdbcRequest.class, JdbcResponse.class);
         var idx = lineToRead.getCompactLine();
         var si = lineToRead.getStorageItem();
         if (idx != null) {
@@ -72,10 +70,6 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
             si.setInput(req);
         }
         return lineToRead;
-    }
-
-    private void buildState(ProtoContext context, Object outputItem, Object aClass) {
-
     }
 
 

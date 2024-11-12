@@ -107,16 +107,6 @@ public class BasicDeliver extends Basic {
 
 
         proxy.respond(bd,new FilterContext("AMQP","RESPONSE",-1,context));
-        var storage = proxy.getStorage();
-        var res = "{\"type\":\"" + bd.getClass().getSimpleName() + "\",\"data\":" +
-                mapper.serialize(bd) + "}";
-
-
-        storage.write(
-                context.getContextId(),
-                null
-                , mapper.toJsonNode(res)
-                , 0, "RESPONSE", "AMQP");
         return iteratorOfList(bd);
     }
 

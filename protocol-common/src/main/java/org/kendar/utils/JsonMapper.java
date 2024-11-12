@@ -31,17 +31,23 @@ public class JsonMapper {
         }
     }
 
-    public <T> T deserialize(String serialized, Class<T> target) {
+    public <T> T deserialize(Object serialized, Class<T> target) {
         try {
-            return mapper.readValue(serialized, target);
+            if(serialized==null) return null;
+            if(serialized instanceof String) return mapper.readValue((String)serialized, target);
+            if(serialized instanceof JsonNode) return mapper.treeToValue((JsonNode)serialized, target);
+            throw new RuntimeException("ERROR");
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public <T> T deserialize(String serialized, TypeReference<T> target) {
+    public <T> T deserialize(Object serialized, TypeReference<T> target) {
         try {
-            return mapper.readValue(serialized, target);
+            if(serialized==null) return null;
+            if(serialized instanceof String) return mapper.readValue((String)serialized, target);
+            if(serialized instanceof JsonNode) return mapper.treeToValue((JsonNode)serialized, target);
+            throw new RuntimeException("ERROR");
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -52,6 +58,9 @@ public class JsonMapper {
         try {
             if (of instanceof String) {
                 return mapper.readTree((String) of);
+            }
+            if (of instanceof JsonNode) {
+                return (JsonNode) of;
             }
             return mapper.readTree(mapper.writeValueAsString(of));
         } catch (JsonProcessingException e) {

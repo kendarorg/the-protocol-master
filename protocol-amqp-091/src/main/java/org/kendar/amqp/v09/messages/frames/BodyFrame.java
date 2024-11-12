@@ -76,19 +76,10 @@ public class BodyFrame extends Frame {
             bf.setConsumeId(basicConsume.getConsumeId());
 
 
-            //If it is not a replayer do not save
+            //If it is a recorder
             if (!proxy.isReplayer()) {
 
                 proxy.respond(bf,new FilterContext("AMQP","RESPONSE",-1,context));
-                var storage = proxy.getStorage();
-                var res = "{\"type\":\"" + bf.getClass().getSimpleName() + "\",\"data\":" +
-                        mapper.serialize(bf) + "}";
-                //Write it down
-                storage.write(
-                        context.getContextId(),
-                        null
-                        , mapper.toJsonNode(res)
-                        , 0, "RESPONSE", "AMQP");
             }
             //Return itself
             return iteratorOfList(bf);

@@ -286,18 +286,9 @@ public class HeaderFrame extends Frame {
         hf.setChannel(channel);
 
         if (isProxyed()) {
-            proxy.respond(hf,new FilterContext("AMQP","RESPONSE",-1,context));
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             hf.setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + hf.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(hf) + "}";
-
-            storage.write(
-                    context.getContextId(),
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
+            proxy.respond(hf,new FilterContext("AMQP","RESPONSE",-1,context));
             return iteratorOfList(hf);
         }
         return iteratorOfRunnable(() -> proxy.sendAndForget(context,
