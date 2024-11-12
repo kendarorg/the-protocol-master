@@ -9,8 +9,8 @@ import org.kendar.apis.ApiHandler;
 import org.kendar.command.*;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.http.plugins.ErrorPlugin;
-import org.kendar.http.plugins.RecordingPlugin;
-import org.kendar.http.plugins.ReplayPlugin;
+import org.kendar.http.plugins.HttpRecordingPlugin;
+import org.kendar.http.plugins.HttpReplayingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -32,7 +32,7 @@ public class Main {
     private static final ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
     private static ProtocolsRunner om;
 
-    public static void main(String[] args)throws Exception {
+    public static void main(String[] args) throws Exception {
         execute(args, Main::stopWhenQuitCommand);
     }
 
@@ -50,8 +50,8 @@ public class Main {
         var options = ProtocolsRunner.getMainOptions();
         HashMap<String, List<PluginDescriptor>> filters = new HashMap<>();
         CommandLine cmd = parser.parse(options, args, true);
-            var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
-            filters = loadFilters(pluginsDir);
+        var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
+        filters = loadFilters(pluginsDir);
 
         var ini = om.run(cmd, args, filters);
         execute(ini, stopWhenFalse, filters);
@@ -113,12 +113,12 @@ public class Main {
             }
             filters.get(protocol).add(item);
         }
-        if(!filters.containsKey("http")){
+        if (!filters.containsKey("http")) {
             filters.put("http", new ArrayList<>());
         }
         filters.get("http").addAll(List.of(
-                new RecordingPlugin(),
-                new ErrorPlugin(),new ReplayPlugin()));
+                new HttpRecordingPlugin(),
+                new ErrorPlugin(), new HttpReplayingPlugin()));
         return filters;
     }
 
@@ -151,7 +151,7 @@ public class Main {
                 if (protocol == null) continue;
                 var protocolManager = om.getManagerFor(protocol);
                 var filters = loadAvailableFiltersForProtocol(protocol, ini, allFilters);
-                var protocolFullSettings = ini.getProtocol(item.getKey(),protocolManager.getSettingsClass());
+                var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
 
                 try {
                     om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, filters, stopWhenFalse);
@@ -159,7 +159,7 @@ public class Main {
                     protocolServer.remove(item);
                     throw new RuntimeException(e);
                 }
-                apiHandler.addProtocol(item.getKey(),protocolManager,filters,protocolFullSettings);
+                apiHandler.addProtocol(item.getKey(), protocolManager, filters, protocolFullSettings);
 
 
             } catch (Exception ex) {
@@ -172,17 +172,17 @@ public class Main {
     }
 
     private static List<PluginDescriptor> loadAvailableFiltersForProtocol(ProtocolSettings protocol, GlobalSettings global,
-                                                          HashMap<String, List<PluginDescriptor>> allFilters) {
+                                                                          HashMap<String, List<PluginDescriptor>> allFilters) {
         var availableFilters = allFilters.get(protocol.getProtocol());
         if (availableFilters == null) availableFilters = new ArrayList<>();
         var simplePlugins = protocol.getSimplePlugins();
         var filters = new ArrayList<PluginDescriptor>();
 
-        for(var simplePlugin:simplePlugins.entrySet()){
-            var availableFilter = availableFilters.stream().filter(av->av.getId().equalsIgnoreCase(simplePlugin.getValue().getPlugin())).findFirst();
-            if(availableFilter.isPresent()){
+        for (var simplePlugin : simplePlugins.entrySet()) {
+            var availableFilter = availableFilters.stream().filter(av -> av.getId().equalsIgnoreCase(simplePlugin.getValue().getPlugin())).findFirst();
+            if (availableFilter.isPresent()) {
                 var realFilter = availableFilter.get().clone();
-                realFilter.setSettings(protocol.getPlugin(simplePlugin.getKey(),realFilter.getSettingClass()));
+                realFilter.setSettings(protocol.getPlugin(simplePlugin.getKey(), realFilter.getSettingClass()));
                 filters.add(realFilter);
 
             }

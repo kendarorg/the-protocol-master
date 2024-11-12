@@ -288,7 +288,7 @@ public class HeaderFrame extends Frame {
         if (isProxyed()) {
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             hf.setConsumeId(basicConsume.getConsumeId());
-            proxy.respond(hf,new FilterContext("AMQP","RESPONSE",-1,context));
+            proxy.respond(hf, new FilterContext("AMQP", "RESPONSE", -1, context));
             return iteratorOfList(hf);
         }
         return iteratorOfRunnable(() -> proxy.sendAndForget(context,

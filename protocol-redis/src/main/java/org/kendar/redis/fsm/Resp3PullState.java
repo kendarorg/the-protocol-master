@@ -73,7 +73,7 @@ public class Resp3PullState extends ProtoState implements NetworkReturnMessage {
             if (event.getData() instanceof List) {
                 if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("message")) {
 
-                    proxy.respond(event.getData(),new FilterContext("RESP3","RESPONSE",-1,context));
+                    proxy.respond(event.getData(), new FilterContext("RESP3", "RESPONSE", -1, context));
                     return iteratorOfList(event);
                 }
 

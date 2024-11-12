@@ -12,6 +12,14 @@ public class ProtocolInstance {
     private final List<PluginDescriptor> filters;
     private final ProtocolSettings settings;
 
+    public ProtocolInstance(String protocolInstanceId, CommonRunner protocolManager, List<PluginDescriptor> filters, ProtocolSettings settings) {
+
+        this.protocolInstanceId = protocolInstanceId;
+        this.protocolManager = protocolManager;
+        this.filters = filters;
+        this.settings = settings;
+    }
+
     public String getProtocolInstanceId() {
         return protocolInstanceId;
     }
@@ -26,13 +34,5 @@ public class ProtocolInstance {
 
     public ProtocolSettings getSettings() {
         return settings;
-    }
-
-    public ProtocolInstance(String protocolInstanceId, CommonRunner protocolManager, List<PluginDescriptor> filters, ProtocolSettings settings) {
-
-        this.protocolInstanceId = protocolInstanceId;
-        this.protocolManager = protocolManager;
-        this.filters = filters;
-        this.settings = settings;
     }
 }

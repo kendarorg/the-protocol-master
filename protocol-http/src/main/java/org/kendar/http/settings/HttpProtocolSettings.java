@@ -11,6 +11,7 @@ public class HttpProtocolSettings extends ProtocolSettings {
     private int proxy;
     private String apis;
     private HttpSSLSettings ssl;
+    private List<HttpRewriteSettings> rewrites = new ArrayList<>();
 
     public List<HttpRewriteSettings> getRewrites() {
         return rewrites;
@@ -20,45 +21,43 @@ public class HttpProtocolSettings extends ProtocolSettings {
         this.rewrites = rewrites;
     }
 
-    private List<HttpRewriteSettings> rewrites = new ArrayList<>();
-
-    public void setHttp(int http) {
-        this.http = http;
-    }
-
     public int getHttp() {
         return http;
     }
 
-    public void setHttps(int https) {
-        this.https = https;
+    public void setHttp(int http) {
+        this.http = http;
     }
 
     public int getHttps() {
         return https;
     }
 
-    public void setProxy(int proxy) {
-        this.proxy = proxy;
+    public void setHttps(int https) {
+        this.https = https;
     }
 
     public int getProxy() {
         return proxy;
     }
 
-    public void setApis(String apis) {
-        this.apis = apis;
+    public void setProxy(int proxy) {
+        this.proxy = proxy;
     }
 
     public String getApis() {
         return apis;
     }
 
-    public void setSSL(HttpSSLSettings ssl) {
-        this.ssl = ssl;
+    public void setApis(String apis) {
+        this.apis = apis;
     }
 
     public HttpSSLSettings getSSL() {
         return ssl;
+    }
+
+    public void setSSL(HttpSSLSettings ssl) {
+        this.ssl = ssl;
     }
 }

@@ -131,7 +131,7 @@ public abstract class NetworkProxy extends Proxy {
 
 
         long start = System.currentTimeMillis();
-        var filterContext = new FilterContext(getCaller(),of.getClass().getSimpleName(),start, context);
+        var filterContext = new FilterContext(getCaller(), of.getClass().getSimpleName(), start, context);
         for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, new Object())) {
             if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, of, null)) {
                 return;
@@ -184,10 +184,10 @@ public abstract class NetworkProxy extends Proxy {
             boolean optional) {
 
         long start = System.currentTimeMillis();
-        var filterContext = new FilterContext(getCaller(),of.getClass().getSimpleName(),start, context);
+        var filterContext = new FilterContext(getCaller(), of.getClass().getSimpleName(), start, context);
 
         for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, toRead)) {
-            if (filter.handle(filterContext,ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
         }
@@ -228,7 +228,7 @@ public abstract class NetworkProxy extends Proxy {
     public <J extends ProtoState> J sendBytesAndExpect(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead, boolean optional) {
 
         long start = System.currentTimeMillis();
-        var filterContext = new FilterContext(getCaller(),"byte[]",start,context);
+        var filterContext = new FilterContext(getCaller(), "byte[]", start, context);
 
         for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, toRead)) {
             if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, of, toRead)) {
@@ -248,7 +248,7 @@ public abstract class NetworkProxy extends Proxy {
         return toRead;
     }
 
-    public void respond(Object publish,FilterContext filterContext) {
+    public void respond(Object publish, FilterContext filterContext) {
         for (var filter : getFilters(ProtocolPhase.ASYNC_RESPONSE, new Object(), publish)) {
             if (filter.handle(filterContext, ProtocolPhase.ASYNC_RESPONSE, null, publish)) {
                 break;

@@ -8,8 +8,7 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 
-public class RedisRecordingPlugin extends BasicRecordingPlugin
-{
+public class RedisRecordingPlugin extends BasicRecordingPlugin {
     @Override
     protected Object getData(Object of) {
         if (of instanceof Resp3Message) {
@@ -39,6 +38,6 @@ public class RedisRecordingPlugin extends BasicRecordingPlugin
                 filterContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
-        storage.write(new LineToWrite(getInstanceId(),storageItem,compactLine));
+        storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));
     }
 }

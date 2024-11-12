@@ -33,9 +33,9 @@ public class JsonMapper {
 
     public <T> T deserialize(Object serialized, Class<T> target) {
         try {
-            if(serialized==null) return null;
-            if(serialized instanceof String) return mapper.readValue((String)serialized, target);
-            if(serialized instanceof JsonNode) return mapper.treeToValue((JsonNode)serialized, target);
+            if (serialized == null) return null;
+            if (serialized instanceof String) return mapper.readValue((String) serialized, target);
+            if (serialized instanceof JsonNode) return mapper.treeToValue((JsonNode) serialized, target);
             throw new RuntimeException("ERROR");
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -44,9 +44,9 @@ public class JsonMapper {
 
     public <T> T deserialize(Object serialized, TypeReference<T> target) {
         try {
-            if(serialized==null) return null;
-            if(serialized instanceof String) return mapper.readValue((String)serialized, target);
-            if(serialized instanceof JsonNode) return mapper.treeToValue((JsonNode)serialized, target);
+            if (serialized == null) return null;
+            if (serialized instanceof String) return mapper.readValue((String) serialized, target);
+            if (serialized instanceof JsonNode) return mapper.treeToValue((JsonNode) serialized, target);
             throw new RuntimeException("ERROR");
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

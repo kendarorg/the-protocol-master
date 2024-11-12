@@ -24,6 +24,7 @@ public interface PluginDescriptor extends ExtensionPoint {
 
     void setSettings(PluginSettings plugin);
 
-    void setActive(boolean active);
     boolean isActive();
+
+    void setActive(boolean active);
 }

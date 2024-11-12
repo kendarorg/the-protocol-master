@@ -23,7 +23,7 @@ public class RedisRunner extends CommonRunner {
                     HashMap<String, List<PluginDescriptor>> filters) throws Exception {
         var options = getCommonOptions(mainOptions);
         if (!isExecute) return;
-        setCommonData(args, options, go,new ByteProtocolSettings());
+        setCommonData(args, options, go, new ByteProtocolSettings());
     }
 
     @Override
@@ -37,14 +37,14 @@ public class RedisRunner extends CommonRunner {
                       StorageRepository storage, List<PluginDescriptor> filters,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var protocolSettings = (ByteProtocolSettings) protocol;
-        var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(),6379);
-        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
-        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(),"");
+        var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 6379);
+        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(), 30);
+        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(), "");
         var baseProtocol = new Resp3Protocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new Resp3Proxy(connectionString, null, null);
 
-        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
+        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
             proxy = new Resp3Proxy();
             proxy.setStorage(new Resp3StorageHandler(storage));
         } else {
@@ -54,7 +54,7 @@ public class RedisRunner extends CommonRunner {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
+        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
             ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
         }
         ps.start();

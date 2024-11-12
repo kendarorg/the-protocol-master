@@ -1,6 +1,6 @@
 package org.kendar.settings;
 
-public class RecordPluginSettings extends PluginSettings{
+public class RecordPluginSettings extends PluginSettings {
     private boolean record;
 
     public boolean isRecord() {

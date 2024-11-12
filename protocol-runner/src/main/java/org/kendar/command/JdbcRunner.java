@@ -29,19 +29,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class JdbcRunner extends CommonRunner {
-    private static TypeReference<List<QueryReplacerItem>> replaceItemsList= new TypeReference<>() {
+    private static TypeReference<List<QueryReplacerItem>> replaceItemsList = new TypeReference<>() {
     };
+    private static JsonMapper mapper = new JsonMapper();
     private final String protocol;
 
     public JdbcRunner(String id) {
 
         this.protocol = id;
     }
-private static JsonMapper mapper = new JsonMapper();
+
     private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws Exception {
         var lines = new String(Files.readAllBytes(Path.of(jdbcReplaceQueries).toAbsolutePath()));
 
-        var items = (List<QueryReplacerItem>)mapper.deserialize(lines,replaceItemsList);
+        var items = (List<QueryReplacerItem>) mapper.deserialize(lines, replaceItemsList);
 
         proxy.setQueryReplacement(items);
     }
@@ -56,18 +57,18 @@ private static JsonMapper mapper = new JsonMapper();
                     HashMap<String, List<PluginDescriptor>> filters) throws Exception {
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
-        options.addOption(createOpt("js","schema", true, "Set schema"));
-        options.addOption(createOpt("jr","replaceQueryFile", true, "Replace queries file"));
+        options.addOption(createOpt("js", "schema", true, "Set schema"));
+        options.addOption(createOpt("jr", "replaceQueryFile", true, "Replace queries file"));
         if (!isExecute) return;
         setCommonData(args, options, go, new JdbcProtocolSettings());
     }
 
     protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
-        parseLoginPassword((ByteProtocolSettingsWithLogin)result, cmd);
-        var sets= (JdbcProtocolSettings)result;
+        parseLoginPassword((ByteProtocolSettingsWithLogin) result, cmd);
+        var sets = (JdbcProtocolSettings) result;
 
-        sets.setForceSchema(ProtocolsRunner.getOrDefault(cmd.getOptionValue("schema"),""));
-        sets.setReplaceQueryFile(ProtocolsRunner.getOrDefault(cmd.getOptionValue("replaceQueryFile"),""));
+        sets.setForceSchema(ProtocolsRunner.getOrDefault(cmd.getOptionValue("schema"), ""));
+        sets.setReplaceQueryFile(ProtocolsRunner.getOrDefault(cmd.getOptionValue("replaceQueryFile"), ""));
     }
 
     @Override
@@ -86,16 +87,16 @@ private static JsonMapper mapper = new JsonMapper();
                       StorageRepository repo, List<PluginDescriptor> filters,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         NetworkProtoDescriptor baseProtocol = null;
-        var realSttings = (JdbcProtocolSettings)protocolSettings;
+        var realSttings = (JdbcProtocolSettings) protocolSettings;
         String driver = "";
         if (protocolSettings.getProtocol().equalsIgnoreCase("postgres")) {
             driver = "org.postgresql.Driver";
             baseProtocol = new PostgresProtocol(
-                    ProtocolsRunner.getOrDefault(realSttings.getPort(),5432)
+                    ProtocolsRunner.getOrDefault(realSttings.getPort(), 5432)
             );
         } else if (protocolSettings.getProtocol().equalsIgnoreCase("mysql")) {
             baseProtocol = new MySQLProtocol(
-                    ProtocolsRunner.getOrDefault(realSttings.getPort(),3306));
+                    ProtocolsRunner.getOrDefault(realSttings.getPort(), 3306));
         }
 
         var proxy = new JdbcProxy(driver,
@@ -106,7 +107,7 @@ private static JsonMapper mapper = new JsonMapper();
         if (protocolSettings.getProtocol().equalsIgnoreCase("mysql")) {
             storage = new MySqlStorageHandler(repo);
         }
-        if (realSttings.getSimulation()!=null && realSttings.getSimulation().isReplay()) {
+        if (realSttings.getSimulation() != null && realSttings.getSimulation().isReplay()) {
             proxy = new JdbcProxy(storage);
         } else {
             proxy.setStorage(storage);
@@ -118,10 +119,10 @@ private static JsonMapper mapper = new JsonMapper();
             handleReplacementQueries(jdbcReplaceQueries, proxy);
         }
         baseProtocol.setProxy(proxy);
-        baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(),30));
+        baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(), 30));
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (realSttings.getSimulation()!=null && realSttings.getSimulation().isReplay()) {
+        if (realSttings.getSimulation() != null && realSttings.getSimulation().isReplay()) {
             ps.useCallDurationTimes(realSttings.getSimulation().isRespectCallDuration());
         }
         ps.start();

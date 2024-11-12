@@ -13,7 +13,7 @@ public interface StorageRepository {
 
     void finalizeWrite(String instanceId);
 
-    LineToRead read(String instanceId,CallItemsQuery query);
+    LineToRead read(String instanceId, CallItemsQuery query);
 
     List<StorageItem> readResponses(String instanceId, ResponseItemQuery query);
 }

@@ -13,17 +13,17 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Object, Object>{
+public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
 
     @Override
     public boolean handle(FilterContext filterContext, ProtocolPhase phase, Object in, Object out) {
-        if(isActive()){
-            if(phase==ProtocolPhase.POST_CALL) {
+        if (isActive()) {
+            if (phase == ProtocolPhase.POST_CALL) {
                 postCall(filterContext, in, out);
-            }else if(phase==ProtocolPhase.ASYNC_RESPONSE){
-                asyncCall(filterContext,out);
+            } else if (phase == ProtocolPhase.ASYNC_RESPONSE) {
+                asyncCall(filterContext, out);
             }
         }
         return false;
@@ -44,7 +44,7 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
 
-        storage.write(new LineToWrite(getInstanceId(),storageItem,compactLine));
+        storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));
     }
 
     protected void postCall(FilterContext filterContext, Object in, Object out) {
@@ -65,10 +65,10 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
                 filterContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
-        if(!shouldNotSave(in,out,compactLine)) {
-            storage.write(new LineToWrite(getInstanceId(), storageItem,compactLine));
-        }else {
-            storage.write(new LineToWrite(getInstanceId(),compactLine));
+        if (!shouldNotSave(in, out, compactLine)) {
+            storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));
+        } else {
+            storage.write(new LineToWrite(getInstanceId(), compactLine));
         }
     }
 
@@ -76,13 +76,13 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
         return Map.of();
     }
 
-    protected boolean shouldNotSave(Object in, Object out, CompactLine compactLine){
+    protected boolean shouldNotSave(Object in, Object out, CompactLine compactLine) {
         return false;
     }
 
     @Override
     public List<ProtocolPhase> getPhases() {
-        return List.of(ProtocolPhase.POST_CALL,ProtocolPhase.ASYNC_RESPONSE);
+        return List.of(ProtocolPhase.POST_CALL, ProtocolPhase.ASYNC_RESPONSE);
     }
 
     @Override

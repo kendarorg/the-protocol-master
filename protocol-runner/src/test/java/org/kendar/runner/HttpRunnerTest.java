@@ -80,8 +80,8 @@ public class HttpRunnerTest {
                     }
                 });
                 exception.set(new Exception("Terminated abruptly"));
-            }catch (Exception e){
-                exception.set(new Exception("Terminated error",e));
+            } catch (Exception e) {
+                exception.set(new Exception("Terminated error", e));
             }
 
         });

@@ -9,7 +9,10 @@ import org.apache.commons.cli.Options;
 import org.kendar.HttpTcpServer;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.http.MasterHandler;
-import org.kendar.http.plugins.*;
+import org.kendar.http.plugins.GlobalPlugin;
+import org.kendar.http.plugins.HttpErrorPluginSettings;
+import org.kendar.http.plugins.HttpRecordPluginSettings;
+import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.settings.HttpSSLSettings;
 import org.kendar.http.utils.ConnectionBuilderImpl;
@@ -56,9 +59,9 @@ public class HttpRunner extends CommonRunner {
 
     private static SimpleRewriterConfig loadRewritersConfiguration(HttpProtocolSettings settings) {
         var proxyConfig = new SimpleRewriterConfig();
-        for(var i=0;i<settings.getRewrites().size();i++){
+        for (var i = 0; i < settings.getRewrites().size(); i++) {
             var rw = settings.getRewrites().get(i);
-            if(rw.getWhen()==null||rw.getThen()==null){
+            if (rw.getWhen() == null || rw.getThen() == null) {
                 continue;
             }
             var remoteServerStatus = new RemoteServerStatus(i + "",
@@ -106,7 +109,7 @@ public class HttpRunner extends CommonRunner {
                                  HttpProtocolSettings section) throws Exception {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
-        ini.getProtocols().put(getId(),section);
+        ini.getProtocols().put(getId(), section);
         section.setProtocol(getId());
         section.setProtocolInstanceId(getId());
         section.setHttp(Integer.parseInt(cmd.getOptionValue("http", "4080")));
@@ -174,8 +177,8 @@ public class HttpRunner extends CommonRunner {
             log.debug("Started waiter");
 
             var port = ProtocolsRunner.getOrDefault(settings.getHttp(), 4080);
-            var httpsPort = ProtocolsRunner.getOrDefault(settings.getHttps(),  4443);
-            var proxyPort = ProtocolsRunner.getOrDefault(settings.getProxy(),  9999);
+            var httpsPort = ProtocolsRunner.getOrDefault(settings.getHttps(), 4443);
+            var proxyPort = ProtocolsRunner.getOrDefault(settings.getProxy(), 9999);
 //        log.info("LISTEN HTTP: " + port);
 //        log.info("LISTEN HTTPS: " + httpsPort);
 //        log.info("LISTEN PROXY: " + proxyPort);
@@ -205,7 +208,7 @@ public class HttpRunner extends CommonRunner {
 
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
             var httpsServer = createHttpsServer(certificatesManager,
-                    sslAddress, backlog, cname, sslDer, sslKey,settings.getSSL().getHosts());
+                    sslAddress, backlog, cname, sslDer, sslKey, settings.getSSL().getHosts());
             log.debug("Https created");
             ps.setStop(() -> {
                 waiterBlock.set(false);
@@ -244,7 +247,7 @@ public class HttpRunner extends CommonRunner {
             }
 
             var globalFilter = new GlobalPlugin();
-            globalFilter.initialize(ini,pset);
+            globalFilter.initialize(ini, pset);
             filters.add(globalFilter);
 
             globalFilter.setFilters(filters);

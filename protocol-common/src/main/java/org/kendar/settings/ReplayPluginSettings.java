@@ -1,6 +1,6 @@
 package org.kendar.settings;
 
-public class ReplayPluginSettings extends PluginSettings{
+public class ReplayPluginSettings extends PluginSettings {
     private boolean replay;
     private String replayId;
     private boolean respectTimings;

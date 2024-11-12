@@ -290,7 +290,7 @@ public class JdbcProxy extends Proxy {
         try {
             var result = new SelectResult();
             long start = System.currentTimeMillis();
-            var filterContext = new FilterContext("JDBC","QUERY",start, context);
+            var filterContext = new FilterContext("JDBC", "QUERY", start, context);
             var jdbcCall = new JdbcCall(query, parameterValues);
             for (var filter : getFilters(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
                 if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, jdbcCall, result)) {

@@ -19,14 +19,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class AmqpReplayingPlugin extends BasicReplayingPlugin {
+    private static final Logger log = LoggerFactory.getLogger(AmqpReplayingPlugin.class);
+    private static JsonMapper mapper = new JsonMapper();
+
     @Override
     public String getProtocol() {
         return "amqp091";
     }
-
-    private static final Logger log = LoggerFactory.getLogger(AmqpReplayingPlugin.class);
-
-    private static JsonMapper mapper = new JsonMapper();
 
     @Override
     protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outObj, Object toread) {
@@ -34,14 +33,14 @@ public class AmqpReplayingPlugin extends BasicReplayingPlugin {
 
         var result = mapper.deserialize(out.get("data").toString(), out.getClass());
         try {
-            BeanUtils.copyProperties(toread,result);
+            BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    protected void sendBackResponses(ProtoContext context,List<StorageItem> storageItems) {
+    protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = mapper.toJsonNode(item.getOutput());

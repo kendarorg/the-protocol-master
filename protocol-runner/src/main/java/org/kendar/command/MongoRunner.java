@@ -25,11 +25,11 @@ public class MongoRunner extends CommonRunner {
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
         if (!isExecute) return;
-        setCommonData(args, options, go,new ByteProtocolSettingsWithLogin());
+        setCommonData(args, options, go, new ByteProtocolSettingsWithLogin());
     }
 
     protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
-        parseLoginPassword((ByteProtocolSettingsWithLogin)result, cmd);
+        parseLoginPassword((ByteProtocolSettingsWithLogin) result, cmd);
     }
 
     @Override
@@ -53,15 +53,15 @@ public class MongoRunner extends CommonRunner {
         var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;
 
         var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 1883);
-        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
-        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(),"");
-        var login = ProtocolsRunner.getOrDefault(protocolSettings.getLogin(),"");
-        var password = ProtocolsRunner.getOrDefault(protocolSettings.getPassword(),"");
+        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(), 30);
+        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(), "");
+        var login = ProtocolsRunner.getOrDefault(protocolSettings.getLogin(), "");
+        var password = ProtocolsRunner.getOrDefault(protocolSettings.getPassword(), "");
         var baseProtocol = new org.kendar.mqtt.MqttProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MongoProxy(connectionString);
 
-        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
+        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
             proxy = new MongoProxy(new MongoStorageHandler(storage));
         } else {
             proxy.setStorage(new MongoStorageHandler(storage));
@@ -70,7 +70,7 @@ public class MongoRunner extends CommonRunner {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
+        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
             ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
         }
         ps.start();

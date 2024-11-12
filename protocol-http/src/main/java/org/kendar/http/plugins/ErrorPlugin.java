@@ -43,7 +43,7 @@ public class ErrorPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
     @Override
     public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request request, Response response) {
-        if(!isActive())return false;
+        if (!isActive()) return false;
         if (Math.random() < percentage) {
 
             log.info("FAKE ERR " + request.getMethod() + " " + request.buildUrl());

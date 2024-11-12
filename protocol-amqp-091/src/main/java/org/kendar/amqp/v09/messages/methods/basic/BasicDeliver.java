@@ -106,7 +106,7 @@ public class BasicDeliver extends Basic {
         bd.routingKey = ShortStringHelper.read(rb);
 
 
-        proxy.respond(bd,new FilterContext("AMQP","RESPONSE",-1,context));
+        proxy.respond(bd, new FilterContext("AMQP", "RESPONSE", -1, context));
         return iteratorOfList(bd);
     }
 

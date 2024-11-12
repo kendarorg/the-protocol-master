@@ -79,7 +79,7 @@ public class BodyFrame extends Frame {
             //If it is a recorder
             if (!proxy.isReplayer()) {
 
-                proxy.respond(bf,new FilterContext("AMQP","RESPONSE",-1,context));
+                proxy.respond(bf, new FilterContext("AMQP", "RESPONSE", -1, context));
             }
             //Return itself
             return iteratorOfList(bf);

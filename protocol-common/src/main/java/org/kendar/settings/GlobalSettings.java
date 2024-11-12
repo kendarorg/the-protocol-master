@@ -12,6 +12,7 @@ public class GlobalSettings {
     private String dataDir;
     private String logType;
     private int tpmApi;
+    private Map<String, Object> protocols = new HashMap<String, Object>();
 
     public int getTpmApi() {
         return tpmApi;
@@ -30,18 +31,18 @@ public class GlobalSettings {
     }
 
     public ProtocolSettings getProtocolForKey(String protocol) {
-        if(!protocols.containsKey(protocol)){
+        if (!protocols.containsKey(protocol)) {
             return null;
         }
-        return mapper.deserialize(mapper.serialize(protocols.get(protocol)),ProtocolSettings.class);
+        return mapper.deserialize(mapper.serialize(protocols.get(protocol)), ProtocolSettings.class);
     }
 
-    public ProtocolSettings getProtocol(String protocol, Class<?> clazz){
-        if(!protocols.containsKey(protocol)){
+    public ProtocolSettings getProtocol(String protocol, Class<?> clazz) {
+        if (!protocols.containsKey(protocol)) {
             return null;
         }
         var protocolData = protocols.get(protocol);
-        return (ProtocolSettings)mapper.deserialize(mapper.serialize(protocolData),clazz);
+        return (ProtocolSettings) mapper.deserialize(mapper.serialize(protocolData), clazz);
     }
 
     public Map<String, Object> getProtocols() {
@@ -51,8 +52,6 @@ public class GlobalSettings {
     public void setProtocols(Map<String, Object> protocols) {
         this.protocols = protocols;
     }
-
-    private Map<String,Object> protocols = new HashMap<String,Object>();
 
     public String getPluginsDir() {
         return pluginsDir;

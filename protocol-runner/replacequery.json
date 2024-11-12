@@ -1,7 +1,8 @@
 [
-    {
-        "type":"regexfind", /* regexfind,replace */
-        "from": "query",
-        "to": "query"
-    }
+  {
+    "type": "regexfind",
+    /* regexfind,replace */
+    "from": "query",
+    "to": "query"
+  }
 ]

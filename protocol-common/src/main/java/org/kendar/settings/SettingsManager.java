@@ -9,12 +9,12 @@ import java.nio.file.Path;
 public class SettingsManager {
     private static JsonMapper mapper = new JsonMapper();
 
-    public static GlobalSettings load(String path) throws Exception{
+    public static GlobalSettings load(String path) throws Exception {
         var file = Path.of(path).toAbsolutePath();
-        if(!file.toFile().exists()){
+        if (!file.toFile().exists()) {
             throw new FileNotFoundException(file.toString());
         }
         var content = new String(Files.readAllBytes(file));
-        return mapper.deserialize(content,GlobalSettings.class);
+        return mapper.deserialize(content, GlobalSettings.class);
     }
 }

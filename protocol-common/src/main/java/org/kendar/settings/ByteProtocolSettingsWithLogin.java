@@ -1,6 +1,6 @@
 package org.kendar.settings;
 
-public class ByteProtocolSettingsWithLogin extends ByteProtocolSettings{
+public class ByteProtocolSettingsWithLogin extends ByteProtocolSettings {
     private String login;
     private String password;
 

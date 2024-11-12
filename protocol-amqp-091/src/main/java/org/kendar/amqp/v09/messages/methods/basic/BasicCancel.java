@@ -70,7 +70,7 @@ public class BasicCancel extends Basic {
 
         if (isProxyed()) {
             toSend.setConsumeId(basicConsume.getConsumeId());
-            proxy.respond(toSend,new FilterContext("AMQP","RESPONSE",-1,context));
+            proxy.respond(toSend, new FilterContext("AMQP", "RESPONSE", -1, context));
 
             return iteratorOfList(toSend);
         }

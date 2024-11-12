@@ -9,12 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MqttRecordingPlugin extends BasicRecordingPlugin
-{
-    @Override
-    public String getProtocol() {
-        return "mqtt";
-    }
+public class MqttRecordingPlugin extends BasicRecordingPlugin {
+    private static final List<String> toAvoid = List.of("Disconnect", "PingReq");
 
     private static int getConsumeId(JsonNode output, int consumeId) {
         if (output == null) return 0;
@@ -25,10 +21,13 @@ public class MqttRecordingPlugin extends BasicRecordingPlugin
         return Math.max(cid.asInt(), consumeId);
     }
 
-    private static final List<String> toAvoid = List.of("Disconnect", "PingReq");
+    @Override
+    public String getProtocol() {
+        return "mqtt";
+    }
 
     @Override
-    protected boolean shouldNotSave(Object in, Object out, CompactLine cl){
+    protected boolean shouldNotSave(Object in, Object out, CompactLine cl) {
         if (cl == null) return false;
         if (cl.getTags() == null || cl.getTags().get("input") == null) {
             return false;

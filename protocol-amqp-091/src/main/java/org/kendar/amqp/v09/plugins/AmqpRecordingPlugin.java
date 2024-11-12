@@ -9,26 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AmqpRecordingPlugin extends BasicRecordingPlugin
-{
+public class AmqpRecordingPlugin extends BasicRecordingPlugin {
     private static final List<String> toAvoid = List.of("byte[]",
             "ConnectionStartOk", "ConnectionTuneOk", "ConnectionOpen", "ChannelOpen", "BasicPublish",
             "HeaderFrame", "BasicPublish", "BodyFrame", "BasicAck", "ChannelClose", "ConnectionClose",
             "QueueDeclare", "ExchangeDeclare", "QueueDelete", "ExchangeDelete");
-
-    @Override
-    public String getProtocol() {
-        return "amqp091";
-    }
-
-    @Override
-    protected boolean shouldNotSave(Object in, Object out, CompactLine cl){
-        if (cl == null) return false;
-        if (cl.getTags() == null || cl.getTags().get("input") == null) {
-            return false;
-        }
-        return toAvoid.contains(cl.getTags().get("input"));
-    }
 
     private static int getConsumeId(JsonNode output, int consumeId) {
         if (output == null) return 0;
@@ -37,6 +22,20 @@ public class AmqpRecordingPlugin extends BasicRecordingPlugin
         var cid = data.get("consumeId");
         if (cid == null) return consumeId;
         return Math.max(cid.asInt(), consumeId);
+    }
+
+    @Override
+    public String getProtocol() {
+        return "amqp091";
+    }
+
+    @Override
+    protected boolean shouldNotSave(Object in, Object out, CompactLine cl) {
+        if (cl == null) return false;
+        if (cl.getTags() == null || cl.getTags().get("input") == null) {
+            return false;
+        }
+        return toAvoid.contains(cl.getTags().get("input"));
     }
 
     @Override

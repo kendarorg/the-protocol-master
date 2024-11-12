@@ -28,12 +28,12 @@ public class Amqp091Runner extends CommonRunner {
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
         if (!isExecute) return;
-        setCommonData(args, options, go,new ByteProtocolSettings());
+        setCommonData(args, options, go, new ByteProtocolSettings());
     }
 
 
     protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
-        parseLoginPassword((ByteProtocolSettingsWithLogin)result, cmd);
+        parseLoginPassword((ByteProtocolSettingsWithLogin) result, cmd);
     }
 
     @Override
@@ -58,15 +58,15 @@ public class Amqp091Runner extends CommonRunner {
         var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;
 
         var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 5672);
-        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(),30);
-        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(),"");
-        var login = ProtocolsRunner.getOrDefault(protocolSettings.getLogin(),"");
-        var password = ProtocolsRunner.getOrDefault(protocolSettings.getPassword(),"");
+        var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(), 30);
+        var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(), "");
+        var login = ProtocolsRunner.getOrDefault(protocolSettings.getLogin(), "");
+        var password = ProtocolsRunner.getOrDefault(protocolSettings.getPassword(), "");
         var baseProtocol = new org.kendar.amqp.v09.AmqpProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new AmqpProxy(connectionString, login, password);
 
-        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
+        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
             proxy = new AmqpProxy();
             proxy.setStorage(new AmqpStorageHandler(storage));
         } else {
@@ -76,7 +76,7 @@ public class Amqp091Runner extends CommonRunner {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var ps = new TcpServer(baseProtocol);
-        if (protocolSettings.getSimulation()!=null && protocolSettings.getSimulation().isReplay()) {
+        if (protocolSettings.getSimulation() != null && protocolSettings.getSimulation().isReplay()) {
             ps.useCallDurationTimes(protocolSettings.getSimulation().isRespectCallDuration());
         }
         ps.start();

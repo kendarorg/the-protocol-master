@@ -13,7 +13,7 @@ public class FixedLengthInputStream extends LeftOverInputStream {
     public FixedLengthInputStream(ExchangeImpl t, InputStream src, long len) {
         super(t, src);
         if (len < 0L) {
-            throw new IllegalArgumentException(ConstantsHeader.CONTENT_LENGTH+": " + len);
+            throw new IllegalArgumentException(ConstantsHeader.CONTENT_LENGTH + ": " + len);
         } else {
             this.remaining = len;
         }

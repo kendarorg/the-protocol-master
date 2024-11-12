@@ -14,29 +14,28 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class BasicReplayingPlugin  extends ProtocolPluginDescriptor<Object, Object>{
+public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
-    protected boolean hasCallbacks(){
+    protected HashSet<Integer> completedIndexes = new HashSet<>();
+    protected HashSet<Integer> completedOutIndexes = new HashSet<>();
+
+    protected boolean hasCallbacks() {
         return false;
     }
-
 
     protected Object getData(Object of) {
         return of;
     }
 
-    protected HashSet<Integer> completedIndexes = new HashSet<>();
-    protected HashSet<Integer> completedOutIndexes = new HashSet<>();
-
     @Override
     public boolean handle(FilterContext filterContext, ProtocolPhase phase, Object in, Object out) {
-        if(isActive()){
-            if(out==null) {
+        if (isActive()) {
+            if (out == null) {
                 sendAndForget(filterContext, in);
                 return true;
-            }else{
-                sendAndExpect(filterContext,in,out);
+            } else {
+                sendAndExpect(filterContext, in, out);
                 return true;
             }
         }
@@ -51,11 +50,14 @@ public abstract class BasicReplayingPlugin  extends ProtocolPluginDescriptor<Obj
         query.setType(in.getClass().getSimpleName());
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
+        if(lineToRead == null) {
+            return;
+        }
 
 
         var item = lineToRead.getStorageItem();
 
-        if(hasCallbacks()) {
+        if (hasCallbacks()) {
             var afterIndex = item.getIndex();
             var respQuery = new ResponseItemQuery();
             respQuery.setCaller(filterContext.getCaller());
@@ -73,7 +75,7 @@ public abstract class BasicReplayingPlugin  extends ProtocolPluginDescriptor<Obj
         if (context.isUseCallDurationTimes()) {
             Sleeper.sleep(item.getDurationMs());
         }
-        buildState(filterContext,context,in, outputItem, out);
+        buildState(filterContext, context, in, outputItem, out);
     }
 
     protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outputItem, Object aClass) {
@@ -88,7 +90,7 @@ public abstract class BasicReplayingPlugin  extends ProtocolPluginDescriptor<Obj
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
         var item = lineToRead.getStorageItem();
-        if(hasCallbacks()) {
+        if (hasCallbacks()) {
 
             var afterIndex = item.getIndex();
             var respQuery = new ResponseItemQuery();

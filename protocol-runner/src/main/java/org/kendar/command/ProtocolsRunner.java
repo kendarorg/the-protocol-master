@@ -1,6 +1,9 @@
 package org.kendar.command;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -28,18 +31,25 @@ public class ProtocolsRunner {
 
     public static Options getMainOptions() {
         Options options = new Options();
-        options.addOption(createOpt("cfg",null, true, "Load config file"));
-        options.addOption(createOpt("pld","pluginsDir", true, "Plugins directory"));
-        options.addOption(createOpt("dd","datadir", true, "Data directory/connection string"));
-        options.addOption(createOpt("ll","loglevel", true, "Log4j log level"));
-        options.addOption(createOpt("lt","logType", true, "The log type: default [none|file]"));
-        options.addOption(createOpt("p","protocol", true, "Protocol (http|mqtt|amqp091|mysql|postgres|redis|mongo"));
+        options.addOption(createOpt("cfg", null, true, "Load config file"));
+        options.addOption(createOpt("pld", "pluginsDir", true, "Plugins directory"));
+        options.addOption(createOpt("dd", "datadir", true, "Data directory/connection string"));
+        options.addOption(createOpt("ll", "loglevel", true, "Log4j log level"));
+        options.addOption(createOpt("lt", "logType", true, "The log type: default [none|file]"));
+        options.addOption(createOpt("p", "protocol", true, "Protocol (http|mqtt|amqp091|mysql|postgres|redis|mongo"));
         options.addOption(Option.builder().option("help").optionalArg(true).desc("Show contestual help").build());
         options.addOption(Option.builder().option("tpmapi").optionalArg(true).desc("Expose The Protocol Master apis on port").build());
         return options;
     }
 
-    public GlobalSettings run(CommandLine cmd,String[] args, HashMap<String, List<PluginDescriptor>> filters) {
+    public static <T> T getOrDefault(Object value, T defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+        return (T) value;
+    }
+
+    public GlobalSettings run(CommandLine cmd, String[] args, HashMap<String, List<PluginDescriptor>> filters) {
         var options = getMainOptions();
         try {
 
@@ -68,11 +78,11 @@ public class ProtocolsRunner {
                 ini.setLogLevel(loglevel);
                 ini.setLogType(logType);
                 ini.setTpmApi(tpmApi);
-                runWithParams(args, protocol, isExecute, ini, options,filters);
+                runWithParams(args, protocol, isExecute, ini, options, filters);
                 return ini;
             }
         } catch (Exception ex) {
-            System.err.println("ERROR: "+ex.getMessage());
+            System.err.println("ERROR: " + ex.getMessage());
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("runner", options);
         }
@@ -91,14 +101,7 @@ public class ProtocolsRunner {
                                GlobalSettings go, Options options,
                                HashMap<String, List<PluginDescriptor>> filters) throws Exception {
         var founded = protocols.get(protocol);
-        founded.run(args, isExecute, go, options,filters);
-    }
-
-    public static <T> T getOrDefault(Object value,T defaultValue){
-        if(value == null){
-            return defaultValue;
-        }
-        return (T) value;
+        founded.run(args, isExecute, go, options, filters);
     }
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
@@ -106,7 +109,7 @@ public class ProtocolsRunner {
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var pr = protocols.get(protocol.getProtocol());
         var datadir = Path.of(ini.getDataDir()).toAbsolutePath().toFile();
-        if(!datadir.exists()){
+        if (!datadir.exists()) {
             datadir.mkdir();
         }
         pr.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);

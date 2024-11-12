@@ -154,7 +154,7 @@ public class MasterHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) {
 
         var connManager = connectionBuilder.getConnectionManger(true, true);
-        var filterContext = new FilterContext("HTTP",httpExchange.getRequestMethod().toUpperCase(), System.currentTimeMillis(), null);
+        var filterContext = new FilterContext("HTTP", httpExchange.getRequestMethod().toUpperCase(), System.currentTimeMillis(), null);
         Request request = null;
         Response response = new Response();
         try {
@@ -179,7 +179,7 @@ public class MasterHandler implements HttpHandler {
 
             log.info("REQ " + request.getMethod() + " " + request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
 
-            handleInternal(filterContext,request, response, connManager);
+            handleInternal(filterContext, request, response, connManager);
             sendResponse(response, httpExchange);
 
         } catch (Exception rex) {

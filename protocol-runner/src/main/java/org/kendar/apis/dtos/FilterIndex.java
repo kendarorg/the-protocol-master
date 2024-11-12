@@ -1,6 +1,9 @@
 package org.kendar.apis.dtos;
 
 public class FilterIndex {
+    private String id;
+    private boolean active;
+
     public FilterIndex(String id, boolean active) {
 
         this.id = id;
@@ -14,7 +17,4 @@ public class FilterIndex {
     public String getId() {
         return id;
     }
-
-    private String id;
-    private boolean active;
 }

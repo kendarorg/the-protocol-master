@@ -17,14 +17,14 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult>{
+public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
     protected static JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
 
     @Override
     public boolean handle(FilterContext filterContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
-        if(isActive()){
-                postCall(filterContext, in, out);
+        if (isActive()) {
+            postCall(filterContext, in, out);
         }
         return false;
     }
@@ -32,14 +32,13 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
 
     protected void postCall(FilterContext filterContext, JdbcCall in, SelectResult out) {
         var duration = System.currentTimeMillis() - filterContext.getStart();
-        var req = new JdbcRequest(in.getQuery(),in.getParameterValues());
+        var req = new JdbcRequest(in.getQuery(), in.getParameterValues());
         JdbcResponse res;
-        if(!out.isIntResult()) {
+        if (!out.isIntResult()) {
             res = new JdbcResponse(out);
-        }else{
+        } else {
             res = new JdbcResponse(out.getCount());
         }
-
 
 
         var storageItem = new StorageItem(
@@ -51,10 +50,10 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
                 filterContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
-        if(!shouldNotSave(storageItem,compactLine)) {
-            storage.write(new LineToWrite(getInstanceId(), storageItem,compactLine));
-        }else {
-            storage.write(new LineToWrite(getInstanceId(),compactLine));
+        if (!shouldNotSave(storageItem, compactLine)) {
+            storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));
+        } else {
+            storage.write(new LineToWrite(getInstanceId(), compactLine));
         }
     }
 
@@ -62,13 +61,13 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
         return Map.of();
     }
 
-    protected boolean shouldNotSave(StorageItem in, CompactLine out){
+    protected boolean shouldNotSave(StorageItem in, CompactLine out) {
         return false;
     }
 
     @Override
     public List<ProtocolPhase> getPhases() {
-        return List.of(ProtocolPhase.POST_CALL,ProtocolPhase.ASYNC_RESPONSE);
+        return List.of(ProtocolPhase.POST_CALL, ProtocolPhase.ASYNC_RESPONSE);
     }
 
     @Override

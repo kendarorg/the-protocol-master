@@ -954,11 +954,11 @@ public class ServerImpl {
                         .append(code).append(Code.msg(code)).append("\r\n");
 
                 if (text != null && text.length() != 0) {
-                    builder.append(ConstantsHeader.CONTENT_LENGTH+": ")
+                    builder.append(ConstantsHeader.CONTENT_LENGTH + ": ")
                             .append(text.length()).append("\r\n")
-                            .append(ConstantsHeader.CONTENT_TYPE+": text/html\r\n");
+                            .append(ConstantsHeader.CONTENT_TYPE + ": text/html\r\n");
                 } else {
-                    builder.append(ConstantsHeader.CONTENT_LENGTH+": 0\r\n");
+                    builder.append(ConstantsHeader.CONTENT_LENGTH + ": 0\r\n");
                     text = "";
                 }
                 if (closeNow) {

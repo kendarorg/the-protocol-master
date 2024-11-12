@@ -1,6 +1,6 @@
 package org.kendar.settings;
 
-public class ByteProtocolSettings extends ProtocolSettings{
+public class ByteProtocolSettings extends ProtocolSettings {
     private int port;
     private String connectionString;
     private int timeoutSeconds;

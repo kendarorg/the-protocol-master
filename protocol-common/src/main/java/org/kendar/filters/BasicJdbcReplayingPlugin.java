@@ -34,8 +34,8 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
     }
 
     protected void sendAndExpect(FilterContext filterContext, JdbcCall inObj, SelectResult outObj) {
-        var in = (JdbcCall)inObj;
-        var out = (SelectResult)outObj;
+        var in = (JdbcCall) inObj;
+        var out = (SelectResult) outObj;
         var query = new CallItemsQuery();
 
         query.setCaller(filterContext.getCaller());
@@ -44,14 +44,15 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
         query.addTag("query", in.getQuery());
         query.setUsed(completedIndexes);
         var lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
-        if ((lineToRead == null || lineToRead.getStorageItem()==null) && in.getQuery().trim().toLowerCase().startsWith("set")) {
+        if ((lineToRead == null || lineToRead.getStorageItem() == null) && in.getQuery().trim().toLowerCase().startsWith("set")) {
             out.setCount(0);
             out.setIntResult(true);
-        }else{
-            var source =(SelectResult)lineToRead.getStorageItem().getOutput();
+        } else {
+            var source = (SelectResult) lineToRead.getStorageItem().getOutput();
             out.fill(source);
         }
     }
+
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
         var idx = lineToRead.getCompactLine();
         var si = lineToRead.getStorageItem();

@@ -1,10 +1,13 @@
 ## TODO
 
 ### Docs
+
 * Replacequery example
 * Change all the parameter names
 * Explain filter
+
 ### Code
+
 * Recording and replay plugin should use the right storage
 * Use anonymous "Object" instead of JsonNode for saving
 * Check if should use filters even for Protocol
@@ -19,9 +22,6 @@
 * Publish on maven central
 * Change Supplier<Boolean> stopWhenFalseAction to a callback to register for
 * KENDARMYSQLPREPARESTATEMENT
-
-
-
 
 STATE CHARTS:
 

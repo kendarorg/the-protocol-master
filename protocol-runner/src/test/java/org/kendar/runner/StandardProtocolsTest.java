@@ -314,7 +314,7 @@ public class StandardProtocolsTest extends BasicTest {
                     }
                 });
                 exception.set(new Exception("Terminated abruptly"));
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 exception.set(new Exception("Terminated with error", ex));
             }
 

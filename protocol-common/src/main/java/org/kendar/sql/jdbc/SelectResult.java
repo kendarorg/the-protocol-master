@@ -44,9 +44,9 @@ public class SelectResult {
     }
 
     public void fill(SelectResult source) {
-        this.intResult=source.intResult;
-        this.lastInsertedId=source.lastInsertedId;
-        this.count=source.count;
+        this.intResult = source.intResult;
+        this.lastInsertedId = source.lastInsertedId;
+        this.count = source.count;
         this.metadata.addAll(source.metadata);
         this.records.addAll(source.records);
 

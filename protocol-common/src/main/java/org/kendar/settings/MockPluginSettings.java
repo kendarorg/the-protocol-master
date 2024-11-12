@@ -1,6 +1,6 @@
 package org.kendar.settings;
 
-public class MockPluginSettings extends PluginSettings{
+public class MockPluginSettings extends PluginSettings {
     private boolean mock;
 
     public boolean isMock() {

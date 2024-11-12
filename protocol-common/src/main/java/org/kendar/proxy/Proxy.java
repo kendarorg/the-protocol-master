@@ -60,7 +60,6 @@ public abstract class Proxy {
     public abstract void initialize();
 
 
-
     public void setFilters(List<PluginDescriptor> filters) {
         for (var filter : filters) {
             var clazz = filter.getClass();
@@ -89,11 +88,11 @@ public abstract class Proxy {
         var data = String.join(",",
                 FilterContext.class.getName(),
                 ProtocolPhase.class.getName(),
-                in.getClass().getName() , out.getClass().getName());
+                in.getClass().getName(), out.getClass().getName());
         var anonymousData = String.join(",",
                 FilterContext.class.getName(),
                 ProtocolPhase.class.getName(),
-                Object.class.getName(),Object.class.getName());
+                Object.class.getName(), Object.class.getName());
         var forData = toFilter.get(anonymousData);
         //Handle Object,Object data
         if (forData != null) {

@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class MySqlRecordPlugin extends BasicJdbcRecordingPlugin {
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
+
     @Override
     public String getProtocol() {
         return "mysql";
@@ -51,7 +52,7 @@ public class MySqlRecordPlugin extends BasicJdbcRecordingPlugin {
         if (cl.getTags().get("query").toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
             if (item != null) {
                 cl.getTags().put("isIntResult", "true");
-                cl.getTags().put("resultsCount", ((JdbcResponse)item.getOutput()).getSelectResult().getRecords().get(0).get(0));
+                cl.getTags().put("resultsCount", ((JdbcResponse) item.getOutput()).getSelectResult().getRecords().get(0).get(0));
             }
             return true;
         }

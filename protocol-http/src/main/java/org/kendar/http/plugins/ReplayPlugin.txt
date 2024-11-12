@@ -132,10 +132,9 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
     }
 
 
-
     @Override
     public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request request, Response response) {
-        if(!isActive())return false;
+        if (!isActive()) return false;
         if (matchSites.size() > 0) {
             var matchFound = false;
             for (var pat : matchSites) {
@@ -177,7 +176,7 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
     @Override
     public void setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
-        settings = (HttpReplayPluginSettings)plugin;
+        settings = (HttpReplayPluginSettings) plugin;
     }
 
     private boolean findMatch(Request request, Response response, String contentHash) {

@@ -39,6 +39,19 @@ public class FileStorageRepository implements StorageRepository {
         this.targetDir = targetDir.toString();
     }
 
+    public static String padLeftZeros(String inputString, int length) {
+        if (inputString.length() >= length) {
+            return inputString;
+        }
+        StringBuilder sb = new StringBuilder();
+        while (sb.length() < length - inputString.length()) {
+            sb.append('0');
+        }
+        sb.append(inputString);
+
+        return sb.toString();
+    }
+
     @Override
     public void initialize() {
 
@@ -109,19 +122,6 @@ public class FileStorageRepository implements StorageRepository {
                 log.warn("Trouble flushing " + e);
             }
         }
-    }
-
-    public static String padLeftZeros(String inputString, int length) {
-        if (inputString.length() >= length) {
-            return inputString;
-        }
-        StringBuilder sb = new StringBuilder();
-        while (sb.length() < length - inputString.length()) {
-            sb.append('0');
-        }
-        sb.append(inputString);
-
-        return sb.toString();
     }
 
     @Override

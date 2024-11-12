@@ -45,7 +45,7 @@ public class GlobalPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        var setttings = (HttpProtocolSettings)protocol;
+        var setttings = (HttpProtocolSettings) protocol;
         this.apis = setttings.getApis();
         return this;
     }

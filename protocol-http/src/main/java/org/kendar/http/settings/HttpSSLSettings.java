@@ -17,27 +17,27 @@ public class HttpSSLSettings {
         this.hosts = hosts;
     }
 
-    public void setCname(String cname) {
-        this.cname = cname;
-    }
-
     public String getCname() {
         return cname;
     }
 
-    public void setDer(String der) {
-        this.der = der;
+    public void setCname(String cname) {
+        this.cname = cname;
     }
 
     public String getDer() {
         return der;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setDer(String der) {
+        this.der = der;
     }
 
     public String getKey() {
         return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

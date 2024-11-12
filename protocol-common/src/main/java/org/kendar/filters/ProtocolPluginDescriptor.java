@@ -9,12 +9,11 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
 
 
     private boolean active;
+    private String instanceId;
 
     public String getInstanceId() {
         return instanceId;
     }
-
-    private String instanceId;
 
     /**
      * @param request

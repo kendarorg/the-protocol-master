@@ -17,24 +17,23 @@ public class MongoReplayingPlugin extends BasicReplayingPlugin {
     }
 
 
-
     protected void buildState(FilterContext filterContext, ProtoContext context,
                               Object in, Object outputData, Object out) {
-        switch (filterContext.getType()){
-            case("OP_MSG"):
-            case("HELLO_OP_MSG"):
-                var data = (OpMsgContent)in;
-                var res = (OpMsgContent)out;
+        switch (filterContext.getType()) {
+            case ("OP_MSG"):
+            case ("HELLO_OP_MSG"):
+                var data = (OpMsgContent) in;
+                var res = (OpMsgContent) out;
                 res.doDeserialize(mapper.toJsonNode(outputData), mapper);
-                res.setRequestId(((MongoProtoContext)filterContext.getContext()).getReqResId());
+                res.setRequestId(((MongoProtoContext) filterContext.getContext()).getReqResId());
                 res.setResponseId(data.getRequestId());
                 res.setFlags(8);
                 break;
-            case("HELLO_OP_QUERY"):
-                var data1 = (OpMsgContent)in;
-                var res1 = (OpReplyContent)out;
+            case ("HELLO_OP_QUERY"):
+                var data1 = (OpMsgContent) in;
+                var res1 = (OpReplyContent) out;
                 res1.doDeserialize(mapper.toJsonNode(outputData), mapper);
-                res1.setRequestId(((MongoProtoContext)filterContext.getContext()).getReqResId());
+                res1.setRequestId(((MongoProtoContext) filterContext.getContext()).getReqResId());
                 res1.setResponseId(data1.getRequestId());
                 res1.setFlags(8);
                 break;

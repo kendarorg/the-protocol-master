@@ -5,20 +5,12 @@ import org.kendar.protocol.context.ProtoContext;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FilterContext {
+    private static AtomicLong counter = new AtomicLong(0);
+    private final String type;
+    private final ProtoContext context;
     private long index;
     private long start;
     private String caller;
-    private final String type;
-    private final ProtoContext context;
-    private static AtomicLong counter = new AtomicLong(0);
-
-    public ProtoContext getContext() {
-        return context;
-    }
-
-    public String getType() {
-        return type;
-    }
 
     public FilterContext(String caller, String type, long start, ProtoContext context) {
 
@@ -27,6 +19,14 @@ public class FilterContext {
         this.context = context;
         this.index = counter.incrementAndGet();
         this.start = start;
+    }
+
+    public ProtoContext getContext() {
+        return context;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public long getIndex() {

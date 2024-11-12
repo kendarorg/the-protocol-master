@@ -10,7 +10,7 @@ public class ReflectionTest {
     private Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
 
     @Test
-    void testReflection(){
+    void testReflection() {
         var example = new RedisRecordingPlugin();
         var clazz = example.getClass();
         var handle = Arrays.stream(clazz.getMethods()).filter(m ->

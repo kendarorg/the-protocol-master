@@ -1,11 +1,11 @@
 package org.kendar.http.plugins;
 
-import org.kendar.settings.PluginSettings;
+import org.kendar.filters.settings.BasicReplayPluginSettings;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HttpReplayPluginSettings extends PluginSettings {
+public class HttpReplayPluginSettings extends BasicReplayPluginSettings {
     private boolean replay;
     private String replayId;
     private boolean respectCallDuration;
@@ -44,11 +44,11 @@ public class HttpReplayPluginSettings extends PluginSettings {
         this.respectCallDuration = respectCallDuration;
     }
 
-    public void setBlockExternal(boolean blockExternal) {
-        this.blockExternal = blockExternal;
-    }
-
     public boolean isBlockExternal() {
         return blockExternal;
+    }
+
+    public void setBlockExternal(boolean blockExternal) {
+        this.blockExternal = blockExternal;
     }
 }

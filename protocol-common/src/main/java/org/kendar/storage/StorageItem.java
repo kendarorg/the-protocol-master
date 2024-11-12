@@ -22,6 +22,7 @@ public class StorageItem {
     private Object deserializedInput;
     private Object deserializedOutput;
     private Object outAs;
+    private Object inAs;
 
     /**
      * Needed for serialization
@@ -49,19 +50,18 @@ public class StorageItem {
         this.caller = caller;
     }
 
-    private Object inAs;
     public <T> T retrieveInAs(Class<T> clazz) {
-        if(inAs==null){
+        if (inAs == null) {
             inAs = mapper.deserialize(input, clazz);
         }
-        return (T)inAs;
+        return (T) inAs;
     }
 
     public <T> T retrieveOutAs(Class<T> clazz) {
-        if(outAs==null){
+        if (outAs == null) {
             outAs = mapper.deserialize(output, clazz);
         }
-        return (T)outAs;
+        return (T) outAs;
     }
 
     public int getNth() {

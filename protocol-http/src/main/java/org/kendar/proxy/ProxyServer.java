@@ -66,7 +66,7 @@ public class ProxyServer {
 
     public void start() {
 
-        new Thread(()->{
+        new Thread(() -> {
             try (var ss = new ServerSocket(port)) {
                 serverSocket = ss;
                 Socket socket;
