@@ -29,7 +29,7 @@ public class ReplayerTest {
     void testReplayer() {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
         var proxy = new Resp3Proxy();
-        proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository<>(Path.of("src",
+        proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository(Path.of("src",
                 "test", "resources", "replay"))));
         var rec = new RedisRecordingPlugin();
         rec.setActive(true);

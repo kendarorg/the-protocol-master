@@ -49,9 +49,9 @@ public class BasicTest {
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository<>(Path.of("target", "tests", className, method, dsp))));
+                proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository(Path.of("target", "tests", className, method, dsp))));
             } else {
-                proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository<>(Path.of("target", "tests", className, method))));
+                proxy.setStorage(new Resp3StorageHandler(new FileStorageRepository(Path.of("target", "tests", className, method))));
             }
         }
         var rec = new RedisRecordingPlugin();

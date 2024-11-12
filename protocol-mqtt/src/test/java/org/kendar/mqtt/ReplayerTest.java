@@ -47,7 +47,7 @@ public class ReplayerTest {
         messages.clear();
         var baseProtocol = new MqttProtocol(1883);
         var proxy = new MqttProxy();
-        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository<>(Path.of("src",
+        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos0Test"))));
 
         baseProtocol.setProxy(proxy);
@@ -92,7 +92,7 @@ public class ReplayerTest {
         messages.clear();
         var baseProtocol = new MqttProtocol(1884);
         var proxy = new MqttProxy();
-        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository<>(Path.of("src",
+        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos1Test"))));
 
         baseProtocol.setProxy(proxy);
@@ -136,7 +136,7 @@ public class ReplayerTest {
         messages.clear();
         var baseProtocol = new MqttProtocol(1885);
         var proxy = new MqttProxy();
-        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository<>(Path.of("src",
+        proxy.setStorage(new MqttStorageHandler(new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos2Test"))));
 
         baseProtocol.setProxy(proxy);
