@@ -29,6 +29,7 @@ public class ProxyServer {
     private Function<String, String> dnsResolver = s -> {
         return s;
     };
+    private boolean running;
 
     public ProxyServer(int port) {
 
@@ -67,6 +68,7 @@ public class ProxyServer {
     public void start() {
 
         new Thread(() -> {
+            running = true;
             try (var ss = new ServerSocket(port)) {
                 serverSocket = ss;
                 Socket socket;
@@ -87,4 +89,7 @@ public class ProxyServer {
     }
 
 
+    public boolean isRunning() {
+        return running;
+    }
 }

@@ -15,17 +15,14 @@ import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.utils.Sleeper;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class HttpReplayingPlugin extends BasicReplayingPlugin {
     private HttpReplayPluginSettings settings;
     private boolean blockExternal = true;
-    private List<Pattern> matchSites;
+    private List<Pattern> matchSites = new ArrayList<>();
 
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {

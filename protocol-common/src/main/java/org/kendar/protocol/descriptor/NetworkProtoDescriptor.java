@@ -12,7 +12,9 @@ import org.slf4j.MDC;
  * Descriptor for network protocol
  */
 public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
-
+    public boolean isWrapper(){
+        return false;
+    }
     /**
      * Proxy instance
      */
@@ -117,5 +119,9 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
      */
     public BBuffer buildBuffer() {
         return new BBuffer(isBe() ? BBufferEndianness.BE : BBufferEndianness.LE);
+    }
+
+    public boolean isWrapperRunning() {
+        throw new RuntimeException("Not implemented");
     }
 }

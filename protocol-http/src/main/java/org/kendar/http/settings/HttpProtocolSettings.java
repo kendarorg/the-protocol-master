@@ -9,7 +9,7 @@ public class HttpProtocolSettings extends ProtocolSettings {
     private int http;
     private int https;
     private int proxy;
-    private HttpSSLSettings ssl;
+    private HttpSSLSettings ssl = new HttpSSLSettings();
     private List<HttpRewriteSettings> rewrites = new ArrayList<>();
 
     public List<HttpRewriteSettings> getRewrites() {

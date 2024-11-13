@@ -13,7 +13,7 @@ import org.kendar.apis.ApiServerHandler;
 import org.kendar.command.*;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.filters.ProtocolPluginDescriptor;
-import org.kendar.http.plugins.ErrorPlugin;
+import org.kendar.http.plugins.HttpErrorPlugin;
 import org.kendar.http.plugins.HttpRecordingPlugin;
 import org.kendar.http.plugins.HttpReplayingPlugin;
 import org.kendar.mongo.plugins.MongoRecordingPlugin;
@@ -135,7 +135,7 @@ public class Main {
         }
         addEmbedded(allFilters, "http", List.of(
                 new HttpRecordingPlugin(),
-                new ErrorPlugin(),
+                new HttpErrorPlugin(),
                 new HttpReplayingPlugin()));
         addEmbedded(allFilters, "mongodb", List.of(
                 new MongoRecordingPlugin(),

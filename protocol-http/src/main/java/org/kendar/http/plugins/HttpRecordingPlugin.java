@@ -10,15 +10,12 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class HttpRecordingPlugin extends BasicRecordingPlugin {
-    private List<Pattern> recordSites;
+    private List<Pattern> recordSites = new ArrayList<>();
     private HttpRecordPluginSettings settings;
 
     @Override

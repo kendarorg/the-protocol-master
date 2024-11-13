@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class ErrorPlugin extends ProtocolPluginDescriptor<Request, Response> {
+public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
-    private static final Logger log = LoggerFactory.getLogger(ErrorPlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
     private int errorCode;
     private String errorMessage;
     private double percentage;

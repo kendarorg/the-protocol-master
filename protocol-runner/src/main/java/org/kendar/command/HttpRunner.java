@@ -1,30 +1,20 @@
 package org.kendar.command;
 
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.kendar.HttpTcpServer;
 import org.kendar.filters.PluginDescriptor;
-import org.kendar.http.MasterHandler;
+import org.kendar.http.HttpProtocol;
 import org.kendar.http.plugins.HttpErrorPluginSettings;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.settings.HttpSSLSettings;
-import org.kendar.http.utils.ConnectionBuilderImpl;
-import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
-import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
-import org.kendar.http.utils.dns.DnsMultiResolverImpl;
-import org.kendar.http.utils.filters.FilteringClassesHandlerImpl;
 import org.kendar.http.utils.rewriter.RemoteServerStatus;
 import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
-import org.kendar.http.utils.rewriter.SimpleRewriterHandlerImpl;
 import org.kendar.http.utils.ssl.CertificatesManager;
-import org.kendar.http.utils.ssl.FileResourcesUtils;
-import org.kendar.proxy.ProxyServer;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -39,13 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class HttpRunner extends CommonRunner {
     private static final Logger log = LoggerFactory.getLogger(HttpRunner.class);
-    private HttpTcpServer ps;
+    private TcpServer ps;
 
     private static HttpsServer createHttpsServer(CertificatesManager certificatesManager,
                                                  InetSocketAddress sslAddress, int backlog, String cname, String der,
@@ -148,133 +136,19 @@ public class HttpRunner extends CommonRunner {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
                       String sectionKey, GlobalSettings ini, ProtocolSettings pset, StorageRepository storage,
                       List<PluginDescriptor> filters,
                       Supplier<Boolean> stopWhenFalseAction) throws Exception {
         var settings = (HttpProtocolSettings) pset;
-        ps = new HttpTcpServer(null);
-        try {
-
-            AtomicBoolean stopWhenFalse = new AtomicBoolean(true);
-            AtomicBoolean waiterBlock = new AtomicBoolean(true);
-
-            ps.setRunner(() -> {
-                new Thread(() -> {
-                    while (stopWhenFalseAction.get() && waiterBlock.get()) {
-                        Sleeper.sleep(100);
-                    }
-                    stopWhenFalse.set(false);
-                }).start();
-            });
-
-            ps.setIsRunning(() -> stopWhenFalse.get());
-            log.debug("Started waiter");
-
-            var port = ProtocolsRunner.getOrDefault(settings.getHttp(), 4080);
-            var httpsPort = ProtocolsRunner.getOrDefault(settings.getHttps(), 4443);
-            var proxyPort = ProtocolsRunner.getOrDefault(settings.getProxy(), 9999);
-//        log.info("LISTEN HTTP: " + port);
-//        log.info("LISTEN HTTPS: " + httpsPort);
-//        log.info("LISTEN PROXY: " + proxyPort);
-            var backlog = 60;
-            var useCachedExecutor = true;
-            var address = new InetSocketAddress(port);
-            var sslAddress = new InetSocketAddress(httpsPort);
-
-
-            // initialise the HTTP server
-            var proxyConfig = loadRewritersConfiguration(settings);
-            var dnsHandler = new DnsMultiResolverImpl();
-            var connectionBuilder = new ConnectionBuilderImpl(dnsHandler);
-            var requestResponseBuilder = new RequestResponseBuilderImpl();
-
-
-            var httpServer = HttpServer.create(address, backlog);
-            log.debug("Http created");
-            ps.setStop(() -> {
-                waiterBlock.set(false);
-                httpServer.stop(0);
-            });
-
-            var sslDer = ProtocolsRunner.getOrDefault(settings.getSSL().getDer(), "resource://certificates/ca.der");
-            var sslKey = ProtocolsRunner.getOrDefault(settings.getSSL().getKey(), "resource://certificates/ca.key");
-            var cname = ProtocolsRunner.getOrDefault(settings.getSSL().getCname(), "C=US,O=Local Development,CN=local.org");
-
-            var certificatesManager = new CertificatesManager(new FileResourcesUtils());
-            var httpsServer = createHttpsServer(certificatesManager,
-                    sslAddress, backlog, cname, sslDer, sslKey, settings.getSSL().getHosts());
-            log.debug("Https created");
-            ps.setStop(() -> {
-                waiterBlock.set(false);
-                httpsServer.stop(0);
-                httpServer.stop(0);
-            });
-
-            var proxy = new ProxyServer(proxyPort)
-                    .withHttpRedirect(port).withHttpsRedirect(httpsPort)
-                    .withDnsResolver(host -> {
-                        try {
-                            certificatesManager.setupSll(httpsServer, List.of(host), cname, sslDer, sslKey);
-                        } catch (Exception e) {
-                            return host;
-                        }
-                        return "127.0.0.1";
-                    }).
-                    ignoringHosts("static.chartbeat.com").
-                    ignoringHosts("detectportal.firefox.com").
-                    ignoringHosts("firefox.settings.services.mozilla.com").
-                    ignoringHosts("incoming.telemetry.mozilla.org").
-                    ignoringHosts("push.services.mozilla.com");
-            ps.setStop(() -> {
-                waiterBlock.set(false);
-                proxy.terminate();
-                httpsServer.stop(0);
-                httpServer.stop(0);
-            });
-            log.debug("Proxy created");
-            proxy.start();
-
-
-            for (var i = filters.size() - 1; i >= 0; i--) {
-                var filter = filters.get(i);
-                filter.initialize(ini, pset);
-            }
-
-            log.debug("Filters added");
-            var handler = new MasterHandler(
-                    new FilteringClassesHandlerImpl(filters),
-                    new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
-                    new RequestResponseBuilderImpl(),
-                    new ExternalRequesterImpl(requestResponseBuilder, dnsHandler, connectionBuilder),
-                    connectionBuilder);
-
-            httpServer.createContext("/", handler);
-            httpsServer.createContext("/", handler);
-            if (useCachedExecutor) {
-                httpServer.setExecutor(Executors.newCachedThreadPool());
-                httpsServer.setExecutor(Executors.newCachedThreadPool());
-            } else {
-                httpServer.setExecutor(null); // creates a default executor
-                httpsServer.setExecutor(null);
-            }
-            httpsServer.start();
-            httpServer.start();
-            log.debug("Servers started");
-
-
-            protocolServer.put(sectionKey, ps);
-        } catch (Exception ex) {
-            try {
-                log.error(ex.getMessage(), ex);
-                var sr = protocolServer.get(sectionKey);
-                sr.stop();
-            } catch (Exception xx) {
-
-            }
-        }
+        var baseProtocol = new HttpProtocol(ini,settings,filters);
+        baseProtocol.initialize();
+        ps = new TcpServer(baseProtocol);
+        ps.start();
+        Sleeper.sleep(5000, () -> ps.isRunning());
+        protocolServer.put(sectionKey, ps);
     }
+
 
     @Override
     public String getId() {
