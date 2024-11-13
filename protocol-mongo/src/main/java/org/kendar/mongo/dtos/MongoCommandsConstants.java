@@ -2,7 +2,7 @@ package org.kendar.mongo.dtos;
 
 import static org.kendar.mongo.dtos.MongoCommandType.*;
 
-public enum MongoCommands {
+public enum MongoCommandsConstants {
     aggregate(ucAggregation),
     count(ucAggregation),
     distinct(ucAggregation),
@@ -158,7 +158,7 @@ public enum MongoCommands {
 
     private final MongoCommandType type;
 
-    MongoCommands(MongoCommandType mongoCommandType) {
+    MongoCommandsConstants(MongoCommandType mongoCommandType) {
         type = mongoCommandType;
     }
 

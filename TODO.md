@@ -18,12 +18,8 @@
 * Common
   * Test internal apis
 * Http
-  * test multipart
   * test file upload
   * Use anonymous Object for serialization for HTTP Body and Multipart
-  * Input streams on copied http server
-* Mongo
-  * MongoCommands
 
 //Should handle somehow
 globalFilter.setShutdownVariable(stopWhenFalse);
