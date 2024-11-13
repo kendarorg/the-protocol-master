@@ -104,7 +104,8 @@ public class StandardProtocolsTest extends BasicTest {
                 "-port", "" + FAKE_PORT,
                 "-login", postgresContainer.getUserId(),
                 "-password", postgresContainer.getPassword(),
-                "-connection", postgresContainer.getJdbcUrl()
+                "-connection", postgresContainer.getJdbcUrl(),
+                "-record"
         };
 
 
