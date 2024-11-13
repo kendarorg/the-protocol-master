@@ -88,7 +88,7 @@ public class JdbcRunner extends CommonRunner {
     @Override
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
                       GlobalSettings ini, ProtocolSettings protocolSettings,
-                      StorageRepository repo, List<PluginDescriptor> filters,
+                      StorageRepository repo, List<PluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         NetworkProtoDescriptor baseProtocol = null;
         var realSttings = (JdbcProtocolSettings) protocolSettings;
@@ -107,11 +107,15 @@ public class JdbcRunner extends CommonRunner {
                 realSttings.getConnectionString(), realSttings.getForceSchema(),
                 realSttings.getLogin(), realSttings.getPassword());
 
-        proxy.setPlugins(filters);
+        proxy.setPlugins(plugins);
         var jdbcReplaceQueries = ((JdbcProtocolSettings) protocolSettings).getReplaceQueryFile();
         if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
 
             handleReplacementQueries(jdbcReplaceQueries, proxy);
+        }
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            plugin.initialize(ini, protocolSettings);
         }
         baseProtocol.setProxy(proxy);
         baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(), 30));

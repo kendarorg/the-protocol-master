@@ -138,10 +138,14 @@ public class HttpRunner extends CommonRunner {
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
                       String sectionKey, GlobalSettings ini, ProtocolSettings pset, StorageRepository storage,
-                      List<PluginDescriptor> filters,
+                      List<PluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalseAction) throws Exception {
         var settings = (HttpProtocolSettings) pset;
-        var baseProtocol = new HttpProtocol(ini, settings, filters);
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            plugin.initialize(ini, pset);
+        }
+        var baseProtocol = new HttpProtocol(ini, settings, plugins);
         baseProtocol.initialize();
         ps = new TcpServer(baseProtocol);
         ps.start();

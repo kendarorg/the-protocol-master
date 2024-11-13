@@ -35,7 +35,7 @@ public class RedisRunner extends CommonRunner {
     @Override
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
                       GlobalSettings ini, ProtocolSettings protocol,
-                      StorageRepository storage, List<PluginDescriptor> filters,
+                      StorageRepository storage, List<PluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var protocolSettings = (ByteProtocolSettings) protocol;
         var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 6379);
@@ -44,8 +44,11 @@ public class RedisRunner extends CommonRunner {
         var baseProtocol = new Resp3Protocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new Resp3Proxy(connectionString, null, null);
-
-        proxy.setPlugins(filters);
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            plugin.initialize(ini, protocolSettings);
+        }
+        proxy.setPlugins(plugins);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         ps = new TcpServer(baseProtocol);

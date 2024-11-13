@@ -55,7 +55,7 @@ public class MqttRunner extends CommonRunner {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> filters, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
 
         var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;
 
@@ -67,7 +67,11 @@ public class MqttRunner extends CommonRunner {
         var baseProtocol = new org.kendar.mqtt.MqttProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MqttProxy(connectionString, login, password);
-        proxy.setPlugins(filters);
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            plugin.initialize(ini, protocolSettings);
+        }
+        proxy.setPlugins(plugins);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         ps = new TcpServer(baseProtocol);
