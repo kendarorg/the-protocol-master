@@ -21,6 +21,12 @@
             <version>${pl4j.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.14</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-common</artifactId>
             <version>${revision}</version>

@@ -1,6 +1,7 @@
 package org.kendar.http.utils.converters;
 
 import org.apache.commons.fileupload.FileItem;
+import org.kendar.http.utils.MimeChecker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,40 @@ public class MultipartPart {
         } else {
             setByteData(fileItem.get());
             setFileName(fileItem.getName());
+        }
+    }
+
+    public MultipartPart(RequestUtils.SimpleBlock simpleBlock) {
+        contentType = "text/plain";
+        ContentDisposition fileItem=null;
+        for(var h:simpleBlock.headers.entrySet()){
+            if(h.getKey().equalsIgnoreCase("Content-Type")){
+                contentType = h.getValue();
+            }else if(h.getKey().equalsIgnoreCase("Content-Disposition")){
+                fileItem = ContentDisposition.parse(h.getValue());
+            }else {
+                headers.put(h.getKey(), h.getValue());
+            }
+        }
+
+        if(this.contentType.contains(";")){
+            this.contentType = this.contentType.split(";",2)[0].trim();
+        }
+        if(fileItem!=null) {
+            this.file = !fileItem.isFormData();
+            setFieldName(fileItem.getName());
+            if (fileItem.isFormData()) {
+                if(MimeChecker.isBinary(this.contentType,null)){
+                    setByteData(simpleBlock.data);
+                    setFileName(fileItem.getFilename());
+                }else {
+                    setStringData(new String(simpleBlock.data));
+                    setFileName(fileItem.getFilename());
+                }
+            } else {
+                setByteData(simpleBlock.data);
+                setFileName(fileItem.getFilename());
+            }
         }
     }
 

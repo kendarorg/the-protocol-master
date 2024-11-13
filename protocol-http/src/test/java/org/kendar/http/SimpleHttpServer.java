@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.fileupload.FileUploadException;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
+import org.kendar.server.KendarHttpServer;
 import org.kendar.utils.JsonMapper;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class SimpleHttpServer {
 
     public void start(int port) throws IOException {
         var address = new InetSocketAddress(port);
-        httpServer = HttpServer.create(address, 10);
+        httpServer = new KendarHttpServer(address, 10);
         var srv = this;
         reqResBuilder = new RequestResponseBuilderImpl();
         httpServer.createContext("/", new HttpHandler() {
@@ -40,9 +41,9 @@ public class SimpleHttpServer {
 
     private void handle(HttpExchange exchange) throws IOException, FileUploadException {
         var request = reqResBuilder.fromExchange(exchange, "http");
-
+        var serializedRequest = mapper.serialize(request);
         var outputStream = exchange.getResponseBody();
-        var serialized = mapper.serialize(request).getBytes(StandardCharsets.UTF_8);
+        var serialized = serializedRequest.getBytes(StandardCharsets.UTF_8);
         exchange.sendResponseHeaders(200, serialized.length);
         outputStream.write(serialized);
         outputStream.flush();

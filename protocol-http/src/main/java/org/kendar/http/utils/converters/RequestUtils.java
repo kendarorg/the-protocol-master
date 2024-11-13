@@ -1,12 +1,9 @@
 package org.kendar.http.utils.converters;
 
 import com.sun.net.httpserver.Headers;
-import org.apache.commons.fileupload.*;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.portlet.PortletFileUpload;
+import org.apache.commons.fileupload.FileUploadException;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.http.utils.SimpleRequestContext;
 
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -153,17 +150,98 @@ public class RequestUtils {
 
     public static List<MultipartPart> buildMultipart(byte[] body, String boundary, String contentType)
             throws FileUploadException {
-        Charset encoding = UTF_8;
-        RequestContext requestContext = new SimpleRequestContext(encoding, contentType, body);
-        FileUploadBase fileUploadBase = new PortletFileUpload();
-        FileItemFactory fileItemFactory = new DiskFileItemFactory();
-        fileUploadBase.setFileItemFactory(fileItemFactory);
-        fileUploadBase.setHeaderEncoding(encoding.displayName());
-        List<FileItem> fileItems = fileUploadBase.parseRequest(requestContext);
+        var blocks = new ArrayList<SimpleBlock>();
+
+        var block = new SimpleBlock();
+        var bodyData = new ArrayList<Byte>();
+        var test = new ArrayList<Byte>();
+        for (var z=0; z <  body.length; z++) {
+            if(body[z] == '\r') break;
+            test.add(body[z]);
+        }
+        var fullBoundary = toPrimitive(test);
+
+        for (var i = 0; i < body.length; i++) {
+            var fullBoundaryOffest = 0;
+            for (; i < body.length && fullBoundaryOffest < fullBoundary.length; i++, fullBoundaryOffest++) {
+                if (body[i] != fullBoundary[fullBoundaryOffest]) {
+                    throw new FileUploadException();
+                }
+            }
+            if (body[i] == '\r' && body[i + 1] == '\n') {
+                i += 2;
+            } else if (body[i] == '-' && body[i + 1] == '-') {
+                break;
+            }
+            //i++;i++;
+            block = new SimpleBlock();
+            var firstHeader = new ArrayList<Byte>();
+            for (; i < body.length; i++) {
+                if (body[i] == '\r' && body[i + 1] == '\n') {
+                    var data = (byte[]) toPrimitive(firstHeader);
+                    var hh =new String(data).trim().split(":",2);
+                    block.headers.put(hh[0],hh[1]);
+                    firstHeader.clear();
+                    if (body[i + 2] == '\r' && body[i + 3] == '\n') {
+                        break;
+                    }
+                } else {
+                    firstHeader.add(body[i]);
+                }
+            }
+            i += 4;
+            bodyData = new ArrayList<Byte>();
+            for (; i < body.length; i++) {
+                if (body[i] == '-' && body[i + 1] == '-') {
+                    //Check for boundary
+                    fullBoundaryOffest = 0;
+                    var foundedBoundary = true;
+                    var j = i;
+                    for (; j < body.length && fullBoundaryOffest < fullBoundary.length; j++, fullBoundaryOffest++) {
+                        if (body[j] != fullBoundary[fullBoundaryOffest]) {
+                            foundedBoundary = false;
+                            break;
+                        }
+                    }
+                    if (foundedBoundary) {
+                        if (body[j] == '\r' && body[j + 1] == '\n') {
+                            i--;
+                        }
+                        block.data = toPrimitive(bodyData.subList(0, bodyData.size() - 2));
+                        blocks.add(block);
+                        //i--;
+                        bodyData = new ArrayList<>();
+                        block = new SimpleBlock();
+                        if (body[j] == '-' && body[j + 1] == '-') {
+                            i = body.length;
+                        }
+                        break;
+                    }
+                }
+                bodyData.add(body[i]);
+            }
+        }
+
+//        Charset encoding = UTF_8;
+//        RequestContext requestContext = new SimpleRequestContext(encoding, contentType, body);
+//        FileUploadBase fileUploadBase = new PortletFileUpload();
+//        FileItemFactory fileItemFactory = new DiskFileItemFactory();
+//        fileUploadBase.setFileItemFactory(fileItemFactory);
+//        fileUploadBase.setHeaderEncoding(encoding.displayName());
+//        List<FileItem> fileItems = fileUploadBase.parseRequest(requestContext);
+
 
         List<MultipartPart> result = new ArrayList<>();
-        for (var fileItem : fileItems) {
-            result.add(new MultipartPart(fileItem));
+        for(var simpleBlock:blocks){
+            result.add(new MultipartPart(simpleBlock));
+        }
+        return result;
+    }
+
+    private static byte[] toPrimitive(List<Byte> firstHeader) {
+        var result = new byte[firstHeader.size()];
+        for (var i = 0; i < firstHeader.size(); i++) {
+            result[i] = firstHeader.get(i);
         }
         return result;
     }
@@ -202,5 +280,10 @@ public class RequestUtils {
                                         + java.net.URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8)
                                         .replace(" ", "%20"))
                 .collect(joining("&"));
+    }
+
+    public static class SimpleBlock {
+        public Map<String,String> headers = new HashMap<>();
+        public byte[] data = new byte[]{};
     }
 }

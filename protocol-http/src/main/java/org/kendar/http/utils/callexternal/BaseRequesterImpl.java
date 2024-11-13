@@ -12,8 +12,9 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.*;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -130,18 +131,32 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                 for (MultipartPart part : request.getMultipartData()) {
                     if (MimeChecker.isBinary(part.getContentType(), null)) {
-                        builder.addBinaryBody(
+                        var cb = new ByteArrayBody(part.getByteData(),part.getFileName());
+                        var fbd = new FormBodyPart(part.getFieldName(),cb);
+                        for(var header:part.getHeaders().entrySet()){
+                            if(null==fbd.getHeader().getField(header.getKey())) {
+                                fbd.addField(header.getKey(), header.getValue());
+                            }
+                        }
+                        builder.addPart(fbd);
+                        /*builder.addBinaryBody(
                                 part.getFieldName(),
                                 part.getByteData(),
                                 ContentType.create(part.getContentType()),
-                                part.getFileName());
+                                part.getFileName());*/
                     } else {
                         var type = part.getContentType();
                         if (type == null) {
                             type = ConstantsMime.TEXT;
                         }
-                        builder.addTextBody(
-                                part.getFieldName(), part.getStringData(), ContentType.create(type));
+                        var cb = new StringBody(part.getStringData());
+                        var fbd = new FormBodyPart(part.getFieldName(),cb);
+                        for(var header:part.getHeaders().entrySet()){
+                            if(null==fbd.getHeader().getField(header.getKey())) {
+                                fbd.addField(header.getKey(), header.getValue());
+                            }
+                        }
+                        builder.addPart(fbd);
                     }
                 }
 

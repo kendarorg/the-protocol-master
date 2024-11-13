@@ -14,11 +14,11 @@ import java.util.concurrent.Executor;
 public class KendarHttpServer extends HttpServer {
     ServerImpl server;
 
-    KendarHttpServer() throws IOException {
+    public KendarHttpServer() throws IOException {
         this(new InetSocketAddress(80), 0);
     }
 
-    KendarHttpServer(InetSocketAddress addr, int backlog) throws IOException {
+    public KendarHttpServer(InetSocketAddress addr, int backlog) throws IOException {
         this.server = new ServerImpl(this, "http", addr, backlog);
     }
 

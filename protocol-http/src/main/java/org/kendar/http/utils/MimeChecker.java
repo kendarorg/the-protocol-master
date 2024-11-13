@@ -26,9 +26,7 @@ public class MimeChecker {
 
     @SuppressWarnings("RedundantIfStatement")
     public static boolean isBinary(String mime, String contentEncoding) {
-        if (contentEncoding == null) {
-            return true;
-        }
+
         if (mime == null || mime.isEmpty()) {
             return false;
         }
