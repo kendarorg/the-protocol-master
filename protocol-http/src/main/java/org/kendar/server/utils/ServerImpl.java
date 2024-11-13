@@ -876,9 +876,13 @@ public class ServerImpl {
                 }
 
                 if (newconnection) {
+                    SSLContext context = null;
+                    if(internalSSLConfig.get()!=null){
+                        context = internalSSLConfig.get().getSslContext();
+                    }
                     connection.setParameters(
                             rawin, rawout, chan, engine, sslStreams,
-                            internalSSLConfig.get().getSslContext(), protocol, ctx, rawin
+                            context, protocol, ctx, rawin
                     );
                 }
                 /* check if client sent an Expect 100 Continue.
