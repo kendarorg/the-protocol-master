@@ -1,6 +1,6 @@
 package org.kendar.postgres.constants;
 
-public class TypesOids {
+public class TypesOidsConstants {
     public static final int Int8 = 20;
     public static final int Float8 = 701;
     public static final int Int4 = 23;

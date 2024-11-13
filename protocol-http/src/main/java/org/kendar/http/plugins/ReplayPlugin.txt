@@ -9,7 +9,7 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.http.utils.utils.Md5Tester;
+import org.kendar.http.utils.Md5Tester;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;

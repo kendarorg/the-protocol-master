@@ -1,4 +1,4 @@
-package org.kendar.http.utils.utils;
+package org.kendar.http.utils;
 
 import org.apache.commons.fileupload.RequestContext;
 

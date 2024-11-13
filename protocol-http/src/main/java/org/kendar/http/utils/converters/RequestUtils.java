@@ -6,7 +6,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.http.utils.utils.SimpleRequestContext;
+import org.kendar.http.utils.SimpleRequestContext;
 
 import java.net.URLDecoder;
 import java.nio.charset.Charset;

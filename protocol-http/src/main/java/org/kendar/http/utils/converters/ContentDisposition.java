@@ -1,6 +1,6 @@
 package org.kendar.http.utils.converters;
 
-import org.kendar.http.utils.utils.StreamUtils;
+import org.kendar.http.utils.StreamUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;

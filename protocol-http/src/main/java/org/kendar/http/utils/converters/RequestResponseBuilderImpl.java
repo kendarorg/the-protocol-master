@@ -12,7 +12,7 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.http.utils.utils.SimpleStringUtils;
+import org.kendar.http.utils.SimpleStringUtils;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;

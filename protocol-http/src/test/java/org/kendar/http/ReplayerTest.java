@@ -1,4 +1,10 @@
 package org.kendar.http;
 
-public class ReplayerTest {
+import org.junit.jupiter.api.Test;
+
+public class ReplayerTest extends BasicTest {
+    @Test
+    void doTest(){
+
+    }
 }

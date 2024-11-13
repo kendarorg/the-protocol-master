@@ -174,8 +174,14 @@
                 <version>0.8.8</version>
                 <configuration>
                     <includes>
-                        <include>org.kendar.**</include>
+                        <include>org/kendar/**</include>
                     </includes>
+
+                    <excludes>
+                        <exclude>org/kendar/server/**</exclude>
+                        <exclude>**/*Constant*.*</exclude>
+                        <exclude>**/*Sample*.*</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
