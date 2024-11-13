@@ -12,7 +12,9 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.*;
+import org.apache.http.entity.mime.FormBodyPart;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -131,10 +133,10 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                 builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                 for (MultipartPart part : request.getMultipartData()) {
                     if (MimeChecker.isBinary(part.getContentType(), null)) {
-                        var cb = new ByteArrayBody(part.getByteData(),part.getFileName());
-                        var fbd = new FormBodyPart(part.getFieldName(),cb);
-                        for(var header:part.getHeaders().entrySet()){
-                            if(null==fbd.getHeader().getField(header.getKey())) {
+                        var cb = new ByteArrayBody(part.getByteData(), part.getFileName());
+                        var fbd = new FormBodyPart(part.getFieldName(), cb);
+                        for (var header : part.getHeaders().entrySet()) {
+                            if (null == fbd.getHeader().getField(header.getKey())) {
                                 fbd.addField(header.getKey(), header.getValue());
                             }
                         }
@@ -150,9 +152,9 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                             type = ConstantsMime.TEXT;
                         }
                         var cb = new StringBody(part.getStringData());
-                        var fbd = new FormBodyPart(part.getFieldName(),cb);
-                        for(var header:part.getHeaders().entrySet()){
-                            if(null==fbd.getHeader().getField(header.getKey())) {
+                        var fbd = new FormBodyPart(part.getFieldName(), cb);
+                        for (var header : part.getHeaders().entrySet()) {
+                            if (null == fbd.getHeader().getField(header.getKey())) {
                                 fbd.addField(header.getKey(), header.getValue());
                             }
                         }

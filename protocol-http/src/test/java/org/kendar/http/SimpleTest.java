@@ -119,7 +119,7 @@ public class SimpleTest extends BasicTest {
         var routePlanner = new DefaultProxyRoutePlanner(proxy);
         var httpclient = HttpClients.custom().setRoutePlanner(routePlanner).build();
 
-        var binaryData = new byte[]{1,2,3,4,5,'\r','\n'};
+        var binaryData = new byte[]{1, 2, 3, 4, 5, '\r', '\n'};
         var entity = MultipartEntityBuilder
                 .create()
                 .addTextBody("number", "5555555555")

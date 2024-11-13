@@ -16,10 +16,10 @@
 * Add an api to list the plugins
 * Publish on maven central
 * Common
-  * Test internal apis
+    * Test internal apis
 * Http
-  * test file upload
-  * Use anonymous Object for serialization for HTTP Body and Multipart
+    * test file upload
+    * Use anonymous Object for serialization for HTTP Body and Multipart
 
 //Should handle somehow
 globalFilter.setShutdownVariable(stopWhenFalse);

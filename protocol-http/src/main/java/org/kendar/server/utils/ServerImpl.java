@@ -877,7 +877,7 @@ public class ServerImpl {
 
                 if (newconnection) {
                     SSLContext context = null;
-                    if(internalSSLConfig.get()!=null){
+                    if (internalSSLConfig.get() != null) {
                         context = internalSSLConfig.get().getSslContext();
                     }
                     connection.setParameters(

@@ -155,8 +155,8 @@ public class RequestUtils {
         var block = new SimpleBlock();
         var bodyData = new ArrayList<Byte>();
         var test = new ArrayList<Byte>();
-        for (var z=0; z <  body.length; z++) {
-            if(body[z] == '\r') break;
+        for (var z = 0; z < body.length; z++) {
+            if (body[z] == '\r') break;
             test.add(body[z]);
         }
         var fullBoundary = toPrimitive(test);
@@ -179,8 +179,8 @@ public class RequestUtils {
             for (; i < body.length; i++) {
                 if (body[i] == '\r' && body[i + 1] == '\n') {
                     var data = (byte[]) toPrimitive(firstHeader);
-                    var hh =new String(data).trim().split(":",2);
-                    block.headers.put(hh[0],hh[1]);
+                    var hh = new String(data).trim().split(":", 2);
+                    block.headers.put(hh[0], hh[1]);
                     firstHeader.clear();
                     if (body[i + 2] == '\r' && body[i + 3] == '\n') {
                         break;
@@ -232,7 +232,7 @@ public class RequestUtils {
 
 
         List<MultipartPart> result = new ArrayList<>();
-        for(var simpleBlock:blocks){
+        for (var simpleBlock : blocks) {
             result.add(new MultipartPart(simpleBlock));
         }
         return result;
@@ -283,7 +283,7 @@ public class RequestUtils {
     }
 
     public static class SimpleBlock {
-        public Map<String,String> headers = new HashMap<>();
+        public Map<String, String> headers = new HashMap<>();
         public byte[] data = new byte[]{};
     }
 }

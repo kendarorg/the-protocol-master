@@ -6,13 +6,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.brotli.dec.BrotliInputStream;
-import org.kendar.http.utils.JsonSmile;
-import org.kendar.http.utils.MimeChecker;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
+import org.kendar.http.utils.*;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.http.utils.SimpleStringUtils;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
