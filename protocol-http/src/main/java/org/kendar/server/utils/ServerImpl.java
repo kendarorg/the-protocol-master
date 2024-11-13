@@ -64,23 +64,24 @@ public class ServerImpl {
     private final System.Logger logger;
     private final AtomicReference<InternalSSLConfig> internalSSLConfig = new AtomicReference<>();
     ServerImpl.Dispatcher dispatcher;
-    private String protocol;
-    private boolean https;
+    private final String protocol;
+    private final boolean https;
     private Executor executor;
     //private HttpsConfigurator httpsConfig;
     //private SSLContext sslContext;
-    private ContextList contexts;
-    private InetSocketAddress address;
-    private ServerSocketChannel schan;
-    private Selector selector;
-    private SelectionKey listenerKey;
+    private final ContextList contexts;
+    private final InetSocketAddress address;
+    private final ServerSocketChannel schan;
+    private final Selector selector;
+    private final SelectionKey listenerKey;
     private List<Event> events;
     private volatile boolean finished = false;
     private volatile boolean terminating = false;
     private boolean bound = false;
     private boolean started = false;
-    private HttpServer wrapper;
-    private Timer timer, timer1;
+    private final HttpServer wrapper;
+    private final Timer timer;
+    private Timer timer1;
     private Thread dispatcherThread;
     private int exchangeCount = 0;
 
@@ -105,10 +106,10 @@ public class ServerImpl {
         schan.configureBlocking(false);
         listenerKey = schan.register(selector, SelectionKey.OP_ACCEPT);
         dispatcher = new ServerImpl.Dispatcher();
-        idleConnections = Collections.synchronizedSet(new HashSet<HttpConnection>());
-        allConnections = Collections.synchronizedSet(new HashSet<HttpConnection>());
-        reqConnections = Collections.synchronizedSet(new HashSet<HttpConnection>());
-        rspConnections = Collections.synchronizedSet(new HashSet<HttpConnection>());
+        idleConnections = Collections.synchronizedSet(new HashSet<>());
+        allConnections = Collections.synchronizedSet(new HashSet<>());
+        reqConnections = Collections.synchronizedSet(new HashSet<>());
+        rspConnections = Collections.synchronizedSet(new HashSet<>());
         newlyAcceptedConnections = Collections.synchronizedSet(new HashSet<>());
         timer = new Timer("idle-timeout-task", true);
         timer.schedule(new ServerImpl.IdleTimeoutTask(), IDLE_TIMER_TASK_SCHEDULE, IDLE_TIMER_TASK_SCHEDULE);
@@ -120,7 +121,7 @@ public class ServerImpl {
             logger.log(System.Logger.Level.DEBUG, "MAX_REQ_TIME:  " + MAX_REQ_TIME);
             logger.log(System.Logger.Level.DEBUG, "MAX_RSP_TIME:  " + MAX_RSP_TIME);
         }
-        events = new LinkedList<Event>();
+        events = new LinkedList<>();
         logger.log(System.Logger.Level.DEBUG, "HttpServer created " + protocol + " " + addr);
     }
 
@@ -238,7 +239,7 @@ public class ServerImpl {
         } catch (IOException e) {
         }
         selector.wakeup();
-        long latest = System.currentTimeMillis() + delay * 1000;
+        long latest = System.currentTimeMillis() + delay * 1000L;
         while (System.currentTimeMillis() < latest) {
             delay();
             if (finished) {
@@ -307,16 +308,10 @@ public class ServerImpl {
         logger.log(System.Logger.Level.DEBUG, "context removed: " + context.getPath());
     }
 
-    @SuppressWarnings("removal")
     public InetSocketAddress getAddress() {
         return AccessController.doPrivileged(
-                new PrivilegedAction<InetSocketAddress>() {
-                    public InetSocketAddress run() {
-                        return
-                                (InetSocketAddress) schan.socket()
-                                        .getLocalSocketAddress();
-                    }
-                });
+                (PrivilegedAction<InetSocketAddress>) () -> (InetSocketAddress) schan.socket()
+                        .getLocalSocketAddress());
     }
 
     public void addEvent(Event r) {
@@ -528,7 +523,7 @@ public class ServerImpl {
     class Dispatcher implements Runnable {
 
         final LinkedList<HttpConnection> connsToRegister =
-                new LinkedList<HttpConnection>();
+                new LinkedList<>();
 
         private void handleEvent(Event r) {
             ExchangeImpl t = r.exchange;
@@ -593,7 +588,7 @@ public class ServerImpl {
                     synchronized (lolock) {
                         if (events.size() > 0) {
                             list = events;
-                            events = new LinkedList<Event>();
+                            events = new LinkedList<>();
                         }
                     }
 
@@ -1002,7 +997,7 @@ public class ServerImpl {
      */
     class IdleTimeoutTask extends TimerTask {
         public void run() {
-            LinkedList<HttpConnection> toClose = new LinkedList<HttpConnection>();
+            LinkedList<HttpConnection> toClose = new LinkedList<>();
             final long currentTime = System.currentTimeMillis();
             synchronized (idleConnections) {
                 final Iterator<HttpConnection> it = idleConnections.iterator();
@@ -1043,7 +1038,7 @@ public class ServerImpl {
 
         // runs every TIMER_MILLIS
         public void run() {
-            LinkedList<HttpConnection> toClose = new LinkedList<HttpConnection>();
+            LinkedList<HttpConnection> toClose = new LinkedList<>();
             final long currentTime = System.currentTimeMillis();
             synchronized (reqConnections) {
                 if (MAX_REQ_TIME != -1) {
@@ -1060,7 +1055,7 @@ public class ServerImpl {
                     }
                 }
             }
-            toClose = new LinkedList<HttpConnection>();
+            toClose = new LinkedList<>();
             synchronized (rspConnections) {
                 if (MAX_RSP_TIME != -1) {
                     for (HttpConnection c : rspConnections) {

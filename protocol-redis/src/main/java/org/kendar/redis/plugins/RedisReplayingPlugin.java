@@ -13,7 +13,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 
 public class RedisReplayingPlugin extends BasicReplayingPlugin {
-    private static JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = new JsonMapper();
 
     @Override
     public String getProtocol() {

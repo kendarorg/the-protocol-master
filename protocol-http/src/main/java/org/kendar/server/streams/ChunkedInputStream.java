@@ -136,7 +136,7 @@ public class ChunkedInputStream extends LeftOverInputStream {
             return 0;
         }
         int n = in.available();
-        return n > remaining ? remaining : n;
+        return Math.min(n, remaining);
     }
 
     /* called after the stream is closed to see if bytes

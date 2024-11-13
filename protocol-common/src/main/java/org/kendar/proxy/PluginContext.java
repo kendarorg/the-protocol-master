@@ -5,7 +5,7 @@ import org.kendar.protocol.context.ProtoContext;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class PluginContext {
-    private static AtomicLong counter = new AtomicLong(0);
+    private static final AtomicLong counter = new AtomicLong(0);
     private final String type;
     private final ProtoContext context;
     private long index;

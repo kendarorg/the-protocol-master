@@ -26,9 +26,7 @@ public class ProxyServer {
     ServerSocket serverSocket = null;
     private int httpRedirect = -1;
     private int httpsRedirect = -1;
-    private Function<String, String> dnsResolver = s -> {
-        return s;
-    };
+    private Function<String, String> dnsResolver = s -> s;
     private boolean running;
 
     public ProxyServer(int port) {

@@ -50,7 +50,7 @@ public class FixedLengthOutputStream extends FilterOutputStream {
                 throw new IOException("too many bytes to write to stream");
             } else {
                 this.out.write(b, off, len);
-                this.remaining -= (long) len;
+                this.remaining -= len;
             }
         }
     }

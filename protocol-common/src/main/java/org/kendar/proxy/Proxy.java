@@ -21,8 +21,8 @@ public abstract class Proxy {
      * Descriptor (of course network like)
      */
     private NetworkProtoDescriptor protocol;
-    private Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
-    private Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
+    private final Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
+    private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
 
     public boolean isReplayer() {
         return replayer;

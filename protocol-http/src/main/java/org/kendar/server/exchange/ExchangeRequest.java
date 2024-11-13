@@ -39,7 +39,7 @@ public class ExchangeRequest {
                 return;
             }
             /* skip blank lines */
-        } while (startLine == null ? false : startLine.equals(""));
+        } while (startLine == null ? false : startLine.isEmpty());
     }
 
     public InputStream inputStream() {
@@ -106,7 +106,7 @@ public class ExchangeRequest {
         }
         hdrs = new Headers();
 
-        char s[] = new char[10];
+        char[] s = new char[10];
         int len = 0;
 
         int firstc = is.read();
@@ -157,7 +157,7 @@ public class ExchangeRequest {
                             break;
                     }
                     if (len >= s.length) {
-                        char ns[] = new char[s.length * 2];
+                        char[] ns = new char[s.length * 2];
                         System.arraycopy(s, 0, ns, 0, len);
                         s = ns;
                     }
@@ -180,7 +180,7 @@ public class ExchangeRequest {
             }
             String v;
             if (keyend >= len)
-                v = new String();
+                v = "";
             else
                 v = String.copyValueOf(s, keyend, len - keyend);
 
@@ -256,7 +256,7 @@ public class ExchangeRequest {
 
             if (reset) { /* satisfy from markBuf */
                 canreturn = markBuf.remaining();
-                willreturn = canreturn > srclen ? srclen : canreturn;
+                willreturn = Math.min(canreturn, srclen);
                 markBuf.get(b, off, willreturn);
                 if (canreturn == willreturn) {
                     reset = false;

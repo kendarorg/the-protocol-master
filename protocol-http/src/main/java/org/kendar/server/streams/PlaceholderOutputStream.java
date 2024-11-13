@@ -37,12 +37,12 @@ public class PlaceholderOutputStream extends java.io.OutputStream {
         wrapped.write(b);
     }
 
-    public void write(byte b[]) throws IOException {
+    public void write(byte[] b) throws IOException {
         checkWrap();
         wrapped.write(b);
     }
 
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         checkWrap();
         wrapped.write(b, off, len);
     }

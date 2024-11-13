@@ -134,8 +134,8 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     @Override
     public void start() {
         try {
-            var port = getOrDefault(settings.getHttp(), 4080);
-            var httpsPort = getOrDefault(settings.getHttps(), 4443);
+            int port = getOrDefault(settings.getHttp(), 4080);
+            int httpsPort = getOrDefault(settings.getHttps(), 4443);
             var proxyPort = getOrDefault(settings.getProxy(), 9999);
 //        log.info("LISTEN HTTP: " + port);
 //        log.info("LISTEN HTTPS: " + httpsPort);

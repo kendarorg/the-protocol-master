@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProtocolSettings {
-    private static JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = new JsonMapper();
     private String protocol;
     private String protocolInstanceId;
-    private Map<String, Object> plugins = new HashMap<String, Object>();
+    private Map<String, Object> plugins = new HashMap<>();
 
     public String getProtocolInstanceId() {
         return protocolInstanceId;

@@ -140,7 +140,6 @@ public class MySQLExecutor {
         }
     }
 
-    @SuppressWarnings("DuplicateCondition")
     private Iterator<ProtoStep> handleSingleQuery(SqlParseResult parsed, MySQLProtoContext
             protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
         var pvup = parsed.getValue().toUpperCase();

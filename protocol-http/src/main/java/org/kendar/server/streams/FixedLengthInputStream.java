@@ -30,7 +30,7 @@ public class FixedLengthInputStream extends LeftOverInputStream {
 
             int n = this.in.read(b, off, len);
             if (n > -1) {
-                this.remaining -= (long) n;
+                this.remaining -= n;
                 if (this.remaining == 0L) {
                     this.t.getServerImpl().requestCompleted(this.t.getConnection());
                 }

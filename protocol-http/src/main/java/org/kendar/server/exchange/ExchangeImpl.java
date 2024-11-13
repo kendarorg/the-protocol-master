@@ -318,7 +318,7 @@ public class ExchangeImpl {
             int diff = slen + extra - rspbuf.length;
             rspbuf = new byte[2 * (rspbuf.length + diff)];
         }
-        char c[] = s.toCharArray();
+        char[] c = s.toCharArray();
         for (int i = 0; i < c.length; i++) {
             rspbuf[i] = (byte) c[i];
         }

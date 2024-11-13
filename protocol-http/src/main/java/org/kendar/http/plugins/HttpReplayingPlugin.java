@@ -33,9 +33,9 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
         var result = new HashMap<String, String>();
         result.put("path", in.getPath());
         result.put("host", in.getHost());
-        var query = String.join("&", in.getQuery().entrySet().stream().
+        var query = in.getQuery().entrySet().stream().
                 sorted(Comparator.comparing(Map.Entry<String, String>::getKey)).
-                map(it -> it.getKey() + "=" + it.getValue()).collect(Collectors.toList()));
+                map(it -> it.getKey() + "=" + it.getValue()).collect(Collectors.joining("&"));
 
         result.put("query", query);
         return result;
@@ -108,8 +108,8 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
 
     private void setupSitesToRecord(List<String> recordSites) {
         this.matchSites = recordSites.stream()
-                .map(s -> s.trim()).filter(s -> s.length() > 0)
-                .map(s -> Pattern.compile(s)).collect(Collectors.toList());
+                .map(String::trim).filter(s -> s.length() > 0)
+                .map(Pattern::compile).collect(Collectors.toList());
     }
 
     @Override

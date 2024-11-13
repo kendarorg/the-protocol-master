@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ApiServerHandler implements HttpHandler {
-    private static JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = new JsonMapper();
     private final ApiHandler handler;
 
     public ApiServerHandler(ApiHandler handler) {

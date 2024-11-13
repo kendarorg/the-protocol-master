@@ -9,7 +9,7 @@ public class ContextList {
 
     final static int MAX_CONTEXTS = 50;
 
-    final LinkedList<HttpContextImpl> list = new LinkedList<HttpContextImpl>();
+    final LinkedList<HttpContextImpl> list = new LinkedList<>();
 
     public synchronized void add(HttpContextImpl ctx) {
         assert ctx.getPath() != null;

@@ -190,7 +190,7 @@ public class RequestUtils {
                 }
             }
             i += 4;
-            bodyData = new ArrayList<Byte>();
+            bodyData = new ArrayList<>();
             for (; i < body.length; i++) {
                 if (body[i] == '-' && body[i + 1] == '-') {
                     //Check for boundary

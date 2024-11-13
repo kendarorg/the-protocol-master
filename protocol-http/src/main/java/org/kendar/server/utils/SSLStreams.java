@@ -246,7 +246,6 @@ public class SSLStreams {
      * on the wrapper methods being idempotent. eg. if wrapAndSend()
      * is called with no data to send then there must be no problem
      */
-    @SuppressWarnings("fallthrough")
     void doHandshake(SSLEngineResult.HandshakeStatus hs_status) throws IOException {
         try {
             handshaking.lock();
@@ -594,16 +593,16 @@ public class SSLStreams {
             write(single, 0, 1);
         }
 
-        public void write(byte b[]) throws IOException {
+        public void write(byte[] b) throws IOException {
             write(b, 0, b.length);
         }
 
-        public void write(byte b[], int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             if (closed) {
                 throw new IOException("output stream is closed");
             }
             while (len > 0) {
-                int l = len > buf.capacity() ? buf.capacity() : len;
+                int l = Math.min(len, buf.capacity());
                 buf.clear();
                 buf.put(b, off, l);
                 len -= l;

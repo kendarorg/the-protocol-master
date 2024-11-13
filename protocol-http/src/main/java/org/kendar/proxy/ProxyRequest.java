@@ -9,7 +9,7 @@ public class ProxyRequest {
     private final String protocol;
     private String path;
     private int port;
-    private String host;
+    private final String host;
 
     public ProxyRequest(String request) throws URISyntaxException {
 

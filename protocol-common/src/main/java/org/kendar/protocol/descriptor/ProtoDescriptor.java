@@ -124,7 +124,7 @@ public abstract class ProtoDescriptor {
         }
         runClean = true;
         contextsCache = new ConcurrentHashMap<>();
-        contextCleaner = new Thread(() -> contextsClean());
+        contextCleaner = new Thread(this::contextsClean);
         contextCleaner.start();
     }
 

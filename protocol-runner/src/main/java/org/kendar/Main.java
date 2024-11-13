@@ -124,7 +124,7 @@ public class Main {
             var pluginManager = new JarPluginManager(Path.of(pluginsDir).toAbsolutePath());
             pluginManager.loadPlugins();
             pluginManager.startPlugins();
-            allPlugins = new HashMap<String, List<PluginDescriptor>>();
+            allPlugins = new HashMap<>();
             for (var item : pluginManager.getExtensions(PluginDescriptor.class)) {
                 var protocol = item.getProtocol().toLowerCase();
                 if (!allPlugins.containsKey(protocol)) {
@@ -167,7 +167,7 @@ public class Main {
 
 
     public static boolean isRunning() {
-        return protocolServer.values().stream().anyMatch(v -> v.isRunning());
+        return protocolServer.values().stream().anyMatch(TcpServer::isRunning);
     }
 
 

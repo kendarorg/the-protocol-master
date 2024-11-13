@@ -261,7 +261,7 @@ public class Request {
             r.query = this.query.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
-        r.requestText = this.requestText != null ? new String(this.requestText) : this.requestText;
+        r.requestText = this.requestText != null ? this.requestText : this.requestText;
         r.soapRequest = this.soapRequest;
         r.staticRequest = this.staticRequest;
         return r;
@@ -303,9 +303,9 @@ public class Request {
     }
 
     public String buildUrl() {
-        var query = String.join("&", getQuery().entrySet().stream().
+        var query = getQuery().entrySet().stream().
                 sorted(Comparator.comparing(Map.Entry<String, String>::getKey)).
-                map(it -> it.getKey() + "=" + it.getValue()).collect(Collectors.toList()));
+                map(it -> it.getKey() + "=" + it.getValue()).collect(Collectors.joining("&"));
         if (!query.isEmpty()) query = "?" + query;
         if (getPort() > 0) {
             return getProtocol() + "://" + getHost() + ":" + getPort() +

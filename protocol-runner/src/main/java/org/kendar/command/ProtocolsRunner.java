@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 import static org.kendar.command.CommonRunner.createOpt;
 
 public class ProtocolsRunner {
-    private Map<String, CommonRunner> protocols = new HashMap<>();
+    private final Map<String, CommonRunner> protocols = new HashMap<>();
 
     public ProtocolsRunner(CommonRunner... input) {
         for (CommonRunner protocol : input) {

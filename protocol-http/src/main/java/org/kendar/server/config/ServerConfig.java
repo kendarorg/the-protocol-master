@@ -2,7 +2,6 @@ package org.kendar.server.config;
 
 import java.security.PrivilegedAction;
 
-@SuppressWarnings("removal")
 public class ServerConfig {
 
     private static final int DEFAULT_IDLE_TIMER_SCHEDULE_MILLIS = 10000; // 10 sec.
@@ -102,33 +101,31 @@ public class ServerConfig {
         // print a warning to logger if they are set.
 
         java.security.AccessController.doPrivileged(
-                new PrivilegedAction<Void>() {
-                    public Void run() {
-                        if (System.getProperty("sun.net.httpserver.readTimeout")
-                                != null) {
-                            logger.log(System.Logger.Level.WARNING,
-                                    "sun.net.httpserver.readTimeout " +
-                                            "property is no longer used. " +
-                                            "Use sun.net.httpserver.maxReqTime instead."
-                            );
-                        }
-                        if (System.getProperty("sun.net.httpserver.writeTimeout")
-                                != null) {
-                            logger.log(System.Logger.Level.WARNING,
-                                    "sun.net.httpserver.writeTimeout " +
-                                            "property is no longer used. Use " +
-                                            "sun.net.httpserver.maxRspTime instead."
-                            );
-                        }
-                        if (System.getProperty("sun.net.httpserver.selCacheTimeout")
-                                != null) {
-                            logger.log(System.Logger.Level.WARNING,
-                                    "sun.net.httpserver.selCacheTimeout " +
-                                            "property is no longer used."
-                            );
-                        }
-                        return null;
+                (PrivilegedAction<Void>) () -> {
+                    if (System.getProperty("sun.net.httpserver.readTimeout")
+                            != null) {
+                        logger.log(System.Logger.Level.WARNING,
+                                "sun.net.httpserver.readTimeout " +
+                                        "property is no longer used. " +
+                                        "Use sun.net.httpserver.maxReqTime instead."
+                        );
                     }
+                    if (System.getProperty("sun.net.httpserver.writeTimeout")
+                            != null) {
+                        logger.log(System.Logger.Level.WARNING,
+                                "sun.net.httpserver.writeTimeout " +
+                                        "property is no longer used. Use " +
+                                        "sun.net.httpserver.maxRspTime instead."
+                        );
+                    }
+                    if (System.getProperty("sun.net.httpserver.selCacheTimeout")
+                            != null) {
+                        logger.log(System.Logger.Level.WARNING,
+                                "sun.net.httpserver.selCacheTimeout " +
+                                        "property is no longer used."
+                        );
+                    }
+                    return null;
                 }
         );
     }

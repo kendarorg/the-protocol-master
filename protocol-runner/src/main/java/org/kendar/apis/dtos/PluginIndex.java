@@ -1,8 +1,8 @@
 package org.kendar.apis.dtos;
 
 public class PluginIndex {
-    private String id;
-    private boolean active;
+    private final String id;
+    private final boolean active;
 
     public PluginIndex(String id, boolean active) {
 

@@ -27,9 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class JdbcRunner extends CommonRunner {
-    private static TypeReference<List<QueryReplacerItem>> replaceItemsList = new TypeReference<>() {
+    private static final TypeReference<List<QueryReplacerItem>> replaceItemsList = new TypeReference<>() {
     };
-    private static JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = new JsonMapper();
     private final String protocol;
     private TcpServer ps;
 

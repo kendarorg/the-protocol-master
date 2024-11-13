@@ -73,8 +73,8 @@ public class Response {
     public Response copy() {
         var r = new Response();
         r.headers = this.headers.entrySet().stream()
-                .collect(Collectors.toMap(t -> (String) t.getKey(), v -> v.getValue()));
-        r.responseText = this.responseText != null ? new String(this.responseText) : this.responseText;
+                .collect(Collectors.toMap(t -> t.getKey(), Map.Entry::getValue));
+        r.responseText = this.responseText != null ? this.responseText : this.responseText;
         r.statusCode = this.statusCode;
 
         return r;

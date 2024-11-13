@@ -7,7 +7,7 @@ public class HttpSSLSettings {
     private String cname;
     private String der;
     private String key;
-    private List<String> hosts = new ArrayList<String>();
+    private List<String> hosts = new ArrayList<>();
 
     public List<String> getHosts() {
         return hosts;

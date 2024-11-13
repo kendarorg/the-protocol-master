@@ -75,7 +75,7 @@ public class CertificatesManager {
         for (var host : hosts) {
             certificateHosts.put(host, host);
         }
-        var newHostsList = new ArrayList<String>(certificateHosts.keySet());
+        var newHostsList = new ArrayList<>(certificateHosts.keySet());
         var root =
                 loadRootCertificate(der, key);
 
@@ -135,7 +135,7 @@ public class CertificatesManager {
             return;
         }
         sslLog.debug("ADD HOST: " + String.join(",", inserted));
-        var sslContextInt = getSslContext(registeredHosts.values().stream().collect(Collectors.toList()), cname, der, key);
+        var sslContextInt = getSslContext(new ArrayList<>(registeredHosts.values()), cname, der, key);
         port.setHttpsConfigurator(
                 new HttpsConfigurator(sslContextInt) {
                     @Override
