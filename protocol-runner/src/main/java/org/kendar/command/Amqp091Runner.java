@@ -75,7 +75,7 @@ public class Amqp091Runner extends CommonRunner {
         proxy.setPlugins(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-       ps = new TcpServer(baseProtocol);
+        ps = new TcpServer(baseProtocol);
 
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());

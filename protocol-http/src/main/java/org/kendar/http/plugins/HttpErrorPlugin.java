@@ -1,10 +1,10 @@
 package org.kendar.http.plugins;
 
+import org.kendar.http.utils.Request;
+import org.kendar.http.utils.Response;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.ProtocolPluginDescriptor;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;

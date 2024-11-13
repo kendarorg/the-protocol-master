@@ -2,7 +2,6 @@ package org.kendar.http;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
-import org.kendar.plugins.PluginDescriptor;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
@@ -14,6 +13,7 @@ import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
 import org.kendar.http.utils.rewriter.SimpleRewriterHandlerImpl;
 import org.kendar.http.utils.ssl.CertificatesManager;
 import org.kendar.http.utils.ssl.FileResourcesUtils;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -38,17 +38,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private boolean httpRunning;
     private boolean httpsRunning;
 
-    private static <T> T getOrDefault(Object value, T defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        return (T) value;
-    }
-
-    public List<PluginDescriptor> getPlugins() {
-        return plugins;
-    }
-
     public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<PluginDescriptor> plugins) {
 
         this.globalSettings = globalSettings;
@@ -56,28 +45,11 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         this.plugins = plugins;
     }
 
-    @Override
-    public boolean isWrapper(){
-        return true;
-    }
-    @Override
-    public boolean isBe() {
-        return false;
-    }
-
-    @Override
-    public int getPort() {
-        return 0;
-    }
-
-    @Override
-    protected void initializeProtocol() {
-
-    }
-
-    @Override
-    protected ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId) {
-        return null;
+    private static <T> T getOrDefault(Object value, T defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+        return (T) value;
     }
 
     private static SimpleRewriterConfig loadRewritersConfiguration(HttpProtocolSettings settings) {
@@ -112,6 +84,35 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         return httpsServer;
     }
 
+    public List<PluginDescriptor> getPlugins() {
+        return plugins;
+    }
+
+    @Override
+    public boolean isWrapper() {
+        return true;
+    }
+
+    @Override
+    public boolean isBe() {
+        return false;
+    }
+
+    @Override
+    public int getPort() {
+        return 0;
+    }
+
+    @Override
+    protected void initializeProtocol() {
+
+    }
+
+    @Override
+    protected ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId) {
+        return null;
+    }
+
     @Override
     public void terminate() {
         for (var i = plugins.size() - 1; i >= 0; i--) {
@@ -121,8 +122,8 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         proxy.terminate();
         httpsServer.stop(0);
         httpServer.stop(0);
-        httpRunning=false;
-        httpsRunning=false;
+        httpRunning = false;
+        httpsRunning = false;
     }
 
     @Override
@@ -213,7 +214,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             httpRunning = true;
             httpsRunning = true;
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }

@@ -71,7 +71,7 @@ public class CertitificatesGeneratorTest {
 
     @Test
     public void generateMultiple() throws Exception {
-        
+
         var resourcesLoader = new FileResourcesUtils();
         var target = new CertificatesManager(resourcesLoader);
         var root = target.loadRootCertificate("resource://certificates/ca.der", "resource://certificates/ca.key");
@@ -94,7 +94,7 @@ public class CertitificatesGeneratorTest {
 
     @Test
     public void generateMultiple2() throws Exception {
-        
+
         var resourcesLoader = new FileResourcesUtils();
         var target = new CertificatesManager(resourcesLoader);
         var root = target.loadRootCertificate("resource://certificates/ca.der", "resource://certificates/ca.key");

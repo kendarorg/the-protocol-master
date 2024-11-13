@@ -12,18 +12,18 @@ import org.slf4j.MDC;
  * Descriptor for network protocol
  */
 public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
-    public boolean isWrapper(){
-        return false;
-    }
     /**
      * Proxy instance
      */
     private Proxy proxyInstance;
-
     /**
      * Whether should use the proxy
      */
     private boolean proxy;
+
+    public boolean isWrapper() {
+        return false;
+    }
 
     /**
      * Initialize all (and the proxy)

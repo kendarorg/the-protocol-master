@@ -1,12 +1,12 @@
 package org.kendar.http.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.kendar.plugins.BasicReplayingPlugin;
-import org.kendar.plugins.ProtocolPhase;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
+import org.kendar.plugins.BasicReplayingPlugin;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;

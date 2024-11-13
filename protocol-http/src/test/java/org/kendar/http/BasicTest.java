@@ -17,8 +17,11 @@ import java.util.List;
 public class BasicTest {
 
     protected static TcpServer protocolServer;
-    private static SimpleHttpServer simpleServer;
     protected static HttpProtocol baseProtocol;
+    static int FAKE_PORT_HTTP = 8087;
+    static int FAKE_PORT_HTTPS = 8487;
+    static int FAKE_PORT_PROXY = 9999;
+    private static SimpleHttpServer simpleServer;
 
     public static void beforeClassBase() throws Exception {
         simpleServer = new SimpleHttpServer();
@@ -26,12 +29,11 @@ public class BasicTest {
 
     }
 
-    static int FAKE_PORT_HTTP = 8087;
-    static int FAKE_PORT_HTTPS = 8487;
-    static int FAKE_PORT_PROXY = 9999;
+    public static void afterClassBase() throws Exception {
+        simpleServer.stop();
+    }
 
     public void beforeEachBase(TestInfo testInfo) {
-
 
 
         StorageRepository storage = new NullStorageRepository();
@@ -56,12 +58,12 @@ public class BasicTest {
         httpProtocolSettings.setProxy(FAKE_PORT_PROXY);
         httpProtocolSettings.setProtocolInstanceId("default");
         var recordingPlugin = new HttpRecordPluginSettings();
-        httpProtocolSettings.getPlugins().put("record-plugin",recordingPlugin);
+        httpProtocolSettings.getPlugins().put("record-plugin", recordingPlugin);
         var replayPlugin = new HttpReplayPluginSettings();
-        httpProtocolSettings.getPlugins().put("replay-plugin",replayPlugin);
+        httpProtocolSettings.getPlugins().put("replay-plugin", replayPlugin);
         globalSettings.getProtocols().put("http", httpProtocolSettings);
-        globalSettings.putService("storage",storage);
-        baseProtocol = new HttpProtocol(globalSettings,httpProtocolSettings,List.of(
+        globalSettings.putService("storage", storage);
+        baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
                 new HttpRecordingPlugin().withStorage(storage),
                 new HttpReplayingPlugin().withStorage(storage),
                 new HttpErrorPlugin()));
@@ -77,9 +79,5 @@ public class BasicTest {
 
         protocolServer.stop();
         Sleeper.sleep(5000, () -> !protocolServer.isRunning());
-    }
-
-    public static void afterClassBase() throws Exception {
-        simpleServer.stop();
     }
 }

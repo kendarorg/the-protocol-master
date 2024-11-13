@@ -6,12 +6,15 @@ public class Ok {
     public Ok(String result) {
         this.result = result;
     }
-    public Ok(){}
-    public void setResult(String result) {
-        this.result = result;
+
+    public Ok() {
     }
 
     public String getResult() {
         return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

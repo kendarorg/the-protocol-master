@@ -54,7 +54,7 @@ public class PluginContext {
     }
 
     public int getContextId() {
-        if(getContext()==null) return 0;
+        if (getContext() == null) return 0;
         return getContext().getContextId();
     }
 }

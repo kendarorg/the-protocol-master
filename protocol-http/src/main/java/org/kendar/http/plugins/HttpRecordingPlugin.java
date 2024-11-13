@@ -1,9 +1,9 @@
 package org.kendar.http.plugins;
 
+import org.kendar.http.utils.Request;
 import org.kendar.plugins.BasicRecordingPlugin;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
-import org.kendar.http.utils.Request;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;

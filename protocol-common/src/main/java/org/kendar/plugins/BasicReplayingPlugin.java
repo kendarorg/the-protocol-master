@@ -25,13 +25,13 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         super.initialize(global, protocol);
-        withStorage ((StorageRepository) global.getService("storage"));
+        withStorage((StorageRepository) global.getService("storage"));
         return this;
     }
 
     public BasicReplayingPlugin withStorage(StorageRepository storage) {
 
-        if(storage!=null) {
+        if (storage != null) {
             this.storage = storage;
         }
         return this;

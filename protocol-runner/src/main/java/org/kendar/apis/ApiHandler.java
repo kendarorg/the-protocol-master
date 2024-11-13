@@ -15,12 +15,11 @@ import static java.lang.System.exit;
 
 public class ApiHandler {
     private final GlobalSettings settings;
+    private List<ProtocolInstance> instances = new ArrayList<>();
 
     public ApiHandler(GlobalSettings settings) {
         this.settings = settings;
     }
-
-    private List<ProtocolInstance> instances = new ArrayList<>();
 
     public void addProtocol(String protocolInstanceId,
                             CommonRunner protocolManager,

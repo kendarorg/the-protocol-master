@@ -1,7 +1,7 @@
 package org.kendar.sql.jdbc;
 
-import org.kendar.plugins.ProtocolPhase;
 import org.kendar.iterators.QueryResultIterator;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;

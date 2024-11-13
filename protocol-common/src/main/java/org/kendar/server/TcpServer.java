@@ -46,7 +46,7 @@ public class TcpServer {
      * Stop the server
      */
     public void stop() {
-        if(protoDescriptor.isWrapper()){
+        if (protoDescriptor.isWrapper()) {
             protoDescriptor.terminate();
             return;
         }
@@ -58,7 +58,7 @@ public class TcpServer {
         } finally {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
                 var proxy = protoDescriptor.getProxy();
-                if(proxy != null){
+                if (proxy != null) {
                     proxy.terminateFilters();
                 }
 
@@ -70,11 +70,11 @@ public class TcpServer {
      * Start the server
      */
     public void start() {
-        if(protoDescriptor.isWrapper()){
+        if (protoDescriptor.isWrapper()) {
             try {
                 protoDescriptor.cleanCounters();
                 protoDescriptor.start();
-            }catch (Exception e){
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             return;
@@ -188,7 +188,7 @@ public class TcpServer {
     }
 
     public boolean isRunning() {
-        if(protoDescriptor.isWrapper()){
+        if (protoDescriptor.isWrapper()) {
             return protoDescriptor.isWrapperRunning();
         }
         if (this.server == null) return false;

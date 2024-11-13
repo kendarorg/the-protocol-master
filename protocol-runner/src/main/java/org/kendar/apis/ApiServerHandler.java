@@ -10,13 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ApiServerHandler implements HttpHandler {
-    private final ApiHandler handler;
     private static JsonMapper mapper = new JsonMapper();
+    private final ApiHandler handler;
 
-    public ApiServerHandler(ApiHandler handler){
+    public ApiServerHandler(ApiHandler handler) {
 
         this.handler = handler;
     }
+
     private boolean isPath(String path, String api, Map<String, String> parameters) {
         try {
             if (path.equalsIgnoreCase(api) ||
@@ -34,36 +35,36 @@ public class ApiServerHandler implements HttpHandler {
                 }
             }
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
     private boolean isPath(String path, String api) {
-        return  path.equalsIgnoreCase(api) ||
-                path.equalsIgnoreCase(api+ "/");
+        return path.equalsIgnoreCase(api) ||
+                path.equalsIgnoreCase(api + "/");
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         var path = exchange.getRequestURI().getPath();
-        Map<String,String> parameters = new HashMap<>();
-        if(isPath(path,"/api/global/shutdown")) {
-            respond(exchange,handler.terminate(),200);
-        }else if(isPath(path,"/api/protocols")){
-            respond(exchange,handler.getProtocols(),200);
-        }else if(isPath(path,"/api/protocols/{protocolInstanceId}/plugins",parameters)){
-            respond(exchange,handler.getProtocolPlugins(parameters.get("protocolInstanceId")),200);
-        }else if(isPath(path,"/api/protocols/{protocolInstanceId}/plugins/{pluginId}/{action}",parameters)){
-            respond(exchange,handler.handleProtocolPluginActivation(
+        Map<String, String> parameters = new HashMap<>();
+        if (isPath(path, "/api/global/shutdown")) {
+            respond(exchange, handler.terminate(), 200);
+        } else if (isPath(path, "/api/protocols")) {
+            respond(exchange, handler.getProtocols(), 200);
+        } else if (isPath(path, "/api/protocols/{protocolInstanceId}/plugins", parameters)) {
+            respond(exchange, handler.getProtocolPlugins(parameters.get("protocolInstanceId")), 200);
+        } else if (isPath(path, "/api/protocols/{protocolInstanceId}/plugins/{pluginId}/{action}", parameters)) {
+            respond(exchange, handler.handleProtocolPluginActivation(
                     parameters.get("protocolInstanceId"),
                     parameters.get("pluginId"),
-                    parameters.get("action")),200);
+                    parameters.get("action")), 200);
         }
     }
 
-    private void respond(HttpExchange exchange, Object toSend,int errorCode) {
+    private void respond(HttpExchange exchange, Object toSend, int errorCode) {
         try {
             String response = mapper.serialize(toSend);
             exchange.getResponseHeaders().add("Content-Type", "application/json");
@@ -72,7 +73,7 @@ public class ApiServerHandler implements HttpHandler {
             os.write(response.getBytes());
             os.flush();
             os.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             try {
                 var result = new Ko();
                 result.setError(e.getMessage());
@@ -83,7 +84,7 @@ public class ApiServerHandler implements HttpHandler {
                 os.write(response.getBytes());
                 os.flush();
                 os.close();
-            }catch (Exception e2){
+            } catch (Exception e2) {
                 e2.printStackTrace();
             }
         }

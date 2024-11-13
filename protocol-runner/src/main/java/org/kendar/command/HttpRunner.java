@@ -5,7 +5,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.kendar.plugins.PluginDescriptor;
 import org.kendar.http.HttpProtocol;
 import org.kendar.http.plugins.HttpErrorPluginSettings;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
@@ -15,6 +14,7 @@ import org.kendar.http.settings.HttpSSLSettings;
 import org.kendar.http.utils.rewriter.RemoteServerStatus;
 import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
 import org.kendar.http.utils.ssl.CertificatesManager;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -141,7 +141,7 @@ public class HttpRunner extends CommonRunner {
                       List<PluginDescriptor> filters,
                       Supplier<Boolean> stopWhenFalseAction) throws Exception {
         var settings = (HttpProtocolSettings) pset;
-        var baseProtocol = new HttpProtocol(ini,settings,filters);
+        var baseProtocol = new HttpProtocol(ini, settings, filters);
         baseProtocol.initialize();
         ps = new TcpServer(baseProtocol);
         ps.start();

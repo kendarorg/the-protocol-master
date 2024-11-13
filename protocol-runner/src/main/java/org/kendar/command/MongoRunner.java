@@ -2,8 +2,8 @@ package org.kendar.command;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.kendar.plugins.PluginDescriptor;
 import org.kendar.mongo.MongoProxy;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
