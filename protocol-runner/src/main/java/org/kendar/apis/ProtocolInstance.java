@@ -1,7 +1,7 @@
 package org.kendar.apis;
 
 import org.kendar.command.CommonRunner;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.settings.ProtocolSettings;
 
 import java.util.List;
@@ -9,14 +9,14 @@ import java.util.List;
 public class ProtocolInstance {
     private final String protocolInstanceId;
     private final CommonRunner protocolManager;
-    private final List<PluginDescriptor> filters;
+    private final List<PluginDescriptor> plugins;
     private final ProtocolSettings settings;
 
-    public ProtocolInstance(String protocolInstanceId, CommonRunner protocolManager, List<PluginDescriptor> filters, ProtocolSettings settings) {
+    public ProtocolInstance(String protocolInstanceId, CommonRunner protocolManager, List<PluginDescriptor> plugins, ProtocolSettings settings) {
 
         this.protocolInstanceId = protocolInstanceId;
         this.protocolManager = protocolManager;
-        this.filters = filters;
+        this.plugins = plugins;
         this.settings = settings;
     }
 
@@ -28,8 +28,8 @@ public class ProtocolInstance {
         return protocolManager;
     }
 
-    public List<PluginDescriptor> getFilters() {
-        return filters;
+    public List<PluginDescriptor> getPlugins() {
+        return plugins;
     }
 
     public ProtocolSettings getSettings() {

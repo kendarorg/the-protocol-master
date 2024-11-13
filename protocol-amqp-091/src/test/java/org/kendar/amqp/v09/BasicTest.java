@@ -70,7 +70,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        proxy.setFilters(List.of(
+        proxy.setPlugins(List.of(
                 new AmqpRecordingPlugin().withStorage(storage).asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

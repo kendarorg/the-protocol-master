@@ -5,15 +5,15 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpsExchange;
 import org.apache.http.conn.HttpClientConnectionManager;
-import org.kendar.filters.ProtocolPhase;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.http.utils.*;
 import org.kendar.http.utils.callexternal.ExternalRequester;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.converters.RequestResponseBuilder;
-import org.kendar.http.utils.filters.FilteringClassesHandler;
+import org.kendar.http.utils.plugins.PluginClassesHandler;
 import org.kendar.http.utils.rewriter.SimpleRewriterHandler;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ public class MasterHandler implements HttpHandler {
     public static final String BLOCK_RECURSION = "X-BLOCK-RECURSIVE";
     private static final Logger log = LoggerFactory.getLogger("org.kendar.http.Main");
     private final ObjectMapper mapper = new ObjectMapper();
-    private final FilteringClassesHandler filteringClassesHandler;
+    private final PluginClassesHandler pluginClassesHandler;
     private final SimpleRewriterHandler simpleProxyHandler;
     private final RequestResponseBuilder requestResponseBuilder;
     private final ExternalRequester externalRequester;
@@ -38,13 +38,13 @@ public class MasterHandler implements HttpHandler {
 
     public MasterHandler(
 
-            FilteringClassesHandler filteringClassesHandler,
+            PluginClassesHandler pluginClassesHandler,
             SimpleRewriterHandler simpleProxyHandler,
             RequestResponseBuilder requestResponseBuilder,
             ExternalRequester externalRequester,
             ConnectionBuilder connectionBuilder) {
 
-        this.filteringClassesHandler = filteringClassesHandler;
+        this.pluginClassesHandler = pluginClassesHandler;
         this.simpleProxyHandler = simpleProxyHandler;
 
         this.requestResponseBuilder = requestResponseBuilder;
@@ -154,7 +154,7 @@ public class MasterHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) {
 
         var connManager = connectionBuilder.getConnectionManger(true, true);
-        var filterContext = new FilterContext("HTTP", httpExchange.getRequestMethod().toUpperCase(), System.currentTimeMillis(), null);
+        var pluginContext = new PluginContext("HTTP", httpExchange.getRequestMethod().toUpperCase(), System.currentTimeMillis(), null);
         Request request = null;
         Response response = new Response();
         try {
@@ -179,7 +179,7 @@ public class MasterHandler implements HttpHandler {
 
             log.info("REQ " + request.getMethod() + " " + request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
 
-            handleInternal(filterContext, request, response, connManager);
+            handleInternal(pluginContext, request, response, connManager);
             sendResponse(response, httpExchange);
 
         } catch (Exception rex) {
@@ -190,8 +190,8 @@ public class MasterHandler implements HttpHandler {
             }
         } finally {
             try {
-                filteringClassesHandler.handle(
-                        filterContext, ProtocolPhase.POST_RENDER, request, response, connManager);
+                pluginClassesHandler.handle(
+                        pluginContext, ProtocolPhase.POST_RENDER, request, response, connManager);
 
             } catch (Exception e) {
                 log.error("ERROR CALLING POST RENDER ", e);
@@ -199,22 +199,22 @@ public class MasterHandler implements HttpHandler {
         }
     }
 
-    private void handleInternal(FilterContext filterContext, Request request, Response response, HttpClientConnectionManager connManager) throws Exception {
+    private void handleInternal(PluginContext pluginContext, Request request, Response response, HttpClientConnectionManager connManager) throws Exception {
 
-        if (filteringClassesHandler.handle(filterContext,
+        if (pluginClassesHandler.handle(pluginContext,
                 ProtocolPhase.PRE_RENDER, request, response, connManager)) {
 
             return;
         }
 
-        if (filteringClassesHandler.handle(
-                filterContext, ProtocolPhase.API, request, response, connManager)) {
+        if (pluginClassesHandler.handle(
+                pluginContext, ProtocolPhase.API, request, response, connManager)) {
             // ALWAYS WHEN CALLED
             return;
         }
 
-        if (filteringClassesHandler.handle(
-                filterContext, ProtocolPhase.STATIC, request, response, connManager)) {
+        if (pluginClassesHandler.handle(
+                pluginContext, ProtocolPhase.STATIC, request, response, connManager)) {
             response.addHeader("Cache Control", "max-age=3600,s-maxage=3600");
             response.addHeader("Last-Modified", "Wed, 21 Oct 2015 07:28:00 GMT");
             // ALWAYS WHEN CALLED
@@ -223,14 +223,14 @@ public class MasterHandler implements HttpHandler {
 
         var proxiedRequest = simpleProxyHandler.translate(request);
 
-        if (filteringClassesHandler.handle(
-                filterContext, ProtocolPhase.PRE_CALL, proxiedRequest, response, connManager)) {
+        if (pluginClassesHandler.handle(
+                pluginContext, ProtocolPhase.PRE_CALL, proxiedRequest, response, connManager)) {
             return;
         }
 
         externalRequester.callSite(proxiedRequest, response);
 
-        filteringClassesHandler.handle(
-                filterContext, ProtocolPhase.POST_CALL, proxiedRequest, response, connManager);
+        pluginClassesHandler.handle(
+                pluginContext, ProtocolPhase.POST_CALL, proxiedRequest, response, connManager);
     }
 }

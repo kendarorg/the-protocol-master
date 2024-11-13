@@ -1,6 +1,6 @@
-package org.kendar.filters;
+package org.kendar.plugins;
 
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -22,11 +22,11 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
     /**
      * @param request
      * @param response
-     * @param filterContext
+     * @param pluginContext
      * @param phase
      * @return true when is blocking
      */
-    public abstract boolean handle(FilterContext filterContext, ProtocolPhase phase, T in, K out);
+    public abstract boolean handle(PluginContext pluginContext, ProtocolPhase phase, T in, K out);
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {

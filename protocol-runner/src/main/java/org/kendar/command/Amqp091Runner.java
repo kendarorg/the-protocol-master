@@ -3,7 +3,7 @@ package org.kendar.command;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.kendar.amqp.v09.AmqpProxy;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
@@ -72,7 +72,7 @@ public class Amqp091Runner extends CommonRunner {
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new AmqpProxy(connectionString, login, password);
 
-        proxy.setFilters(filters);
+        proxy.setPlugins(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
        ps = new TcpServer(baseProtocol);

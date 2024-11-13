@@ -1,6 +1,6 @@
 package org.kendar.mongo.plugins;
 
-import org.kendar.filters.BasicRecordingPlugin;
+import org.kendar.plugins.BasicRecordingPlugin;
 
 public class MongoRecordingPlugin extends BasicRecordingPlugin {
 

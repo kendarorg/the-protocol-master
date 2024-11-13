@@ -1,11 +1,11 @@
 package org.kendar.http.plugins;
 
-import org.kendar.filters.PluginDescriptor;
-import org.kendar.filters.ProtocolPhase;
-import org.kendar.filters.ProtocolPluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -42,7 +42,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response>
     }
 
     @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request request, Response response) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
         if (!isActive()) return false;
         if (Math.random() < percentage) {
 

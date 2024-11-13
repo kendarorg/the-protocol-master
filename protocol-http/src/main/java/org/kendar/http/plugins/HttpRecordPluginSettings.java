@@ -1,6 +1,6 @@
 package org.kendar.http.plugins;
 
-import org.kendar.filters.settings.BasicRecordingPluginSettings;
+import org.kendar.plugins.settings.BasicRecordingPluginSettings;
 
 import java.util.ArrayList;
 import java.util.List;

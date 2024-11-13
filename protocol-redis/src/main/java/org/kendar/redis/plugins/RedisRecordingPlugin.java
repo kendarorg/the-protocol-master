@@ -1,7 +1,7 @@
 package org.kendar.redis.plugins;
 
-import org.kendar.filters.BasicRecordingPlugin;
-import org.kendar.proxy.FilterContext;
+import org.kendar.plugins.BasicRecordingPlugin;
+import org.kendar.proxy.PluginContext;
 import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.storage.CompactLine;
@@ -25,17 +25,17 @@ public class RedisRecordingPlugin extends BasicRecordingPlugin {
         return "redis";
     }
 
-    protected void asyncCall(FilterContext filterContext, Object out) {
+    protected void asyncCall(PluginContext pluginContext, Object out) {
         var duration = 0;
 
         var res = "{\"type\":\"RESPONSE\",\"data\":" + mapper.serialize(out) + "}";
         var req = "{\"type\":null,\"data\":null}";
 
-        var storageItem = new StorageItem(filterContext.getContextId(),
+        var storageItem = new StorageItem(pluginContext.getContextId(),
                 mapper.toJsonNode(req),
                 mapper.toJsonNode(res),
-                duration, filterContext.getType(),
-                filterContext.getCaller());
+                duration, pluginContext.getType(),
+                pluginContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));

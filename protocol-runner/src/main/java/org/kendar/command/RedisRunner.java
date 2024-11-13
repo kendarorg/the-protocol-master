@@ -1,7 +1,7 @@
 package org.kendar.command;
 
 import org.apache.commons.cli.Options;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.server.TcpServer;
@@ -45,7 +45,7 @@ public class RedisRunner extends CommonRunner {
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new Resp3Proxy(connectionString, null, null);
 
-        proxy.setFilters(filters);
+        proxy.setPlugins(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         ps = new TcpServer(baseProtocol);

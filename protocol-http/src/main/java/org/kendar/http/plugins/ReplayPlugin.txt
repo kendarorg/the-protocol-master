@@ -1,16 +1,16 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.filters.PluginDescriptor;
-import org.kendar.filters.ProtocolPhase;
-import org.kendar.filters.ProtocolPluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.http.utils.MimeChecker;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.utils.Md5Tester;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -133,7 +133,7 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
 
 
     @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Request request, Response response) {
+    public boolean handle(FilterContext pluginContext, ProtocolPhase phase, Request request, Response response) {
         if (!isActive()) return false;
         if (matchSites.size() > 0) {
             var matchFound = false;

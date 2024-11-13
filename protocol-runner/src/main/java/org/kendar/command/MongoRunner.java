@@ -2,7 +2,7 @@ package org.kendar.command;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
@@ -70,7 +70,7 @@ public class MongoRunner extends CommonRunner {
         var proxy = new MongoProxy(connectionString);
 
 
-        proxy.setFilters(filters);
+        proxy.setPlugins(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         ps = new TcpServer(baseProtocol);

@@ -2,7 +2,7 @@ package org.kendar.apis;
 
 import org.kendar.apis.dtos.*;
 import org.kendar.command.CommonRunner;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 
@@ -24,9 +24,9 @@ public class ApiHandler {
 
     public void addProtocol(String protocolInstanceId,
                             CommonRunner protocolManager,
-                            List<PluginDescriptor> filters, ProtocolSettings settings) {
+                            List<PluginDescriptor> plugins, ProtocolSettings settings) {
         instances.add(new ProtocolInstance(protocolInstanceId,
-                protocolManager, filters, settings));
+                protocolManager, plugins, settings));
     }
 
     public List<ProtocolIndex> getProtocols() {
@@ -36,10 +36,10 @@ public class ApiHandler {
     }
 
 
-    public List<FilterIndex> getProtocolFilters(String protocolInstanceId) {
+    public List<PluginIndex> getProtocolPlugins(String protocolInstanceId) {
         var instance = instances.stream().filter(p -> p.getProtocolInstanceId().equals(protocolInstanceId)).findFirst();
-        return instance.get().getFilters().stream().map(p -> new
-                        FilterIndex(p.getId(), p.isActive())).
+        return instance.get().getPlugins().stream().map(p -> new
+                        PluginIndex(p.getId(), p.isActive())).
                 collect(Collectors.toList());
     }
 
@@ -47,44 +47,44 @@ public class ApiHandler {
         try {
             return new Ok();
         } finally {
-            for (var filter : instances) {
-                filter.getProtocolManager().stop();
+            for (var plugin : instances) {
+                plugin.getProtocolManager().stop();
             }
             exit(0);
         }
     }
 
-    public Object handleProtocolFilterActivation(String protocolInstanceId, String filterId, String action) {
+    public Object handleProtocolPluginActivation(String protocolInstanceId, String pluginId, String action) {
         action = action.toLowerCase(Locale.ROOT);
         if (protocolInstanceId.equalsIgnoreCase("*")) {
             for (var instanceId : instances.stream().map(ProtocolInstance::getProtocolInstanceId).collect(Collectors.toList())) {
-                Object x = handleProtocolFilterActivationSingle(instanceId, filterId, action);
+                Object x = handleProtocolPluginActivationSingle(instanceId, pluginId, action);
                 if (x instanceof Ko) return x;
             }
 
         } else {
-            return handleProtocolFilterActivationSingle(protocolInstanceId, filterId, action);
+            return handleProtocolPluginActivationSingle(protocolInstanceId, pluginId, action);
         }
         return new Ok();
     }
 
 
-    private Object handleProtocolFilterActivationSingle(String protocolInstanceId, String filterId, String action) {
+    private Object handleProtocolPluginActivationSingle(String protocolInstanceId, String pluginId, String action) {
         var instance = instances.stream().filter(p -> p.getProtocolInstanceId().equals(protocolInstanceId)).findFirst();
         if (instance.isEmpty()) {
             return new Ko("Missing protocol instance id " + protocolInstanceId);
         }
-        var filterInstance = instance.get().getFilters().stream().filter(f -> f.getId().equalsIgnoreCase(filterId)).findFirst();
+        var pluginInstance = instance.get().getPlugins().stream().filter(f -> f.getId().equalsIgnoreCase(pluginId)).findFirst();
         switch (action) {
             case "start":
-                filterInstance.get().setActive(true);
+                pluginInstance.get().setActive(true);
                 return new Ok();
             case "stop":
-                filterInstance.get().setActive(false);
+                pluginInstance.get().setActive(false);
                 return new Ok();
             case "status":
                 var status = new Status();
-                status.setActive(filterInstance.get().isActive());
+                status.setActive(pluginInstance.get().isActive());
                 return status;
         }
         return new Ko("Unknown action " + action);

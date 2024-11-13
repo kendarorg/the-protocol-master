@@ -6,10 +6,10 @@ import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
-import org.kendar.filters.BasicReplayingPlugin;
+import org.kendar.plugins.BasicReplayingPlugin;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class AmqpReplayingPlugin extends BasicReplayingPlugin {
     }
 
     @Override
-    protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outObj, Object toread) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread) {
         if (outObj == null) return;
         if (toread == null) return;
         var out = mapper.toJsonNode(outObj);

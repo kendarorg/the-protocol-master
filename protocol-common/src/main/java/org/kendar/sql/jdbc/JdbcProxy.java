@@ -1,10 +1,10 @@
 package org.kendar.sql.jdbc;
 
-import org.kendar.filters.ProtocolPhase;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.iterators.QueryResultIterator;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
@@ -290,10 +290,10 @@ public class JdbcProxy extends Proxy {
         try {
             var result = new SelectResult();
             long start = System.currentTimeMillis();
-            var filterContext = new FilterContext("JDBC", "QUERY", start, context);
+            var pluginContext = new PluginContext("JDBC", "QUERY", start, context);
             var jdbcCall = new JdbcCall(query, parameterValues);
-            for (var filter : getFilters(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
-                if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, jdbcCall, result)) {
+            for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
+                if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, jdbcCall, result)) {
                     return result;
                 }
             }
@@ -317,8 +317,8 @@ public class JdbcProxy extends Proxy {
             } else {
                 runThroughSingleResult(insert, parameterValues, statement, result, count);
             }
-            for (var filter : getFilters(ProtocolPhase.POST_CALL, jdbcCall, result)) {
-                if (filter.handle(filterContext, ProtocolPhase.POST_CALL, jdbcCall, result)) {
+            for (var plugin : getPlugins(ProtocolPhase.POST_CALL, jdbcCall, result)) {
+                if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, jdbcCall, result)) {
                     break;
                 }
             }

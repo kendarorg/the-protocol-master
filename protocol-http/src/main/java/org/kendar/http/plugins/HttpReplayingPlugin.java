@@ -1,14 +1,14 @@
 package org.kendar.http.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.kendar.filters.BasicReplayingPlugin;
-import org.kendar.filters.ProtocolPhase;
+import org.kendar.plugins.BasicReplayingPlugin;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
@@ -42,7 +42,7 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
     }
 
     @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Object in, Object out) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
             if (phase == ProtocolPhase.PRE_CALL) {
                 var request = (Request) in;
@@ -59,7 +59,7 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
                         return false;
                     }
                 }
-                if (blockExternal && !doSend(filterContext, request, response)) {
+                if (blockExternal && !doSend(pluginContext, request, response)) {
                     response.setStatusCode(404);
                     response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
                     response.setResponseText("Page Not Found: " + request.getMethod() + " on " + request.buildUrl());
@@ -72,11 +72,11 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
     }
 
 
-    protected boolean doSend(FilterContext filterContext, Request in, Response out) {
+    protected boolean doSend(PluginContext pluginContext, Request in, Response out) {
         var query = new CallItemsQuery();
-        var context = filterContext.getContext();
+        var context = pluginContext.getContext();
 
-        query.setCaller(filterContext.getCaller());
+        query.setCaller(pluginContext.getCaller());
         query.setType(in.getClass().getSimpleName());
         for (var tag : buildTag(in).entrySet()) {
             query.addTag(tag.getKey(), tag.getValue());

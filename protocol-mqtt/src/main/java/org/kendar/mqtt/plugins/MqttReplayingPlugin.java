@@ -1,13 +1,13 @@
 package org.kendar.mqtt.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.kendar.filters.BasicReplayingPlugin;
+import org.kendar.plugins.BasicReplayingPlugin;
 import org.kendar.mqtt.MqttProtocol;
 import org.kendar.mqtt.fsm.ConnectAck;
 import org.kendar.mqtt.fsm.Publish;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class MqttReplayingPlugin extends BasicReplayingPlugin {
     }
 
     @Override
-    protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outObj, Object toread) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread) {
         var out = mapper.toJsonNode(outObj);
 
         var result = mapper.deserialize(out.get("data").toString(), toread.getClass());

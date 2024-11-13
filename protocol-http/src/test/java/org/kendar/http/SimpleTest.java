@@ -52,7 +52,7 @@ public class SimpleTest extends BasicTest {
 
     @Test
     void googleTest() throws Exception {
-        var recordPlugin = baseProtocol.getFilters().stream().filter(a->a.getId().equalsIgnoreCase("record-plugin")).findFirst();
+        var recordPlugin = baseProtocol.getPlugins().stream().filter(a->a.getId().equalsIgnoreCase("record-plugin")).findFirst();
         recordPlugin.get().setActive(true);
 
         final var sslContext = new SSLContextBuilder()
@@ -87,7 +87,7 @@ public class SimpleTest extends BasicTest {
 
     @Test
     void simpleTest() throws Exception {
-        var recordPlugin = baseProtocol.getFilters().stream().filter(a->a.getId().equalsIgnoreCase("record-plugin")).findFirst();
+        var recordPlugin = baseProtocol.getPlugins().stream().filter(a->a.getId().equalsIgnoreCase("record-plugin")).findFirst();
         recordPlugin.get().setActive(true);
 
         var proxy = new HttpHost("localhost", FAKE_PORT_PROXY, "http");

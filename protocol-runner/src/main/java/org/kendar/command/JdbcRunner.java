@@ -3,7 +3,7 @@ package org.kendar.command;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.mysql.MySQLProtocol;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -107,7 +107,7 @@ public class JdbcRunner extends CommonRunner {
                 realSttings.getConnectionString(), realSttings.getForceSchema(),
                 realSttings.getLogin(), realSttings.getPassword());
 
-        proxy.setFilters(filters);
+        proxy.setPlugins(filters);
         var jdbcReplaceQueries = ((JdbcProtocolSettings) protocolSettings).getReplaceQueryFile();
         if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
 

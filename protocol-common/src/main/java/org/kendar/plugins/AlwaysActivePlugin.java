@@ -1,4 +1,4 @@
-package org.kendar.filters;
+package org.kendar.plugins;
 
 public interface AlwaysActivePlugin {
 }

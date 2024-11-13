@@ -1,7 +1,7 @@
 package org.kendar.amqp.v09.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.kendar.filters.BasicRecordingPlugin;
+import org.kendar.plugins.BasicRecordingPlugin;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 

@@ -1,6 +1,6 @@
 package org.kendar.mysql.plugins;
 
-import org.kendar.filters.BasicJdbcReplayingPlugin;
+import org.kendar.plugins.BasicJdbcReplayingPlugin;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;

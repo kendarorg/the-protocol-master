@@ -1,9 +1,9 @@
 package org.kendar.redis.plugins;
 
-import org.kendar.filters.BasicReplayingPlugin;
+import org.kendar.plugins.BasicReplayingPlugin;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
@@ -21,7 +21,7 @@ public class RedisReplayingPlugin extends BasicReplayingPlugin {
     }
 
     @Override
-    protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outObj, Object toread) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread) {
         var out = mapper.toJsonNode(outObj);
         ((Resp3Response) toread).execute(new Resp3Message(context, null, out.get("data")));
     }

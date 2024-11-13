@@ -2,13 +2,13 @@ package org.kendar.http;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
-import org.kendar.http.utils.filters.FilteringClassesHandlerImpl;
+import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
 import org.kendar.http.utils.rewriter.RemoteServerStatus;
 import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
 import org.kendar.http.utils.rewriter.SimpleRewriterHandlerImpl;
@@ -31,7 +31,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
     private final GlobalSettings globalSettings;
     private final HttpProtocolSettings settings;
-    private final List<PluginDescriptor> filters;
+    private final List<PluginDescriptor> plugins;
     private ProxyServer proxy;
     private HttpsServer httpsServer;
     private HttpServer httpServer;
@@ -45,15 +45,15 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         return (T) value;
     }
 
-    public List<PluginDescriptor> getFilters() {
-        return filters;
+    public List<PluginDescriptor> getPlugins() {
+        return plugins;
     }
 
-    public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<PluginDescriptor> filters) {
+    public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<PluginDescriptor> plugins) {
 
         this.globalSettings = globalSettings;
         this.settings = settings;
-        this.filters = filters;
+        this.plugins = plugins;
     }
 
     @Override
@@ -114,9 +114,9 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
     @Override
     public void terminate() {
-        for (var i = filters.size() - 1; i >= 0; i--) {
-            var filter = filters.get(i);
-            filter.terminate();
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            plugin.terminate();
         }
         proxy.terminate();
         httpsServer.stop(0);
@@ -185,14 +185,14 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             proxy.start();
 
 
-            for (var i = filters.size() - 1; i >= 0; i--) {
-                var filter = filters.get(i);
-                filter.initialize(globalSettings, settings);
+            for (var i = plugins.size() - 1; i >= 0; i--) {
+                var plugin = plugins.get(i);
+                plugin.initialize(globalSettings, settings);
             }
 
             log.debug("Filters added");
             var handler = new MasterHandler(
-                    new FilteringClassesHandlerImpl(filters),
+                    new PluginClassesHandlerImpl(plugins),
                     new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
                     new RequestResponseBuilderImpl(),
                     new ExternalRequesterImpl(requestResponseBuilder, dnsHandler, connectionBuilder),

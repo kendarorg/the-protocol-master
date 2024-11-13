@@ -1,6 +1,6 @@
 package org.kendar.postgres.plugins;
 
-import org.kendar.filters.BasicJdbcReplayingPlugin;
+import org.kendar.plugins.BasicJdbcReplayingPlugin;
 
 public class PostgresReplayPlugin extends BasicJdbcReplayingPlugin {
 

@@ -4,7 +4,7 @@ import org.kendar.protocol.context.ProtoContext;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class FilterContext {
+public class PluginContext {
     private static AtomicLong counter = new AtomicLong(0);
     private final String type;
     private final ProtoContext context;
@@ -12,7 +12,7 @@ public class FilterContext {
     private long start;
     private String caller;
 
-    public FilterContext(String caller, String type, long start, ProtoContext context) {
+    public PluginContext(String caller, String type, long start, ProtoContext context) {
 
         this.caller = caller;
         this.type = type;

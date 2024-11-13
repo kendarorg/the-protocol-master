@@ -5,7 +5,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.http.HttpProtocol;
 import org.kendar.http.plugins.HttpErrorPluginSettings;
 import org.kendar.http.plugins.HttpRecordPluginSettings;

@@ -6,7 +6,7 @@ import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
@@ -68,7 +68,7 @@ public class Publish extends BasePropertiesMqttState {
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
         if (isProxyed()) {
-            proxy.respond(publish, new FilterContext("MQTT", "RESPONSE", -1, context));
+            proxy.respond(publish, new PluginContext("MQTT", "RESPONSE", -1, context));
             return iteratorOfList(publish);
         }
         if (qos == 1) {

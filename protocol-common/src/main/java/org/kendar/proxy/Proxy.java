@@ -1,8 +1,8 @@
 package org.kendar.proxy;
 
-import org.kendar.filters.PluginDescriptor;
-import org.kendar.filters.ProtocolPhase;
-import org.kendar.filters.ProtocolPluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 
@@ -21,7 +21,7 @@ public abstract class Proxy {
      * Descriptor (of course network like)
      */
     private NetworkProtoDescriptor protocol;
-    private Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> toFilter = new ConcurrentHashMap<>();
+    private Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
     private Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
 
     public boolean isReplayer() {
@@ -60,40 +60,40 @@ public abstract class Proxy {
     public abstract void initialize();
 
 
-    public void setFilters(List<PluginDescriptor> filters) {
-        for (var filter : filters) {
-            var clazz = filter.getClass();
+    public void setPlugins(List<PluginDescriptor> filters) {
+        for (var plugin : filters) {
+            var clazz = plugin.getClass();
             var handle = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase("handle")).findFirst();
 
             if (handle.isPresent()) {
                 var matcher = pattern.matcher(handle.get().toString());
                 if (matcher.find()) {
                     var pars = matcher.group(2);
-                    if (!toFilter.containsKey(pars)) {
-                        toFilter.put(pars, new HashMap<>());
+                    if (!allowedPlugins.containsKey(pars)) {
+                        allowedPlugins.put(pars, new HashMap<>());
                     }
-                    var map = toFilter.get(pars);
-                    for (var phase : filter.getPhases()) {
+                    var map = allowedPlugins.get(pars);
+                    for (var phase : plugin.getPhases()) {
                         if (!map.containsKey(phase)) {
                             map.put(phase, new ArrayList<>());
                         }
-                        map.get(phase).add((ProtocolPluginDescriptor) filter);
+                        map.get(phase).add((ProtocolPluginDescriptor) plugin);
                     }
                 }
             }
         }
     }
 
-    public <I, J> List<ProtocolPluginDescriptor> getFilters(ProtocolPhase phase, I in, J out) {
+    public <I, J> List<ProtocolPluginDescriptor> getPlugins(ProtocolPhase phase, I in, J out) {
         var data = String.join(",",
-                FilterContext.class.getName(),
+                PluginContext.class.getName(),
                 ProtocolPhase.class.getName(),
                 in.getClass().getName(), out.getClass().getName());
         var anonymousData = String.join(",",
-                FilterContext.class.getName(),
+                PluginContext.class.getName(),
                 ProtocolPhase.class.getName(),
                 Object.class.getName(), Object.class.getName());
-        var forData = toFilter.get(anonymousData);
+        var forData = allowedPlugins.get(anonymousData);
         //Handle Object,Object data
         if (forData != null) {
             var forPhase = forData.get(phase);
@@ -101,7 +101,7 @@ public abstract class Proxy {
                 return forPhase;
             }
         }
-        forData = toFilter.get(data);
+        forData = allowedPlugins.get(data);
         if (forData != null) {
             var forPhase = forData.get(phase);
             if (forPhase != null) {
@@ -112,7 +112,7 @@ public abstract class Proxy {
     }
 
     public void terminateFilters() {
-        for (var item : toFilter.entrySet()) {
+        for (var item : allowedPlugins.entrySet()) {
             for (var phase : item.getValue().entrySet()) {
                 for (var plugin : phase.getValue()) {
                     if (plugin.isActive())

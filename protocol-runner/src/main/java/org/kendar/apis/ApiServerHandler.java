@@ -53,12 +53,12 @@ public class ApiServerHandler implements HttpHandler {
             respond(exchange,handler.terminate(),200);
         }else if(isPath(path,"/api/protocols")){
             respond(exchange,handler.getProtocols(),200);
-        }else if(isPath(path,"/api/protocols/{protocolInstanceId}/filters",parameters)){
-            respond(exchange,handler.getProtocolFilters(parameters.get("protocolInstanceId")),200);
-        }else if(isPath(path,"/api/protocols/{protocolInstanceId}/filters/{filterId}/{action}",parameters)){
-            respond(exchange,handler.handleProtocolFilterActivation(
+        }else if(isPath(path,"/api/protocols/{protocolInstanceId}/plugins",parameters)){
+            respond(exchange,handler.getProtocolPlugins(parameters.get("protocolInstanceId")),200);
+        }else if(isPath(path,"/api/protocols/{protocolInstanceId}/plugins/{pluginId}/{action}",parameters)){
+            respond(exchange,handler.handleProtocolPluginActivation(
                     parameters.get("protocolInstanceId"),
-                    parameters.get("filterId"),
+                    parameters.get("pluginId"),
                     parameters.get("action")),200);
         }
     }

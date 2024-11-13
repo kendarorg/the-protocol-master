@@ -1,9 +1,9 @@
 package org.kendar.command;
 
 import org.apache.commons.cli.*;
-import org.kendar.filters.PluginDescriptor;
-import org.kendar.filters.settings.BasicRecordingPluginSettings;
-import org.kendar.filters.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.settings.BasicRecordingPluginSettings;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;

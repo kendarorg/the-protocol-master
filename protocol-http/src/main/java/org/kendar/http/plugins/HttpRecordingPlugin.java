@@ -1,10 +1,10 @@
 package org.kendar.http.plugins;
 
-import org.kendar.filters.BasicRecordingPlugin;
-import org.kendar.filters.PluginDescriptor;
-import org.kendar.filters.ProtocolPhase;
+import org.kendar.plugins.BasicRecordingPlugin;
+import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.http.utils.Request;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -24,7 +24,7 @@ public class HttpRecordingPlugin extends BasicRecordingPlugin {
     }
 
     @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Object in, Object out) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
             if (phase == ProtocolPhase.POST_CALL) {
                 var request = (Request) in;
@@ -40,7 +40,7 @@ public class HttpRecordingPlugin extends BasicRecordingPlugin {
                         return false;
                     }
                 }
-                postCall(filterContext, in, out);
+                postCall(pluginContext, in, out);
             }
         }
         return false;

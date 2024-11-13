@@ -1,8 +1,8 @@
-package org.kendar.filters;
+package org.kendar.plugins;
 
-import org.kendar.filters.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
@@ -46,25 +46,25 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
     }
 
     @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Object in, Object out) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
             if (out == null) {
-                sendAndForget(filterContext, in);
+                sendAndForget(pluginContext, in);
                 return true;
             } else {
-                sendAndExpect(filterContext, in, out);
+                sendAndExpect(pluginContext, in, out);
                 return true;
             }
         }
         return false;
     }
 
-    protected void sendAndExpect(FilterContext filterContext, Object in, Object out) {
+    protected void sendAndExpect(PluginContext pluginContext, Object in, Object out) {
         var query = new CallItemsQuery();
-        var context = filterContext.getContext();
+        var context = pluginContext.getContext();
 
-        query.setCaller(filterContext.getCaller());
-        query.setType(filterContext.getType());
+        query.setCaller(pluginContext.getCaller());
+        query.setType(pluginContext.getType());
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
         if (lineToRead == null) {
@@ -77,7 +77,7 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
         if (hasCallbacks()) {
             var afterIndex = item.getIndex();
             var respQuery = new ResponseItemQuery();
-            respQuery.setCaller(filterContext.getCaller());
+            respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
             var responses = storage.readResponses(getInstanceId(), respQuery);
@@ -86,23 +86,23 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
                 completedOutIndexes.add((int) response.getIndex());
                 result.add(response);
             }
-            sendBackResponses(filterContext.getContext(), result);
+            sendBackResponses(pluginContext.getContext(), result);
         }
         var outputItem = item.getOutput();
         if (context.isUseCallDurationTimes()) {
             Sleeper.sleep(item.getDurationMs());
         }
-        buildState(filterContext, context, in, outputItem, out);
+        buildState(pluginContext, context, in, outputItem, out);
     }
 
-    protected void buildState(FilterContext filterContext, ProtoContext context, Object in, Object outputItem, Object aClass) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outputItem, Object aClass) {
 
     }
 
-    protected void sendAndForget(FilterContext filterContext, Object in) {
+    protected void sendAndForget(PluginContext pluginContext, Object in) {
         var query = new CallItemsQuery();
 
-        query.setCaller(filterContext.getCaller());
+        query.setCaller(pluginContext.getCaller());
         query.setType(in.getClass().getSimpleName());
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
@@ -111,7 +111,7 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
 
             var afterIndex = item.getIndex();
             var respQuery = new ResponseItemQuery();
-            respQuery.setCaller(filterContext.getCaller());
+            respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
             var responses = storage.readResponses(getInstanceId(), respQuery);
@@ -120,7 +120,7 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
                 completedOutIndexes.add((int) response.getIndex());
                 result.add(response);
             }
-            sendBackResponses(filterContext.getContext(), result);
+            sendBackResponses(pluginContext.getContext(), result);
         }
     }
 

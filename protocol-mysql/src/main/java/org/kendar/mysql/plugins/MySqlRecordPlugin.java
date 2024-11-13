@@ -1,6 +1,6 @@
 package org.kendar.mysql.plugins;
 
-import org.kendar.filters.BasicJdbcRecordingPlugin;
+import org.kendar.plugins.BasicJdbcRecordingPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.storage.CompactLine;

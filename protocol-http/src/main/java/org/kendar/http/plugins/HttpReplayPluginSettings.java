@@ -1,6 +1,6 @@
 package org.kendar.http.plugins;
 
-import org.kendar.filters.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 
 import java.util.ArrayList;
 import java.util.List;

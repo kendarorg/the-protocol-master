@@ -1,7 +1,7 @@
 package org.kendar.proxy;
 
 import org.kendar.buffers.BBuffer;
-import org.kendar.filters.ProtocolPhase;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -129,9 +129,9 @@ public abstract class NetworkProxy extends Proxy {
 
 
         long start = System.currentTimeMillis();
-        var filterContext = new FilterContext(getCaller(), of.getClass().getSimpleName(), start, context);
-        for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, new Object())) {
-            if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, of, null)) {
+        var pluginContext = new PluginContext(getCaller(), of.getClass().getSimpleName(), start, context);
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, new Object())) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, null)) {
                 return;
             }
         }
@@ -139,8 +139,8 @@ public abstract class NetworkProxy extends Proxy {
 
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of, getProtocol().buildBuffer());
-        for (var filter : getFilters(ProtocolPhase.POST_CALL, of, new Object())) {
-            if (filter.handle(filterContext, ProtocolPhase.POST_CALL, of, null)) {
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, new Object())) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, null)) {
                 break;
             }
         }
@@ -182,10 +182,10 @@ public abstract class NetworkProxy extends Proxy {
             boolean optional) {
 
         long start = System.currentTimeMillis();
-        var filterContext = new FilterContext(getCaller(), of.getClass().getSimpleName(), start, context);
+        var pluginContext = new PluginContext(getCaller(), of.getClass().getSimpleName(), start, context);
 
-        for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, toRead)) {
-            if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, of, toRead)) {
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
         }
@@ -201,8 +201,8 @@ public abstract class NetworkProxy extends Proxy {
             }
         }
 
-        for (var filter : getFilters(ProtocolPhase.POST_CALL, of, toRead)) {
-            if (filter.handle(filterContext, ProtocolPhase.POST_CALL, of, toRead)) {
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
                 break;
             }
         }
@@ -226,10 +226,10 @@ public abstract class NetworkProxy extends Proxy {
     public <J extends ProtoState> J sendBytesAndExpect(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead, boolean optional) {
 
         long start = System.currentTimeMillis();
-        var filterContext = new FilterContext(getCaller(), "byte[]", start, context);
+        var pluginContext = new PluginContext(getCaller(), "byte[]", start, context);
 
-        for (var filter : getFilters(ProtocolPhase.PRE_CALL, of, toRead)) {
-            if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, of, toRead)) {
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
         }
@@ -238,17 +238,17 @@ public abstract class NetworkProxy extends Proxy {
         sock.write(of);
         sock.read(toRead, optional);
 
-        for (var filter : getFilters(ProtocolPhase.POST_CALL, of, toRead)) {
-            if (filter.handle(filterContext, ProtocolPhase.POST_CALL, of, toRead)) {
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
                 break;
             }
         }
         return toRead;
     }
 
-    public void respond(Object publish, FilterContext filterContext) {
-        for (var filter : getFilters(ProtocolPhase.ASYNC_RESPONSE, new Object(), publish)) {
-            if (filter.handle(filterContext, ProtocolPhase.ASYNC_RESPONSE, null, publish)) {
+    public void respond(Object publish, PluginContext pluginContext) {
+        for (var plugin : getPlugins(ProtocolPhase.ASYNC_RESPONSE, new Object(), publish)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.ASYNC_RESPONSE, null, publish)) {
                 break;
             }
         }

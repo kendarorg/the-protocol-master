@@ -34,14 +34,14 @@ public class CertitificatesGeneratorTest {
     public void loadRootCertificate() throws Exception {
         var resourcesLoader = new FileResourcesUtils();
         var target = new CertificatesManager(resourcesLoader);
-        var root = target.loadRootCertificate("certificates/ca.der", "certificates/ca.key");
+        var root = target.loadRootCertificate("resource://certificates/ca.der", "resource://certificates/ca.key");
     }
 
     @Test
     public void generateFromRoot() throws Exception {
         var resourcesLoader = new FileResourcesUtils();
         var target = new CertificatesManager(resourcesLoader);
-        var root = target.loadRootCertificate("certificates/ca.der", "certificates/ca.key");
+        var root = target.loadRootCertificate("resource://certificates/ca.der", "resource://certificates/ca.key");
         var extraDomains = new ArrayList<String>();
         GeneratedCert domain =
                 target.createCertificate(
@@ -59,7 +59,7 @@ public class CertitificatesGeneratorTest {
 
         var resourcesLoader = new FileResourcesUtils();
         var target = new CertificatesManager(resourcesLoader);
-        var root = target.loadRootCertificate("certificates/ca.der", "certificates/ca.key");
+        var root = target.loadRootCertificate("resource://certificates/ca.der", "resource://certificates/ca.key");
         var encodedBytes = root.certificate.getEncoded();
 
         final FileOutputStream os = new FileOutputStream("target/cert.cer");
@@ -74,7 +74,7 @@ public class CertitificatesGeneratorTest {
         
         var resourcesLoader = new FileResourcesUtils();
         var target = new CertificatesManager(resourcesLoader);
-        var root = target.loadRootCertificate("certificates/ca.der", "certificates/ca.key");
+        var root = target.loadRootCertificate("resource://certificates/ca.der", "resource://certificates/ca.key");
         var extraDomains = new ArrayList<String>();
         extraDomains.add("*.eu-west-1.tsaws.kendar.org");
         extraDomains.add("*.tsint.kendar.org");
@@ -97,7 +97,7 @@ public class CertitificatesGeneratorTest {
         
         var resourcesLoader = new FileResourcesUtils();
         var target = new CertificatesManager(resourcesLoader);
-        var root = target.loadRootCertificate("certificates/ca.der", "certificates/ca.key");
+        var root = target.loadRootCertificate("resource://certificates/ca.der", "resource://certificates/ca.key");
         var extraDomains = new ArrayList<String>();
         extraDomains.add("kendar.org");
         extraDomains.add("*.kendar.org");

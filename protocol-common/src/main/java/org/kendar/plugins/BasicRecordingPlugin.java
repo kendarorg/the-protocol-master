@@ -1,7 +1,7 @@
-package org.kendar.filters;
+package org.kendar.plugins;
 
-import org.kendar.filters.settings.BasicRecordingPluginSettings;
-import org.kendar.proxy.FilterContext;
+import org.kendar.plugins.settings.BasicRecordingPluginSettings;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.CompactLine;
@@ -18,37 +18,37 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
     protected StorageRepository storage;
 
     @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, Object in, Object out) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
             if (phase == ProtocolPhase.POST_CALL) {
-                postCall(filterContext, in, out);
+                postCall(pluginContext, in, out);
             } else if (phase == ProtocolPhase.ASYNC_RESPONSE) {
-                asyncCall(filterContext, out);
+                asyncCall(pluginContext, out);
             }
         }
         return false;
     }
 
-    protected void asyncCall(FilterContext filterContext, Object out) {
+    protected void asyncCall(PluginContext pluginContext, Object out) {
         var duration = 0;
 
         var res = "{\"type\":\"" + out.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(out)) + "}";
         var req = "{\"type\":null,\"data\":null}";
 
         var storageItem = new StorageItem(
-                filterContext.getContextId(),
+                pluginContext.getContextId(),
                 mapper.toJsonNode(req),
                 mapper.toJsonNode(res),
                 duration, "RESPONSE",
-                filterContext.getCaller());
+                pluginContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
 
         storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));
     }
 
-    protected void postCall(FilterContext filterContext, Object in, Object out) {
-        var duration = System.currentTimeMillis() - filterContext.getStart();
+    protected void postCall(PluginContext pluginContext, Object in, Object out) {
+        var duration = System.currentTimeMillis() - pluginContext.getStart();
 
         var req = "{\"type\":\"" + in.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(in)) + "}";
         var res = "{\"type\":null,\"data\":null}";
@@ -57,12 +57,12 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
             res = "{\"type\":\"" + out.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(out)) + "}";
         }
         var storageItem = new StorageItem(
-                filterContext.getContextId(),
+                pluginContext.getContextId(),
                 mapper.toJsonNode(req),
                 mapper.toJsonNode(res),
                 duration,
-                filterContext.getType(),
-                filterContext.getCaller());
+                pluginContext.getType(),
+                pluginContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(in, out, compactLine)) {

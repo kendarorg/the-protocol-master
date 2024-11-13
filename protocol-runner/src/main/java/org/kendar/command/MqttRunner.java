@@ -2,7 +2,7 @@ package org.kendar.command;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.kendar.filters.PluginDescriptor;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.mqtt.MqttProxy;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
@@ -67,7 +67,7 @@ public class MqttRunner extends CommonRunner {
         var baseProtocol = new org.kendar.mqtt.MqttProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MqttProxy(connectionString, login, password);
-        proxy.setFilters(filters);
+        proxy.setPlugins(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         ps = new TcpServer(baseProtocol);

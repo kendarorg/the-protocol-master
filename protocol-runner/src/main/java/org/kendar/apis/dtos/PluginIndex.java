@@ -1,10 +1,10 @@
 package org.kendar.apis.dtos;
 
-public class FilterIndex {
+public class PluginIndex {
     private String id;
     private boolean active;
 
-    public FilterIndex(String id, boolean active) {
+    public PluginIndex(String id, boolean active) {
 
         this.id = id;
         this.active = active;

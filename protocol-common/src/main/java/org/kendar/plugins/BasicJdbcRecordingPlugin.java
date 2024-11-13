@@ -1,7 +1,7 @@
-package org.kendar.filters;
+package org.kendar.plugins;
 
-import org.kendar.filters.settings.BasicRecordingPluginSettings;
-import org.kendar.proxy.FilterContext;
+import org.kendar.plugins.settings.BasicRecordingPluginSettings;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.SelectResult;
@@ -22,16 +22,16 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
     protected StorageRepository storage;
 
     @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         if (isActive()) {
-            postCall(filterContext, in, out);
+            postCall(pluginContext, in, out);
         }
         return false;
     }
 
 
-    protected void postCall(FilterContext filterContext, JdbcCall in, SelectResult out) {
-        var duration = System.currentTimeMillis() - filterContext.getStart();
+    protected void postCall(PluginContext pluginContext, JdbcCall in, SelectResult out) {
+        var duration = System.currentTimeMillis() - pluginContext.getStart();
         var req = new JdbcRequest(in.getQuery(), in.getParameterValues());
         JdbcResponse res;
         if (!out.isIntResult()) {
@@ -43,12 +43,12 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
 
 
         var storageItem = new StorageItem(
-                filterContext.getContextId(),
+                pluginContext.getContextId(),
                 req,
                 res,
                 duration,
-                filterContext.getType(),
-                filterContext.getCaller());
+                pluginContext.getType(),
+                pluginContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(storageItem, compactLine)) {

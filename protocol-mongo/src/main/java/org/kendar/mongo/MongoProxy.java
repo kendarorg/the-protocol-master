@@ -12,7 +12,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
-import org.kendar.filters.ProtocolPhase;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.iterators.ProcessId;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpMsgSection;
@@ -21,7 +21,7 @@ import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.proxy.DocumentContainer;
 import org.kendar.protocol.context.NetworkProtoContext;
-import org.kendar.proxy.FilterContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
@@ -96,11 +96,11 @@ public class MongoProxy extends Proxy {
 
         var cmdContainer = new DocumentContainer(protoContext.getReqResId(), data.getRequestId());
 
-        var filterContext = new FilterContext("MONGODB", "OP_MSG", start, protoContext);
+        var pluginContext = new PluginContext("MONGODB", "OP_MSG", start, protoContext);
 
 
-        for (var filter : getFilters(ProtocolPhase.PRE_CALL, data, out)) {
-            if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, data, out)) {
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, data, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, data, out)) {
                 return out;
             }
         }
@@ -116,8 +116,8 @@ public class MongoProxy extends Proxy {
                 commandResult.toJson(
                         JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build()));
         out.getSections().add(section);
-        for (var filter : getFilters(ProtocolPhase.POST_CALL, data, out)) {
-            if (filter.handle(filterContext, ProtocolPhase.POST_CALL, data, out)) {
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, data, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, data, out)) {
                 break;
             }
         }
@@ -128,10 +128,10 @@ public class MongoProxy extends Proxy {
         long start = System.currentTimeMillis();
 
         var out = new OpMsgContent(0, protoContext.getReqResId(), lsatOp.getRequestId());
-        var filterContext = new FilterContext("MONGODB", "HELLO_OP_MSG", start, protoContext);
+        var pluginContext = new PluginContext("MONGODB", "HELLO_OP_MSG", start, protoContext);
 
-        for (var filter : getFilters(ProtocolPhase.PRE_CALL, lsatOp, out)) {
-            if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, lsatOp, out)) {
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, lsatOp, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, lsatOp, out)) {
                 return out;
             }
         }
@@ -164,8 +164,8 @@ public class MongoProxy extends Proxy {
         out.setFlags(0);
         out.setRequestId(protoContext.getReqResId());
         out.setResponseId(lsatOp.getRequestId());
-        for (var filter : getFilters(ProtocolPhase.POST_CALL, lsatOp, out)) {
-            if (filter.handle(filterContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, lsatOp, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
                 break;
             }
         }
@@ -175,10 +175,10 @@ public class MongoProxy extends Proxy {
     public OpReplyContent runHelloOpQuery(MongoProtoContext protoContext, OpQueryContent lsatOp, Class<?> prevState, MongoClient mongoClient, String dbName) {
         long start = System.currentTimeMillis();
         var out = new OpReplyContent();
-        var filterContext = new FilterContext("MONGODB", "HELLO_OP_QUERY", start, protoContext);
+        var pluginContext = new PluginContext("MONGODB", "HELLO_OP_QUERY", start, protoContext);
 
-        for (var filter : getFilters(ProtocolPhase.PRE_CALL, lsatOp, out)) {
-            if (filter.handle(filterContext, ProtocolPhase.PRE_CALL, lsatOp, out)) {
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, lsatOp, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, lsatOp, out)) {
                 return out;
             }
         }
@@ -221,8 +221,8 @@ public class MongoProxy extends Proxy {
         out.setCursorId(0);
         out.getDocuments().add(json);
 
-        for (var filter : getFilters(ProtocolPhase.POST_CALL, lsatOp, out)) {
-            if (filter.handle(filterContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, lsatOp, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
                 break;
             }
         }

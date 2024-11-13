@@ -1,21 +1,18 @@
-package org.kendar.filters;
+package org.kendar.plugins;
 
-import org.kendar.proxy.FilterContext;
+import org.kendar.amqp.v09.messages.methods.channel.ChannelOpen;
+import org.kendar.amqp.v09.messages.methods.channel.ChannelOpenOk;
+import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.sql.jdbc.SelectResult;
-import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.pf4j.Extension;
 
 import java.util.List;
 
 @Extension
-public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectResult> implements AlwaysActivePlugin {
-    @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
-        return false;
-    }
+public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, ChannelOpenOk> implements AlwaysActivePlugin {
+
 
     /**
      * Only PRE_CALL and POST_CALL for things different from http
@@ -34,14 +31,13 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
 
     @Override
     public String getProtocol() {
-        return "postgres";
+        return "amqp091";
     }
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         return null;
     }
-
 
     @Override
     public void terminate() {
@@ -50,12 +46,17 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
 
     @Override
     public Class<?> getSettingClass() {
-        return PostgresFilterSettings.class;
+        return Amqp091FilterSettings.class;
     }
 
     @Override
     public void setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
 
+    }
+
+    @Override
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, ChannelOpen in, ChannelOpenOk out) {
+        return false;
     }
 }

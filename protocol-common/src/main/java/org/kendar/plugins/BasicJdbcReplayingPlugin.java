@@ -1,7 +1,7 @@
-package org.kendar.filters;
+package org.kendar.plugins;
 
-import org.kendar.filters.settings.BasicReplayPluginSettings;
-import org.kendar.proxy.FilterContext;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.proxy.PluginContext;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
@@ -26,20 +26,20 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
     }
 
     @Override
-    public boolean handle(FilterContext filterContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         if (isActive()) {
-            sendAndExpect(filterContext, in, out);
+            sendAndExpect(pluginContext, in, out);
             return true;
         }
         return false;
     }
 
-    protected void sendAndExpect(FilterContext filterContext, JdbcCall inObj, SelectResult outObj) {
+    protected void sendAndExpect(PluginContext pluginContext, JdbcCall inObj, SelectResult outObj) {
         var in = (JdbcCall) inObj;
         var out = (SelectResult) outObj;
         var query = new CallItemsQuery();
 
-        query.setCaller(filterContext.getCaller());
+        query.setCaller(pluginContext.getCaller());
         query.setType("QUERY");
         query.addTag("parametersCount", in.getParameterValues().size());
         query.addTag("query", in.getQuery());
