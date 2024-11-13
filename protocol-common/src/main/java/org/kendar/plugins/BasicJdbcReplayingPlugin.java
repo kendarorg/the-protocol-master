@@ -2,6 +2,8 @@ package org.kendar.plugins;
 
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.proxy.PluginContext;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
@@ -23,6 +25,15 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
 
     protected Object getData(Object of) {
         return of;
+    }
+
+    @Override
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+        super.initialize(global, protocol);
+        if (storage == null) {
+            this.storage = (StorageRepository) global.getService("storage");
+        }
+        return this;
     }
 
     @Override

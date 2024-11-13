@@ -74,6 +74,9 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         super.initialize(global, protocol);
+        if (storage == null) {
+            this.storage = (StorageRepository) global.getService("storage");
+        }
         return this;
     }
 

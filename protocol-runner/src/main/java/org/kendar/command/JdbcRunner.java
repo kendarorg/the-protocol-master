@@ -106,17 +106,17 @@ public class JdbcRunner extends CommonRunner {
         var proxy = new JdbcProxy(driver,
                 realSttings.getConnectionString(), realSttings.getForceSchema(),
                 realSttings.getLogin(), realSttings.getPassword());
-
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            plugin.initialize(ini, protocolSettings);
+        }
         proxy.setPlugins(plugins);
         var jdbcReplaceQueries = ((JdbcProtocolSettings) protocolSettings).getReplaceQueryFile();
         if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
 
             handleReplacementQueries(jdbcReplaceQueries, proxy);
         }
-        for (var i = plugins.size() - 1; i >= 0; i--) {
-            var plugin = plugins.get(i);
-            plugin.initialize(ini, protocolSettings);
-        }
+
         baseProtocol.setProxy(proxy);
         baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(), 30));
         baseProtocol.initialize();
