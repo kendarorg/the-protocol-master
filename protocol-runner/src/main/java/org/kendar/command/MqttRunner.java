@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class MqttRunner extends CommonRunner {
+    private TcpServer ps;
+
     @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go,
                     Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
@@ -43,6 +45,11 @@ public class MqttRunner extends CommonRunner {
     }
 
     @Override
+    public void stop() {
+        ps.stop();
+    }
+
+    @Override
     public String getDefaultPort() {
         return "1883";
     }
@@ -63,7 +70,7 @@ public class MqttRunner extends CommonRunner {
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var ps = new TcpServer(baseProtocol);
+        ps = new TcpServer(baseProtocol);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

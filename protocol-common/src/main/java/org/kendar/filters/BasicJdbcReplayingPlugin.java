@@ -115,7 +115,7 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
 
     @Override
     public String getId() {
-        return "replay-pluing";
+        return "replay-plugin";
     }
 
     @Override

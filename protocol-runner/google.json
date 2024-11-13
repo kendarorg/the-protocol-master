@@ -2,13 +2,13 @@
   "pluginsDir": "plugins",
   "logLevel": "DEBUG",
   "dataDir": "target/tests/fromini",
+  "apiPort": 8095,
   "protocols": {
     "http-01": {
       "protocol": "http",
       "http": 12080,
       "https": 12443,
       "proxy": 12081,
-      "apis": "specialApisRoot",
       "ssl": {
         "der": "resource://certificates/ca.der",
         "key": "resource://certificates/ca.key",

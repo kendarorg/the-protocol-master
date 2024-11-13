@@ -2,12 +2,14 @@ package org.kendar;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.kendar.amqp.v09.plugins.AmqpRecordingPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
 import org.kendar.apis.ApiHandler;
+import org.kendar.apis.ApiServerHandler;
 import org.kendar.command.*;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.filters.ProtocolPluginDescriptor;
@@ -35,6 +37,7 @@ import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -168,7 +171,7 @@ public class Main {
     }
 
 
-    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<PluginDescriptor>> allFilters) {
+    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<PluginDescriptor>> allFilters) throws Exception {
         if (ini == null) return;
         var logsDir = ProtocolsRunner.getOrDefault(ini.getDataDir(), "data");
         StorageRepository storage = setupStorage(logsDir);
@@ -185,7 +188,7 @@ public class Main {
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
 
-        var apiHandler = new ApiHandler();
+        var apiHandler = new ApiHandler(ini);
 
         for (var item : ini.getProtocols().entrySet()) {
             try {
@@ -208,6 +211,12 @@ public class Main {
 
             }
         }
+        if(ini.getApiPort()>0){
+            var address = new InetSocketAddress(ini.getApiPort());
+            var apiServer = HttpServer.create(address,10);
+            apiServer.createContext("/", new ApiServerHandler(apiHandler));
+            apiServer.start();
+        }
         while (stopWhenFalse.get()) {
             Sleeper.sleep(100);
         }
@@ -221,7 +230,7 @@ public class Main {
         var filters = new ArrayList<PluginDescriptor>();
 
         for (var simplePlugin : simplePlugins.entrySet()) {
-            var availableFilter = availableFilters.stream().filter(av -> av.getId().equalsIgnoreCase(simplePlugin.getValue().getPlugin())).findFirst();
+            var availableFilter = availableFilters.stream().filter(av -> av.getId().equalsIgnoreCase(simplePlugin.getKey())).findFirst();
             if (availableFilter.isPresent()) {
                 var realFilter = availableFilter.get().clone();
                 realFilter.setSettings(protocol.getPlugin(simplePlugin.getKey(), realFilter.getSettingClass()));

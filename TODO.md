@@ -17,6 +17,10 @@
 * Add an api for start/stop record/replay/mock
 * Publish on maven central
 
+//Should handle somehow
+globalFilter.setShutdownVariable(stopWhenFalse);
+log.debug("Filters added");
+var handler = new MasterHandler(
 
 STATE CHARTS:
 

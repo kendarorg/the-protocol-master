@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class MongoRunner extends CommonRunner {
+    private TcpServer ps;
+
     public void run(String[] args, boolean isExecute, GlobalSettings go,
                     Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
 
@@ -39,6 +41,11 @@ public class MongoRunner extends CommonRunner {
     @Override
     public Class<?> getSettingsClass() {
         return ByteProtocolSettingsWithLogin.class;
+    }
+
+    @Override
+    public void stop() {
+        ps.stop();
     }
 
     @Override
@@ -66,7 +73,7 @@ public class MongoRunner extends CommonRunner {
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var ps = new TcpServer(baseProtocol);
+        ps = new TcpServer(baseProtocol);
 
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());

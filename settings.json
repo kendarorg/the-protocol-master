@@ -2,6 +2,7 @@
   "pluginsDir": "plugins",
   "logLevel": "ERROR",
   "dataDir": "data",
+  "apiPort": 8095,
   "protocols": {
     "postgres-01": {
       "protocol": "postgres",
@@ -38,7 +39,6 @@
       "http": 8085,
       "https": 8485,
       "proxy": 9999,
-      "apis": "specialApisRoot",
       "ssl": {
         "der": "resource://certificates/ca.der",
         "key": "resource://certificates/ca.key",

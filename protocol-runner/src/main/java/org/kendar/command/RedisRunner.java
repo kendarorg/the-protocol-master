@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class RedisRunner extends CommonRunner {
+    private TcpServer ps;
+
     @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go, Options mainOptions,
                     HashMap<String, List<PluginDescriptor>> filters) throws Exception {
@@ -46,7 +48,7 @@ public class RedisRunner extends CommonRunner {
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var ps = new TcpServer(baseProtocol);
+        ps = new TcpServer(baseProtocol);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);
@@ -60,6 +62,11 @@ public class RedisRunner extends CommonRunner {
     @Override
     public Class<?> getSettingsClass() {
         return ByteProtocolSettings.class;
+    }
+
+    @Override
+    public void stop() {
+        ps.stop();
     }
 
 

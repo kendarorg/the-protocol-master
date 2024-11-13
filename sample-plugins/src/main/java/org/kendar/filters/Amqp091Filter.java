@@ -31,7 +31,7 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
 
     @Override
     public String getProtocol() {
-        return "postgres";
+        return "amqp091";
     }
 
     @Override

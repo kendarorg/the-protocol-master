@@ -88,6 +88,11 @@ public class FileStorageRepository implements StorageRepository {
                 }
 
                 currRepo.index = retrieveIndexFile(protocolInstanceId);
+                if(!currRepo.index.isEmpty()) {
+                    var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
+                    var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex()+1);
+                    storageCounter.set((int) maxIndex);
+                }
                 currRepo.initialized = true;
             }
             return currRepo;

@@ -108,4 +108,6 @@ public abstract class CommonRunner {
     public abstract String getId();
 
     public abstract Class<?> getSettingsClass();
+
+    public abstract void stop();
 }

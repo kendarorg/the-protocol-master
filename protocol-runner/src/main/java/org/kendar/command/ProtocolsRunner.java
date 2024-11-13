@@ -35,6 +35,7 @@ public class ProtocolsRunner {
         options.addOption(createOpt("pld", "pluginsDir", true, "Plugins directory"));
         options.addOption(createOpt("dd", "datadir", true, "Data directory/connection string"));
         options.addOption(createOpt("ll", "loglevel", true, "Log4j log level"));
+        options.addOption(createOpt("ap", "apis", true, "The port TPM controllers (def 0, as not active)"));
         options.addOption(createOpt("lt", "logType", true, "The log type: default [none|file]"));
         options.addOption(createOpt("p", "protocol", true, "Protocol (http|mqtt|amqp091|mysql|postgres|redis|mongo"));
         options.addOption(Option.builder().option("help").optionalArg(true).desc("Show contestual help").build());
@@ -70,14 +71,14 @@ public class ProtocolsRunner {
                 var protocol = cmd.getOptionValue("protocol");
                 var loglevel = cmd.getOptionValue("loglevel", "ERROR");
                 var logType = cmd.getOptionValue("logType", "file");
-                var tpmApi = Integer.parseInt(cmd.getOptionValue("tpmApi", "0"));
+                var tpmApi = Integer.parseInt(cmd.getOptionValue("apis", "0"));
                 checkOptions(datadir, pluginsDir, protocol);
                 var ini = new GlobalSettings();
                 ini.setDataDir(datadir);
                 ini.setPluginsDir(pluginsDir);
                 ini.setLogLevel(loglevel);
                 ini.setLogType(logType);
-                ini.setTpmApi(tpmApi);
+                ini.setApiPort(tpmApi);
                 runWithParams(args, protocol, isExecute, ini, options, filters);
                 return ini;
             }
@@ -112,6 +113,7 @@ public class ProtocolsRunner {
         if (!datadir.exists()) {
             datadir.mkdir();
         }
+        protocol.setProtocolInstanceId(key);
         pr.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);
     }
 

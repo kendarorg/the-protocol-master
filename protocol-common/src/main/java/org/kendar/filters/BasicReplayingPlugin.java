@@ -131,7 +131,7 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
 
     @Override
     public String getId() {
-        return "replay-pluing";
+        return "replay-plugin";
     }
 
     @Override

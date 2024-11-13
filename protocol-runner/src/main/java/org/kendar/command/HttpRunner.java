@@ -9,7 +9,6 @@ import org.apache.commons.cli.Options;
 import org.kendar.HttpTcpServer;
 import org.kendar.filters.PluginDescriptor;
 import org.kendar.http.MasterHandler;
-import org.kendar.http.plugins.GlobalPlugin;
 import org.kendar.http.plugins.HttpErrorPluginSettings;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
@@ -46,6 +45,7 @@ import java.util.function.Supplier;
 
 public class HttpRunner extends CommonRunner {
     private static final Logger log = LoggerFactory.getLogger(HttpRunner.class);
+    private HttpTcpServer ps;
 
     private static HttpsServer createHttpsServer(CertificatesManager certificatesManager,
                                                  InetSocketAddress sslAddress, int backlog, String cname, String der,
@@ -86,7 +86,6 @@ public class HttpRunner extends CommonRunner {
         options.addOption(createOpt("ht", "http", true, "Http port (def 4080)"));
         options.addOption(createOpt("hs", "https", true, "Https port (def 4443)"));
         options.addOption(createOpt("prx", "proxy", true, "Http/s proxy port (def 9999)"));
-        options.addOption(createOpt("ap", "apis", true, "The base url for special TPM controllers (def specialApisRoot)"));
         options.addOption(createOpt("prp", "replay", false, "Replay from log/replay source."));
         options.addOption(createOpt("prc", "record", false, "Record to log/replay source."));
         options.addOption(createOpt("plid", "replayid", true, "Set an id for the replay instance (default to timestamp_uuid)."));
@@ -115,7 +114,6 @@ public class HttpRunner extends CommonRunner {
         section.setHttp(Integer.parseInt(cmd.getOptionValue("http", "4080")));
         section.setHttps(Integer.parseInt(cmd.getOptionValue("https", "4443")));
         section.setProxy(Integer.parseInt(cmd.getOptionValue("proxy", "9999")));
-        section.setApis(cmd.getOptionValue("apis", "specialApisRoot"));
         var sslSettings = new HttpSSLSettings();
         sslSettings.setCname(cmd.getOptionValue("cname", "C=US,O=Local Development,CN=local.org"));
         sslSettings.setDer(cmd.getOptionValue("der", "resource://certificates/ca.der"));
@@ -156,7 +154,7 @@ public class HttpRunner extends CommonRunner {
                       List<PluginDescriptor> filters,
                       Supplier<Boolean> stopWhenFalseAction) throws Exception {
         var settings = (HttpProtocolSettings) pset;
-        var ps = new HttpTcpServer(null);
+        ps = new HttpTcpServer(null);
         try {
 
             AtomicBoolean stopWhenFalse = new AtomicBoolean(true);
@@ -244,13 +242,6 @@ public class HttpRunner extends CommonRunner {
                 filter.initialize(ini, pset);
             }
 
-            var globalFilter = new GlobalPlugin();
-            globalFilter.initialize(ini, pset);
-            filters.add(globalFilter);
-
-            globalFilter.setFilters(filters);
-            globalFilter.setServer(httpServer, httpsServer);
-            globalFilter.setShutdownVariable(stopWhenFalse);
             log.debug("Filters added");
             var handler = new MasterHandler(
                     new FilteringClassesHandlerImpl(filters),
@@ -293,5 +284,10 @@ public class HttpRunner extends CommonRunner {
     @Override
     public Class<?> getSettingsClass() {
         return HttpProtocolSettings.class;
+    }
+
+    @Override
+    public void stop() {
+        ps.stop();
     }
 }

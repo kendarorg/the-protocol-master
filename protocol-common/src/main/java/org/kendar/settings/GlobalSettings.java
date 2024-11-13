@@ -11,16 +11,16 @@ public class GlobalSettings {
     private String logLevel;
     private String dataDir;
     private String logType;
-    private int tpmApi;
+    private int apiPort;
     private Map<String, Object> protocols = new HashMap<String, Object>();
     private Map<String, Object> services = new HashMap<>();
 
-    public int getTpmApi() {
-        return tpmApi;
+    public int getApiPort() {
+        return apiPort;
     }
 
-    public void setTpmApi(int tpmApi) {
-        this.tpmApi = tpmApi;
+    public void setApiPort(int apiPort) {
+        this.apiPort = apiPort;
     }
 
     public void putService(String key, Object value) {

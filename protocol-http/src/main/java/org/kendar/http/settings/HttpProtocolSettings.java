@@ -9,7 +9,6 @@ public class HttpProtocolSettings extends ProtocolSettings {
     private int http;
     private int https;
     private int proxy;
-    private String apis;
     private HttpSSLSettings ssl;
     private List<HttpRewriteSettings> rewrites = new ArrayList<>();
 
@@ -45,13 +44,6 @@ public class HttpProtocolSettings extends ProtocolSettings {
         this.proxy = proxy;
     }
 
-    public String getApis() {
-        return apis;
-    }
-
-    public void setApis(String apis) {
-        this.apis = apis;
-    }
 
     public HttpSSLSettings getSSL() {
         return ssl;

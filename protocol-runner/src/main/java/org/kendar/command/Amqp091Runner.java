@@ -20,6 +20,8 @@ import java.util.function.Supplier;
 public class Amqp091Runner extends CommonRunner {
 
 
+    private TcpServer ps;
+
     @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go,
                     Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
@@ -45,6 +47,11 @@ public class Amqp091Runner extends CommonRunner {
         return ByteProtocolSettingsWithLogin.class;
     }
 
+    @Override
+    public void stop() {
+        ps.stop();
+    }
+
 
     @Override
     public String getDefaultPort() {
@@ -68,7 +75,7 @@ public class Amqp091Runner extends CommonRunner {
         proxy.setFilters(filters);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var ps = new TcpServer(baseProtocol);
+       ps = new TcpServer(baseProtocol);
 
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());

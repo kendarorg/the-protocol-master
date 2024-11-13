@@ -31,6 +31,7 @@ public class JdbcRunner extends CommonRunner {
     };
     private static JsonMapper mapper = new JsonMapper();
     private final String protocol;
+    private TcpServer ps;
 
     public JdbcRunner(String id) {
 
@@ -80,6 +81,11 @@ public class JdbcRunner extends CommonRunner {
     }
 
     @Override
+    public void stop() {
+        ps.stop();
+    }
+
+    @Override
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
                       GlobalSettings ini, ProtocolSettings protocolSettings,
                       StorageRepository repo, List<PluginDescriptor> filters,
@@ -110,7 +116,7 @@ public class JdbcRunner extends CommonRunner {
         baseProtocol.setProxy(proxy);
         baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(), 30));
         baseProtocol.initialize();
-        var ps = new TcpServer(baseProtocol);
+        ps = new TcpServer(baseProtocol);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);
