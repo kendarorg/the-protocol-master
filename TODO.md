@@ -2,8 +2,8 @@
 
 ### Docs
 
-* Replacequery example
-* Change all the parameter names
+* example rewrite,record,reply,(mock)
+* Change all the parameter names?
 * Explain filter
 
 ### Code
@@ -11,7 +11,7 @@
 * Test with replay record multiple protocols at same time
 * Add mock plugin (nth and simple replace)
 * Set a replayId for replaying?
-* Change Supplier<Boolean> stopWhenFalseAction to a callback to register for
+* Change Supplier<Boolean> stopWhenFalseAction to a callback to register for?
 * Remove spring boot
 * Publish on maven central
 * Common
