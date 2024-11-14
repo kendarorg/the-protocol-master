@@ -6,16 +6,16 @@ import org.kendar.plugins.PluginDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import static java.lang.System.exit;
 
 public class ApiHandler {
     private final GlobalSettings settings;
-    private final List<ProtocolInstance> instances = new ArrayList<>();
+    private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
 
     public ApiHandler(GlobalSettings settings) {
         this.settings = settings;

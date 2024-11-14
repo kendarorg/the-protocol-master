@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.logging.LogFactory;
 import org.kendar.amqp.v09.plugins.AmqpRecordingPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
 import org.kendar.apis.ApiHandler;
@@ -185,32 +186,37 @@ public class Main {
         }
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "ERROR");
 
+
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
 
         var apiHandler = new ApiHandler(ini);
 
+        var finalAllPlugins = allPlugins;
         for (var item : ini.getProtocols().entrySet()) {
-            try {
-                var protocol = ini.getProtocolForKey(item.getKey());
-                if (protocol == null) continue;
-                var protocolManager = om.getManagerFor(protocol);
-                var availablePlugins = loadAvailablePluginsForProtocol(protocol, ini, allPlugins);
-                var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
-
+            new Thread(()-> {
                 try {
-                    om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, availablePlugins, stopWhenFalse);
-                } catch (Exception e) {
-                    protocolServer.remove(item);
-                    throw new RuntimeException(e);
+
+                    var protocol = ini.getProtocolForKey(item.getKey());
+                    if (protocol == null) return;
+                    var protocolManager = om.getManagerFor(protocol);
+                    var availablePlugins = loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
+                    var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
+
+                    try {
+                        om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, availablePlugins, stopWhenFalse);
+                    } catch (Exception e) {
+                        protocolServer.remove(item);
+                        throw new RuntimeException(e);
+                    }
+                    apiHandler.addProtocol(item.getKey(), protocolManager, availablePlugins, protocolFullSettings);
+
+
+                } catch (Exception ex) {
+
                 }
-                apiHandler.addProtocol(item.getKey(), protocolManager, availablePlugins, protocolFullSettings);
-
-
-            } catch (Exception ex) {
-
-            }
+            }).start();
         }
         if (ini.getApiPort() > 0) {
             var address = new InetSocketAddress(ini.getApiPort());

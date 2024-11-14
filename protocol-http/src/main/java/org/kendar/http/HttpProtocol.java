@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 
 public class HttpProtocol extends NetworkProtoDescriptor {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
@@ -43,6 +44,9 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         this.globalSettings = globalSettings;
         this.settings = settings;
         this.plugins = plugins;
+        //Disable logging for apache http client
+        java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
+
     }
 
     private static <T> T getOrDefault(Object value, T defaultValue) {
