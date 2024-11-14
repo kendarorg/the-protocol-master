@@ -48,7 +48,7 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
             if (phase == ProtocolPhase.PRE_CALL) {
                 var request = (Request) in;
                 var response = (Response) out;
-                if (matchSites.size() > 0) {
+                if (!matchSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : matchSites) {
                         if (pat.matcher(request.getHost()).matches()) {
@@ -109,7 +109,7 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
 
     private void setupSitesToRecord(List<String> recordSites) {
         this.matchSites = recordSites.stream()
-                .map(String::trim).filter(s -> s.length() > 0)
+                .map(String::trim).filter(s -> !s.isEmpty())
                 .map(Pattern::compile).collect(Collectors.toList());
     }
 

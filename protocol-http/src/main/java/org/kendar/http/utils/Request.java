@@ -262,7 +262,7 @@ public class Request {
             r.query = this.query.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
-        r.requestText = this.requestText != null ? this.requestText : this.requestText;
+        r.requestText = this.requestText;
         r.soapRequest = this.soapRequest;
         r.staticRequest = this.staticRequest;
         return r;

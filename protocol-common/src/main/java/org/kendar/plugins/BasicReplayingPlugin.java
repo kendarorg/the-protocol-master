@@ -17,10 +17,10 @@ import java.util.HashSet;
 import java.util.List;
 
 public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Object, Object> {
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
+    protected final HashSet<Integer> completedIndexes = new HashSet<>();
+    protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
     protected StorageRepository storage;
-    protected HashSet<Integer> completedIndexes = new HashSet<>();
-    protected HashSet<Integer> completedOutIndexes = new HashSet<>();
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {

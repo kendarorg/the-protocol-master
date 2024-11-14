@@ -3,15 +3,12 @@ package org.kendar.http.utils.dns;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DnsMultiResolverImpl implements DnsMultiResolver {
     final ConcurrentHashMap<String, String> cachedDomains = new ConcurrentHashMap<>();
 
-    @Override
-    public void noResponseCaching() {
-
-    }
 
     @Override
     public void clearCache() {
@@ -41,17 +38,12 @@ public class DnsMultiResolverImpl implements DnsMultiResolver {
     }
 
     @Override
-    public List<String> resolveLocal(String dnsName) {
-        return resolve(dnsName);
-    }
-
-    @Override
     public List<String> resolveRemote(String dnsName) {
         return resolve(dnsName);
     }
 
     @Override
-    public HashMap<String, String> listDomains() {
+    public Map<String, String> listDomains() {
         return new HashMap<>(cachedDomains);
     }
 }

@@ -117,7 +117,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                 HttpEntity entity = handleSoapRequest(request);
                 ((HttpEntityEnclosingRequestBase) fullRequest).setEntity(entity);
             } else */
-            if (request.getPostParameters().size() > 0) {
+            if (!request.getPostParameters().isEmpty()) {
                 List<NameValuePair> form = new ArrayList<>();
                 for (var par : request.getPostParameters().entrySet()) {
                     form.add(new BasicNameValuePair(par.getKey(), par.getValue()));
@@ -196,7 +196,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                                         request.getRequestText().toString(), ContentType.create(contentType));
                     }
                 } catch (Exception ex) {
-                    logger.debug("Error " + request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
+                    logger.debug("Error {}", request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
                     entity =
                             new StringEntity(
                                     request.getRequestText().toString(), ContentType.create(ConstantsMime.STREAM));
@@ -253,7 +253,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
         } else if (request.getMethod().equalsIgnoreCase("TRACE")) {
             return new HttpTrace(stringAdress);
         } else {
-            logger.error("MISSING METHOD " + request.getMethod() + " on " + stringAdress);
+            logger.error("MISSING METHOD {} on {}", request.getMethod(), stringAdress);
             throw new Exception("MISSING METHOD " + request.getMethod() + " on " + stringAdress);
         }
     }

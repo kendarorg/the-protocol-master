@@ -134,7 +134,7 @@ public class CertificatesManager {
         if (hostsSize == registeredHosts.size() && port.getHttpsConfigurator() != null) {
             return;
         }
-        sslLog.debug("ADD HOST: " + String.join(",", inserted));
+        sslLog.debug("ADD HOST: {}", String.join(",", inserted));
         var sslContextInt = getSslContext(new ArrayList<>(registeredHosts.values()), cname, der, key);
         port.setHttpsConfigurator(
                 new HttpsConfigurator(sslContextInt) {
@@ -239,7 +239,7 @@ public class CertificatesManager {
                     Extension.subjectAlternativeName,
                     false,
                     new GeneralNames(new GeneralName(GeneralName.dNSName, rootDomain)));
-        } else if (childDomains.size() > 0) {
+        } else if (!childDomains.isEmpty()) {
             var generalNames = new GeneralName[childDomains.size()];
             for (int i = 0; i < childDomains.size(); i++) {
                 generalNames[i] = new GeneralName(GeneralName.dNSName, childDomains.get(i));

@@ -91,7 +91,7 @@ public class ProxyServerHandler {
     public void run() {
         try {
             String request = readLine(clientSocket);
-            if (request.length() == 0) {
+            if (request.isEmpty()) {
                 return;
             }
             var proxyRequest = new ProxyRequest(request);

@@ -128,6 +128,7 @@ public class HttpRunner extends CommonRunner {
             pl.setShowError(Integer.parseInt(cmd.getOptionValue("showError", "0")));
             pl.setErrorPercent(Integer.parseInt(cmd.getOptionValue("errorPercent", "0")));
             pl.setErrorMessage(cmd.getOptionValue("errorMessage", "Error"));
+            section.getPlugins().put("error-plugin", pl);
         }
     }
 

@@ -71,7 +71,7 @@ public class MasterHandler implements HttpHandler {
                 } else if (MimeChecker.isJson(response.getFirstHeader(ConstantsHeader.CONTENT_TYPE))) {
                     data = response.getResponseText().toString().getBytes(StandardCharsets.UTF_8);
                 } else if (response.getResponseText() instanceof TextNode) {
-                    data = ((TextNode) response.getResponseText()).textValue().getBytes(StandardCharsets.UTF_8);
+                    data = response.getResponseText().textValue().getBytes(StandardCharsets.UTF_8);
                 } else if (response.getResponseText() instanceof BinaryNode) {
                     data = ((BinaryNode) response.getResponseText()).binaryValue();
                 }
@@ -144,7 +144,6 @@ public class MasterHandler implements HttpHandler {
             response.addHeader("X-Exception-Message", ex.getMessage());
             response.addHeader("X-Exception-PrevStatusCode", Integer.toString(response.getStatusCode()));
             response.setStatusCode(500);
-            ;
             if (!requestResponseBuilder.hasBody(response)) {
                 response.setResponseText(new TextNode(ex.getMessage()));
             } else {
@@ -183,7 +182,7 @@ public class MasterHandler implements HttpHandler {
                 }
             }
 
-            log.info("REQ " + request.getMethod() + " " + request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
+            log.info("REQ {} {}", request.getMethod(), request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
 
             handleInternal(pluginContext, request, response, connManager);
             sendResponse(response, httpExchange);

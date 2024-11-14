@@ -119,9 +119,10 @@ public class Main {
         if (!allPlugins.isEmpty()) {
             return allPlugins;
         }
-        if (Path.of(pluginsDir).toAbsolutePath().toFile().exists()) {
+        var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
+        if (pathOfPluginsDir.toFile().exists()) {
 
-            var pluginManager = new JarPluginManager(Path.of(pluginsDir).toAbsolutePath());
+            var pluginManager = new JarPluginManager(pathOfPluginsDir);
             pluginManager.loadPlugins();
             pluginManager.startPlugins();
             allPlugins = new HashMap<>();

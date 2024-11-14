@@ -46,7 +46,7 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
         setActive(plugin.isActive());
     }
 
-    private void handleActivation(boolean active) {
+    protected void handleActivation(boolean active) {
 
     }
 

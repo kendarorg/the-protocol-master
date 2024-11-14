@@ -133,7 +133,7 @@ public class FileStorageRepository implements StorageRepository {
                     Files.writeString(Path.of(targetDir, id), result);
                 }
             } catch (Exception e) {
-                log.warn("Trouble flushing " + e);
+                log.warn("Trouble flushing {}", e);
             }
         }
     }
@@ -301,7 +301,7 @@ public class FileStorageRepository implements StorageRepository {
         return "storage";
     }
 
-    private class ProtocolRepo {
+    private static class ProtocolRepo {
         public final Object lockObject = new Object();
         public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
         public final List<StorageItem> outItems = new ArrayList<>();

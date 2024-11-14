@@ -47,7 +47,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response>
         if (!isActive()) return false;
         if (Math.random() < percentage) {
 
-            log.info("FAKE ERR " + request.getMethod() + " " + request.buildUrl());
+            log.info("FAKE ERR {} {}", request.getMethod(), request.buildUrl());
             response.setStatusCode(errorCode);
             response.setResponseText(new TextNode(errorMessage));
             return true;

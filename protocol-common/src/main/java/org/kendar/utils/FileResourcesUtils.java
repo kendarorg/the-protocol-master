@@ -76,7 +76,7 @@ public class FileResourcesUtils {
                 result.add(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return result;
     }
@@ -197,7 +197,7 @@ public class FileResourcesUtils {
         try {
             //noinspection ResultOfMethodCallIgnored
             jarFile.getCanonicalPath();
-            return true && !jarFile.getPath().contains("!");
+            return !jarFile.getPath().contains("!");
         } catch (IOException e) {
             return false;
         }

@@ -141,7 +141,7 @@ public class MultipartPart {
         r.fieldName = this.fieldName;
         r.file = this.file;
         r.fileName = this.fileName;
-        r.stringData = this.stringData != null ? this.stringData : this.stringData;
+        r.stringData = this.stringData;
         r.headers = this.headers.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return r;

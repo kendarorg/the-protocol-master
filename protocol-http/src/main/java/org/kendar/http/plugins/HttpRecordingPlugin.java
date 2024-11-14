@@ -28,7 +28,7 @@ public class HttpRecordingPlugin extends BasicRecordingPlugin {
         if (isActive()) {
             if (phase == ProtocolPhase.POST_CALL) {
                 var request = (Request) in;
-                if (recordSites.size() > 0) {
+                if (!recordSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : recordSites) {
                         if (pat.matcher(request.getHost()).matches()) {
@@ -60,7 +60,7 @@ public class HttpRecordingPlugin extends BasicRecordingPlugin {
 
     private void setupSitesToRecord(List<String> recordSites) {
         this.recordSites = recordSites.stream()
-                .map(String::trim).filter(s -> s.length() > 0)
+                .map(String::trim).filter(s -> !s.isEmpty())
                 .map(Pattern::compile).collect(Collectors.toList());
     }
 

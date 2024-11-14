@@ -29,9 +29,7 @@ public class MimeChecker {
             return false;
         }
         var mimeLow = mime.toLowerCase(Locale.ROOT);
-        ;
-        if (mimeLow.contains("json")) return true;
-        return false;
+        return mimeLow.contains("json");
     }
 
     public static boolean isJsonSmile(String mime) {
@@ -39,9 +37,7 @@ public class MimeChecker {
             return false;
         }
         var mimeLow = mime.toLowerCase(Locale.ROOT);
-        ;
-        if (mimeLow.contains("application/x-jackson-smile")) return true;
-        return false;
+        return mimeLow.contains("application/x-jackson-smile");
     }
 
     @SuppressWarnings("RedundantIfStatement")

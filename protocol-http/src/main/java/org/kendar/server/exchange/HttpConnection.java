@@ -39,8 +39,6 @@ public class HttpConnection {
     System.Logger logger;
     volatile HttpConnection.State state;
 
-    ;
-
     public HttpConnection() {
     }
 
@@ -95,7 +93,7 @@ public class HttpConnection {
         }
         closed = true;
         if (logger != null && chan != null) {
-            logger.log(System.Logger.Level.TRACE, "Closing connection: " + chan.toString());
+            logger.log(System.Logger.Level.TRACE, "Closing connection: " + chan);
         }
 
         if (!chan.isOpen()) {

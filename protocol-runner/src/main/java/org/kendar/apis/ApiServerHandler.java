@@ -4,6 +4,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.kendar.apis.dtos.Ko;
 import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.Map;
 public class ApiServerHandler implements HttpHandler {
     private static final JsonMapper mapper = new JsonMapper();
     private final ApiHandler handler;
+    private final Logger log = LoggerFactory.getLogger(ApiServerHandler.class);
 
     public ApiServerHandler(ApiHandler handler) {
 
@@ -36,7 +39,7 @@ public class ApiServerHandler implements HttpHandler {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
             return false;
         }
     }
@@ -85,7 +88,7 @@ public class ApiServerHandler implements HttpHandler {
                 os.flush();
                 os.close();
             } catch (Exception e2) {
-                e2.printStackTrace();
+                log.warn(e.getMessage(), e);
             }
         }
     }

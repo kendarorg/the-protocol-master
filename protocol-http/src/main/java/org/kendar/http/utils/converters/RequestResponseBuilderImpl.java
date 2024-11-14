@@ -31,8 +31,8 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
     private static final String H_AUTHORIZATION = "Authorization";
     private static final String BASIC_AUTH_MARKER = "basic";
     private static final String BASIC_AUTH_SEPARATOR = ":";
+    private static final JsonMapper mapper = new JsonMapper();
     private static Logger logger;
-    private static JsonMapper mapper = new JsonMapper();
 
     public RequestResponseBuilderImpl() {
 
@@ -143,7 +143,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
         } else if (data instanceof BinaryNode) {
             return ((BinaryNode) data).binaryValue().length > 0;
         } else if (data instanceof JsonNode) {
-            return data.size() > 0;
+            return !data.isEmpty();
         }
         return false;
     }

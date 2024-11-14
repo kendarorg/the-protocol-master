@@ -53,9 +53,7 @@ public class Resp3Unsubscribe extends ProtoState implements NetworkReturnMessage
 
     public boolean canRun(Resp3Message event) {
         if (event.getData() instanceof List) {
-            if (((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("unsubscribe")) {
-                return true;
-            }
+            return ((List<?>) event.getData()).get(0) != null && ((List<?>) event.getData()).get(0).toString().equalsIgnoreCase("unsubscribe");
 
         }
         return false;

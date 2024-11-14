@@ -163,8 +163,6 @@ public class SSLStreams {
         return b;
     }
 
-    ;
-
     /**
      * send the data in the given ByteBuffer. If a handshake is needed
      * then this is handled within this method. When this call returns,
@@ -289,7 +287,7 @@ public class SSLStreams {
         PACKET, APPLICATION
     }
 
-    class Parameters extends HttpsParameters {
+    static class Parameters extends HttpsParameters {
         final InetSocketAddress addr;
         final HttpsConfigurator cfg;
         //BEGIN_TIGER_EXCLUDE
@@ -318,7 +316,7 @@ public class SSLStreams {
 //END_TIGER_EXCLUDE
     }
 
-    class WrapperResult {
+    static class WrapperResult {
         SSLEngineResult result;
 
         /* if passed in buffer was not big enough then the

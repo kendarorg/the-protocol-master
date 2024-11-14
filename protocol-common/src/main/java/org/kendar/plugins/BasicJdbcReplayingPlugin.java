@@ -19,8 +19,8 @@ import java.util.List;
 
 public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
     protected static JsonMapper mapper = new JsonMapper();
+    protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected StorageRepository storage;
-    protected HashSet<Integer> completedIndexes = new HashSet<>();
     protected HashSet<Integer> completedOutIndexes = new HashSet<>();
 
     protected Object getData(Object of) {

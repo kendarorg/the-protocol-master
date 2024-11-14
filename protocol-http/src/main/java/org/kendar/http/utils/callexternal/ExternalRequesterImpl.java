@@ -19,7 +19,7 @@ public class ExternalRequesterImpl extends BaseRequesterImpl implements External
     public void callSite(Request request, Response response)
             throws Exception {
         var resolved = multiResolver.resolveRemote(request.getHost());
-        if (resolved.size() == 0) {
+        if (resolved.isEmpty()) {
             if (!InetAddressValidator.getInstance().isValidInet4Address(request.getHost())) {
                 response.setStatusCode(404);
                 return;

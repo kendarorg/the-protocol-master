@@ -92,17 +92,17 @@ public class ConnectionBuilderImpl implements ConnectionBuilder {
         SSLContextBuilder contextBuilder = new SSLContextBuilder();
         try {
             contextBuilder.loadTrustMaterial(null, (TrustStrategy) (chain, authType) -> true);
+//            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(contextBuilder.build(),
+//                    SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(contextBuilder.build(),
-                    SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            //SSLConnectionSocketFactory sslsf = SSLConnectionSocketFactory.getSocketFactory()).build()
-
+                    NoopHostnameVerifier.INSTANCE);
             RegistryBuilder<ConnectionSocketFactory> builder = RegistryBuilder.create();
             return builder
                     .register("http", PlainConnectionSocketFactory.getSocketFactory())
                     .register("https", sslsf).build();
 
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -139,7 +139,7 @@ public class ConnectionBuilderImpl implements ConnectionBuilder {
                     .loadTrustMaterial(null, (x509CertChain, authType) -> true)
                     .build();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return HttpClientBuilder.create()
                 .disableAutomaticRetries()

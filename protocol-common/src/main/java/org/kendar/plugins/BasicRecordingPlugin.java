@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
-    protected static JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
 
     @Override

@@ -40,12 +40,12 @@ public class SimpleProxyServer {
             int remoteport = 100;
             int localport = 111;
             // Print a start-up message
-            System.out.println("Starting proxy for " + host + ":" + remoteport
+            log.info("Starting proxy for " + host + ":" + remoteport
                     + " on port " + localport);
             // And start running the server
             runServer(host, remoteport, localport, remoteHost);
         } catch (Exception e) {
-            System.err.println(e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -100,7 +100,7 @@ public class SimpleProxyServer {
                             int bytesRead;
                             try {
                                 while ((bytesRead = streamFromClient.read(request)) != -1) {
-                                    System.out.println("[PROXY ] " + currentConnection + " TO SERVER:\n" + toHexByteArray(request, bytesRead));
+                                    log.info("[PROXY ] " + currentConnection + " TO SERVER:\n" + toHexByteArray(request, bytesRead));
                                     streamToServer.write(request, 0, bytesRead);
                                     streamToServer.flush();
                                 }
@@ -125,7 +125,7 @@ public class SimpleProxyServer {
                         int bytesRead;
                         try {
                             while ((bytesRead = streamFromServer.read(reply)) != -1) {
-                                System.out.println("[PROXY ] " + currentConnection + " FR SERVER " + toHexByteArray(reply, bytesRead));
+                                log.info("[PROXY ] " + currentConnection + " FR SERVER " + toHexByteArray(reply, bytesRead));
                                 streamToClient.write(reply, 0, bytesRead);
                                 streamToClient.flush();
                             }
@@ -139,9 +139,9 @@ public class SimpleProxyServer {
 
 
                     } catch (IOException e) {
-                        System.err.println(e);
+                        log.error(e.getMessage(), e);
                     } finally {
-                        System.out.println("[PROXY ] " + currentConnection + " CLOSING");
+                        log.info("[PROXY ] " + currentConnection + " CLOSING");
                         try {
                             if (server != null)
                                 server.close();

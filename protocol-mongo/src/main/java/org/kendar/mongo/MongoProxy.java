@@ -18,7 +18,6 @@ import org.kendar.mongo.dtos.OpMsgSection;
 import org.kendar.mongo.dtos.OpQueryContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
-import org.kendar.mongo.proxy.DocumentContainer;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.PluginContext;
@@ -94,8 +93,6 @@ public class MongoProxy extends Proxy {
         command.remove("$clusterTime");
         command.remove("apiVersion");
 
-        var cmdContainer = new DocumentContainer(protoContext.getReqResId(), data.getRequestId());
-
         var pluginContext = new PluginContext("MONGODB", "OP_MSG", start, protoContext);
 
 
@@ -108,7 +105,6 @@ public class MongoProxy extends Proxy {
         var database = mongoClient.getDatabase(db);
 
         Document commandResult = database.runCommand(command);
-        cmdContainer.setResult(commandResult);
 
 
         OpMsgSection section = new OpMsgSection();

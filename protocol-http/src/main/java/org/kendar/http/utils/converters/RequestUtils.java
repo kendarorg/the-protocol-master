@@ -109,7 +109,7 @@ public class RequestUtils {
     public static Map<String, List<String>> headersToMap(Headers requestHeaders) {
         var result = new HashMap<String, List<String>>();
         for (var entry : requestHeaders.entrySet()) {
-            if (entry.getValue() == null || entry.getValue().size() == 0) {
+            if (entry.getValue() == null || entry.getValue().isEmpty()) {
                 result.put(entry.getKey(), new ArrayList<>());
             } else {
 
@@ -270,7 +270,7 @@ public class RequestUtils {
     }
 
     public static String buildFullQuery(Request request) {
-        if (request.getQuery().size() == 0) return "";
+        if (request.getQuery().isEmpty()) return "";
         return "?"
                 + request.getQuery().entrySet().stream()
                 .map(
@@ -283,7 +283,7 @@ public class RequestUtils {
     }
 
     public static class SimpleBlock {
-        public Map<String, String> headers = new HashMap<>();
+        public final Map<String, String> headers = new HashMap<>();
         public byte[] data = new byte[]{};
     }
 }

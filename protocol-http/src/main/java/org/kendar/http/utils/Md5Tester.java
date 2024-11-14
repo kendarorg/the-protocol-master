@@ -13,7 +13,7 @@ public class Md5Tester {
                 return "0";
             }
             if (data instanceof String) {
-                if (((String) data).length() == 0) return "0";
+                if (((String) data).isEmpty()) return "0";
                 md.update(((String) data).getBytes(StandardCharsets.UTF_8));
             } else {
                 if (((byte[]) data).length == 0) return "0";

@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Resp3Protocol extends NetworkProtoDescriptor {
     private static final int PORT = 6379;
-    public ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
+    public final ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
     private int port = PORT;
 
     private Resp3Protocol() {

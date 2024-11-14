@@ -438,13 +438,13 @@ public class ServerImpl {
         }
     }
 
-    class InternalSSLConfig {
+    static class InternalSSLConfig {
         private final SSLContext sslContext;
         private HttpsConfigurator httpsConfig;
 
         public InternalSSLConfig(HttpsConfigurator config) {
 
-            this.httpsConfig = httpsConfig;
+            this.httpsConfig = config;
             this.sslContext = config.getSSLContext();
         }
 
@@ -586,7 +586,7 @@ public class ServerImpl {
                 try {
                     List<Event> list = null;
                     synchronized (lolock) {
-                        if (events.size() > 0) {
+                        if (!events.isEmpty()) {
                             list = events;
                             events = new LinkedList<>();
                         }
@@ -952,7 +952,7 @@ public class ServerImpl {
                 builder.append("HTTP/1.1 ")
                         .append(code).append(Code.msg(code)).append("\r\n");
 
-                if (text != null && text.length() != 0) {
+                if (text != null && !text.isEmpty()) {
                     builder.append(ConstantsHeader.CONTENT_LENGTH + ": ")
                             .append(text.length()).append("\r\n")
                             .append(ConstantsHeader.CONTENT_TYPE + ": text/html\r\n");
