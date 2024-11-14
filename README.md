@@ -66,7 +66,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
   * redis 3,redis 2
   * mqtt
   * rabbitmq/Amqp 0.9
-
+  
 
 * Mocked errors (http/s)
 * Mocked responses (all)
@@ -76,6 +76,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Record activity (all)
 * Replay activity (all)
 * Custom transparent proxy (all)
+* Translate postgres to any Jdbc supported db (like Oracle!)
 
 
 
