@@ -1,5 +1,7 @@
 package org.kendar.http.utils.callexternal;
 
+import com.fasterxml.jackson.databind.node.BinaryNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -35,7 +37,6 @@ import org.slf4j.Logger;
 
 import javax.net.ssl.SSLContext;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,7 +150,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                     } else {
                         var type = part.getContentType();
                         if (type == null) {
-                            type = ConstantsMime.TEXT;
+                            type = ConstantsMime.DEFAULT_CONTENT_TYPE;
                         }
                         var cb = new StringBody(part.getStringData());
                         var fbd = new FormBodyPart(part.getFieldName(), cb);
@@ -173,6 +174,9 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                 HttpEntity entity;
                 try {
                     String contentType = request.getFirstHeader(ConstantsHeader.CONTENT_TYPE);
+                    if(contentType==null){
+                        contentType = ConstantsMime.DEFAULT_CONTENT_TYPE;
+                    }
                     if (contentType.indexOf(";") > 0) {
                         var spl = contentType.split(";");
                         contentType = spl[0];
@@ -184,18 +188,18 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                     } else if (MimeChecker.isBinary(request)) {
                         entity =
                                 new ByteArrayEntity(
-                                        Base64.getDecoder().decode(request.getRequestText()), ContentType.create(contentType));
+                                        ((BinaryNode)request.getRequestText()).binaryValue(), ContentType.create(contentType));
 
                     } else {
                         entity =
                                 new StringEntity(
-                                        request.getRequestText(), ContentType.create(contentType));
+                                        request.getRequestText().toString(), ContentType.create(contentType));
                     }
                 } catch (Exception ex) {
                     logger.debug("Error " + request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
                     entity =
                             new StringEntity(
-                                    request.getRequestText(), ContentType.create(ConstantsMime.STREAM));
+                                    request.getRequestText().toString(), ContentType.create(ConstantsMime.STREAM));
                 }
                 if (gzip) {
                     ((HttpEntityEnclosingRequestBase) fullRequest).setEntity(new GzipCompressingEntity(entity));
@@ -210,10 +214,11 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                 requestResponseBuilder.fromHttpResponse(httpResponse, response);
             } catch (Exception ex) {
                 response.setStatusCode(404);
-                response.setResponseText(ex.getMessage());
+                response.getHeaders().put("Content-Type",List.of("text/plain"));
+                response.setResponseText(new TextNode(ex.getMessage()));
                 if (httpResponse != null) {
                     response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
-                    response.setResponseText(httpResponse.getStatusLine().getReasonPhrase() + " " + ex.getMessage());
+                    response.setResponseText(new TextNode(httpResponse.getStatusLine().getReasonPhrase() + " " + ex.getMessage()));
                 }
             }
         } finally {

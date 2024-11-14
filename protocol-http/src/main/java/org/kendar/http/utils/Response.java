@@ -1,5 +1,6 @@
 package org.kendar.http.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.http.utils.converters.RequestUtils;
 
 import java.util.ArrayList;
@@ -9,23 +10,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Response {
-    private String responseText;
+    private JsonNode responseText;
     private Map<String, List<String>> headers = new HashMap<>();
     private int statusCode = 200;
 
     private List<String> messages = new ArrayList<>();
 
-    public boolean bodyExists() {
-        return
-                (responseText != null && responseText.length() > 0);
-    }
-
-
-    public String getResponseText() {
+    public JsonNode getResponseText() {
         return responseText;
     }
 
-    public void setResponseText(String responseText) {
+    public void setResponseText(JsonNode responseText) {
         this.responseText = responseText;
     }
 

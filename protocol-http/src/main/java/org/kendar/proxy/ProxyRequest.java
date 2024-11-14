@@ -29,6 +29,9 @@ public class ProxyRequest {
             var uri = new URI(content);
             host = uri.getHost();
             path = uri.getPath();
+            if(uri.getRawQuery()!=null && !uri.getRawQuery().isEmpty()) {
+                path += "?"+uri.getRawQuery();
+            }
             if (uri.getScheme().equals("https")) {
                 port = 443;
             } else if (uri.getScheme().equals("http")) {

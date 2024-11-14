@@ -4,7 +4,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kendar.http.utils.ssl.CertificatesManager;
-import org.kendar.http.utils.ssl.FileResourcesUtils;
+import org.kendar.utils.FileResourcesUtils;
 import org.kendar.http.utils.ssl.GeneratedCert;
 
 import java.io.FileOutputStream;

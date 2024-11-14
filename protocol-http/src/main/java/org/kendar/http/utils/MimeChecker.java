@@ -13,17 +13,33 @@ public class MimeChecker {
     };
 
     public static boolean isBinary(Request request) {
-        var cnt = request.getHeaders().get(ConstantsHeader.CONTENT_TYPE);
+        var cnt = request.getHeader(ConstantsHeader.CONTENT_TYPE);
         if (cnt == null || cnt.isEmpty()) return false;
         return isBinary(cnt.get(0), "");
     }
 
     public static boolean isBinary(Response request) {
-        var cnt = request.getHeaders().get(ConstantsHeader.CONTENT_TYPE);
+        var cnt = request.getHeader(ConstantsHeader.CONTENT_TYPE);
         if (cnt == null || cnt.isEmpty()) return false;
         return isBinary(cnt.get(0), "");
     }
 
+    public static boolean isJson(String mime){
+        if (mime == null || mime.isEmpty()) {
+            return false;
+        }
+        var mimeLow = mime.toLowerCase(Locale.ROOT);;
+        if (mimeLow.contains("json")) return true;
+        return false;
+    }
+    public static boolean isJsonSmile(String mime){
+        if (mime == null || mime.isEmpty()) {
+            return false;
+        }
+        var mimeLow = mime.toLowerCase(Locale.ROOT);;
+        if (mimeLow.contains("application/x-jackson-smile")) return true;
+        return false;
+    }
     @SuppressWarnings("RedundantIfStatement")
     public static boolean isBinary(String mime, String contentEncoding) {
 

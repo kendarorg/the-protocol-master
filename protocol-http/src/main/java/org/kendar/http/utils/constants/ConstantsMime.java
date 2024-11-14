@@ -1,6 +1,7 @@
 package org.kendar.http.utils.constants;
 
 public class ConstantsMime {
+    public static final String DEFAULT_CONTENT_TYPE = "text/plain";
     public static final String JSON_SMILE = "application/x-jackson-smile";
     public static final String JSON = "application/json";
     public static final String STREAM = "application/octet-stream";

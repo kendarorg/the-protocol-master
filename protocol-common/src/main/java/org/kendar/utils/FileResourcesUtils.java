@@ -1,4 +1,4 @@
-package org.kendar.http.utils.ssl;
+package org.kendar.utils;
 
 import org.slf4j.Logger;
 

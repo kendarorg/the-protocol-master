@@ -1,5 +1,8 @@
 package org.kendar.http.utils.converters;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.BinaryNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.sun.net.httpserver.HttpExchange;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.IOUtils;
@@ -9,6 +12,7 @@ import org.brotli.dec.BrotliInputStream;
 import org.kendar.http.utils.*;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
+import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -64,6 +68,9 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
     private static void setupOptionalBody(HttpExchange exchange, Request result)
             throws IOException, FileUploadException {
         var headerContentType = result.getFirstHeader(ConstantsHeader.CONTENT_TYPE);
+        if (headerContentType == null) {
+            headerContentType = ConstantsMime.DEFAULT_CONTENT_TYPE;
+        }
 
         if (RequestUtils.isMethodWithBody(result)) {
 
@@ -98,17 +105,23 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
             } else if (headerContentType != null && headerContentType
                     .toLowerCase(Locale.ROOT)
                     .startsWith(ConstantsMime.JSON_SMILE)) {
-                var requestText = JsonSmile.smileToJSON(data).toPrettyString();
-                result.setRequestText(requestText);
+                result.setRequestText(JsonSmile.smileToJSON(data));
             } else {
                 if (MimeChecker.isBinary(result)) {
-                    result.setRequestText(Base64.getEncoder().encodeToString(data));
+                    result.setRequestText(new BinaryNode(data));
                 } else {
-                    result.setRequestText(new String(data, StandardCharsets.UTF_8));
+                    if(MimeChecker.isJson(headerContentType)) {
+                        result.setRequestText(mapper.toJsonNode(new String(data, StandardCharsets.UTF_8)));
+                    }else {
+
+                        result.setRequestText(new TextNode(new String(data, StandardCharsets.UTF_8)));
+                    }
                 }
             }
         }
     }
+
+    private static JsonMapper mapper =new JsonMapper();
 
     private static void setupAuthHeaders(Request result) {
         var headerAuthorization = result.getFirstHeader(H_AUTHORIZATION);
@@ -160,12 +173,26 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
 
     @Override
     public boolean hasBody(Request request) {
-        return request.getRequestText() != null && !request.getRequestText().isEmpty();
+        var data = request.getRequestText();
+        return isJsonNodeFull(data);
+    }
+
+    private static boolean isJsonNodeFull(JsonNode data) {
+        if(data ==null) return false;
+        if(data instanceof TextNode){
+            return !data.textValue().isEmpty();
+        }else if(data instanceof BinaryNode){
+            return ((BinaryNode) data).binaryValue().length > 0;
+        }else if(data instanceof JsonNode){
+            return data.size() > 0;
+        }
+        return false;
     }
 
     @Override
-    public boolean hasBody(Response request) {
-        return request.getResponseText() != null && !request.getResponseText().isEmpty();
+    public boolean hasBody(Response response) {
+        var data = response.getResponseText();
+        return isJsonNodeFull(data);
     }
 
     @Override
@@ -185,30 +212,39 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
 
 
             brotli = contentEncoding.equalsIgnoreCase("br");
-            if (responseEntity.getContentType() != null
-                    && responseEntity.getContentType().getValue() != null
-                    && MimeChecker.isBinary(responseEntity.getContentType().getValue(), contentEncoding)) {
+            if (responseEntity.getContentType() != null &&
+                    MimeChecker.isBinary(responseEntity.getContentType().getValue(), contentEncoding)) {
 
                 if (brotli) {
-                    response.setResponseText(Base64.getEncoder().encodeToString(IOUtils.toByteArray(new BrotliInputStream(in))));
+                    response.setResponseText(new BinaryNode(IOUtils.toByteArray(new BrotliInputStream(in))));
                     response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
                 } else {
-                    response.setResponseText(Base64.getEncoder().encodeToString(IOUtils.toByteArray(in)));
+                    response.setResponseText(new BinaryNode(IOUtils.toByteArray(in)));
                 }
             } else {
-                String responseText = null;
+                JsonNode responseText = null;
+                var bytes = new byte[]{};
                 if (brotli) {
-                    responseText = IOUtils.toString(new BrotliInputStream(in), StandardCharsets.UTF_8);
+                    bytes = IOUtils.toByteArray(new BrotliInputStream(in));
                     response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
-                } else if (responseEntity.getContentType() != null && responseEntity.getContentType().getValue().equalsIgnoreCase(ConstantsMime.JSON_SMILE)) {
-                    responseText = JsonSmile.smileToJSON(IOUtils.toByteArray(in)).toPrettyString();
-                } else {
-                    responseText = IOUtils.toString(in, StandardCharsets.UTF_8);
+                }else{
+                    bytes = IOUtils.toByteArray(in);
+                }
+                if (responseEntity.getContentType() != null &&
+                        MimeChecker.isJsonSmile(responseEntity.getContentType()
+                        .getValue())) {
+                    responseText = JsonSmile.smileToJSON(bytes);
+                } else if (responseEntity.getContentType() != null &&
+                        MimeChecker.isJson(responseEntity.getContentType()
+                                .getValue())) {
+                    responseText = mapper.toJsonNode(new String(bytes, StandardCharsets.UTF_8));
+                } else{
+                    responseText = new TextNode(new String(bytes, StandardCharsets.UTF_8));
                 }
                 response.setResponseText(responseText);
             }
         } else {
-            response.setResponseText("");
+            response.setResponseText(new TextNode(""));
         }
         response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
         for (var header : httpResponse.getAllHeaders()) {

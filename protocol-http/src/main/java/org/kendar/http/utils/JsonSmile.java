@@ -16,6 +16,10 @@ public class JsonSmile {
         return smileMapper.writeValueAsBytes(actualObj);
     }
 
+    public static byte[] jsonToSmile(JsonNode actualObj) throws JsonProcessingException {
+        return smileMapper.writeValueAsBytes(actualObj);
+    }
+
     public static JsonNode smileToJSON(byte[] smileBytes) throws IOException {
         return smileMapper.readValue(smileBytes, JsonNode.class);
     }

@@ -1,5 +1,6 @@
 package org.kendar.http.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.http.utils.converters.MultipartPart;
 import org.kendar.http.utils.converters.RequestUtils;
 
@@ -15,7 +16,7 @@ public class Request {
     private long id = counter.incrementAndGet();
     private long ms = Calendar.getInstance().getTimeInMillis();
     private String method;
-    private String requestText;
+    private JsonNode requestText;
     private Map<String, List<String>> headers;
     private String protocol;
     private boolean soapRequest;
@@ -40,11 +41,11 @@ public class Request {
         this.method = method;
     }
 
-    public String getRequestText() {
+    public JsonNode getRequestText() {
         return requestText;
     }
 
-    public void setRequestText(String requestText) {
+    public void setRequestText(JsonNode requestText) {
         this.requestText = requestText;
     }
 
@@ -287,11 +288,6 @@ public class Request {
             }
         }
         return null;
-    }
-
-    public boolean bodyExists() {
-        return
-                (requestText != null && requestText.length() > 0);
     }
 
     public long getId() {

@@ -12,7 +12,7 @@ import org.kendar.http.utils.rewriter.RemoteServerStatus;
 import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
 import org.kendar.http.utils.rewriter.SimpleRewriterHandlerImpl;
 import org.kendar.http.utils.ssl.CertificatesManager;
-import org.kendar.http.utils.ssl.FileResourcesUtils;
+import org.kendar.utils.FileResourcesUtils;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;

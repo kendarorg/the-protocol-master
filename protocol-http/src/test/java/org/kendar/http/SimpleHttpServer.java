@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.fileupload.FileUploadException;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.server.KendarHttpServer;
+import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
 
 import java.io.IOException;
@@ -41,11 +42,20 @@ public class SimpleHttpServer {
 
     private void handle(HttpExchange exchange) throws IOException, FileUploadException {
         var request = reqResBuilder.fromExchange(exchange, "http");
-        var serializedRequest = mapper.serialize(request);
         var outputStream = exchange.getResponseBody();
-        var serialized = serializedRequest.getBytes(StandardCharsets.UTF_8);
-        exchange.sendResponseHeaders(200, serialized.length);
-        outputStream.write(serialized);
+        byte[] bytes = null;
+        if(request.getPath().endsWith("image.gif")){
+            var frf = new FileResourcesUtils();
+            bytes = frf.getFileFromResourceAsByteArray("resource://image.gif");
+            exchange.getResponseHeaders().add("Content-Type", "image/gif");
+
+        }else if(request.getPath().equalsIgnoreCase("/jsonized")){
+            var serializedRequest = mapper.serialize(request);
+            bytes = serializedRequest.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json");
+        }
+        exchange.sendResponseHeaders(200, bytes.length);
+        outputStream.write(bytes);
         outputStream.flush();
         outputStream.close();
     }

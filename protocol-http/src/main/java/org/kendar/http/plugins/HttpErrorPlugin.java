@@ -1,5 +1,6 @@
 package org.kendar.http.plugins;
 
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.plugins.PluginDescriptor;
@@ -48,7 +49,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response>
 
             log.info("FAKE ERR " + request.getMethod() + " " + request.buildUrl());
             response.setStatusCode(errorCode);
-            response.setResponseText(errorMessage);
+            response.setResponseText(new TextNode(errorMessage));
             return true;
         }
         return false;

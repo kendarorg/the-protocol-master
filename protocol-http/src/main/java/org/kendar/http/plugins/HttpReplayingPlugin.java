@@ -1,5 +1,6 @@
 package org.kendar.http.plugins;
 
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
@@ -62,7 +63,7 @@ public class HttpReplayingPlugin extends BasicReplayingPlugin {
                 if (blockExternal && !doSend(pluginContext, request, response)) {
                     response.setStatusCode(404);
                     response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
-                    response.setResponseText("Page Not Found: " + request.getMethod() + " on " + request.buildUrl());
+                    response.setResponseText(new TextNode("Page Not Found: " + request.getMethod() + " on " + request.buildUrl()));
                     return true;
                 }
                 return false;

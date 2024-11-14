@@ -330,7 +330,7 @@ public class ReplayPlugin extends ProtocolPluginDescriptor<Request, Response> {
         for (var kvp : templateRequest.getHeaders().entrySet()) {
             if (isTemplateParameter(kvp.getValue().get(0))) {
                 if (originalRequest.getHeaders().containsKey(kvp.getKey())) {
-                    parameters.put(kvp.getKey(), originalRequest.getHeaders().get(kvp.getKey()).get(0));
+                    parameters.put(kvp.getKey(), originalRequest.getHeader(kvp.getKey()).get(0));
                 }
             }
         }

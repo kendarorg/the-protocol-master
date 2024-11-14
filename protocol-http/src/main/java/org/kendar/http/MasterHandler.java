@@ -1,6 +1,8 @@
 package org.kendar.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BinaryNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpsExchange;
@@ -21,7 +23,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Calendar;
 
 
@@ -62,13 +63,17 @@ public class MasterHandler implements HttpHandler {
         var dataLength = 0;
         if (requestResponseBuilder.hasBody(response)) {
             if (MimeChecker.isBinary(response)) {
-                data = Base64.getDecoder().decode(response.getResponseText());
-            } else if (response.getResponseText().length() > 0) {
+                data = ((BinaryNode)response.getResponseText()).binaryValue();
+            } else if (response.getResponseText()!=null) {
 
                 if (ConstantsMime.JSON_SMILE.equalsIgnoreCase(response.getFirstHeader(ConstantsHeader.CONTENT_TYPE))) {
                     data = JsonSmile.jsonToSmile(response.getResponseText());
-                } else {
-                    data = (response.getResponseText().getBytes(StandardCharsets.UTF_8));
+                } else if(MimeChecker.isJson(response.getFirstHeader(ConstantsHeader.CONTENT_TYPE))) {
+                    data = response.getResponseText().toString().getBytes(StandardCharsets.UTF_8);
+                }else if(response.getResponseText() instanceof TextNode){
+                    data = ((TextNode)response.getResponseText()).textValue().getBytes(StandardCharsets.UTF_8);
+                }else if(response.getResponseText() instanceof BinaryNode){
+                    data = ((BinaryNode)response.getResponseText()).binaryValue();
                 }
             }
             if (data.length > 0) {
@@ -138,11 +143,11 @@ public class MasterHandler implements HttpHandler {
             response.addHeader("X-Exception-Type", ex.getClass().getName());
             response.addHeader("X-Exception-Message", ex.getMessage());
             response.addHeader("X-Exception-PrevStatusCode", Integer.toString(response.getStatusCode()));
-            response.setStatusCode(500);
+            response.setStatusCode(500);;
             if (!requestResponseBuilder.hasBody(response)) {
-                response.setResponseText(ex.getMessage());
+                response.setResponseText(new TextNode(ex.getMessage()));
             } else {
-                response.setResponseText(mapper.writeValueAsString(ex.getMessage()));
+                response.setResponseText(new TextNode(ex.getMessage()));
             }
             sendResponse(response, httpExchange);
         } catch (Exception xx) {
