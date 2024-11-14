@@ -46,15 +46,36 @@ Open a http/s proxy on port 9999 and return a 503 error, on 50% of calls
 
 ```
 java -jar protocol-runner.jar -protocol http -proxy 9999 \
-    -showError 503 errorPercent 40
+    -showError 503 -errorPercent 40
 ```
 
 ## Features
 
-* Run on any OS
+* Language independent: use the native protocols without drivers
+
+* Run on all OSs
   * Windows
-  * macOS
   * Linux
+  * macOs
+
+* Native protocol for (and all compatibles):
+  * anything that goes through http/https
+  * postgres
+  * mysql
+  * mongoDB
+  * redis 3,redis 2
+  * mqtt
+  * rabbitmq/Amqp 0.9
+
+
+* Mocked errors (http/s)
+* Mocked responses (all)
+* Support gzip,brotli,jacksonSmile,multipart and more (http/s)
+* Mocked error response (http/s)
+* Internal rewrite queries and urls (http/s,mysql,postgres)
+* Record activity (all)
+* Replay activity (all)
+* Custom transparent proxy (all)
 
 
 

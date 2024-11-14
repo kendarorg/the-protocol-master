@@ -8,7 +8,7 @@
 
 ### Code
 
-* Test with replay record multiple protocols at same time
+* Test with replay record multiple protocols at same time MultiREcordReplay.java (with settings.ini)
 * Add mock plugin (nth and simple replace)
 * Set a replayId for replaying?
 * Change Supplier<Boolean> stopWhenFalseAction to a callback to register for?
