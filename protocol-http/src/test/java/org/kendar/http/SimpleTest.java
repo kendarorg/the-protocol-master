@@ -47,10 +47,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SimpleTest extends BasicTest {
 
 
-
-
-
-
     private static CloseableHttpClient createHttpClient(HttpClientBuilder custom) {
         var proxy = new HttpHost("localhost", FAKE_PORT_PROXY, "http");
         var routePlanner = new DefaultProxyRoutePlanner(proxy);
@@ -58,55 +54,28 @@ public class SimpleTest extends BasicTest {
         return httpclient;
     }
 
-    private static byte[] buildBytesData(){
+    private static byte[] buildBytesData() {
         try {
             var frf = new FileResourcesUtils();
             return frf.getFileFromResourceAsByteArray("resource://image.gif");
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static class NullEntity extends AbstractHttpEntity implements Cloneable{
-        @Override
-        public boolean isRepeatable() {
-            return false;
-        }
-
-        @Override
-        public long getContentLength() {
-            return 0;
-        }
-
-        @Override
-        public InputStream getContent() throws IOException, UnsupportedOperationException {
-            return null;
-        }
-
-        @Override
-        public void writeTo(OutputStream outputStream) throws IOException {
-
-        }
-
-        @Override
-        public boolean isStreaming() {
-            return false;
-        }
-    }
-
-    private static ByteArrayEntity buildByteEntity(){
+    private static ByteArrayEntity buildByteEntity() {
         try {
 
 
-            var  entity = new ByteArrayEntity(buildBytesData());
+            var entity = new ByteArrayEntity(buildBytesData());
             return entity;
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
 
     }
 
-    private static String getContentString(HttpResponse httpresponse){
+    private static String getContentString(HttpResponse httpresponse) {
         try {
             var sc = new Scanner(httpresponse.getEntity().getContent());
 
@@ -117,7 +86,7 @@ public class SimpleTest extends BasicTest {
                 content += sc.nextLine();
             }
             return content;
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -135,36 +104,6 @@ public class SimpleTest extends BasicTest {
         } catch (Exception ex) {
 
         }
-    }
-
-    @BeforeEach
-    public void beforeEach(TestInfo testInfo) {
-        beforeEachBase(testInfo);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        afterEachBase();
-    }
-
-
-    @Test
-    void testExternalProxy() throws Exception {
-        var recordPlugin = baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("record-plugin")).findFirst();
-        recordPlugin.get().setActive(true);
-
-        var httpclient = createHttpsHttpClient();
-        var httpget = new HttpGet("https://www.google.com");
-        var httpresponse = httpclient.execute(httpget);
-        var sc = new Scanner(httpresponse.getEntity().getContent());
-
-        //Printing the status line
-        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
-        var content = "";
-        while (sc.hasNext()) {
-            content += sc.nextLine();
-        }
-        assertTrue(content.toLowerCase().contains("<title>google</title>"));
     }
 
     private static CloseableHttpClient createHttpsHttpClient() throws Exception {
@@ -185,29 +124,9 @@ public class SimpleTest extends BasicTest {
         return httpclient;
     }
 
-    private static byte[] getConfusingByteArray(){
+    private static byte[] getConfusingByteArray() {
         return new byte[]{1, 2, 3, 4, 5, '\r', '\n'};
     }
-
-    @ParameterizedTest
-    @MethodSource("provideTestSituations")
-    void allSamplesTest(String description, HttpEntity entity, HttpRequestBase httpPost , Map<String,String> headers, ConsumeException<HttpResponse> consumer) throws Exception {
-        var recordPlugin = baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("record-plugin")).findFirst();
-        recordPlugin.get().setActive(true);
-
-        var httpclient = createHttpClient(HttpClients.custom());
-
-        if(HttpEntityEnclosingRequestBase.class.isAssignableFrom(httpPost.getClass()) ) {
-            ((HttpEntityEnclosingRequestBase)httpPost).setEntity(entity);
-        }
-        for(var h: headers.entrySet()){
-            httpPost.setHeader(h.getKey(), h.getValue());
-        }
-        var httpresponse = httpclient.execute(httpPost);
-        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
-        consumer.accept(httpresponse);
-    }
-
 
     private static Stream<Arguments> provideTestSituations() {
         try {
@@ -274,14 +193,14 @@ public class SimpleTest extends BasicTest {
                     Arguments.of(
                             "DSC:jsonizeTestQueryParameters",
                             new NullEntity(),
-                            withQuery(new HttpGet("http://localhost:" + 8456 + "/jsonized"),Map.of("par1","par1Value")),
+                            withQuery(new HttpGet("http://localhost:" + 8456 + "/jsonized"), Map.of("par1", "par1Value")),
                             Map.of(),
                             (ConsumeException<HttpResponse>) httpResponse -> {
                                 var content = getContentString(httpResponse);
                                 assertTrue(content.contains("par1Value"));
                             })
             );
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -294,8 +213,83 @@ public class SimpleTest extends BasicTest {
             }
             req.setURI(uriBuilder.build());
             return req;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @BeforeEach
+    public void beforeEach(TestInfo testInfo) {
+        beforeEachBase(testInfo);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        afterEachBase();
+    }
+
+    @Test
+    void testExternalProxy() throws Exception {
+        var recordPlugin = baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("record-plugin")).findFirst();
+        recordPlugin.get().setActive(true);
+
+        var httpclient = createHttpsHttpClient();
+        var httpget = new HttpGet("https://www.google.com");
+        var httpresponse = httpclient.execute(httpget);
+        var sc = new Scanner(httpresponse.getEntity().getContent());
+
+        //Printing the status line
+        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+        var content = "";
+        while (sc.hasNext()) {
+            content += sc.nextLine();
+        }
+        assertTrue(content.toLowerCase().contains("<title>google</title>"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTestSituations")
+    void allSamplesTest(String description, HttpEntity entity, HttpRequestBase httpPost, Map<String, String> headers, ConsumeException<HttpResponse> consumer) throws Exception {
+        var recordPlugin = baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("record-plugin")).findFirst();
+        recordPlugin.get().setActive(true);
+
+        var httpclient = createHttpClient(HttpClients.custom());
+
+        if (HttpEntityEnclosingRequestBase.class.isAssignableFrom(httpPost.getClass())) {
+            ((HttpEntityEnclosingRequestBase) httpPost).setEntity(entity);
+        }
+        for (var h : headers.entrySet()) {
+            httpPost.setHeader(h.getKey(), h.getValue());
+        }
+        var httpresponse = httpclient.execute(httpPost);
+        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+        consumer.accept(httpresponse);
+    }
+
+    public static class NullEntity extends AbstractHttpEntity implements Cloneable {
+        @Override
+        public boolean isRepeatable() {
+            return false;
+        }
+
+        @Override
+        public long getContentLength() {
+            return 0;
+        }
+
+        @Override
+        public InputStream getContent() throws IOException, UnsupportedOperationException {
+            return null;
+        }
+
+        @Override
+        public void writeTo(OutputStream outputStream) throws IOException {
+
+        }
+
+        @Override
+        public boolean isStreaming() {
+            return false;
         }
     }
 }

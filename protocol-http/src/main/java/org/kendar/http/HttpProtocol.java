@@ -12,7 +12,6 @@ import org.kendar.http.utils.rewriter.RemoteServerStatus;
 import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
 import org.kendar.http.utils.rewriter.SimpleRewriterHandlerImpl;
 import org.kendar.http.utils.ssl.CertificatesManager;
-import org.kendar.utils.FileResourcesUtils;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -20,6 +19,7 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.proxy.ProxyServer;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.utils.FileResourcesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

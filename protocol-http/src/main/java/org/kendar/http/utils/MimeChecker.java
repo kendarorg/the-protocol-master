@@ -24,22 +24,26 @@ public class MimeChecker {
         return isBinary(cnt.get(0), "");
     }
 
-    public static boolean isJson(String mime){
+    public static boolean isJson(String mime) {
         if (mime == null || mime.isEmpty()) {
             return false;
         }
-        var mimeLow = mime.toLowerCase(Locale.ROOT);;
+        var mimeLow = mime.toLowerCase(Locale.ROOT);
+        ;
         if (mimeLow.contains("json")) return true;
         return false;
     }
-    public static boolean isJsonSmile(String mime){
+
+    public static boolean isJsonSmile(String mime) {
         if (mime == null || mime.isEmpty()) {
             return false;
         }
-        var mimeLow = mime.toLowerCase(Locale.ROOT);;
+        var mimeLow = mime.toLowerCase(Locale.ROOT);
+        ;
         if (mimeLow.contains("application/x-jackson-smile")) return true;
         return false;
     }
+
     @SuppressWarnings("RedundantIfStatement")
     public static boolean isBinary(String mime, String contentEncoding) {
 

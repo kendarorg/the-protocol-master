@@ -63,17 +63,17 @@ public class MasterHandler implements HttpHandler {
         var dataLength = 0;
         if (requestResponseBuilder.hasBody(response)) {
             if (MimeChecker.isBinary(response)) {
-                data = ((BinaryNode)response.getResponseText()).binaryValue();
-            } else if (response.getResponseText()!=null) {
+                data = ((BinaryNode) response.getResponseText()).binaryValue();
+            } else if (response.getResponseText() != null) {
 
                 if (ConstantsMime.JSON_SMILE.equalsIgnoreCase(response.getFirstHeader(ConstantsHeader.CONTENT_TYPE))) {
                     data = JsonSmile.jsonToSmile(response.getResponseText());
-                } else if(MimeChecker.isJson(response.getFirstHeader(ConstantsHeader.CONTENT_TYPE))) {
+                } else if (MimeChecker.isJson(response.getFirstHeader(ConstantsHeader.CONTENT_TYPE))) {
                     data = response.getResponseText().toString().getBytes(StandardCharsets.UTF_8);
-                }else if(response.getResponseText() instanceof TextNode){
-                    data = ((TextNode)response.getResponseText()).textValue().getBytes(StandardCharsets.UTF_8);
-                }else if(response.getResponseText() instanceof BinaryNode){
-                    data = ((BinaryNode)response.getResponseText()).binaryValue();
+                } else if (response.getResponseText() instanceof TextNode) {
+                    data = ((TextNode) response.getResponseText()).textValue().getBytes(StandardCharsets.UTF_8);
+                } else if (response.getResponseText() instanceof BinaryNode) {
+                    data = ((BinaryNode) response.getResponseText()).binaryValue();
                 }
             }
             if (data.length > 0) {
@@ -143,7 +143,8 @@ public class MasterHandler implements HttpHandler {
             response.addHeader("X-Exception-Type", ex.getClass().getName());
             response.addHeader("X-Exception-Message", ex.getMessage());
             response.addHeader("X-Exception-PrevStatusCode", Integer.toString(response.getStatusCode()));
-            response.setStatusCode(500);;
+            response.setStatusCode(500);
+            ;
             if (!requestResponseBuilder.hasBody(response)) {
                 response.setResponseText(new TextNode(ex.getMessage()));
             } else {

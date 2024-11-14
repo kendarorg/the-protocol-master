@@ -39,10 +39,10 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
 
     private static final boolean IS_BIG_ENDIAN = true;
     private static final int PORT = 5672;
-    AtomicBoolean running = new AtomicBoolean(true);
     private final ConcurrentHashMap<Integer, AmqpProtoContext> consumeContext;
-    private int port = PORT;
     private final Logger log = LoggerFactory.getLogger(AmqpProtocol.class);
+    AtomicBoolean running = new AtomicBoolean(true);
+    private int port = PORT;
 
     private AmqpProtocol() {
         consumeContext = new ConcurrentHashMap<>();

@@ -37,9 +37,9 @@ public class MultipartPart {
         ContentDisposition fileItem = null;
         for (var h : simpleBlock.headers.entrySet()) {
             if (h.getKey().equalsIgnoreCase("Content-Type")) {
-                contentType = h.getValue();
+                contentType = h.getValue().trim();
             } else if (h.getKey().equalsIgnoreCase("Content-Disposition")) {
-                fileItem = ContentDisposition.parse(h.getValue());
+                fileItem = ContentDisposition.parse(h.getValue().trim());
             } else {
                 headers.put(h.getKey(), h.getValue());
             }

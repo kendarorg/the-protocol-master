@@ -7,9 +7,9 @@ public class ProxyRequest {
 
     private final String verb;
     private final String protocol;
+    private final String host;
     private String path;
     private int port;
-    private final String host;
 
     public ProxyRequest(String request) throws URISyntaxException {
 
@@ -29,8 +29,8 @@ public class ProxyRequest {
             var uri = new URI(content);
             host = uri.getHost();
             path = uri.getPath();
-            if(uri.getRawQuery()!=null && !uri.getRawQuery().isEmpty()) {
-                path += "?"+uri.getRawQuery();
+            if (uri.getRawQuery() != null && !uri.getRawQuery().isEmpty()) {
+                path += "?" + uri.getRawQuery();
             }
             if (uri.getScheme().equals("https")) {
                 port = 443;

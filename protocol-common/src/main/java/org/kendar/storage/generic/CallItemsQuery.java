@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class CallItemsQuery {
+    private final HashMap<String, String> tags = new HashMap<>();
     private String type;
     private HashSet<Integer> used = new HashSet<>();
-    private final HashMap<String, String> tags = new HashMap<>();
     private String caller;
 
     public HashMap<String, String> getTags() {

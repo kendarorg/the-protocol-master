@@ -44,12 +44,12 @@ public class SimpleHttpServer {
         var request = reqResBuilder.fromExchange(exchange, "http");
         var outputStream = exchange.getResponseBody();
         byte[] bytes = null;
-        if(request.getPath().endsWith("image.gif")){
+        if (request.getPath().endsWith("image.gif")) {
             var frf = new FileResourcesUtils();
             bytes = frf.getFileFromResourceAsByteArray("resource://image.gif");
             exchange.getResponseHeaders().add("Content-Type", "image/gif");
 
-        }else if(request.getPath().equalsIgnoreCase("/jsonized")){
+        } else if (request.getPath().equalsIgnoreCase("/jsonized")) {
             var serializedRequest = mapper.serialize(request);
             bytes = serializedRequest.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().add("Content-Type", "application/json");

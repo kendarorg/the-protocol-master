@@ -7,13 +7,13 @@ import java.util.Map;
 
 public class GlobalSettings {
     private static final JsonMapper mapper = new JsonMapper();
+    private final Map<String, Object> services = new HashMap<>();
     private String pluginsDir;
     private String logLevel;
     private String dataDir;
     private String logType;
     private int apiPort;
     private Map<String, Object> protocols = new HashMap<>();
-    private final Map<String, Object> services = new HashMap<>();
 
     public int getApiPort() {
         return apiPort;

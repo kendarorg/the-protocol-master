@@ -32,6 +32,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
     private static final String BASIC_AUTH_MARKER = "basic";
     private static final String BASIC_AUTH_SEPARATOR = ":";
     private static Logger logger;
+    private static JsonMapper mapper = new JsonMapper();
 
     public RequestResponseBuilderImpl() {
 
@@ -110,9 +111,9 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
                 if (MimeChecker.isBinary(result)) {
                     result.setRequestText(new BinaryNode(data));
                 } else {
-                    if(MimeChecker.isJson(headerContentType)) {
+                    if (MimeChecker.isJson(headerContentType)) {
                         result.setRequestText(mapper.toJsonNode(new String(data, StandardCharsets.UTF_8)));
-                    }else {
+                    } else {
 
                         result.setRequestText(new TextNode(new String(data, StandardCharsets.UTF_8)));
                     }
@@ -120,8 +121,6 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
             }
         }
     }
-
-    private static JsonMapper mapper =new JsonMapper();
 
     private static void setupAuthHeaders(Request result) {
         var headerAuthorization = result.getFirstHeader(H_AUTHORIZATION);
@@ -135,6 +134,18 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
             result.setBasicUsername(values[0]);
             result.setBasicPassword(values[1]);
         }
+    }
+
+    private static boolean isJsonNodeFull(JsonNode data) {
+        if (data == null) return false;
+        if (data instanceof TextNode) {
+            return !data.textValue().isEmpty();
+        } else if (data instanceof BinaryNode) {
+            return ((BinaryNode) data).binaryValue().length > 0;
+        } else if (data instanceof JsonNode) {
+            return data.size() > 0;
+        }
+        return false;
     }
 
     @Override
@@ -177,18 +188,6 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
         return isJsonNodeFull(data);
     }
 
-    private static boolean isJsonNodeFull(JsonNode data) {
-        if(data ==null) return false;
-        if(data instanceof TextNode){
-            return !data.textValue().isEmpty();
-        }else if(data instanceof BinaryNode){
-            return ((BinaryNode) data).binaryValue().length > 0;
-        }else if(data instanceof JsonNode){
-            return data.size() > 0;
-        }
-        return false;
-    }
-
     @Override
     public boolean hasBody(Response response) {
         var data = response.getResponseText();
@@ -227,18 +226,18 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
                 if (brotli) {
                     bytes = IOUtils.toByteArray(new BrotliInputStream(in));
                     response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
-                }else{
+                } else {
                     bytes = IOUtils.toByteArray(in);
                 }
                 if (responseEntity.getContentType() != null &&
                         MimeChecker.isJsonSmile(responseEntity.getContentType()
-                        .getValue())) {
+                                .getValue())) {
                     responseText = JsonSmile.smileToJSON(bytes);
                 } else if (responseEntity.getContentType() != null &&
                         MimeChecker.isJson(responseEntity.getContentType()
                                 .getValue())) {
                     responseText = mapper.toJsonNode(new String(bytes, StandardCharsets.UTF_8));
-                } else{
+                } else {
                     responseText = new TextNode(new String(bytes, StandardCharsets.UTF_8));
                 }
                 response.setResponseText(responseText);

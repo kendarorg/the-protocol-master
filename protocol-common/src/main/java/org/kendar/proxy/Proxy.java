@@ -16,13 +16,13 @@ import java.util.regex.Pattern;
  * @param <T>
  */
 public abstract class Proxy {
+    private final Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
+    private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
     protected boolean replayer;
     /**
      * Descriptor (of course network like)
      */
     private NetworkProtoDescriptor protocol;
-    private final Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
-    private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
 
     public boolean isReplayer() {
         return replayer;

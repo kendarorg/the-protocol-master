@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AmqpProtoContext extends NetworkProtoContext {
-    private short channel = 1;
     private final Set<Short> channels = new HashSet<>();
+    private short channel = 1;
     private int consumeId;
 
     public AmqpProtoContext(ProtoDescriptor descriptor, int contextId) {

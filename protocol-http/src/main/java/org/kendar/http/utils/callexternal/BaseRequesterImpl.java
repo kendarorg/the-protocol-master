@@ -174,7 +174,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                 HttpEntity entity;
                 try {
                     String contentType = request.getFirstHeader(ConstantsHeader.CONTENT_TYPE);
-                    if(contentType==null){
+                    if (contentType == null) {
                         contentType = ConstantsMime.DEFAULT_CONTENT_TYPE;
                     }
                     if (contentType.indexOf(";") > 0) {
@@ -188,7 +188,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                     } else if (MimeChecker.isBinary(request)) {
                         entity =
                                 new ByteArrayEntity(
-                                        ((BinaryNode)request.getRequestText()).binaryValue(), ContentType.create(contentType));
+                                        ((BinaryNode) request.getRequestText()).binaryValue(), ContentType.create(contentType));
 
                     } else {
                         entity =
@@ -214,7 +214,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                 requestResponseBuilder.fromHttpResponse(httpResponse, response);
             } catch (Exception ex) {
                 response.setStatusCode(404);
-                response.getHeaders().put("Content-Type",List.of("text/plain"));
+                response.getHeaders().put("Content-Type", List.of("text/plain"));
                 response.setResponseText(new TextNode(ex.getMessage()));
                 if (httpResponse != null) {
                     response.setStatusCode(httpResponse.getStatusLine().getStatusCode());

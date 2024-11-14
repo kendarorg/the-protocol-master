@@ -4,8 +4,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kendar.http.utils.ssl.CertificatesManager;
-import org.kendar.utils.FileResourcesUtils;
 import org.kendar.http.utils.ssl.GeneratedCert;
+import org.kendar.utils.FileResourcesUtils;
 
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -24,10 +24,10 @@ public class CertitificatesGeneratorTest {
                         "CN=do_not_trust_test_certs_issuer", null, rootCA, extraDomains, true);
         GeneratedCert domain =
                 target.createCertificate(
-                        "CN=local.gamlor.info", "local.gamlor.info", issuer, extraDomains, false);
+                        "CN=local.cergentest.info", "local.cergentest.info", issuer, extraDomains, false);
         GeneratedCert otherD =
                 target.createCertificate(
-                        "CN=other.gamlor.info", "other.gamlor.info", issuer, extraDomains, false);
+                        "CN=other.cergentest.info", "other.cergentest.info", issuer, extraDomains, false);
     }
 
     @Test
@@ -45,9 +45,9 @@ public class CertitificatesGeneratorTest {
         var extraDomains = new ArrayList<String>();
         GeneratedCert domain =
                 target.createCertificate(
-                        "CN=local.gamlor.info", "local.gamlor.info", root, extraDomains, false);
+                        "CN=local.cergentest.info", "local.cergentest.info", root, extraDomains, false);
         var encodedBytes = domain.certificate.getEncoded();
-        final FileOutputStream os = new FileOutputStream("target/local.gamlor.info.cer");
+        final FileOutputStream os = new FileOutputStream("target/local.cergentest.info.cer");
         os.write("-----BEGIN CERTIFICATE-----\n".getBytes(StandardCharsets.US_ASCII));
         os.write(Base64.encodeBase64(encodedBytes, true));
         os.write("-----END CERTIFICATE-----\n".getBytes(StandardCharsets.US_ASCII));

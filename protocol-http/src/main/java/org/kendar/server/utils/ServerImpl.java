@@ -63,10 +63,8 @@ public class ServerImpl {
     private final Object lolock = new Object();
     private final System.Logger logger;
     private final AtomicReference<InternalSSLConfig> internalSSLConfig = new AtomicReference<>();
-    ServerImpl.Dispatcher dispatcher;
     private final String protocol;
     private final boolean https;
-    private Executor executor;
     //private HttpsConfigurator httpsConfig;
     //private SSLContext sslContext;
     private final ContextList contexts;
@@ -74,13 +72,15 @@ public class ServerImpl {
     private final ServerSocketChannel schan;
     private final Selector selector;
     private final SelectionKey listenerKey;
+    private final HttpServer wrapper;
+    private final Timer timer;
+    ServerImpl.Dispatcher dispatcher;
+    private Executor executor;
     private List<Event> events;
     private volatile boolean finished = false;
     private volatile boolean terminating = false;
     private boolean bound = false;
     private boolean started = false;
-    private final HttpServer wrapper;
-    private final Timer timer;
     private Timer timer1;
     private Thread dispatcherThread;
     private int exchangeCount = 0;
