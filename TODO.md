@@ -13,13 +13,12 @@
 * Set a replayId for replaying?
 * Change Supplier<Boolean> stopWhenFalseAction to a callback to register for
 * Remove spring boot
-* Add an api to list the plugins
 * Publish on maven central
 * Common
     * Test internal apis
 * Http
-    * test file upload
-    * Use anonymous Object for serialization for HTTP Body and Multipart
+    * test brotli compression
+    * Use anonymous Object for serialization for HTTP Multipart
 
 //Should handle somehow
 globalFilter.setShutdownVariable(stopWhenFalse);

@@ -1,7 +1,6 @@
 package org.kendar.http;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.fileupload.FileUploadException;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
@@ -23,14 +22,11 @@ public class SimpleHttpServer {
         httpServer = new KendarHttpServer(address, 10);
         var srv = this;
         reqResBuilder = new RequestResponseBuilderImpl();
-        httpServer.createContext("/", new HttpHandler() {
-            @Override
-            public void handle(HttpExchange exchange) throws IOException {
-                try {
-                    srv.handle(exchange);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
+        httpServer.createContext("/", exchange -> {
+            try {
+                srv.handle(exchange);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
         });
         httpServer.start();
@@ -41,22 +37,27 @@ public class SimpleHttpServer {
     }
 
     private void handle(HttpExchange exchange) throws IOException, FileUploadException {
-        var request = reqResBuilder.fromExchange(exchange, "http");
-        var outputStream = exchange.getResponseBody();
-        byte[] bytes = null;
-        if (request.getPath().endsWith("image.gif")) {
-            var frf = new FileResourcesUtils();
-            bytes = frf.getFileFromResourceAsByteArray("resource://image.gif");
-            exchange.getResponseHeaders().add("Content-Type", "image/gif");
+        try {
+            var request = reqResBuilder.fromExchange(exchange, "http");
 
-        } else if (request.getPath().equalsIgnoreCase("/jsonized")) {
-            var serializedRequest = mapper.serialize(request);
-            bytes = serializedRequest.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json");
+            var outputStream = exchange.getResponseBody();
+            byte[] bytes = new byte[]{};
+            if (request.getPath().endsWith("image.gif")) {
+                var frf = new FileResourcesUtils();
+                bytes = frf.getFileFromResourceAsByteArray("resource://image.gif");
+                exchange.getResponseHeaders().add("Content-Type", "image/gif");
+
+            } else if (request.getPath().equalsIgnoreCase("/jsonized")) {
+                var serializedRequest = mapper.serialize(request);
+                bytes = serializedRequest.getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().add("Content-Type", "application/json");
+            }
+            exchange.sendResponseHeaders(200, bytes.length);
+            outputStream.write(bytes);
+            outputStream.flush();
+            outputStream.close();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
         }
-        exchange.sendResponseHeaders(200, bytes.length);
-        outputStream.write(bytes);
-        outputStream.flush();
-        outputStream.close();
     }
 }

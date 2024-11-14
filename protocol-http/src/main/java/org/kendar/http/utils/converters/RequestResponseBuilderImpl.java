@@ -139,8 +139,10 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
     private static boolean isJsonNodeFull(JsonNode data) {
         if (data == null) return false;
         if (data instanceof TextNode) {
+            if(data.textValue()==null)return false;
             return !data.textValue().isEmpty();
         } else if (data instanceof BinaryNode) {
+            if(((BinaryNode) data).binaryValue()==null)return false;
             return ((BinaryNode) data).binaryValue().length > 0;
         } else if (data instanceof JsonNode) {
             return !data.isEmpty();

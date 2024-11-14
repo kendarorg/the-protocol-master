@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.BinaryNode;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -14,7 +15,6 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -30,13 +30,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.kendar.http.utils.ConsumeException;
+import org.kendar.http.utils.NullEntity;
 import org.kendar.utils.FileResourcesUtils;
 import org.testcontainers.shaded.com.trilead.ssh2.crypto.Base64;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Stream;
@@ -199,6 +197,16 @@ public class SimpleTest extends BasicTest {
                                 var content = getContentString(httpResponse);
                                 assertTrue(content.contains("par1Value"));
                             })
+                    ,Arguments.of(
+                            "DSC:jsonizedPostJsonStringGzip",
+                            new GzipCompressingEntity(new StringEntity("{\"id\":1,\"name\":\"John\"}")),
+                            new HttpPost("http://localhost:" + 8456 + "/jsonized"),
+                            //new HttpPost("https://echo.free.beeceptor.com"),
+                            Map.of("Content-Type", "application/json"),
+                            (ConsumeException<HttpResponse>) httpResponse -> {
+                                var content = getContentString(httpResponse);
+                                assertTrue(content.contains("\"John\""));
+                            })
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -253,7 +261,7 @@ public class SimpleTest extends BasicTest {
         var recordPlugin = baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("record-plugin")).findFirst();
         recordPlugin.get().setActive(true);
 
-        var httpclient = createHttpClient(HttpClients.custom());
+        var httpclient = createHttpsHttpClient();
 
         if (HttpEntityEnclosingRequestBase.class.isAssignableFrom(httpPost.getClass())) {
             ((HttpEntityEnclosingRequestBase) httpPost).setEntity(entity);
@@ -266,30 +274,4 @@ public class SimpleTest extends BasicTest {
         consumer.accept(httpresponse);
     }
 
-    public static class NullEntity extends AbstractHttpEntity implements Cloneable {
-        @Override
-        public boolean isRepeatable() {
-            return false;
-        }
-
-        @Override
-        public long getContentLength() {
-            return 0;
-        }
-
-        @Override
-        public InputStream getContent() throws IOException, UnsupportedOperationException {
-            return null;
-        }
-
-        @Override
-        public void writeTo(OutputStream outputStream) throws IOException {
-
-        }
-
-        @Override
-        public boolean isStreaming() {
-            return false;
-        }
-    }
 }

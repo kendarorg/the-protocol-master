@@ -112,7 +112,12 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                     }
                 }
             }
-            fullRequest.addHeader("Host", request.getHost());
+            var port = request.getPort();
+            if(port>0) {
+                fullRequest.addHeader("Host", request.getHost()+":"+port);
+            }else{
+                fullRequest.addHeader("Host", request.getHost());
+            }
             /*if (request.isSoapRequest()) {
                 HttpEntity entity = handleSoapRequest(request);
                 ((HttpEntityEnclosingRequestBase) fullRequest).setEntity(entity);

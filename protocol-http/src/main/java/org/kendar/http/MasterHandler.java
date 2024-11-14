@@ -168,6 +168,7 @@ public class MasterHandler implements HttpHandler {
             } else {
                 request = requestResponseBuilder.fromExchange(httpExchange, "http");
             }
+            request.removeHeader("transfer-encoding");
             request.setMs(Calendar.getInstance().getTimeInMillis());
 
             //START REQUEST

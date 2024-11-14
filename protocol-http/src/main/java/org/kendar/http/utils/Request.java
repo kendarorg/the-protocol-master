@@ -312,4 +312,13 @@ public class Request {
                     getPath() + query;
         }
     }
+
+    public void removeHeader(String s) {
+        for (var kvp : headers.keySet()) {
+            if (s.equalsIgnoreCase(kvp)) {
+                headers.remove(kvp);
+                return;
+            }
+        }
+    }
 }
