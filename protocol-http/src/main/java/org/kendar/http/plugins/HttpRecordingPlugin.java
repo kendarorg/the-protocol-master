@@ -1,7 +1,7 @@
 package org.kendar.http.plugins;
 
 import org.kendar.http.utils.Request;
-import org.kendar.plugins.BasicRecordingPlugin;
+import org.kendar.plugins.RecordingPlugin;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class HttpRecordingPlugin extends BasicRecordingPlugin {
+public class HttpRecordingPlugin extends RecordingPlugin {
     private List<Pattern> recordSites = new ArrayList<>();
     private HttpRecordPluginSettings settings;
 

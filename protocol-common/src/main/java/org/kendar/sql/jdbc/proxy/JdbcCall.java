@@ -5,7 +5,7 @@ import org.kendar.sql.jdbc.BindingParameter;
 import java.util.List;
 
 public class JdbcCall {
-    private final String query;
+    private String query;
     private final List<BindingParameter> parameterValues;
 
     public JdbcCall(String query, List<BindingParameter> parameterValues) {
@@ -20,5 +20,9 @@ public class JdbcCall {
 
     public List<BindingParameter> getParameterValues() {
         return parameterValues;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 }

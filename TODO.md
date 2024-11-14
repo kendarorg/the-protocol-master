@@ -9,7 +9,7 @@
 ### Code
 
 * Test with replay record multiple protocols at same time
-* Add mock type for nth call
+* Add mock plugin (nth and simple replace)
 * Set a replayId for replaying?
 * Change Supplier<Boolean> stopWhenFalseAction to a callback to register for
 * Remove spring boot

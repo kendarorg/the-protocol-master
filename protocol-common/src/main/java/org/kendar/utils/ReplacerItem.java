@@ -1,6 +1,6 @@
 package org.kendar.utils;
 
-public class QueryReplacerItem {
+public class ReplacerItem {
     private String toFind;
     private String toReplace;
     private boolean regex;

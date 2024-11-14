@@ -17,7 +17,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
+public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
     protected static JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected StorageRepository storage;
@@ -139,7 +139,7 @@ public abstract class BasicJdbcReplayingPlugin extends ProtocolPluginDescriptor<
         return BasicReplayPluginSettings.class;
     }
 
-    public BasicJdbcReplayingPlugin withStorage(FileStorageRepository storage) {
+    public JdbcReplayingPlugin withStorage(FileStorageRepository storage) {
         this.storage = storage;
         return this;
     }

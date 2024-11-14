@@ -5,6 +5,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.kendar.mysql.MySQLProtocol;
 import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.RewritePluginSettings;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.server.TcpServer;
@@ -16,18 +17,16 @@ import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
-import org.kendar.utils.QueryReplacerItem;
+import org.kendar.utils.ReplacerItem;
 import org.kendar.utils.Sleeper;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class JdbcRunner extends CommonRunner {
-    private static final TypeReference<List<QueryReplacerItem>> replaceItemsList = new TypeReference<>() {
+    private static final TypeReference<List<ReplacerItem>> replaceItemsList = new TypeReference<>() {
     };
     private static final JsonMapper mapper = new JsonMapper();
     private final String protocol;
@@ -38,13 +37,7 @@ public class JdbcRunner extends CommonRunner {
         this.protocol = id;
     }
 
-    private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws Exception {
-        var lines = new String(Files.readAllBytes(Path.of(jdbcReplaceQueries).toAbsolutePath()));
 
-        var items = (List<QueryReplacerItem>) mapper.deserialize(lines, replaceItemsList);
-
-        proxy.setQueryReplacement(items);
-    }
 
     @Override
     public String getDefaultPort() {
@@ -57,7 +50,7 @@ public class JdbcRunner extends CommonRunner {
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
         options.addOption(createOpt("js", "schema", true, "Set schema"));
-        options.addOption(createOpt("jr", "replaceQueryFile", true, "Replace queries file"));
+        options.addOption(createOpt("rew", "rewrite", true, "Rewrite a query (requires a file)."));
         if (!isExecute) return;
         setCommonData(args, options, go, new JdbcProtocolSettings());
     }
@@ -67,7 +60,11 @@ public class JdbcRunner extends CommonRunner {
         var sets = (JdbcProtocolSettings) result;
 
         sets.setForceSchema(ProtocolsRunner.getOrDefault(cmd.getOptionValue("schema"), ""));
-        sets.setReplaceQueryFile(ProtocolsRunner.getOrDefault(cmd.getOptionValue("replaceQueryFile"), ""));
+        if(cmd.hasOption("rewrite")){
+            var pl = new RewritePluginSettings();
+            pl.setRewritesFile(cmd.getOptionValue("rewrite","rewrite.json"));
+            sets.getPlugins().put("rewrite-plugin", pl);
+        }
     }
 
     @Override
@@ -111,11 +108,6 @@ public class JdbcRunner extends CommonRunner {
             plugin.initialize(ini, protocolSettings);
         }
         proxy.setPlugins(plugins);
-        var jdbcReplaceQueries = ((JdbcProtocolSettings) protocolSettings).getReplaceQueryFile();
-        if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
-
-            handleReplacementQueries(jdbcReplaceQueries, proxy);
-        }
 
         baseProtocol.setProxy(proxy);
         baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(), 30));

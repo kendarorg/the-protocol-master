@@ -6,7 +6,7 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.plugins.BasicReplayingPlugin;
+import org.kendar.plugins.ReplayingPlugin;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class HttpReplayingPlugin extends BasicReplayingPlugin {
+public class HttpReplayingPlugin extends ReplayingPlugin {
     private HttpReplayPluginSettings settings;
     private boolean blockExternal = true;
     private List<Pattern> matchSites = new ArrayList<>();

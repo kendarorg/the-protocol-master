@@ -1,6 +1,6 @@
 package org.kendar.postgres.plugins;
 
-import org.kendar.plugins.BasicJdbcRecordingPlugin;
+import org.kendar.plugins.JdbcRecordingPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.storage.StorageItem;
@@ -8,7 +8,7 @@ import org.kendar.storage.StorageItem;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PostgresRecordPlugin extends BasicJdbcRecordingPlugin {
+public class PostgresRecordPlugin extends JdbcRecordingPlugin {
     @Override
     public String getProtocol() {
         return "postgres";

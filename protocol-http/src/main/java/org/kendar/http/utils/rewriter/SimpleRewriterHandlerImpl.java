@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class SimpleRewriterHandlerImpl implements SimpleRewriterHandler {
     private static final String HTTP = "http";
-    private static final String HTTPS = "http";
+    private static final String HTTPS = "https";
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final SimpleRewriterConfig config;
     private final DnsMultiResolver multiResolver;

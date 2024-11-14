@@ -13,7 +13,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
+public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
 
@@ -92,7 +92,7 @@ public abstract class BasicRecordingPlugin extends ProtocolPluginDescriptor<Obje
         return this;
     }
 
-    public BasicRecordingPlugin withStorage(StorageRepository storage) {
+    public RecordingPlugin withStorage(StorageRepository storage) {
         if (storage != null) {
             this.storage = storage;
         }

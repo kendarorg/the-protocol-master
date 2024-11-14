@@ -1,13 +1,13 @@
 package org.kendar.mysql.plugins;
 
-import org.kendar.plugins.BasicJdbcReplayingPlugin;
+import org.kendar.plugins.JdbcReplayingPlugin;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.utils.JsonMapper;
 
-public class MySqlReplayPlugin extends BasicJdbcReplayingPlugin {
+public class MySqlReplayPlugin extends JdbcReplayingPlugin {
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
     private static final String SELECT_TRANS_RESULT = "{\n" +
             "      \"records\" : [ [ \"0\" ] ],\n" +

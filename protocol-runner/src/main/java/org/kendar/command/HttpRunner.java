@@ -15,6 +15,7 @@ import org.kendar.http.utils.rewriter.RemoteServerStatus;
 import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
 import org.kendar.http.utils.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.RewritePluginSettings;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -71,6 +72,7 @@ public class HttpRunner extends CommonRunner {
     @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go,
                     Options options, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
+        options.addOption(createOpt("rew", "rewrite", true, "Rewrite request url (requires a file)."));
         options.addOption(createOpt("ht", "http", true, "Http port (def 4080)"));
         options.addOption(createOpt("hs", "https", true, "Https port (def 4443)"));
         options.addOption(createOpt("prx", "proxy", true, "Http/s proxy port (def 9999)"));
@@ -121,6 +123,11 @@ public class HttpRunner extends CommonRunner {
             pl.setPlugin("record-plugin");
             pl.setActive(true);
             section.getPlugins().put("record-plugin", pl);
+        }
+        if(cmd.hasOption("rewrite")){
+            var pl = new RewritePluginSettings();
+            pl.setRewritesFile(cmd.getOptionValue("rewrite","rewrite.json"));
+            section.getPlugins().put("rewrite-plugin", pl);
         }
         if (cmd.hasOption("showError") && cmd.hasOption("errorPercent")) {
             var pl = new HttpErrorPluginSettings();

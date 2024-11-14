@@ -80,7 +80,7 @@ public abstract class CommonRunner {
             section.getPlugins().put("record-plugin", plugin);
             plugin.setPlugin("record-plugin");
             plugin.setActive(true);
-        } else if (cmd.hasOption("mock")) {
+        }else if (cmd.hasOption("mock")) {
             throw new RuntimeException("MISSING MOCK");
         }
         parseExtra(section, cmd);

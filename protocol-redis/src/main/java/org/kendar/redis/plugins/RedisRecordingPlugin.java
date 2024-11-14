@@ -1,6 +1,6 @@
 package org.kendar.redis.plugins;
 
-import org.kendar.plugins.BasicRecordingPlugin;
+import org.kendar.plugins.RecordingPlugin;
 import org.kendar.proxy.PluginContext;
 import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
@@ -8,7 +8,7 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 
-public class RedisRecordingPlugin extends BasicRecordingPlugin {
+public class RedisRecordingPlugin extends RecordingPlugin {
     @Override
     protected Object getData(Object of) {
         if (of instanceof Resp3Message) {

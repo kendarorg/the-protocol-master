@@ -2,8 +2,68 @@
 
 ![](protocolmaster_s.gif)
 
-The "protocol-master" is a command line tool (usable for any language) with (if you want to embed it)
-a set of java libraries, aimed at various tasks (and an executable jar if you want to try it quickly)
+The "protocol-master" is a java command line tool to emulate/change/record
+APIs and server calls for testing apps with the following protocol: 
+HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091
+... and all the compatible ones!
+
+The main targets are testing and inspection
+
+You can use it to:
+
+* Block troubles BEFORE PRODUCTION
+* Simulate errors
+* Simulate behaviours
+* Mock responses without coding
+* Mock entire infrastructures without coding
+* "Gold standard" test without infrastructure without coding
+
+The whole project is covered with Jacoco (73% coverage actually)
+
+## Get Started
+
+Start looking at [tutorials](docs/tutorials.md) for a good start
+
+## Examples
+
+Open a http/s proxy on port 9999 and record everything that goes through
+
+```
+java -jar protocol-runner.jar -protocol http -proxy 9999 \
+    -record
+```
+
+Create a local postgres "forward proxy" to a real one and record everything
+
+```
+java -jar protocol-runner.jar -protocol postgres  \
+    -connection jdbc:postgresql://REALSERVER:5432  \
+    -login REALLOGIN -password REALPWD \
+    -record
+```
+
+Open a http/s proxy on port 9999 and return a 503 error, on 50% of calls
+
+```
+java -jar protocol-runner.jar -protocol http -proxy 9999 \
+    -showError 503 errorPercent 40
+```
+
+## Features
+
+* Run on any OS
+  * Windows
+  * macOS
+  * Linux
+
+
+
+
+
+
+
+
+
 
 * Create a state machine able to interpret a generic wire protocol, handling
   special situations like incomplete messages, sanding and receiving data according
@@ -59,7 +119,7 @@ several database wire protocol implementations:
 * Record all request response
 
 ```
-java -jar protocol-runner.jar -datadir recording -protocol http -record
+java -jar protocol-runner.jar -protocol http -record
 ```
 
 * Inside directory "recording"

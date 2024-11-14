@@ -4,9 +4,11 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.utils.JsonMapper;
 
 public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor {
 
+    protected final static JsonMapper mapper = new JsonMapper();
     private boolean active;
     private String instanceId = "default";
 

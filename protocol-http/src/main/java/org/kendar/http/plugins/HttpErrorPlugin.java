@@ -39,6 +39,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response>
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+        super.initialize(global,protocol);
         return this;
     }
 

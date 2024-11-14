@@ -1,6 +1,6 @@
 package org.kendar.mysql.plugins;
 
-import org.kendar.plugins.BasicJdbcRecordingPlugin;
+import org.kendar.plugins.JdbcRecordingPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.storage.CompactLine;
@@ -9,7 +9,7 @@ import org.kendar.storage.StorageItem;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MySqlRecordPlugin extends BasicJdbcRecordingPlugin {
+public class MySqlRecordPlugin extends JdbcRecordingPlugin {
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
 
     @Override

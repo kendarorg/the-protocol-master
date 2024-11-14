@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Object, Object> {
+public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
@@ -29,7 +29,7 @@ public abstract class BasicReplayingPlugin extends ProtocolPluginDescriptor<Obje
         return this;
     }
 
-    public BasicReplayingPlugin withStorage(StorageRepository storage) {
+    public ReplayingPlugin withStorage(StorageRepository storage) {
 
         if (storage != null) {
             this.storage = storage;

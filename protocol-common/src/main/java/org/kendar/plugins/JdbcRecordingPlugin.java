@@ -17,7 +17,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
+public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
     protected static JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
 
@@ -99,7 +99,7 @@ public abstract class BasicJdbcRecordingPlugin extends ProtocolPluginDescriptor<
         return of;
     }
 
-    public BasicJdbcRecordingPlugin withStorage(StorageRepository storage) {
+    public JdbcRecordingPlugin withStorage(StorageRepository storage) {
         this.storage = storage;
         return this;
     }

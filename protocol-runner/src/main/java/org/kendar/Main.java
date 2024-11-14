@@ -6,7 +6,6 @@ import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.logging.LogFactory;
 import org.kendar.amqp.v09.plugins.AmqpRecordingPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
 import org.kendar.apis.ApiHandler;
@@ -15,16 +14,19 @@ import org.kendar.command.*;
 import org.kendar.http.plugins.HttpErrorPlugin;
 import org.kendar.http.plugins.HttpRecordingPlugin;
 import org.kendar.http.plugins.HttpReplayingPlugin;
+import org.kendar.http.plugins.HttpRewritePlugin;
 import org.kendar.mongo.plugins.MongoRecordingPlugin;
 import org.kendar.mongo.plugins.MongoReplayingPlugin;
 import org.kendar.mqtt.plugins.MqttRecordingPlugin;
 import org.kendar.mqtt.plugins.MqttReplayingPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
+import org.kendar.mysql.plugins.MySqlRewritePlugin;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.postgres.plugins.PostgresReplayPlugin;
+import org.kendar.postgres.plugins.PostgresRewritePlugin;
 import org.kendar.redis.plugins.RedisRecordingPlugin;
 import org.kendar.redis.plugins.RedisReplayingPlugin;
 import org.kendar.server.TcpServer;
@@ -138,7 +140,8 @@ public class Main {
         addEmbedded(allPlugins, "http", List.of(
                 new HttpRecordingPlugin(),
                 new HttpErrorPlugin(),
-                new HttpReplayingPlugin()));
+                new HttpReplayingPlugin(),
+                new HttpRewritePlugin()));
         addEmbedded(allPlugins, "mongodb", List.of(
                 new MongoRecordingPlugin(),
                 new MongoReplayingPlugin()));
@@ -153,10 +156,12 @@ public class Main {
                 new MqttReplayingPlugin()));
         addEmbedded(allPlugins, "postgres", List.of(
                 new PostgresRecordPlugin(),
-                new PostgresReplayPlugin()));
+                new PostgresReplayPlugin(),
+                new PostgresRewritePlugin()));
         addEmbedded(allPlugins, "mysql", List.of(
                 new MySqlRecordPlugin(),
-                new MySqlReplayPlugin()));
+                new MySqlReplayPlugin(),
+                new MySqlRewritePlugin()));
         return allPlugins;
     }
 
@@ -175,7 +180,10 @@ public class Main {
 
     public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<PluginDescriptor>> allPlugins) throws Exception {
         if (ini == null) return;
-        var logsDir = ProtocolsRunner.getOrDefault(ini.getDataDir(), "data");
+        var logsDir = ProtocolsRunner.getOrDefault(
+                ini.getDataDir(),
+                Path.of("data",
+                Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString());
         StorageRepository storage = setupStorage(logsDir);
         storage.initialize();
         ini.putService(storage.getType(), storage);

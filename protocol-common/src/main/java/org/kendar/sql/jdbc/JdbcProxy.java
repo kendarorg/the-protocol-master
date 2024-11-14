@@ -9,7 +9,6 @@ import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.parser.SqlStringParser;
-import org.kendar.utils.QueryReplacerItem;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +18,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class JdbcProxy extends Proxy {
@@ -28,7 +26,6 @@ public class JdbcProxy extends Proxy {
     private final String forcedSchema;
     private final String login;
     private final String password;
-    private List<QueryReplacerItem> queryReplacements = new ArrayList<>();
 
     public JdbcProxy() {
         this(null, null, null, null, null);
@@ -270,22 +267,6 @@ public class JdbcProxy extends Proxy {
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
                                      ArrayList<JDBCType> concreteTypes, ProtoContext context) {
-        if (!queryReplacements.isEmpty()) {
-            query = query.replaceAll("\r\n", "\n").trim();
-            for (int i = 0; i < queryReplacements.size(); i++) {
-                var replace = queryReplacements.get(i);
-                var find = replace.getToFind().replaceAll("\r\n", "\n").trim();
-                var repl = replace.getToReplace().replaceAll("\r\n", "\n").trim();
-
-                if (replace.isRegex()) {
-                    query = Pattern.compile(find, Pattern.DOTALL | Pattern.CASE_INSENSITIVE).matcher(query).replaceFirst(repl);
-                } else {
-                    if (find.equalsIgnoreCase(query)) {
-                        query = repl;
-                    }
-                }
-            }
-        }
 
         try {
             var result = new SelectResult();
@@ -302,10 +283,10 @@ public class JdbcProxy extends Proxy {
 
             var c = ((Connection) ((ProxyConnection) connection).getConnection());
             if (parameterValues.isEmpty()) {
-                statement = c.prepareStatement(query, insert ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
+                statement = c.prepareStatement(jdbcCall.getQuery(), insert ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
             } else {
                 ParametrizedStatement parametrizedStatementBuilder = buildParametrizedStatement(
-                        query, parameterValues, parser, c,
+                        jdbcCall.getQuery(), parameterValues, parser, c,
                         concreteTypes, insert);
                 statement = parametrizedStatementBuilder.ps;
             }
@@ -467,9 +448,5 @@ public class JdbcProxy extends Proxy {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void setQueryReplacement(List<QueryReplacerItem> items) {
-        queryReplacements = items;
     }
 }
