@@ -67,8 +67,9 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        proxy.setPlugins(List.of(
-                new PostgresRecordPlugin().asActive()));
+        var pl = new PostgresRecordPlugin();
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

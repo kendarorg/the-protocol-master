@@ -51,7 +51,9 @@ public class ReplayerTest {
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos0Test"));
         storage.initialize();
-        proxy.setPlugins(List.of(new MqttReplayingPlugin().withStorage(storage).asActive()));
+        var pl = new MqttReplayingPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);
@@ -98,7 +100,9 @@ public class ReplayerTest {
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos1Test"));
         storage.initialize();
-        proxy.setPlugins(List.of(new MqttReplayingPlugin().withStorage(storage).asActive()));
+        var pl = new MqttReplayingPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -145,7 +149,9 @@ public class ReplayerTest {
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos2Test"));
         storage.initialize();
-        proxy.setPlugins(List.of(new MqttReplayingPlugin().withStorage(storage).asActive()));
+        var pl = new MqttReplayingPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

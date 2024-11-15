@@ -1,0 +1,37 @@
+{
+  "pluginsDir": "plugins",
+  "logLevel": "DEBUG",
+  "dataDir": "{dataDir}",
+  "apiPort": 0,
+  "protocols": {
+    "postgres-01": {
+      "protocol": "postgres",
+      "port": {postgresPort},
+      "login": "{postgresLogin}",
+      "password": "{postgresPassword}",
+      "connectionString": "{postgresConnection}",
+      "plugins": {
+        "record-plugin": {
+          "active": {recordActive}
+        },
+        "replay-plugin": {
+          "active": {replayActive}
+        }
+      }
+    },
+    "http-01": {
+      "protocol": "http",
+      "http": {httpPort},
+      "https": {httpsPort},
+      "proxy": {proxyPort},
+      "plugins": {
+        "record-plugin": {
+          "active": {recordActive}
+        },
+        "replay-plugin": {
+          "active": {replayActive}
+        }
+      }
+    }
+  }
+}

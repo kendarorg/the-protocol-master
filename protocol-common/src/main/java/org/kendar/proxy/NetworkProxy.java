@@ -25,13 +25,13 @@ public abstract class NetworkProxy extends Proxy {
     protected AsynchronousChannelGroup group;
 
     public NetworkProxy() {
-        this.replayer = true;
+        super();
         init();
     }
 
     public NetworkProxy(String connectionString, String userId, String password) {
+        super();
         try {
-            this.replayer = false;
             this.connectionString = connectionString;
             if (connectionString != null && !connectionString.isEmpty()) {
                 var uri = new URI(connectionString);

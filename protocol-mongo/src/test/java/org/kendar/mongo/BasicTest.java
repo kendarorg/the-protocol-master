@@ -77,8 +77,9 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        proxy.setPlugins(List.of(
-                new MongoRecordingPlugin().asActive()));
+        var pl = new MongoRecordingPlugin();
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

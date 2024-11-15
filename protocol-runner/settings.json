@@ -9,14 +9,7 @@
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
-      "connection": "jdbc:mysql://localhost:3306",
-      "simulation": {
-        "replay": false,
-        "record": false,
-        "mock": false,
-        "RespectCallDuration": true,
-        "ReplayId": "replay{timestamp}"
-      }
+      "connectionString": "jdbc:mysql://localhost:3306"
     },
     "mqtt-01": {
       "protocol": "mqtt",
@@ -24,14 +17,7 @@
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
-      "connection": "tcp://localhost:1885",
-      "simulation": {
-        "replay": false,
-        "record": false,
-        "mock": false,
-        "RespectCallDuration": true,
-        "ReplayId": "replay{timestamp}"
-      }
+      "connectionString": "tcp://localhost:1885"
     }
   }
 }

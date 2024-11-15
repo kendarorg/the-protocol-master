@@ -19,16 +19,6 @@ public class StandardProtocolsTest extends BasicTest {
 
     private AtomicBoolean runTheServer = new AtomicBoolean(true);
 
-    @BeforeAll
-    public static void beforeClass() {
-        beforeClassBase();
-
-    }
-
-    @AfterAll
-    public static void afterClass() throws Exception {
-        afterClassBase();
-    }
 
     @BeforeEach
     public void beforeEach() throws IOException {
@@ -40,6 +30,16 @@ public class StandardProtocolsTest extends BasicTest {
         runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(100);
+    }
+    @BeforeAll
+    public static void beforeClass() {
+        beforeClassBase();
+
+    }
+
+    @AfterAll
+    public static void afterClass() throws Exception {
+        afterClassBase();
     }
 
     @Test
@@ -301,7 +301,7 @@ public class StandardProtocolsTest extends BasicTest {
         Main.stop();
     }
 
-    private void startAndHandleUnexpectedErrors(String[] args) {
+    private void startAndHandleUnexpectedErrors(String ... args) {
         AtomicReference exception = new AtomicReference(null);
         var serverThread = new Thread(() -> {
             try {

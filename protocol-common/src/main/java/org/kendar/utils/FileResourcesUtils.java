@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -65,7 +64,7 @@ public class FileResourcesUtils {
     }
 
 
-    public List<String> getFileFromResourceAsString(String fileName) {
+    public String getFileFromResourceAsString(String fileName) {
         var result = new ArrayList<String>();
         var is = getFileFromResourceAsStream(fileName);
         try (InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
@@ -78,7 +77,7 @@ public class FileResourcesUtils {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
-        return result;
+        return String.join("\n",result);
     }
 
     /*

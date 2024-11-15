@@ -31,7 +31,9 @@ public class ReplayerTest {
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "replay"));
         storage.initialize();
-        proxy.setPlugins(List.of(new RedisReplayingPlugin().withStorage(storage).asActive()));
+        var pl = new RedisReplayingPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

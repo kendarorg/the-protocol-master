@@ -1,5 +1,7 @@
 package org.kendar.plugins;
 
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReplayStatusEvent;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -48,6 +50,10 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
             return true;
         }
         return false;
+    }
+
+    protected void handleActivation(boolean active) {
+        EventsQueue.send(new ReplayStatusEvent(active));
     }
 
     protected void sendAndExpect(PluginContext pluginContext, JdbcCall inObj, SelectResult outObj) {

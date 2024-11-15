@@ -43,6 +43,8 @@ public class SimpleHttpServer {
 
         var outputStream = exchange.getResponseBody();
         var serialized = mapper.serialize(request).getBytes(StandardCharsets.UTF_8);
+
+        exchange.getResponseHeaders().add("Content-Type", "application/json");
         exchange.sendResponseHeaders(200, serialized.length);
         outputStream.write(serialized);
         outputStream.flush();

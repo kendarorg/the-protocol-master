@@ -16,11 +16,6 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
         return instanceId;
     }
 
-    public ProtocolPluginDescriptor<T, K> asActive() {
-        active = true;
-        return this;
-    }
-
     /**
      * @param request
      * @param response
@@ -57,7 +52,7 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
     }
 
     public void setActive(boolean active) {
-        handleActivation(active);
+        if(active!=this.active)handleActivation(active);
         this.active = active;
     }
 }

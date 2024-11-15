@@ -1,5 +1,7 @@
 package org.kendar.plugins;
 
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReplayStatusEvent;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
@@ -57,6 +59,11 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
             }
         }
         return false;
+    }
+
+    @Override
+    protected void handleActivation(boolean active) {
+        EventsQueue.send(new ReplayStatusEvent(active));
     }
 
     protected void sendAndExpect(PluginContext pluginContext, Object in, Object out) {

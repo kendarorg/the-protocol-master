@@ -124,6 +124,7 @@ public class FileStorageRepository implements StorageRepository {
 
             var repo = protocolRepo.get(item.getInstanceId());
             repo.index.add(item.getCompactLine());
+            repo.somethingWritten=true;
             if (item.getStorageItem() != null) {
                 var result = mapper.serializePretty(item.getStorageItem());
                 if (!Files.exists(Paths.get(targetDir))) {
@@ -182,6 +183,10 @@ public class FileStorageRepository implements StorageRepository {
         try {
             var repo = protocolRepo.get(protocolInstanceId);
             if (repo == null) return;
+            if(!repo.somethingWritten){
+                protocolRepo.remove(protocolInstanceId);
+                return;
+            }
             var indexFile = "index." + protocolInstanceId + ".json";
             if (Files.exists(Path.of(targetDir, indexFile))) {
                 Files.delete(Path.of(targetDir, indexFile));
@@ -296,5 +301,6 @@ public class FileStorageRepository implements StorageRepository {
         public final List<StorageItem> outItems = new ArrayList<>();
         public List<CompactLine> index = new ArrayList<>();
         public boolean initialized = false;
+        public volatile boolean somethingWritten=false;
     }
 }

@@ -29,12 +29,12 @@ public class JdbcProxy extends Proxy {
 
     public JdbcProxy() {
         this(null, null, null, null, null);
-        this.replayer = true;
+
 
     }
 
     public JdbcProxy(String driver, String connectionString, String forcedSchema, String login, String password) {
-
+        super();
         this.driver = driver;
         this.connectionString = connectionString;
         this.forcedSchema = forcedSchema;

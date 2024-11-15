@@ -1,5 +1,7 @@
 package org.kendar.proxy;
 
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReplayStatusEvent;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.ProtocolPluginDescriptor;
@@ -19,6 +21,15 @@ public abstract class Proxy {
     private final Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
     private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
     protected boolean replayer;
+
+    protected Proxy(){
+        EventsQueue.register(this.toString(), this::replayChange, ReplayStatusEvent.class);
+    }
+
+    private void replayChange(ReplayStatusEvent e) {
+        replayer = e.isReplaying();
+    }
+
     /**
      * Descriptor (of course network like)
      */
@@ -43,6 +54,7 @@ public abstract class Proxy {
      * @param protocol
      */
     public void setProtocol(NetworkProtoDescriptor protocol) {
+
         this.protocol = protocol;
     }
 

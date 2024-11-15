@@ -2,6 +2,8 @@ package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.beanutils.BeanUtils;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReplayStatusEvent;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
@@ -28,6 +30,10 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
 
+    }
+
+    protected void handleActivation(boolean active) {
+        EventsQueue.send(new ReplayStatusEvent(active));
     }
 
     private Map<String, String> buildTag(Request in) {
