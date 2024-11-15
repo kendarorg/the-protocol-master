@@ -1,5 +1,6 @@
 package org.kendar.server;
 
+import org.kendar.events.EventsQueue;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
@@ -47,21 +48,26 @@ public class TcpServer {
      */
     public void stop() {
         if (protoDescriptor.isWrapper()) {
-            protoDescriptor.terminate();
-            return;
-        }
-        try {
-            server.close();
-            Sleeper.sleepNoException(2000, () -> !server.isOpen());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
-                var proxy = protoDescriptor.getProxy();
-                if (proxy != null) {
-                    proxy.terminateFilters();
-                }
+                protoDescriptor.terminate();
+                Sleeper.sleepNoException(1000,()->EventsQueue.isEmpty(),true);
 
+            }
+        }else {
+            try {
+                server.close();
+                Sleeper.sleepNoException(2000, () -> !server.isOpen());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
+                    var proxy = protoDescriptor.getProxy();
+                    if (proxy != null) {
+                        proxy.terminateFilters();
+                    }
+
+                }
+                Sleeper.sleepNoException(1000,()->EventsQueue.isEmpty(),true);
             }
         }
     }

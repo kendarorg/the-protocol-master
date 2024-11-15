@@ -70,7 +70,7 @@ public class BasicTest {
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
-                new HttpRecordingPlugin().withStorage(storage),
+                new HttpRecordingPlugin(),
                 new HttpReplayingPlugin().withStorage(storage),
                 new HttpErrorPlugin()));
         baseProtocol.initialize();

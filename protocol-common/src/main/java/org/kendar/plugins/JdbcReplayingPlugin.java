@@ -8,7 +8,6 @@ import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
-import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
@@ -30,8 +29,14 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         super.initialize(global, protocol);
-        if (storage == null) {
-            this.storage = (StorageRepository) global.getService("storage");
+        withStorage((StorageRepository) global.getService("storage"));
+        return this;
+    }
+
+    public JdbcReplayingPlugin withStorage(StorageRepository storage) {
+
+        if (storage != null) {
+            this.storage = storage;
         }
         return this;
     }
@@ -137,10 +142,5 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     @Override
     public Class<?> getSettingClass() {
         return BasicReplayPluginSettings.class;
-    }
-
-    public JdbcReplayingPlugin withStorage(FileStorageRepository storage) {
-        this.storage = storage;
-        return this;
     }
 }

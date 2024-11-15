@@ -12,11 +12,6 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
-    public void flush() {
-
-    }
-
-    @Override
     public void write(LineToWrite lineToWrite) {
 
     }

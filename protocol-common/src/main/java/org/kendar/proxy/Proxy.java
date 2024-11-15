@@ -112,11 +112,14 @@ public abstract class Proxy {
     }
 
     public void terminateFilters() {
+        var terminatedPlugins = new HashSet<>();
         for (var item : allowedPlugins.entrySet()) {
             for (var phase : item.getValue().entrySet()) {
                 for (var plugin : phase.getValue()) {
-                    if (plugin.isActive())
+                    if (plugin.isActive() && !terminatedPlugins.contains(plugin)) {
                         plugin.terminate();
+                        terminatedPlugins.add(plugin);
+                    }
                 }
             }
         }

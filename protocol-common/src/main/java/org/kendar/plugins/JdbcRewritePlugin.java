@@ -10,6 +10,7 @@ public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectRe
     @Override
     protected void replaceData(ReplacerItemInstance item, String toReplace, JdbcCall request, SelectResult response) {
         var replaced = item.run(toReplace);
+        //noinspection StringEquality
         if(replaced!=toReplace){
             request.setQuery(replaced);
         }

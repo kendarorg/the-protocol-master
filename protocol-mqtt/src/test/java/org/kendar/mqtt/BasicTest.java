@@ -96,7 +96,7 @@ public class BasicTest {
         }
         storage.initialize();
         proxy.setPlugins(List.of(
-                new MqttRecordingPlugin().withStorage(storage).asActive()));
+                new MqttRecordingPlugin().asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

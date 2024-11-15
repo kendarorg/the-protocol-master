@@ -1,5 +1,8 @@
 package org.kendar.plugins;
 
+import org.kendar.events.EventsQueue;
+import org.kendar.events.FinalizeWriteEvent;
+import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.settings.BasicRecordingPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -7,7 +10,6 @@ import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
-import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 
 import java.util.List;
@@ -15,7 +17,6 @@ import java.util.Map;
 
 public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static final JsonMapper mapper = new JsonMapper();
-    protected StorageRepository storage;
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
@@ -44,7 +45,7 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
 
-        storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));
+        EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
     }
 
     protected void postCall(PluginContext pluginContext, Object in, Object out) {
@@ -66,9 +67,9 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(in, out, compactLine)) {
-            storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));
+            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
         } else {
-            storage.write(new LineToWrite(getInstanceId(), compactLine));
+            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine)));
         }
     }
 
@@ -88,20 +89,18 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         super.initialize(global, protocol);
-        withStorage((StorageRepository) global.getService("storage"));
-        return this;
-    }
-
-    public RecordingPlugin withStorage(StorageRepository storage) {
-        if (storage != null) {
-            this.storage = storage;
-        }
         return this;
     }
 
     @Override
     public void terminate() {
-        storage.finalizeWrite(getInstanceId());
+        EventsQueue.send(new FinalizeWriteEvent(getInstanceId()));
+    }
+
+    protected void handleActivation(boolean active) {
+        if(!active){
+            terminate();
+        }
     }
 
     @Override

@@ -71,7 +71,7 @@ public class BasicTest {
         }
         storage.initialize();
         proxy.setPlugins(List.of(
-                new AmqpRecordingPlugin().withStorage(storage).asActive()));
+                new AmqpRecordingPlugin().asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

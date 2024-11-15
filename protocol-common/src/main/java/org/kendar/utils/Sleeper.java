@@ -45,6 +45,10 @@ public class Sleeper {
     }
 
     public static void sleepNoException(long timeoutMillis, BooleanSupplier booleanSupplier) {
+        sleepNoException(timeoutMillis, booleanSupplier,false);
+    }
+
+    public static void sleepNoException(long timeoutMillis, BooleanSupplier booleanSupplier,boolean silent) {
         try {
             Object obj = new Object();
             var times = (int) timeoutMillis / 100;
@@ -60,7 +64,9 @@ public class Sleeper {
         } catch (Exception ex) {
 
         }
-        System.out.println("Sleeper sleep timed out with no answer");
+        if(!silent) {
+            System.out.println("Sleeper sleep timed out with no answer");
+        }
     }
 
     /**

@@ -1,9 +1,11 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.FinalizeWriteEvent;
+import org.kendar.events.WriteItemEvent;
 import org.kendar.storage.generic.*;
 import org.kendar.utils.JsonMapper;
-import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,16 +23,16 @@ import java.util.stream.Stream;
 public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
-    private final ConcurrentLinkedQueue<LineToWrite> items = new ConcurrentLinkedQueue<>();
     private final ConcurrentHashMap<String, ProtocolRepo> protocolRepo = new ConcurrentHashMap<>();
     private final AtomicInteger storageCounter = new AtomicInteger(0);
     private final TypeReference<StorageItem> typeReference = new TypeReference<>() {
     };
+
     private String targetDir;
 
     public FileStorageRepository(String targetDir) {
 
-        this.targetDir = targetDir;
+        this(Path.of(targetDir));
     }
 
     public FileStorageRepository(Path targetDir) {
@@ -65,7 +66,9 @@ public class FileStorageRepository implements StorageRepository {
                     log.error("Error creating target dir {}", targetDir);
                 }
             }
-            new Thread(this::flush).start();
+
+            EventsQueue.register("FileStorageRepository",(e) -> write(e.getLineToWrite()), WriteItemEvent.class);
+            EventsQueue.register("FileStorageRepository",(e) -> finalizeWrite(e.getInstanceId()), FinalizeWriteEvent.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -104,46 +107,32 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     @Override
-    public void flush() {
-
-        while (true) {
-            try {
-                if (items.isEmpty()) {
-                    Sleeper.sleep(10);
-                    continue;
-                }
-                var item = items.poll();
-                //if (item.getIndex() <= 0) {
-                var valueId = generateIndex();
-                item.getCompactLine().setIndex(valueId);
-                if (item.getStorageItem() != null) {
-                    item.getStorageItem().setIndex(valueId);
-                }
-                initializeContent(item.getInstanceId());
-                //}
-                var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
-
-                var repo = protocolRepo.get(item.getInstanceId());
-                repo.index.add(item.getCompactLine());
-                if (item.getStorageItem() != null) {
-                    var result = mapper.serializePretty(item.getStorageItem());
-                    if (!Files.exists(Paths.get(targetDir))) {
-                        Files.createDirectories(Paths.get(targetDir));
-                    }
-                    Files.writeString(Path.of(targetDir, id), result);
-                }
-            } catch (Exception e) {
-                log.warn("Trouble flushing {}", e);
-            }
-        }
-    }
-
-    @Override
     public void write(LineToWrite item) {
         if (item == null) {
             log.error("Blank item");
-        } else {
-            items.add(item);
+            return;
+        }
+        try {
+            var valueId = generateIndex();
+            item.getCompactLine().setIndex(valueId);
+            if (item.getStorageItem() != null) {
+                item.getStorageItem().setIndex(valueId);
+            }
+            initializeContent(item.getInstanceId());
+            //}
+            var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
+
+            var repo = protocolRepo.get(item.getInstanceId());
+            repo.index.add(item.getCompactLine());
+            if (item.getStorageItem() != null) {
+                var result = mapper.serializePretty(item.getStorageItem());
+                if (!Files.exists(Paths.get(targetDir))) {
+                    Files.createDirectories(Paths.get(targetDir));
+                }
+                Files.writeString(Path.of(targetDir, id), result);
+            }
+        } catch (Exception e) {
+            log.warn("Trouble writing {}", e);
         }
     }
 

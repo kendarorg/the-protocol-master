@@ -1,5 +1,7 @@
 package org.kendar.redis.plugins;
 
+import org.kendar.events.EventsQueue;
+import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.RecordingPlugin;
 import org.kendar.proxy.PluginContext;
 import org.kendar.redis.fsm.Resp3Response;
@@ -38,6 +40,6 @@ public class RedisRecordingPlugin extends RecordingPlugin {
                 pluginContext.getCaller());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
-        storage.write(new LineToWrite(getInstanceId(), storageItem, compactLine));
+        EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
     }
 }

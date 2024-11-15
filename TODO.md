@@ -8,6 +8,7 @@
 
 ### Code
 
+* Event based writing
 * Test with replay record multiple protocols at same time MultiREcordReplay.java (with settings.ini)
 * Add mock plugin (nth and simple replace)
 * Set a replayId for replaying?

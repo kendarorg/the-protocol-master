@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -119,9 +120,13 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
     @Override
     public void terminate() {
+        var terminatedPlugins = new HashSet<>();
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
-            plugin.terminate();
+            if(plugin.isActive() && !terminatedPlugins.contains(plugin)) {
+                plugin.terminate();
+                terminatedPlugins.add(plugin);
+            }
         }
         proxy.terminate();
         httpsServer.stop(0);

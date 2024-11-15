@@ -58,7 +58,7 @@ public class BasicTest {
         }
         storage.initialize();
         proxy.setPlugins(List.of(
-                new MySqlRecordPlugin().withStorage(storage).asActive()));
+                new MySqlRecordPlugin().asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
@@ -90,7 +90,7 @@ public class BasicTest {
         }
         storage.initialize();
         proxy.setPlugins(List.of(
-                new MySqlRecordPlugin().withStorage(storage).asActive()));
+                new MySqlRecordPlugin().asActive()));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

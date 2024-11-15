@@ -18,7 +18,6 @@ public class StorageItem {
     private long durationMs;
     private String type;
     private String caller;
-    private int nth = -1;
     private Object deserializedInput;
     private Object deserializedOutput;
     private Object outAs;
@@ -71,13 +70,6 @@ public class StorageItem {
         return (T) outAs;
     }
 
-    public int getNth() {
-        return nth;
-    }
-
-    public void setNth(int nth) {
-        this.nth = nth;
-    }
 
     public boolean isConstant() {
         return constant;

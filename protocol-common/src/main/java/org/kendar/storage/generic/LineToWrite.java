@@ -24,23 +24,11 @@ public class LineToWrite {
         return instanceId;
     }
 
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
-    }
-
     public CompactLine getCompactLine() {
         return compactLine;
     }
 
-    public void setCompactLine(CompactLine compactLine) {
-        this.compactLine = compactLine;
-    }
-
     public StorageItem getStorageItem() {
         return storageItem;
-    }
-
-    public void setStorageItem(StorageItem storageItem) {
-        this.storageItem = storageItem;
     }
 }

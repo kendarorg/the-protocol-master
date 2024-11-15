@@ -13,7 +13,7 @@ You can use it to:
 
 * Block troubles BEFORE PRODUCTION
 * Simulate errors
-* Simulate behaviours
+* Simulate behaviours and not yet ready APIs
 * Mock responses without coding
 * Mock entire infrastructures without coding
 * "Gold standard" test without infrastructure without coding
