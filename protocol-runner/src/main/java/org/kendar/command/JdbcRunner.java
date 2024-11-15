@@ -101,6 +101,7 @@ public class JdbcRunner extends CommonRunner {
                     ProtocolsRunner.getOrDefault(realSttings.getPort(), 3306));
         }
 
+
         var proxy = new JdbcProxy(driver,
                 realSttings.getConnectionString(), realSttings.getForceSchema(),
                 realSttings.getLogin(), realSttings.getPassword());

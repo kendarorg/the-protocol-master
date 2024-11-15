@@ -11,10 +11,7 @@ import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
 import org.kendar.apis.ApiHandler;
 import org.kendar.apis.ApiServerHandler;
 import org.kendar.command.*;
-import org.kendar.http.plugins.HttpErrorPlugin;
-import org.kendar.http.plugins.HttpRecordingPlugin;
-import org.kendar.http.plugins.HttpReplayingPlugin;
-import org.kendar.http.plugins.HttpRewritePlugin;
+import org.kendar.http.plugins.*;
 import org.kendar.mongo.plugins.MongoRecordingPlugin;
 import org.kendar.mongo.plugins.MongoReplayingPlugin;
 import org.kendar.mqtt.plugins.MqttRecordingPlugin;
@@ -141,7 +138,8 @@ public class Main {
                 new HttpRecordingPlugin(),
                 new HttpErrorPlugin(),
                 new HttpReplayingPlugin(),
-                new HttpRewritePlugin()));
+                new HttpRewritePlugin(),
+                new HttpMockPlugin()));
         addEmbedded(allPlugins, "mongodb", List.of(
                 new MongoRecordingPlugin(),
                 new MongoReplayingPlugin()));
