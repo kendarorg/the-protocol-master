@@ -27,8 +27,8 @@ public class JdbcProxy extends Proxy {
     private final String login;
     private final String password;
 
-    public JdbcProxy() {
-        this(null, null, null, null, null);
+    public JdbcProxy(String driver) {
+        this(driver, null, null, null, null);
 
 
     }

@@ -22,7 +22,7 @@ public class ReplayerTest {
     @Test
     void simpleJpaTest() throws Exception {
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy();
+        var proxy = new JdbcProxy("org.postgresql.Driver");
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "replay"));
         storage.initialize();

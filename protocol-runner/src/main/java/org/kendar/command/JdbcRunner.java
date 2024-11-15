@@ -96,6 +96,7 @@ public class JdbcRunner extends CommonRunner {
                     ProtocolsRunner.getOrDefault(realSttings.getPort(), 5432)
             );
         } else if (protocolSettings.getProtocol().equalsIgnoreCase("mysql")) {
+            driver = "com.mysql.cj.jdbc.Driver";
             baseProtocol = new MySQLProtocol(
                     ProtocolsRunner.getOrDefault(realSttings.getPort(), 3306));
         }

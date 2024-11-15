@@ -7,7 +7,9 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -32,10 +34,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CertificatesManager {
@@ -297,8 +296,74 @@ public class CertificatesManager {
         if (!isCa) {
             return createSNACertificate(cnName, rootDomain, issuer, childDomains);
         } else {
-            sslLog.error("ERROR LOADING CERTIFICATE");
-            throw new Exception("Miss");
+            return generateRootCertificate(cnName,issuer);
         }
+    }
+    private static final String BC_PROVIDER = "BC";
+    private static final String KEY_ALGORITHM = "RSA";
+    private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+
+    public static GeneratedCert generateRootCertificate(String cnName, GeneratedCert issuer) throws Exception {
+        // Initialize a new KeyPair generator
+        var keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM, BC_PROVIDER);
+        keyPairGenerator.initialize(2048);
+
+        // Setup start date to yesterday and end date for 1 year validity
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        var startDate = calendar.getTime();
+
+        calendar.add(Calendar.YEAR, 20);
+        var endDate = calendar.getTime();
+
+        // First step is to create a root certificate
+        // First Generate a KeyPair,
+        // then a random serial number
+        // then generate a certificate using the KeyPair
+        var rootKeyPair = keyPairGenerator.generateKeyPair();
+        BigInteger rootSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong()));
+
+        // Issued By and Issued To same for root certificate
+        var rootCertIssuer = new X500Name(cnName);
+        X500Name rootCertSubject = rootCertIssuer;
+        ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(BC_PROVIDER).build(rootKeyPair.getPrivate());
+        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(rootCertIssuer, rootSerialNum, startDate, endDate, rootCertSubject, rootKeyPair.getPublic());
+
+        // Add Extensions
+        // A BasicConstraint to mark root certificate as CA certificate
+        JcaX509ExtensionUtils rootCertExtUtils = new JcaX509ExtensionUtils();
+        rootCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+        rootCertBuilder.addExtension(Extension.subjectKeyIdentifier, false,
+                rootCertExtUtils.createSubjectKeyIdentifier(rootKeyPair.getPublic()));
+
+
+        rootCertBuilder.addExtension(
+                Extension.extendedKeyUsage,
+                false,
+                new ExtendedKeyUsage(
+                        new KeyPurposeId[]{
+                                KeyPurposeId.id_kp_serverAuth,
+                                KeyPurposeId.id_kp_clientAuth,
+                                KeyPurposeId.id_kp_codeSigning,
+                                KeyPurposeId.id_kp_timeStamping,
+                                KeyPurposeId.id_kp_emailProtection,}));
+
+        rootCertBuilder.addExtension(
+                Extension.keyUsage,
+                false,
+                new X509KeyUsage(
+                        X509KeyUsage.digitalSignature
+                                | X509KeyUsage.nonRepudiation
+                                | X509KeyUsage.cRLSign
+                                | X509KeyUsage.keyCertSign
+                                | X509KeyUsage.keyAgreement
+                                | X509KeyUsage.keyEncipherment
+                                | X509KeyUsage.dataEncipherment));
+
+        // Create a cert holder and export to X509Certificate
+        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner);
+        var rootCert = new JcaX509CertificateConverter().setProvider(BC_PROVIDER).getCertificate(rootCertHolder);
+        return new GeneratedCert(rootKeyPair.getPrivate(),rootCert);
+
     }
 }
