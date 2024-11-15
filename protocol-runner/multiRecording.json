@@ -6,30 +6,46 @@
   "protocols": {
     "postgres-01": {
       "protocol": "postgres",
-      "port": {postgresPort},
+      "port": {
+        postgresPort
+      },
       "login": "{postgresLogin}",
       "password": "{postgresPassword}",
       "connectionString": "{postgresConnection}",
       "plugins": {
         "record-plugin": {
-          "active": {recordActive}
+          "active": {
+            recordActive
+          }
         },
         "replay-plugin": {
-          "active": {replayActive}
+          "active": {
+            replayActive
+          }
         }
       }
     },
     "http-01": {
       "protocol": "http",
-      "http": {httpPort},
-      "https": {httpsPort},
-      "proxy": {proxyPort},
+      "http": {
+        httpPort
+      },
+      "https": {
+        httpsPort
+      },
+      "proxy": {
+        proxyPort
+      },
       "plugins": {
         "record-plugin": {
-          "active": {recordActive}
+          "active": {
+            recordActive
+          }
         },
         "replay-plugin": {
-          "active": {replayActive}
+          "active": {
+            replayActive
+          }
         }
       }
     }

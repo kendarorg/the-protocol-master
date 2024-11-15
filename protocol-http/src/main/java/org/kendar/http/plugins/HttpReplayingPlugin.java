@@ -8,8 +8,8 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.plugins.ReplayingPlugin;
 import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.ReplayingPlugin;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
@@ -34,7 +34,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
 
     @Override
     protected void handleActivation(boolean active) {
-        EventsQueue.send(new ReplayStatusEvent(active,getProtocol(),getId(),getInstanceId()));
+        EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
 
     private Map<String, String> buildTag(Request in) {

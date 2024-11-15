@@ -15,10 +15,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RewritePlugin<T, K,J> extends ProtocolPluginDescriptor<T, K> {
+public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T, K> {
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
-    private List<ReplacerItemInstance> replacers=new ArrayList<>();
+    private List<ReplacerItemInstance> replacers = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -34,10 +34,10 @@ public abstract class RewritePlugin<T, K,J> extends ProtocolPluginDescriptor<T, 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
         if (!isActive()) return false;
-        if(replacers.isEmpty()) return false;
-        J toReplace = prepare(request,response);
-        for(var item :replacers ){
-            replaceData(item,toReplace,request,response);
+        if (replacers.isEmpty()) return false;
+        J toReplace = prepare(request, response);
+        for (var item : replacers) {
+            replaceData(item, toReplace, request, response);
         }
         return false;
     }
@@ -66,18 +66,18 @@ public abstract class RewritePlugin<T, K,J> extends ProtocolPluginDescriptor<T, 
             var path = Path.of(settings.getRewritesFile()).toAbsolutePath();
             if (!path.toFile().exists()) return;
 
-            for(var replacer :mapper.deserialize(Files.readString(path), new TypeReference<List<ReplacerItem>>() {
-            })){
+            for (var replacer : mapper.deserialize(Files.readString(path), new TypeReference<List<ReplacerItem>>() {
+            })) {
                 replacers.add(new ReplacerItemInstance(replacer));
             }
-        }catch (Exception e){
-            log.error("Unable to read rewrite file "+settings.getRewritesFile(), e);
+        } catch (Exception e) {
+            log.error("Unable to read rewrite file " + settings.getRewritesFile(), e);
             throw new RuntimeException(e);
         }
     }
 
-    public void setReplacers(List<ReplacerItem> items){
-        for(var replacer :items){
+    public void setReplacers(List<ReplacerItem> items) {
+        for (var replacer : items) {
             replacers.add(new ReplacerItemInstance(replacer));
         }
     }

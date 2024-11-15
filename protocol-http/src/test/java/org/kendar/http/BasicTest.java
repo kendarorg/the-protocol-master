@@ -144,7 +144,7 @@ public class BasicTest {
         var replayPlugin = new HttpReplayPluginSettings();
         httpProtocolSettings.getPlugins().put("replay-plugin", replayPlugin);
         var mockPlugin = new BasicMockPluginSettings();
-        mockPlugin.setDataDir(Path.of("src","test","resources","mock").toAbsolutePath().toString());
+        mockPlugin.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         httpProtocolSettings.getPlugins().put("mock-plugin", mockPlugin);
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);

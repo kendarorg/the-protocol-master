@@ -15,18 +15,16 @@ import java.util.function.Function;
 
 public class EventsQueue {
     private static final Logger logger = LoggerFactory.getLogger(EventsQueue.class);
-    private final JsonMapper mapper = new JsonMapper();
-    private final HashMap<String, Map<String,Consumer<TpmEvent>>> eventHandlers = new HashMap<>();
-    @SuppressWarnings("rawtypes")
-    private final HashMap<String, Class> conversions = new HashMap<>();
-    private final HashMap<String,CommandConsumer> commandHandlers = new HashMap<>();
-
-    private final ConcurrentLinkedQueue<TpmEvent> items = new ConcurrentLinkedQueue<>();
-
     private static EventsQueue instance = new EventsQueue();
     private static AtomicLong size = new AtomicLong(0);
+    private final JsonMapper mapper = new JsonMapper();
+    private final HashMap<String, Map<String, Consumer<TpmEvent>>> eventHandlers = new HashMap<>();
+    @SuppressWarnings("rawtypes")
+    private final HashMap<String, Class> conversions = new HashMap<>();
+    private final HashMap<String, CommandConsumer> commandHandlers = new HashMap<>();
+    private final ConcurrentLinkedQueue<TpmEvent> items = new ConcurrentLinkedQueue<>();
 
-    private EventsQueue(){
+    private EventsQueue() {
         start();
     }
 
@@ -40,36 +38,11 @@ public class EventsQueue {
     }
 
     public static boolean isEmpty() {
-        return size.get()==0;
-    }
-
-
-    private void start() {
-        new Thread(() -> {
-            while (true) {
-                    if (items.isEmpty()) {
-                        Sleeper.sleep(10);
-                        continue;
-                    }
-                    var item = items.poll();
-                    while (item != null) {
-
-                        try {
-                            handle(item);
-                        } catch (Exception e) {
-                            logger.warn("Trouble handling {}",item.getClass().getSimpleName(), e);
-                        }
-                        size.decrementAndGet();
-                        item = items.poll();
-                    }
-
-            }
-        }).start();
-
+        return size.get() == 0;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends TpmEvent> void register(String id,Consumer<T> consumer, Class<T> clazz) {
+    public static <T extends TpmEvent> void register(String id, Consumer<T> consumer, Class<T> clazz) {
         var eventName = clazz.getSimpleName().toLowerCase(Locale.ROOT);
         instance.conversions.put(eventName, clazz);
         var realConsumer = new Consumer<TpmEvent>() {
@@ -81,11 +54,10 @@ public class EventsQueue {
         if (!instance.eventHandlers.containsKey(eventName)) {
             instance.eventHandlers.put(eventName, new HashMap<>());
         }
-        instance.eventHandlers.get(eventName).put(id,realConsumer);
+        instance.eventHandlers.get(eventName).put(id, realConsumer);
     }
 
-
-    public static <T extends TpmEvent> void registerCommand(String id,Function<T, Object> function, Class<T> clazz) {
+    public static <T extends TpmEvent> void registerCommand(String id, Function<T, Object> function, Class<T> clazz) {
         var eventName = clazz.getSimpleName().toLowerCase(Locale.ROOT);
         instance.conversions.put(eventName, clazz);
         var realConsumer = new Function<TpmEvent, Object>() {
@@ -95,13 +67,36 @@ public class EventsQueue {
             }
         };
         var prevConsumer = instance.commandHandlers.get(eventName);
-        if(prevConsumer == null || prevConsumer.id.equalsIgnoreCase(id)) {
-            instance.commandHandlers.put(eventName, new CommandConsumer(id,realConsumer));
-        }else {
+        if (prevConsumer == null || prevConsumer.id.equalsIgnoreCase(id)) {
+            instance.commandHandlers.put(eventName, new CommandConsumer(id, realConsumer));
+        } else {
             throw new RuntimeException("Duplicate event " + eventName);
         }
     }
 
+    private void start() {
+        new Thread(() -> {
+            while (true) {
+                if (items.isEmpty()) {
+                    Sleeper.sleep(10);
+                    continue;
+                }
+                var item = items.poll();
+                while (item != null) {
+
+                    try {
+                        handle(item);
+                    } catch (Exception e) {
+                        logger.warn("Trouble handling {}", item.getClass().getSimpleName(), e);
+                    }
+                    size.decrementAndGet();
+                    item = items.poll();
+                }
+
+            }
+        }).start();
+
+    }
 
     public void handle(TpmEvent event) {
         var eventName = event.getClass().getSimpleName().toLowerCase(Locale.ROOT);
@@ -110,7 +105,7 @@ public class EventsQueue {
         var handlers = eventHandlers.get(eventName);
         var handler = commandHandlers.get(eventName);
         if (handlers != null) {
-            for (var subHandler: handlers.entrySet()) {
+            for (var subHandler : handlers.entrySet()) {
                 try {
                     subHandler.getValue().accept(event);
                 } catch (Exception ex) {

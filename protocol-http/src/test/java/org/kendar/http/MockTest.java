@@ -10,7 +10,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MockTest extends BasicTest{
+public class MockTest extends BasicTest {
     @BeforeAll
     public static void beforeClass() throws Exception {
         beforeClassBase();
@@ -26,6 +26,14 @@ public class MockTest extends BasicTest{
         }
     }
 
+    private static void runAndFind(CloseableHttpClient httpclient, HttpGet httpget, String x) throws IOException {
+
+        var httpresponse = httpclient.execute(httpget);
+        var content = getContentString(httpresponse);
+        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+        assertTrue(content.toLowerCase().contains(x.toLowerCase()));
+    }
+
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
         beforeEachBase(testInfo);
@@ -36,14 +44,6 @@ public class MockTest extends BasicTest{
         afterEachBase();
     }
 
-    private static void runAndFind( CloseableHttpClient httpclient, HttpGet httpget,  String x) throws IOException {
-
-        var httpresponse = httpclient.execute(httpget);
-        var content = getContentString(httpresponse);
-        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
-        assertTrue(content.toLowerCase().contains(x.toLowerCase()));
-    }
-
     @Test
     void countedMock() throws Exception {
         var recordPlugin = baseProtocol.getPlugins().stream().filter(a ->
@@ -52,12 +52,12 @@ public class MockTest extends BasicTest{
 
         var httpclient = createHttpsHttpClient();
         var httpget = new HttpGet("http://localhost:" + 8456 + "/jsonized");
-        httpget = (HttpGet) withQuery(httpget, Map.of("counter","true"));
+        httpget = (HttpGet) withQuery(httpget, Map.of("counter", "true"));
 
 
-        runAndFind(httpclient, httpget,"google.ps===void");
-        runAndFind(httpclient, httpget,"google.ps===void");
-        runAndFind( httpclient, httpget,  "x-block-recursive");
+        runAndFind(httpclient, httpget, "google.ps===void");
+        runAndFind(httpclient, httpget, "google.ps===void");
+        runAndFind(httpclient, httpget, "x-block-recursive");
     }
 
     @Test
@@ -68,12 +68,12 @@ public class MockTest extends BasicTest{
 
         var httpclient = createHttpsHttpClient();
         var httpget = new HttpGet("http://localhost:" + 8456 + "/jsonized");
-        httpget = (HttpGet) withQuery(httpget, Map.of("nth","true"));
+        httpget = (HttpGet) withQuery(httpget, Map.of("nth", "true"));
 
 
-        runAndFind( httpclient, httpget,  "x-block-recursive");
-        runAndFind( httpclient, httpget,  "google.ps===void");
-        runAndFind( httpclient, httpget,  "x-block-recursive");
+        runAndFind(httpclient, httpget, "x-block-recursive");
+        runAndFind(httpclient, httpget, "google.ps===void");
+        runAndFind(httpclient, httpget, "x-block-recursive");
     }
 
     @Test
@@ -84,13 +84,13 @@ public class MockTest extends BasicTest{
 
         var httpclient = createHttpsHttpClient();
         var httpget = new HttpGet("http://localhost:" + 8456 + "/jsonized");
-        httpget = (HttpGet) withQuery(httpget, Map.of("both","true"));
+        httpget = (HttpGet) withQuery(httpget, Map.of("both", "true"));
 
 
-        runAndFind( httpclient, httpget,  "x-block-recursive");
-        runAndFind(httpclient, httpget,"google.ps===void");
-        runAndFind(httpclient, httpget,"google.ps===void");
-        runAndFind(httpclient, httpget,"google.ps===void");
-        runAndFind( httpclient, httpget,  "x-block-recursive");
+        runAndFind(httpclient, httpget, "x-block-recursive");
+        runAndFind(httpclient, httpget, "google.ps===void");
+        runAndFind(httpclient, httpget, "google.ps===void");
+        runAndFind(httpclient, httpget, "google.ps===void");
+        runAndFind(httpclient, httpget, "x-block-recursive");
     }
 }

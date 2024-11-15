@@ -1,10 +1,18 @@
 package org.kendar.events;
 
-public class RecordStatusEvent implements TpmEvent{
+public class RecordStatusEvent implements TpmEvent {
     private final boolean replaying;
     private final String protocol;
     private final String filter;
     private final String instanceId;
+
+    public RecordStatusEvent(boolean replaying, String protocol, String filter, String instanceId) {
+
+        this.replaying = replaying;
+        this.protocol = protocol;
+        this.filter = filter;
+        this.instanceId = instanceId;
+    }
 
     public boolean isReplaying() {
         return replaying;
@@ -20,13 +28,5 @@ public class RecordStatusEvent implements TpmEvent{
 
     public String getInstanceId() {
         return instanceId;
-    }
-
-    public RecordStatusEvent(boolean replaying, String protocol, String filter, String instanceId){
-
-        this.replaying = replaying;
-        this.protocol = protocol;
-        this.filter = filter;
-        this.instanceId = instanceId;
     }
 }

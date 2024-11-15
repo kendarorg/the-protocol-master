@@ -123,7 +123,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         var terminatedPlugins = new HashSet<>();
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
-            if(plugin.isActive() && !terminatedPlugins.contains(plugin)) {
+            if (plugin.isActive() && !terminatedPlugins.contains(plugin)) {
                 plugin.terminate();
                 terminatedPlugins.add(plugin);
             }

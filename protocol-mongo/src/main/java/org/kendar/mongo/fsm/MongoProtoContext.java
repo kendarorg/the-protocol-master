@@ -24,6 +24,6 @@ public class MongoProtoContext extends NetworkProtoContext {
     @Override
     public void disconnect(Object connection) {
         var mongoClient = ((MongoClient) ((ProxyConnection) getValue("CONNECTION")).getConnection());
-        if(mongoClient!=null)mongoClient.close();
+        if (mongoClient != null) mongoClient.close();
     }
 }

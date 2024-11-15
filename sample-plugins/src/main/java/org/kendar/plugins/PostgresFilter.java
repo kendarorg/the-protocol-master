@@ -39,7 +39,7 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global,protocol);
+        super.initialize(global, protocol);
         return this;
     }
 

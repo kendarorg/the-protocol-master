@@ -69,7 +69,7 @@ public class ReplayerTest {
         StorageRepository storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "test2_differentChannelAndConnection"));
         storage.initialize();
-        var pl =new AmqpReplayingPlugin().withStorage(storage);
+        var pl = new AmqpReplayingPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 

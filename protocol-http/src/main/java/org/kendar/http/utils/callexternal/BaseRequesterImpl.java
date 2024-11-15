@@ -113,9 +113,9 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                 }
             }
             var port = request.getPort();
-            if(port>0) {
-                fullRequest.addHeader("Host", request.getHost()+":"+port);
-            }else{
+            if (port > 0) {
+                fullRequest.addHeader("Host", request.getHost() + ":" + port);
+            } else {
                 fullRequest.addHeader("Host", request.getHost());
             }
             /*if (request.isSoapRequest()) {

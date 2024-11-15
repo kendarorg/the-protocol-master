@@ -124,9 +124,9 @@ public class HttpRunner extends CommonRunner {
             pl.setActive(true);
             section.getPlugins().put("record-plugin", pl);
         }
-        if(cmd.hasOption("rewrite")){
+        if (cmd.hasOption("rewrite")) {
             var pl = new RewritePluginSettings();
-            pl.setRewritesFile(cmd.getOptionValue("rewrite","rewrite.json"));
+            pl.setRewritesFile(cmd.getOptionValue("rewrite", "rewrite.json"));
             section.getPlugins().put("rewrite-plugin", pl);
         }
         if (cmd.hasOption("showError") && cmd.hasOption("errorPercent")) {

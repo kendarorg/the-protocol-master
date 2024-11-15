@@ -53,7 +53,6 @@ public class SimpleTest extends BasicTest {
     }
 
 
-
     @BeforeAll
     public static void beforeClass() throws Exception {
         beforeClassBase();
@@ -68,7 +67,6 @@ public class SimpleTest extends BasicTest {
 
         }
     }
-
 
 
     private static byte[] getConfusingByteArray() {
@@ -146,7 +144,7 @@ public class SimpleTest extends BasicTest {
                                 var content = getContentString(httpResponse);
                                 assertTrue(content.contains("par1Value"));
                             })
-                    ,Arguments.of(
+                    , Arguments.of(
                             "DSC:jsonizedPostJsonStringGzip",
                             new GzipCompressingEntity(new StringEntity("{\"id\":1,\"name\":\"John\"}")),
                             new HttpPost("http://localhost:" + 8456 + "/jsonized"),
@@ -161,7 +159,6 @@ public class SimpleTest extends BasicTest {
             throw new RuntimeException(e);
         }
     }
-
 
 
     @BeforeEach

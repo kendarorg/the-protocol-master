@@ -55,9 +55,9 @@ public class StorageItem {
             if (clazz == input.getClass()) {
                 inAs = input;
             } else {
-                if(input instanceof JsonNode && ((JsonNode) input).has("data")) {
+                if (input instanceof JsonNode && ((JsonNode) input).has("data")) {
                     inAs = mapper.deserialize(((JsonNode) input).get("data"), clazz);
-                }else {
+                } else {
                     inAs = mapper.deserialize(input, clazz);
                 }
             }
@@ -70,9 +70,9 @@ public class StorageItem {
             if (clazz == output.getClass()) {
                 outAs = output;
             } else {
-                if(output instanceof JsonNode && ((JsonNode) output).has("data")) {
+                if (output instanceof JsonNode && ((JsonNode) output).has("data")) {
                     outAs = mapper.deserialize(((JsonNode) output).get("data"), clazz);
-                }else {
+                } else {
                     outAs = mapper.deserialize(output, clazz);
                 }
             }

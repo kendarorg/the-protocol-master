@@ -6,18 +6,18 @@ import org.kendar.utils.ReplacerItemInstance;
 
 import java.util.List;
 
-public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectResult,String> {
+public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectResult, String> {
     @Override
     protected void replaceData(ReplacerItemInstance item, String toReplace, JdbcCall request, SelectResult response) {
         var replaced = item.run(toReplace);
         //noinspection StringEquality
-        if(replaced!=toReplace){
+        if (replaced != toReplace) {
             request.setQuery(replaced);
         }
     }
 
     @Override
-    protected String prepare( JdbcCall request, SelectResult response) {
+    protected String prepare(JdbcCall request, SelectResult response) {
         return request.getQuery().replaceAll("\r\n", "\n").trim();
     }
 

@@ -73,16 +73,16 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
                 counters.get(founded.getIndex()).getAndIncrement();
                 if (founded.getNthRequest() > 0) {
                     var isNth = counters.get(founded.getIndex()).get() == founded.getNthRequest();
-                    if(isNth) {
+                    if (isNth) {
                         founded.setNthRequest(-1);
-                        if(founded.getCount()>0) {
+                        if (founded.getCount() > 0) {
                             founded.setCount(founded.getCount() - 1);
                         }
                         writeOutput(request, response, founded, parametric, foundedResponse);
                         return true;
                     }
                     return false;
-                }else if(founded.getCount()>0){
+                } else if (founded.getCount() > 0) {
                     founded.setCount(founded.getCount() - 1);
                     writeOutput(request, response, founded, parametric, foundedResponse);
                     return true;

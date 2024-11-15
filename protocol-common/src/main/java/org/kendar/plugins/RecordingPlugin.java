@@ -1,6 +1,9 @@
 package org.kendar.plugins;
 
-import org.kendar.events.*;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.FinalizeWriteEvent;
+import org.kendar.events.RecordStatusEvent;
+import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.settings.BasicRecordingPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -97,8 +100,8 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     protected void handleActivation(boolean active) {
-        EventsQueue.send(new RecordStatusEvent(active,getProtocol(),getId(),getInstanceId()));
-        if(!active){
+        EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
+        if (!active) {
             terminate();
         }
     }

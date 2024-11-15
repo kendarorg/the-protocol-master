@@ -85,7 +85,7 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
 
     @Override
     protected void handleActivation(boolean active) {
-        if(!active){
+        if (!active) {
             terminate();
         }
     }

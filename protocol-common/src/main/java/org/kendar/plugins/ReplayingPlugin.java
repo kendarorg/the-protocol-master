@@ -63,7 +63,7 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     protected void handleActivation(boolean active) {
-        EventsQueue.send(new ReplayStatusEvent(active,getProtocol(),getId(),getInstanceId()));
+        EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
 
     protected void sendAndExpect(PluginContext pluginContext, Object in, Object out) {

@@ -21,19 +21,18 @@ public abstract class Proxy {
     private final Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
     private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
     protected boolean replayer;
+    /**
+     * Descriptor (of course network like)
+     */
+    private NetworkProtoDescriptor protocol;
 
-    protected Proxy(){
+    protected Proxy() {
         EventsQueue.register(this.toString(), this::replayChange, ReplayStatusEvent.class);
     }
 
     private void replayChange(ReplayStatusEvent e) {
         replayer = e.isReplaying();
     }
-
-    /**
-     * Descriptor (of course network like)
-     */
-    private NetworkProtoDescriptor protocol;
 
     public boolean isReplayer() {
         return replayer;

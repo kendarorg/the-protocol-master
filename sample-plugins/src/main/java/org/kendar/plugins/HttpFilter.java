@@ -34,7 +34,7 @@ public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> impl
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global,protocol);
+        super.initialize(global, protocol);
         return this;
     }
 

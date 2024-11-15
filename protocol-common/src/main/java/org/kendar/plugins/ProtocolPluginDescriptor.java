@@ -52,7 +52,7 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
     }
 
     public void setActive(boolean active) {
-        if(active!=this.active)handleActivation(active);
+        if (active != this.active) handleActivation(active);
         this.active = active;
     }
 }

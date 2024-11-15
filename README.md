@@ -3,7 +3,7 @@
 ![](protocolmaster_s.gif)
 
 The "protocol-master" is a java command line tool to emulate/change/record
-APIs and server calls for testing apps with the following protocol: 
+APIs and server calls for testing apps with the following protocol:
 HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091
 ... and all the compatible ones!
 
@@ -54,19 +54,19 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Language independent: use the native protocols without drivers
 
 * Run on all OSs
-  * Windows
-  * Linux
-  * macOs
+    * Windows
+    * Linux
+    * macOs
 
 * Native protocol for (and all compatibles):
-  * anything that goes through http/https
-  * postgres
-  * mysql
-  * mongoDB
-  * redis 3,redis 2
-  * mqtt
-  * rabbitmq/Amqp 0.9
-  
+    * anything that goes through http/https
+    * postgres
+    * mysql
+    * mongoDB
+    * redis 3,redis 2
+    * mqtt
+    * rabbitmq/Amqp 0.9
+
 
 * Mocked errors (http/s)
 * Mocked flow (all)
@@ -78,14 +78,6 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Replay activity (all)
 * Custom transparent proxy (all)
 * Translate postgres to any Jdbc supported db (like Oracle!)
-
-
-
-
-
-
-
-
 
 
 * Create a state machine able to interpret a generic wire protocol, handling

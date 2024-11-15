@@ -38,7 +38,6 @@ public class JdbcRunner extends CommonRunner {
     }
 
 
-
     @Override
     public String getDefaultPort() {
         return protocol.equalsIgnoreCase("mysql") ? "3306" : "5432";
@@ -60,9 +59,9 @@ public class JdbcRunner extends CommonRunner {
         var sets = (JdbcProtocolSettings) result;
 
         sets.setForceSchema(ProtocolsRunner.getOrDefault(cmd.getOptionValue("schema"), ""));
-        if(cmd.hasOption("rewrite")){
+        if (cmd.hasOption("rewrite")) {
             var pl = new RewritePluginSettings();
-            pl.setRewritesFile(cmd.getOptionValue("rewrite","rewrite.json"));
+            pl.setRewritesFile(cmd.getOptionValue("rewrite", "rewrite.json"));
             sets.getPlugins().put("rewrite-plugin", pl);
         }
     }

@@ -26,20 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MultiRecordReplay extends BasicTest {
 
     private static SimpleHttpServer simpleServer;
+    private static String POSTGRES_PORT = "5631";
+    private static String HTTP_PORT = "12080";
+    private static String HTTPS_PORT = "12443";
+    private static String PROXY_PORT = "1281";
+    private static int SIMPLE_SERVER_HTTP_PORT = 18080;
     private AtomicBoolean runTheServer = new AtomicBoolean(true);
 
-
-    @BeforeEach
-    public void beforeEach() throws IOException {
-        runTheServer.set(true);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        runTheServer.set(false);
-        Main.stop();
-        Sleeper.sleep(100);
-    }
     @BeforeAll
     public static void beforeClass() throws IOException {
         simpleServer = new SimpleHttpServer();
@@ -54,7 +47,19 @@ public class MultiRecordReplay extends BasicTest {
         simpleServer.stop();
     }
 
-    private void startAndHandleUnexpectedErrors(String ... args) {
+    @BeforeEach
+    public void beforeEach() throws IOException {
+        runTheServer.set(true);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        runTheServer.set(false);
+        Main.stop();
+        Sleeper.sleep(100);
+    }
+
+    private void startAndHandleUnexpectedErrors(String... args) {
         AtomicReference exception = new AtomicReference(null);
         var serverThread = new Thread(() -> {
             try {
@@ -82,17 +87,11 @@ public class MultiRecordReplay extends BasicTest {
         }
     }
 
-    private static String POSTGRES_PORT = "5631";
-    private static String HTTP_PORT = "12080";
-    private static String HTTPS_PORT = "12443";
-    private static String PROXY_PORT = "1281";
-    private static int SIMPLE_SERVER_HTTP_PORT = 18080;
-
     @Test
     void testRecordingReplaying() throws Exception {
-        var targetDir = Path.of("target","multiRecording").toFile();
+        var targetDir = Path.of("target", "multiRecording").toFile();
         targetDir.mkdir();
-        for (var f: targetDir.listFiles()) f.delete();
+        for (var f : targetDir.listFiles()) f.delete();
         var proxy = new HttpHost("localhost", Integer.parseInt(PROXY_PORT), "http");
         var routePlanner = new DefaultProxyRoutePlanner(proxy);
         var httpclient = HttpClients.custom().setRoutePlanner(routePlanner).build();
@@ -100,21 +99,21 @@ public class MultiRecordReplay extends BasicTest {
 
         var fr = new FileResourcesUtils();
         var recordingSettings = fr.getFileFromResourceAsString(Path.of("multiRecording.json").toAbsolutePath().toString());
-        recordingSettings = recordingSettings.replace("{postgresPort}",POSTGRES_PORT);
-        recordingSettings = recordingSettings.replace("{httpPort}",HTTP_PORT);
-        recordingSettings = recordingSettings.replace("{httpsPort}",HTTPS_PORT);
-        recordingSettings = recordingSettings.replace("{proxyPort}",PROXY_PORT);
-        recordingSettings = recordingSettings.replace("{postgresLogin}",postgresContainer.getUserId());
-        recordingSettings = recordingSettings.replace("{postgresPassword}",postgresContainer.getPassword());
-        recordingSettings = recordingSettings.replace("{postgresConnection}",postgresContainer.getJdbcUrl());
-        recordingSettings = recordingSettings.replace("{dataDir}",Path.of("target","multiRecording").toAbsolutePath().toString().replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")));
-        recordingSettings = recordingSettings.replaceAll(Pattern.quote("{recordActive}"),"true");
-        recordingSettings = recordingSettings.replaceAll(Pattern.quote("{replayActive}"),"false");
-        var recordingConfig =Path.of("target","multiRecording","recording.json").toAbsolutePath();
+        recordingSettings = recordingSettings.replace("{postgresPort}", POSTGRES_PORT);
+        recordingSettings = recordingSettings.replace("{httpPort}", HTTP_PORT);
+        recordingSettings = recordingSettings.replace("{httpsPort}", HTTPS_PORT);
+        recordingSettings = recordingSettings.replace("{proxyPort}", PROXY_PORT);
+        recordingSettings = recordingSettings.replace("{postgresLogin}", postgresContainer.getUserId());
+        recordingSettings = recordingSettings.replace("{postgresPassword}", postgresContainer.getPassword());
+        recordingSettings = recordingSettings.replace("{postgresConnection}", postgresContainer.getJdbcUrl());
+        recordingSettings = recordingSettings.replace("{dataDir}", Path.of("target", "multiRecording").toAbsolutePath().toString().replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")));
+        recordingSettings = recordingSettings.replaceAll(Pattern.quote("{recordActive}"), "true");
+        recordingSettings = recordingSettings.replaceAll(Pattern.quote("{replayActive}"), "false");
+        var recordingConfig = Path.of("target", "multiRecording", "recording.json").toAbsolutePath();
         Files.writeString(recordingConfig, recordingSettings);
 
         System.out.println("STARTING ==============================================");
-        startAndHandleUnexpectedErrors("-cfg",recordingConfig.toString());
+        startAndHandleUnexpectedErrors("-cfg", recordingConfig.toString());
         System.out.println("RECORDING ==============================================");
 
 
@@ -160,21 +159,21 @@ public class MultiRecordReplay extends BasicTest {
         System.out.println("RECORDING COMPLETED ==============================================");
 
         var replaySettings = fr.getFileFromResourceAsString(Path.of("multiRecording.json").toAbsolutePath().toString());
-        replaySettings = replaySettings.replace("{postgresPort}",POSTGRES_PORT);
-        replaySettings = replaySettings.replace("{httpPort}",HTTP_PORT);
-        replaySettings = replaySettings.replace("{httpsPort}",HTTPS_PORT);
-        replaySettings = replaySettings.replace("{proxyPort}",PROXY_PORT);
-        replaySettings = replaySettings.replace("{postgresLogin}","");
-        replaySettings = replaySettings.replace("{postgresPassword}","");
-        replaySettings = replaySettings.replace("{postgresConnection}","");
-        replaySettings = replaySettings.replace("{dataDir}",Path.of("target","multiRecording").toAbsolutePath().toString().replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")));
-        replaySettings = replaySettings.replaceAll(Pattern.quote("{recordActive}"),"false");
-        replaySettings = replaySettings.replaceAll(Pattern.quote("{replayActive}"),"true");
-        var replayConfig =Path.of("target","multiRecording","replaying.json").toAbsolutePath();
+        replaySettings = replaySettings.replace("{postgresPort}", POSTGRES_PORT);
+        replaySettings = replaySettings.replace("{httpPort}", HTTP_PORT);
+        replaySettings = replaySettings.replace("{httpsPort}", HTTPS_PORT);
+        replaySettings = replaySettings.replace("{proxyPort}", PROXY_PORT);
+        replaySettings = replaySettings.replace("{postgresLogin}", "");
+        replaySettings = replaySettings.replace("{postgresPassword}", "");
+        replaySettings = replaySettings.replace("{postgresConnection}", "");
+        replaySettings = replaySettings.replace("{dataDir}", Path.of("target", "multiRecording").toAbsolutePath().toString().replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")));
+        replaySettings = replaySettings.replaceAll(Pattern.quote("{recordActive}"), "false");
+        replaySettings = replaySettings.replaceAll(Pattern.quote("{replayActive}"), "true");
+        var replayConfig = Path.of("target", "multiRecording", "replaying.json").toAbsolutePath();
         Files.writeString(replayConfig, replaySettings);
 
         System.out.println("STARTING ==============================================");
-        startAndHandleUnexpectedErrors("-cfg",replayConfig.toString());
+        startAndHandleUnexpectedErrors("-cfg", replayConfig.toString());
         System.out.println("REPLAYING ==============================================");
 
         HibernateSessionFactory.initialize("org.postgresql.Driver",

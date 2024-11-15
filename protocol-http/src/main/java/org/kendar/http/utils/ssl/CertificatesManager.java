@@ -42,6 +42,9 @@ public class CertificatesManager {
     public static final String PASSPHRASE = "passphrase";
     public static final String PRIVATE_CERT = "privateCert";
     private static final Logger sslLog = LoggerFactory.getLogger("org.kendar.http.SSL");
+    private static final String BC_PROVIDER = "BC";
+    private static final String KEY_ALGORITHM = "RSA";
+    private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
     private final FileResourcesUtils fileResourcesUtils;
     private final ConcurrentHashMap<String, String> certificateHosts = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> registeredHosts = new ConcurrentHashMap<>();
@@ -68,6 +71,70 @@ public class CertificatesManager {
         KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(new ByteArrayInputStream(bOut.toByteArray()), PASSPHRASE.toCharArray());
         return keyStore;
+    }
+
+    public static GeneratedCert generateRootCertificate(String cnName, GeneratedCert issuer) throws Exception {
+        // Initialize a new KeyPair generator
+        var keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM, BC_PROVIDER);
+        keyPairGenerator.initialize(2048);
+
+        // Setup start date to yesterday and end date for 1 year validity
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        var startDate = calendar.getTime();
+
+        calendar.add(Calendar.YEAR, 20);
+        var endDate = calendar.getTime();
+
+        // First step is to create a root certificate
+        // First Generate a KeyPair,
+        // then a random serial number
+        // then generate a certificate using the KeyPair
+        var rootKeyPair = keyPairGenerator.generateKeyPair();
+        BigInteger rootSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong()));
+
+        // Issued By and Issued To same for root certificate
+        var rootCertIssuer = new X500Name(cnName);
+        X500Name rootCertSubject = rootCertIssuer;
+        ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(BC_PROVIDER).build(rootKeyPair.getPrivate());
+        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(rootCertIssuer, rootSerialNum, startDate, endDate, rootCertSubject, rootKeyPair.getPublic());
+
+        // Add Extensions
+        // A BasicConstraint to mark root certificate as CA certificate
+        JcaX509ExtensionUtils rootCertExtUtils = new JcaX509ExtensionUtils();
+        rootCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+        rootCertBuilder.addExtension(Extension.subjectKeyIdentifier, false,
+                rootCertExtUtils.createSubjectKeyIdentifier(rootKeyPair.getPublic()));
+
+
+        rootCertBuilder.addExtension(
+                Extension.extendedKeyUsage,
+                false,
+                new ExtendedKeyUsage(
+                        new KeyPurposeId[]{
+                                KeyPurposeId.id_kp_serverAuth,
+                                KeyPurposeId.id_kp_clientAuth,
+                                KeyPurposeId.id_kp_codeSigning,
+                                KeyPurposeId.id_kp_timeStamping,
+                                KeyPurposeId.id_kp_emailProtection,}));
+
+        rootCertBuilder.addExtension(
+                Extension.keyUsage,
+                false,
+                new X509KeyUsage(
+                        X509KeyUsage.digitalSignature
+                                | X509KeyUsage.nonRepudiation
+                                | X509KeyUsage.cRLSign
+                                | X509KeyUsage.keyCertSign
+                                | X509KeyUsage.keyAgreement
+                                | X509KeyUsage.keyEncipherment
+                                | X509KeyUsage.dataEncipherment));
+
+        // Create a cert holder and export to X509Certificate
+        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner);
+        var rootCert = new JcaX509CertificateConverter().setProvider(BC_PROVIDER).getCertificate(rootCertHolder);
+        return new GeneratedCert(rootKeyPair.getPrivate(), rootCert);
+
     }
 
     private SSLContext getSslContext(List<String> hosts, String cname, String der, String key) throws Exception {
@@ -166,7 +233,6 @@ public class CertificatesManager {
     public GeneratedCert getCaCertificate() {
         return caCertificate;
     }
-
 
     public GeneratedCert loadRootCertificate(String derFile, String keyFile)
             throws CertificateException, IOException {
@@ -296,74 +362,7 @@ public class CertificatesManager {
         if (!isCa) {
             return createSNACertificate(cnName, rootDomain, issuer, childDomains);
         } else {
-            return generateRootCertificate(cnName,issuer);
+            return generateRootCertificate(cnName, issuer);
         }
-    }
-    private static final String BC_PROVIDER = "BC";
-    private static final String KEY_ALGORITHM = "RSA";
-    private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
-
-    public static GeneratedCert generateRootCertificate(String cnName, GeneratedCert issuer) throws Exception {
-        // Initialize a new KeyPair generator
-        var keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM, BC_PROVIDER);
-        keyPairGenerator.initialize(2048);
-
-        // Setup start date to yesterday and end date for 1 year validity
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
-        var startDate = calendar.getTime();
-
-        calendar.add(Calendar.YEAR, 20);
-        var endDate = calendar.getTime();
-
-        // First step is to create a root certificate
-        // First Generate a KeyPair,
-        // then a random serial number
-        // then generate a certificate using the KeyPair
-        var rootKeyPair = keyPairGenerator.generateKeyPair();
-        BigInteger rootSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong()));
-
-        // Issued By and Issued To same for root certificate
-        var rootCertIssuer = new X500Name(cnName);
-        X500Name rootCertSubject = rootCertIssuer;
-        ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(BC_PROVIDER).build(rootKeyPair.getPrivate());
-        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(rootCertIssuer, rootSerialNum, startDate, endDate, rootCertSubject, rootKeyPair.getPublic());
-
-        // Add Extensions
-        // A BasicConstraint to mark root certificate as CA certificate
-        JcaX509ExtensionUtils rootCertExtUtils = new JcaX509ExtensionUtils();
-        rootCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
-        rootCertBuilder.addExtension(Extension.subjectKeyIdentifier, false,
-                rootCertExtUtils.createSubjectKeyIdentifier(rootKeyPair.getPublic()));
-
-
-        rootCertBuilder.addExtension(
-                Extension.extendedKeyUsage,
-                false,
-                new ExtendedKeyUsage(
-                        new KeyPurposeId[]{
-                                KeyPurposeId.id_kp_serverAuth,
-                                KeyPurposeId.id_kp_clientAuth,
-                                KeyPurposeId.id_kp_codeSigning,
-                                KeyPurposeId.id_kp_timeStamping,
-                                KeyPurposeId.id_kp_emailProtection,}));
-
-        rootCertBuilder.addExtension(
-                Extension.keyUsage,
-                false,
-                new X509KeyUsage(
-                        X509KeyUsage.digitalSignature
-                                | X509KeyUsage.nonRepudiation
-                                | X509KeyUsage.cRLSign
-                                | X509KeyUsage.keyCertSign
-                                | X509KeyUsage.keyAgreement
-                                | X509KeyUsage.keyEncipherment
-                                | X509KeyUsage.dataEncipherment));
-
-        // Create a cert holder and export to X509Certificate
-        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner);
-        var rootCert = new JcaX509CertificateConverter().setProvider(BC_PROVIDER).getCertificate(rootCertHolder);
-        return new GeneratedCert(rootKeyPair.getPrivate(),rootCert);
-
     }
 }

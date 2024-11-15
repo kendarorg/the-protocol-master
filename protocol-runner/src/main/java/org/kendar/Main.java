@@ -181,7 +181,7 @@ public class Main {
         var logsDir = ProtocolsRunner.getOrDefault(
                 ini.getDataDir(),
                 Path.of("data",
-                Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString());
+                        Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString());
         StorageRepository storage = setupStorage(logsDir);
         storage.initialize();
         ini.putService(storage.getType(), storage);
@@ -201,7 +201,7 @@ public class Main {
 
         var finalAllPlugins = allPlugins;
         for (var item : ini.getProtocols().entrySet()) {
-            new Thread(()-> {
+            new Thread(() -> {
                 try {
 
                     var protocol = ini.getProtocolForKey(item.getKey());

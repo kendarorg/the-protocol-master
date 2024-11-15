@@ -67,8 +67,8 @@ public class FileStorageRepository implements StorageRepository {
                 }
             }
 
-            EventsQueue.register("FileStorageRepository",(e) -> write(e.getLineToWrite()), WriteItemEvent.class);
-            EventsQueue.register("FileStorageRepository",(e) -> finalizeWrite(e.getInstanceId()), FinalizeWriteEvent.class);
+            EventsQueue.register("FileStorageRepository", (e) -> write(e.getLineToWrite()), WriteItemEvent.class);
+            EventsQueue.register("FileStorageRepository", (e) -> finalizeWrite(e.getInstanceId()), FinalizeWriteEvent.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -124,7 +124,7 @@ public class FileStorageRepository implements StorageRepository {
 
             var repo = protocolRepo.get(item.getInstanceId());
             repo.index.add(item.getCompactLine());
-            repo.somethingWritten=true;
+            repo.somethingWritten = true;
             if (item.getStorageItem() != null) {
                 var result = mapper.serializePretty(item.getStorageItem());
                 if (!Files.exists(Paths.get(targetDir))) {
@@ -183,7 +183,7 @@ public class FileStorageRepository implements StorageRepository {
         try {
             var repo = protocolRepo.get(protocolInstanceId);
             if (repo == null) return;
-            if(!repo.somethingWritten){
+            if (!repo.somethingWritten) {
                 protocolRepo.remove(protocolInstanceId);
                 return;
             }
@@ -301,6 +301,6 @@ public class FileStorageRepository implements StorageRepository {
         public final List<StorageItem> outItems = new ArrayList<>();
         public List<CompactLine> index = new ArrayList<>();
         public boolean initialized = false;
-        public volatile boolean somethingWritten=false;
+        public volatile boolean somethingWritten = false;
     }
 }

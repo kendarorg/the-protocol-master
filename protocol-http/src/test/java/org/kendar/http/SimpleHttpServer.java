@@ -56,7 +56,7 @@ public class SimpleHttpServer {
             outputStream.write(bytes);
             outputStream.flush();
             outputStream.close();
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }

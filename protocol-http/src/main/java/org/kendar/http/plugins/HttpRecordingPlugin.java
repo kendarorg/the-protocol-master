@@ -3,9 +3,9 @@ package org.kendar.http.plugins;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.RecordStatusEvent;
 import org.kendar.http.utils.Request;
-import org.kendar.plugins.RecordingPlugin;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.RecordingPlugin;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -88,10 +88,9 @@ public class HttpRecordingPlugin extends RecordingPlugin {
     }
 
 
-
     @Override
     protected void handleActivation(boolean active) {
-        EventsQueue.send(new RecordStatusEvent(active,getProtocol(),getId(),getInstanceId()));
+        EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
         super.handleActivation(active);
     }
 

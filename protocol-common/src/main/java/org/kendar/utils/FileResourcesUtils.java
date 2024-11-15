@@ -77,7 +77,7 @@ public class FileResourcesUtils {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
-        return String.join("\n",result);
+        return String.join("\n", result);
     }
 
     /*
