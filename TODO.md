@@ -8,7 +8,9 @@
 
 ### Code
 
-* TODONTHREQUEST
+* Mocked specific responses for postgres, mysql,mongo, redis
+* Expose the connections for protocol
+* Send mock messages amqp,mqtt,redis
 * Set a replayId for replaying?
 * Change Supplier<Boolean> stopWhenFalseAction to a callback to register for?
 * Remove spring boot

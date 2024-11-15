@@ -69,9 +69,10 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
   
 
 * Mocked errors (http/s)
-* Mocked responses (all)
+* Mocked flow (all)
 * Support gzip,brotli,jacksonSmile,multipart and more (http/s)
 * Mocked error response (http/s)
+* Mocked specific responses (http/s) (nth, and count)
 * Internal rewrite queries and urls (http/s,mysql,postgres)
 * Record activity (all)
 * Replay activity (all)

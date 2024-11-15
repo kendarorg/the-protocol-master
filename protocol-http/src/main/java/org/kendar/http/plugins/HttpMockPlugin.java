@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 public class HttpMockPlugin extends MockPlugin<Request, Response> {
     private List<MockStorage> mocks = new ArrayList<>();
+    private final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
 
     private static void writeHeaderParameter(Response clonedResponse, HashMap<String, String> parameters) {
         for (var kvp : clonedResponse.getHeaders().entrySet()) {
@@ -70,9 +71,7 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
 
     }
 
-    private ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
-
-    private void loadMocks(){
+    private void loadMocks() {
         try {
             var mocksPath = Path.of(getMocksDir()).toAbsolutePath();
             mocks = new ArrayList<>();
@@ -80,9 +79,7 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
                 if (file.isFile() && file.getName().endsWith(".json")) {
                     var si = mapper.deserialize(Files.readString(file.toPath()), MockStorage.class);
                     mocks.add(si);
-                    if(si.getNthRequest()>0){
-                        counters.put(si.getIndex(), new AtomicInteger(0));
-                    }
+                    counters.put(si.getIndex(), new AtomicInteger(0));
                 }
             }
 
@@ -115,7 +112,19 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
                 response.setHeaders(foundedCloneResponse.getHeaders());
                 response.setStatusCode(foundedCloneResponse.getStatusCode());
                 response.setMessages(foundedCloneResponse.getMessages());
-                founded.setCount(founded.getCount() - 1);
+
+                counters.get(founded.getIndex()).getAndIncrement();
+                if (founded.getNthRequest() > 0) {
+                    var isNth = counters.get(founded.getIndex()).get() == founded.getNthRequest();
+                    if(isNth) {
+                        founded.setNthRequest(0);
+                        founded.setCount(founded.getCount() - 1);
+                        return true;
+                    }
+                    return false;
+                }else{
+                    founded.setCount(founded.getCount() - 1);
+                }
                 return true;
             }
         }
