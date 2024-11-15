@@ -283,6 +283,7 @@ public class JdbcProxy extends Proxy {
 
             var c = ((Connection) ((ProxyConnection) connection).getConnection());
             if (parameterValues.isEmpty()) {
+                //noinspection SqlSourceToSinkFlow
                 statement = c.prepareStatement(jdbcCall.getQuery(), insert ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
             } else {
                 ParametrizedStatement parametrizedStatementBuilder = buildParametrizedStatement(

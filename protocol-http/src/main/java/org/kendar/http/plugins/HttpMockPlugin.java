@@ -12,7 +12,6 @@ import org.kendar.utils.ChangeableReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -78,13 +77,13 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
                         if (founded.getCount() > 0) {
                             founded.setCount(founded.getCount() - 1);
                         }
-                        writeOutput(request, response, founded, parametric, foundedResponse);
+                        writeOutput(request, response, founded, parametric, founded);
                         return true;
                     }
                     return false;
                 } else if (founded.getCount() > 0) {
                     founded.setCount(founded.getCount() - 1);
-                    writeOutput(request, response, founded, parametric, foundedResponse);
+                    writeOutput(request, response, founded, parametric, founded);
                     return true;
                 }
             }
@@ -92,10 +91,10 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         return false;
     }
 
-    private void writeOutput(Request request, Response response, MockStorage founded, boolean parametric, Optional<MockStorage> foundedResponse) {
+    private void writeOutput(Request request, Response response, MockStorage founded, boolean parametric, MockStorage foundedResponse) {
         var foundedCloneResponse = founded.retrieveOutAs(Response.class).copy();
         if (parametric) {
-            loadParameters(foundedResponse.get().retrieveInAs(Request.class), request, foundedCloneResponse);
+            loadParameters(foundedResponse.retrieveInAs(Request.class), request, foundedCloneResponse);
         }
         response.setResponseText(foundedCloneResponse.getResponseText());
         response.setHeaders(foundedCloneResponse.getHeaders());
@@ -118,7 +117,7 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
 //            counters.put(si.getIndex(), new AtomicInteger(0));
 //        }
 
-        ChangeableReference<Integer> matchedQuery = new ChangeableReference<Integer>(0);
+        ChangeableReference<Integer> matchedQuery = new ChangeableReference<>(0);
 
         var possibleRequest = data.retrieveInAs(Request.class);
         verifyHostAndPath(requestToSimulate, possibleRequest, matchedQuery, parametric);

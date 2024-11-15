@@ -181,13 +181,13 @@ public class CertificatesManager {
         for (var host : hosts) {
             var hstSpl = host.split("\\.");
             if (hstSpl.length > 2) {
-                var newHost = "*";
+                StringBuilder newHost = new StringBuilder("*");
                 for (var i = 1; i < hstSpl.length; i++) {
-                    newHost += "." + hstSpl[i];
+                    newHost.append(".").append(hstSpl[i]);
                 }
-                if (!registeredHosts.containsKey(newHost)) {
-                    inserted.add(newHost);
-                    registeredHosts.put(newHost, newHost);
+                if (!registeredHosts.containsKey(newHost.toString())) {
+                    inserted.add(newHost.toString());
+                    registeredHosts.put(newHost.toString(), newHost.toString());
                 }
             }
 

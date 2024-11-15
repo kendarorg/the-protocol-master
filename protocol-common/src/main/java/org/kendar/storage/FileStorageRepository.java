@@ -133,7 +133,7 @@ public class FileStorageRepository implements StorageRepository {
                 Files.writeString(Path.of(targetDir, id), result);
             }
         } catch (Exception e) {
-            log.warn("Trouble writing {}", e);
+            log.warn("Trouble writing", e);
         }
     }
 
@@ -258,10 +258,11 @@ public class FileStorageRepository implements StorageRepository {
             if (tags.containsKey(tag.getKey())) {
                 var l = tags.get(tag.getKey());
                 var r = query.getTags().get(tag.getKey());
+                //noinspection StringEquality
                 if ((l == null || r == null) && l == r) {
                     continue;
                 }
-                if (l.equalsIgnoreCase(r)) {
+                if (l!=null && l.equalsIgnoreCase(r)) {
                     continue;
                 }
                 return false;

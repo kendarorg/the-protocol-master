@@ -50,7 +50,7 @@ public class TcpServer {
         if (protoDescriptor.isWrapper()) {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
                 protoDescriptor.terminate();
-                Sleeper.sleepNoException(1000, () -> EventsQueue.isEmpty(), true);
+                Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
 
             }
         } else {
@@ -67,7 +67,7 @@ public class TcpServer {
                     }
 
                 }
-                Sleeper.sleepNoException(1000, () -> EventsQueue.isEmpty(), true);
+                Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
             }
         }
     }

@@ -4,8 +4,8 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 
 public class LineToWrite {
-    private String instanceId;
-    private CompactLine compactLine;
+    private final String instanceId;
+    private final CompactLine compactLine;
     private StorageItem storageItem;
 
     public LineToWrite(String instanceId, StorageItem storageItem, CompactLine compactLine) {

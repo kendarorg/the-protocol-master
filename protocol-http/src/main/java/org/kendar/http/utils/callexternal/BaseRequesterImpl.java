@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("resource")
 public abstract class BaseRequesterImpl implements BaseRequester {
+    @SuppressWarnings("UastIncorrectHttpHeaderInspection")
     public static final String BLOCK_RECURSION = "X-BLOCK-RECURSIVE";
 
     private static final HttpRequestRetryHandler requestRetryHandler =

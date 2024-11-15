@@ -440,7 +440,7 @@ public class ServerImpl {
 
     static class InternalSSLConfig {
         private final SSLContext sslContext;
-        private HttpsConfigurator httpsConfig;
+        private final HttpsConfigurator httpsConfig;
 
         public InternalSSLConfig(HttpsConfigurator config) {
 

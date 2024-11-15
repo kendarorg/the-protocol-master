@@ -31,6 +31,7 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
         return this;
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public PluginDescriptor clone() {
         try {
             return this.getClass().getDeclaredConstructor().newInstance();

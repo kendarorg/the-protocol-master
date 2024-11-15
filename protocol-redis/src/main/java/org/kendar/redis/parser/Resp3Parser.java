@@ -370,7 +370,7 @@ public class Resp3Parser {
     }
 
     public String serialize(JsonNode jsonNode) throws Resp3ParseException {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         if (jsonNode.isArray()) {
             var arrayNode = (ArrayNode) jsonNode;
             var type = "*";
@@ -388,7 +388,7 @@ public class Resp3Parser {
                     size++;
                 }
             }
-            result += type + size + "\r\n";
+            result.append(type).append(size).append("\r\n");
 
             for (var item : arrayNode) {
                 if (item.asText().equalsIgnoreCase("@@SET@@") || item.asText().equalsIgnoreCase("@@MAP@@") || item.asText().equalsIgnoreCase("@@PUSH@@") || item.asText().equalsIgnoreCase("@@ARRAY@@")) {
@@ -396,13 +396,13 @@ public class Resp3Parser {
                 }
                 if (type.equalsIgnoreCase("%")) { //MAP
                     var subArray = (ArrayNode) item;
-                    result += serialize(subArray.get(0));
-                    result += serialize(subArray.get(1));
+                    result.append(serialize(subArray.get(0)));
+                    result.append(serialize(subArray.get(1)));
                 } else {
-                    result += serialize(item);
+                    result.append(serialize(item));
                 }
             }
-            return result;
+            return result.toString();
         } else if (jsonNode.isValueNode()) {
             var valNode = (ValueNode) jsonNode;
             if (valNode.isLong() || valNode.isInt() || valNode.isIntegralNumber() || valNode.isShort()) {

@@ -18,7 +18,7 @@ import java.util.List;
 public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T, K> {
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
-    private List<ReplacerItemInstance> replacers = new ArrayList<>();
+    private final List<ReplacerItemInstance> replacers = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -71,7 +71,7 @@ public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T,
                 replacers.add(new ReplacerItemInstance(replacer));
             }
         } catch (Exception e) {
-            log.error("Unable to read rewrite file " + settings.getRewritesFile(), e);
+            log.error("Unable to read rewrite file {}", settings.getRewritesFile(), e);
             throw new RuntimeException(e);
         }
     }

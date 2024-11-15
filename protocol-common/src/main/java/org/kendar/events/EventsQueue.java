@@ -1,6 +1,5 @@
 package org.kendar.events;
 
-import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +14,12 @@ import java.util.function.Function;
 
 public class EventsQueue {
     private static final Logger logger = LoggerFactory.getLogger(EventsQueue.class);
-    private static EventsQueue instance = new EventsQueue();
-    private static AtomicLong size = new AtomicLong(0);
-    private final JsonMapper mapper = new JsonMapper();
+    private static final EventsQueue instance = new EventsQueue();
+    private static final AtomicLong size = new AtomicLong(0);
+
     private final HashMap<String, Map<String, Consumer<TpmEvent>>> eventHandlers = new HashMap<>();
-    @SuppressWarnings("rawtypes")
-    private final HashMap<String, Class> conversions = new HashMap<>();
+
+    //private final HashMap<String, Class> conversions = new HashMap<>();
     private final HashMap<String, CommandConsumer> commandHandlers = new HashMap<>();
     private final ConcurrentLinkedQueue<TpmEvent> items = new ConcurrentLinkedQueue<>();
 
@@ -41,10 +40,10 @@ public class EventsQueue {
         return size.get() == 0;
     }
 
-    @SuppressWarnings("unchecked")
+
     public static <T extends TpmEvent> void register(String id, Consumer<T> consumer, Class<T> clazz) {
         var eventName = clazz.getSimpleName().toLowerCase(Locale.ROOT);
-        instance.conversions.put(eventName, clazz);
+        //instance.conversions.put(eventName, clazz);
         var realConsumer = new Consumer<TpmEvent>() {
             @Override
             public void accept(TpmEvent event) {
@@ -59,7 +58,7 @@ public class EventsQueue {
 
     public static <T extends TpmEvent> void registerCommand(String id, Function<T, Object> function, Class<T> clazz) {
         var eventName = clazz.getSimpleName().toLowerCase(Locale.ROOT);
-        instance.conversions.put(eventName, clazz);
+        //instance.conversions.put(eventName, clazz);
         var realConsumer = new Function<TpmEvent, Object>() {
             @Override
             public Object apply(TpmEvent event) {
@@ -109,21 +108,21 @@ public class EventsQueue {
                 try {
                     subHandler.getValue().accept(event);
                 } catch (Exception ex) {
-                    logger.error("Error executing TpmEvent " + eventName, ex);
+                    logger.error("Error executing TpmEvent {}", eventName, ex);
                 }
             }
         } else if (handler != null) {
             try {
                 handler.consumer.apply(event);
             } catch (Exception ex) {
-                logger.error("Error executing TpmEvent " + eventName, ex);
+                logger.error("Error executing TpmEvent {}", eventName, ex);
             }
         }
     }
 
     private static class CommandConsumer {
-        public String id;
-        public Function<TpmEvent, Object> consumer;
+        public final String id;
+        public final Function<TpmEvent, Object> consumer;
 
         public CommandConsumer(String id, Function<TpmEvent, Object> consumer) {
             this.id = id;
