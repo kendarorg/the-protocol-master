@@ -72,10 +72,13 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         try {
             var mocksPath = Path.of(getMocksDir()).toAbsolutePath();
             mocks = new ArrayList<>();
+            var presentAlready = new HashSet<Long>();
             for (var file : mocksPath.toFile().listFiles()) {
                 if (file.isFile() && file.getName().endsWith(".json")) {
                     var si = mapper.deserialize(Files.readString(file.toPath()), MockStorage.class);
-
+                    if(presentAlready.contains(si.getIndex()))throw new RuntimeException(
+                            "Duplicate id "+si.getIndex()+" found in "+file.getName());
+                    presentAlready.add(si.getIndex());
                     mocks.add(si);
                     counters.put(si.getIndex(), new AtomicInteger(0));
                 }
