@@ -20,6 +20,7 @@
 * Http
     * test brotli compression
     * Use anonymous Object for serialization for HTTP Multipart
+    * Test the mock with @{regexp} and ${replace} parameters
 
 //Should handle somehow
 globalFilter.setShutdownVariable(stopWhenFalse);
