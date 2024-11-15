@@ -14,10 +14,7 @@ import org.kendar.utils.ChangeableReference;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -66,18 +63,19 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
 
         super.initialize(global, protocol);
-        loadMocks();
         return this;
 
     }
 
-    private void loadMocks() {
+    @Override
+    protected void loadMocks() {
         try {
             var mocksPath = Path.of(getMocksDir()).toAbsolutePath();
             mocks = new ArrayList<>();
             for (var file : mocksPath.toFile().listFiles()) {
                 if (file.isFile() && file.getName().endsWith(".json")) {
                     var si = mapper.deserialize(Files.readString(file.toPath()), MockStorage.class);
+
                     mocks.add(si);
                     counters.put(si.getIndex(), new AtomicInteger(0));
                 }
@@ -104,31 +102,38 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
             var foundedResponse = mocks.stream().filter(a -> a.getIndex() == foundedIndex.get()).findFirst();
             if (foundedResponse.isPresent()) {
                 var founded = foundedResponse.get();
-                var foundedCloneResponse = founded.retrieveOutAs(Response.class).copy();
-                if (parametric) {
-                    loadParameters(foundedResponse.get().retrieveInAs(Request.class), request, foundedCloneResponse);
-                }
-                response.setResponseText(foundedCloneResponse.getResponseText());
-                response.setHeaders(foundedCloneResponse.getHeaders());
-                response.setStatusCode(foundedCloneResponse.getStatusCode());
-                response.setMessages(foundedCloneResponse.getMessages());
 
                 counters.get(founded.getIndex()).getAndIncrement();
                 if (founded.getNthRequest() > 0) {
                     var isNth = counters.get(founded.getIndex()).get() == founded.getNthRequest();
                     if(isNth) {
-                        founded.setNthRequest(0);
-                        founded.setCount(founded.getCount() - 1);
+                        founded.setNthRequest(-1);
+                        if(founded.getCount()>0) {
+                            founded.setCount(founded.getCount() - 1);
+                        }
+                        writeOutput(request, response, founded, parametric, foundedResponse);
                         return true;
                     }
                     return false;
-                }else{
+                }else if(founded.getCount()>0){
                     founded.setCount(founded.getCount() - 1);
+                    writeOutput(request, response, founded, parametric, foundedResponse);
+                    return true;
                 }
-                return true;
             }
         }
         return false;
+    }
+
+    private void writeOutput(Request request, Response response, MockStorage founded, boolean parametric, Optional<MockStorage> foundedResponse) {
+        var foundedCloneResponse = founded.retrieveOutAs(Response.class).copy();
+        if (parametric) {
+            loadParameters(foundedResponse.get().retrieveInAs(Request.class), request, foundedCloneResponse);
+        }
+        response.setResponseText(foundedCloneResponse.getResponseText());
+        response.setHeaders(foundedCloneResponse.getHeaders());
+        response.setStatusCode(foundedCloneResponse.getStatusCode());
+        response.setMessages(foundedCloneResponse.getMessages());
     }
 
     private void checkMatching(MockStorage data,
@@ -136,9 +141,7 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
                                ChangeableReference<Integer> matchingQuery,
                                ChangeableReference<Long> foundedIndex,
                                boolean parametric) {
-        if (data.getCount() == 0) {
-            return;
-        }
+
         //TODONTHREQUEST
 //        if(data.getNthRequest()>0){
 //            if(data.getCount()<=0){
@@ -232,14 +235,14 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
                             matchedQuery.set(1 + matchedQuery.get());
                         }
                     } else if (possibleMatch.getValue().equalsIgnoreCase(requestToMatch.getValue())) {
-                        matchedQuery.set(1 + matchedQuery.get());
+                        matchedQuery.set(3 + matchedQuery.get());
                     } else if (parametric) {
                         if (possibleMatch.getValue().startsWith("${") && possibleMatch.getValue().endsWith("}")) {
                             matchedQuery.set(1 + matchedQuery.get());
                         } else if (possibleMatch.getValue().startsWith("@{") && possibleMatch.getValue().endsWith("}")) {
                             var regexp = possibleMatch.getValue().substring(2, possibleMatch.getValue().length() - 3);
                             if (Pattern.compile(regexp).matcher(requestToMatch.getValue()).matches()) {
-                                matchedQuery.set(1 + matchedQuery.get());
+                                matchedQuery.set(2 + matchedQuery.get());
                             }
                         }
                     }

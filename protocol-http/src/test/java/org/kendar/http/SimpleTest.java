@@ -2,29 +2,16 @@ package org.kendar.http;
 
 import com.fasterxml.jackson.databind.node.BinaryNode;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -43,14 +30,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class SimpleTest extends BasicTest {
-
-
-    private static CloseableHttpClient createHttpClient(HttpClientBuilder custom) {
-        var proxy = new HttpHost("localhost", FAKE_PORT_PROXY, "http");
-        var routePlanner = new DefaultProxyRoutePlanner(proxy);
-        var httpclient = custom.setRoutePlanner(routePlanner).build();
-        return httpclient;
-    }
 
     private static byte[] buildBytesData() {
         try {
@@ -73,21 +52,7 @@ public class SimpleTest extends BasicTest {
 
     }
 
-    private static String getContentString(HttpResponse httpresponse) {
-        try {
-            var sc = new Scanner(httpresponse.getEntity().getContent());
 
-            //Printing the status line
-            assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
-            var content = "";
-            while (sc.hasNext()) {
-                content += sc.nextLine();
-            }
-            return content;
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
 
     @BeforeAll
     public static void beforeClass() throws Exception {
@@ -104,23 +69,7 @@ public class SimpleTest extends BasicTest {
         }
     }
 
-    private static CloseableHttpClient createHttpsHttpClient() throws Exception {
-        final var sslContext = new SSLContextBuilder()
-                .loadTrustMaterial(null, (x509CertChain, authType) -> true)
-                .build();
 
-        var httpclient = createHttpClient(HttpClients.custom()
-                .setSSLContext(sslContext)
-                .setConnectionManager(
-                        new PoolingHttpClientConnectionManager(
-                                RegistryBuilder.<ConnectionSocketFactory>create()
-                                        .register("http", PlainConnectionSocketFactory.INSTANCE)
-                                        .register("https", new SSLConnectionSocketFactory(sslContext,
-                                                NoopHostnameVerifier.INSTANCE))
-                                        .build()
-                        )));
-        return httpclient;
-    }
 
     private static byte[] getConfusingByteArray() {
         return new byte[]{1, 2, 3, 4, 5, '\r', '\n'};
@@ -213,18 +162,7 @@ public class SimpleTest extends BasicTest {
         }
     }
 
-    private static HttpRequestBase withQuery(HttpRequestBase req, Map<String, String> queryParms) {
-        try {
-            var uriBuilder = new URIBuilder(req.getURI());
-            for (var q : queryParms.entrySet()) {
-                uriBuilder.addParameter(q.getKey(), q.getValue());
-            }
-            req.setURI(uriBuilder.build());
-            return req;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {

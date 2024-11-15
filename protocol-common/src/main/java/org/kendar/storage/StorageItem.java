@@ -1,5 +1,6 @@
 package org.kendar.storage;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.utils.JsonMapper;
 
 /**
@@ -54,7 +55,11 @@ public class StorageItem {
             if (clazz == input.getClass()) {
                 inAs = input;
             } else {
-                inAs = mapper.deserialize(input, clazz);
+                if(input instanceof JsonNode && ((JsonNode) input).has("data")) {
+                    inAs = mapper.deserialize(((JsonNode) input).get("data"), clazz);
+                }else {
+                    inAs = mapper.deserialize(input, clazz);
+                }
             }
         }
         return (T) inAs;
@@ -64,8 +69,13 @@ public class StorageItem {
         if (outAs == null && output != null) {
             if (clazz == output.getClass()) {
                 outAs = output;
-            } else
-                outAs = mapper.deserialize(output, clazz);
+            } else {
+                if(output instanceof JsonNode && ((JsonNode) output).has("data")) {
+                    outAs = mapper.deserialize(((JsonNode) output).get("data"), clazz);
+                }else {
+                    outAs = mapper.deserialize(output, clazz);
+                }
+            }
         }
         return (T) outAs;
     }

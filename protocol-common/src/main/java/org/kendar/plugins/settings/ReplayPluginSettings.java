@@ -1,4 +1,6 @@
-package org.kendar.settings;
+package org.kendar.plugins.settings;
+
+import org.kendar.settings.PluginSettings;
 
 public class ReplayPluginSettings extends PluginSettings {
     private boolean replay;

@@ -47,7 +47,7 @@ public class PostgresProtoContext extends NetworkProtoContext {
         var conn = getValue("CONNECTION");
         var c = ((Connection) ((ProxyConnection) conn).getConnection());
         try {
-            if (!c.isValid(1)) {
+            if (c!=null && !c.isValid(1)) {
                 c.close();
             }
         } catch (Exception ex) {

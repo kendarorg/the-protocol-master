@@ -1,9 +1,25 @@
 package org.kendar.http;
 
 
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
+import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
@@ -13,6 +29,11 @@ import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.logging.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BasicTest {
 
@@ -24,9 +45,64 @@ public class BasicTest {
     private static SimpleHttpServer simpleServer;
 
     public static void beforeClassBase() throws Exception {
+        java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
         simpleServer = new SimpleHttpServer();
         simpleServer.start(8456);
 
+    }
+
+    protected static CloseableHttpClient createHttpClient(HttpClientBuilder custom) {
+        var proxy = new HttpHost("localhost", FAKE_PORT_PROXY, "http");
+        var routePlanner = new DefaultProxyRoutePlanner(proxy);
+        var httpclient = custom.setRoutePlanner(routePlanner).build();
+        return httpclient;
+    }
+
+    protected static String getContentString(HttpResponse httpresponse) {
+        try {
+            var sc = new Scanner(httpresponse.getEntity().getContent());
+
+            //Printing the status line
+            assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+            var content = "";
+            while (sc.hasNext()) {
+                content += sc.nextLine();
+            }
+            return content;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    protected static HttpRequestBase withQuery(HttpRequestBase req, Map<String, String> queryParms) {
+        try {
+            var uriBuilder = new URIBuilder(req.getURI());
+            for (var q : queryParms.entrySet()) {
+                uriBuilder.addParameter(q.getKey(), q.getValue());
+            }
+            req.setURI(uriBuilder.build());
+            return req;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected static CloseableHttpClient createHttpsHttpClient() throws Exception {
+        final var sslContext = new SSLContextBuilder()
+                .loadTrustMaterial(null, (x509CertChain, authType) -> true)
+                .build();
+
+        var httpclient = createHttpClient(HttpClients.custom()
+                .setSSLContext(sslContext)
+                .setConnectionManager(
+                        new PoolingHttpClientConnectionManager(
+                                RegistryBuilder.<ConnectionSocketFactory>create()
+                                        .register("http", PlainConnectionSocketFactory.INSTANCE)
+                                        .register("https", new SSLConnectionSocketFactory(sslContext,
+                                                NoopHostnameVerifier.INSTANCE))
+                                        .build()
+                        )));
+        return httpclient;
     }
 
     public static void afterClassBase() throws Exception {
@@ -67,12 +143,16 @@ public class BasicTest {
         httpProtocolSettings.getPlugins().put("record-plugin", recordingPlugin);
         var replayPlugin = new HttpReplayPluginSettings();
         httpProtocolSettings.getPlugins().put("replay-plugin", replayPlugin);
+        var mockPlugin = new BasicMockPluginSettings();
+        mockPlugin.setDataDir(Path.of("src","test","resources","mock").toAbsolutePath().toString());
+        httpProtocolSettings.getPlugins().put("mock-plugin", mockPlugin);
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
                 new HttpRecordingPlugin(),
                 new HttpReplayingPlugin().withStorage(storage),
-                new HttpErrorPlugin()));
+                new HttpErrorPlugin(),
+                new HttpMockPlugin()));
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 
