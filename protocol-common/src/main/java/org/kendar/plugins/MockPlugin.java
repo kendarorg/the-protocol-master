@@ -6,7 +6,13 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
     private String mocksDir;
@@ -34,8 +40,30 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
         this.mocksDir = ((BasicMockPluginSettings)plugin).getDataDir();
         loadMocks();
     }
+    protected List<MockStorage> mocks = new ArrayList<>();
+    protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
 
-    protected abstract void loadMocks();
+    protected void loadMocks() {
+        try {
+            var mocksPath = Path.of(getMocksDir()).toAbsolutePath();
+            mocks = new ArrayList<>();
+            var presentAlready = new HashSet<Long>();
+            for (var file : mocksPath.toFile().listFiles()) {
+                if (file.isFile() && file.getName().endsWith(".json")) {
+                    var si = mapper.deserialize(Files.readString(file.toPath()), MockStorage.class);
+                    if(presentAlready.contains(si.getIndex()))throw new RuntimeException(
+                            "Duplicate id "+si.getIndex()+" found in "+file.getName());
+                    presentAlready.add(si.getIndex());
+                    mocks.add(si);
+                    counters.put(si.getIndex(), new AtomicInteger(0));
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public List<ProtocolPhase> getPhases() {
         return List.of(ProtocolPhase.PRE_CALL);
@@ -60,10 +88,15 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
         return mocksDir;
     }
     protected void handleActivation(boolean active) {
-        super.handleActivation(active);
-        if(active!=isActive() && active){
-            loadMocks();
+        if (active != this.isActive()) {
+            counters.clear();
+            if (active) {
+                loadMocks();
+            } else {
+                mocks.clear();
+            }
         }
+        super.handleActivation(active);
     }
 
 }

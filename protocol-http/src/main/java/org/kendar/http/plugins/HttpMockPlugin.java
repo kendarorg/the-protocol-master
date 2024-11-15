@@ -5,24 +5,18 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.plugins.MockPlugin;
 import org.kendar.plugins.MockStorage;
-import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
-import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.ChangeableReference;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class HttpMockPlugin extends MockPlugin<Request, Response> {
-    private List<MockStorage> mocks = new ArrayList<>();
-    private final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
 
     private static void writeHeaderParameter(Response clonedResponse, HashMap<String, String> parameters) {
         for (var kvp : clonedResponse.getHeaders().entrySet()) {
@@ -57,36 +51,6 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
     @Override
     public String getProtocol() {
         return "http";
-    }
-
-    @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-
-        super.initialize(global, protocol);
-        return this;
-
-    }
-
-    @Override
-    protected void loadMocks() {
-        try {
-            var mocksPath = Path.of(getMocksDir()).toAbsolutePath();
-            mocks = new ArrayList<>();
-            var presentAlready = new HashSet<Long>();
-            for (var file : mocksPath.toFile().listFiles()) {
-                if (file.isFile() && file.getName().endsWith(".json")) {
-                    var si = mapper.deserialize(Files.readString(file.toPath()), MockStorage.class);
-                    if(presentAlready.contains(si.getIndex()))throw new RuntimeException(
-                            "Duplicate id "+si.getIndex()+" found in "+file.getName());
-                    presentAlready.add(si.getIndex());
-                    mocks.add(si);
-                    counters.put(si.getIndex(), new AtomicInteger(0));
-                }
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -211,19 +175,6 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
             return possSpl[0].equalsIgnoreCase(tossSpl[0]);
         }
         return false;
-    }
-
-    @Override
-    protected void handleActivation(boolean active) {
-        if (active != this.isActive()) {
-            counters.clear();
-            if (active) {
-                loadMocks();
-            } else {
-                mocks.clear();
-            }
-        }
-        super.handleActivation(active);
     }
 
     private void matchQuery(Map<String, String> possibleMatches, Map<String, String> requestsToMatch, ChangeableReference<Integer> matchedQuery,
