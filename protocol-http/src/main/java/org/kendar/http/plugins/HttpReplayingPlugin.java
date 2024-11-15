@@ -32,8 +32,9 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
 
     }
 
+    @Override
     protected void handleActivation(boolean active) {
-        EventsQueue.send(new ReplayStatusEvent(active));
+        EventsQueue.send(new ReplayStatusEvent(active,getProtocol(),getId(),getInstanceId()));
     }
 
     private Map<String, String> buildTag(Request in) {

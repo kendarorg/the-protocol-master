@@ -52,8 +52,9 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
         return false;
     }
 
+    @Override
     protected void handleActivation(boolean active) {
-        EventsQueue.send(new ReplayStatusEvent(active));
+        EventsQueue.send(new ReplayStatusEvent(active,getProtocol(),getId(),getInstanceId()));
     }
 
     protected void sendAndExpect(PluginContext pluginContext, JdbcCall inObj, SelectResult outObj) {

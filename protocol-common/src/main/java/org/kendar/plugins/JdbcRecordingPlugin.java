@@ -83,6 +83,7 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
         EventsQueue.send(new FinalizeWriteEvent(getInstanceId()));
     }
 
+    @Override
     protected void handleActivation(boolean active) {
         if(!active){
             terminate();
