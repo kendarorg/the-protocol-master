@@ -47,20 +47,22 @@ public class EventsQueue {
     private void start() {
         new Thread(() -> {
             while (true) {
-                try {
                     if (items.isEmpty()) {
                         Sleeper.sleep(10);
                         continue;
                     }
                     var item = items.poll();
                     while (item != null) {
-                        handle(item);
+
+                        try {
+                            handle(item);
+                        } catch (Exception e) {
+                            logger.warn("Trouble handling {}",item.getClass().getSimpleName(), e);
+                        }
                         size.decrementAndGet();
                         item = items.poll();
                     }
-                } catch (Exception e) {
-                    logger.warn("Trouble flushing {}", e);
-                }
+
             }
         }).start();
 
