@@ -5,6 +5,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.utils.ChangeableReference;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +20,52 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
     protected List<MockStorage> mocks = new ArrayList<>();
     private String mocksDir;
 
+
+    protected static boolean isTemplateParameter(String tplSeg) {
+        return tplSeg.startsWith("${") && tplSeg.endsWith("}") || tplSeg.startsWith("@{") && tplSeg.endsWith("}");
+    }
+    protected abstract void checkMatching(MockStorage data,
+                                 T requestToSimulate,
+                                 ChangeableReference<Integer> matchingQuery,
+                                 ChangeableReference<Long> foundedIndex) ;
+    @Override
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
+        if (!isActive()) return false;
+        var matchingQuery = new ChangeableReference<>(0);
+        var foundedIndex = new ChangeableReference<>(-1L);
+        var withHost = firstCheckOnMainPart(request);
+        withHost.forEach(a -> checkMatching(a, request, matchingQuery, foundedIndex));
+        if (foundedIndex.get() > 0) {
+            var foundedResponse = mocks.stream().filter(a -> a.getIndex() == foundedIndex.get()).findFirst();
+            if (foundedResponse.isPresent()) {
+                var founded = foundedResponse.get();
+
+                counters.get(founded.getIndex()).getAndIncrement();
+                if (founded.getNthRequest() > 0) {
+                    var isNth = counters.get(founded.getIndex()).get() == founded.getNthRequest();
+                    if (isNth) {
+                        founded.setNthRequest(-1);
+                        if (founded.getCount() > 0) {
+                            founded.setCount(founded.getCount() - 1);
+                        }
+                        writeOutput(request, response, founded);
+                        return true;
+                    }
+                    return false;
+                } else if (founded.getCount() > 0) {
+                    founded.setCount(founded.getCount() - 1);
+                    writeOutput(request, response, founded);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    protected abstract void writeOutput(T request, K response,
+                                        MockStorage founded);
+
+    protected abstract List<MockStorage> firstCheckOnMainPart(T request);
+
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
 
@@ -31,11 +78,7 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
 
     }
 
-    @Override
-    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T in, K out) {
-        if (!isActive()) return false;
-        return false;
-    }
+
 
     public void setSettings(PluginSettings plugin) {
         super.setSettings(plugin);

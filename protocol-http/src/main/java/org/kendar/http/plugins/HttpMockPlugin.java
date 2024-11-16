@@ -5,8 +5,6 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.plugins.MockPlugin;
 import org.kendar.plugins.MockStorage;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.proxy.PluginContext;
 import org.kendar.utils.ChangeableReference;
 
 import java.util.HashMap;
@@ -43,59 +41,32 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         }
     }
 
-    private static boolean isTemplateParameter(String tplSeg) {
-        return tplSeg.startsWith("${") && tplSeg.endsWith("}") || tplSeg.startsWith("@{") && tplSeg.endsWith("}");
-    }
 
     @Override
     public String getProtocol() {
         return "http";
     }
 
-    @Override
-    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
-        if (!isActive()) return false;
-        var matchingQuery = new ChangeableReference<>(0);
-        var foundedIndex = new ChangeableReference<>(-1L);
-        var withHost = mocks.stream().filter(a -> a.retrieveInAs(Request.class).getHost().equalsIgnoreCase(request.getHost())).collect(Collectors.toList());
-        withHost.forEach(a -> checkMatching(a, request, matchingQuery, foundedIndex));
-        if (foundedIndex.get() > 0) {
-            var foundedResponse = mocks.stream().filter(a -> a.getIndex() == foundedIndex.get()).findFirst();
-            if (foundedResponse.isPresent()) {
-                var founded = foundedResponse.get();
 
-                counters.get(founded.getIndex()).getAndIncrement();
-                if (founded.getNthRequest() > 0) {
-                    var isNth = counters.get(founded.getIndex()).get() == founded.getNthRequest();
-                    if (isNth) {
-                        founded.setNthRequest(-1);
-                        if (founded.getCount() > 0) {
-                            founded.setCount(founded.getCount() - 1);
-                        }
-                        writeOutput(request, response, founded, founded);
-                        return true;
-                    }
-                    return false;
-                } else if (founded.getCount() > 0) {
-                    founded.setCount(founded.getCount() - 1);
-                    writeOutput(request, response, founded, founded);
-                    return true;
-                }
-            }
-        }
-        return false;
+
+    @Override
+    protected List<MockStorage> firstCheckOnMainPart(Request request) {
+        return mocks.stream().filter(a -> a.retrieveInAs(Request.class).getHost().
+                equalsIgnoreCase(request.getHost())).collect(Collectors.toList());
     }
 
-    private void writeOutput(Request request, Response response, MockStorage founded, MockStorage foundedResponse) {
+    @Override
+    protected void writeOutput(Request request, Response response, MockStorage founded) {
         var foundedCloneResponse = founded.retrieveOutAs(Response.class).copy();
-        loadParameters(foundedResponse.retrieveInAs(Request.class), request, foundedCloneResponse);
+        loadParameters(founded.retrieveInAs(Request.class), request, foundedCloneResponse);
         response.setResponseText(foundedCloneResponse.getResponseText());
         response.setHeaders(foundedCloneResponse.getHeaders());
         response.setStatusCode(foundedCloneResponse.getStatusCode());
         response.setMessages(foundedCloneResponse.getMessages());
     }
 
-    private void checkMatching(MockStorage data,
+    @Override
+    protected void checkMatching(MockStorage data,
                                Request requestToSimulate,
                                ChangeableReference<Integer> matchingQuery,
                                ChangeableReference<Long> foundedIndex) {
