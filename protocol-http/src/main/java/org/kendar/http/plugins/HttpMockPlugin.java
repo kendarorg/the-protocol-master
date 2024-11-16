@@ -58,12 +58,7 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         var matchingQuery = new ChangeableReference<>(0);
         var foundedIndex = new ChangeableReference<>(-1L);
         var withHost = mocks.stream().filter(a -> a.retrieveInAs(Request.class).getHost().equalsIgnoreCase(request.getHost())).collect(Collectors.toList());
-        var parametric = false;
-        withHost.forEach(a -> checkMatching(a, request, matchingQuery, foundedIndex, false));
-        if (foundedIndex.get() <= 0) {
-            parametric = true;
-            withHost.forEach(a -> checkMatching(a, request, matchingQuery, foundedIndex, true));
-        }
+        withHost.forEach(a -> checkMatching(a, request, matchingQuery, foundedIndex));
         if (foundedIndex.get() > 0) {
             var foundedResponse = mocks.stream().filter(a -> a.getIndex() == foundedIndex.get()).findFirst();
             if (foundedResponse.isPresent()) {
@@ -77,13 +72,13 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
                         if (founded.getCount() > 0) {
                             founded.setCount(founded.getCount() - 1);
                         }
-                        writeOutput(request, response, founded, parametric, founded);
+                        writeOutput(request, response, founded, founded);
                         return true;
                     }
                     return false;
                 } else if (founded.getCount() > 0) {
                     founded.setCount(founded.getCount() - 1);
-                    writeOutput(request, response, founded, parametric, founded);
+                    writeOutput(request, response, founded, founded);
                     return true;
                 }
             }
@@ -91,11 +86,9 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         return false;
     }
 
-    private void writeOutput(Request request, Response response, MockStorage founded, boolean parametric, MockStorage foundedResponse) {
+    private void writeOutput(Request request, Response response, MockStorage founded, MockStorage foundedResponse) {
         var foundedCloneResponse = founded.retrieveOutAs(Response.class).copy();
-        if (parametric) {
-            loadParameters(foundedResponse.retrieveInAs(Request.class), request, foundedCloneResponse);
-        }
+        loadParameters(foundedResponse.retrieveInAs(Request.class), request, foundedCloneResponse);
         response.setResponseText(foundedCloneResponse.getResponseText());
         response.setHeaders(foundedCloneResponse.getHeaders());
         response.setStatusCode(foundedCloneResponse.getStatusCode());
@@ -105,25 +98,15 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
     private void checkMatching(MockStorage data,
                                Request requestToSimulate,
                                ChangeableReference<Integer> matchingQuery,
-                               ChangeableReference<Long> foundedIndex,
-                               boolean parametric) {
-
-        //TODONTHREQUEST
-//        if(data.getNthRequest()>0){
-//            if(data.getCount()<=0){
-//            if(counters.get(data.getIndex()).get()==data.getNthRequest()){
-//
-//            };
-//            counters.put(si.getIndex(), new AtomicInteger(0));
-//        }
+                               ChangeableReference<Long> foundedIndex) {
 
         ChangeableReference<Integer> matchedQuery = new ChangeableReference<>(0);
 
         var possibleRequest = data.retrieveInAs(Request.class);
-        verifyHostAndPath(requestToSimulate, possibleRequest, matchedQuery, parametric);
-        if (matchedQuery.get() == 0) return;
-
-        matchQuery(possibleRequest.getQuery(), requestToSimulate.getQuery(), matchedQuery, true);
+        if (!verifyHostAndPath(requestToSimulate, possibleRequest, matchedQuery)) {
+            return;
+        }
+        matchQuery(possibleRequest.getQuery(), requestToSimulate.getQuery(), matchedQuery);
 
         if (matchedQuery.get() > matchingQuery.get()) {
             matchingQuery.set(matchedQuery.get());
@@ -131,35 +114,38 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         }
     }
 
-    private void verifyHostAndPath(Request requestToSimulate, Request possibleRequest,
-                                   ChangeableReference<Integer> matchedQuery, boolean parametric) {
+    private boolean verifyHostAndPath(Request requestToSimulate,
+                                      Request possibleRequest,
+                                      ChangeableReference<Integer> matchedQuery) {
         if (!possibleRequest.getHost().equalsIgnoreCase(requestToSimulate.getHost())) {
-            return;
+            return false;
         }
         var possiblePath = possibleRequest.getPath().split("/");
         var toSimulatePath = requestToSimulate.getPath().split("/");
         if (possiblePath.length != toSimulatePath.length) {
-            return;
+            return false;
+        }
+
+        if (possibleRequest.getPath().equalsIgnoreCase(requestToSimulate.getPath())) {
+            matchedQuery.set(10000 + matchedQuery.get());
+            return true;
         }
 
         for (var i = 0; i < possiblePath.length; i++) {
             var poss = possiblePath[i];
             var toss = toSimulatePath[i];
-            if (poss.equalsIgnoreCase(toss)) {
-                matchedQuery.set(3 + matchedQuery.get());
-            } else if (arePathSectionsSimilar(poss, toss, parametric)) {
-                matchedQuery.set(1 + matchedQuery.get());
+            if (!poss.equalsIgnoreCase(toss) && !arePathSectionsSimilar(poss, toss)) {
+                return false;
             }
         }
-        if (possiblePath.length == 0) {
-            matchedQuery.set(1 + matchedQuery.get());
-        }
+        matchedQuery.set(1000 + matchedQuery.get());
+        return true;
     }
 
-    private boolean arePathSectionsSimilar(String possiblePathPart, String toMatchPathPart, boolean parametric) {
-        if (possiblePathPart.startsWith("${") && possiblePathPart.endsWith("}") && parametric) {
+    private boolean arePathSectionsSimilar(String possiblePathPart, String toMatchPathPart) {
+        if (possiblePathPart.startsWith("${") && possiblePathPart.endsWith("}")) {
             return true;
-        } else if (possiblePathPart.startsWith("@{") && possiblePathPart.endsWith("}") && parametric) {
+        } else if (possiblePathPart.startsWith("@{") && possiblePathPart.endsWith("}")) {
             var regexp = possiblePathPart.substring(2, possiblePathPart.length() - 3);
             if (Pattern.compile(regexp).matcher(toMatchPathPart).matches()) {
                 return true;
@@ -176,8 +162,9 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         return false;
     }
 
-    private void matchQuery(Map<String, String> possibleMatches, Map<String, String> requestsToMatch, ChangeableReference<Integer> matchedQuery,
-                            boolean parametric) {
+    private void matchQuery(Map<String, String> possibleMatches,
+                            Map<String, String> requestsToMatch,
+                            ChangeableReference<Integer> matchedQuery) {
         for (var possibleMatch : possibleMatches.entrySet()) {
             for (var requestToMatch : requestsToMatch.entrySet()) {
                 if (possibleMatch.getKey().equalsIgnoreCase(requestToMatch.getKey())) {
@@ -189,14 +176,12 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
                         }
                     } else if (possibleMatch.getValue().equalsIgnoreCase(requestToMatch.getValue())) {
                         matchedQuery.set(3 + matchedQuery.get());
-                    } else if (parametric) {
-                        if (possibleMatch.getValue().startsWith("${") && possibleMatch.getValue().endsWith("}")) {
-                            matchedQuery.set(1 + matchedQuery.get());
-                        } else if (possibleMatch.getValue().startsWith("@{") && possibleMatch.getValue().endsWith("}")) {
-                            var regexp = possibleMatch.getValue().substring(2, possibleMatch.getValue().length() - 3);
-                            if (Pattern.compile(regexp).matcher(requestToMatch.getValue()).matches()) {
-                                matchedQuery.set(2 + matchedQuery.get());
-                            }
+                    } else if (possibleMatch.getValue().startsWith("${") && possibleMatch.getValue().endsWith("}")) {
+                        matchedQuery.set(1 + matchedQuery.get());
+                    } else if (possibleMatch.getValue().startsWith("@{") && possibleMatch.getValue().endsWith("}")) {
+                        var regexp = possibleMatch.getValue().substring(2, possibleMatch.getValue().length() - 3);
+                        if (Pattern.compile(regexp).matcher(requestToMatch.getValue()).matches()) {
+                            matchedQuery.set(2 + matchedQuery.get());
                         }
                     }
                 }
