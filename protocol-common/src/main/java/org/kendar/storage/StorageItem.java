@@ -1,6 +1,5 @@
 package org.kendar.storage;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.utils.JsonMapper;
 
 /**
@@ -23,6 +22,24 @@ public class StorageItem {
     private Object deserializedOutput;
     private Object outAs;
     private Object inAs;
+    private String inputType;
+    private String outputType;
+
+    public String getInputType() {
+        return inputType;
+    }
+
+    public void setInputType(String inputType) {
+        this.inputType = inputType;
+    }
+
+    public String getOutputType() {
+        return outputType;
+    }
+
+    public void setOutputType(String outputType) {
+        this.outputType = outputType;
+    }
 
     /**
      * Needed for serialization
@@ -31,16 +48,20 @@ public class StorageItem {
 
     }
 
-    public StorageItem(int connectionId, Object input, Object output, long durationMs, String type, String caller) {
+    public StorageItem(int connectionId, Object input, Object output, long durationMs, String type, String caller,
+                       String inputType, String outputType) {
         this.connectionId = connectionId;
         this.input = input;
         this.output = output;
         this.durationMs = durationMs;
         this.type = type;
         this.caller = caller;
+        this.inputType = inputType;
+        this.outputType = outputType;
     }
 
-    public StorageItem(long index, int connectionId, Object input, Object output, long durationMs, String type, String caller) {
+    public StorageItem(long index, int connectionId, Object input, Object output, long durationMs, String type, String caller,
+                       String inputType, String outputType) {
         this.index = index;
         this.connectionId = connectionId;
         this.input = input;
@@ -48,6 +69,8 @@ public class StorageItem {
         this.durationMs = durationMs;
         this.type = type;
         this.caller = caller;
+        this.inputType = inputType;
+        this.outputType = outputType;
     }
 
     public <T> T retrieveInAs(Class<T> clazz) {
@@ -55,11 +78,7 @@ public class StorageItem {
             if (clazz == input.getClass()) {
                 inAs = input;
             } else {
-                if (input instanceof JsonNode && ((JsonNode) input).has("data")) {
-                    inAs = mapper.deserialize(((JsonNode) input).get("data"), clazz);
-                } else {
-                    inAs = mapper.deserialize(input, clazz);
-                }
+                inAs = mapper.deserialize(input, clazz);
             }
         }
         return (T) inAs;
@@ -70,11 +89,7 @@ public class StorageItem {
             if (clazz == output.getClass()) {
                 outAs = output;
             } else {
-                if (output instanceof JsonNode && ((JsonNode) output).has("data")) {
-                    outAs = mapper.deserialize(((JsonNode) output).get("data"), clazz);
-                } else {
-                    outAs = mapper.deserialize(output, clazz);
-                }
+                outAs = mapper.deserialize(output, clazz);
             }
         }
         return (T) outAs;

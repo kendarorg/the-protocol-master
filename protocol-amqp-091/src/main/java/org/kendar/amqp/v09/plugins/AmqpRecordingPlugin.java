@@ -15,9 +15,7 @@ public class AmqpRecordingPlugin extends RecordingPlugin {
             "HeaderFrame", "BasicPublish", "BodyFrame", "BasicAck", "ChannelClose", "ConnectionClose",
             "QueueDeclare", "ExchangeDeclare", "QueueDelete", "ExchangeDelete");
 
-    private static int getConsumeId(JsonNode output, int consumeId) {
-        if (output == null) return 0;
-        var data = output.get("data");
+    private static int getConsumeId(JsonNode data, int consumeId) {
         if (data == null) return consumeId;
         var cid = data.get("consumeId");
         if (cid == null) return consumeId;
@@ -49,14 +47,12 @@ public class AmqpRecordingPlugin extends RecordingPlugin {
         data.put("output", null);
         data.put("consumeId", null);
         if (item.getInput() != null) {
-            if (in.get("type") != null) {
-                data.put("input", in.get("type").textValue());
+            if (item.getInputType() != null) {
                 consumeId = getConsumeId(out, consumeId);
             }
         }
         if (item.getOutput() != null) {
-            if (out.get("type") != null) {
-                data.put("output", out.get("type").textValue());
+            if (item.getOutputType() != null) {
                 consumeId = getConsumeId(out, consumeId);
             }
         }

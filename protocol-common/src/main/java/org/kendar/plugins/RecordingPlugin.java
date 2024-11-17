@@ -1,5 +1,6 @@
 package org.kendar.plugins;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.FinalizeWriteEvent;
 import org.kendar.events.RecordStatusEvent;
@@ -34,15 +35,15 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     protected void asyncCall(PluginContext pluginContext, Object out) {
         var duration = 0;
 
-        var res = "{\"type\":\"" + out.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(out)) + "}";
-        var req = "{\"type\":null,\"data\":null}";
 
         var storageItem = new StorageItem(
                 pluginContext.getContextId(),
-                mapper.toJsonNode(req),
-                mapper.toJsonNode(res),
+                null,
+                mapper.toJsonNode(getData(out)),
                 duration, "RESPONSE",
-                pluginContext.getCaller());
+                pluginContext.getCaller(),
+                null,
+                out.getClass().getSimpleName());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
 
@@ -52,19 +53,22 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     protected void postCall(PluginContext pluginContext, Object in, Object out) {
         var duration = System.currentTimeMillis() - pluginContext.getStart();
 
-        var req = "{\"type\":\"" + in.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(in)) + "}";
-        var res = "{\"type\":null,\"data\":null}";
+        JsonNode resSerialized = null;
+        String resType = null;
 
         if (out != null) {
-            res = "{\"type\":\"" + out.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(out)) + "}";
+            resType=out.getClass().getSimpleName();
+            resSerialized = mapper.toJsonNode(getData(out));
         }
         var storageItem = new StorageItem(
                 pluginContext.getContextId(),
-                mapper.toJsonNode(req),
-                mapper.toJsonNode(res),
+                mapper.toJsonNode(getData(in)),
+                resSerialized,
                 duration,
                 pluginContext.getType(),
-                pluginContext.getCaller());
+                pluginContext.getCaller(),
+                in.getClass().getSimpleName(),
+                resType);
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(in, out, compactLine)) {
@@ -119,4 +123,5 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     protected Object getData(Object of) {
         return of;
     }
+
 }

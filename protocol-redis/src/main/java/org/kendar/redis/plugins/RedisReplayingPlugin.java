@@ -23,7 +23,7 @@ public class RedisReplayingPlugin extends ReplayingPlugin {
     @Override
     protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread) {
         var out = mapper.toJsonNode(outObj);
-        ((Resp3Response) toread).execute(new Resp3Message(context, null, out.get("data")));
+        ((Resp3Response) toread).execute(new Resp3Message(context, null, out));
     }
 
     @Override
@@ -36,12 +36,12 @@ public class RedisReplayingPlugin extends ReplayingPlugin {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = mapper.toJsonNode(item.getOutput());
-            var type = out.get("type").textValue();
+            var type = item.getOutputType();
 
             int connectionId = item.getConnectionId();
             if (type.equalsIgnoreCase("RESPONSE")) {
                 var ctx = ((Resp3Protocol) context.getDescriptor()).consumeContext.get(connectionId);
-                ReturnMessage fr = new Resp3Message(ctx, null, out.get("data"));
+                ReturnMessage fr = new Resp3Message(ctx, null, out);
                 ctx.write(fr);
             } else {
                 throw new RuntimeException("MISSING RESPONSE_CLASS");

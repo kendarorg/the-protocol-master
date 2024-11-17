@@ -34,7 +34,7 @@ public class MqttReplayingPlugin extends ReplayingPlugin {
     protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread) {
         var out = mapper.toJsonNode(outObj);
 
-        var result = mapper.deserialize(out.get("data").toString(), toread.getClass());
+        var result = mapper.deserialize(out.toString(), toread.getClass());
         try {
             BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -47,15 +47,15 @@ public class MqttReplayingPlugin extends ReplayingPlugin {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = mapper.toJsonNode(item.getOutput());
-            var clazz = out.get("type").textValue();
+            var clazz = item.getOutputType();
             ReturnMessage fr;
             int consumeId = item.getConnectionId();
             switch (clazz) {
                 case "ConnectAck":
-                    fr = mapper.deserialize(out.get("data").toString(), ConnectAck.class);
+                    fr = mapper.deserialize(out.toString(), ConnectAck.class);
                     break;
                 case "Publish":
-                    fr = mapper.deserialize(out.get("data").toString(), Publish.class);
+                    fr = mapper.deserialize(out.toString(), Publish.class);
                     break;
                 default:
                     throw new RuntimeException("MISSING " + clazz);

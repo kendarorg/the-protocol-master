@@ -38,7 +38,7 @@ public class AmqpReplayingPlugin extends ReplayingPlugin {
         if (toread == null) return;
         var out = mapper.toJsonNode(outObj);
 
-        var result = mapper.deserialize(out.get("data"), toread.getClass());
+        var result = mapper.deserialize(out, toread.getClass());
         try {
             BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -51,27 +51,27 @@ public class AmqpReplayingPlugin extends ReplayingPlugin {
         if (storageItems.isEmpty()) return;
         for (var item : storageItems) {
             var out = mapper.toJsonNode(item.getOutput());
-            var clazz = out.get("type").textValue();
+            var clazz = item.getOutputType();
             ReturnMessage fr = null;
             int consumeId = -1;
             switch (clazz) {
                 case "BasicDeliver":
-                    var bd = mapper.deserialize(out.get("data"), BasicDeliver.class);
+                    var bd = mapper.deserialize(out, BasicDeliver.class);
                     consumeId = bd.getConsumeId();
                     fr = bd;
                     break;
                 case "HeaderFrame":
-                    var hf = mapper.deserialize(out.get("data"), HeaderFrame.class);
+                    var hf = mapper.deserialize(out, HeaderFrame.class);
                     consumeId = hf.getConsumeId();
                     fr = hf;
                     break;
                 case "BodyFrame":
-                    var bf = mapper.deserialize(out.get("data"), BodyFrame.class);
+                    var bf = mapper.deserialize(out, BodyFrame.class);
                     consumeId = bf.getConsumeId();
                     fr = bf;
                     break;
                 case "BasicCancel":
-                    var bc = mapper.deserialize(out.get("data"), BasicCancel.class);
+                    var bc = mapper.deserialize(out, BasicCancel.class);
                     consumeId = bc.getConsumeId();
                     fr = bc;
                     break;

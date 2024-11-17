@@ -30,14 +30,13 @@ public class RedisRecordingPlugin extends RecordingPlugin {
     protected void asyncCall(PluginContext pluginContext, Object out) {
         var duration = 0;
 
-        var res = "{\"type\":\"RESPONSE\",\"data\":" + mapper.serialize(out) + "}";
-        var req = "{\"type\":null,\"data\":null}";
-
         var storageItem = new StorageItem(pluginContext.getContextId(),
-                mapper.toJsonNode(req),
-                mapper.toJsonNode(res),
+                null,
+                mapper.toJsonNode(out),
                 duration, pluginContext.getType(),
-                pluginContext.getCaller());
+                pluginContext.getCaller(),
+                null,
+                "RESPONSE");
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
