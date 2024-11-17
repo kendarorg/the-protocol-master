@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BinaryNode;
 import org.kendar.buffers.BBuffer;
 
 /**
@@ -66,6 +67,9 @@ public class JsonMapper {
             }
             if (of instanceof JsonNode) {
                 return (JsonNode) of;
+            }
+            if (of instanceof BBuffer) {
+                return new BinaryNode(((BBuffer) of).getAll());
             }
             return mapper.readTree(mapper.writeValueAsString(of));
         } catch (JsonProcessingException e) {

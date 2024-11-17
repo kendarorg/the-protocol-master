@@ -2,19 +2,16 @@
   "constant": false,
   "connectionId": 1,
   "index": 5,
+  "inputType": "Disconnect",
   "input": {
-    "type": "Disconnect",
-    "data": {
       "uuid": "24",
       "fullFlag": -32,
       "fixedHeader": "DISCONNECT",
       "reasonCode": 0
-    }
+
   },
-  "output": {
-    "type": null,
-    "data": null
-  },
+  "outputType": null,
+  "output": null,
   "durationMs": 1,
   "type": "Disconnect",
   "caller": "MQTT"

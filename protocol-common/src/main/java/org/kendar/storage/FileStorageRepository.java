@@ -80,6 +80,7 @@ public class FileStorageRepository implements StorageRepository {
                 currRepo = new ProtocolRepo();
             }
             if (!currRepo.initialized) {
+
                 for (var item : readAllItems(protocolInstanceId)) {
                     if (item == null) continue;
                     if (item.getType() == null) continue;
@@ -90,6 +91,24 @@ public class FileStorageRepository implements StorageRepository {
                     currRepo.inMemoryDb.put(item.getIndex(), item);
                 }
 
+                currRepo.index = retrieveIndexFile(protocolInstanceId);
+                if (!currRepo.index.isEmpty()) {
+                    var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
+                    var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
+                    storageCounter.set((int) maxIndex);
+                }
+                currRepo.initialized = true;
+            }
+            return currRepo;
+        });
+    }
+
+    private ProtocolRepo initializeContentWrite(String protocolInstanceIdOuter) {
+        return protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
+            if (currRepo == null) {
+                currRepo = new ProtocolRepo();
+            }
+            if (!currRepo.initialized) {
                 currRepo.index = retrieveIndexFile(protocolInstanceId);
                 if (!currRepo.index.isEmpty()) {
                     var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
@@ -118,7 +137,7 @@ public class FileStorageRepository implements StorageRepository {
             if (item.getStorageItem() != null) {
                 item.getStorageItem().setIndex(valueId);
             }
-            initializeContent(item.getInstanceId());
+            initializeContentWrite(item.getInstanceId());
             //}
             var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
 
