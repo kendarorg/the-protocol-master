@@ -1,12 +1,14 @@
 package org.kendar.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BinaryNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.buffers.BBuffer;
 
 /**
@@ -63,7 +65,11 @@ public class JsonMapper {
     public JsonNode toJsonNode(Object of) {
         try {
             if (of instanceof String) {
-                return mapper.readTree((String) of);
+                try {
+                    return mapper.readTree((String) of);
+                }catch (JsonParseException e){
+                    return new TextNode((String) of);
+                }
             }
             if (of instanceof JsonNode) {
                 return (JsonNode) of;

@@ -98,7 +98,7 @@ public class MultiRecordReplay extends BasicTest {
         var httpget = new HttpGet("http://localhost:" + SIMPLE_SERVER_HTTP_PORT);
 
         var fr = new FileResourcesUtils();
-        var recordingSettings = fr.getFileFromResourceAsString(Path.of("multiRecording.json").toAbsolutePath().toString());
+        var recordingSettings = fr.getFileFromResourceAsString(Path.of("multiRecording.json.template").toAbsolutePath().toString());
         recordingSettings = recordingSettings.replace("{postgresPort}", POSTGRES_PORT);
         recordingSettings = recordingSettings.replace("{httpPort}", HTTP_PORT);
         recordingSettings = recordingSettings.replace("{httpsPort}", HTTPS_PORT);
@@ -158,7 +158,7 @@ public class MultiRecordReplay extends BasicTest {
         assertTrue(verifyTestRun.get());
         System.out.println("RECORDING COMPLETED ==============================================");
 
-        var replaySettings = fr.getFileFromResourceAsString(Path.of("multiRecording.json").toAbsolutePath().toString());
+        var replaySettings = fr.getFileFromResourceAsString(Path.of("multiRecording.json.template").toAbsolutePath().toString());
         replaySettings = replaySettings.replace("{postgresPort}", POSTGRES_PORT);
         replaySettings = replaySettings.replace("{httpPort}", HTTP_PORT);
         replaySettings = replaySettings.replace("{httpsPort}", HTTPS_PORT);
