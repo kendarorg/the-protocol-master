@@ -2,12 +2,20 @@ package org.kendar.sql.jdbc.proxy;
 
 import org.kendar.sql.jdbc.BindingParameter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcCall {
-    private final List<BindingParameter> parameterValues;
+    public void setParameterValues(List<BindingParameter> parameterValues) {
+        this.parameterValues = parameterValues;
+    }
+
+    private  List<BindingParameter> parameterValues = new ArrayList<>();
     private String query;
 
+    public JdbcCall(){
+
+    }
     public JdbcCall(String query, List<BindingParameter> parameterValues) {
 
         this.query = query;

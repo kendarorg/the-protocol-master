@@ -1,6 +1,8 @@
 package org.kendar.postgres;
 
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.plugins.settings.BasicMockPluginSettings;
+import org.kendar.postgres.plugins.PostgresMockPlugin;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
@@ -25,6 +27,7 @@ public class BasicTest {
     protected static final int FAKE_PORT = 5431;
     protected static PostgreslImage postgresContainer;
     protected static TcpServer protocolServer;
+    protected static PostgresProtocol baseProtocol;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -48,7 +51,7 @@ public class BasicTest {
 
     public static void beforeEachBase(TestInfo testInfo) {
 
-        var baseProtocol = new PostgresProtocol(FAKE_PORT);
+        baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("org.postgresql.Driver",
                 postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
@@ -68,7 +71,11 @@ public class BasicTest {
         }
         storage.initialize();
         var pl = new PostgresRecordPlugin();
-        proxy.setPlugins(List.of(pl));
+        var pl1 = new PostgresMockPlugin();
+        var mockPluginSettings = new BasicMockPluginSettings();
+        mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
+        pl1.setSettings(mockPluginSettings);
+        proxy.setPlugins(List.of(pl,pl1));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

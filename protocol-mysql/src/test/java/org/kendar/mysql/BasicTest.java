@@ -1,7 +1,9 @@
 package org.kendar.mysql;
 
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.mysql.plugins.MySqlMockPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
+import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
@@ -25,6 +27,7 @@ public class BasicTest {
     protected static final int FAKE_PORT = 3310;
     protected static MysqlImage mysqlContainer;
     protected static TcpServer protocolServer;
+    protected static MySQLProtocol baseProtocol;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -40,7 +43,7 @@ public class BasicTest {
 
 
     public static void beforeEachBase(TestInfo testInfo) {
-        var baseProtocol = new MySQLProtocol(FAKE_PORT);
+        baseProtocol = new MySQLProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl(), null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
@@ -58,7 +61,14 @@ public class BasicTest {
         }
         storage.initialize();
         var pl = new MySqlRecordPlugin();
-        proxy.setPlugins(List.of(pl));
+
+        var pl1 = new MySqlMockPlugin();
+        var mockPluginSettings = new BasicMockPluginSettings();
+        mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
+        pl1.setSettings(mockPluginSettings);
+        proxy.setPlugins(List.of(pl,pl1));
+
+
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -93,6 +103,11 @@ public class BasicTest {
         var pl = new MySqlRecordPlugin();
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
+        var pl1 = new MySqlMockPlugin();
+        var mockPluginSettings = new BasicMockPluginSettings();
+        mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
+        pl1.setSettings(mockPluginSettings);
+        proxy.setPlugins(List.of(pl,pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

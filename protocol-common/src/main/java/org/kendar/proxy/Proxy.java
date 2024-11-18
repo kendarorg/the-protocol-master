@@ -95,6 +95,19 @@ public abstract class Proxy {
         }
     }
 
+    public List<PluginDescriptor> getPlugins() {
+        var result = new HashMap<String,PluginDescriptor>();
+        for(var item: allowedPlugins.entrySet()) {
+            for(var phase: item.getValue().entrySet()) {
+                for(var plugin: phase.getValue()) {
+                    result.put(plugin.getId(),plugin);
+                }
+            }
+        }
+
+        return new ArrayList<>(result.values());
+    }
+
     public <I, J> List<ProtocolPluginDescriptor> getPlugins(ProtocolPhase phase, I in, J out) {
         var data = String.join(",",
                 PluginContext.class.getName(),

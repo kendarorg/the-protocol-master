@@ -1,0 +1,30 @@
+{
+  "constant" : false,
+  "connectionId" : 1,
+  "index": 2,
+  "nthRequest": 2,
+  "input" : {
+    "query" : "SELECT DENOMINATION FROM COMPANY_N;",
+    "parameterValues" : [ ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ [ "FAKED" ] ],
+      "metadata" : [ {
+        "columnName" : "DENOMINATION",
+        "byteData" : false,
+        "columnType" : "LONGVARCHAR",
+        "precision" : 16383
+      } ],
+      "count" : 1,
+      "intResult" : false,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 0
+  },
+  "durationMs" : 2,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
+}

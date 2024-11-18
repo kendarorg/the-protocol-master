@@ -7,4 +7,9 @@ public class MySqlMockPlugin extends JdbcMockPlugin {
     public String getProtocol() {
         return "mysql";
     }
+
+    @Override
+    protected String getSqlStringParserSeparator() {
+        return "?";
+    }
 }
