@@ -1,5 +1,6 @@
 package org.kendar.http.plugins;
 
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.http.utils.MimeChecker;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
@@ -10,6 +11,7 @@ import org.kendar.utils.ChangeableReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -182,16 +184,17 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         if (!MimeChecker.isBinary(clonedResponse)) {
             var text = clonedResponse.getResponseText().asText();
             for (var param : parameters.entrySet()) {
-                text = text.replaceAll(Pattern.quote(param.getKey()), param.getValue());
+                text = text.replaceAll(Pattern.quote(param.getKey()), Matcher.quoteReplacement(param.getValue()));
             }
+            clonedResponse.setResponseText(new TextNode(text));
         }
     }
 
     private void loadHeaderParameters(Request foundedRequest, Request originalRequest, HashMap<String, String> parameters) {
         for (var kvp : foundedRequest.getHeaders().entrySet()) {
             if (isTemplateParameter(kvp.getValue().get(0))) {
-                if (originalRequest.getHeaders().containsKey(kvp.getKey())) {
-                    parameters.put(kvp.getKey(), originalRequest.getHeader(kvp.getKey()).get(0));
+                if (originalRequest.getFirstHeader(kvp.getKey())!=null) {
+                    parameters.put(kvp.getValue().get(0), originalRequest.getFirstHeader(kvp.getKey()));
                 }
             }
         }
@@ -199,9 +202,9 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
 
     private void loadQueryParameters(Request templateRequest, Request originalRequest, HashMap<String, String> parameters) {
         for (var kvp : templateRequest.getQuery().entrySet()) {
-            if (isTemplateParameter(kvp.getKey())) {
+            if (isTemplateParameter(kvp.getValue())) {
                 if (originalRequest.getQuery().containsKey(kvp.getKey())) {
-                    parameters.put(kvp.getKey(), originalRequest.getQuery().get(kvp.getKey()));
+                    parameters.put(kvp.getValue(), originalRequest.getQuery().get(kvp.getKey()));
                 }
             }
         }

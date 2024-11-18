@@ -47,7 +47,7 @@ public class SimpleHttpServer {
                 bytes = frf.getFileFromResourceAsByteArray("resource://image.gif");
                 exchange.getResponseHeaders().add("Content-Type", "image/gif");
 
-            } else if (request.getPath().equalsIgnoreCase("/jsonized")) {
+            } else if (request.getPath().startsWith("/jsonized")) {
                 var serializedRequest = mapper.serialize(request);
                 bytes = serializedRequest.getBytes(StandardCharsets.UTF_8);
                 exchange.getResponseHeaders().add("Content-Type", "application/json");

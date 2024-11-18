@@ -93,4 +93,24 @@ public class MockTest extends BasicTest {
         runAndFind(httpclient, httpget, "google.ps===void");
         runAndFind(httpclient, httpget, "x-block-recursive");
     }
+
+    @Test
+    void replacingMock() throws Exception {
+        var recordPlugin = baseProtocol.getPlugins().stream().filter(a ->
+                a.getId().equalsIgnoreCase("mock-plugin")).findFirst();
+        recordPlugin.get().setActive(true);
+
+        var httpclient = createHttpsHttpClient();
+        var httpget = new HttpGet("http://localhost:" + 8456 + "/jsonized/pathValue");
+        httpget = (HttpGet) withQuery(httpget, Map.of(
+                "replacing", "true",
+                "testQuery","testQueryValue"));
+        httpget.addHeader("Test-Header", "testHeaderValue");
+
+        var httpresponse = httpclient.execute(httpget);
+        var content = getContentString(httpresponse);
+        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+        assertTrue(content.contains("pathValue testQueryValue testHeaderValue"));
+        assertEquals("pathValue",httpresponse.getFirstHeader("Rewritten-Header").getValue());
+    }
 }
