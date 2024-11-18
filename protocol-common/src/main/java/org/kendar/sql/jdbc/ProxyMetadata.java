@@ -60,4 +60,10 @@ public class ProxyMetadata {
         this.columnName = columnName;
     }
 
+    public ProxyMetadata copy() {
+        var result = new ProxyMetadata(columnName,byteData);
+        result.setPrecision(precision);
+        result.setColumnType(columnType);
+        return result;
+    }
 }

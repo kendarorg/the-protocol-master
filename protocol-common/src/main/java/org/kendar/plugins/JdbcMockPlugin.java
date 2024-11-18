@@ -7,8 +7,11 @@ import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.utils.ChangeableReference;
+import org.kendar.utils.ExtraStringReplacer;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> {
@@ -68,8 +71,8 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
             matchedQuery.set(10000 + matchedQuery.get());
             return true;
         }
-        var possiblePath = parser.parseString(possibleRequest.getQuery());
-        var toSimulatePath = parser.parseString(requestToSimulate.getQuery());
+        var possiblePath = ExtraStringReplacer.parse(possibleRequest.getQuery());
+        var toSimulatePath = ExtraStringReplacer.match(possiblePath,requestToSimulate.getQuery());
         if (possiblePath.size() != toSimulatePath.size()) {
             return false;
         }
@@ -98,14 +101,57 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
 
     protected abstract String getSqlStringParserSeparator();
 
-    @Override
-    protected void writeOutput(JdbcCall request, SelectResult response, MockStorage founded) {
-        var foundedSelectResult = founded.retrieveOutAs(JdbcResponse.class);
-        response.fill(foundedSelectResult.getSelectResult());
-    }
 
     @Override
     protected List<MockStorage> firstCheckOnMainPart(JdbcCall request) {
         return mocks;
+    }
+
+
+    @Override
+    protected void writeOutput(JdbcCall request, SelectResult response, MockStorage founded) {
+        var foundedCloneResponse = founded.retrieveOutAs(JdbcResponse.class).copy();
+        loadParameters(founded.retrieveInAs(JdbcRequest.class), request, foundedCloneResponse);
+        response.fill(foundedCloneResponse.getSelectResult());
+    }
+
+    private void loadParameters(JdbcRequest foundedRequest, JdbcCall originalRequest, JdbcResponse clonedResponse) {
+        var parameters = new HashMap<String, String>();
+        loadQueryParameters(foundedRequest, originalRequest, parameters);
+        loadParamsParameters(foundedRequest, originalRequest, parameters);
+        writeSelectResultParameter(clonedResponse, parameters);
+    }
+
+    private void writeSelectResultParameter(JdbcResponse clonedResponse, HashMap<String, String> parameters) {
+        for(var item:clonedResponse.getSelectResult().getRecords()){
+            for (int i = 0; i < item.size(); i++) {
+                var subItem = item.get(i);
+                for(var param:parameters.entrySet()){
+                    subItem = subItem.replaceAll(Pattern.quote(param.getKey()), Matcher.quoteReplacement(param.getValue()));
+                }
+                item.set(i, subItem);
+            }
+        }
+    }
+
+    private void loadParamsParameters(JdbcRequest foundedRequest, JdbcCall originalRequest, HashMap<String, String> parameters) {
+        if(foundedRequest.getParameterValues().size()>0){
+            throw new RuntimeException();
+        }
+    }
+
+    private void loadQueryParameters(JdbcRequest foundedRequest, JdbcCall originalRequest, HashMap<String, String> parameters) {
+        var tplPath = ExtraStringReplacer.parse(foundedRequest.getQuery());
+        var oriPath = ExtraStringReplacer.match(tplPath,originalRequest.getQuery());
+        for (var i = 0; i < tplPath.size(); i++) {
+            var tplSeg = tplPath.get(i);
+            if (isTemplateParameter(tplSeg)) {
+                var oriSeg = oriPath.get(i);
+                parameters.put(tplSeg, oriSeg);
+            }else if (tplSeg.length()>2 && isTemplateParameter(tplSeg.substring(1,tplSeg.length()-2))) {
+                var oriSeg = oriPath.get(i);
+                parameters.put(tplSeg, oriSeg);
+            }
+        }
     }
 }
