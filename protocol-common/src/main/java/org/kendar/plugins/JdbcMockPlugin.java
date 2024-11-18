@@ -136,7 +136,14 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
 
     private void loadParamsParameters(JdbcRequest foundedRequest, JdbcCall originalRequest, HashMap<String, String> parameters) {
         if(foundedRequest.getParameterValues().size()>0){
-            throw new RuntimeException();
+            List<BindingParameter> parameterValues = foundedRequest.getParameterValues();
+            for (int i = 0; i < parameterValues.size(); i++) {
+                var tplParam = parameterValues.get(i);
+                var oriParam = originalRequest.getParameterValues().get(i);
+                if(isTemplateParameter(tplParam.getValue())){
+                    parameters.put(tplParam.getValue(), oriParam.getValue());
+                }
+            }
         }
     }
 
