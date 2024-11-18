@@ -9,7 +9,7 @@ import java.util.List;
 public class RedisMockPlugin extends MockPlugin<Object, Object> {
     @Override
     protected void checkMatching(MockStorage data, Object requestToSimulate, ChangeableReference<Integer> matchingQuery, ChangeableReference<Long> foundedIndex) {
-
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
