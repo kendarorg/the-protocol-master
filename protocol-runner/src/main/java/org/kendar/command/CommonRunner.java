@@ -48,7 +48,7 @@ public abstract class CommonRunner {
 
     protected Options getCommonOptions(Options options) {
         options.addOption(createOpt("po", "port", true, "Listening port"));
-        options.addOption(createOpt("pc", "connection", true, "Select remote connection string "+getConnectionDescription()));
+        options.addOption(createOpt("pc", "connection", true, "Select remote connection string "+getConnectionDescription()+" for "+getId()));
         options.addOption(createOpt("prp", "replay", false, "Replay from log/replay source."));
         options.addOption(createOpt("prc", "record", false, "Record to log/replay source."));
         options.addOption(createOpt("plid", "replayid", true, "Set an id for the replay instance (default to timestamp_uuid)."));

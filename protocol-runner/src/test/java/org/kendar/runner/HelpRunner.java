@@ -9,6 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class HelpRunner {
     private ByteArrayOutputStream myOut;
     private PrintStream oriOut;
@@ -56,7 +58,8 @@ public class HelpRunner {
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);
+        System.out.println(standardOutput);;
+        assertTrue(standardOutput.contains("http"));
     }
 
     @Test
@@ -73,7 +76,8 @@ public class HelpRunner {
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);
+        System.out.println(standardOutput);;
+        assertTrue(standardOutput.contains("mysql"));
     }
 
     @Test
@@ -90,7 +94,8 @@ public class HelpRunner {
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);
+        System.out.println(standardOutput);;
+        assertTrue(standardOutput.contains("postgres"));
     }
 
     @Test
@@ -108,6 +113,7 @@ public class HelpRunner {
         });
         final String standardOutput = getOut();
         System.out.println(standardOutput);
+        assertTrue(standardOutput.contains("amqp091"));
     }
 
 
@@ -127,6 +133,7 @@ public class HelpRunner {
         });
         final String standardOutput = getOut();
         System.out.println(standardOutput);
+        assertTrue(standardOutput.contains("mqtt"));
     }
 
     @Test
@@ -143,7 +150,8 @@ public class HelpRunner {
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);
+        System.out.println(standardOutput);;
+        assertTrue(standardOutput.contains("redis"));
     }
 
     @Test
@@ -160,6 +168,7 @@ public class HelpRunner {
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);
+        System.out.println(standardOutput);;
+        assertTrue(standardOutput.contains("mongodb"));
     }
 }
