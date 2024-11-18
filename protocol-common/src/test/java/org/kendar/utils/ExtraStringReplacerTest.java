@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ExtraStringReplacerTest {
     @Test
-    void testFirst(){
+    void testFirst() {
         var result = ExtraStringReplacer.parse("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=@{age};");
-        assertIterableEquals (
+        assertIterableEquals(
                 List.of("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='",
                         "${denomination}",
                         "' AND AGE=",
@@ -22,10 +22,10 @@ public class ExtraStringReplacerTest {
     }
 
     @Test
-    void testFirstMath(){
+    void testFirstMath() {
         var result = ExtraStringReplacer.parse("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=@{age};");
-        var match = ExtraStringReplacer.match(result,"SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='test va;ie' AND AGE=237;");
-        assertIterableEquals (
+        var match = ExtraStringReplacer.match(result, "SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='test va;ie' AND AGE=237;");
+        assertIterableEquals(
                 List.of("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='",
                         "test va;ie",
                         "' AND AGE=",
@@ -36,9 +36,9 @@ public class ExtraStringReplacerTest {
     }
 
     @Test
-    void testSecond(){
+    void testSecond() {
         var result = ExtraStringReplacer.parse("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=@{age;");
-        assertIterableEquals (
+        assertIterableEquals(
                 List.of("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='",
                         "${denomination}",
                         "' AND AGE=@{age;"),
@@ -47,10 +47,10 @@ public class ExtraStringReplacerTest {
     }
 
     @Test
-    void testSecondMatch(){
+    void testSecondMatch() {
         var result = ExtraStringReplacer.parse("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=@{age;");
-        var match = ExtraStringReplacer.match(result,"SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='test va;ie' AND AGE=@{age;");
-        assertIterableEquals (
+        var match = ExtraStringReplacer.match(result, "SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='test va;ie' AND AGE=@{age;");
+        assertIterableEquals(
                 List.of("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='",
                         "test va;ie",
                         "' AND AGE=@{age;"),
@@ -59,9 +59,9 @@ public class ExtraStringReplacerTest {
     }
 
     @Test
-    void testThird(){
+    void testThird() {
         var result = ExtraStringReplacer.parse("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=@{age};");
-        assertIterableEquals (
+        assertIterableEquals(
                 List.of("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=",
                         "@{age}",
                         ";"),
@@ -70,10 +70,10 @@ public class ExtraStringReplacerTest {
     }
 
     @Test
-    void testThirdMatch(){
+    void testThirdMatch() {
         var result = ExtraStringReplacer.parse("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=@{age};");
-        var match = ExtraStringReplacer.match(result,"SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=237;");
-        assertIterableEquals (
+        var match = ExtraStringReplacer.match(result, "SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=237;");
+        assertIterableEquals(
                 List.of("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=",
                         "237",
                         ";"),
@@ -82,10 +82,10 @@ public class ExtraStringReplacerTest {
     }
 
     @Test
-    void testFinalMatch(){
+    void testFinalMatch() {
         var result = ExtraStringReplacer.parse("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=@{age}");
-        var match = ExtraStringReplacer.match(result,"SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=237");
-        assertIterableEquals (
+        var match = ExtraStringReplacer.match(result, "SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=237");
+        assertIterableEquals(
                 List.of("SELECT DENOMINATION,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination' AND AGE=",
                         "237"),
                 match
@@ -93,7 +93,7 @@ public class ExtraStringReplacerTest {
     }
 
     @Test
-    void testError(){
-       assertThrows(RuntimeException.class,()->ExtraStringReplacer.parse("SELECT ${denomination}@{age};"));
+    void testError() {
+        assertThrows(RuntimeException.class, () -> ExtraStringReplacer.parse("SELECT ${denomination}@{age};"));
     }
 }

@@ -281,7 +281,7 @@ public class FileStorageRepository implements StorageRepository {
                 if ((l == null || r == null) && l == r) {
                     continue;
                 }
-                if (l!=null && l.equalsIgnoreCase(r)) {
+                if (l != null && l.equalsIgnoreCase(r)) {
                     continue;
                 }
                 return false;

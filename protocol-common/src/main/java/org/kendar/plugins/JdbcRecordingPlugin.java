@@ -50,7 +50,7 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
                 duration,
                 pluginContext.getType(),
                 pluginContext.getCaller(),
-                "JdbcCall","SelectResult");
+                "JdbcCall", "SelectResult");
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(storageItem, compactLine)) {

@@ -1,12 +1,17 @@
 {
-  "constant" : false,
-  "connectionId" : 2,
-  "index" : 4,
-  "input" : [ "CLIENT", "SETINFO", "LIB-NAME", "jedis" ],
-  "output" : "OK",
-  "durationMs" : 2,
-  "type" : "Resp3Message",
-  "caller" : "RESP3",
-  "inputType" : "Resp3Message",
-  "outputType" : "Resp3Response"
+  "constant": false,
+  "connectionId": 2,
+  "index": 4,
+  "input": [
+    "CLIENT",
+    "SETINFO",
+    "LIB-NAME",
+    "jedis"
+  ],
+  "output": "OK",
+  "durationMs": 2,
+  "type": "Resp3Message",
+  "caller": "RESP3",
+  "inputType": "Resp3Message",
+  "outputType": "Resp3Response"
 }

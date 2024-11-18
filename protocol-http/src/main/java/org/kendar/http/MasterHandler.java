@@ -13,7 +13,6 @@ import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.converters.RequestResponseBuilder;
 import org.kendar.http.utils.plugins.PluginClassesHandler;
-import org.kendar.http.utils.rewriter.SimpleRewriterHandler;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ public class MasterHandler implements HttpHandler {
     private static final Logger log = LoggerFactory.getLogger("org.kendar.http.Main");
     private final ObjectMapper mapper = new ObjectMapper();
     private final PluginClassesHandler pluginClassesHandler;
-    private final SimpleRewriterHandler simpleProxyHandler;
+    //private final SimpleRewriterHandler simpleProxyHandler;
     private final RequestResponseBuilder requestResponseBuilder;
     private final ExternalRequester externalRequester;
     private final ConnectionBuilder connectionBuilder;
@@ -40,13 +39,13 @@ public class MasterHandler implements HttpHandler {
     public MasterHandler(
 
             PluginClassesHandler pluginClassesHandler,
-            SimpleRewriterHandler simpleProxyHandler,
+            //SimpleRewriterHandler simpleProxyHandler,
             RequestResponseBuilder requestResponseBuilder,
             ExternalRequester externalRequester,
             ConnectionBuilder connectionBuilder) {
 
         this.pluginClassesHandler = pluginClassesHandler;
-        this.simpleProxyHandler = simpleProxyHandler;
+        //this.simpleProxyHandler = simpleProxyHandler;
 
         this.requestResponseBuilder = requestResponseBuilder;
         this.externalRequester = externalRequester;
@@ -197,7 +196,7 @@ public class MasterHandler implements HttpHandler {
         } finally {
             try {
                 pluginClassesHandler.handle(
-                        pluginContext, ProtocolPhase.POST_RENDER, request, response, connManager);
+                        pluginContext, ProtocolPhase.FINALIZE, request, response, connManager);
 
             } catch (Exception e) {
                 log.error("ERROR CALLING POST RENDER ", e);
@@ -208,35 +207,21 @@ public class MasterHandler implements HttpHandler {
     private void handleInternal(PluginContext pluginContext, Request request, Response response, HttpClientConnectionManager connManager) throws Exception {
 
         if (pluginClassesHandler.handle(pluginContext,
-                ProtocolPhase.PRE_RENDER, request, response, connManager)) {
+                ProtocolPhase.CONNECT, request, response, connManager)) {
 
             return;
         }
+
+        //var proxiedRequest = simpleProxyHandler.translate(request);
 
         if (pluginClassesHandler.handle(
-                pluginContext, ProtocolPhase.API, request, response, connManager)) {
-            // ALWAYS WHEN CALLED
+                pluginContext, ProtocolPhase.PRE_CALL, request, response, connManager)) {
             return;
         }
 
-        if (pluginClassesHandler.handle(
-                pluginContext, ProtocolPhase.STATIC, request, response, connManager)) {
-            response.addHeader("Cache Control", "max-age=3600,s-maxage=3600");
-            response.addHeader("Last-Modified", "Wed, 21 Oct 2015 07:28:00 GMT");
-            // ALWAYS WHEN CALLED
-            return;
-        }
-
-        var proxiedRequest = simpleProxyHandler.translate(request);
-
-        if (pluginClassesHandler.handle(
-                pluginContext, ProtocolPhase.PRE_CALL, proxiedRequest, response, connManager)) {
-            return;
-        }
-
-        externalRequester.callSite(proxiedRequest, response);
+        externalRequester.callSite(request, response);
 
         pluginClassesHandler.handle(
-                pluginContext, ProtocolPhase.POST_CALL, proxiedRequest, response, connManager);
+                pluginContext, ProtocolPhase.POST_CALL, request, response, connManager);
     }
 }

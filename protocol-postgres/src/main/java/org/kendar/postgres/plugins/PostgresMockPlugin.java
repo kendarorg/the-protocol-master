@@ -7,6 +7,7 @@ public class PostgresMockPlugin extends JdbcMockPlugin {
     public String getProtocol() {
         return "postgres";
     }
+
     @Override
     protected String getSqlStringParserSeparator() {
         return "$";

@@ -5,39 +5,39 @@
   "count": 2,
   "inputType": "Request",
   "input": {
-      "id": 1,
-      "ms": 1731682775808,
-      "method": "GET",
-      "headers": {
-        "Accept-encoding": [
-          "gzip,deflate"
-        ],
-        "Proxy-connection": [
-          "Keep-Alive"
-        ],
-        "Host": [
-          "localhost:8456"
-        ],
-        "User-agent": [
-          "Apache-HttpClient/4.5.13 (Java/11.0.21)"
-        ],
-        "Proxy-agent": [
-          "Simple/0.1"
-        ]
-      },
-      "protocol": "http",
-      "soapRequest": false,
-      "multipartData": [],
-      "staticRequest": false,
-      "host": "localhost",
-      "path": "/jsonized",
-      "postParameters": {},
-      "port": 8456,
-      "query": {
-        "counter": "true"
-      },
-      "remoteHost": "127.0.0.1",
-      "pathParameters": {}
+    "id": 1,
+    "ms": 1731682775808,
+    "method": "GET",
+    "headers": {
+      "Accept-encoding": [
+        "gzip,deflate"
+      ],
+      "Proxy-connection": [
+        "Keep-Alive"
+      ],
+      "Host": [
+        "localhost:8456"
+      ],
+      "User-agent": [
+        "Apache-HttpClient/4.5.13 (Java/11.0.21)"
+      ],
+      "Proxy-agent": [
+        "Simple/0.1"
+      ]
+    },
+    "protocol": "http",
+    "soapRequest": false,
+    "multipartData": [],
+    "staticRequest": false,
+    "host": "localhost",
+    "path": "/jsonized",
+    "postParameters": {},
+    "port": 8456,
+    "query": {
+      "counter": "true"
+    },
+    "remoteHost": "127.0.0.1",
+    "pathParameters": {}
   },
   "outputType": "Response",
   "output": {

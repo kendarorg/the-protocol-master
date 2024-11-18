@@ -11,8 +11,6 @@ import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.settings.HttpSSLSettings;
-import org.kendar.http.utils.rewriter.RemoteServerStatus;
-import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
 import org.kendar.http.utils.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.RewritePluginSettings;
@@ -43,30 +41,6 @@ public class HttpRunner extends CommonRunner {
 
         certificatesManager.setupSll(httpsServer, hosts, cname, der, key);
         return httpsServer;
-    }
-
-
-    private static SimpleRewriterConfig loadRewritersConfiguration(HttpProtocolSettings settings) {
-        var proxyConfig = new SimpleRewriterConfig();
-        for (var i = 0; i < settings.getRewrites().size(); i++) {
-            var rw = settings.getRewrites().get(i);
-            if (rw.getWhen() == null || rw.getThen() == null) {
-                continue;
-            }
-            var remoteServerStatus = new RemoteServerStatus(i + "",
-                    rw.getWhen(),
-                    rw.getThen(),
-                    rw.getTest());
-            if (rw.getTest() == null || rw.getTest().isEmpty()) {
-                remoteServerStatus.setRunning(true);
-                remoteServerStatus.setForce(true);
-            } else {
-                remoteServerStatus.setRunning(true);
-                remoteServerStatus.setForce(rw.isForceActive());
-            }
-            proxyConfig.getProxies().add(remoteServerStatus);
-        }
-        return proxyConfig;
     }
 
     @Override

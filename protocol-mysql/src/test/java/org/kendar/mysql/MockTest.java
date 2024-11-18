@@ -9,7 +9,7 @@ import java.sql.Statement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MockTest extends BasicTest{
+public class MockTest extends BasicTest {
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();
@@ -21,6 +21,19 @@ public class MockTest extends BasicTest{
         afterClassBase();
     }
 
+    private static boolean verifyRun(Connection c, String expectedResult, boolean runned, String tableExt) throws SQLException {
+        Statement stmt;
+        stmt = c.createStatement();
+        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_" + tableExt + ";");
+        while (resultset.next()) {
+            assertEquals(expectedResult, resultset.getString("DENOMINATION"));
+            runned = true;
+        }
+        resultset.close();
+        stmt.close();
+        return runned;
+    }
+
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
         beforeEachBase(testInfo);
@@ -30,21 +43,6 @@ public class MockTest extends BasicTest{
     public void afterEach() {
 
         afterEachBase();
-    }
-
-
-
-    private static boolean verifyRun(Connection c, String expectedResult, boolean runned,String tableExt) throws SQLException {
-        Statement stmt;
-        stmt = c.createStatement();
-        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_"+tableExt+";");
-        while (resultset.next()) {
-            assertEquals(expectedResult, resultset.getString("DENOMINATION"));
-            runned = true;
-        }
-        resultset.close();
-        stmt.close();
-        return runned;
     }
 
     @Test
@@ -69,9 +67,9 @@ public class MockTest extends BasicTest{
                 "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
         stmt.close();
 
-        runned = verifyRun(c, "FAKED", runned,"C");
-        runned = verifyRun(c, "FAKED", runned,"C");
-        runned = verifyRun(c, "Test Ltd", runned,"C");
+        runned = verifyRun(c, "FAKED", runned, "C");
+        runned = verifyRun(c, "FAKED", runned, "C");
+        runned = verifyRun(c, "Test Ltd", runned, "C");
         c.close();
 
         assertTrue(runned);
@@ -99,14 +97,13 @@ public class MockTest extends BasicTest{
                 "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
         stmt.close();
 
-        runned = verifyRun(c, "Test Ltd", runned,"N");
-        runned = verifyRun(c, "FAKED", runned,"N");
-        runned = verifyRun(c, "Test Ltd", runned,"N");
+        runned = verifyRun(c, "Test Ltd", runned, "N");
+        runned = verifyRun(c, "FAKED", runned, "N");
+        runned = verifyRun(c, "Test Ltd", runned, "N");
         c.close();
 
         assertTrue(runned);
     }
-
 
 
     @Test
@@ -131,11 +128,11 @@ public class MockTest extends BasicTest{
                 "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
         stmt.close();
 
-        runned = verifyRun(c, "Test Ltd", runned,"B");
-        runned = verifyRun(c, "FAKED", runned,"B");
-        runned = verifyRun(c, "FAKED", runned,"B");
-        runned = verifyRun(c, "FAKED", runned,"B");
-        runned = verifyRun(c, "Test Ltd", runned,"B");
+        runned = verifyRun(c, "Test Ltd", runned, "B");
+        runned = verifyRun(c, "FAKED", runned, "B");
+        runned = verifyRun(c, "FAKED", runned, "B");
+        runned = verifyRun(c, "FAKED", runned, "B");
+        runned = verifyRun(c, "Test Ltd", runned, "B");
         c.close();
 
         assertTrue(runned);

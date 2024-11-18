@@ -104,13 +104,13 @@ public class MockTest extends BasicTest {
         var httpget = new HttpGet("http://localhost:" + 8456 + "/jsonized/pathValue");
         httpget = (HttpGet) withQuery(httpget, Map.of(
                 "replacing", "true",
-                "testQuery","testQueryValue"));
+                "testQuery", "testQueryValue"));
         httpget.addHeader("Test-Header", "testHeaderValue");
 
         var httpresponse = httpclient.execute(httpget);
         var content = getContentString(httpresponse);
         assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
         assertTrue(content.contains("pathValue testQueryValue testHeaderValue"));
-        assertEquals("pathValue",httpresponse.getFirstHeader("Rewritten-Header").getValue());
+        assertEquals("pathValue", httpresponse.getFirstHeader("Rewritten-Header").getValue());
     }
 }

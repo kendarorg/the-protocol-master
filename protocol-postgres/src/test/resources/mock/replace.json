@@ -11,20 +11,21 @@
     "selectResult": {
       "records": [
         [
-          "${denomination}","${age}"
+          "${denomination}",
+          "${age}"
         ]
       ],
       "metadata": [
         {
           "columnName": "ADDRESS",
           "byteData": false,
-          "columnType" : "CHAR",
-          "precision" : 50
+          "columnType": "CHAR",
+          "precision": 50
         },
         {
           "columnName": "AGE",
           "byteData": false,
-          "columnType" : "INTEGER"
+          "columnType": "INTEGER"
         }
       ],
       "count": 1,

@@ -1,12 +1,17 @@
 {
-  "constant" : false,
-  "connectionId" : 2,
-  "index" : 5,
-  "input" : [ "CLIENT", "SETINFO", "LIB-VER", "5.1.2" ],
-  "output" : "OK",
-  "durationMs" : 2,
-  "type" : "Resp3Message",
-  "caller" : "RESP3",
-  "inputType" : "Resp3Message",
-  "outputType" : "Resp3Response"
+  "constant": false,
+  "connectionId": 2,
+  "index": 5,
+  "input": [
+    "CLIENT",
+    "SETINFO",
+    "LIB-VER",
+    "5.1.2"
+  ],
+  "output": "OK",
+  "durationMs": 2,
+  "type": "Resp3Message",
+  "caller": "RESP3",
+  "inputType": "Resp3Message",
+  "outputType": "Resp3Response"
 }

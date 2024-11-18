@@ -4,11 +4,10 @@
   "index": 5,
   "inputType": "Disconnect",
   "input": {
-      "uuid": "24",
-      "fullFlag": -32,
-      "fixedHeader": "DISCONNECT",
-      "reasonCode": 0
-
+    "uuid": "24",
+    "fullFlag": -32,
+    "fixedHeader": "DISCONNECT",
+    "reasonCode": 0
   },
   "outputType": null,
   "output": null,

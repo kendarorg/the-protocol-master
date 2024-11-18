@@ -83,7 +83,7 @@ public class ProtocolsRunner {
                 return ini;
             }
         } catch (Exception ex) {
-            if(ex.getMessage()!=null) {
+            if (ex.getMessage() != null) {
                 System.err.println("ERROR: " + ex.getMessage());
             }
             HelpFormatter formatter = new HelpFormatter();

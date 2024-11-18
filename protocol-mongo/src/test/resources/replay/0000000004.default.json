@@ -1,74 +1,82 @@
 {
-  "constant" : false,
-  "connectionId" : 3,
-  "index" : 4,
-  "input" : {
-    "flags" : 0,
-    "opCode" : "OP_MSG",
-    "sections" : [ {
-      "documents" : [ {
-        "dbStats" : {
-          "$numberLong" : "1"
-        },
-        "$db" : "admin"
-      } ]
-    } ]
-  },
-  "output" : {
-    "flags" : 0,
-    "opCode" : "OP_MSG",
-    "sections" : [ {
-      "documents" : [ {
-        "db" : "admin",
-        "collections" : {
-          "$numberInt" : "3"
-        },
-        "views" : {
-          "$numberInt" : "0"
-        },
-        "objects" : {
-          "$numberInt" : "5"
-        },
-        "avgObjSize" : {
-          "$numberDouble" : "82.6"
-        },
-        "dataSize" : {
-          "$numberDouble" : "413.0"
-        },
-        "storageSize" : {
-          "$numberDouble" : "45056.0"
-        },
-        "indexes" : {
-          "$numberInt" : "3"
-        },
-        "indexSize" : {
-          "$numberDouble" : "45056.0"
-        },
-        "totalSize" : {
-          "$numberDouble" : "90112.0"
-        },
-        "scaleFactor" : {
-          "$numberDouble" : "1.0"
-        },
-        "fsUsedSize" : {
-          "$numberDouble" : "1.8730954752E10"
-        },
-        "fsTotalSize" : {
-          "$numberDouble" : "6.652123136E10"
-        },
-        "ok" : {
-          "$numberDouble" : "1.0"
-        },
-        "operationTime" : {
-          "$timestamp" : {
-            "t" : 1709545403,
-            "i" : 1
+  "constant": false,
+  "connectionId": 3,
+  "index": 4,
+  "input": {
+    "flags": 0,
+    "opCode": "OP_MSG",
+    "sections": [
+      {
+        "documents": [
+          {
+            "dbStats": {
+              "$numberLong": "1"
+            },
+            "$db": "admin"
           }
-        }
-      } ]
-    } ]
+        ]
+      }
+    ]
   },
-  "durationMs" : 1,
-  "type" : "OP_MSG",
-  "caller" : "MONGODB"
+  "output": {
+    "flags": 0,
+    "opCode": "OP_MSG",
+    "sections": [
+      {
+        "documents": [
+          {
+            "db": "admin",
+            "collections": {
+              "$numberInt": "3"
+            },
+            "views": {
+              "$numberInt": "0"
+            },
+            "objects": {
+              "$numberInt": "5"
+            },
+            "avgObjSize": {
+              "$numberDouble": "82.6"
+            },
+            "dataSize": {
+              "$numberDouble": "413.0"
+            },
+            "storageSize": {
+              "$numberDouble": "45056.0"
+            },
+            "indexes": {
+              "$numberInt": "3"
+            },
+            "indexSize": {
+              "$numberDouble": "45056.0"
+            },
+            "totalSize": {
+              "$numberDouble": "90112.0"
+            },
+            "scaleFactor": {
+              "$numberDouble": "1.0"
+            },
+            "fsUsedSize": {
+              "$numberDouble": "1.8730954752E10"
+            },
+            "fsTotalSize": {
+              "$numberDouble": "6.652123136E10"
+            },
+            "ok": {
+              "$numberDouble": "1.0"
+            },
+            "operationTime": {
+              "$timestamp": {
+                "t": 1709545403,
+                "i": 1
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "durationMs": 1,
+  "type": "OP_MSG",
+  "caller": "MONGODB"
 }

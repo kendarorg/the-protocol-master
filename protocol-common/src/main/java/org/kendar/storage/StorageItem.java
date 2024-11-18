@@ -25,22 +25,6 @@ public class StorageItem {
     private String inputType;
     private String outputType;
 
-    public String getInputType() {
-        return inputType;
-    }
-
-    public void setInputType(String inputType) {
-        this.inputType = inputType;
-    }
-
-    public String getOutputType() {
-        return outputType;
-    }
-
-    public void setOutputType(String outputType) {
-        this.outputType = outputType;
-    }
-
     /**
      * Needed for serialization
      */
@@ -70,6 +54,22 @@ public class StorageItem {
         this.type = type;
         this.caller = caller;
         this.inputType = inputType;
+        this.outputType = outputType;
+    }
+
+    public String getInputType() {
+        return inputType;
+    }
+
+    public void setInputType(String inputType) {
+        this.inputType = inputType;
+    }
+
+    public String getOutputType() {
+        return outputType;
+    }
+
+    public void setOutputType(String outputType) {
         this.outputType = outputType;
     }
 

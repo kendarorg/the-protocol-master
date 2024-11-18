@@ -1,11 +1,15 @@
 {
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 9,
-  "input" : null,
-  "output" : [ "message", "commonChannel", "SECOND" ],
-  "durationMs" : 0,
-  "type" : "RESPONSE",
-  "caller" : "RESP3",
-  "outputType" : "RESPONSE"
+  "constant": false,
+  "connectionId": 1,
+  "index": 9,
+  "input": null,
+  "output": [
+    "message",
+    "commonChannel",
+    "SECOND"
+  ],
+  "durationMs": 0,
+  "type": "RESPONSE",
+  "caller": "RESP3",
+  "outputType": "RESPONSE"
 }

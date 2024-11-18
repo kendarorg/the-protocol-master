@@ -50,7 +50,6 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
     }
 
 
-
     @Override
     protected List<MockStorage> firstCheckOnMainPart(Request request) {
         return mocks.stream().filter(a -> a.retrieveInAs(Request.class).getHost().
@@ -69,9 +68,9 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
 
     @Override
     protected void checkMatching(MockStorage data,
-                               Request requestToSimulate,
-                               ChangeableReference<Integer> matchingQuery,
-                               ChangeableReference<Long> foundedIndex) {
+                                 Request requestToSimulate,
+                                 ChangeableReference<Integer> matchingQuery,
+                                 ChangeableReference<Long> foundedIndex) {
 
         ChangeableReference<Integer> matchedQuery = new ChangeableReference<>(0);
 
@@ -193,7 +192,7 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
     private void loadHeaderParameters(Request foundedRequest, Request originalRequest, HashMap<String, String> parameters) {
         for (var kvp : foundedRequest.getHeaders().entrySet()) {
             if (isTemplateParameter(kvp.getValue().get(0))) {
-                if (originalRequest.getFirstHeader(kvp.getKey())!=null) {
+                if (originalRequest.getFirstHeader(kvp.getKey()) != null) {
                     parameters.put(kvp.getValue().get(0), originalRequest.getFirstHeader(kvp.getKey()));
                 }
             }

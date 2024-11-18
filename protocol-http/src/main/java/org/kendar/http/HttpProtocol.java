@@ -8,9 +8,6 @@ import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
 import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
-import org.kendar.http.utils.rewriter.RemoteServerStatus;
-import org.kendar.http.utils.rewriter.SimpleRewriterConfig;
-import org.kendar.http.utils.rewriter.SimpleRewriterHandlerImpl;
 import org.kendar.http.utils.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
@@ -55,29 +52,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             return defaultValue;
         }
         return (T) value;
-    }
-
-    private static SimpleRewriterConfig loadRewritersConfiguration(HttpProtocolSettings settings) {
-        var proxyConfig = new SimpleRewriterConfig();
-        for (var i = 0; i < settings.getRewrites().size(); i++) {
-            var rw = settings.getRewrites().get(i);
-            if (rw.getWhen() == null || rw.getThen() == null) {
-                continue;
-            }
-            var remoteServerStatus = new RemoteServerStatus(i + "",
-                    rw.getWhen(),
-                    rw.getThen(),
-                    rw.getTest());
-            if (rw.getTest() == null || rw.getTest().isEmpty()) {
-                remoteServerStatus.setRunning(true);
-                remoteServerStatus.setForce(true);
-            } else {
-                remoteServerStatus.setRunning(true);
-                remoteServerStatus.setForce(rw.isForceActive());
-            }
-            proxyConfig.getProxies().add(remoteServerStatus);
-        }
-        return proxyConfig;
     }
 
     private static HttpsServer createHttpsServer(CertificatesManager certificatesManager,
@@ -156,7 +130,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
 
             // initialise the HTTP server
-            var proxyConfig = loadRewritersConfiguration(settings);
+//            var proxyConfig = loadRewritersConfiguration(settings);
             var dnsHandler = new DnsMultiResolverImpl();
             var connectionBuilder = new ConnectionBuilderImpl(dnsHandler);
             var requestResponseBuilder = new RequestResponseBuilderImpl();
@@ -203,7 +177,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             log.debug("Filters added");
             var handler = new MasterHandler(
                     new PluginClassesHandlerImpl(plugins),
-                    new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
+                    //new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
                     new RequestResponseBuilderImpl(),
                     new ExternalRequesterImpl(requestResponseBuilder, dnsHandler, connectionBuilder),
                     connectionBuilder);

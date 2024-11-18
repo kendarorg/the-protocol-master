@@ -61,7 +61,7 @@ public class ProxyMetadata {
     }
 
     public ProxyMetadata copy() {
-        var result = new ProxyMetadata(columnName,byteData);
+        var result = new ProxyMetadata(columnName, byteData);
         result.setPrecision(precision);
         result.setColumnType(columnType);
         return result;

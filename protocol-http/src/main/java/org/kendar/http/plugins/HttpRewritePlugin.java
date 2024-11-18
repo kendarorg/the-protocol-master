@@ -16,7 +16,7 @@ public class HttpRewritePlugin extends RewritePlugin<Request, Response, String> 
 
     @Override
     public List<ProtocolPhase> getPhases() {
-        return List.of(ProtocolPhase.PRE_RENDER);
+        return List.of(ProtocolPhase.CONNECT);
     }
 
     @Override

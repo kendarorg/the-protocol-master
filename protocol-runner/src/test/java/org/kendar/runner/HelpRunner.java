@@ -16,13 +16,13 @@ public class HelpRunner {
     private PrintStream oriOut;
 
     @BeforeEach
-    void beforeEach(){
+    void beforeEach() {
         myOut = new ByteArrayOutputStream();
         oriOut = System.out;
         System.setOut(new PrintStream(myOut));
     }
-    
-    private String getOut(){
+
+    private String getOut() {
         var returning = myOut.toString();
         System.setOut(oriOut);
         return returning;
@@ -44,6 +44,7 @@ public class HelpRunner {
         final String standardOutput = getOut();
         System.out.println(standardOutput);
     }
+
     @Test
     void testHttpHelp() throws Exception {
 
@@ -51,14 +52,15 @@ public class HelpRunner {
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
                 "-loglevel", "DEBUG",
-                "-help","http"
+                "-help", "http"
         };
         Main.execute(args, () -> {
             Sleeper.sleep(100);
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);;
+        System.out.println(standardOutput);
+        ;
         assertTrue(standardOutput.contains("http"));
     }
 
@@ -69,14 +71,15 @@ public class HelpRunner {
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
                 "-loglevel", "DEBUG",
-                "-help","mysql"
+                "-help", "mysql"
         };
         Main.execute(args, () -> {
             Sleeper.sleep(100);
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);;
+        System.out.println(standardOutput);
+        ;
         assertTrue(standardOutput.contains("mysql"));
     }
 
@@ -87,14 +90,15 @@ public class HelpRunner {
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
                 "-loglevel", "DEBUG",
-                "-help","postgres"
+                "-help", "postgres"
         };
         Main.execute(args, () -> {
             Sleeper.sleep(100);
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);;
+        System.out.println(standardOutput);
+        ;
         assertTrue(standardOutput.contains("postgres"));
     }
 
@@ -105,7 +109,7 @@ public class HelpRunner {
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
                 "-loglevel", "DEBUG",
-                "-help","amqp091"
+                "-help", "amqp091"
         };
         Main.execute(args, () -> {
             Sleeper.sleep(100);
@@ -117,7 +121,6 @@ public class HelpRunner {
     }
 
 
-
     @Test
     void testMqttHelp() throws Exception {
 
@@ -125,7 +128,7 @@ public class HelpRunner {
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
                 "-loglevel", "DEBUG",
-                "-help","mqtt"
+                "-help", "mqtt"
         };
         Main.execute(args, () -> {
             Sleeper.sleep(100);
@@ -143,14 +146,15 @@ public class HelpRunner {
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
                 "-loglevel", "DEBUG",
-                "-help","redis"
+                "-help", "redis"
         };
         Main.execute(args, () -> {
             Sleeper.sleep(100);
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);;
+        System.out.println(standardOutput);
+        ;
         assertTrue(standardOutput.contains("redis"));
     }
 
@@ -161,14 +165,15 @@ public class HelpRunner {
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
                 "-loglevel", "DEBUG",
-                "-help","mongodb"
+                "-help", "mongodb"
         };
         Main.execute(args, () -> {
             Sleeper.sleep(100);
             return false;
         });
         final String standardOutput = getOut();
-        System.out.println(standardOutput);;
+        System.out.println(standardOutput);
+        ;
         assertTrue(standardOutput.contains("mongodb"));
     }
 }

@@ -67,7 +67,7 @@ public class JsonMapper {
             if (of instanceof String) {
                 try {
                     return mapper.readTree((String) of);
-                }catch (JsonParseException e){
+                } catch (JsonParseException e) {
                     return new TextNode((String) of);
                 }
             }

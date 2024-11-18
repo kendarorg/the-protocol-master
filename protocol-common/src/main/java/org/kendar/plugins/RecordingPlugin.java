@@ -57,7 +57,7 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         String resType = null;
 
         if (out != null) {
-            resType=out.getClass().getSimpleName();
+            resType = out.getClass().getSimpleName();
             resSerialized = mapper.toJsonNode(getData(out));
         }
         var storageItem = new StorageItem(

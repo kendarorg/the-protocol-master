@@ -8,14 +8,8 @@ public enum ProtocolPhase {
     PRE_CALL("PRE_CALL"),
     CONNECT("CONNECT"),
     POST_CALL("POST_CALL"),
-    PRE_RENDER("PRE_RENDER"),
-    ASYNC_RESPONSE("ASYNC_RESPONSE"),
-    /**
-     * Always blocking
-     */
-    API("API"),
-    STATIC("STATIC"),
-    POST_RENDER("POST_RENDER");
+    FINALIZE("FINALIZE"),
+    ASYNC_RESPONSE("ASYNC_RESPONSE");
     private final String text;
 
     /**

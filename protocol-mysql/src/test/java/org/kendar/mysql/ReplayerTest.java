@@ -1,12 +1,12 @@
 package org.kendar.mysql;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;

@@ -4,13 +4,11 @@
   "index": 7,
   "inputType": "PublishComp",
   "input": {
-
-      "uuid": "32",
-      "fullFlag": 112,
-      "fixedHeader": "PUBCOMP",
-      "packetIdentifier": 1,
-      "reasonCode": 0
-
+    "uuid": "32",
+    "fullFlag": 112,
+    "fixedHeader": "PUBCOMP",
+    "packetIdentifier": 1,
+    "reasonCode": 0
   },
   "outputType": null,
   "output": null,

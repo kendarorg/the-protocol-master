@@ -4,55 +4,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExtraStringReplacer {
-    public static List<String> parse(String input){
+    public static List<String> parse(String input) {
         var result = new ArrayList<String>();
         char[] charArray = input.toCharArray();
         String sb = "";
-        var previousIsParameter=false;
+        var previousIsParameter = false;
         for (int i = 0; i < charArray.length; i++) {
             var ch = charArray[i];
-            if((ch=='$'||ch=='@')&&(i+1)<charArray.length){
-                if(charArray[i+1]=='{'){
-                    var start = i+2;
-                    String paramName = ch+"{";
-                    for(;start<charArray.length;start++){
+            if ((ch == '$' || ch == '@') && (i + 1) < charArray.length) {
+                if (charArray[i + 1] == '{') {
+                    var start = i + 2;
+                    String paramName = ch + "{";
+                    for (; start < charArray.length; start++) {
                         var ch2 = charArray[start];
-                        if( (ch2>=65 && ch2<=90) || (ch2>=97 && ch2<=122) ){
-                            paramName+=ch2;
+                        if ((ch2 >= 65 && ch2 <= 90) || (ch2 >= 97 && ch2 <= 122)) {
+                            paramName += ch2;
                             continue;
-                        }else if(ch2=='}'){
-                            if(previousIsParameter){
+                        } else if (ch2 == '}') {
+                            if (previousIsParameter) {
                                 throw new RuntimeException();
                             }
                             result.add(sb);
-                            sb="";
-                            paramName+=ch2;
+                            sb = "";
+                            paramName += ch2;
                             result.add(paramName);
-                            previousIsParameter=true;
-                            i=start;
+                            previousIsParameter = true;
+                            i = start;
                             break;
-                        }else{
-                            paramName=null;
+                        } else {
+                            paramName = null;
                             break;
                         }
                     }
-                    if(paramName==null){
+                    if (paramName == null) {
 
-                        previousIsParameter=false;
-                        sb+=ch;
+                        previousIsParameter = false;
+                        sb += ch;
                     }
-                }else{
+                } else {
 
-                    previousIsParameter=false;
-                    sb+=ch;
+                    previousIsParameter = false;
+                    sb += ch;
                 }
-            }else{
+            } else {
 
-                previousIsParameter=false;
-                sb+=ch;
+                previousIsParameter = false;
+                sb += ch;
             }
         }
-        if(sb.length()>0){
+        if (sb.length() > 0) {
             result.add(sb);
         }
         return result;
@@ -81,7 +81,7 @@ public class ExtraStringReplacer {
             }
 
             return result;
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ArrayList<>();
         }
     }

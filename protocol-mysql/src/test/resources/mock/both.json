@@ -1,31 +1,37 @@
 {
-  "constant" : false,
-  "connectionId" : 1,
+  "constant": false,
+  "connectionId": 1,
   "index": 3,
   "nthRequest": 2,
   "count": 3,
-  "input" : {
-    "query" : "SELECT DENOMINATION FROM COMPANY_B;",
-    "parameterValues" : [ ]
+  "input": {
+    "query": "SELECT DENOMINATION FROM COMPANY_B;",
+    "parameterValues": []
   },
-  "output" : {
-    "selectResult" : {
-      "records" : [ [ "FAKED" ] ],
-      "metadata" : [ {
-        "columnName" : "DENOMINATION",
-        "byteData" : false,
-        "columnType" : "LONGVARCHAR",
-        "precision" : 16383
-      } ],
-      "count" : 1,
-      "intResult" : false,
-      "lastInsertedId" : 0
+  "output": {
+    "selectResult": {
+      "records": [
+        [
+          "FAKED"
+        ]
+      ],
+      "metadata": [
+        {
+          "columnName": "DENOMINATION",
+          "byteData": false,
+          "columnType": "LONGVARCHAR",
+          "precision": 16383
+        }
+      ],
+      "count": 1,
+      "intResult": false,
+      "lastInsertedId": 0
     },
-    "intResult" : 0
+    "intResult": 0
   },
-  "durationMs" : 2,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "inputType" : "JdbcCall",
-  "outputType" : "SelectResult"
+  "durationMs": 2,
+  "type": "QUERY",
+  "caller": "JDBC",
+  "inputType": "JdbcCall",
+  "outputType": "SelectResult"
 }

@@ -21,6 +21,7 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
         super();
         parser = new SqlStringParser(getSqlStringParserSeparator());
     }
+
     @Override
     protected void checkMatching(MockStorage data, JdbcCall callToSimulate, ChangeableReference<Integer> matchingQuery, ChangeableReference<Long> foundedIndex) {
         ChangeableReference<Integer> matchedQuery = new ChangeableReference<>(0);
@@ -28,7 +29,7 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
         requestToSimulate.setQuery(callToSimulate.getQuery());
         requestToSimulate.setParameterValues(callToSimulate.getParameterValues());
         var possibleRequest = data.retrieveInAs(JdbcRequest.class);
-        if(possibleRequest.getParameterValues().size()!=requestToSimulate.getParameterValues().size()){
+        if (possibleRequest.getParameterValues().size() != requestToSimulate.getParameterValues().size()) {
             return;
         }
         if (!verifyQuery(requestToSimulate, possibleRequest, matchedQuery)) {
@@ -49,11 +50,11 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
         for (int i = 0; i < possibleMatches.size(); i++) {
             var possibleMatch = possibleMatches.get(i);
             var requestToMatch = requestsToMatch.get(i);
-            if (possibleMatch.getValue()==null && requestToMatch.getValue()==null) {
+            if (possibleMatch.getValue() == null && requestToMatch.getValue() == null) {
                 matchedQuery.set(3 + matchedQuery.get());
-            }else if (possibleMatch.getValue()==null && requestToMatch.getValue()!=null) {
+            } else if (possibleMatch.getValue() == null && requestToMatch.getValue() != null) {
                 //DO NOTHING
-            }else if (possibleMatch.getValue().equalsIgnoreCase(requestToMatch.getValue())) {
+            } else if (possibleMatch.getValue().equalsIgnoreCase(requestToMatch.getValue())) {
                 matchedQuery.set(3 + matchedQuery.get());
             } else if (possibleMatch.getValue().startsWith("${") && possibleMatch.getValue().endsWith("}")) {
                 matchedQuery.set(1 + matchedQuery.get());
@@ -72,7 +73,7 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
             return true;
         }
         var possiblePath = ExtraStringReplacer.parse(possibleRequest.getQuery());
-        var toSimulatePath = ExtraStringReplacer.match(possiblePath,requestToSimulate.getQuery());
+        var toSimulatePath = ExtraStringReplacer.match(possiblePath, requestToSimulate.getQuery());
         if (possiblePath.size() != toSimulatePath.size()) {
             return false;
         }
@@ -123,10 +124,10 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
     }
 
     private void writeSelectResultParameter(JdbcResponse clonedResponse, HashMap<String, String> parameters) {
-        for(var item:clonedResponse.getSelectResult().getRecords()){
+        for (var item : clonedResponse.getSelectResult().getRecords()) {
             for (int i = 0; i < item.size(); i++) {
                 var subItem = item.get(i);
-                for(var param:parameters.entrySet()){
+                for (var param : parameters.entrySet()) {
                     subItem = subItem.replaceAll(Pattern.quote(param.getKey()), Matcher.quoteReplacement(param.getValue()));
                 }
                 item.set(i, subItem);
@@ -135,12 +136,12 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
     }
 
     private void loadParamsParameters(JdbcRequest foundedRequest, JdbcCall originalRequest, HashMap<String, String> parameters) {
-        if(foundedRequest.getParameterValues().size()>0){
+        if (foundedRequest.getParameterValues().size() > 0) {
             List<BindingParameter> parameterValues = foundedRequest.getParameterValues();
             for (int i = 0; i < parameterValues.size(); i++) {
                 var tplParam = parameterValues.get(i);
                 var oriParam = originalRequest.getParameterValues().get(i);
-                if(isTemplateParameter(tplParam.getValue())){
+                if (isTemplateParameter(tplParam.getValue())) {
                     parameters.put(tplParam.getValue(), oriParam.getValue());
                 }
             }
@@ -149,13 +150,13 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
 
     private void loadQueryParameters(JdbcRequest foundedRequest, JdbcCall originalRequest, HashMap<String, String> parameters) {
         var tplPath = ExtraStringReplacer.parse(foundedRequest.getQuery());
-        var oriPath = ExtraStringReplacer.match(tplPath,originalRequest.getQuery());
+        var oriPath = ExtraStringReplacer.match(tplPath, originalRequest.getQuery());
         for (var i = 0; i < tplPath.size(); i++) {
             var tplSeg = tplPath.get(i);
             if (isTemplateParameter(tplSeg)) {
                 var oriSeg = oriPath.get(i);
                 parameters.put(tplSeg, oriSeg);
-            }else if (tplSeg.length()>2 && isTemplateParameter(tplSeg.substring(1,tplSeg.length()-2))) {
+            } else if (tplSeg.length() > 2 && isTemplateParameter(tplSeg.substring(1, tplSeg.length() - 2))) {
                 var oriSeg = oriPath.get(i);
                 parameters.put(tplSeg, oriSeg);
             }

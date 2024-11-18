@@ -32,7 +32,7 @@ public class ReformatIndexes {
             ObjectMapper mapper = new ObjectMapper().
                     configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                     .setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            for(var file:result){
+            for (var file : result) {
                 try {
                     var changed = false;
                     var content = Files.readString(file);
@@ -64,7 +64,7 @@ public class ReformatIndexes {
                         System.out.println(newTree);
                         Files.writeString(file, newTree);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
             }

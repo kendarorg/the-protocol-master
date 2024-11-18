@@ -75,7 +75,7 @@ public class BasicTest {
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.setSettings(mockPluginSettings);
-        proxy.setPlugins(List.of(pl,pl1));
+        proxy.setPlugins(List.of(pl, pl1));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

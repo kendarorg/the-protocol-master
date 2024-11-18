@@ -15,10 +15,6 @@ public class ReplacerItemInstance extends ReplacerItem {
         }
     }
 
-    public Pattern getFindPattern() {
-        return findPattern;
-    }
-
     public String run(String query) {
         if (isRegex()) {
             var matcher = findPattern.matcher(query);

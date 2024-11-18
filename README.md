@@ -72,34 +72,21 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Mocked error response (http/s)
 * Mocked (optionally parametrized) responses (http/s,mysql,postgres) (nth, and count)
 * Internal rewrite queries and urls (http/s,mysql,postgres)
-* Record activity (all)
-* Replay activity (all)
+* Record/replay activity-Gold standards-Zero infrastructure (all)
 * Custom transparent proxy (all)
-* Translate postgres to any Jdbc supported db like Oracle!
+* Translate postgres and MySQL to any Jdbc supported db like Oracle!
+* Plugin-based architecture
 
+The configuration is based on command line parameters or a json properties file
+for the usage check [here](docs/properties.md)
 
-* Create a state machine able to interpret a generic wire protocol, handling
-  special situations like incomplete messages, sanding and receiving data according
-  to byte ordering and formatting
-* Translate the queries in a standard, serializable format, logging all queries
-  and results in a consistent way
-* Forward wire protocol to drivers. For SQL means passing the queries to JDBC drivers,
-  for NO-SQL forwarding to the specific ones like MongoDB or AMQP
-* Run queries against a pre-recorded sequence of commands to simulate a real data
-  storage, without the need of a real server (in the making)
-* Adding custom Java plugins
+For the api usage [here](docs/apis.md)
 
-The whole project is covered with Jacoco (66% coverage actually)
-
-For this to become real an event based state machine has been developed, with
-several database wire protocol implementations:
+If you want to go on the specific functions by protocol: 
 
 * [Http](protocol-http/README.md)
-    * Support Http and Https mitm
-    * Simulate errors for chaos engineering
-    * Simulate API behaviours
-    * Mock responses
-    * Record everything
+    * Support Http and Https as Man In The Middle
+    * Custom proxy to intercept without DNS changes
 * [PostgresSQL](protocol-postgres/README.md)  Usable for most db (for hibernate you should set the final db dialect of
   course)
     * Support for simple and extended query protocol
@@ -111,7 +98,7 @@ several database wire protocol implementations:
 * [MongoDB](protocol-mongo/README.md)
     * Basic authentication
 * [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md)
-    * Support for basic queue/publish/consume
+    * Support for all kind of publish/consume
     * Channels multiplexing
 * [Redis](protocol-redis/README.md)
     * Support for subscriptions
@@ -125,76 +112,10 @@ several database wire protocol implementations:
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/kendarorg/1)
 
-## Using it out of the box
-
-* Inside directory "recording"
-* For protocol "http" (and https)
-* Record all request response
-
-```
-java -jar protocol-runner.jar -protocol http -record
-```
-
-* Inside directory "recording"
-* For protocol postgres
-* Fake a postgres db listening on 7715
-* Forward requests to remotedb:5432
-* With login reallogin and password realpassword
-* Record all query and responses
-
-```
-java -jar protocol-runner.jar -datadir recording -protocol postgres -port 7715 \
-  -connection jdbc:postgresql://remotedb:5432 -login reallogin -password realpassword \
-  -record
-```
-
-You can use the "protocol-runner-VERSION.jar" to proxy all your calls and test your
-connections (and add some ISSUE to this project hopefully).
-
-Inside protocol-runner/src/test/java/org/kendar/runner/MainTest.java you can see
-an example where a recording is made and then reporduced.
-
-Just call it like the following if using included mysql and postgres driver (adapt
-the line end to your system!):
-<pre>
-  java -jar protocol-runner.jar \
-    -p postgres -l 3175 \
-    -xl remoteUser -xw remotePassword -xc jdbc:postgresql://remoteDb/test \
-    -xd test/{timestamp}
-</pre>
-
-Or like this to use an external driver (in this case Oracle JDBC driver) (adapt
-the cp/classpath and line end to your system!)
-
-<pre>
 java -cp "ojdbc11.jar;protocol-runner.jar" \
-    org.springframework.boot.loader.JarLauncher \
-    -p postgres -l 5432 \
-    -xl system -xw password -xc jdbc:oracle:thin:@192.168.1.96:1521/FREEPDB1 \
-    -xd test/{timestamp}
-</pre>
-
-<pre>
-usage: runner
- -l <arg>    [all] Select listening port
- -p <arg>    Select protocol (mysql/mongo/postgres/amqp091/redis/mqtt)
- -pl         [all] Replay from log/replay directory
- -t <arg>    [all] Set timeout in seconds towards proxied system (default
-             30s)
- -v <arg>    [all] Log level (default ERROR)
- -xc <arg>   [all] Select remote connection string (for redis use
-             redis://host:port
- -xd <arg>   [all] Select log/replay directory (you can set a {timestamp}
-             value
-             that will be replaced with the current timestamp)
- -xl <arg>   [mysql/mongo/postgres/amqp091/mqtt] Select remote login
- -xw <arg>   [mysql/mongo/postgres/amqp091/mqtt] Select remote password
- -jr <arg>   [jdbc] Replace queries
- -js <arg>   [jdbc] Set schema
-</pre>
-
-Inside the chosen directory you will find simple jsons containing all the data exchanged
-with the server AND you can modify it before replaying, to simulate special situations!
+org.springframework.boot.loader.JarLauncher \
+-p postgres -l 5432 \
+-xl system -xw password -xc jdbc:oracle:thin:@192.168.1.96:1521/FREEPDB
 
 ### Set Schema
 

@@ -1,5 +1,7 @@
 # AMQP 0.9.1 Protocol
 
+## Default Plugins
+
 ## Documentation used
 
 * https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf (page 31)

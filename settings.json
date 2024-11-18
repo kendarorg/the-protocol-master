@@ -34,21 +34,6 @@
           "www.google.com"
         ]
       },
-      "rewrites": [
-        {
-          "when": "http://localhost/google",
-          "then": "https://www.microsoft.com"
-        },
-        {
-          "when": "http://localhost/microsoft",
-          "then": "https://www.microsoft.com"
-        },
-        {
-          "when": "http://localhost/fake",
-          "then": "http://localhost:999",
-          "forceActive": true
-        }
-      ],
       "plugins": {
         "error-plugin": {
           "errorCode": 0,

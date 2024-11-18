@@ -6,16 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcCall {
-    public void setParameterValues(List<BindingParameter> parameterValues) {
-        this.parameterValues = parameterValues;
-    }
-
-    private  List<BindingParameter> parameterValues = new ArrayList<>();
+    private List<BindingParameter> parameterValues = new ArrayList<>();
     private String query;
-
-    public JdbcCall(){
+    public JdbcCall() {
 
     }
+
     public JdbcCall(String query, List<BindingParameter> parameterValues) {
 
         this.query = query;
@@ -32,5 +28,9 @@ public class JdbcCall {
 
     public List<BindingParameter> getParameterValues() {
         return parameterValues;
+    }
+
+    public void setParameterValues(List<BindingParameter> parameterValues) {
+        this.parameterValues = parameterValues;
     }
 }

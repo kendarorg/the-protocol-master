@@ -7,23 +7,22 @@ public class SelectResult {
     private final List<List<String>> records = new ArrayList<>();
     private final List<ProxyMetadata> metadata = new ArrayList<>();
     private int count;
+    private boolean intResult;
+    private long lastInsertedId;
 
-
-    public SelectResult copy(){
+    public SelectResult copy() {
         var cloned = new SelectResult();
         cloned.setCount(this.count);
-        for(var record : records){
+        for (var record : records) {
             cloned.records.add(new ArrayList<>(record));
         }
-        for(var metadataItem : metadata){
+        for (var metadataItem : metadata) {
             cloned.metadata.add(metadataItem.copy());
         }
         cloned.intResult = this.intResult;
         cloned.lastInsertedId = this.lastInsertedId;
         return cloned;
     }
-    private boolean intResult;
-    private long lastInsertedId;
 
     public List<List<String>> getRecords() {
         return records;

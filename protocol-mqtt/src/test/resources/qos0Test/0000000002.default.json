@@ -1,23 +1,23 @@
 {
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 2,
-  "input" : {
-    "uuid" : "10",
-    "fullFlag" : -126,
-    "fixedHeader" : "SUBSCRIBE",
-    "payload" : "AAsvc3Vic2NyaWJlLwA=",
-    "packetIdentifier" : 1
+  "constant": false,
+  "connectionId": 1,
+  "index": 2,
+  "input": {
+    "uuid": "10",
+    "fullFlag": -126,
+    "fixedHeader": "SUBSCRIBE",
+    "payload": "AAsvc3Vic2NyaWJlLwA=",
+    "packetIdentifier": 1
   },
-  "output" : {
-    "uuid" : "13",
-    "fullFlag" : -112,
-    "fixedHeader" : "SUBACK",
-    "packetIdentifier" : 1
+  "output": {
+    "uuid": "13",
+    "fullFlag": -112,
+    "fixedHeader": "SUBACK",
+    "packetIdentifier": 1
   },
-  "durationMs" : 11,
-  "type" : "Subscribe",
-  "caller" : "MQTT",
-  "inputType" : "Subscribe",
-  "outputType" : "SubscribeAck"
+  "durationMs": 11,
+  "type": "Subscribe",
+  "caller": "MQTT",
+  "inputType": "Subscribe",
+  "outputType": "SubscribeAck"
 }

@@ -24,10 +24,12 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
     protected static boolean isTemplateParameter(String tplSeg) {
         return tplSeg.startsWith("${") && tplSeg.endsWith("}") || tplSeg.startsWith("@{") && tplSeg.endsWith("}");
     }
+
     protected abstract void checkMatching(MockStorage data,
-                                 T requestToSimulate,
-                                 ChangeableReference<Integer> matchingQuery,
-                                 ChangeableReference<Long> foundedIndex) ;
+                                          T requestToSimulate,
+                                          ChangeableReference<Integer> matchingQuery,
+                                          ChangeableReference<Long> foundedIndex);
+
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
         if (!isActive()) return false;
@@ -61,6 +63,7 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
         }
         return false;
     }
+
     protected abstract void writeOutput(T request, K response,
                                         MockStorage founded);
 
@@ -77,7 +80,6 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
         return this;
 
     }
-
 
 
     public void setSettings(PluginSettings plugin) {
