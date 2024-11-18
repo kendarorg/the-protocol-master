@@ -83,7 +83,9 @@ public class ProtocolsRunner {
                 return ini;
             }
         } catch (Exception ex) {
-            System.err.println("ERROR: " + ex.getMessage());
+            if(ex.getMessage()!=null) {
+                System.err.println("ERROR: " + ex.getMessage());
+            }
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("runner", options);
         }

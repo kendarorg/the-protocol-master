@@ -59,6 +59,11 @@ public class Amqp091Runner extends CommonRunner {
     }
 
     @Override
+    protected String getConnectionDescription() {
+        return "amqp://localhost:5372";
+    }
+
+    @Override
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
 
         var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;

@@ -44,6 +44,12 @@ public class JdbcRunner extends CommonRunner {
     }
 
     @Override
+    protected String getConnectionDescription() {
+        return protocol.equalsIgnoreCase("mysql") ? "jdbc:mysql://localhost:3306" :
+                "jdbc:postgresql://localhost:5432/db?ssl=false";
+    }
+
+    @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go, Options mainOptions,
                     HashMap<String, List<PluginDescriptor>> filters) throws Exception {
         var options = getCommonOptions(mainOptions);

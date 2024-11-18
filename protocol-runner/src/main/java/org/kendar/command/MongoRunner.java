@@ -54,6 +54,11 @@ public class MongoRunner extends CommonRunner {
     }
 
     @Override
+    protected String getConnectionDescription() {
+        return "mongodb://localhost:27018";
+    }
+
+    @Override
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini,
                       ProtocolSettings protocol, StorageRepository storage,
                       List<PluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {

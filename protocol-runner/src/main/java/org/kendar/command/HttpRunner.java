@@ -144,6 +144,11 @@ public class HttpRunner extends CommonRunner {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    protected String getConnectionDescription() {
+        return "";
+    }
+
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
                       String sectionKey, GlobalSettings ini, ProtocolSettings pset, StorageRepository storage,
                       List<PluginDescriptor> plugins,

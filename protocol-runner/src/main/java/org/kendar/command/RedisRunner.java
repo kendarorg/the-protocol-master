@@ -28,6 +28,11 @@ public class RedisRunner extends CommonRunner {
     }
 
     @Override
+    protected String getConnectionDescription() {
+        return "redis://localhost:5372";
+    }
+
+    @Override
     public String getDefaultPort() {
         return "6379";
     }
