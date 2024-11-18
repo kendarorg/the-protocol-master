@@ -179,6 +179,8 @@
 
                     <excludes>
                         <exclude>org/kendar/server/**</exclude>
+                        <exclude>org/kendar/tests/**</exclude>
+                        <exclude>org/kendar/samples/**</exclude>
                         <exclude>**/*Constant*.*</exclude>
                         <exclude>**/*Sample*.*</exclude>
                     </excludes>

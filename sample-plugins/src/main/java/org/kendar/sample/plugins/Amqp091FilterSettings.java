@@ -1,4 +1,4 @@
-package org.kendar.plugins;
+package org.kendar.sample.plugins;
 
 import org.kendar.settings.PluginSettings;
 

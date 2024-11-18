@@ -1,6 +1,6 @@
-package org.kendar.testcontainer.images;
+package org.kendar.tests.testcontainer.images;
 
-import org.kendar.testcontainer.utils.BaseImage;
+import org.kendar.tests.testcontainer.utils.BaseImage;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;

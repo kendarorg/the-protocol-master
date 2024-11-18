@@ -1,7 +1,11 @@
-package org.kendar.plugins;
+package org.kendar.sample.plugins;
 
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpen;
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpenOk;
+import org.kendar.plugins.AlwaysActivePlugin;
+import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;

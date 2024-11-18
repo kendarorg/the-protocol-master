@@ -9,8 +9,8 @@ import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
-import org.kendar.testcontainer.images.PostgreslImage;
-import org.kendar.testcontainer.utils.Utils;
+import org.kendar.tests.testcontainer.images.PostgreslImage;
+import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 

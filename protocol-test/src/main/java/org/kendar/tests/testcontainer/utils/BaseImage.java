@@ -1,4 +1,4 @@
-package org.kendar.testcontainer.utils;
+package org.kendar.tests.testcontainer.utils;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;

@@ -1,4 +1,4 @@
-package org.kendar.jpa;
+package org.kendar.tests.jpa;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;

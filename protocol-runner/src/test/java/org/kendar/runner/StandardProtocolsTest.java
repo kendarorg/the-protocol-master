@@ -2,7 +2,7 @@ package org.kendar.runner;
 
 import org.junit.jupiter.api.*;
 import org.kendar.Main;
-import org.kendar.jpa.HibernateSessionFactory;
+import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;

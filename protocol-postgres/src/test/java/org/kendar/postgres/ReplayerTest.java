@@ -1,12 +1,12 @@
 package org.kendar.postgres;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.postgres.jpa.CompanyJpa;
 import org.kendar.postgres.plugins.PostgresReplayPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;

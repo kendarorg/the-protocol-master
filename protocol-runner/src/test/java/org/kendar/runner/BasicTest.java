@@ -1,8 +1,8 @@
 package org.kendar.runner;
 
 import org.kendar.server.TcpServer;
-import org.kendar.testcontainer.images.PostgreslImage;
-import org.kendar.testcontainer.utils.Utils;
+import org.kendar.tests.testcontainer.images.PostgreslImage;
+import org.kendar.tests.testcontainer.utils.Utils;
 import org.testcontainers.containers.Network;
 
 import java.sql.Connection;

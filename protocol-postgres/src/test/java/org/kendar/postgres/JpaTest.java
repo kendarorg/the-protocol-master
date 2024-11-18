@@ -1,8 +1,8 @@
 package org.kendar.postgres;
 
 import org.junit.jupiter.api.*;
-import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.postgres.jpa.CompanyJpa;
+import org.kendar.tests.jpa.HibernateSessionFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

@@ -1,12 +1,12 @@
-package org.kendar.testcontainer;
+package org.kendar.tests.testcontainer;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.kendar.testcontainer.images.*;
-import org.kendar.testcontainer.utils.Utils;
+import org.kendar.tests.testcontainer.images.*;
+import org.kendar.tests.testcontainer.utils.Utils;
 import org.testcontainers.containers.Network;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;

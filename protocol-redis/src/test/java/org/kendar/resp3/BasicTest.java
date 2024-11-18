@@ -9,8 +9,8 @@ import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
-import org.kendar.testcontainer.images.RedisImage;
-import org.kendar.testcontainer.utils.Utils;
+import org.kendar.tests.testcontainer.images.RedisImage;
+import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 

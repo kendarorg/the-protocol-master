@@ -1,4 +1,4 @@
-package org.kendar.plugin;
+package org.kendar.sample.plugin;
 
 import org.pf4j.Plugin;
 import org.slf4j.Logger;

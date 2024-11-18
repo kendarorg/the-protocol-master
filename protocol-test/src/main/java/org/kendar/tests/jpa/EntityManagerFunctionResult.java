@@ -1,4 +1,4 @@
-package org.kendar.jpa;
+package org.kendar.tests.jpa;
 
 import javax.persistence.EntityManager;
 

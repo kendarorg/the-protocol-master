@@ -17,7 +17,7 @@
         <maven.jar.version>3.2.0</maven.jar.version>
         <!-- Override below properties in each plugin's pom.xml -->
         <plugin.id>sample-plugin</plugin.id>
-        <plugin.class>org.kendar.plugin.SamplePlugin</plugin.class>
+        <plugin.class>org.kendar.sample.plugin.SamplePlugin</plugin.class>
         <plugin.version>1.0.0</plugin.version>
         <plugin.provider/>
         <plugin.dependencies/>

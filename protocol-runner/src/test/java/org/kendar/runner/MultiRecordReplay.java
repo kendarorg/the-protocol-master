@@ -6,7 +6,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.junit.jupiter.api.*;
 import org.kendar.Main;
-import org.kendar.jpa.HibernateSessionFactory;
+import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.runner.utils.SimpleHttpServer;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.Sleeper;

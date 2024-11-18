@@ -1,7 +1,7 @@
-package org.kendar.testcontainer.images;
+package org.kendar.tests.testcontainer.images;
 
 import org.apache.ibatis.jdbc.ScriptRunner;
-import org.kendar.testcontainer.utils.BaseImage;
+import org.kendar.tests.testcontainer.utils.BaseImage;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 

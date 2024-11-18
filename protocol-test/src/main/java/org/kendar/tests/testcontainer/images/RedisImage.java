@@ -1,7 +1,7 @@
-package org.kendar.testcontainer.images;
+package org.kendar.tests.testcontainer.images;
 
 import com.redis.testcontainers.RedisContainer;
-import org.kendar.testcontainer.utils.BaseImage;
+import org.kendar.tests.testcontainer.utils.BaseImage;
 import org.testcontainers.utility.DockerImageName;
 
 public class RedisImage extends BaseImage<RedisImage, RedisContainer> {

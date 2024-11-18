@@ -1,40 +1,39 @@
-package org.kendar.plugins;
+package org.kendar.sample.plugins;
 
+import org.kendar.http.utils.Request;
+import org.kendar.http.utils.Response;
+import org.kendar.plugins.AlwaysActivePlugin;
+import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.sql.jdbc.SelectResult;
-import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.pf4j.Extension;
 
 import java.util.List;
 
 @Extension
-public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectResult> implements AlwaysActivePlugin {
+public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> implements AlwaysActivePlugin {
     @Override
-    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         return false;
     }
 
-    /**
-     * Only PRE_CALL and POST_CALL for things different from http
-     *
-     * @return
-     */
     @Override
     public List<ProtocolPhase> getPhases() {
-        return List.of();
+        return List.of(ProtocolPhase.PRE_CALL);
     }
 
     @Override
     public String getId() {
-        return "";
+        return "http-filter";
     }
 
     @Override
     public String getProtocol() {
-        return "postgres";
+        return "http";
     }
 
     @Override
@@ -51,7 +50,7 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
 
     @Override
     public Class<?> getSettingClass() {
-        return PostgresFilterSettings.class;
+        return HttpFilterSettings.class;
     }
 
     @Override
