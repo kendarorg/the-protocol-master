@@ -73,6 +73,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Mocked (optionally parametrized) responses (http/s,mysql,postgres) (nth, and count)
 * Internal rewrite queries and urls (http/s,mysql,postgres)
 * Record/replay activity-Gold standards-Zero infrastructure (all)
+* Handle callback mocks during replay automagically (mqtt,amqp,redis)
 * Custom transparent proxy (all)
 * Translate postgres and MySQL to any Jdbc supported db like Oracle!
 * Plugin-based architecture
