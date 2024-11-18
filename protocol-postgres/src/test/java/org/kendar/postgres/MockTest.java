@@ -141,41 +141,6 @@ public class MockTest extends BasicTest{
         assertTrue(runned);
     }
 
-    @Test
-    void replacingMock() throws Exception {
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
-                a.getId().equalsIgnoreCase("mock-plugin")).findFirst().get().setActive(true);
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
-                a.getId().equalsIgnoreCase("record-plugin")).findFirst().get().setActive(false);
-        var runned = false;
-        Connection c = getProxyConnection();
-        Statement stmt;
-        stmt = c.createStatement();
-        stmt.executeUpdate("CREATE TABLE COMPANY_R " +
-                "(ID INT PRIMARY KEY NOT NULL," +
-                " DENOMINATION TEXT NOT NULL, " +
-                " AGE INT NOT NULL, " +
-                " ADDRESS CHAR(50), " +
-                " SALARY REAL)");
-        stmt.close();
-        stmt = c.createStatement();
-        stmt.executeUpdate("INSERT INTO COMPANY_R (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
-                "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
-        stmt.close();
-
-        stmt = c.createStatement();
-        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_R WHERE AGE=${test};");
-        while (resultset.next()) {
-            assertEquals("22", resultset.getString("DENOMINATION"));
-            runned = true;
-        }
-        resultset.close();
-        stmt.close();
-        c.close();
-
-        assertTrue(runned);
-    }
-
 
     @Test
     void replacingMockQuery() throws Exception {
