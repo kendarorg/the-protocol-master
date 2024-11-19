@@ -16,7 +16,7 @@ public class OpMsgContent extends BaseMessageData {
     private List<OpMsgSection> sections = new ArrayList<>();
 
     public OpMsgContent() {
-
+        setOpCode(OpCodes.OP_MSG);
     }
 
     public OpMsgContent(int flags, int requestId, int responseId) {

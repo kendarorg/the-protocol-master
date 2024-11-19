@@ -1,6 +1,31 @@
 ## TODO
 
-* Use the interrupt to generate "preformed" events for the state chart
+### Docs
+
+* example rewrite,record,reply,(mock)
+* Change all the parameter names?
+* Explain filter
+
+### Code
+
+* Mocked specific responses for postgres, mysql,mongo, redis
+* Expose the connections for protocol
+* Send mock messages amqp,mqtt,redis
+* Set a replayId for replaying?
+* Change Supplier<Boolean> stopWhenFalseAction to a callback to register for?
+* Remove spring boot
+* Publish on maven central
+* Common
+    * Test internal apis
+* Http
+    * test brotli compression
+    * Use anonymous Object for serialization for HTTP Multipart
+    * Test the mock with @{regexp} and ${replace} parameters
+
+//Should handle somehow
+globalFilter.setShutdownVariable(stopWhenFalse);
+log.debug("Filters added");
+var handler = new MasterHandler(
 
 STATE CHARTS:
 

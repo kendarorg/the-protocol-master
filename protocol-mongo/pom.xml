@@ -4,22 +4,26 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>1.4.0</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>protocol-mongo</artifactId>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.pf4j</groupId>
+            <artifactId>pf4j</artifactId>
+            <version>${pl4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-common</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-test</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

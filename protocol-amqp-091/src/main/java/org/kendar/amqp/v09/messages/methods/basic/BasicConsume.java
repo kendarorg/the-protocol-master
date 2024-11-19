@@ -10,7 +10,6 @@ import org.kendar.amqp.v09.utils.FieldsWriter;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferUtils;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 import org.slf4j.Logger;
@@ -127,6 +126,7 @@ public class BasicConsume extends Basic {
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
         var context = (AmqpProtoContext) event.getContext();
+        var protocol = (AmqpProtocol) context.getDescriptor();
         var proxy = (AmqpProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
@@ -151,9 +151,9 @@ public class BasicConsume extends Basic {
         basicConsume.consumerTag = consumerTag;
         basicConsume.noLocal = noLocal;
         basicConsume.queue = queue;
-        basicConsume.setConsumeId(ProtoDescriptor.getCounter("CONSUME_ID"));
-
-        AmqpProtocol.consumeContext.put(basicConsume.getConsumeId(), context);
+        basicConsume.setConsumeId(context.getDescriptor().getCounter("CONSUME_ID"));
+        context.setConsumeId(basicConsume.getConsumeId());
+        protocol.getConsumeContext().put(basicConsume.getConsumeId(), context);
 
         context.setValue("BASIC_CONSUME_CH_" + channel, basicConsume);
         log.debug("CTX:{} CHAN:{} CNS_ID:{}", context.getContextId(), channel, basicConsume.getConsumeId());

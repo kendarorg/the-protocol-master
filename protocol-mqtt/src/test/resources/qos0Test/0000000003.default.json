@@ -1,0 +1,22 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 3,
+  "inputType": "Publish",
+  "input": {
+    "uuid": "14",
+    "fullFlag": 48,
+    "fixedHeader": "PUBLISH",
+    "topicName": "/subscribe/",
+    "payload": "bGxvIFdvcmxkISE=",
+    "packetIdentifier": 18533,
+    "dupFlag": false,
+    "retainFlag": false,
+    "qos": 0
+  },
+  "outputType": null,
+  "output": null,
+  "durationMs": 0,
+  "type": "Publish",
+  "caller": "MQTT"
+}

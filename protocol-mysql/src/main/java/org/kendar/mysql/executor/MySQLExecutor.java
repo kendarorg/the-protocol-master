@@ -7,7 +7,6 @@ import org.kendar.mysql.constants.StatusFlag;
 import org.kendar.mysql.messages.Error;
 import org.kendar.mysql.messages.*;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
@@ -16,8 +15,6 @@ import org.kendar.sql.jdbc.BindingParameter;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.ProxyMetadata;
 import org.kendar.sql.jdbc.SelectResult;
-import org.kendar.sql.jdbc.storage.JdbcRequest;
-import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.sql.parser.SqlParseResult;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
@@ -143,7 +140,6 @@ public class MySQLExecutor {
         }
     }
 
-    @SuppressWarnings("DuplicateCondition")
     private Iterator<ProtoStep> handleSingleQuery(SqlParseResult parsed, MySQLProtoContext
             protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
         var pvup = parsed.getValue().toUpperCase();
@@ -301,14 +297,9 @@ public class MySQLExecutor {
                 var isByte = JdbcProxy.isByteOut(parameterMetaData.getParameterClassName(i + 1));
                 fields.add(new ProxyMetadata(
                         "?",
-                        "",
                         isByte,
-                        "def",
-                        "",
-                        "",
-                        parameterMetaData.getScale(i + 1),
                         parameterMetaData.getParameterType(i + 1),
-                        parameterMetaData.getPrecision(i + 1)));
+                        parameterMetaData.getScale(i + 1)));
             }
 
 
@@ -316,19 +307,16 @@ public class MySQLExecutor {
             if (resultSetMetaData != null) {
                 for (var i = 0; i < resultSetMetaData.getColumnCount(); i++) {
                     var isByte = JdbcProxy.isByteOut(resultSetMetaData.getColumnClassName(i + 1));
+                    var name = (resultSetMetaData.getColumnLabel(i + 1) == null || resultSetMetaData.getColumnLabel(i + 1).isEmpty()) ?
+                            resultSetMetaData.getColumnName(i + 1) : resultSetMetaData.getColumnLabel(i + 1);
                     fields.add(new ProxyMetadata(
-                            resultSetMetaData.getColumnName(i + 1),
-                            resultSetMetaData.getColumnLabel(i + 1),
+                            name,
                             isByte,
-                            resultSetMetaData.getCatalogName(i + 1),
-                            resultSetMetaData.getSchemaName(i + 1),
-                            resultSetMetaData.getTableName(i + 1),
-                            resultSetMetaData.getColumnDisplaySize(i + 1),
                             resultSetMetaData.getColumnType(i + 1),
                             resultSetMetaData.getPrecision(i + 1)));
                 }
             }
-            int currentStatementId = ProtoDescriptor.getCounter("STATEMENT_ID");
+            int currentStatementId = protoContext.getDescriptor().getCounter("STATEMENT_ID");
             var packetNumber = 0;
             result.add(new ComStmtPrepareOk(fields, currentStatementId)
                     .withPacketNumber(++packetNumber));
@@ -364,19 +352,20 @@ public class MySQLExecutor {
                     withPacketNumber(++packetNumber));
             long end = System.currentTimeMillis();
 
-            var storage = protoContext.getProxy().getStorage();
+            //KENDARMYSQLPREPARESTATEMENT
+            //var storage = protoContext.getProxy().getStorage();
 
 
-            var selRes = new SelectResult();
+            //var selRes = new SelectResult();
             protoContext.setValue("STATEMENT_" + currentStatementId, query);
             protoContext.setValue("STATEMENT_FIELDS_" + currentStatementId, fields);
             //protoContext.setValue("STATEMENT_PS_"+currentStatementId,ps);
-            selRes.setLastInsertedId(currentStatementId);
-            selRes.getMetadata().addAll(fields);
-            storage.write(protoContext.getContextId(),
-                    new JdbcRequest(query, new ArrayList<>()),
-                    new JdbcResponse(selRes),
-                    end - start, "PREPARE", "JDBC");
+//            selRes.setLastInsertedId(currentStatementId);
+//            selRes.getMetadata().addAll(fields);
+//            storage.write(protoContext.getContextId(),
+//                    new JdbcRequest(query, new ArrayList<>()),
+//                    new JdbcResponse(selRes),
+//                    end - start, "PREPARE", "JDBC");
 
             ps.close();
 

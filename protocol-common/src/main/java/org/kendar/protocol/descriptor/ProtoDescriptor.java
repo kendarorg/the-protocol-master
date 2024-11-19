@@ -5,8 +5,11 @@ import org.kendar.protocol.states.InterruptProtoState;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.special.SpecialProtoState;
 import org.kendar.protocol.states.special.Tagged;
+import org.kendar.proxy.ProxyConnection;
+import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,32 +22,46 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Simple protocol descriptor
  */
 public abstract class ProtoDescriptor {
-
-
-    private static final ConcurrentHashMap<String, AtomicInteger> counters = new ConcurrentHashMap<>();
-    private static final Logger log = LoggerFactory.getLogger(ProtoDescriptor.class);
     /**
      * A map of [tag keys][states] one for each "tag" branch
      */
     protected final Map<String, ProtoState> taggedStates = new HashMap<>();
+    private final AtomicInteger timeout = new AtomicInteger(30);
+    private final ConcurrentHashMap<String, AtomicInteger> counters = new ConcurrentHashMap<>();
+    private final Logger log = LoggerFactory.getLogger(ProtoDescriptor.class);
     /**
      * Interrupt states, these are evaluated always, BEFORE the standard events
      */
     private final List<ProtoState> interrupts = new ArrayList<>();
+    private ConcurrentHashMap<Integer, ProtoContext> contextsCache;
+    private Thread contextCleaner;
+    private volatile boolean runClean = false;
 
-    public static int getCounter(String id) {
+    public static long getNow() {
+        return System.currentTimeMillis() / 1000;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout.set(timeout);
+    }
+
+    public ConcurrentHashMap<Integer, ProtoContext> getContextsCache() {
+        return contextsCache;
+    }
+
+    public int getCounter(String id) {
         id = id.toUpperCase();
         return counters.computeIfAbsent(id, (key) ->
                 new AtomicInteger(0)).incrementAndGet();
     }
 
-    public static String getCounterString(String id) {
+    public String getCounterString(String id) {
         id = id.toUpperCase();
         return "" + counters.computeIfAbsent(id, (key) ->
                 new AtomicInteger(0)).incrementAndGet();
     }
 
-    public static void cleanCounters() {
+    public void cleanCounters() {
         counters.clear();
     }
 
@@ -62,20 +79,55 @@ public abstract class ProtoDescriptor {
      * @param start
      */
     protected void initialize(ProtoState start) {
-        ProtoContext.initializeStatic();
-        buildProtocolDescription(start);
+        start.setProtoDescriptor(this);
+        initializeStatic(this);
         initializeTag("", start);
         initializeInternal(start, "");
     }
 
-    /**
-     * Build a graphviz file for the protocol description
-     *
-     * @param start
-     */
-    private void buildProtocolDescription(ProtoState start) {
-        log.warn("[TPM  ][IN] Not implemented ProtoDescriptor::buildProtocolDescription");
+    private void contextsClean() {
+
+        while (runClean) {
+            Sleeper.sleep(1000);
+            var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
+            for (var item : fixedItemsList) {
+                var now = getNow();
+                if (item.getValue().getLastAccess() < (now - timeout.get())) {
+                    var context = item.getValue();
+                    var contextConnection = context.getValue("CONNECTION");
+                    if (contextConnection == null) {
+                        contextsCache.remove(item.getKey());
+                    }
+
+                    try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.getContextId() + "")) {
+                        try {
+                            context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                            log.debug("[DISCONNECT]");
+                        } catch (Exception ex) {
+                            log.trace("[DISCONNECT] Error", ex);
+                        }
+                    }
+                    contextsCache.remove(item.getKey());
+                } else {
+                    log.trace("[KEEPALIVE]");
+                }
+            }
+        }
     }
+
+    protected void initializeStatic(ProtoDescriptor protoDescriptor) {
+        runClean = false;
+        if (contextCleaner != null) {
+            if (contextCleaner.isAlive()) {
+                Sleeper.sleep(2000);
+            }
+        }
+        runClean = true;
+        contextsCache = new ConcurrentHashMap<>();
+        contextCleaner = new Thread(this::contextsClean);
+        contextCleaner.start();
+    }
+
 
     /**
      * Split the protocol in all the sub tags
@@ -84,6 +136,7 @@ public abstract class ProtoDescriptor {
      * @param parentTags
      */
     protected void initializeInternal(ProtoState start, String parentTags) {
+        start.setProtoDescriptor(this);
         if (start instanceof SpecialProtoState) {
             var spp = (SpecialProtoState) start;
             List<ProtoState> children = spp.getChildren();
@@ -113,6 +166,7 @@ public abstract class ProtoDescriptor {
      * @param start
      */
     protected void initializeTag(String tag, ProtoState start) {
+        start.setProtoDescriptor(this);
         if (this.taggedStates.containsKey(tag)) throw new RuntimeException("Duplicate Tag");
         this.taggedStates.put(tag, start);
     }
@@ -133,7 +187,7 @@ public abstract class ProtoDescriptor {
     }
 
     public ProtoContext buildContext() {
-        return buildContext(ProtoDescriptor.getCounter("CONTEXT_ID"));
+        return buildContext(getCounter("CONTEXT_ID"));
     }
 
     /**
@@ -145,7 +199,7 @@ public abstract class ProtoDescriptor {
     protected abstract ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId);
 
     protected ProtoContext createContext(ProtoDescriptor protoContext) {
-        return createContext(protoContext, ProtoDescriptor.getCounter("CONTEXT_ID"));
+        return createContext(protoContext, protoContext.getCounter("CONTEXT_ID"));
     }
 
     /**
@@ -166,6 +220,7 @@ public abstract class ProtoDescriptor {
         if (!(state instanceof InterruptProtoState)) {
             throw new RuntimeException(state.getClass().getSimpleName() + " is not an InterruptProtoState");
         }
+        state.setProtoDescriptor(this);
         interrupts.add(state);
     }
 
@@ -177,5 +232,13 @@ public abstract class ProtoDescriptor {
      */
     public Map<String, ProtoState> getTaggedStates() {
         return taggedStates;
+    }
+
+    public void terminate() {
+
+    }
+
+    public void start() {
+
     }
 }

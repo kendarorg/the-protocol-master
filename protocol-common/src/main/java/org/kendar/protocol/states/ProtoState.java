@@ -21,17 +21,15 @@ import java.util.stream.Collectors;
  * Basic state
  */
 public abstract class ProtoState {
-
     /**
      * List of handled messages types
      */
     private final Set<Class<?>> messages;
-
+    private ProtoDescriptor descriptor;
     /**
      * The id of the state (unique for each protocol instance)
      */
     private String uuid;
-
     /**
      * If the state is optional it can fail without error
      */
@@ -39,7 +37,7 @@ public abstract class ProtoState {
     private boolean optional;
 
     public ProtoState(Class<?>... messages) {
-        this.uuid = ProtoDescriptor.getCounterString("PROTO_STATE_COUNTER");
+
 
         this.messages = new HashSet<>(Arrays.asList(messages));
         Class<?> current;
@@ -128,6 +126,11 @@ public abstract class ProtoState {
      */
     public static Iterator<ProtoStep> iteratorOfList(ReturnMessage... msg) {
         return Arrays.stream(msg).map(a -> (ProtoStep) () -> a).collect(Collectors.toList()).iterator();
+    }
+
+    public void setProtoDescriptor(ProtoDescriptor descriptor) {
+        this.descriptor = descriptor;
+        this.uuid = descriptor.getCounterString("PROTO_STATE_COUNTER");
     }
 
     public ProtoState asOptional() {

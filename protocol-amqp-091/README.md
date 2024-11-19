@@ -1,5 +1,37 @@
 # AMQP 0.9.1 Protocol
 
+Create a two way transparent proxy to a remote amqp 0.9.1 compatible server.
+
+## Configuration
+
+* protocol: amqp091 (this is mandatory)
+* port: the port on which the proxy will listen
+* login: the -real- login to use to connect to the real server
+* password: the -real- password to use to connect to the real server
+* connectionString: the connection string for the real server (e.g. amqp://localhost:5372 )
+* timeoutSeconds: the timeout to drop the connections
+
+## Plugins
+
+### record-plugin
+
+The data will be stored in the global dataDir.
+
+All callback are recorded
+
+* active: If it is active
+* ignoreTrivialCalls: store in full only calls that cannot be generated automatically (the ones with real data)
+
+### replay-plugin
+
+The data will be loaded from the global dataDir. This is used to replay a whole flow
+without the need to mock a single request
+
+All callback are replayed automatically
+
+* active: If it is active
+* respectCallDuration: respect the duration of the round trip
+
 ## Documentation used
 
 * https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf (page 31)
@@ -16,6 +48,5 @@
 
 ## Weirdness
 
-amqp0-9-1.pdf, section 4.2.3
-The size is an INTEGER not a long
-Actually transactions are not supported
+* amqp0-9-1.pdf, section 4.2.3, The size is an INTEGER not a long
+* Actually transactions are not supported

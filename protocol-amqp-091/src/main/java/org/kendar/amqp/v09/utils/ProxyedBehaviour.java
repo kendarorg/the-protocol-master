@@ -4,6 +4,7 @@ import org.kendar.amqp.v09.messages.frames.Frame;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.NetworkProxy;
+import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
@@ -22,16 +23,7 @@ public class ProxyedBehaviour {
         if (input.isProxyed()) {
             var basicConsume = (ConsumeConnected) context.getValue("BASIC_CONSUME_CH_" + channel);
             ((ConsumeConnected) toSend).setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(toSend) + "}";
-
-
-            storage.write(
-                    context.getContextId(),
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
+            proxy.respond(toSend, new PluginContext("AMQP", "RESPONSE", -1, context));
             return Frame.iteratorOfList(toSend);
         }
         return iteratorOfRunnable(() -> proxy.sendAndForget(context, connection, toSend));

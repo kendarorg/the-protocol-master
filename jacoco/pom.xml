@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>1.4.0</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>jacoco</artifactId>
@@ -13,27 +13,32 @@
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mongo</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-postgres</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-amqp-091</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mysql</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-redis</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-http</artifactId>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 

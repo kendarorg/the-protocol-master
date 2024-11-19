@@ -13,11 +13,14 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.kendar.mongo.plugins.MongoReplayingPlugin;
 import org.kendar.server.TcpServer;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,11 +44,17 @@ public class ReplayerTest {
     @Test
     void testConnectionWithProtocolWithServerApis() {
         var baseProtocol = new MongoProtocol(FAKE_PORT);
-        var proxy = new MongoProxy(new MongoFileStorage(
-                Path.of("src",
-                        "test", "resources", "replay")));
+        var proxy = new MongoProxy();
 
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "replay"));
+        storage.initialize();
+        var pl = new MongoReplayingPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
         baseProtocol.setProxy(proxy);
+
+
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);
 

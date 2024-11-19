@@ -1,0 +1,17 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 5,
+  "inputType": "Disconnect",
+  "input": {
+    "uuid": "17",
+    "fullFlag": -32,
+    "fixedHeader": "DISCONNECT",
+    "reasonCode": 0
+  },
+  "outputType": null,
+  "output": null,
+  "durationMs": 0,
+  "type": "Disconnect",
+  "caller": "MQTT"
+}

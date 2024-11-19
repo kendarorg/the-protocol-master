@@ -1,13 +1,16 @@
 package org.kendar.mysql;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
+import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
+import org.kendar.storage.FileStorageRepository;
+import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,8 +22,14 @@ public class ReplayerTest {
     @Test
     void simpleJpaTest() throws Exception {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy(new MySqlFileStorage(Path.of("src",
-                "test", "resources", "replay")));
+        var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver");
+
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "replay"));
+        storage.initialize();
+        var pl = new MySqlReplayPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);

@@ -1,0 +1,94 @@
+{
+  "constant": false,
+  "connectionId": 0,
+  "index": 12,
+  "count": 99999,
+  "inputType": "Request",
+  "input": {
+    "id": 1,
+    "ms": 1731682775808,
+    "method": "GET",
+    "headers": {
+      "Accept-encoding": [
+        "gzip,deflate"
+      ],
+      "Proxy-connection": [
+        "Keep-Alive"
+      ],
+      "Host": [
+        "localhost:8456"
+      ],
+      "User-agent": [
+        "Apache-HttpClient/4.5.13 (Java/11.0.21)"
+      ],
+      "Proxy-agent": [
+        "Simple/0.1"
+      ],
+      "Test-Header": [
+        "${testHeader}"
+      ]
+    },
+    "protocol": "http",
+    "soapRequest": false,
+    "multipartData": [],
+    "staticRequest": false,
+    "host": "localhost",
+    "path": "/jsonized/${testPath}",
+    "postParameters": {},
+    "port": 8456,
+    "query": {
+      "both": "true",
+      "testQuery": "${testQuery}"
+    },
+    "remoteHost": "127.0.0.1",
+    "pathParameters": {}
+  },
+  "outputType": "Response",
+  "output": {
+    "responseText": "${testPath} ${testQuery} ${testHeader}",
+    "headers": {
+      "X-Frame-Options": [
+        "SAMEORIGIN"
+      ],
+      "Cache-Control": [
+        "private, max-age=0"
+      ],
+      "Server": [
+        "gws"
+      ],
+      "Alt-Svc": [
+        "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+      ],
+      "Set-Cookie": [
+        "AEC=AZ6Zc-Xz5cPWLro9mk59hF94WpaWzkcLbwuxbLjZzmURRSryPDsRL1H5QDE; expires=Wed, 14-May-2025 15:00:36 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax",
+        "__Secure-ENID=23.SE=Q64HrjmPh2ZMPBRkseDWy078Q0o_Mbpw5ypMtuU_ap0d5wKnaW1egrL_l28GPNefhxYg8W387jel2D9Uqjs9E5qL5AwlBJFaP-l7DTG1ijOin0KYIv7yV-SmZHtPFlT9FB1RJmzob-sSIEhnBv3C9wN3tfG2rvK7tvXGP_odmyT4G61pbHETL1La3bE09qb9RSKl10YfBX-DvsxEIZ8JbQxPrqqMlOM22Z41GgjyG_SC; expires=Tue, 16-Dec-2025 07:18:54 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax"
+      ],
+      "Expires": [
+        "-1"
+      ],
+      "Accept-CH": [
+        "Sec-CH-Prefers-Color-Scheme"
+      ],
+      "P3P": [
+        "CP=\"This is not a P3P policy! See g.co/p3phelp for more info.\""
+      ],
+      "X-XSS-Protection": [
+        "0"
+      ],
+      "Rewritten-Header": [
+        "${testPath}"
+      ],
+      "Date": [
+        "Fri, 15 Nov 2024 15:00:36 GMT"
+      ],
+      "Content-Type": [
+        "text/html; charset=ISO-8859-1"
+      ]
+    },
+    "statusCode": 200,
+    "messages": []
+  },
+  "durationMs": 120,
+  "type": "GET",
+  "caller": "HTTP"
+}

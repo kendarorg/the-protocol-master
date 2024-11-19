@@ -2,7 +2,6 @@ package org.kendar.proto.taggedfsm;
 
 import org.junit.jupiter.api.Test;
 import org.kendar.protocol.context.Tag;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateWhile;
@@ -44,7 +43,7 @@ public class TaggedFsmTest {
     void levelZeroTest() {
         var protocol = getProtocol();
         protocol.initializeProtocol();
-        var context = (TaggedContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
+        var context = (TaggedContext) protocol.createContext(protocol, protocol.getCounter("CONTEXT_ID"));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "A")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "C")));
@@ -56,7 +55,7 @@ public class TaggedFsmTest {
     void levelOneTest() {
         var protocol = getProtocol();
         protocol.initializeProtocol();
-        var context = (TaggedContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
+        var context = (TaggedContext) protocol.createContext(protocol, protocol.getCounter("CONTEXT_ID"));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "A")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B")));
 
@@ -71,7 +70,7 @@ public class TaggedFsmTest {
     void levelOneTestWithNoChildLevel() {
         var protocol = getProtocol();
         protocol.initializeProtocol();
-        var context = (TaggedContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
+        var context = (TaggedContext) protocol.createContext(protocol, protocol.getCounter("CONTEXT_ID"));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "A")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B")));
 
@@ -85,7 +84,7 @@ public class TaggedFsmTest {
     void levelOneTestPrematureEnd() {
         var protocol = getProtocol();
         protocol.initializeProtocol();
-        var context = (TaggedContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
+        var context = (TaggedContext) protocol.createContext(protocol, protocol.getCounter("CONTEXT_ID"));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "A")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B")));
 
@@ -100,7 +99,7 @@ public class TaggedFsmTest {
     void levelTwoTest() {
         var protocol = getProtocol();
         protocol.initializeProtocol();
-        var context = (TaggedContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
+        var context = (TaggedContext) protocol.createContext(protocol, protocol.getCounter("CONTEXT_ID"));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "A")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B")));
 
@@ -121,7 +120,7 @@ public class TaggedFsmTest {
     void levelTwoTestPremature() {
         var protocol = getProtocol();
         protocol.initializeProtocol();
-        var context = (TaggedContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
+        var context = (TaggedContext) protocol.createContext(protocol, protocol.getCounter("CONTEXT_ID"));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "A")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B")));
 
@@ -146,7 +145,7 @@ public class TaggedFsmTest {
     void levelTwoTestNotMatching() {
         var protocol = getProtocol();
         protocol.initializeProtocol();
-        var context = (TaggedContext) protocol.createContext(protocol, ProtoDescriptor.getCounter("CONTEXT_ID"));
+        var context = (TaggedContext) protocol.createContext(protocol, protocol.getCounter("CONTEXT_ID"));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "A")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B")));
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>1.4.0</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>protocol-runner</artifactId>
@@ -19,34 +19,44 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.pf4j</groupId>
+            <artifactId>pf4j</artifactId>
+            <version>${pl4j.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mongo</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-http</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-postgres</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-amqp-091</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mysql</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-redis</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mqtt</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -56,13 +66,31 @@
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-test</artifactId>
-            <version>${project.version}</version>
+            <version>${revision}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
             <version>${jaxb.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.moquette</groupId>
+            <artifactId>moquette-broker</artifactId>
+            <version>0.15</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <version>1.2.4</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -80,7 +108,7 @@
                         <configuration>
                             <finalName>protocol-runner</finalName>
                             <mainClass>
-                                org.kendar.Main
+                                org.kendar.OldMain
                             </mainClass>
                         </configuration>
                     </execution>

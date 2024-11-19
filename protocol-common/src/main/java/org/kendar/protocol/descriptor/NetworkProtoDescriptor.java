@@ -12,16 +12,18 @@ import org.slf4j.MDC;
  * Descriptor for network protocol
  */
 public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
-
     /**
      * Proxy instance
      */
-    private Proxy<?> proxyInstance;
-
+    private Proxy proxyInstance;
     /**
      * Whether should use the proxy
      */
     private boolean proxy;
+
+    public boolean isWrapper() {
+        return false;
+    }
 
     /**
      * Initialize all (and the proxy)
@@ -30,6 +32,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
     public void initialize() {
         try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
             if (hasProxy()) {
+                proxyInstance.setProtocol(this);
                 proxyInstance.initialize();
             }
             super.initialize();
@@ -116,5 +119,9 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
      */
     public BBuffer buildBuffer() {
         return new BBuffer(isBe() ? BBufferEndianness.BE : BBufferEndianness.LE);
+    }
+
+    public boolean isWrapperRunning() {
+        throw new RuntimeException("Not implemented");
     }
 }

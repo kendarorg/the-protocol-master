@@ -1,14 +1,14 @@
 package org.kendar.sql.jdbc;
 
 import org.kendar.iterators.QueryResultIterator;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.sql.jdbc.storage.JdbcStorage;
-import org.kendar.sql.jdbc.storage.NullJdbcStorage;
+import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.parser.SqlStringParser;
-import org.kendar.utils.QueryReplacerItem;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -18,32 +18,28 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class JdbcProxy extends Proxy<JdbcStorage> {
+public class JdbcProxy extends Proxy {
     private final String driver;
     private final String connectionString;
     private final String forcedSchema;
     private final String login;
     private final String password;
-    private ArrayList<QueryReplacerItem> queryReplacements = new ArrayList<>();
 
-    public JdbcProxy(JdbcStorage jdbcStorage) {
-        this(null, null, null, null, null);
-        setStorage(jdbcStorage);
-        this.replayer = true;
+    public JdbcProxy(String driver) {
+        this(driver, null, null, null, null);
+
 
     }
 
     public JdbcProxy(String driver, String connectionString, String forcedSchema, String login, String password) {
-
+        super();
         this.driver = driver;
         this.connectionString = connectionString;
         this.forcedSchema = forcedSchema;
         this.login = login;
         this.password = password;
-        setStorage(new NullJdbcStorage());
 
     }
 
@@ -271,39 +267,27 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
                                      List<BindingParameter> parameterValues,
                                      SqlStringParser parser,
                                      ArrayList<JDBCType> concreteTypes, ProtoContext context) {
-        if (!queryReplacements.isEmpty()) {
-            query = query.replaceAll("\r\n", "\n").trim();
-            for (int i = 0; i < queryReplacements.size(); i++) {
-                var replace = queryReplacements.get(i);
-                var find = replace.getToFind().replaceAll("\r\n", "\n").trim();
-                var repl = replace.getToReplace().replaceAll("\r\n", "\n").trim();
 
-                if (replace.isRegex()) {
-                    query = Pattern.compile(find, Pattern.DOTALL | Pattern.CASE_INSENSITIVE).matcher(query).replaceFirst(repl);
-                } else {
-                    if (find.equalsIgnoreCase(query)) {
-                        query = repl;
-                    }
+        try {
+            var result = new SelectResult();
+            long start = System.currentTimeMillis();
+            var pluginContext = new PluginContext("JDBC", "QUERY", start, context);
+            var jdbcCall = new JdbcCall(query, parameterValues);
+            for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
+                if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, jdbcCall, result)) {
+                    return result;
                 }
             }
-        }
-        if (replayer) {
-            var storageItem = storage.read(query, parameterValues, "QUERY");
-            return storageItem.getOutput().getSelectResult();
-        }
-        try {
-            long start = System.currentTimeMillis();
-            var result = new SelectResult();
 
             PreparedStatement statement;
-            ResultSet resultSet;
 
             var c = ((Connection) ((ProxyConnection) connection).getConnection());
             if (parameterValues.isEmpty()) {
-                statement = c.prepareStatement(query, insert ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
+                //noinspection SqlSourceToSinkFlow
+                statement = c.prepareStatement(jdbcCall.getQuery(), insert ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
             } else {
                 ParametrizedStatement parametrizedStatementBuilder = buildParametrizedStatement(
-                        query, parameterValues, parser, c,
+                        jdbcCall.getQuery(), parameterValues, parser, c,
                         concreteTypes, insert);
                 statement = parametrizedStatementBuilder.ps;
             }
@@ -315,9 +299,11 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             } else {
                 runThroughSingleResult(insert, parameterValues, statement, result, count);
             }
-
-            long end = System.currentTimeMillis();
-            storage.write(connectionId, query, result, parameterValues, end - start, "QUERY");
+            for (var plugin : getPlugins(ProtocolPhase.POST_CALL, jdbcCall, result)) {
+                if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, jdbcCall, result)) {
+                    break;
+                }
+            }
             return result;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -385,15 +371,11 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             for (var i = 0; i < resultSetMetaData.getColumnCount(); i++) {
 
                 var isByte = isByteOut(resultSetMetaData.getColumnClassName(i + 1));
-
+                var name = (resultSetMetaData.getColumnLabel(i + 1) == null || resultSetMetaData.getColumnLabel(i + 1).isEmpty()) ?
+                        resultSetMetaData.getColumnName(i + 1) : resultSetMetaData.getColumnLabel(i + 1);
                 fields.add(new ProxyMetadata(
-                        resultSetMetaData.getColumnName(i + 1),
-                        resultSetMetaData.getColumnLabel(i + 1),
+                        name,
                         isByte,
-                        resultSetMetaData.getCatalogName(i + 1),
-                        resultSetMetaData.getSchemaName(i + 1),
-                        resultSetMetaData.getTableName(i + 1),
-                        resultSetMetaData.getColumnDisplaySize(i + 1),
                         resultSetMetaData.getColumnType(i + 1),
                         resultSetMetaData.getPrecision(i + 1)));
             }
@@ -405,9 +387,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
 
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
-        if (replayer) {
-            return new ProxyConnection(null);
-        }
+
         try {
             var connection = DriverManager.
                     getConnection(getConnectionString(), getLogin(), getPassword());
@@ -416,7 +396,7 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
             }
             return new ProxyConnection(connection);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return new ProxyConnection(null);
         }
     }
 
@@ -469,9 +449,5 @@ public class JdbcProxy extends Proxy<JdbcStorage> {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void setQueryReplacement(ArrayList<QueryReplacerItem> items) {
-        queryReplacements = items;
     }
 }

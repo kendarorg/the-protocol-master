@@ -4,13 +4,15 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.kendar.postgres.plugins.PostgresRewritePlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.utils.QueryReplacerItem;
+import org.kendar.utils.ReplacerItem;
 import org.kendar.utils.Sleeper;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,13 +58,17 @@ public class QueryTranslationTest extends BasicTest {
                 postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
 
-        var replaceList = new ArrayList<QueryReplacerItem>();
-        var replaceItem = new QueryReplacerItem();
+        var replaceList = new ArrayList<ReplacerItem>();
+        var replaceItem = new ReplacerItem();
         replaceItem.setToFind(find);
         replaceItem.setRegex(regex);
         replaceItem.setToReplace(replace);
         replaceList.add(replaceItem);
-        proxy.setQueryReplacement(replaceList);
+
+        var filter = new PostgresRewritePlugin();
+        filter.setReplacers(replaceList);
+        filter.setActive(true);
+        proxy.setPlugins(List.of(filter));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

@@ -1,20 +1,29 @@
 package org.kendar.storage;
 
+import org.kendar.utils.JsonMapper;
+
 /**
  * Storage item
  *
  * @param <I>
  * @param <O>
  */
-public class StorageItem<I, O> {
+public class StorageItem {
+    private static final JsonMapper mapper = new JsonMapper();
     private boolean constant;
     private int connectionId;
     private long index = -1;
-    private I input;
-    private O output;
+    private Object input;
+    private Object output;
     private long durationMs;
     private String type;
     private String caller;
+    private Object deserializedInput;
+    private Object deserializedOutput;
+    private Object outAs;
+    private Object inAs;
+    private String inputType;
+    private String outputType;
 
     /**
      * Needed for serialization
@@ -23,16 +32,20 @@ public class StorageItem<I, O> {
 
     }
 
-    public StorageItem(int connectionId, I input, O output, long durationMs, String type, String caller) {
+    public StorageItem(int connectionId, Object input, Object output, long durationMs, String type, String caller,
+                       String inputType, String outputType) {
         this.connectionId = connectionId;
         this.input = input;
         this.output = output;
         this.durationMs = durationMs;
         this.type = type;
         this.caller = caller;
+        this.inputType = inputType;
+        this.outputType = outputType;
     }
 
-    public StorageItem(long index, int connectionId, I input, O output, long durationMs, String type, String caller) {
+    public StorageItem(long index, int connectionId, Object input, Object output, long durationMs, String type, String caller,
+                       String inputType, String outputType) {
         this.index = index;
         this.connectionId = connectionId;
         this.input = input;
@@ -40,7 +53,48 @@ public class StorageItem<I, O> {
         this.durationMs = durationMs;
         this.type = type;
         this.caller = caller;
+        this.inputType = inputType;
+        this.outputType = outputType;
     }
+
+    public String getInputType() {
+        return inputType;
+    }
+
+    public void setInputType(String inputType) {
+        this.inputType = inputType;
+    }
+
+    public String getOutputType() {
+        return outputType;
+    }
+
+    public void setOutputType(String outputType) {
+        this.outputType = outputType;
+    }
+
+    public <T> T retrieveInAs(Class<T> clazz) {
+        if (inAs == null && input != null) {
+            if (clazz == input.getClass()) {
+                inAs = input;
+            } else {
+                inAs = mapper.deserialize(input, clazz);
+            }
+        }
+        return (T) inAs;
+    }
+
+    public <T> T retrieveOutAs(Class<T> clazz) {
+        if (outAs == null && output != null) {
+            if (clazz == output.getClass()) {
+                outAs = output;
+            } else {
+                outAs = mapper.deserialize(output, clazz);
+            }
+        }
+        return (T) outAs;
+    }
+
 
     public boolean isConstant() {
         return constant;
@@ -66,20 +120,22 @@ public class StorageItem<I, O> {
         this.index = index;
     }
 
-    public I getInput() {
+    public Object getInput() {
         return input;
     }
 
-    public void setInput(I input) {
-        this.input = input;
+    public void setInput(Object input) {
+        this.input = mapper.toJsonNode(input);
+        inAs = null;
     }
 
-    public O getOutput() {
+    public Object getOutput() {
         return output;
     }
 
-    public void setOutput(O output) {
-        this.output = output;
+    public void setOutput(Object output) {
+        this.output = mapper.toJsonNode(output);
+        outAs = null;
     }
 
     public long getDurationMs() {

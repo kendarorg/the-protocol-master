@@ -1,10 +1,16 @@
 package org.kendar.mysql;
 
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.mysql.plugins.MySqlMockPlugin;
+import org.kendar.mysql.plugins.MySqlRecordPlugin;
+import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.testcontainer.images.MysqlImage;
-import org.kendar.testcontainer.utils.Utils;
+import org.kendar.storage.FileStorageRepository;
+import org.kendar.storage.NullStorageRepository;
+import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tests.testcontainer.images.MysqlImage;
+import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
@@ -12,6 +18,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -20,6 +27,7 @@ public class BasicTest {
     protected static final int FAKE_PORT = 3310;
     protected static MysqlImage mysqlContainer;
     protected static TcpServer protocolServer;
+    protected static MySQLProtocol baseProtocol;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -35,21 +43,33 @@ public class BasicTest {
 
 
     public static void beforeEachBase(TestInfo testInfo) {
-        var baseProtocol = new MySQLProtocol(FAKE_PORT);
+        baseProtocol = new MySQLProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl(), null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
+        StorageRepository storage = new NullStorageRepository();
         if (testInfo != null && testInfo.getTestClass().isPresent() &&
                 testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new MySqlFileStorage(Path.of("target", "tests", className, method, dsp)));
+                storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
             } else {
-                proxy.setStorage(new MySqlFileStorage(Path.of("target", "tests", className, method)));
+                storage = new FileStorageRepository(Path.of("target", "tests", className, method));
             }
         }
+        storage.initialize();
+        var pl = new MySqlRecordPlugin();
+
+        var pl1 = new MySqlMockPlugin();
+        var mockPluginSettings = new BasicMockPluginSettings();
+        mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
+        pl1.setSettings(mockPluginSettings);
+        proxy.setPlugins(List.of(pl, pl1));
+
+
+        pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
@@ -65,17 +85,29 @@ public class BasicTest {
                         "?generateSimpleParameterMetadata=true" +
                         "&useServerPrepStmts=true", null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
+        StorageRepository storage = new NullStorageRepository();
         if (testInfo != null && testInfo.getTestClass().isPresent() &&
                 testInfo.getTestMethod().isPresent()) {
             var className = testInfo.getTestClass().get().getSimpleName();
             var method = testInfo.getTestMethod().get().getName();
+
+
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                proxy.setStorage(new MySqlFileStorage(Path.of("target", "tests", className, method, dsp)));
+                storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
             } else {
-                proxy.setStorage(new MySqlFileStorage(Path.of("target", "tests", className, method)));
+                storage = new FileStorageRepository(Path.of("target", "tests", className, method));
             }
         }
+        storage.initialize();
+        var pl = new MySqlRecordPlugin();
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
+        var pl1 = new MySqlMockPlugin();
+        var mockPluginSettings = new BasicMockPluginSettings();
+        mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
+        pl1.setSettings(mockPluginSettings);
+        proxy.setPlugins(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

@@ -16,7 +16,7 @@ public class OpReplyContent extends BaseMessageData {
     private int cursorId;
 
     public OpReplyContent() {
-
+        setOpCode(OpCodes.OP_REPLY);
     }
 
     public OpReplyContent(int flags, int requestId, int responseId) {

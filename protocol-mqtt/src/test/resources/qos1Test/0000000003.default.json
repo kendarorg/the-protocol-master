@@ -1,0 +1,28 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 3,
+  "input": {
+    "uuid": "14",
+    "fullFlag": 50,
+    "fixedHeader": "PUBLISH",
+    "topicName": "/subscribe/",
+    "payload": "SGVsbG8gV29ybGQhIQ==",
+    "packetIdentifier": 2,
+    "dupFlag": false,
+    "retainFlag": false,
+    "qos": 1
+  },
+  "output": {
+    "uuid": "18",
+    "fullFlag": 64,
+    "fixedHeader": "PUBACK",
+    "packetIdentifier": 2,
+    "reasonCode": 0
+  },
+  "durationMs": 668,
+  "type": "Publish",
+  "caller": "MQTT",
+  "inputType": "Publish",
+  "outputType": "PublishAck"
+}

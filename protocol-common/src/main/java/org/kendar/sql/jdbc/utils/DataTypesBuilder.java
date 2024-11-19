@@ -61,6 +61,7 @@ public class DataTypesBuilder {
         return allDtd;
     }
 
+    @SuppressWarnings("rawtypes")
     private String getClName(DataTypeDescriptor dt) {
         Class clazz;
         var type = dt.getDataType();

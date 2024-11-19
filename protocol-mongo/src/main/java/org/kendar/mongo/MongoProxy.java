@@ -1,6 +1,5 @@
 package org.kendar.mongo;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerApiVersion;
@@ -19,14 +18,14 @@ import org.kendar.mongo.dtos.OpMsgSection;
 import org.kendar.mongo.dtos.OpQueryContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
-import org.kendar.mongo.utils.MongoStorage;
-import org.kendar.mongo.utils.NullMongoStorage;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
-public class MongoProxy extends Proxy<MongoStorage> {
+public class MongoProxy extends Proxy {
     private static final JsonMapper mapper = new JsonMapper();
     private String connectionString;
     private ServerApiVersion serverApiVersion;
@@ -35,12 +34,6 @@ public class MongoProxy extends Proxy<MongoStorage> {
 
         this.connectionString = connectionString;
         this.serverApiVersion = serverApiVersion;
-        this.setStorage(new NullMongoStorage());
-    }
-
-    public MongoProxy(MongoStorage storage) {
-        replayer = true;
-        this.setStorage(storage);
     }
 
     public MongoProxy(String connectionString) {
@@ -48,15 +41,21 @@ public class MongoProxy extends Proxy<MongoStorage> {
         this(connectionString, ServerApiVersion.V1);
     }
 
+    public MongoProxy() {
+
+    }
+
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
-        if (replayer) {
+
+        try {
+            var settings = MongoClientSettings.builder()
+                    .applyConnectionString(new ConnectionString(connectionString))
+                    .build();
+            return new ProxyConnection(MongoClients.create(settings));
+        } catch (Exception ex) {
             return new ProxyConnection(null);
         }
-        var settings = MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString(connectionString))
-                .build();
-        return new ProxyConnection(MongoClients.create(settings));
     }
 
     @Override
@@ -67,16 +66,7 @@ public class MongoProxy extends Proxy<MongoStorage> {
     public OpMsgContent runGenericOpMsg(MongoProtoContext protoContext, OpMsgContent data,
                                         Class<?> prevState, MongoClient mongoClient, String db) {
         long start = System.currentTimeMillis();
-
-        if (replayer) {
-            var item = storage.read((JsonNode) data.serialize(), "OP_MSG");
-            var res = new OpMsgContent();
-            res.doDeserialize(item.getOutput(), mapper);
-            res.setRequestId(protoContext.getReqResId());
-            res.setResponseId(data.getRequestId());
-            res.setFlags(8);
-            return res;
-        }
+        var out = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
 
         var docPayload = data.getSections().get(0).getDocuments().get(0);
         var command = (BsonDocument) BsonDocument.parse(docPayload);
@@ -103,32 +93,43 @@ public class MongoProxy extends Proxy<MongoStorage> {
         command.remove("$clusterTime");
         command.remove("apiVersion");
 
+        var pluginContext = new PluginContext("MONGODB", "OP_MSG", start, protoContext);
+
+
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, data, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, data, out)) {
+                return out;
+            }
+        }
 
         var database = mongoClient.getDatabase(db);
+
         Document commandResult = database.runCommand(command);
 
-        var toSend = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
-        OpMsgSection section = new OpMsgSection();
-        section.getDocuments().add(commandResult.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build()));
-        toSend.getSections().add(section);
-        long end = System.currentTimeMillis();
 
-        this.storage.write(protoContext.getContextId(),
-                (JsonNode) data.serialize(), (JsonNode) toSend.serialize(), end - start, "OP_MSG", "MONGODB");
-        return toSend;
+        OpMsgSection section = new OpMsgSection();
+        section.getDocuments().add(
+                commandResult.toJson(
+                        JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build()));
+        out.getSections().add(section);
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, data, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, data, out)) {
+                break;
+            }
+        }
+        return out;
     }
 
     public OpMsgContent runHelloOpMsg(MongoProtoContext protoContext, OpMsgContent lsatOp, Class<?> prevState, MongoClient mongoClient, String dbName) {
         long start = System.currentTimeMillis();
 
-        if (replayer) {
-            var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_MSG");
-            var res = new OpMsgContent();
-            res.doDeserialize(item.getOutput(), mapper);
-            res.setRequestId(protoContext.getReqResId());
-            res.setResponseId(lsatOp.getRequestId());
-            res.setFlags(8);
-            return res;
+        var out = new OpMsgContent(0, protoContext.getReqResId(), lsatOp.getRequestId());
+        var pluginContext = new PluginContext("MONGODB", "HELLO_OP_MSG", start, protoContext);
+
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, lsatOp, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, lsatOp, out)) {
+                return out;
+            }
         }
         var dbInstance = mongoClient.getDatabase(dbName);
         var serverDescription = mongoClient.getClusterDescription().getServerDescriptions().get(0);
@@ -152,27 +153,40 @@ public class MongoProxy extends Proxy<MongoStorage> {
         resultMap.put("readOnly", false);
         // resultMap.put("saslSupportedMechs", List.of("PLAIN"));
         var json = resultMap.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        var toSend = new OpMsgContent(0, protoContext.getReqResId(), lsatOp.getRequestId());
+        //
         OpMsgSection section = new OpMsgSection();
         section.getDocuments().add(json);
-        toSend.getSections().add(section);
-        long end = System.currentTimeMillis();
-        this.storage.write(protoContext.getContextId(),
-                (JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_MSG", "MONGODB");
-        return toSend;
+        out.getSections().add(section);
+        out.setFlags(0);
+        out.setRequestId(protoContext.getReqResId());
+        out.setResponseId(lsatOp.getRequestId());
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, lsatOp, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
+                break;
+            }
+        }
+        return out;
     }
 
     public OpReplyContent runHelloOpQuery(MongoProtoContext protoContext, OpQueryContent lsatOp, Class<?> prevState, MongoClient mongoClient, String dbName) {
         long start = System.currentTimeMillis();
-        if (replayer) {
-            var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_QUERY");
-            var res = new OpReplyContent();
-            res.doDeserialize(item.getOutput(), mapper);
-            res.setRequestId(protoContext.getReqResId());
-            res.setResponseId(lsatOp.getRequestId());
-            res.setFlags(8);
-            return res;
+        var out = new OpReplyContent();
+        var pluginContext = new PluginContext("MONGODB", "HELLO_OP_QUERY", start, protoContext);
+
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, lsatOp, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, lsatOp, out)) {
+                return out;
+            }
         }
+//        if (replayer) {
+//            var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_QUERY");
+//            var res = new OpReplyContent();
+//            res.doDeserialize(item.getOutput(), mapper);
+//            res.setRequestId(protoContext.getReqResId());
+//            res.setResponseId(lsatOp.getRequestId());
+//            res.setFlags(8);
+//            return res;
+//        }
         var dbInstance = mongoClient.getDatabase(dbName);
         var serverDescription = mongoClient.getClusterDescription().getServerDescriptions().get(0);
         Bson findCommand = new BsonDocument("hostInfo", new BsonInt64(1));
@@ -195,14 +209,20 @@ public class MongoProxy extends Proxy<MongoStorage> {
         resultMap.put("ok", 1.0);
         //resultMap.put("saslSupportedMechs", List.of("PLAIN"));
         var json = resultMap.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        var toSend = new OpReplyContent(8, protoContext.getReqResId(), lsatOp.getRequestId());
-        toSend.setCursorId(0);
-        toSend.getDocuments().add(json);
+        //var toSend = new OpReplyContent(8, protoContext.getReqResId(), lsatOp.getRequestId());
+        //var out2 = new OpReplyContent();
+        out.setFlags(8);
+        out.setRequestId(protoContext.getReqResId());
+        out.setResponseId(lsatOp.getRequestId());
+        out.setCursorId(0);
+        out.getDocuments().add(json);
 
-        long end = System.currentTimeMillis();
-        this.storage.write(protoContext.getContextId(),
-                (JsonNode) lsatOp.serialize(), (JsonNode) toSend.serialize(), end - start, "HELLO_OP_QUERY", "MONGODB");
-        return toSend;
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, lsatOp, out)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
+                break;
+            }
+        }
+        return out;
     }
 
     public ServerApiVersion getServerApiVersion() {

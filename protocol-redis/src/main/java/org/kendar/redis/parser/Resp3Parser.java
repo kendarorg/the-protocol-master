@@ -23,6 +23,27 @@ public class Resp3Parser {
         return true;
     }
 
+    private static String buildIntegerString(Resp3Input line) throws Resp3ParseException {
+        String result = "";
+        var end = 0;
+        while (line.hasNext() && end != 2) {
+            var ch = line.charAtAndIncrement();
+            if (ch == '\r' && end == 0) {
+                end++;
+            } else if (ch == '\n' && end == 1) {
+                end++;
+            } else if (((ch >= '0' && ch <= '9') || ch == '-' || ch == '+') && end == 0) {
+                result += ch;
+            } else {
+                throw new Resp3ParseException("Invalid integer format");
+            }
+        }
+        if (end != 2) {
+            throw new Resp3ParseException("Unterminated end of integer", true);
+        }
+        return result;
+    }
+
     private RespError parseSimpleError(Resp3Input line) throws Resp3ParseException {
         var content = parseSimpleString(line);
 
@@ -36,7 +57,6 @@ public class Resp3Parser {
         }
         return result;
     }
-
 
     private String parseSimpleString(Resp3Input line) throws Resp3ParseException {
         String result = "";
@@ -60,23 +80,7 @@ public class Resp3Parser {
     }
 
     private int parseInteger(Resp3Input line) throws Resp3ParseException {
-        String result = "";
-        var end = 0;
-        while (line.hasNext() && end != 2) {
-            var ch = line.charAtAndIncrement();
-            if (ch == '\r' && end == 0) {
-                end++;
-            } else if (ch == '\n' && end == 1) {
-                end++;
-            } else if (((ch >= '0' && ch <= '9') || ch == '-' || ch == '+') && end == 0) {
-                result += ch;
-            } else {
-                throw new Resp3ParseException("Invalid integer format");
-            }
-        }
-        if (end != 2) {
-            throw new Resp3ParseException("Unterminated end of integer", true);
-        }
+        String result = buildIntegerString(line);
         try {
             return Integer.parseInt(result);
         } catch (Exception ex) {
@@ -158,25 +162,8 @@ public class Resp3Parser {
         return letter == 't';
     }
 
-
     private BigInteger parseBigNumber(Resp3Input line) throws Resp3ParseException {
-        String result = "";
-        var end = 0;
-        while (line.hasNext() && end != 2) {
-            var ch = line.charAtAndIncrement();
-            if (ch == '\r' && end == 0) {
-                end++;
-            } else if (ch == '\n' && end == 1) {
-                end++;
-            } else if (((ch >= '0' && ch <= '9') || ch == '-' || ch == '+') && end == 0) {
-                result += ch;
-            } else {
-                throw new Resp3ParseException("Invalid integer format");
-            }
-        }
-        if (end != 2) {
-            throw new Resp3ParseException("Unterminated end of integer", true);
-        }
+        String result = buildIntegerString(line);
         try {
             return new BigInteger(result);
         } catch (Exception ex) {
@@ -383,7 +370,7 @@ public class Resp3Parser {
     }
 
     public String serialize(JsonNode jsonNode) throws Resp3ParseException {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         if (jsonNode.isArray()) {
             var arrayNode = (ArrayNode) jsonNode;
             var type = "*";
@@ -401,7 +388,7 @@ public class Resp3Parser {
                     size++;
                 }
             }
-            result += type + size + "\r\n";
+            result.append(type).append(size).append("\r\n");
 
             for (var item : arrayNode) {
                 if (item.asText().equalsIgnoreCase("@@SET@@") || item.asText().equalsIgnoreCase("@@MAP@@") || item.asText().equalsIgnoreCase("@@PUSH@@") || item.asText().equalsIgnoreCase("@@ARRAY@@")) {
@@ -409,13 +396,13 @@ public class Resp3Parser {
                 }
                 if (type.equalsIgnoreCase("%")) { //MAP
                     var subArray = (ArrayNode) item;
-                    result += serialize(subArray.get(0));
-                    result += serialize(subArray.get(1));
+                    result.append(serialize(subArray.get(0)));
+                    result.append(serialize(subArray.get(1)));
                 } else {
-                    result += serialize(item);
+                    result.append(serialize(item));
                 }
             }
-            return result;
+            return result.toString();
         } else if (jsonNode.isValueNode()) {
             var valNode = (ValueNode) jsonNode;
             if (valNode.isLong() || valNode.isInt() || valNode.isIntegralNumber() || valNode.isShort()) {

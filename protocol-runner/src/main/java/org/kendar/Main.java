@@ -2,146 +2,86 @@ package org.kendar;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
-import org.apache.commons.cli.*;
-import org.kendar.amqp.v09.AmqpFileStorage;
-import org.kendar.amqp.v09.AmqpProtocol;
-import org.kendar.amqp.v09.AmqpProxy;
-import org.kendar.mongo.MongoFileStorage;
-import org.kendar.mongo.MongoProtocol;
-import org.kendar.mongo.MongoProxy;
-import org.kendar.mqtt.MqttFileStorage;
-import org.kendar.mqtt.MqttProtocol;
-import org.kendar.mqtt.MqttProxy;
-import org.kendar.mysql.MySqlFileStorage;
-import org.kendar.postgres.PostgresProtocol;
-import org.kendar.protocol.context.ProtoContext;
-import org.kendar.redis.Resp3FileStorage;
-import org.kendar.redis.Resp3Protocol;
-import org.kendar.redis.Resp3Proxy;
+import com.sun.net.httpserver.HttpServer;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.kendar.amqp.v09.plugins.AmqpRecordingPlugin;
+import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
+import org.kendar.apis.ApiHandler;
+import org.kendar.apis.ApiServerHandler;
+import org.kendar.command.*;
+import org.kendar.http.plugins.*;
+import org.kendar.mongo.plugins.MongoRecordingPlugin;
+import org.kendar.mongo.plugins.MongoReplayingPlugin;
+import org.kendar.mqtt.plugins.MqttRecordingPlugin;
+import org.kendar.mqtt.plugins.MqttReplayingPlugin;
+import org.kendar.mysql.plugins.MySqlRecordPlugin;
+import org.kendar.mysql.plugins.MySqlReplayPlugin;
+import org.kendar.mysql.plugins.MySqlRewritePlugin;
+import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.postgres.plugins.PostgresRecordPlugin;
+import org.kendar.postgres.plugins.PostgresReplayPlugin;
+import org.kendar.postgres.plugins.PostgresRewritePlugin;
+import org.kendar.redis.plugins.RedisRecordingPlugin;
+import org.kendar.redis.plugins.RedisReplayingPlugin;
 import org.kendar.server.TcpServer;
-import org.kendar.sql.jdbc.JdbcProxy;
-import org.kendar.sql.jdbc.storage.JdbcFileStorage;
-import org.kendar.utils.QueryReplacerItem;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
+import org.kendar.storage.FileStorageRepository;
+import org.kendar.storage.NullStorageRepository;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
+import org.pf4j.JarPluginManager;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 public class Main {
-    private static TcpServer protocolServer;
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
+    private static final ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
+    private static ProtocolsRunner om;
+    private static HashMap<String, List<PluginDescriptor>> allPlugins = new HashMap<>();
 
-    public static boolean isRunning() {
-        if (protocolServer == null) return false;
-        return protocolServer.isRunning();
+    public static void main(String[] args) throws Exception {
+        execute(args, Main::stopWhenQuitCommand);
     }
 
-    public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) {
-        if (protocolServer != null) {
-            protocolServer.stop();
-        }
-        Options options = getOptions();
+    public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
+        om = new ProtocolsRunner(
+                new Amqp091Runner(),
+                new MongoRunner(),
+                new HttpRunner(),
+                new JdbcRunner("mysql"),
+                new JdbcRunner("postgres"),
+                new MqttRunner(),
+                new RedisRunner()
+        );
+        CommandLineParser parser = new DefaultParser();
+        var options = ProtocolsRunner.getMainOptions();
+        HashMap<String, List<PluginDescriptor>> plugins = new HashMap<>();
+        CommandLine cmd = parser.parse(options, args, true);
+        var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
+        plugins = loadPlugins(pluginsDir);
 
-        try {
-            CommandLineParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args);
-            var replayFromLog = cmd.hasOption("pl");
-            var protocol = cmd.getOptionValue("p");
-            var portVal = cmd.getOptionValue("l");
-            var login = cmd.getOptionValue("xl");
-            var password = cmd.getOptionValue("xw");
-            var logLevel = cmd.getOptionValue("v");
-            var callDurationTimes = cmd.hasOption("cdt");
-            var jdbcForcedSchema = cmd.getOptionValue("js");
-            var jdbcReplaceQueries = cmd.getOptionValue("jr");
-            var timeout = cmd.getOptionValue("t");
-            if (logLevel == null || logLevel.isEmpty()) {
-                logLevel = "ERROR";
-            }
-            var timeoutSec = 30;
-            if (timeout != null && !timeout.isEmpty() && Pattern.matches("[0-9]+", timeout)) {
-                timeoutSec = Integer.parseInt(timeout);
-            }
-
-            ProtoContext.setTimeout(timeoutSec);
-
-            LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-
-            var logger = loggerContext.getLogger("org.kendar");
-            logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
-
-            var connectionString = cmd.getOptionValue("xc");
-            var logsDir = cmd.getOptionValue("xd");
-            if (logsDir != null && !logsDir.isEmpty()) {
-                logsDir = logsDir.replace("{timestamp}", "" + new Date().getTime());
-            }
-            if (replayFromLog &&
-                    (logsDir == null || logsDir.isEmpty())) {
-                throw new Exception("cannot replay, missing logsDir (xd)");
-            }
-            var port = -1;
-            if (portVal != null && !portVal.isEmpty()) {
-                port = Integer.parseInt(portVal);
-            }
-            if (protocol.equalsIgnoreCase("mysql")) {
-                if (port == -1) port = 3306;
-                runMysql(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
-            } else if (protocol.equalsIgnoreCase("postgres")) {
-                if (port == -1) port = 5432;
-                runPostgres(port, logsDir, connectionString, jdbcForcedSchema, login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
-            } else if (protocol.equalsIgnoreCase("mongo")) {
-                if (port == -1) port = 27017;
-                runMongo(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
-            } else if (protocol.equalsIgnoreCase("amqp091")) {
-                if (port == -1) port = 5672;
-                runAmqp091(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
-            } else if (protocol.equalsIgnoreCase("redis")) {
-                if (port == -1) port = 6379;
-                runRedis(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
-            } else if (protocol.equalsIgnoreCase("mqtt")) {
-                if (port == -1) port = 1883;
-                runMqtt(port, logsDir, connectionString, login, password, replayFromLog, callDurationTimes);
-            } else {
-                throw new Exception("missing protocol (p)");
-            }
-
-            while (stopWhenFalse.get()) {
-                Sleeper.sleep(100);
-            }
-            protocolServer.stop();
-        } catch (Exception ex) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("runner", options);
-        }
-        System.out.println("EXITED");
+        var ini = om.run(cmd, args, plugins);
+        execute(ini, stopWhenFalse, plugins);
     }
 
-    private static Options getOptions() {
-        Options options = new Options();
-        options.addOption("p", true, "Select protocol (mysql/mongo/postgres/amqp091/redis)");
-        options.addOption("l", true, "[all] Select listening port");
-        options.addOption("xl", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote login");
-        options.addOption("xw", true, "[mysql/mongo/postgres/amqp091/mqtt] Select remote password");
-        options.addOption("xc", true, "[all] Select remote connection string (for redis use redis://host:port");
-        options.addOption("xd", true, "[all] Select log/replay directory (you can set a {timestamp} value\n" +
-                "that will be replaced with the current timestamp)");
-        options.addOption("pl", false, "[all] Replay from log/replay directory");
-        options.addOption("v", true, "[all] Log level (default ERROR)");
-        options.addOption("t", true, "[all] Set timeout in seconds towards proxied system (default 30s)");
-        options.addOption("cdt", false, "[all] Respect call duration timing");
-        options.addOption("js", true, "[jdbc] Set schema");
-        options.addOption("jr", true, "[jdbc] Replace queries");
-        return options;
+    public static void stop() {
+        for (var server : protocolServer.values()) {
+            server.stop();
+        }
     }
 
     private static Boolean stopWhenQuitCommand() {
-        Scanner scanner = new Scanner(System.in);
+        var scanner = new Scanner(System.in);
         System.out.println("Press Q to quit");
         String line = scanner.nextLine();
         try {
@@ -163,175 +103,154 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) {
-        execute(args, Main::stopWhenQuitCommand);
-    }
+    private static StorageRepository setupStorage(String logsDir) {
 
-
-    private static void runPostgres(int port, String logsDir, String connectionString, String forcedSchema,
-                                    String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
-        runJdbc("postgres", "org.postgresql.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
-    }
-
-    private static void runMysql(int port, String logsDir, String connectionString, String forcedSchema,
-                                 String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
-        runJdbc("mysql", "com.mysql.cj.jdbc.Driver", port, logsDir, connectionString, forcedSchema,
-                login, password, replayFromLog, jdbcReplaceQueries, callDurationTimes);
-    }
-
-    private static void runJdbc(String type, String driver, int port, String logsDir,
-                                String connectionString, String forcedSchema,
-                                String login, String password, boolean replayFromLog, String jdbcReplaceQueries, boolean callDurationTimes) throws IOException {
-        var baseProtocol = new PostgresProtocol(port);
-        var proxy = new JdbcProxy(driver,
-                connectionString, forcedSchema,
-                login, password);
-
-        if (logsDir != null) {
-            var logsDirPath = Path.of(logsDir);
-            JdbcFileStorage storage = new JdbcFileStorage(logsDirPath);
-            if (type.equalsIgnoreCase("mysql")) {
-                storage = new MySqlFileStorage(logsDirPath);
-            }
-            if (replayFromLog) {
-                proxy = new JdbcProxy(storage);
-            } else {
-                proxy.setStorage(storage);
-            }
+        if (logsDir != null && !logsDir.isEmpty()) {
+            logsDir = logsDir.replace("{timestamp}", "" + new Date().getTime());
         }
-        if (jdbcReplaceQueries != null && !jdbcReplaceQueries.isEmpty() && Files.exists(Path.of(jdbcReplaceQueries))) {
-
-            handleReplacementQueries(jdbcReplaceQueries, proxy);
+        StorageRepository storage = new NullStorageRepository();
+        if (logsDir != null && !logsDir.isEmpty()) {
+            storage = new FileStorageRepository(Path.of(logsDir));
         }
-        baseProtocol.setProxy(proxy);
-        baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
-        protocolServer.useCallDurationTimes(callDurationTimes);
-        protocolServer.start();
-        Sleeper.sleep(5000, () -> protocolServer.isRunning());
+        return storage;
     }
 
-    private static void handleReplacementQueries(String jdbcReplaceQueries, JdbcProxy proxy) throws IOException {
-        var lines = Files.readAllLines(Path.of(jdbcReplaceQueries));
-        var items = new ArrayList<QueryReplacerItem>();
-        QueryReplacerItem replacerItem = new QueryReplacerItem();
-        boolean find = false;
-        for (var line : lines) {
-            if (line.toLowerCase().startsWith("#regexfind")) {
-                if (replacerItem.getToFind() != null) {
-                    items.add(replacerItem);
-                    replacerItem = new QueryReplacerItem();
+    private static HashMap<String, List<PluginDescriptor>> loadPlugins(String pluginsDir) {
+        if (!allPlugins.isEmpty()) {
+            return allPlugins;
+        }
+        var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
+        if (pathOfPluginsDir.toFile().exists()) {
+
+            var pluginManager = new JarPluginManager(pathOfPluginsDir);
+            pluginManager.loadPlugins();
+            pluginManager.startPlugins();
+            allPlugins = new HashMap<>();
+            for (var item : pluginManager.getExtensions(PluginDescriptor.class)) {
+                var protocol = item.getProtocol().toLowerCase();
+                if (!allPlugins.containsKey(protocol)) {
+                    allPlugins.put(protocol, new ArrayList<>());
                 }
-                replacerItem.setRegex(true);
-                replacerItem.setToFind("");
-                find = true;
-            } else if (line.toLowerCase().startsWith("#find")) {
-                if (replacerItem.getToFind() != null) {
-                    items.add(replacerItem);
-                    replacerItem = new QueryReplacerItem();
+                allPlugins.get(protocol).add(item);
+            }
+        }
+        addEmbedded(allPlugins, "http", List.of(
+                new HttpRecordingPlugin(),
+                new HttpErrorPlugin(),
+                new HttpReplayingPlugin(),
+                new HttpRewritePlugin(),
+                new HttpMockPlugin()));
+        addEmbedded(allPlugins, "mongodb", List.of(
+                new MongoRecordingPlugin(),
+                new MongoReplayingPlugin()));
+        addEmbedded(allPlugins, "redis", List.of(
+                new RedisRecordingPlugin(),
+                new RedisReplayingPlugin()));
+        addEmbedded(allPlugins, "amqp091", List.of(
+                new AmqpRecordingPlugin(),
+                new AmqpReplayingPlugin()));
+        addEmbedded(allPlugins, "mqtt", List.of(
+                new MqttRecordingPlugin(),
+                new MqttReplayingPlugin()));
+        addEmbedded(allPlugins, "postgres", List.of(
+                new PostgresRecordPlugin(),
+                new PostgresReplayPlugin(),
+                new PostgresRewritePlugin()));
+        addEmbedded(allPlugins, "mysql", List.of(
+                new MySqlRecordPlugin(),
+                new MySqlReplayPlugin(),
+                new MySqlRewritePlugin()));
+        return allPlugins;
+    }
+
+    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?>> embeddedPlugins) {
+        if (!plugins.containsKey(prt)) {
+            plugins.put(prt, new ArrayList<>());
+        }
+        plugins.get(prt).addAll(embeddedPlugins);
+    }
+
+
+    public static boolean isRunning() {
+        return protocolServer.values().stream().anyMatch(TcpServer::isRunning);
+    }
+
+
+    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<PluginDescriptor>> allPlugins) throws Exception {
+        if (ini == null) return;
+        var logsDir = ProtocolsRunner.getOrDefault(
+                ini.getDataDir(),
+                Path.of("data",
+                        Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString());
+        StorageRepository storage = setupStorage(logsDir);
+        storage.initialize();
+        ini.putService(storage.getType(), storage);
+
+        var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
+        if (allPlugins == null || allPlugins.isEmpty()) {
+            allPlugins = loadPlugins(pluginsDir);
+        }
+        var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "ERROR");
+
+
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        var logger = loggerContext.getLogger("org.kendar");
+        logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
+
+        var apiHandler = new ApiHandler(ini);
+
+        var finalAllPlugins = allPlugins;
+        for (var item : ini.getProtocols().entrySet()) {
+            new Thread(() -> {
+                try {
+
+                    var protocol = ini.getProtocolForKey(item.getKey());
+                    if (protocol == null) return;
+                    var protocolManager = om.getManagerFor(protocol);
+                    var availablePlugins = loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
+                    var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
+
+                    try {
+                        om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, availablePlugins, stopWhenFalse);
+                    } catch (Exception e) {
+                        protocolServer.remove(item);
+                        throw new RuntimeException(e);
+                    }
+                    apiHandler.addProtocol(item.getKey(), protocolManager, availablePlugins, protocolFullSettings);
+
+
+                } catch (Exception ex) {
+
                 }
-                replacerItem.setToFind("");
-                find = true;
-            } else if (line.toLowerCase().startsWith("#replace")) {
-                replacerItem.setToReplace("");
-                find = false;
-            } else {
-                if (find) {
-                    replacerItem.setToFind(replacerItem.getToFind() + line + "\n");
-                } else {
-                    replacerItem.setToReplace(replacerItem.getToReplace() + line + "\n");
-                }
-            }
+            }).start();
         }
-        if (replacerItem.getToFind() != null && !replacerItem.getToFind().isEmpty()) {
-            items.add(replacerItem);
+        if (ini.getApiPort() > 0) {
+            var address = new InetSocketAddress(ini.getApiPort());
+            var apiServer = HttpServer.create(address, 10);
+            apiServer.createContext("/", new ApiServerHandler(apiHandler));
+            apiServer.start();
         }
-        proxy.setQueryReplacement(items);
+        while (stopWhenFalse.get()) {
+            Sleeper.sleep(100);
+        }
     }
 
-    private static void runMongo(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
-        var baseProtocol = new MongoProtocol(port);
-        var proxy = new MongoProxy(connectionString);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new MongoProxy(new MongoFileStorage(path));
-            } else {
-                proxy.setStorage(new MongoFileStorage(path));
+    private static List<PluginDescriptor> loadAvailablePluginsForProtocol(ProtocolSettings protocol, GlobalSettings global,
+                                                                          HashMap<String, List<PluginDescriptor>> allPlugins) {
+        var availablePlugins = allPlugins.get(protocol.getProtocol());
+        if (availablePlugins == null) availablePlugins = new ArrayList<>();
+        var simplePlugins = protocol.getSimplePlugins();
+        var plugins = new ArrayList<PluginDescriptor>();
+
+        for (var simplePlugin : simplePlugins.entrySet()) {
+            var availablePlugin = availablePlugins.stream().filter(av -> av.getId().equalsIgnoreCase(simplePlugin.getKey())).findFirst();
+            if (availablePlugin.isPresent()) {
+                var pluginInstance = availablePlugin.get().clone();
+                pluginInstance.setSettings(protocol.getPlugin(simplePlugin.getKey(), pluginInstance.getSettingClass()));
+                plugins.add(pluginInstance);
+
             }
         }
-        baseProtocol.setProxy(proxy);
-        baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
-        protocolServer.useCallDurationTimes(callDurationTimes);
-        protocolServer.start();
-        Sleeper.sleep(5000, () -> protocolServer.isRunning());
-    }
-
-    private static void runAmqp091(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
-        var baseProtocol = new AmqpProtocol(port);
-        var proxy = new AmqpProxy(connectionString, login, password);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new AmqpProxy();
-                proxy.setStorage(new AmqpFileStorage(path));
-            } else {
-                proxy.setStorage(new AmqpFileStorage(path));
-            }
-        }
-        baseProtocol.setProxy(proxy);
-        baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
-        protocolServer.useCallDurationTimes(callDurationTimes);
-        protocolServer.start();
-        Sleeper.sleep(5000, () -> protocolServer.isRunning());
-    }
-
-    private static void runRedis(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
-        var baseProtocol = new Resp3Protocol(port);
-        var proxy = new Resp3Proxy(connectionString, login, password);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new Resp3Proxy();
-                proxy.setStorage(new Resp3FileStorage(path) {
-                });
-            } else {
-                proxy.setStorage(new Resp3FileStorage(path));
-            }
-        }
-        baseProtocol.setProxy(proxy);
-        baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
-
-        protocolServer.start();
-        Sleeper.sleep(5000, () -> protocolServer.isRunning());
-    }
-
-    private static void runMqtt(int port, String logsDir, String connectionString, String login, String password, boolean replayFromLog, boolean callDurationTimes) {
-        var baseProtocol = new MqttProtocol(port);
-        var proxy = new MqttProxy(connectionString, login, password);
-        if (logsDir != null) {
-            var path = Path.of(logsDir);
-            if (replayFromLog) {
-                proxy = new MqttProxy();
-                proxy.setStorage(new MqttFileStorage(path) {
-                });
-            } else {
-                proxy.setStorage(new MqttFileStorage(path));
-            }
-        }
-        baseProtocol.setProxy(proxy);
-        baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
-
-        protocolServer.start();
-        Sleeper.sleep(5000, () -> protocolServer.isRunning());
-    }
-
-    public static void stop() {
-        protocolServer.stop();
+        return plugins;
     }
 }

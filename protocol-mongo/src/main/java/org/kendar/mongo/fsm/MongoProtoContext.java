@@ -14,16 +14,16 @@ public class MongoProtoContext extends NetworkProtoContext {
     }
 
     public int getNewPid() {
-        return ProtoDescriptor.getCounter("PID_COUNTER");
+        return descriptor.getCounter("PID_COUNTER");
     }
 
     public int getReqResId() {
-        return ProtoDescriptor.getCounter("REQ_ID_COUNTER");
+        return descriptor.getCounter("REQ_ID_COUNTER");
     }
 
     @Override
     public void disconnect(Object connection) {
         var mongoClient = ((MongoClient) ((ProxyConnection) getValue("CONNECTION")).getConnection());
-        mongoClient.close();
+        if (mongoClient != null) mongoClient.close();
     }
 }

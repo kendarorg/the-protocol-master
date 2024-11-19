@@ -1,8 +1,8 @@
 package org.kendar.server;
 
+import org.kendar.events.EventsQueue;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
-import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -47,20 +47,27 @@ public class TcpServer {
      * Stop the server
      */
     public void stop() {
-        try {
-            server.close();
-            Sleeper.sleepNoException(2000, () -> !server.isOpen());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
+        if (protoDescriptor.isWrapper()) {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
-                var proxy = protoDescriptor.getProxy();
-                if (proxy != null && !proxy.isReplayer()) {
-                    var storage = protoDescriptor.getProxy().getStorage();
-                    if (storage != null) {
-                        storage.optimize();
+                protoDescriptor.terminate();
+                Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
+
+            }
+        } else {
+            try {
+                server.close();
+                Sleeper.sleepNoException(2000, () -> !server.isOpen());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
+                    var proxy = protoDescriptor.getProxy();
+                    if (proxy != null) {
+                        proxy.terminateFilters();
                     }
+
                 }
+                Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
             }
         }
     }
@@ -69,6 +76,15 @@ public class TcpServer {
      * Start the server
      */
     public void start() {
+        if (protoDescriptor.isWrapper()) {
+            try {
+                protoDescriptor.cleanCounters();
+                protoDescriptor.start();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return;
+        }
         this.thread = new Thread(() -> {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
                 try {
@@ -94,7 +110,8 @@ public class TcpServer {
         //Executor for the asynchronous requests
         ExecutorService executor = Executors.newCachedThreadPool();
         AsynchronousChannelGroup group = AsynchronousChannelGroup.withThreadPool(executor);
-        ProtoDescriptor.cleanCounters();
+        protoDescriptor.cleanCounters();
+        protoDescriptor.start();
 
         try (AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group)) {
             this.server = server;
@@ -103,7 +120,7 @@ public class TcpServer {
             server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
             server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
-            log.info("[CL>TP][IN] Listening on " + HOST + ":{}", protoDescriptor.getPort());
+            log.info("[CL>TP][IN] Listening on " + HOST + ":{} {}", protoDescriptor.getPort(), protoDescriptor.getClass().getSimpleName());
 
             //noinspection InfiniteLoopStatement
             while (true) {
@@ -116,7 +133,7 @@ public class TcpServer {
                     //Prepare the native buffer
                     ByteBuffer buffer = ByteBuffer.allocate(4096);
 
-                    var contextId = ProtoDescriptor.getCounter("CONTEXT_ID");
+                    var contextId = protoDescriptor.getCounter("CONTEXT_ID");
                     try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
 
                         log.trace("[CL>TP] Accepted connection from {}", client.getRemoteAddress());
@@ -171,10 +188,15 @@ public class TcpServer {
                     log.trace("Execution exception", e);
                 }
             }
+        } finally {
+            protoDescriptor.terminate();
         }
     }
 
     public boolean isRunning() {
+        if (protoDescriptor.isWrapper()) {
+            return protoDescriptor.isWrapperRunning();
+        }
         if (this.server == null) return false;
         return this.server.isOpen();
     }

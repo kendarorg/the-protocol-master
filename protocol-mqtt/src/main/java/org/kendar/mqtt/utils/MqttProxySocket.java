@@ -15,13 +15,13 @@ import org.kendar.proxy.NetworkProxySplitterState;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MqttProxySocket extends NetworkProxySocket {
     private final MqttPacketTranslator translator = new MqttPacketTranslator().asProxy();
     private final List<ProtoState> states = new ArrayList<>(
-            Arrays.asList(
+            Collections.singletonList(
                     new Publish().asProxy()
             )
     );
@@ -34,10 +34,6 @@ public class MqttProxySocket extends NetworkProxySocket {
     protected NetworkProxySplitterState getStateToRetrieveOneSingleMessage() {
         return new GenericFrame();
     }
-
-    //Arrays.asList(
-    //            (ProtoState)new ConnectAck()
-    //    )
 
     @Override
     protected List<ProtoState> availableStates() {

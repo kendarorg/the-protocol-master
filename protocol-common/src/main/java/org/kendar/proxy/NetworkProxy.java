@@ -1,26 +1,20 @@
 package org.kendar.proxy;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.buffers.BBuffer;
+import org.kendar.plugins.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
-import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
-import org.kendar.storage.Storage;
-import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
-import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
 import java.net.*;
 import java.nio.channels.AsynchronousChannelGroup;
-import java.util.Base64;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extends Proxy<T> {
+public abstract class NetworkProxy extends Proxy {
     protected static final JsonMapper mapper = new JsonMapper();
     protected String connectionString;
     protected String userId;
@@ -31,17 +25,19 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
     protected AsynchronousChannelGroup group;
 
     public NetworkProxy() {
-        this.replayer = true;
+        super();
         init();
     }
 
     public NetworkProxy(String connectionString, String userId, String password) {
+        super();
         try {
-            this.replayer = false;
-            var uri = new URI(connectionString);
             this.connectionString = connectionString;
-            this.port = uri.getPort();
-            this.host = uri.getHost();
+            if (connectionString != null && !connectionString.isEmpty()) {
+                var uri = new URI(connectionString);
+                this.port = uri.getPort();
+                this.host = uri.getHost();
+            }
             this.userId = userId;
             this.password = password;
             init();
@@ -90,9 +86,7 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      */
     @Override
     public ProxyConnection connect(NetworkProtoContext context) {
-        if (replayer) {
-            return new ProxyConnection(null);
-        }
+
         try {
             @SuppressWarnings("resource")
             var connection = new Socket();
@@ -100,10 +94,11 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             connection.setKeepAlive(true);
             connection.setTcpNoDelay(true);
             connection.connect(new InetSocketAddress(InetAddress.getByName(host), port));
+
             return new ProxyConnection(buildProxyConnection(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return new ProxyConnection(null);
         }
     }
 
@@ -131,30 +126,25 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      * @param of
      */
     public <K extends NetworkReturnMessage> void sendAndForget(NetworkProtoContext context, ProxyConnection connection, K of) {
-        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
-        var jsonReq = mapper.toJsonNode(req);
-        if (replayer) {
-            var item = storage.read(jsonReq, of.getClass().getSimpleName());
-            if (item.getOutput() == null && item.getInput() == null) {
-                sendBackResponses(storage.readResponses(item.getIndex()));
+
+
+        long start = System.currentTimeMillis();
+        var pluginContext = new PluginContext(getCaller(), of.getClass().getSimpleName(), start, context);
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, new Object())) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, null)) {
                 return;
             }
-            sendBackResponses(storage.readResponses(item.getIndex()));
-            return;
         }
-        var index = storage.generateIndex();
-        long start = System.currentTimeMillis();
+
 
         var sock = (NetworkProxySocket) connection.getConnection();
-        sock.write(of, protocol.buildBuffer());
-        var res = "{\"type\":null,\"data\":null}";
-        long end = System.currentTimeMillis();
-        storage.write(
-                index,
-                context.getContextId(),
-                mapper.toJsonNode(req)
-                , mapper.toJsonNode(res)
-                , (end - start), of.getClass().getSimpleName(), getCaller());
+        sock.write(of, getProtocol().buildBuffer());
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, new Object())) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, null)) {
+                break;
+            }
+        }
+
     }
 
     /**
@@ -164,13 +154,6 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
      */
     protected abstract String getCaller();
 
-    /**
-     * Given a event to read return the data to serialize
-     *
-     * @param of
-     * @return
-     */
-    protected abstract Object getData(Object of);
 
     /**
      * Run expecting a message and a return value
@@ -197,30 +180,18 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             K of,
             T toRead,
             boolean optional) {
-        var req = "{\"type\":\"" + of.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(of)) + "}";
-        var jsonReq = mapper.toJsonNode(req);
-
-        if (replayer) {
-            var item = storage.read(jsonReq, of.getClass().getSimpleName());
-            if (item.getOutput() == null && item.getInput() == null) {
-                sendBackResponses(storage.readResponses(item.getIndex()));
-                return toRead;
-            }
-            sendBackResponses(storage.readResponses(item.getIndex()));
-
-            var out = item.getOutput();
-            if (context.isUseCallDurationTimes()) {
-                Sleeper.sleep(item.getDurationMs());
-            }
-            return (T) buildState(context, out, toRead.getClass());
-
-        }
-        var index = storage.generateIndex();
 
         long start = System.currentTimeMillis();
+        var pluginContext = new PluginContext(getCaller(), of.getClass().getSimpleName(), start, context);
+
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
+                return toRead;
+            }
+        }
 
         var sock = (NetworkProxySocket) connection.getConnection();
-        var bufferToWrite = protocol.buildBuffer();
+        var bufferToWrite = getProtocol().buildBuffer();
         sock.write(of, bufferToWrite);
         var returnMessages = sock.read(toRead, optional);
         for (var item : returnMessages) {
@@ -230,27 +201,13 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
             }
         }
 
-        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
-        long end = System.currentTimeMillis();
-
-        storage.write(
-                index,
-                context.getContextId(),
-                jsonReq
-                , mapper.toJsonNode(res)
-                , (end - start), of.getClass().getSimpleName(), getCaller());
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
+                break;
+            }
+        }
         return toRead;
     }
-
-    /**
-     * Build the state that will be rendered to the client based on the json serialized data
-     *
-     * @param context
-     * @param out
-     * @param aClass
-     * @return
-     */
-    protected abstract Object buildState(ProtoContext context, JsonNode out, Class<? extends ProtoState> aClass);
 
     /**
      * Execute with return data (proto state to be precise)
@@ -267,48 +224,33 @@ public abstract class NetworkProxy<T extends Storage<JsonNode, JsonNode>> extend
     }
 
     public <J extends ProtoState> J sendBytesAndExpect(NetworkProtoContext context, ProxyConnection connection, BBuffer of, J toRead, boolean optional) {
-        var req = "{\"type\":\"byte[]\",\"data\":{\"bytes\":\"" + Base64.getEncoder().encode(of.getAll()) + "\"}}";
-        var jsonReq = mapper.toJsonNode(req);
-
-        if (replayer) {
-            var item = storage.read(jsonReq, "byte[]");
-            if (item.getOutput() == null && item.getInput() == null) {
-                sendBackResponses(storage.readResponses(item.getIndex()));
-                return toRead;
-            }
-            sendBackResponses(storage.readResponses(item.getIndex()));
-            var out = item.getOutput();
-            if (context.isUseCallDurationTimes()) {
-                Sleeper.sleep(item.getDurationMs());
-            }
-            return (J) buildState(context, out, toRead.getClass());
-
-        }
-        var index = storage.generateIndex();
 
         long start = System.currentTimeMillis();
+        var pluginContext = new PluginContext(getCaller(), "byte[]", start, context);
+
+        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
+                return toRead;
+            }
+        }
+
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of);
         sock.read(toRead, optional);
 
-        var res = "{\"type\":\"" + toRead.getClass().getSimpleName() + "\",\"data\":" + mapper.serialize(getData(toRead)) + "}";
-        long end = System.currentTimeMillis();
-        storage.write(
-                index,
-                context.getContextId(),
-                jsonReq
-                , mapper.toJsonNode(res)
-                , (end - start), "byte[]", getCaller());
+        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
+                break;
+            }
+        }
         return toRead;
     }
 
-    /**
-     * In case of push messages from the recording, this translate the storage item involved
-     * in the correct message. Finds the correct originating connection (From the connection
-     * id and the list of connections just created) and write the result to the client resulting
-     * in the emulation of an async response
-     *
-     * @param storageItems
-     */
-    protected abstract void sendBackResponses(List<StorageItem<JsonNode, JsonNode>> storageItems);
+    public void respond(Object publish, PluginContext pluginContext) {
+        for (var plugin : getPlugins(ProtocolPhase.ASYNC_RESPONSE, new Object(), publish)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.ASYNC_RESPONSE, null, publish)) {
+                break;
+            }
+        }
+    }
 }

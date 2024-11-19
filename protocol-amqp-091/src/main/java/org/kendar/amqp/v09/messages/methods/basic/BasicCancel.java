@@ -7,6 +7,7 @@ import org.kendar.amqp.v09.messages.methods.Basic;
 import org.kendar.amqp.v09.utils.ShortStringHelper;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
+import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
@@ -69,16 +70,8 @@ public class BasicCancel extends Basic {
 
         if (isProxyed()) {
             toSend.setConsumeId(basicConsume.getConsumeId());
-            var storage = proxy.getStorage();
-            var res = "{\"type\":\"" + toSend.getClass().getSimpleName() + "\",\"data\":" +
-                    mapper.serialize(toSend) + "}";
+            proxy.respond(toSend, new PluginContext("AMQP", "RESPONSE", -1, context));
 
-
-            storage.write(
-                    context.getContextId(),
-                    null
-                    , mapper.toJsonNode(res)
-                    , 0, "RESPONSE", "AMQP");
             return iteratorOfList(toSend);
         }
         return iteratorOfRunnable(() -> {

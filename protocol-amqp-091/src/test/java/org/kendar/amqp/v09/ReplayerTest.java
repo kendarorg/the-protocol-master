@@ -4,7 +4,10 @@ import com.rabbitmq.client.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
 import org.kendar.server.TcpServer;
+import org.kendar.storage.FileStorageRepository;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
@@ -13,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,8 +65,13 @@ public class ReplayerTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "test2_differentChannelAndConnection")));
+
+        StorageRepository storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "test2_differentChannelAndConnection"));
+        storage.initialize();
+        var pl = new AmqpReplayingPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -141,8 +150,12 @@ public class ReplayerTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "test5_noPublish")));
+        StorageRepository storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "test5_noPublish"));
+        storage.initialize();
+        var pl = new AmqpReplayingPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -211,8 +224,12 @@ public class ReplayerTest {
 
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();
-        proxy.setStorage(new AmqpFileStorage(Path.of("src",
-                "test", "resources", "test3_openConnection")));
+        StorageRepository storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "test3_openConnection"));
+        storage.initialize();
+        var pl = new AmqpReplayingPlugin().withStorage(storage);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

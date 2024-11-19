@@ -14,7 +14,6 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.SpecialProtoState;
-import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +22,15 @@ import org.slf4j.MDC;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static org.kendar.protocol.descriptor.ProtoDescriptor.getNow;
 
 /**
  * Instance of a protocol definition
  */
 public abstract class ProtoContext {
 
-    private static final AtomicInteger timeout = new AtomicInteger(30);
-    private static final Logger log = LoggerFactory.getLogger(ProtoContext.class);
-    private static ConcurrentHashMap<Integer, ProtoContext> contextsCache;
-    private static Thread contextCleaner;
-    private static volatile boolean runClean = false;
     /**
      * Stores the variable relatives to the current instance execution
      */
@@ -55,7 +50,8 @@ public abstract class ProtoContext {
      * Flag to stop the execution
      */
     protected final AtomicBoolean run = new AtomicBoolean(true);
-    protected final AtomicLong lastAccess = new AtomicLong(getNow());
+    private final Logger log = LoggerFactory.getLogger(ProtoContext.class);
+    private final AtomicLong lastAccess = new AtomicLong(getNow());
     /**
      * Contains the -DECLARATION- of the protocol
      */
@@ -83,58 +79,7 @@ public abstract class ProtoContext {
         this.descriptor = descriptor;
         this.root = descriptor.getTaggedStates();
         lastAccess.set(getNow());
-        contextsCache.put(this.contextId, this);
-    }
-
-    public static void initializeStatic() {
-        runClean = false;
-        if (contextCleaner != null) {
-            if (contextCleaner.isAlive()) {
-                Sleeper.sleep(2000);
-            }
-        }
-        runClean = true;
-        contextsCache = new ConcurrentHashMap<>();
-        contextCleaner = new Thread(ProtoContext::contextsClean);
-        contextCleaner.start();
-    }
-
-    public static void setTimeout(int value) {
-        timeout.set(value);
-    }
-
-    private static void contextsClean() {
-
-        while (runClean) {
-            Sleeper.sleep(1000);
-            var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
-            for (var item : fixedItemsList) {
-                var now = getNow();
-                if (item.getValue().lastAccess.get() < (now - timeout.get())) {
-                    var context = item.getValue();
-                    var contextConnection = context.getValue("CONNECTION");
-                    if (contextConnection == null) {
-                        contextsCache.remove(item.getKey());
-                    }
-
-                    try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.contextId + "")) {
-                        try {
-                            context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                            log.debug("[DISCONNECT]");
-                        } catch (Exception ex) {
-                            log.trace("[DISCONNECT] Error", ex);
-                        }
-                    }
-                    contextsCache.remove(item.getKey());
-                } else {
-                    log.trace("[KEEPALIVE]");
-                }
-            }
-        }
-    }
-
-    protected static long getNow() {
-        return System.currentTimeMillis() / 1000;
+        descriptor.getContextsCache().put(this.contextId, this);
     }
 
     /**
@@ -177,6 +122,14 @@ public abstract class ProtoContext {
             result = new FailedState("Unable to run event", candidate, event);
         }
         return result;
+    }
+
+    public long getLastAccess() {
+        return lastAccess.get();
+    }
+
+    public ProtoDescriptor getDescriptor() {
+        return descriptor;
     }
 
     public void updateLastAccess() {
@@ -400,7 +353,7 @@ public abstract class ProtoContext {
         //Prepare the tagged stack
         if (!executionStack.containsKey(tag)) {
             executionStack.put(tag, new Stack<>());
-            executionStack.get(tag).add(new ProtoStackItem(root.get(tagKey), event));
+            executionStack.get(tag).add(new ProtoStackItem(root.get(tagKey), event, descriptor.getCounterString("STACK_ID")));
         }
         //Cleanup the recursion blocker
         recursionBlocker = new HashSet<>();
@@ -568,7 +521,7 @@ public abstract class ProtoContext {
                 return new FailedState("Blocked recursion", candidate, event);
             } else {
                 //Execute special states
-                executionStack.get(eventTags).add(new ProtoStackItem(candidate, event));
+                executionStack.get(eventTags).add(new ProtoStackItem(candidate, event, descriptor.getCounterString("STACK_ID")));
                 return findThePossibleNextStateOnStack(event, depth + 1);
             }
         }

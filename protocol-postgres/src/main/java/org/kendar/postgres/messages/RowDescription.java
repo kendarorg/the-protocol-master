@@ -1,7 +1,7 @@
 package org.kendar.postgres.messages;
 
 import org.kendar.buffers.BBuffer;
-import org.kendar.postgres.constants.TypesOids;
+import org.kendar.postgres.constants.TypesOidsConstants;
 import org.kendar.postgres.dtos.Field;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 
@@ -35,7 +35,7 @@ public class RowDescription implements NetworkReturnMessage {
             length += 4;
             buffer.writeShort((short) 0);
             length += 2;
-            buffer.writeInt(field.isByteContent() ? TypesOids.Varbit : TypesOids.Varchar);
+            buffer.writeInt(field.isByteContent() ? TypesOidsConstants.Varbit : TypesOidsConstants.Varchar);
             length += 4;
             buffer.writeShort((short) 2147483647);
             length += 2;

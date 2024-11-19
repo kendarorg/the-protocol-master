@@ -1,0 +1,39 @@
+{
+  "pluginsDir": "plugins",
+  "logLevel": "DEBUG",
+  "dataDir": "target/tests/fromini",
+  "apiPort": 8095,
+  "protocols": {
+    "http-01": {
+      "protocol": "http",
+      "http": 12080,
+      "https": 12443,
+      "proxy": 12081,
+      "ssl": {
+        "der": "resource://certificates/ca.der",
+        "key": "resource://certificates/ca.key",
+        "cname": "C=US,O=Local Development,CN=local.org",
+        "hosts": [
+        ]
+      },
+      "plugins": {
+        "error-plugin": {
+          "errorCode": 0,
+          "errorMessage": "ERROR",
+          "percentage": 0
+        },
+        "replay-plugin": {
+          "replay": false,
+          "replayId": "replay{timestamp}",
+          "respectCallDuration": true,
+          "blockExternal": true,
+          "matchSites": []
+        },
+        "record-plugin": {
+          "record": false,
+          "recordSites": []
+        }
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@
 
     <groupId>org.kendar.protocol</groupId>
     <artifactId>protocol-master</artifactId>
-    <version>1.4.0</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -20,13 +20,15 @@
         <module>protocol-redis</module>
         <module>protocol-mqtt</module>
         <module>jacoco</module>
-        <module>todo</module>
+        <module>protocol-http</module>
+        <module>sample-plugins</module>
     </modules>
 
     <properties>
-        <project.version>1.4.0</project.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
+        <revision>2.0.0</revision>
         <testcontainers.version>1.20.1</testcontainers.version>
         <testcontainers.redis.version>1.6.4</testcontainers.redis.version>
         <junit.jupiter.version>RELEASE</junit.jupiter.version>
@@ -43,6 +45,16 @@
         <commons.cli.version>1.6.0</commons.cli.version>
         <amqp.client.version>5.20.0</amqp.client.version>
         <jedis.version>5.1.2</jedis.version>
+        <commons.io.version>2.7</commons.io.version>
+        <commons.lang3.version>3.12.0</commons.lang3.version>
+        <commons.text.version>1.10.0</commons.text.version>
+        <pl4j.version>3.12.1</pl4j.version>
+        <jaxb.api.version>2.3.0</jaxb.api.version>
+        <apache.http.version>4.5.13</apache.http.version>
+        <json.schema.validator.version>1.0.66</json.schema.validator.version>
+        <pl4j.version>3.12.1</pl4j.version>
+        <commons.cli.version>1.6.0</commons.cli.version>
+        <bouncycastle.version>1.68</bouncycastle.version>
     </properties>
     <dependencies>
         <!--        <dependency>-->
@@ -162,8 +174,16 @@
                 <version>0.8.8</version>
                 <configuration>
                     <includes>
-                        <include>org.kendar.**</include>
+                        <include>org/kendar/**</include>
                     </includes>
+
+                    <excludes>
+                        <exclude>org/kendar/server/**</exclude>
+                        <exclude>org/kendar/tests/**</exclude>
+                        <exclude>org/kendar/samples/**</exclude>
+                        <exclude>**/*Constant*.*</exclude>
+                        <exclude>**/*Sample*.*</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

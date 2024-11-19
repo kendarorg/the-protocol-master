@@ -1,0 +1,17 @@
+[
+  {
+    "toFind": "http://localhost/external/google",
+    "toReplace": "https://www.google.com",
+    "regex": false
+  },
+  {
+    "toFind": "http://localhost/regex/([a-zA-Z0-9]+)",
+    "toReplace": "https://www.$1.com",
+    "regex": true
+  },
+  {
+    "toFind": "http://localhost/multireg/([a-zA-Z0-9]+)/test/([0-9]+)",
+    "toReplace": "https://www.$1.com/test/$2",
+    "regex": true
+  }
+]

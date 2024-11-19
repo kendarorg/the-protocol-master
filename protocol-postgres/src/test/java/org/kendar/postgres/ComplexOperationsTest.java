@@ -2,7 +2,7 @@ package org.kendar.postgres;
 
 import junit.framework.TestSuite;
 import org.junit.jupiter.api.*;
-import org.kendar.testcontainer.utils.IOReplicator;
+import org.kendar.tests.testcontainer.utils.IOReplicator;
 import org.testcontainers.shaded.org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;

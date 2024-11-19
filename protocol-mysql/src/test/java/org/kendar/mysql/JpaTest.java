@@ -1,8 +1,8 @@
 package org.kendar.mysql;
 
 import org.junit.jupiter.api.*;
-import org.kendar.jpa.HibernateSessionFactory;
 import org.kendar.mysql.jpa.CompanyJpa;
+import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
 
 import java.util.concurrent.atomic.AtomicBoolean;

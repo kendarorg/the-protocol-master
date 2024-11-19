@@ -61,7 +61,7 @@ public class BuildDataTypesJson extends BasicTest {
     public void afterEach() {
     }
 
-    //@Test
+    @Test
     void loadDbInfo() throws SQLException, ClassNotFoundException, JsonProcessingException {
         var c = getRealConnection();
         var dataTypesBuilder = new DataTypesBuilder(c)

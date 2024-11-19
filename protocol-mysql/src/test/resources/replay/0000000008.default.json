@@ -1,0 +1,34 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 8,
+  "input": {
+    "query": "select companyjpa0_.DENOMINATION as col_0_0_ from COMPANY_JPA companyjpa0_",
+    "parameterValues": []
+  },
+  "output": {
+    "selectResult": {
+      "records": [
+        [
+          "Test Ltd"
+        ]
+      ],
+      "metadata": [
+        {
+          "columnName": "col_0_0_",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 255
+        }
+      ],
+      "count": 1,
+      "intResult": false,
+      "lastInsertedId": 0
+    },
+    "intResult": 0
+  },
+  "durationMs": 1,
+  "type": "QUERY",
+  "caller": "JDBC",
+  "nth": -1
+}

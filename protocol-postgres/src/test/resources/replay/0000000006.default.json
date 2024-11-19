@@ -1,0 +1,31 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 6,
+  "input": {
+    "query": "select current_schema()",
+    "parameterValues": []
+  },
+  "output": {
+    "selectResult": {
+      "records": [
+        [
+          "public"
+        ]
+      ],
+      "metadata": [
+        {
+          "columnName": "current_schema",
+          "byteData": false
+        }
+      ],
+      "count": 1,
+      "intResult": false,
+      "lastInsertedId": 0
+    },
+    "intResult": 0
+  },
+  "durationMs": 1,
+  "type": "QUERY",
+  "caller": "JDBC"
+}

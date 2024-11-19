@@ -1,0 +1,12 @@
+{
+  "pluginsDir": "plugins",
+  "logLevel": "ERROR",
+  "dataDir": "data",
+  "protocols": {
+    "http": {
+      "http": 4080,
+      "https": 4483,
+      "proxy": 9999
+    }
+  }
+}

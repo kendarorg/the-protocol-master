@@ -35,4 +35,11 @@ public class JdbcResponse {
     public void setSelectResult(SelectResult selectResult) {
         this.selectResult = selectResult;
     }
+
+    public JdbcResponse copy() {
+        var result = new JdbcResponse();
+        result.setIntResult(intResult);
+        result.setSelectResult(selectResult.copy());
+        return result;
+    }
 }

@@ -1,0 +1,23 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 7,
+  "input": {
+    "query": "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ('TEST RD', 22, 'Test Ltd', 500.22)",
+    "parameterValues": []
+  },
+  "output": {
+    "selectResult": {
+      "records": [],
+      "metadata": [],
+      "count": 1,
+      "intResult": true,
+      "lastInsertedId": 1
+    },
+    "intResult": 0
+  },
+  "durationMs": 9,
+  "type": "QUERY",
+  "caller": "JDBC",
+  "nth": -1
+}

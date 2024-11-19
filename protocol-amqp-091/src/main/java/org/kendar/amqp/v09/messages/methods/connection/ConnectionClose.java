@@ -1,5 +1,6 @@
 package org.kendar.amqp.v09.messages.methods.connection;
 
+import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
@@ -94,6 +95,8 @@ public class ConnectionClose extends Connection {
 
 
         if (context != null) {
+            var protocol = (AmqpProtocol) context.getDescriptor();
+            protocol.getConsumeContext().remove(context.getConsumeId());
             var result = new ConnectionCloseOk();
             result.setChannel(channel);
             var fproxy = proxy;
