@@ -6,6 +6,7 @@ import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.settings.BasicRecordingPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
@@ -21,6 +22,11 @@ import java.util.Map;
 
 public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
     protected static JsonMapper mapper = new JsonMapper();
+    private boolean ignoreTrivialCalls =true;
+
+    public boolean shouldIgnoreTrivialCalls() {
+        return ignoreTrivialCalls;
+    }
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
@@ -28,6 +34,12 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
             postCall(pluginContext, in, out);
         }
         return false;
+    }
+
+    @Override
+    public void setSettings(PluginSettings plugin) {
+        super.setSettings(plugin);
+        ignoreTrivialCalls = ((BasicRecordingPluginSettings)plugin).isIgnoreTrivialCalls();
     }
 
 
@@ -53,7 +65,7 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
                 "JdbcCall", "SelectResult");
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
-        if (!shouldNotSave(storageItem, compactLine)) {
+        if (!shouldNotSave(storageItem, compactLine)|| !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
         } else {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine)));

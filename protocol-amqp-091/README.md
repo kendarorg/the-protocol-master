@@ -1,6 +1,23 @@
 # AMQP 0.9.1 Protocol
 
-## Default Plugins
+## Plugins
+
+### record-plugin
+
+The data will be stored in the global dataDir
+
+* active: If it is active
+* recordSites: list of java regexp for matching hosts to record. When empty everything is recorded
+
+### replay-plugin
+
+The data will be loaded from the global dataDir. This is used to replay a whole flow
+without the need to mock a single request
+
+* active: If it is active
+* matchSites: list of java regexp for matching hosts to replay. When empty everything is replayed
+* respectCallDuration: respect the duration of the round trip
+* blockExternal: default to true, block any calls to not recorded website
 
 ## Documentation used
 
@@ -18,6 +35,5 @@
 
 ## Weirdness
 
-amqp0-9-1.pdf, section 4.2.3
-The size is an INTEGER not a long
-Actually transactions are not supported
+* amqp0-9-1.pdf, section 4.2.3, The size is an INTEGER not a long
+* Actually transactions are not supported

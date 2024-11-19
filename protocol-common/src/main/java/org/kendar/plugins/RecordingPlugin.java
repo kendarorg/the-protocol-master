@@ -8,6 +8,7 @@ import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.settings.BasicRecordingPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
@@ -19,6 +20,11 @@ import java.util.Map;
 
 public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static final JsonMapper mapper = new JsonMapper();
+    private boolean ignoreTrivialCalls =true;
+
+    public boolean shouldIgnoreTrivialCalls() {
+        return ignoreTrivialCalls;
+    }
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
@@ -30,6 +36,12 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
             }
         }
         return false;
+    }
+
+    @Override
+    public void setSettings(PluginSettings plugin) {
+        super.setSettings(plugin);
+        ignoreTrivialCalls = ((BasicRecordingPluginSettings)plugin).isIgnoreTrivialCalls();
     }
 
     protected void asyncCall(PluginContext pluginContext, Object out) {
@@ -71,7 +83,7 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
                 resType);
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
-        if (!shouldNotSave(in, out, compactLine)) {
+        if (!shouldNotSave(in, out, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
         } else {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine)));

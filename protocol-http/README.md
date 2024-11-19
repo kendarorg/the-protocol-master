@@ -91,7 +91,7 @@ The recording will contain the target address!
 * rewritesFile: the json file containing the rewrites 
 
 The format, is the following. When settings a regexp the replacements (like $1 etc)
-can be used
+can be used. Please remind that what follows the founded request is added at the end!
 
 ```
 [
@@ -99,6 +99,14 @@ can be used
     "toReplace":"https://remoteservice.com",
     "isRegex":false}
 ]
+```
+
+An example of complex regexp
+
+```
+    "toFind": "http://localhost/multireg/([a-zA-Z0-9]+)/test/([0-9]+)",
+    "toReplace": "https://www.$1.com/test/$2",
+    "regex": true
 ```
 
 ## Documentation used

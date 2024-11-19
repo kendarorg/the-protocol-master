@@ -2,23 +2,11 @@ package org.kendar.http.settings;
 
 import org.kendar.settings.ProtocolSettings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class HttpProtocolSettings extends ProtocolSettings {
     private int http;
     private int https;
     private int proxy;
     private HttpSSLSettings ssl = new HttpSSLSettings();
-    private List<HttpRewriteSettings> rewrites = new ArrayList<>();
-
-    public List<HttpRewriteSettings> getRewrites() {
-        return rewrites;
-    }
-
-    public void setRewrites(List<HttpRewriteSettings> rewrites) {
-        this.rewrites = rewrites;
-    }
 
     public int getHttp() {
         return http;

@@ -9,7 +9,7 @@ public class ReplacerItemInstance extends ReplacerItem {
         setToReplace(replacer.getToReplace().replaceAll("\r\n", "\n").trim());
         setRegex(replacer.isRegex());
         if (isRegex()) {
-            findPattern = Pattern.compile(replacer.getToFind().replaceAll("\r\n", "\n").trim(), Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+            findPattern = Pattern.compile(replacer.getToFind().replaceAll("\r\n", "\n").trim()+"(.*)", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
         } else {
             setToFind(replacer.getToFind().replaceAll("\r\n", "\n").trim());
         }
@@ -19,10 +19,11 @@ public class ReplacerItemInstance extends ReplacerItem {
         if (isRegex()) {
             var matcher = findPattern.matcher(query);
             if (!matcher.matches()) return query;
-            return matcher.replaceFirst(getToReplace());
+            var lastGroup = matcher.group(matcher.groupCount());
+            return matcher.replaceAll(getToReplace())+lastGroup.toString();
         } else {
-            if (getToFind().equalsIgnoreCase(query)) {
-                return getToReplace();
+            if (query.startsWith(getToFind())) {
+                return  getToReplace()+query.substring(getToFind().length());
             }
             return query;
         }

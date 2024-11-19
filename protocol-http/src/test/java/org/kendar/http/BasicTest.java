@@ -19,6 +19,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
+import org.kendar.plugins.RewritePluginSettings;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -139,20 +140,25 @@ public class BasicTest {
         httpProtocolSettings.setHttp(FAKE_PORT_HTTP);
         httpProtocolSettings.setProxy(FAKE_PORT_PROXY);
         httpProtocolSettings.setProtocolInstanceId("default");
-        var recordingPlugin = new HttpRecordPluginSettings();
-        httpProtocolSettings.getPlugins().put("record-plugin", recordingPlugin);
-        var replayPlugin = new HttpReplayPluginSettings();
-        httpProtocolSettings.getPlugins().put("replay-plugin", replayPlugin);
-        var mockPlugin = new BasicMockPluginSettings();
-        mockPlugin.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        httpProtocolSettings.getPlugins().put("mock-plugin", mockPlugin);
+        var rewriteSettings = new RewritePluginSettings();
+        rewriteSettings.setRewritesFile(Path.of("src","test","resources","rewrite.json").toAbsolutePath().toString());
+        httpProtocolSettings.getPlugins().put("replay-plugin", rewriteSettings);
+
+        var recordingSettings = new HttpRecordPluginSettings();
+        httpProtocolSettings.getPlugins().put("record-plugin", recordingSettings);
+        var replaySettings = new HttpReplayPluginSettings();
+        httpProtocolSettings.getPlugins().put("replay-plugin", replaySettings);
+        var mockSettings = new BasicMockPluginSettings();
+        mockSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
+        httpProtocolSettings.getPlugins().put("mock-plugin", mockSettings);
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
                 new HttpRecordingPlugin(),
                 new HttpReplayingPlugin().withStorage(storage),
                 new HttpErrorPlugin(),
-                new HttpMockPlugin()));
+                new HttpMockPlugin(),
+                new HttpRewritePlugin()));
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 

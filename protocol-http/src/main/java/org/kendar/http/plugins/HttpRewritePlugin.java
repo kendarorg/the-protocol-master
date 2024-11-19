@@ -33,8 +33,7 @@ public class HttpRewritePlugin extends RewritePlugin<Request, Response, String> 
     protected void replaceData(ReplacerItemInstance item, String realSrc, Request source, Response response) {
         try {
             var replaced = item.run(realSrc);
-            //noinspection StringEquality
-            if (replaced != realSrc) {
+            if (!replaced.equalsIgnoreCase(realSrc)) {
                 var oriSource = source.copy();
                 var url = new URL(replaced);
                 if (url.getProtocol().equalsIgnoreCase(HTTPS) && url.getPort() != 443) {
