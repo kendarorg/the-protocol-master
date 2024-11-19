@@ -1,4 +1,4 @@
-package org.kendar.http.utils.ssl;
+package org.kendar.ssl;
 
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;

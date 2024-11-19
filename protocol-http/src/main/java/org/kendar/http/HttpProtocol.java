@@ -8,7 +8,7 @@ import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
 import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
-import org.kendar.http.utils.ssl.CertificatesManager;
+import org.kendar.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;

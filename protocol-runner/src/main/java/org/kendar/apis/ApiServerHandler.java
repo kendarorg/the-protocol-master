@@ -65,8 +65,8 @@ public class ApiServerHandler implements HttpHandler {
         } else if (isPath(path, "/api/protocols")) {
             respond(exchange, handler.getProtocols(), 200);
             return;
-        } else if (isPath(path, "/api/storage/{action}",parameters)) {
-            respond(exchange, handler.handleStrage(parameters.get("action")), 200);
+        }  else if (isPath(path, "/api/storage/{action}",parameters)) {
+            respond(exchange, handler.handleStrage(parameters.get("action"),exchange), 200);
             return;
         } else if (isPath(path, "/api/protocols/{protocolInstanceId}/plugins", parameters)) {
             respond(exchange, handler.getProtocolPlugins(parameters.get("protocolInstanceId")), 200);

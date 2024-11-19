@@ -11,7 +11,7 @@ import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.settings.HttpSSLSettings;
-import org.kendar.http.utils.ssl.CertificatesManager;
+import org.kendar.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.RewritePluginSettings;
 import org.kendar.server.KendarHttpsServer;

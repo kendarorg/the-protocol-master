@@ -17,4 +17,6 @@ public interface StorageRepository extends Service {
     List<StorageItem> readResponses(String instanceId, ResponseItemQuery query);
 
     byte[] readAsZip();
+
+    void writeZip(byte[] byteArray);
 }

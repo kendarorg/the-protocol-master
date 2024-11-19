@@ -13,6 +13,10 @@ Shutdown the whole system gracefully
 
 Download a zip file with all the recordings
 
+### POST /api/storage/upload
+
+Upload a zip file with all the recordings
+
 ### GET /api/protocols
 
 List all active protocols with the instanceId of the protocol
