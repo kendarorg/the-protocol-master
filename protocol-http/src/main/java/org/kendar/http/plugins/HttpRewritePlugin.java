@@ -20,6 +20,11 @@ public class HttpRewritePlugin extends RewritePlugin<Request, Response, String> 
     }
 
     @Override
+    protected boolean useTrailing() {
+        return true;
+    }
+
+    @Override
     public String getProtocol() {
         return "http";
     }

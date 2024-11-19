@@ -113,61 +113,6 @@ If you want to go on the specific functions by protocol:
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/kendarorg/1)
 
-java -cp "ojdbc11.jar;protocol-runner.jar" \
-org.springframework.boot.loader.JarLauncher \
--p postgres -l 5432 \
--xl system -xw password -xc jdbc:oracle:thin:@192.168.1.96:1521/FREEPDB
-
-### Set Schema
-
-The set schema is called in case the jdbc driver does not allow setting the schema from connection string
-
-### Replace Queries
-
-Specify a file containing "replacement queries" this is specially useful when running ... the runner
-as postgres and contacting a different kind of database. Here can be inserted the replacements.
-
-SPACE ARE IMPORTANT INSIDE THE QUERY. THEY MUST MATCH THE REAL ONE.
-AND NO ";" SHOULD BE ADDED AT THE END OF QUERIES
-
-This first example replaces "SELECT 1 AS TEST" directly with "SELECT 2 AS TEST".
-
-<pre>
-#find
-SELECT 
- 1 AS TEST
-#replace
-SELECT 
- 2 AS TEST
-</pre>
-
-This second example replaces "SELECT anynumber AS TEST" with "SELECT anynumber+1 AS TEST"
-So if you send a "SELECT 10 AS TEST" the resultset will contain a 12.
-
-Please notice the usage of the $1 in the capture group.
-
-<pre>
-#regexfind
-SELECT 
- ([0-9]+) AS TEST
-#replace
-SELECT 
- $1+2 AS TEST
-</pre>
-
-This third example replaces "SELECT anynumber AS TEST" directly with "SELECT 2 AS TEST".
-
-In this case the capture group is not used and the whole query will be ALWAYS be replaced
-
-<pre>
-#regexfind
-SELECT 
- ([0-9]+) AS TEST
-#replace
-SELECT 
- 2 AS TEST
-</pre>
-
 ## The state machine-Behaviour tree
 
 ### TLDR

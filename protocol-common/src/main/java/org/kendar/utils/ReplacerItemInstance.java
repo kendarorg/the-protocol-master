@@ -3,13 +3,19 @@ package org.kendar.utils;
 import java.util.regex.Pattern;
 
 public class ReplacerItemInstance extends ReplacerItem {
+    private final boolean trailing;
     private Pattern findPattern;
 
-    public ReplacerItemInstance(ReplacerItem replacer) {
+    public ReplacerItemInstance(ReplacerItem replacer,boolean trailing) {
+        this.trailing = trailing;
         setToReplace(replacer.getToReplace().replaceAll("\r\n", "\n").trim());
         setRegex(replacer.isRegex());
         if (isRegex()) {
-            findPattern = Pattern.compile(replacer.getToFind().replaceAll("\r\n", "\n").trim()+"(.*)", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+            var expr = replacer.getToFind().replaceAll("\r\n", "\n").trim();
+            if(trailing){
+                expr+="(.*)";
+            }
+            findPattern = Pattern.compile(expr, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
         } else {
             setToFind(replacer.getToFind().replaceAll("\r\n", "\n").trim());
         }
@@ -19,8 +25,12 @@ public class ReplacerItemInstance extends ReplacerItem {
         if (isRegex()) {
             var matcher = findPattern.matcher(query);
             if (!matcher.matches()) return query;
-            var lastGroup = matcher.group(matcher.groupCount());
-            return matcher.replaceAll(getToReplace())+lastGroup.toString();
+            if(this.trailing) {
+                var lastGroup = matcher.group(matcher.groupCount());
+                return matcher.replaceAll(getToReplace()) + lastGroup.toString();
+            }else{
+                return matcher.replaceAll(getToReplace());
+            }
         } else {
             if (query.startsWith(getToFind())) {
                 return  getToReplace()+query.substring(getToFind().length());

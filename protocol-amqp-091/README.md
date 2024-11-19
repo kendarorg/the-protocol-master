@@ -1,23 +1,36 @@
 # AMQP 0.9.1 Protocol
 
+Create a two way transparent proxy to a remote amqp 0.9.1 compatible server.
+
+## Configuration
+
+* protocol: amqp091 (this is mandatory)
+* port: the port on which the proxy will listen
+* login: the -real- login to use to connect to the real server
+* password: the -real- password to use to connect to the real server
+* connectionString: the connection string for the real server (e.g. amqp://localhost:5372 )
+* timeoutSeconds: the timeout to drop the connections
+
 ## Plugins
 
 ### record-plugin
 
-The data will be stored in the global dataDir
+The data will be stored in the global dataDir. 
+
+All callback are recorded
 
 * active: If it is active
-* recordSites: list of java regexp for matching hosts to record. When empty everything is recorded
+* ignoreTrivialCalls: store in full only calls that cannot be generated automatically (the ones with real data)
 
 ### replay-plugin
 
 The data will be loaded from the global dataDir. This is used to replay a whole flow
 without the need to mock a single request
 
+All callback are replayed automatically
+
 * active: If it is active
-* matchSites: list of java regexp for matching hosts to replay. When empty everything is replayed
 * respectCallDuration: respect the duration of the round trip
-* blockExternal: default to true, block any calls to not recorded website
 
 ## Documentation used
 

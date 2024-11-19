@@ -3,6 +3,36 @@
 You can directly use the proxy as a normal MQTT server (with no authentication
 at the moment)
 
+## Configuration
+
+* protocol: mqtt (this is mandatory)
+* port: the port on which the proxy will listen
+* login: the -real- login to use to connect to the real server
+* password: the -real- password to use to connect to the real server
+* connectionString: the connection string for the real server (e.g. tcp://localhost:1884 )
+* timeoutSeconds: the timeout to drop the connections
+
+## Plugins
+
+### record-plugin
+
+The data will be stored in the global dataDir.
+
+All callback are recorded
+
+* active: If it is active
+* ignoreTrivialCalls: store in full only calls that cannot be generated automatically (the ones with real data)
+
+### replay-plugin
+
+The data will be loaded from the global dataDir. This is used to replay a whole flow
+without the need to mock a single request
+
+All callback are replayed automatically
+
+* active: If it is active
+* respectCallDuration: respect the duration of the round trip
+
 ## Missing features
 
 * Authentication (AUTH packet)
@@ -33,5 +63,5 @@ that involve a couple of reflection tricks (check the MqttClientHack class in th
 test section)
 
 When the Paho client does not know what packet identifier it should generate,
-simply create a new one. This happened for example when during development i
+simply create a new one. This happened for example when during development. I
 had not set the packet Identifier when returning a PUBREL packet

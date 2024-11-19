@@ -5,7 +5,6 @@ import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
-import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.ExtraStringReplacer;
 
@@ -15,12 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> {
-    private final SqlStringParser parser;
-
-    public JdbcMockPlugin() {
-        super();
-        parser = new SqlStringParser(getSqlStringParserSeparator());
-    }
 
     @Override
     protected void checkMatching(MockStorage data, JdbcCall callToSimulate, ChangeableReference<Integer> matchingQuery, ChangeableReference<Long> foundedIndex) {
@@ -99,9 +92,6 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
         }
         return false;
     }
-
-    protected abstract String getSqlStringParserSeparator();
-
 
     @Override
     protected List<MockStorage> firstCheckOnMainPart(JdbcCall request) {

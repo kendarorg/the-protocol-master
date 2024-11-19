@@ -6,6 +6,120 @@ This protocol can be used as a "drop-in" replacement since the
 not left as they are. So you can use this protocol to proxy and log a
 connection even with Oracle or SQLServer
 
+## Configuration
+
+* protocol: redis (this is mandatory)
+* port: the port on which the proxy will listen
+* login: the -real- login to use to connect to the real server
+* password: the -real- password to use to connect to the real server
+* connectionString: the connection string for the real server (e.g. jdbc:postgresql://localhost:5432/db?ssl=false ) can be even another db!!
+* timeoutSeconds: the timeout to drop the connections
+* forceSchema: the force is called in case the jdbc driver does not allow setting the schema from connection string
+
+## Plugins
+
+### record-plugin
+
+The data will be stored in the global dataDir.
+
+* active: If it is active
+* ignoreTrivialCalls: store in full only calls that cannot be generated automatically (the ones with real data)
+
+### replay-plugin
+
+The data will be loaded from the global dataDir. This is used to replay a whole flow
+without the need to mock a single request
+
+* active: If it is active
+* respectCallDuration: respect the duration of the round trip
+
+### mock-plugin
+
+To mock single requests
+
+* active: If it is active
+* dataDir: The directory where the mock will be stored
+
+The mock files are exactly like the recorded files with an addition of a few fields
+
+* nthRequest: run only from the nTh request (default 0)
+* count: run for "count" times (set to 99999 if you want them all)
+
+The mocks can be parametrized using ${variableName} format inside
+
+* Query: e.g. SELECT ADDRESS,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=${age}
+* Parameter: setting a value to ${myParameterVariable}
+
+These variable are assigned taking the value from the real request and are modified
+inside the replaced response. For example the mocked response
+can be set to the following
+
+
+```
+  "output": {
+    "selectResult": {
+      "records": [
+        [
+          "${denomination}",
+          "${age}"
+        ]
+      ],
+```
+
+This is useful to generate "dynamic" responses
+
+### rewrite-plugin
+
+To change some call, for example to rewrite all call to localhost/microservice.1/* to remoteserice.com/*
+This can be used to avoid configuring the proxy on the application
+
+The recording will contain the target address!
+
+* active: If it is active
+* rewritesFile: the json file containing the rewrites
+
+The format, is the following. When settings a regexp the replacements (like $1 etc)
+can be used.
+
+```
+[
+    {"toFind":"SELECT * FROM ATABLE ORDER BY ID DESC",
+    "toReplace":"SELECT * FROM ATABLE WHERE ID>100 ORDER BY ID DESC",
+    "isRegex":false}
+]
+```
+
+An example of complex regexp
+
+```
+    {"toFind":"SELECT * FROM ([a-zA-Z]+) WHERE ID=([0-9]+) ORDER BY ID DESC",
+    "toReplace":"SELECT * FROM NEW_TABLE_$1 WHERE NEW_ID=$2 ORDER BY ID DESC",
+    "regex": true
+```
+
+### Connect to different servers
+
+Leveraging on rewrite and mock plugin it is possible to connect to any kind of db
+just replacing the queries (or adding them as mocks if tables are not available.
+
+For example calling the following
+
+```
+java -cp "ojdbc11.jar;protocol-runner.jar" \
+  org.springframework.boot.loader.JarLauncher \
+  -cfg oracleSettings.json
+```
+
+and specifying the connection string for Oracle(TM) in the settings
+
+```
+  "connectionString":"jdbc:oracle:thin:@192.168.1.96:1521/FREEPDB",
+```
+
+And adding a couple of rewrites, can use an Oracle as a Postgres DB!!
+
+If you are interested check the tutorial [Postgres to Oracle Bridge](../docs/postgres2oracleBridge.md)
+
 ## Missing features
 
 * Real authentication (always allowed)
@@ -50,10 +164,10 @@ When is set to 1 (one) then the data inserted MUST NOT be returned
 Calling sp or functions add around the call the following and setup the out param rebuilding everything -BY HAND-
 in Parser::modifyJdbcCall. The out parameter is diabolically reintegrated!
 
-<pre>
+```
       prefix = "select * from ";
       suffix = " as result";
-</pre>
+```
 
 ### Numeric format
 
@@ -83,14 +197,14 @@ Some other relevant comments are
   expressed
 * in *decimal* digits, and so it may correspond to a fractional number of
 
-<pre>
+```
   pq_sendint(&buf, x.ndigits, sizeof(int16));
   pq_sendint(&buf, x.weight, sizeof(int16));
   pq_sendint(&buf, x.sign, sizeof(int16));
   pq_sendint(&buf, x.dscale, sizeof(int16));
   for (i = 0; i < x.ndigits; i++)
   pq_sendint(&buf, x.digits[i], sizeof(NumericDigit));
-</pre>
+```
 
 Note that the "digits" are base-10000 digits.
 

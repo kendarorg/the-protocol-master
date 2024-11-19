@@ -11,9 +11,9 @@ on localhost the sites to build must be added on the "ssl/hosts"
 
 ### General
 
-* protocol: http
-* http: http port for interception of calls
-* https: https port for interception of calls
+* protocol: http (this is mandatory)
+* http: http port for interception of calls (mostly with rewrite-plugin)
+* https: https port for interception of calls (mostly with rewrite-plugin)
 * proxy: proxy port (used to intercept -everything-)
 
 ### SSL
@@ -73,12 +73,12 @@ These variable are assigned taking the value from the real request and are modif
 inside the headers and the content (when textual). For example the mocked response 
 can be set to the following, same goes for the header variable.
 
-This is useful to generate "dynamic" responses
-
 ```
   "output": {
     "responseText": "${myPathVariable} ${myQueryVariable} ${myHeaderVariable}",
 ```
+
+This is useful to generate "dynamic" responses
 
 ### rewrite-plugin
 

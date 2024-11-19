@@ -10,6 +10,32 @@ is the only supported auth mechanism for the proxy
 The connection string to connect to the proxy must always be without login and passwords,
 the SaslStart message is not supported
 
+## Configuration
+
+* protocol: redis (this is mandatory)
+* port: the port on which the proxy will listen
+* login: the -real- login to use to connect to the real server
+* password: the -real- password to use to connect to the real server
+* connectionString: the connection string for the real server (e.g. mongodb://localhost:27018 )
+* timeoutSeconds: the timeout to drop the connections
+
+## Plugins
+
+### record-plugin
+
+The data will be stored in the global dataDir.
+
+* active: If it is active
+* ignoreTrivialCalls: store in full only calls that cannot be generated automatically (the ones with real data)
+
+### replay-plugin
+
+The data will be loaded from the global dataDir. This is used to replay a whole flow
+without the need to mock a single request
+
+* active: If it is active
+* respectCallDuration: respect the duration of the round trip
+
 ## Missing features
 
 * Real authentication (always allowed)
@@ -27,7 +53,8 @@ the SaslStart message is not supported
 
 The document starts with the Int32 length
 
-<pre>
+```
+
 struct Section {
     uint8 payloadType;
     union payload {
@@ -51,5 +78,4 @@ struct OP_MSG {
     Section+    sections;
     [uint32     checksum;]
 };
-
-</pre>
+```

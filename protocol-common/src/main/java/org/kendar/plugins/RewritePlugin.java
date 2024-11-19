@@ -68,7 +68,7 @@ public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T,
 
             for (var replacer : mapper.deserialize(Files.readString(path), new TypeReference<List<ReplacerItem>>() {
             })) {
-                replacers.add(new ReplacerItemInstance(replacer));
+                replacers.add(new ReplacerItemInstance(replacer,useTrailing()));
             }
         } catch (Exception e) {
             log.error("Unable to read rewrite file {}", settings.getRewritesFile(), e);
@@ -76,9 +76,13 @@ public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T,
         }
     }
 
+    protected boolean useTrailing(){
+        return false;
+    }
+
     public void setReplacers(List<ReplacerItem> items) {
         for (var replacer : items) {
-            replacers.add(new ReplacerItemInstance(replacer));
+            replacers.add(new ReplacerItemInstance(replacer,useTrailing()));
         }
     }
 }
