@@ -7,4 +7,4 @@ The queries where used to expose on Grafana an Oracle DB.
 
 Grafana only integrate Postgres driver.
 
-This is the [rewrite file](rewrite.json)
+This is the [rewrite file](rewriteOcl.json)
