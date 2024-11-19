@@ -32,7 +32,6 @@ All callback are replayed automatically
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
 
-
 ## Missing features
 
 * [Inline commands](https://redis.io/docs/latest/develop/reference/protocol-spec/#inline-commands) issued via Telnet

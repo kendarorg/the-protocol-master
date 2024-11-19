@@ -92,6 +92,7 @@ public class UnmodifiableHeaders extends Headers {
         throw new UnsupportedOperationException("unsupported operation");
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object o) {
         return headers.equals(o);
     }

@@ -12,7 +12,8 @@ connection even with Oracle or SQLServer
 * port: the port on which the proxy will listen
 * login: the -real- login to use to connect to the real server
 * password: the -real- password to use to connect to the real server
-* connectionString: the connection string for the real server (e.g. jdbc:postgresql://localhost:5432/db?ssl=false ) can be even another db!!
+* connectionString: the connection string for the real server (e.g. jdbc:postgresql://localhost:5432/db?ssl=false ) can
+  be even another db!!
 * timeoutSeconds: the timeout to drop the connections
 * forceSchema: the force is called in case the jdbc driver does not allow setting the schema from connection string
 
@@ -53,7 +54,6 @@ The mocks can be parametrized using ${variableName} format inside
 These variable are assigned taking the value from the real request and are modified
 inside the replaced response. For example the mocked response
 can be set to the following
-
 
 ```
   "output": {

@@ -1,6 +1,6 @@
 ## The properties.json
 
-All configurations can be stored in a json file. 
+All configurations can be stored in a json file.
 
 The first section contains the main settings:
 
@@ -19,7 +19,7 @@ The first section contains the main settings:
 ```
 
 Here can be set all the protocol used multiple times. The name of the section will
-be appended to the registration/loaded for replay, but keeping all the calls in 
+be appended to the registration/loaded for replay, but keeping all the calls in
 order (to understand interactions)
 
 For the specific settings and supported plugin search on the protocols

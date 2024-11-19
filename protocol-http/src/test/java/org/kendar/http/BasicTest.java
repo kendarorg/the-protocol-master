@@ -141,7 +141,7 @@ public class BasicTest {
         httpProtocolSettings.setProxy(FAKE_PORT_PROXY);
         httpProtocolSettings.setProtocolInstanceId("default");
         var rewriteSettings = new RewritePluginSettings();
-        rewriteSettings.setRewritesFile(Path.of("src","test","resources","rewrite.json").toAbsolutePath().toString());
+        rewriteSettings.setRewritesFile(Path.of("src", "test", "resources", "rewrite.json").toAbsolutePath().toString());
         httpProtocolSettings.getPlugins().put("replay-plugin", rewriteSettings);
 
         var recordingSettings = new HttpRecordPluginSettings();

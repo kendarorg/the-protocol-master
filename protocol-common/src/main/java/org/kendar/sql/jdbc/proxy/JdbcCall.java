@@ -8,6 +8,7 @@ import java.util.List;
 public class JdbcCall {
     private List<BindingParameter> parameterValues = new ArrayList<>();
     private String query;
+
     public JdbcCall() {
 
     }

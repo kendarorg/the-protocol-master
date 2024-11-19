@@ -72,6 +72,7 @@ public class HibernateSessionFactory {
     }
 
 
+    @SuppressWarnings("rawtypes")
     public static <T> Optional<T> querySingle(EntityManagerFunctionResult function) throws Exception {
         var sessionFactory = buildSessionFactory();
         var em = sessionFactory.createEntityManager();

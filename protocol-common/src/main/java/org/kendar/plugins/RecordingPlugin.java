@@ -20,7 +20,7 @@ import java.util.Map;
 
 public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static final JsonMapper mapper = new JsonMapper();
-    private boolean ignoreTrivialCalls =true;
+    private boolean ignoreTrivialCalls = true;
 
     public boolean shouldIgnoreTrivialCalls() {
         return ignoreTrivialCalls;
@@ -41,7 +41,7 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     @Override
     public void setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
-        ignoreTrivialCalls = ((BasicRecordingPluginSettings)plugin).isIgnoreTrivialCalls();
+        ignoreTrivialCalls = ((BasicRecordingPluginSettings) plugin).isIgnoreTrivialCalls();
     }
 
     protected void asyncCall(PluginContext pluginContext, Object out) {

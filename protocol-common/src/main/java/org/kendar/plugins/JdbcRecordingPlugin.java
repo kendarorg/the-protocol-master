@@ -22,7 +22,7 @@ import java.util.Map;
 
 public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
     protected static JsonMapper mapper = new JsonMapper();
-    private boolean ignoreTrivialCalls =true;
+    private boolean ignoreTrivialCalls = true;
 
     public boolean shouldIgnoreTrivialCalls() {
         return ignoreTrivialCalls;
@@ -39,7 +39,7 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
     @Override
     public void setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
-        ignoreTrivialCalls = ((BasicRecordingPluginSettings)plugin).isIgnoreTrivialCalls();
+        ignoreTrivialCalls = ((BasicRecordingPluginSettings) plugin).isIgnoreTrivialCalls();
     }
 
 
@@ -65,7 +65,7 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
                 "JdbcCall", "SelectResult");
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
-        if (!shouldNotSave(storageItem, compactLine)|| !shouldIgnoreTrivialCalls()) {
+        if (!shouldNotSave(storageItem, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
         } else {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine)));

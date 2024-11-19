@@ -12,6 +12,7 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+@SuppressWarnings("ClassEscapesDefinedScope")
 public class SSLStreams {
 
     final SSLContext sslctx;
@@ -353,6 +354,7 @@ public class SSLStreams {
             wrap_dst = allocate(SSLStreams.BufType.PACKET);
         }
 
+        @SuppressWarnings("EmptyMethod")
         void close() throws IOException {
         }
 

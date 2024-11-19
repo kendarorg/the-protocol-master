@@ -26,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
 
+@SuppressWarnings("resource")
 public class ExchangeImpl {
 
     /* for formatting the Date: header */

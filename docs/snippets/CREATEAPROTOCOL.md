@@ -12,7 +12,7 @@ Add first to the pom.xml the dependencies on the main projects.
 * Common for the common stuffs
 * Test for the testcontainers and general test utilities
 
-<pre>
+```
     <dependency>
         <groupId>javax.xml.bind</groupId>
         <artifactId>jaxb-api</artifactId>
@@ -30,7 +30,7 @@ Add first to the pom.xml the dependencies on the main projects.
         <version>${revision}</version>
         <scope>test</scope>
     </dependency>
-</pre>
+```
 
 ### MqttProtocol class
 
@@ -45,7 +45,7 @@ and the default port is 1883.
 * Constructor with and without ports
 * consumeContext, with all the currently running contexts
 
-<pre>
+```
     private static final int PORT = 1883;
     private int port = PORT;
     public static ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
@@ -60,7 +60,7 @@ and the default port is 1883.
 
     @Override
     public int getPort() {return port;}
-</pre>
+```
 
 ### MqttContext
 
@@ -71,7 +71,7 @@ the data relative to a specific connection. Let's create "MqttContext" extending
 The only method is the disconnect. It get the default "CONNECTION" object from
 the context specific values and close it.
 
-<pre>
+```
     @Override
     public void disconnect(Object connection) {
         ProxyConnection conn = ((ProxyConnection) getValue("CONNECTION"));
@@ -80,19 +80,19 @@ the context specific values and close it.
 //            sock.close();
 //        }
     }
-</pre>
+```
 
 Is now possible to initialize the "MqttProtocol.createContext" function. Storing
 the context in the contexts cache
 
-<pre>
+```
     @Override
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor) {
         var result = new MqttContext(protoDescriptor);
         consumeContext.put(result.getContextId(), result);
         return result;
     }
-</pre>
+```
 
 ### What's inside
 
@@ -129,7 +129,7 @@ inside a specific "flag" enum: MqttFixedHeader
 
 Looking at the code we add the method to read/write the flag
 
-<pre>
+```
 public enum MqttFixedHeader {
   RESERVED(0x00),
   ....
@@ -139,7 +139,7 @@ public enum MqttFixedHeader {
   ....
   int unsetFlag(int source, int flag)
   ....  
-</pre>
+```
 
 The first thing would be to translate the bytes to a MqttPacket. For this we can add
 a special "interruptState" implementing InterruptProtoState. This means that this
@@ -154,22 +154,22 @@ common for the return data, the "NetworkReturnMessage" the latter require
 the write method to be implemented. This method writes the buffer that will
 be sent back to the client
 
-<pre>
+```
     public class MqttPacket extends BaseEvent implements NetworkReturnMessage
-</pre>
+```
 
 #### The variable length integer
 
 To ease the development the BBuffer used will be a new MqttBBuffer, containing
 methods specific for the protocol
 
-<pre>
+```
 public class MqttBBuffer extends BBuffer {
   void writeVarBInteger(long number)
   int writeVarBInteger(long number, int offset) //returns the length
   long readVarBInteger()
   long readVarBInteger(int offset)
-</pre>
+```
 
 
 

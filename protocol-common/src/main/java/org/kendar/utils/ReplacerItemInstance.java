@@ -6,14 +6,14 @@ public class ReplacerItemInstance extends ReplacerItem {
     private final boolean trailing;
     private Pattern findPattern;
 
-    public ReplacerItemInstance(ReplacerItem replacer,boolean trailing) {
+    public ReplacerItemInstance(ReplacerItem replacer, boolean trailing) {
         this.trailing = trailing;
         setToReplace(replacer.getToReplace().replaceAll("\r\n", "\n").trim());
         setRegex(replacer.isRegex());
         if (isRegex()) {
             var expr = replacer.getToFind().replaceAll("\r\n", "\n").trim();
-            if(trailing){
-                expr+="(.*)";
+            if (trailing) {
+                expr += "(.*)";
             }
             findPattern = Pattern.compile(expr, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
         } else {
@@ -25,15 +25,15 @@ public class ReplacerItemInstance extends ReplacerItem {
         if (isRegex()) {
             var matcher = findPattern.matcher(query);
             if (!matcher.matches()) return query;
-            if(this.trailing) {
+            if (this.trailing) {
                 var lastGroup = matcher.group(matcher.groupCount());
-                return matcher.replaceAll(getToReplace()) + lastGroup.toString();
-            }else{
+                return matcher.replaceAll(getToReplace()) + lastGroup;
+            } else {
                 return matcher.replaceAll(getToReplace());
             }
         } else {
             if (query.startsWith(getToFind())) {
-                return  getToReplace()+query.substring(getToFind().length());
+                return getToReplace() + query.substring(getToFind().length());
             }
             return query;
         }

@@ -1,4 +1,3 @@
-
 * Create a state machine able to interpret a generic wire protocol, handling
   special situations like incomplete messages, sanding and receiving data according
   to byte ordering and formatting

@@ -54,7 +54,7 @@ public class ContainersTest {
         assertNotNull(dockerHost);
         var network = Network.newNetwork();
 
-        try (var postgresContainer = new PostgreslImage()) {
+        try (var postgresContainer = new PostgresSqlImage()) {
             postgresContainer
                     .withNetwork(network)
                     .withAliases("postgres.sample.test", "postgres.proxy.test")

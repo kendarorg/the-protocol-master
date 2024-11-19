@@ -68,8 +68,8 @@ public class MimeChecker {
         if (pathlow.equalsIgnoreCase("/") || pathlow.equalsIgnoreCase("")) {
             return true;
         }
-        for (int i = 0; i < STATIC_FILES.length; i++) {
-            if (pathlow.endsWith(STATIC_FILES[i])) return true;
+        for (String staticFile : STATIC_FILES) {
+            if (pathlow.endsWith(staticFile)) return true;
         }
         return false;
     }

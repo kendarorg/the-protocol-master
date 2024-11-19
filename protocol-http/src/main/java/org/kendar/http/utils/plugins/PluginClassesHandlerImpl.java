@@ -19,6 +19,7 @@ public class PluginClassesHandlerImpl implements PluginClassesHandler {
         this.handlers = handlers;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response, HttpClientConnectionManager connectionManager) throws InvocationTargetException, IllegalAccessException {
         for (var handler : handlers.stream().filter(h -> h.getPhases().contains(phase)).collect(Collectors.toList())) {

@@ -8,7 +8,7 @@ You can directly use the "proxy" as a normal mysql backend
 * port: the port on which the proxy will listen
 * login: the -real- login to use to connect to the real server
 * password: the -real- password to use to connect to the real server
-* connectionString: the connection string for the real server (e.g. jdbc:mysql://localhost:5432/db?ssl=false ) 
+* connectionString: the connection string for the real server (e.g. jdbc:mysql://localhost:5432/db?ssl=false )
 * timeoutSeconds: the timeout to drop the connections
 * forceSchema: the force is called in case the jdbc driver does not allow setting the schema from connection string
 
@@ -49,7 +49,6 @@ The mocks can be parametrized using ${variableName} format inside
 These variable are assigned taking the value from the real request and are modified
 inside the replaced response. For example the mocked response
 can be set to the following
-
 
 ```
   "output": {
@@ -168,8 +167,6 @@ using that approach. Only the parameters of the PS are sent in "compact mysql fo
 
 When doing an INSERT if the generated key is a LONG/INT then should be returned
 -ONLY- the new value without a real recordset
-
-
 
 ### Prepared statement
 

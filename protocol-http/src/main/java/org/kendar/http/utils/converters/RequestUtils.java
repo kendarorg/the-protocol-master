@@ -155,9 +155,9 @@ public class RequestUtils {
         var block = new SimpleBlock();
         var bodyData = new ArrayList<Byte>();
         var test = new ArrayList<Byte>();
-        for (var z = 0; z < body.length; z++) {
-            if (body[z] == '\r') break;
-            test.add(body[z]);
+        for (byte b : body) {
+            if (b == '\r') break;
+            test.add(b);
         }
         var fullBoundary = toPrimitive(test);
 

@@ -15,7 +15,7 @@ Create a two way transparent proxy to a remote amqp 0.9.1 compatible server.
 
 ### record-plugin
 
-The data will be stored in the global dataDir. 
+The data will be stored in the global dataDir.
 
 All callback are recorded
 

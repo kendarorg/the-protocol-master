@@ -2,7 +2,7 @@
 
 [Encoding:](https://github.com/eclipse/paho.mqtt.java/blob/9c742c1d83e71132452e08d325e5a90d1631c302/org.eclipse.paho.mqttv5.client/src/main/java/org/eclipse/paho/mqttv5/common/packet/MqttWireMessage.java#L277)
 
-<pre>
+```
     public static byte[] encodeVariableByteInteger(int number) {
 		int numBytes = 0;
 		long no = number;
@@ -19,11 +19,11 @@
 		} while ((no > 0) && (numBytes < 4));
 		return baos.toByteArray();
 	}
-</pre>
+```
 
 [Decoding:](https://github.com/eclipse/paho.mqtt.java/blob/master/org.eclipse.paho.mqttv5.client/src/main/java/org/eclipse/paho/mqttv5/common/packet/MqttDataTypes.java#L213)
 
-<pre>
+```
 	public static VariableByteInteger readVariableByteInteger(DataInputStream in) throws IOException {
 		byte digit;
 		int value = 0;
@@ -45,4 +45,4 @@
 		return new VariableByteInteger(value, count);
 
 	}
-</pre>
+```

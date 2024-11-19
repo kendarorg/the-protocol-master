@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public class JavaImage extends BaseImage<JavaImage, GenericContainer> {
 
     private final Map<String, String> paths = new HashMap<>();

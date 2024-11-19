@@ -3,6 +3,7 @@ package org.kendar.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("StringConcatenationInLoop")
 public class ExtraStringReplacer {
     public static List<String> parse(String input) {
         var result = new ArrayList<String>();
@@ -19,7 +20,6 @@ public class ExtraStringReplacer {
                         var ch2 = charArray[start];
                         if ((ch2 >= 65 && ch2 <= 90) || (ch2 >= 97 && ch2 <= 122)) {
                             paramName += ch2;
-                            continue;
                         } else if (ch2 == '}') {
                             if (previousIsParameter) {
                                 throw new RuntimeException();
@@ -52,7 +52,7 @@ public class ExtraStringReplacer {
                 sb += ch;
             }
         }
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             result.add(sb);
         }
         return result;

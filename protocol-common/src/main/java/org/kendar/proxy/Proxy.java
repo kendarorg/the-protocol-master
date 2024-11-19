@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
  *
  * @param <T>
  */
+@SuppressWarnings("rawtypes")
 public abstract class Proxy {
     private final Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
     private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");

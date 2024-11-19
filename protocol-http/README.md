@@ -1,6 +1,6 @@
 # Http(s) Protocol
 
-You can access the protocol as a proxy (as configured) or use the "rewrites" to 
+You can access the protocol as a proxy (as configured) or use the "rewrites" to
 define global rewriting of requests.
 
 When accessing via proxy the site certificates are generated in runtime, instead
@@ -70,7 +70,7 @@ The mocks can be parametrized using ${variableName} format inside
 * Path: e.g. /jsonized/${myPathVariable}/wetheaver
 
 These variable are assigned taking the value from the real request and are modified
-inside the headers and the content (when textual). For example the mocked response 
+inside the headers and the content (when textual). For example the mocked response
 can be set to the following, same goes for the header variable.
 
 ```
@@ -88,7 +88,7 @@ This can be used to avoid configuring the proxy on the application
 The recording will contain the target address!
 
 * active: If it is active
-* rewritesFile: the json file containing the rewrites 
+* rewritesFile: the json file containing the rewrites
 
 The format, is the following. When settings a regexp the replacements (like $1 etc)
 can be used. Please remind that what follows the founded request is added at the end!

@@ -1,7 +1,6 @@
 ## Session factory usage
 
-<pre>
-
+```
 sessionFactory.query(em -> {
         var query = em.createQuery("SELECT e FROM LoggingTable e ORDER BY e.id ASC");
         query.setFirstResult((int) start);
@@ -19,5 +18,4 @@ sessionFactory.query(em -> {
 
         }
     })
-
-</pre>
+```

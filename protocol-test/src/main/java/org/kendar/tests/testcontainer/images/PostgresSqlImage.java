@@ -16,14 +16,14 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("rawtypes")
-public class PostgreslImage extends BaseImage<PostgreslImage, PostgreSQLContainer> {
+public class PostgresSqlImage extends BaseImage<PostgresSqlImage, PostgreSQLContainer> {
     private final List<ScriptList> initScripts = new ArrayList<>();
     private String dbName;
     private String jdbcUrl;
     private String userId;
     private String password;
 
-    public PostgreslImage() {
+    public PostgresSqlImage() {
         this.withExposedPorts(5432);
     }
 
@@ -43,7 +43,7 @@ public class PostgreslImage extends BaseImage<PostgreslImage, PostgreSQLContaine
         return password;
     }
 
-    public PostgreslImage withInitScript(String db, String initScriptPath) {
+    public PostgresSqlImage withInitScript(String db, String initScriptPath) {
         try {
             if (db == null) throw new RuntimeException();
             ScriptList ls = new ScriptList();
@@ -53,12 +53,12 @@ public class PostgreslImage extends BaseImage<PostgreslImage, PostgreSQLContaine
             if (Files.exists(path)) {
                 ls.scriptContent = String.join("\n", Files.readAllLines(path));
             } else {
-                InputStream stream = PostgreslImage.class.getResourceAsStream(initScriptPath);
+                InputStream stream = PostgresSqlImage.class.getResourceAsStream(initScriptPath);
                 if (null != stream) {
                     ls.scriptContent = new String(stream.readAllBytes());
                     stream.close();
                 } else {
-                    stream = PostgreslImage.class.getResourceAsStream("/" + initScriptPath);
+                    stream = PostgresSqlImage.class.getResourceAsStream("/" + initScriptPath);
                     if (null != stream) {
                         ls.scriptContent = new String(stream.readAllBytes());
                         stream.close();

@@ -9,7 +9,7 @@ import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
-import org.kendar.tests.testcontainer.images.PostgreslImage;
+import org.kendar.tests.testcontainer.images.PostgresSqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class BasicTest {
 
     protected static final int FAKE_PORT = 5431;
-    protected static PostgreslImage postgresContainer;
+    protected static PostgresSqlImage postgresContainer;
     protected static TcpServer protocolServer;
     protected static PostgresProtocol baseProtocol;
 
@@ -33,7 +33,7 @@ public class BasicTest {
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
         var network = Network.newNetwork();
-        postgresContainer = new PostgreslImage();
+        postgresContainer = new PostgresSqlImage();
         postgresContainer
                 .withNetwork(network)
                 .start();

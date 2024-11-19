@@ -83,7 +83,7 @@ for the usage check [here](docs/properties.md)
 
 For the api usage [here](docs/apis.md)
 
-If you want to go on the specific functions by protocol: 
+If you want to go on the specific functions by protocol:
 
 * [Http](protocol-http/README.md)
     * Support Http and Https as Man In The Middle

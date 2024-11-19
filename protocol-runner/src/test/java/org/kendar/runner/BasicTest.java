@@ -1,7 +1,7 @@
 package org.kendar.runner;
 
 import org.kendar.server.TcpServer;
-import org.kendar.tests.testcontainer.images.PostgreslImage;
+import org.kendar.tests.testcontainer.images.PostgresSqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.testcontainers.containers.Network;
 
@@ -14,14 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class BasicTest {
 
     protected static final int FAKE_PORT = 5631;
-    protected static PostgreslImage postgresContainer;
+    protected static PostgresSqlImage postgresContainer;
     protected static TcpServer protocolServer;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
         var network = Network.newNetwork();
-        postgresContainer = new PostgreslImage();
+        postgresContainer = new PostgresSqlImage();
         postgresContainer
                 .withNetwork(network)
                 .start();
