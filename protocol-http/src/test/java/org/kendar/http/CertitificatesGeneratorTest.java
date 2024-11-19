@@ -3,8 +3,8 @@ package org.kendar.http;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.kendar.ssl.CertificatesManager;
-import org.kendar.ssl.GeneratedCert;
+import org.kendar.http.ssl.CertificatesManager;
+import org.kendar.http.ssl.GeneratedCert;
 import org.kendar.utils.FileResourcesUtils;
 
 import java.io.FileOutputStream;

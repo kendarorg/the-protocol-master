@@ -11,7 +11,7 @@ import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.settings.HttpSSLSettings;
-import org.kendar.ssl.CertificatesManager;
+import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.RewritePluginSettings;
 import org.kendar.server.KendarHttpsServer;
@@ -83,6 +83,7 @@ public class HttpRunner extends CommonRunner {
         sslSettings.setDer(cmd.getOptionValue("der", "resource://certificates/ca.der"));
         sslSettings.setKey(cmd.getOptionValue("key", "resource://certificates/ca.key"));
         section.setSSL(sslSettings);
+
 
         if (cmd.hasOption("replay")) {
             var pl = new HttpReplayPluginSettings();

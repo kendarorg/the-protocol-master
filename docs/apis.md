@@ -43,3 +43,13 @@ Change/retrieve the status for the given plugin. Action can be
 * stop (returns '{"OK"}')
 * status (returns '{"active":false}')
 
+## Protocol http
+
+### GET /api/protocols/{protocolInstanceId}/plugins/ssl-plugin/der
+
+Download the der certificate file
+
+### GET /api/protocols/{protocolInstanceId}/plugins/ssl-plugin/key
+
+Download the key certificate file
+

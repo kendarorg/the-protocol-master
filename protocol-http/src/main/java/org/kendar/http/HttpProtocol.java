@@ -2,13 +2,14 @@ package org.kendar.http;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
+import org.kendar.http.plugins.SSLDummyPlugin;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
 import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
-import org.kendar.ssl.CertificatesManager;
+import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -41,7 +43,10 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
         this.globalSettings = globalSettings;
         this.settings = settings;
-        this.plugins = plugins;
+        this.plugins = new ArrayList<>(plugins);
+        var sslPlugin = new SSLDummyPlugin();
+        sslPlugin.setActive(true);
+        this.plugins.add(sslPlugin);
         //Disable logging for apache http client
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
 

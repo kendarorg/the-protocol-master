@@ -1,4 +1,4 @@
-package org.kendar.ssl;
+package org.kendar.http.ssl;
 
 
 import java.security.PrivateKey;
