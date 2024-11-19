@@ -27,4 +27,6 @@ public interface PluginDescriptor extends ExtensionPoint {
     boolean isActive();
 
     void setActive(boolean active);
+
+    PluginApiHandler getApiHandler();
 }

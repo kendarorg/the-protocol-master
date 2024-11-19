@@ -9,6 +9,7 @@ import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
@@ -308,6 +311,28 @@ public class FileStorageRepository implements StorageRepository {
             }
         }
         return result;
+    }
+
+    private List<File> listFilesUsingJavaIO(String dir) {
+        return Stream.of(new File(dir).listFiles())
+                .filter(file -> !file.isDirectory())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public byte[] readAsZip() {
+        var baos = new ByteArrayOutputStream();
+        try (var zos = new ZipOutputStream(baos)) {
+            for (var file : listFilesUsingJavaIO(Path.of(targetDir).toAbsolutePath().toString())) {
+                var entry = new ZipEntry(file.getName());
+                zos.putNextEntry(entry);
+                zos.write(Files.readAllBytes(file.toPath()));
+                zos.closeEntry();
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return baos.toByteArray();
     }
 
     @Override

@@ -28,7 +28,7 @@ public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> impl
 
     @Override
     public String getId() {
-        return "http-filter";
+        return "sample-http";
     }
 
     @Override

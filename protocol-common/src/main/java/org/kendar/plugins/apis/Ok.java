@@ -1,4 +1,4 @@
-package org.kendar.apis.dtos;
+package org.kendar.plugins.apis;
 
 public class Ok {
     private String result = "OK";

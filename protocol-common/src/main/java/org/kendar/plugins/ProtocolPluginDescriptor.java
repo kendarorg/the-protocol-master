@@ -7,13 +7,24 @@ import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.JsonMapper;
 
 public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor {
-
     protected final static JsonMapper mapper = new JsonMapper();
     private boolean active;
     private String instanceId = "default";
 
     public String getInstanceId() {
         return instanceId;
+    }
+    private PluginApiHandler apiHandler;
+
+    public PluginApiHandler getApiHandler() {
+        if(apiHandler == null) {
+            apiHandler = buildApiHandler();
+        }
+        return apiHandler;
+    }
+
+    protected PluginApiHandler buildApiHandler() {
+        return new DefaultPluginApiHandler(this,getId(),getInstanceId());
     }
 
     /**

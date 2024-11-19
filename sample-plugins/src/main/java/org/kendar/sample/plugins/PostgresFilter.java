@@ -33,7 +33,7 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
 
     @Override
     public String getId() {
-        return "";
+        return "sample-postgres";
     }
 
     @Override

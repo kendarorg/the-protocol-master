@@ -30,7 +30,7 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
 
     @Override
     public String getId() {
-        return "";
+        return "sample-amqp";
     }
 
     @Override

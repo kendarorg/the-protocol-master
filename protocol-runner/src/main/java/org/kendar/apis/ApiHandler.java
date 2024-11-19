@@ -1,11 +1,18 @@
 package org.kendar.apis;
 
-import org.kendar.apis.dtos.*;
+import org.kendar.apis.dtos.PluginIndex;
+import org.kendar.apis.dtos.ProtocolIndex;
 import org.kendar.command.CommonRunner;
 import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.apis.FileDownload;
+import org.kendar.plugins.apis.Ko;
+import org.kendar.plugins.apis.Ok;
+import org.kendar.plugins.apis.Status;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.storage.generic.StorageRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -15,6 +22,11 @@ import static java.lang.System.exit;
 
 public class ApiHandler {
     private final GlobalSettings settings;
+
+    public ConcurrentLinkedQueue<ProtocolInstance> getInstances() {
+        return instances;
+    }
+
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
 
     public ApiHandler(GlobalSettings settings) {
@@ -87,5 +99,17 @@ public class ApiHandler {
                 return status;
         }
         return new Ko("Unknown action " + action);
+    }
+
+    public Object handleStrage(String action) {
+        var storage = (StorageRepository)settings.getService("storage");
+        switch (action){
+            case "download":
+                var data =  storage.readAsZip();
+                return new FileDownload(data,new Date().getTime()+".zip","application/zip");
+            case "upload":
+                throw new RuntimeException("Not implemented");
+        }
+        return new Ok();
     }
 }

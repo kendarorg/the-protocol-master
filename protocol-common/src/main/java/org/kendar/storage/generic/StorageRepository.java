@@ -15,4 +15,6 @@ public interface StorageRepository extends Service {
     LineToRead read(String instanceId, CallItemsQuery query);
 
     List<StorageItem> readResponses(String instanceId, ResponseItemQuery query);
+
+    byte[] readAsZip();
 }

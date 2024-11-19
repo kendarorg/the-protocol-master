@@ -1,4 +1,4 @@
-package org.kendar.apis.dtos;
+package org.kendar.plugins.apis;
 
 public class Ko {
     private String error;

@@ -2,7 +2,8 @@ package org.kendar.apis;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.kendar.apis.dtos.Ko;
+import org.kendar.plugins.apis.FileDownload;
+import org.kendar.plugins.apis.Ko;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,11 @@ public class ApiServerHandler implements HttpHandler {
     public ApiServerHandler(ApiHandler handler) {
 
         this.handler = handler;
+    }
+
+    private boolean isPartialPath(String path, String api) {
+        return (path.equalsIgnoreCase(api) ||
+                path.equalsIgnoreCase(api + "/"));
     }
 
     private boolean isPath(String path, String api, Map<String, String> parameters) {
@@ -55,25 +61,56 @@ public class ApiServerHandler implements HttpHandler {
         Map<String, String> parameters = new HashMap<>();
         if (isPath(path, "/api/global/shutdown")) {
             respond(exchange, handler.terminate(), 200);
+            return;
         } else if (isPath(path, "/api/protocols")) {
             respond(exchange, handler.getProtocols(), 200);
+            return;
+        } else if (isPath(path, "/api/storage/{action}",parameters)) {
+            respond(exchange, handler.handleStrage(parameters.get("action")), 200);
+            return;
         } else if (isPath(path, "/api/protocols/{protocolInstanceId}/plugins", parameters)) {
             respond(exchange, handler.getProtocolPlugins(parameters.get("protocolInstanceId")), 200);
+            return;
         } else if (isPath(path, "/api/protocols/{protocolInstanceId}/plugins/{pluginId}/{action}", parameters)) {
             respond(exchange, handler.handleProtocolPluginActivation(
                     parameters.get("protocolInstanceId"),
                     parameters.get("pluginId"),
                     parameters.get("action")), 200);
+            return;
+        }else{
+            for(var instance: handler.getInstances()) {
+                for (var plugin : instance.getPlugins()) {
+                    var handler = plugin.getApiHandler();
+                    var rootPath = "/api/protocols/"+handler.getProtocolInstanceId()+"/plugins/"+handler.getId();
+                    if(isPartialPath(path,rootPath)){
+
+                        if(handler.handle(exchange,path.replace(rootPath,""))){
+                            System.out.println("aa");
+                        }
+                    }
+                }
+            }
         }
+        respond(exchange, new Ko("Not found"), 404);
     }
+
+
 
     private void respond(HttpExchange exchange, Object toSend, int errorCode) {
         try {
-            String response = mapper.serialize(toSend);
-            exchange.getResponseHeaders().add("Content-Type", "application/json");
-            exchange.sendResponseHeaders(errorCode, response.length());
             var os = exchange.getResponseBody();
-            os.write(response.getBytes());
+            if(toSend instanceof FileDownload){
+                exchange.getResponseHeaders().add("Content-Type", ((FileDownload)toSend).getContentType());
+                exchange.getResponseHeaders().add("Content-Transfer-Encoding", "binary");
+                exchange.getResponseHeaders().add("Content-Disposition", "attachment; filename=\""+((FileDownload)toSend).getFileName()+"\";");
+                exchange.sendResponseHeaders(errorCode, ((FileDownload)toSend).getData().length);
+                os.write(((FileDownload)toSend).getData());
+            }else {
+                String response = mapper.serialize(toSend);
+                exchange.getResponseHeaders().add("Content-Type", "application/json");
+                exchange.sendResponseHeaders(errorCode, response.length());
+                os.write(response.getBytes());
+            }
             os.flush();
             os.close();
         } catch (Exception e) {

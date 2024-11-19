@@ -9,6 +9,10 @@ Apis are exposed (only when required) on the localhost port specified by
 
 Shutdown the whole system gracefully
 
+### GET /api/storage/download
+
+Download a zip file with all the recordings
+
 ### GET /api/protocols
 
 List all active protocols with the instanceId of the protocol
