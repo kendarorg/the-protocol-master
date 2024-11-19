@@ -31,15 +31,4 @@ target
 
 ### The protocol master
 /plugins/*.jar
-/data/0000000007.default.json
-/data/0000000017.default.json
-/data/0000000018.default.json
-/data/0000000019.default.json
-/data/0000000027.default.json
-/data/0000000028.default.json
-/data/0000000029.default.json
-/data/0000000030.default.json
-/data/0000000031.default.json
-/data/0000000033.default.json
-/data/0000000035.default.json
-/data/index.default.json
+/data/*.*
