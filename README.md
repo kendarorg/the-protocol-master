@@ -41,9 +41,7 @@ java -jar protocol-runner.jar -protocol postgres  \
     -login REALLOGIN -password REALPWD \
     -record
 ```
-
 Open a http/s proxy on port 9999 and return a 503 error, on 50% of calls
-
 ```
 java -jar protocol-runner.jar -protocol http -proxy 9999 \
     -showError 503 -errorPercent 40
@@ -52,12 +50,10 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 ## Features
 
 * Language independent: use the native protocols without drivers
-
 * Run on all OSs
     * Windows
     * Linux
     * macOs
-
 * Native protocol for (and all compatibles):
     * anything that goes through http/https
     * postgres
@@ -66,7 +62,6 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
     * redis 3,redis 2
     * mqtt
     * rabbitmq/Amqp 0.9
-
 * Mocked flow (all)
 * Support gzip,brotli,jacksonSmile,multipart and more (http/s)
 * Mocked error response (http/s)
@@ -77,6 +72,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Custom transparent proxy (all)
 * Translate postgres and MySQL to any Jdbc supported db like Oracle!
 * Plugin-based architecture
+* Custom maven repository on [https://maven.kendar.org](https://maven.kendar.org/maven2/releases/org/kendar/protocol/)
 
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
