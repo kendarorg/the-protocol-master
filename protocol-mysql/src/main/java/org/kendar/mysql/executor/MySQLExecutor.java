@@ -1,6 +1,5 @@
 package org.kendar.mysql.executor;
 
-import org.kendar.iterators.IteratorOfLists;
 import org.kendar.mysql.constants.ErrorCode;
 import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.constants.StatusFlag;
@@ -117,11 +116,16 @@ public class MySQLExecutor {
     }
 
     private Iterator<ProtoStep> executeRealQuery(MySQLProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) {
+        if(!parse.trim().endsWith(";")) {
+            parse = parse + ";";
+        }
         var parsed = parser.getTypes(parse);
         try {
-            if (!shouldHandleAsSingleQuery(parsed) &&
-                    true//CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_MULTI_STATEMENTS)
-                    ) {
+            //CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_MULTI_STATEMENTS)
+            if (!shouldHandleAsSingleQuery(parsed) || (
+                    parsed.size()==2 && parsed.get(0).getType()== SqlStringType.INSERT
+                            && parsed.get(1).getType()== SqlStringType.SELECT
+                    )  ) {
                 return handleWithinTransaction(parsed, protoContext, parse, parameterValues, text);
                 //TODO transaction
             } else {
@@ -280,14 +284,15 @@ public class MySQLExecutor {
         return ProtoState.iteratorOfList(result.toArray(new ReturnMessage[0]));
     }
 
-    private Iterator<ProtoStep> handleWithinTransaction(List<SqlParseResult> parseds, ProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
-        var ol = new IteratorOfLists();
-
+    private Iterator<ProtoStep> handleWithinTransaction(List<SqlParseResult> parseds, MySQLProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
+        ((JdbcProxy) protoContext.getProxy()).executeBegin(protoContext);
+        Iterator<ProtoStep> lastOne = null;
         for(var parsed:parseds){
             var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
-            ol.addIterator(handleSingleQuery(sqlParseResult, (MySQLProtoContext) protoContext, parse, parameterValues, text));
+            lastOne = handleSingleQuery(sqlParseResult, (MySQLProtoContext) protoContext, parse, parameterValues, text);
         }
-        return ol;
+        ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
+        return lastOne;
     }
 
     @SuppressWarnings("SqlSourceToSinkFlow")

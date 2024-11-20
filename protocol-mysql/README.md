@@ -96,7 +96,6 @@ An example of complex regexp
 
 * Real authentication (always allowed)
 * Multi-Resultset
-* Multi-Statement
 * Replication Protocol
 * Commands
     * COM_QUIT
@@ -142,6 +141,8 @@ the alias AND NOT THE COLUMN NAME
 
 The packet number is used to define the steps of the "subprotocols" (e.g. query
 and its response)
+
+.NET uses the get last row id
 
 ### Data types mess
 
