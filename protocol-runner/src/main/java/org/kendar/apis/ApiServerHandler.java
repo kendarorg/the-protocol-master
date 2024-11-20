@@ -2,8 +2,10 @@ package org.kendar.apis;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.kendar.plugins.BaseApiServerHandler;
 import org.kendar.plugins.apis.FileDownload;
 import org.kendar.plugins.apis.Ko;
+import org.kendar.plugins.apis.Ok;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,22 +14,22 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ApiServerHandler implements HttpHandler {
+public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
     private static final JsonMapper mapper = new JsonMapper();
     private final ApiHandler handler;
-    private final Logger log = LoggerFactory.getLogger(ApiServerHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiServerHandler.class);
 
     public ApiServerHandler(ApiHandler handler) {
 
         this.handler = handler;
     }
 
-    private boolean isPartialPath(String path, String api) {
-        return (path.equalsIgnoreCase(api) ||
-                path.equalsIgnoreCase(api + "/"));
+    public boolean isPartialPath(String path, String api) {
+        return (path.startsWith(api) ||
+                path.startsWith(api + "/"));
     }
 
-    private boolean isPath(String path, String api, Map<String, String> parameters) {
+    public boolean isPath(String path, String api, Map<String, String> parameters) {
         try {
             if (path.equalsIgnoreCase(api) ||
                     path.equalsIgnoreCase(api + "/")) return true;
@@ -50,7 +52,7 @@ public class ApiServerHandler implements HttpHandler {
         }
     }
 
-    private boolean isPath(String path, String api) {
+    public boolean isPath(String path, String api) {
         return path.equalsIgnoreCase(api) ||
                 path.equalsIgnoreCase(api + "/");
     }
@@ -59,44 +61,49 @@ public class ApiServerHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         var path = exchange.getRequestURI().getPath();
         Map<String, String> parameters = new HashMap<>();
+        var multiCall = false;
+        for(var instance: handler.getInstances()) {
+            for (var plugin : instance.getPlugins()) {
+                var handler = plugin.getApiHandler();
+                var rootPath = "/api/protocols/"+handler.getProtocolInstanceId()+"/plugins/"+handler.getId();
+                var wildcardProtocolPath = "/api/protocols/*/plugins/"+handler.getId();
+                if(isPartialPath(path,rootPath)){
+                    if(handler.handle(this,exchange,path.replace(rootPath,""))){
+                        return;
+                    }
+                }else if(isPartialPath(path,wildcardProtocolPath)){
+                    multiCall=true;
+                    if(!handler.handle(new NotRespondingDecorator(this),exchange,path.replace(wildcardProtocolPath,""))){
+                        respond(exchange,new Ko("Unable to start for protocol instance "+
+                                instance.getProtocolInstanceId()+" the plugin "+plugin.getId()),500);
+                        break;
+                    }
+                }
+            }
+        }
+        if(multiCall){
+            respond(exchange,new Ok(),200);
+            return;
+        }
         if (isPath(path, "/api/global/shutdown")) {
             respond(exchange, handler.terminate(), 200);
             return;
         } else if (isPath(path, "/api/protocols")) {
             respond(exchange, handler.getProtocols(), 200);
             return;
-        } else if (isPath(path, "/api/storage/{action}",parameters)) {
-            respond(exchange, handler.handleStrage(parameters.get("action")), 200);
+        }  else if (isPath(path, "/api/storage/{action}",parameters)) {
+            respond(exchange, handler.handleStorage(parameters.get("action"),exchange), 200);
             return;
         } else if (isPath(path, "/api/protocols/{protocolInstanceId}/plugins", parameters)) {
             respond(exchange, handler.getProtocolPlugins(parameters.get("protocolInstanceId")), 200);
             return;
-        } else if (isPath(path, "/api/protocols/{protocolInstanceId}/plugins/{pluginId}/{action}", parameters)) {
-            respond(exchange, handler.handleProtocolPluginActivation(
-                    parameters.get("protocolInstanceId"),
-                    parameters.get("pluginId"),
-                    parameters.get("action")), 200);
-            return;
-        }else{
-            for(var instance: handler.getInstances()) {
-                for (var plugin : instance.getPlugins()) {
-                    var handler = plugin.getApiHandler();
-                    var rootPath = "/api/protocols/"+handler.getProtocolInstanceId()+"/plugins/"+handler.getId();
-                    if(isPartialPath(path,rootPath)){
-
-                        if(handler.handle(exchange,path.replace(rootPath,""))){
-                            System.out.println("aa");
-                        }
-                    }
-                }
-            }
         }
         respond(exchange, new Ko("Not found"), 404);
     }
 
 
 
-    private void respond(HttpExchange exchange, Object toSend, int errorCode) {
+    public void respond(HttpExchange exchange, Object toSend, int errorCode) {
         try {
             var os = exchange.getResponseBody();
             if(toSend instanceof FileDownload){

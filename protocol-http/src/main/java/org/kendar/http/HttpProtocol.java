@@ -2,13 +2,14 @@ package org.kendar.http;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
+import org.kendar.http.plugins.SSLDummyPlugin;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
 import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
-import org.kendar.http.utils.ssl.CertificatesManager;
+import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -41,7 +43,10 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
         this.globalSettings = globalSettings;
         this.settings = settings;
-        this.plugins = plugins;
+        this.plugins = new ArrayList<>(plugins);
+        var sslPlugin = new SSLDummyPlugin();
+        sslPlugin.setActive(true);
+        this.plugins.add(sslPlugin);
         //Disable logging for apache http client
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
 
@@ -137,7 +142,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
 
             httpServer = HttpServer.create(address, backlog);
-            log.debug("Http created");
+            log.debug("[CL>TP][IN] Listening on *.:"+port+" Http");
 
             var sslDer = getOrDefault(settings.getSSL().getDer(), "resource://certificates/ca.der");
             var sslKey = getOrDefault(settings.getSSL().getKey(), "resource://certificates/ca.key");
@@ -146,7 +151,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
             httpsServer = createHttpsServer(certificatesManager,
                     sslAddress, backlog, cname, sslDer, sslKey, settings.getSSL().getHosts());
-            log.debug("Https created");
+            log.debug("[CL>TP][IN] Listening on *.:"+httpsPort+" Https");
 
 
             proxy = new ProxyServer(proxyPort)
@@ -165,8 +170,8 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                     ignoringHosts("incoming.telemetry.mozilla.org").
                     ignoringHosts("push.services.mozilla.com");
 
-            log.debug("Proxy created");
             proxy.start();
+            log.debug("[CL>TP][IN] Listening on *.:"+proxyPort+" Http Proxy");
 
 
             for (var i = plugins.size() - 1; i >= 0; i--) {
@@ -174,7 +179,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                 plugin.initialize(globalSettings, settings);
             }
 
-            log.debug("Filters added");
             var handler = new MasterHandler(
                     new PluginClassesHandlerImpl(plugins),
                     //new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
@@ -193,7 +197,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             }
             httpsServer.start();
             httpServer.start();
-            log.debug("Servers started");
+            log.debug("[CL>TP][IN] Servers Started");
             httpRunning = true;
             httpsRunning = true;
 

@@ -1,0 +1,77 @@
+{
+  "pluginsDir": "plugins",
+  "logLevel": "DEBUG",
+  "dataDir": "target/tests/apitest",
+  "apiPort": 5005,
+  "protocols": {
+    "http-01": {
+      "protocol": "http",
+      "http": 5006,
+      "https": 5007,
+      "proxy": 5008,
+      "ssl": {
+        "der": "resource://certificates/ca.der",
+        "key": "resource://certificates/ca.key",
+        "cname": "C=US,O=Local Development,CN=local.org",
+        "hosts": [
+        ]
+      },
+      "plugins": {"record-plugin":{},"replay-plugin":{}}
+    },
+    "mqtt-01": {
+      "protocol": "mqtt",
+      "port": 4885,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {"record-plugin":{},"replay-plugin":{}}
+    },
+    "postgres-01": {
+      "protocol": "postgres",
+      "port": 4886,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {"record-plugin":{},"replay-plugin":{},"mock-plugin":{}}
+    },
+    "mysql-01": {
+      "protocol": "mysql",
+      "port": 4887,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {"record-plugin":{},"replay-plugin":{},"mock-plugin":{}}
+    },
+    "amqp091-01": {
+      "protocol": "amqp091",
+      "port": 4888,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {"record-plugin":{},"replay-plugin":{}}
+    },
+    "mongodb-01": {
+      "protocol": "mongodb",
+      "port": 4889,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {"record-plugin":{},"replay-plugin":{}}
+    },
+    "redis-01": {
+      "protocol": "redis",
+      "port": 4890,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {"record-plugin":{},"replay-plugin":{}}
+    }
+  }
+
+}

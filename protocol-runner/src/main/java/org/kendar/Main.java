@@ -19,6 +19,7 @@ import org.kendar.mqtt.plugins.MqttReplayingPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.mysql.plugins.MySqlRewritePlugin;
+import org.kendar.plugins.AlwaysActivePlugin;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
@@ -28,6 +29,7 @@ import org.kendar.redis.plugins.RedisRecordingPlugin;
 import org.kendar.redis.plugins.RedisReplayingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -42,6 +44,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
@@ -134,12 +137,15 @@ public class Main {
                 allPlugins.get(protocol).add(item);
             }
         }
+        var ssl =  new SSLDummyPlugin();
+        ssl.setActive(true);
         addEmbedded(allPlugins, "http", List.of(
                 new HttpRecordingPlugin(),
                 new HttpErrorPlugin(),
                 new HttpReplayingPlugin(),
                 new HttpRewritePlugin(),
-                new HttpMockPlugin()));
+                new HttpMockPlugin(),ssl
+               ));
         addEmbedded(allPlugins, "mongodb", List.of(
                 new MongoRecordingPlugin(),
                 new MongoReplayingPlugin()));
@@ -229,6 +235,7 @@ public class Main {
             var apiServer = HttpServer.create(address, 10);
             apiServer.createContext("/", new ApiServerHandler(apiHandler));
             apiServer.start();
+            log.debug("[CL>TP][IN] Listening on *.:"+ini.getApiPort()+" TPM Apis");
         }
         while (stopWhenFalse.get()) {
             Sleeper.sleep(100);
@@ -248,8 +255,13 @@ public class Main {
                 var pluginInstance = availablePlugin.get().clone();
                 pluginInstance.setSettings(protocol.getPlugin(simplePlugin.getKey(), pluginInstance.getSettingClass()));
                 plugins.add(pluginInstance);
-
             }
+        }
+        var alwaysActives = availablePlugins.stream().filter(av -> AlwaysActivePlugin.class.isAssignableFrom(av.getClass())).collect(Collectors.toList());
+        for (var alwaysActive : alwaysActives) {
+            var pluginInstance = alwaysActive.clone();
+            pluginInstance.setSettings(new PluginSettings());
+            plugins.add(pluginInstance);
         }
         return plugins;
     }

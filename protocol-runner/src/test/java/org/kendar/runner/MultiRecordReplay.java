@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,33 +58,7 @@ public class MultiRecordReplay extends BasicTest {
         Sleeper.sleep(100);
     }
 
-    private void startAndHandleUnexpectedErrors(String... args) {
-        AtomicReference exception = new AtomicReference(null);
-        var serverThread = new Thread(() -> {
-            try {
-                Main.execute(args, () -> {
-                    try {
-                        Sleeper.sleep(100);
-                        return runTheServer.get();
-                    } catch (Exception e) {
-                        exception.set(e);
-                        return false;
-                    }
-                });
-                exception.set(new Exception("Terminated abruptly"));
-            } catch (Exception ex) {
-                exception.set(new Exception("Terminated with error", ex));
-            }
 
-        });
-        serverThread.start();
-        while (!Main.isRunning()) {
-            if (exception.get() != null) {
-                throw new RuntimeException((Throwable) exception.get());
-            }
-            Sleeper.sleep(100);
-        }
-    }
 
     @Test
     void testRecordingReplaying() throws Exception {
@@ -98,7 +71,7 @@ public class MultiRecordReplay extends BasicTest {
         var httpget = new HttpGet("http://localhost:" + SIMPLE_SERVER_HTTP_PORT);
 
         var fr = new FileResourcesUtils();
-        var recordingSettings = fr.getFileFromResourceAsString(Path.of("multiRecording.json.template").toAbsolutePath().toString());
+        var recordingSettings = fr.getFileFromResourceAsString(Path.of("src","test","resources","multiRecording.json.template").toAbsolutePath().toString());
         recordingSettings = recordingSettings.replace("{postgresPort}", POSTGRES_PORT);
         recordingSettings = recordingSettings.replace("{httpPort}", HTTP_PORT);
         recordingSettings = recordingSettings.replace("{httpsPort}", HTTPS_PORT);
@@ -158,7 +131,7 @@ public class MultiRecordReplay extends BasicTest {
         assertTrue(verifyTestRun.get());
         System.out.println("RECORDING COMPLETED ==============================================");
 
-        var replaySettings = fr.getFileFromResourceAsString(Path.of("multiRecording.json.template").toAbsolutePath().toString());
+        var replaySettings = fr.getFileFromResourceAsString(Path.of("src","test","resources","multiRecording.json.template").toAbsolutePath().toString());
         replaySettings = replaySettings.replace("{postgresPort}", POSTGRES_PORT);
         replaySettings = replaySettings.replace("{httpPort}", HTTP_PORT);
         replaySettings = replaySettings.replace("{httpsPort}", HTTPS_PORT);

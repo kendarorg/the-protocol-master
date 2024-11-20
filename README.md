@@ -18,7 +18,7 @@ You can use it to:
 * Mock entire infrastructures without coding
 * "Gold standard" test without infrastructure without coding
 
-The whole project is covered with Jacoco (73% coverage actually)
+The whole project is covered with Jacoco (77% instructions coverage actually)
 
 ## Get Started
 

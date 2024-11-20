@@ -38,7 +38,7 @@ public abstract class ProtoContext {
     /**
      * The executor to run asynchronously the system
      */
-    protected final ExecutorService executorService =
+    protected static final ExecutorService executorService =
             new ThreadPoolExecutor(1, 100, 0L, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<>());
     protected final int contextId;

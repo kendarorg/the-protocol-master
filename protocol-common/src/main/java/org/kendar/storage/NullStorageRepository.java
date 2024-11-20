@@ -37,6 +37,11 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public void writeZip(byte[] byteArray) {
+        
+    }
+
+    @Override
     public String getType() {
         return "storage";
     }

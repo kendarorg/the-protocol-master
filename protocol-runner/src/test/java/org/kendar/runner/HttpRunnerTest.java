@@ -28,12 +28,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HttpRunnerTest {
+public class HttpRunnerTest extends BasicTest {
     static int FAKE_PORT_HTTP = 8087;
     static int FAKE_PORT_HTTPS = 8487;
     static int FAKE_PORT_PROXY = 9999;
@@ -64,34 +63,6 @@ public class HttpRunnerTest {
             return !res;
         });
         System.out.println("COMPLETED");
-    }
-
-    private void startAndHandleUnexpectedErrors(String[] args) {
-        AtomicReference exception = new AtomicReference(null);
-        var serverThread = new Thread(() -> {
-            try {
-                Main.execute(args, () -> {
-                    try {
-                        Sleeper.sleep(100);
-                        return runTheServer.get();
-                    } catch (Exception e) {
-                        exception.set(e);
-                        return false;
-                    }
-                });
-                exception.set(new Exception("Terminated abruptly"));
-            } catch (Exception e) {
-                exception.set(new Exception("Terminated error", e));
-            }
-
-        });
-        serverThread.start();
-        while (!Main.isRunning()) {
-            if (exception.get() != null) {
-                throw new RuntimeException((Throwable) exception.get());
-            }
-            Sleeper.sleep(100);
-        }
     }
 
     @Test
@@ -186,7 +157,7 @@ public class HttpRunnerTest {
 
         var args = new String[]{
 
-                "-cfg", Path.of("google.json").toString()
+                "-cfg", Path.of("src","test","resources","google.json").toString()
         };
         startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000, () -> {
