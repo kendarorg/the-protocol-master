@@ -37,7 +37,9 @@ public class ApiTest extends BasicTest{
     }
     @BeforeAll
     public static void setup() {
-        Main.stop();
+        try {
+            Main.stop();
+        }catch (Exception e){}
         Sleeper.sleep(1000);
         var args = new String[]{
 
