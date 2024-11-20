@@ -1,160 +1,119 @@
 {
-  "constant": false,
-  "connectionId": 1,
-  "index": 1,
-  "input": {
-    "query": "/* mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c) */SELECT  @@session.auto_increment_increment AS auto_increment_increment, @@character_set_client AS character_set_client, @@character_set_connection AS character_set_connection, @@character_set_results AS character_set_results, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@collation_connection AS collation_connection, @@init_connect AS init_connect, @@interactive_timeout AS interactive_timeout, @@license AS license, @@lower_case_table_names AS lower_case_table_names, @@max_allowed_packet AS max_allowed_packet, @@net_write_timeout AS net_write_timeout, @@performance_schema AS performance_schema, @@sql_mode AS sql_mode, @@system_time_zone AS system_time_zone, @@time_zone AS time_zone, @@transaction_isolation AS transaction_isolation, @@wait_timeout AS wait_timeout",
-    "parameterValues": []
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 1,
+  "input" : {
+    "query" : "/* mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c) */SELECT  @@session.auto_increment_increment AS auto_increment_increment, @@character_set_client AS character_set_client, @@character_set_connection AS character_set_connection, @@character_set_results AS character_set_results, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@collation_connection AS collation_connection, @@init_connect AS init_connect, @@interactive_timeout AS interactive_timeout, @@license AS license, @@lower_case_table_names AS lower_case_table_names, @@max_allowed_packet AS max_allowed_packet, @@net_write_timeout AS net_write_timeout, @@performance_schema AS performance_schema, @@sql_mode AS sql_mode, @@system_time_zone AS system_time_zone, @@time_zone AS time_zone, @@transaction_isolation AS transaction_isolation, @@wait_timeout AS wait_timeout;",
+    "parameterValues" : [ ]
   },
-  "output": {
-    "selectResult": {
-      "records": [
-        [
-          "1",
-          "utf8mb4",
-          "utf8mb4",
-          null,
-          "utf8mb4",
-          "utf8mb4_0900_ai_ci",
-          "utf8mb4_0900_ai_ci",
-          "",
-          "28800",
-          "GPL",
-          "0",
-          "1048576",
-          "60",
-          "1",
-          "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
-          "UTC",
-          "SYSTEM",
-          "REPEATABLE-READ",
-          "28800"
-        ]
-      ],
-      "metadata": [
-        {
-          "columnName": "auto_increment_increment",
-          "byteData": false,
-          "columnType": "BIGINT",
-          "precision": 20
-        },
-        {
-          "columnName": "character_set_client",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "character_set_connection",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "character_set_results",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "character_set_server",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "collation_server",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "collation_connection",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "init_connect",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "interactive_timeout",
-          "byteData": false,
-          "columnType": "BIGINT",
-          "precision": 20
-        },
-        {
-          "columnName": "license",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "lower_case_table_names",
-          "byteData": false,
-          "columnType": "BIGINT",
-          "precision": 20
-        },
-        {
-          "columnName": "max_allowed_packet",
-          "byteData": false,
-          "columnType": "BIGINT",
-          "precision": 20
-        },
-        {
-          "columnName": "net_write_timeout",
-          "byteData": false,
-          "columnType": "BIGINT",
-          "precision": 20
-        },
-        {
-          "columnName": "performance_schema",
-          "byteData": false,
-          "columnType": "BIGINT",
-          "precision": 19
-        },
-        {
-          "columnName": "sql_mode",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "system_time_zone",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "time_zone",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "transaction_isolation",
-          "byteData": false,
-          "columnType": "VARCHAR",
-          "precision": 21845
-        },
-        {
-          "columnName": "wait_timeout",
-          "byteData": false,
-          "columnType": "BIGINT",
-          "precision": 20
-        }
-      ],
-      "count": 1,
-      "intResult": false,
-      "lastInsertedId": 0
+  "output" : {
+    "selectResult" : {
+      "records" : [ [ "1", "utf8mb4", "utf8mb4", null, "utf8mb4", "utf8mb4_0900_ai_ci", "utf8mb4_0900_ai_ci", "", "28800", "GPL", "0", "1048576", "60", "1", "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION", "UTC", "SYSTEM", "REPEATABLE-READ", "28800" ] ],
+      "metadata" : [ {
+        "columnName" : "auto_increment_increment",
+        "byteData" : false,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "character_set_client",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "character_set_connection",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "character_set_results",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "character_set_server",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "collation_server",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "collation_connection",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "init_connect",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "interactive_timeout",
+        "byteData" : false,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "license",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "lower_case_table_names",
+        "byteData" : false,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "max_allowed_packet",
+        "byteData" : false,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "net_write_timeout",
+        "byteData" : false,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      }, {
+        "columnName" : "performance_schema",
+        "byteData" : false,
+        "columnType" : "BIGINT",
+        "precision" : 19
+      }, {
+        "columnName" : "sql_mode",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "system_time_zone",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "time_zone",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "transaction_isolation",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 21845
+      }, {
+        "columnName" : "wait_timeout",
+        "byteData" : false,
+        "columnType" : "BIGINT",
+        "precision" : 20
+      } ],
+      "count" : 1,
+      "intResult" : false,
+      "lastInsertedId" : 0
     },
-    "intResult": 0
+    "intResult" : 0
   },
-  "durationMs": 9,
-  "type": "QUERY",
-  "caller": "JDBC",
-  "nth": -1
+  "durationMs" : 8,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
 }

@@ -1,23 +1,24 @@
 {
-  "constant": false,
-  "connectionId": 1,
-  "index": 6,
-  "input": {
-    "query": "create table COMPANY_JPA (ID bigint not null auto_increment, ADDRESS varchar(255), AGE integer, DENOMINATION varchar(255), SALARY double precision, primary key (ID))",
-    "parameterValues": []
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 6,
+  "input" : {
+    "query" : "create table COMPANY_JPA (ID bigint not null auto_increment, ADDRESS varchar(255), AGE integer, DENOMINATION varchar(255), SALARY double precision, primary key (ID));",
+    "parameterValues" : [ ]
   },
-  "output": {
-    "selectResult": {
-      "records": [],
-      "metadata": [],
-      "count": 0,
-      "intResult": true,
-      "lastInsertedId": 0
+  "output" : {
+    "selectResult" : {
+      "records" : [ ],
+      "metadata" : [ ],
+      "count" : 0,
+      "intResult" : true,
+      "lastInsertedId" : 0
     },
-    "intResult": 0
+    "intResult" : 0
   },
-  "durationMs": 5,
-  "type": "QUERY",
-  "caller": "JDBC",
-  "nth": -1
+  "durationMs" : 6,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
 }

@@ -86,7 +86,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
                 && lineToRead.getStorageItem().getOutput() != null) {
             var source = lineToRead.getStorageItem().retrieveOutAs(JdbcResponse.class);
             out.fill(source.getSelectResult());
-        } else if (lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
+        } else if (lineToRead!=null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
 
             if (lineToRead.getCompactLine().getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 SelectResult resultset = new SelectResult();
@@ -94,7 +94,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
                 resultset.setCount(Integer.parseInt(lineToRead.getCompactLine().getTags().get("resultsCount")));
                 out.fill(resultset);
             } else if (in.getQuery().trim().toLowerCase().startsWith("set")) {
-                System.out.println("a");
+
             }
         }
         /*if ((lineToRead == null || lineToRead.getStorageItem() == null

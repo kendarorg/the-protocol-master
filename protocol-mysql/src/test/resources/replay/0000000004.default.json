@@ -1,23 +1,24 @@
 {
-  "constant": false,
-  "connectionId": 1,
-  "index": 4,
-  "input": {
-    "query": "drop table if exists COMPANY_JPA",
-    "parameterValues": []
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 4,
+  "input" : {
+    "query" : "drop table if exists COMPANY_JPA;",
+    "parameterValues" : [ ]
   },
-  "output": {
-    "selectResult": {
-      "records": [],
-      "metadata": [],
-      "count": 0,
-      "intResult": true,
-      "lastInsertedId": 0
+  "output" : {
+    "selectResult" : {
+      "records" : [ ],
+      "metadata" : [ ],
+      "count" : 0,
+      "intResult" : true,
+      "lastInsertedId" : 0
     },
-    "intResult": 0
+    "intResult" : 0
   },
-  "durationMs": 3,
-  "type": "QUERY",
-  "caller": "JDBC",
-  "nth": -1
+  "durationMs" : 4,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
 }
