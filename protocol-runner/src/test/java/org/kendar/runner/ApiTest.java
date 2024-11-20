@@ -37,6 +37,8 @@ public class ApiTest extends BasicTest{
     }
     @BeforeAll
     public static void setup() {
+        Main.stop();
+        Sleeper.sleep(1000);
         var args = new String[]{
 
                 "-cfg", Path.of("src", "test", "resources", "apitest.json").toString()
