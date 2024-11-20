@@ -2,13 +2,13 @@
   "pluginsDir": "plugins",
   "logLevel": "DEBUG",
   "dataDir": "target/tests/apitest",
-  "apiPort": 8095,
+  "apiPort": 5005,
   "protocols": {
     "http-01": {
       "protocol": "http",
-      "http": 12080,
-      "https": 12443,
-      "proxy": 12081,
+      "http": 5006,
+      "https": 5007,
+      "proxy": 5008,
       "ssl": {
         "der": "resource://certificates/ca.der",
         "key": "resource://certificates/ca.key",
@@ -20,7 +20,7 @@
     },
     "mqtt-01": {
       "protocol": "mqtt",
-      "port": 1885,
+      "port": 4885,
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
@@ -29,7 +29,7 @@
     },
     "postgres-01": {
       "protocol": "postgres",
-      "port": 1886,
+      "port": 4886,
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
@@ -38,7 +38,7 @@
     },
     "mysql-01": {
       "protocol": "mysql",
-      "port": 1887,
+      "port": 4887,
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
@@ -47,7 +47,7 @@
     },
     "amqp091-01": {
       "protocol": "amqp091",
-      "port": 1888,
+      "port": 4888,
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
@@ -56,7 +56,7 @@
     },
     "mongodb-01": {
       "protocol": "mongodb",
-      "port": 1889,
+      "port": 4889,
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
@@ -65,7 +65,7 @@
     },
     "redis-01": {
       "protocol": "redis",
-      "port": 1890,
+      "port": 4890,
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
