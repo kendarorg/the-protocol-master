@@ -6,6 +6,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.kendar.Main;
 import org.kendar.apis.dtos.PluginIndex;
@@ -25,14 +27,27 @@ import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApiTest extends BasicTest{
-    @Test
-    void globalApiTest() throws Exception {
+    private static BasicTest bs;
+
+    @AfterAll
+    public static void cleanup(){
+        bs.runTheServer.set(false);
+        Main.stop();
+        Sleeper.sleep(1000);
+    }
+    @BeforeAll
+    public static void setup() {
         var args = new String[]{
 
                 "-cfg", Path.of("src", "test", "resources", "apitest.json").toString()
         };
-        startAndHandleUnexpectedErrors(args);
+        bs = new BasicTest();
+        bs.startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000);
+    }
+    @Test
+    void globalApiTest() throws Exception {
+
         var httpclient = HttpClients.createDefault();
         var data = Files.readAllBytes(Path.of("src","test","resources","testcontent.zip"));
         var okResult = postRequest("http://localhost:8095/api/storage/upload",httpclient,data,new TypeReference<Ok>(){});
@@ -40,18 +55,13 @@ public class ApiTest extends BasicTest{
         var zip = downloadRequest("http://localhost:8095/api/storage/download", httpclient);
         assertTrue(zip.length>100);
         Files.write(Path.of("target","downloaded.zip"),zip);
-        runTheServer.set(false);
-        Main.stop();
+
     }
 
     @Test
     void httpApiTest() throws Exception {
         var frsu = new FileResourcesUtils();
-        var args = new String[]{
 
-                "-cfg", Path.of("src", "test", "resources", "apitest.json").toString()
-        };
-        startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000);
         var httpclient = HttpClients.createDefault();
         var expected = frsu.getFileFromResourceAsByteArray("resource://certificates/ca.der");
@@ -61,18 +71,12 @@ public class ApiTest extends BasicTest{
         expected = frsu.getFileFromResourceAsByteArray("resource://certificates/ca.key");
         actual = downloadRequest("http://localhost:8095/api/protocols/http-01/plugins/ssl-plugin/key",httpclient);
         assertArrayEquals(expected,actual);
-        runTheServer.set(false);
-        Main.stop();
+
     }
 
     @Test
     void protocolApiTest() throws Exception {
-        var args = new String[]{
 
-                "-cfg", Path.of("src","test","resources","apitest.json").toString()
-        };
-        startAndHandleUnexpectedErrors(args);
-        Sleeper.sleep(1000);
         var httpclient = HttpClients.createDefault();
         //Creating a HttpGet object
         var protocols = getRequest("http://localhost:8095/api/protocols", httpclient, new TypeReference<List<ProtocolIndex>>(){});
@@ -97,8 +101,6 @@ public class ApiTest extends BasicTest{
             var status = getRequest("http://localhost:8095/api/protocols/"+protocol.getId()+"/plugins/record-plugin/start",httpclient,new TypeReference<Status>(){});
             assertFalse(status.isActive());
         }
-        runTheServer.set(false);
-        Main.stop();
 
     }
 
