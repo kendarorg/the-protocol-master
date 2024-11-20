@@ -1,6 +1,6 @@
 package org.kendar.mysql.executor;
 
-import org.kendar.mysql.constants.CapabilityFlag;
+import org.kendar.iterators.IteratorOfLists;
 import org.kendar.mysql.constants.ErrorCode;
 import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.constants.StatusFlag;
@@ -120,8 +120,8 @@ public class MySQLExecutor {
         var parsed = parser.getTypes(parse);
         try {
             if (!shouldHandleAsSingleQuery(parsed) &&
-                    CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_MULTI_STATEMENTS
-                    )) {
+                    true//CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_MULTI_STATEMENTS)
+                    ) {
                 return handleWithinTransaction(parsed, protoContext, parse, parameterValues, text);
                 //TODO transaction
             } else {
@@ -167,7 +167,7 @@ public class MySQLExecutor {
                 } else if (parsed.getValue().toUpperCase().startsWith("ROLLBACK")) {
                     return executeRollback(parse, protoContext);
                 } else if (parsed.getValue().toUpperCase().startsWith("USE")) {
-                    return executeQuery(999999, parsed, protoContext, parse, "USE", parameterValues, text);
+                    return executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
                 }
                 throw new SQLException("UNSUPPORTED QUERY " + parsed.getValue());
         }
@@ -280,8 +280,14 @@ public class MySQLExecutor {
         return ProtoState.iteratorOfList(result.toArray(new ReturnMessage[0]));
     }
 
-    private Iterator<ProtoStep> handleWithinTransaction(List<SqlParseResult> parsed, ProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
-        throw new SQLException("UNSUPPORTED TRANSACTIONS");
+    private Iterator<ProtoStep> handleWithinTransaction(List<SqlParseResult> parseds, ProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
+        var ol = new IteratorOfLists();
+
+        for(var parsed:parseds){
+            var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
+            ol.addIterator(handleSingleQuery(sqlParseResult, (MySQLProtoContext) protoContext, parse, parameterValues, text));
+        }
+        return ol;
     }
 
     @SuppressWarnings("SqlSourceToSinkFlow")
