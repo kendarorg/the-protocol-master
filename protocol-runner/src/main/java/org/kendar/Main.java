@@ -70,6 +70,12 @@ public class Main {
         var options = ProtocolsRunner.getMainOptions();
         HashMap<String, List<PluginDescriptor>> plugins = new HashMap<>();
         CommandLine cmd = parser.parse(options, args, true);
+        if(cmd.hasOption("unattended")){
+            stopWhenFalse = ()->{
+              Sleeper.sleep(10000);
+              return true;
+            };
+        }
         var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
         plugins = loadPlugins(pluginsDir);
 
@@ -86,7 +92,8 @@ public class Main {
     private static Boolean stopWhenQuitCommand() {
         var scanner = new Scanner(System.in);
         System.out.println("Press Q to quit");
-        String line = scanner.nextLine();
+        String line = "";
+        line = scanner.nextLine();
         try {
             if (line != null && line.trim().equalsIgnoreCase("q")) {
                 System.out.println("Exiting");

@@ -31,6 +31,7 @@ public class ProtocolsRunner {
 
     public static Options getMainOptions() {
         Options options = new Options();
+        options.addOption("un", "unattended", false, "Unattended run");
         options.addOption(createOpt("cfg", null, true, "Load config file"));
         options.addOption(createOpt("pld", "pluginsDir", true, "Plugins directory"));
         options.addOption(createOpt("dd", "datadir", true, "Data directory/connection string"));

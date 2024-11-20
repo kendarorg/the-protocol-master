@@ -9,6 +9,14 @@ public class SqlParseResult {
         this.type = type;
     }
 
+    @Override
+    public String toString() {
+        return "SqlParseResult{" +
+                "value='" + value + '\'' +
+                ", type=" + type +
+                '}';
+    }
+
     public String getValue() {
         return value;
     }

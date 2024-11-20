@@ -1,6 +1,5 @@
 package org.kendar.mysql.executor;
 
-import org.kendar.mysql.constants.CapabilityFlag;
 import org.kendar.mysql.constants.ErrorCode;
 import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.constants.StatusFlag;
@@ -117,11 +116,16 @@ public class MySQLExecutor {
     }
 
     private Iterator<ProtoStep> executeRealQuery(MySQLProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) {
+        if(!parse.trim().endsWith(";")) {
+            parse = parse + ";";
+        }
         var parsed = parser.getTypes(parse);
         try {
-            if (!shouldHandleAsSingleQuery(parsed) &&
-                    CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_MULTI_STATEMENTS
-                    )) {
+            //CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_MULTI_STATEMENTS)
+            if (!shouldHandleAsSingleQuery(parsed) || (
+                    parsed.size()==2 && parsed.get(0).getType()== SqlStringType.INSERT
+                            && parsed.get(1).getType()== SqlStringType.SELECT
+                    )  ) {
                 return handleWithinTransaction(parsed, protoContext, parse, parameterValues, text);
                 //TODO transaction
             } else {
@@ -166,6 +170,8 @@ public class MySQLExecutor {
                     return executeCommit(parse, protoContext);
                 } else if (parsed.getValue().toUpperCase().startsWith("ROLLBACK")) {
                     return executeRollback(parse, protoContext);
+                } else if (parsed.getValue().toUpperCase().startsWith("USE")) {
+                    return executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
                 }
                 throw new SQLException("UNSUPPORTED QUERY " + parsed.getValue());
         }
@@ -278,8 +284,15 @@ public class MySQLExecutor {
         return ProtoState.iteratorOfList(result.toArray(new ReturnMessage[0]));
     }
 
-    private Iterator<ProtoStep> handleWithinTransaction(List<SqlParseResult> parsed, ProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
-        throw new SQLException("UNSUPPORTED TRANSACTIONS");
+    private Iterator<ProtoStep> handleWithinTransaction(List<SqlParseResult> parseds, MySQLProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
+        ((JdbcProxy) protoContext.getProxy()).executeBegin(protoContext);
+        Iterator<ProtoStep> lastOne = null;
+        for(var parsed:parseds){
+            var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
+            lastOne = handleSingleQuery(sqlParseResult, (MySQLProtoContext) protoContext, parse, parameterValues, text);
+        }
+        ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
+        return lastOne;
     }
 
     @SuppressWarnings("SqlSourceToSinkFlow")

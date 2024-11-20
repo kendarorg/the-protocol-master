@@ -7,6 +7,8 @@ import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.fsm.events.CommandEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,11 +22,12 @@ public class ComInitDb extends ProtoState {
         return event.getCommandType() == CommandType.COM_INIT_DB;
     }
 
+    private static final Logger log = LoggerFactory.getLogger(ComInitDb.class);
     public Iterator<ProtoStep> execute(CommandEvent event) {
         var inputBuffer = (MySQLBBuffer) event.getBuffer();
         var context = (MySQLProtoContext) event.getContext();
         var database = inputBuffer.getString(5);
         var executor = new MySQLExecutor();
-        return executor.executeText(context, "USE DATABASE " + database, new ArrayList<>(), true);
+        return executor.executeText(context, "USE " + database+";", new ArrayList<>(), true);
     }
 }

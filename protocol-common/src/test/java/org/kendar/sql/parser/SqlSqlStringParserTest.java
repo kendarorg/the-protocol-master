@@ -7,6 +7,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SqlSqlStringParserTest {
 
     @Test
+    void prepStatementForMysql(){
+        var  query= "INSERT INTO `task` (`archive_date`, `notes`, `priority`, `status`, `task_name`)\n" +
+                "\n" +
+                "VALUES (@NULL, 'vvv', 'High', @NULL, 'aa');\n" +
+                "\n" +
+                "SELECT `id`\n" +
+                "\n" +
+                "FROM `task`\n" +
+                "\n" +
+                "WHERE ROW_COUNT() = 1 AND `id` = LAST_INSERT_ID()";
+        var target = new SqlStringParser("$");
+        var result = target.getTypes(query);
+        assertEquals(2, result.size());
+
+    }
+    @Test
     void parseCalls() {
         var target = new SqlStringParser("$");
         var result = target.parseString("select * from hello($1, $2 )  as result");
