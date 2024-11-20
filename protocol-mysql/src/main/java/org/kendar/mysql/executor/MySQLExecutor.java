@@ -166,6 +166,8 @@ public class MySQLExecutor {
                     return executeCommit(parse, protoContext);
                 } else if (parsed.getValue().toUpperCase().startsWith("ROLLBACK")) {
                     return executeRollback(parse, protoContext);
+                } else if (parsed.getValue().toUpperCase().startsWith("USE")) {
+                    return executeQuery(999999, parsed, protoContext, parse, "USE", parameterValues, text);
                 }
                 throw new SQLException("UNSUPPORTED QUERY " + parsed.getValue());
         }
