@@ -25,6 +25,6 @@ public class ComInitDb extends ProtoState {
         var context = (MySQLProtoContext) event.getContext();
         var database = inputBuffer.getString(5);
         var executor = new MySQLExecutor();
-        return executor.executeText(context, "USE DATABASE " + database, new ArrayList<>(), true);
+        return executor.executeText(context, "USE " + database, new ArrayList<>(), true);
     }
 }
