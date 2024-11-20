@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 import org.kendar.plugins.BaseApiServerHandler;
 import org.kendar.plugins.apis.FileDownload;
 import org.kendar.plugins.apis.Ko;
+import org.kendar.plugins.apis.Ok;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,7 @@ public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
     public void handle(HttpExchange exchange) throws IOException {
         var path = exchange.getRequestURI().getPath();
         Map<String, String> parameters = new HashMap<>();
+        var multiCall = false;
         for(var instance: handler.getInstances()) {
             for (var plugin : instance.getPlugins()) {
                 var handler = plugin.getApiHandler();
@@ -70,11 +72,18 @@ public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
                         return;
                     }
                 }else if(isPartialPath(path,wildcardProtocolPath)){
-                    if(handler.handle(this,exchange,path.replace(wildcardProtocolPath,""))){
-                        return;
+                    multiCall=true;
+                    if(!handler.handle(new NotRespondingDecorator(this),exchange,path.replace(wildcardProtocolPath,""))){
+                        respond(exchange,new Ko("Unable to start for protocol instance "+
+                                instance.getProtocolInstanceId()+" the plugin "+plugin.getId()),500);
+                        break;
                     }
                 }
             }
+        }
+        if(multiCall){
+            respond(exchange,new Ok(),200);
+            return;
         }
         if (isPath(path, "/api/global/shutdown")) {
             respond(exchange, handler.terminate(), 200);

@@ -142,7 +142,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
 
             httpServer = HttpServer.create(address, backlog);
-            log.debug("Http created");
+            log.debug("[CL>TP][IN] Listening on *.:"+port+" Http");
 
             var sslDer = getOrDefault(settings.getSSL().getDer(), "resource://certificates/ca.der");
             var sslKey = getOrDefault(settings.getSSL().getKey(), "resource://certificates/ca.key");
@@ -151,7 +151,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
             httpsServer = createHttpsServer(certificatesManager,
                     sslAddress, backlog, cname, sslDer, sslKey, settings.getSSL().getHosts());
-            log.debug("Https created");
+            log.debug("[CL>TP][IN] Listening on *.:"+httpsPort+" Https");
 
 
             proxy = new ProxyServer(proxyPort)
@@ -170,8 +170,8 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                     ignoringHosts("incoming.telemetry.mozilla.org").
                     ignoringHosts("push.services.mozilla.com");
 
-            log.debug("Proxy created");
             proxy.start();
+            log.debug("[CL>TP][IN] Listening on *.:"+proxyPort+" Http Proxy");
 
 
             for (var i = plugins.size() - 1; i >= 0; i--) {
@@ -179,7 +179,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                 plugin.initialize(globalSettings, settings);
             }
 
-            log.debug("Filters added");
             var handler = new MasterHandler(
                     new PluginClassesHandlerImpl(plugins),
                     //new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
@@ -198,7 +197,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             }
             httpsServer.start();
             httpServer.start();
-            log.debug("Servers started");
+            log.debug("[CL>TP][IN] Servers Started");
             httpRunning = true;
             httpsRunning = true;
 

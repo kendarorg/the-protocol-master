@@ -235,6 +235,7 @@ public class Main {
             var apiServer = HttpServer.create(address, 10);
             apiServer.createContext("/", new ApiServerHandler(apiHandler));
             apiServer.start();
+            log.debug("[CL>TP][IN] Listening on *.:"+ini.getApiPort()+" TPM Apis");
         }
         while (stopWhenFalse.get()) {
             Sleeper.sleep(100);

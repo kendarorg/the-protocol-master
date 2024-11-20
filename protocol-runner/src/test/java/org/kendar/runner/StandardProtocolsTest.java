@@ -10,14 +10,13 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StandardProtocolsTest extends BasicTest {
 
-    private AtomicBoolean runTheServer = new AtomicBoolean(true);
+
 
     @BeforeAll
     public static void beforeClass() {
@@ -299,33 +298,5 @@ public class StandardProtocolsTest extends BasicTest {
 
         runTheServer.set(false);
         Main.stop();
-    }
-
-    private void startAndHandleUnexpectedErrors(String... args) {
-        AtomicReference exception = new AtomicReference(null);
-        var serverThread = new Thread(() -> {
-            try {
-                Main.execute(args, () -> {
-                    try {
-                        Sleeper.sleep(100);
-                        return runTheServer.get();
-                    } catch (Exception e) {
-                        exception.set(e);
-                        return false;
-                    }
-                });
-                exception.set(new Exception("Terminated abruptly"));
-            } catch (Exception ex) {
-                exception.set(new Exception("Terminated with error", ex));
-            }
-
-        });
-        serverThread.start();
-        while (!Main.isRunning()) {
-            if (exception.get() != null) {
-                throw new RuntimeException((Throwable) exception.get());
-            }
-            Sleeper.sleep(100);
-        }
     }
 }
