@@ -11,11 +11,8 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
@@ -60,7 +57,7 @@ public class ReplayerTest {
     }
 
     @Test
-    void test2_differentChannelAndConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test2_differentChannelAndConnection() throws Exception {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
@@ -145,7 +142,7 @@ public class ReplayerTest {
     }
 
     @Test
-    void test5_noPublish() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test5_noPublish() throws Exception {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
@@ -220,7 +217,7 @@ public class ReplayerTest {
     }
 
     @Test
-    void test3_openConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test3_openConnection() throws Exception {
 
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy();

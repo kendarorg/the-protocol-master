@@ -78,6 +78,7 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
         if (lineToRead == null) {
             return;
         }
+
         completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
 
         var item = lineToRead.getStorageItem();
@@ -115,6 +116,8 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
         var item = lineToRead.getStorageItem();
+
+        completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
         if (hasCallbacks()) {
 
             var afterIndex = item.getIndex();

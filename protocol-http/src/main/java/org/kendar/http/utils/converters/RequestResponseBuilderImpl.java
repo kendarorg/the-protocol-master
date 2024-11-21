@@ -170,8 +170,6 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
         result.setSoapRequest(result.getHeader(H_SOAP_ACTION) != null);
         setupAuthHeaders(result);
 
-
-        result.setStaticRequest(MimeChecker.isStatic(headerContentType, result.getPath()));
         setupOptionalBody(exchange, result);
         // result.sanitizedPath = RequestUtils.sanitizePath(result);
         return result;

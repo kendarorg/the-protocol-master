@@ -1,7 +1,7 @@
 {
   "constant" : false,
   "connectionId" : 1,
-  "index" : 30,
+  "index" : 25,
   "output" : {
     "channel" : 1,
     "type" : 1,
@@ -9,7 +9,7 @@
     "classId" : 60,
     "methodId" : 60,
     "consumerTag" : "amq.ctag-qZcPnE1q2m9Vg3ICbroWHg",
-    "deliveryTag" : 3,
+    "deliveryTag" : 2,
     "redelivered" : false,
     "exchange" : "",
     "routingKey" : "fuffa_queue",
