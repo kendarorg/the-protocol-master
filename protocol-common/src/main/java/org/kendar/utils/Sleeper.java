@@ -14,7 +14,12 @@ public class Sleeper {
      */
     @SuppressWarnings("CatchMayIgnoreException")
     public static void sleep(long timeoutMillis) {
+
         try {
+            if(timeoutMillis == 0){
+                Thread.sleep(0);
+                return;
+            }
             Object obj = new Object();
             synchronized (obj) {
                 obj.wait(timeoutMillis);
