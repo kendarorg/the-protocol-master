@@ -77,7 +77,7 @@ public class EventsQueue {
         new Thread(() -> {
             while (true) {
                 if (items.isEmpty()) {
-                    Sleeper.sleep(0);
+                    Sleeper.sleep(5);
                     continue;
                 }
                 var item = items.poll();
