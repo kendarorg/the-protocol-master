@@ -250,14 +250,14 @@ public class FileStorageRepository implements StorageRepository {
             if (item.isPresent()) {
 
                 log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
-                ctx.inMemoryDb.remove(item.get().getIndex());
-                idx.ifPresent(compactLine -> ctx.index.remove(compactLine));
+                //ctx.inMemoryDb.remove(item.get().getIndex());
+                //idx.ifPresent(compactLine -> ctx.index.remove(compactLine));
                 return new LineToRead(item.get(), idx.get());
             }
 
             if (idx.isPresent()) {
                 log.debug("[SERVER][REPSHRT] {}:{}", idx.get().getIndex(), idx.get().getType());
-                ctx.index.remove(idx.get());
+                //ctx.index.remove(idx.get());
                 var si = new StorageItem();
                 si.setIndex(idx.get().getIndex());
 

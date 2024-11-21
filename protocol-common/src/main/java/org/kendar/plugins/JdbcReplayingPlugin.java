@@ -55,6 +55,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     @Override
     protected void handleActivation(boolean active) {
         super.handleActivation(active);
+        completedIndexes.clear();
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
 

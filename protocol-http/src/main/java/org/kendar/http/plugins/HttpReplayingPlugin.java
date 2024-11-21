@@ -2,8 +2,6 @@ package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.beanutils.BeanUtils;
-import org.kendar.events.EventsQueue;
-import org.kendar.events.ReplayStatusEvent;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
@@ -30,11 +28,6 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
 
-    }
-
-    @Override
-    protected void handleActivation(boolean active) {
-        EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
 
     private Map<String, String> buildTag(Request in) {
@@ -67,13 +60,16 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
                         return false;
                     }
                 }
-                if (!doSend(pluginContext, request, response) && blockExternal) {
-                    response.setStatusCode(404);
-                    response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
-                    response.setResponseText(new TextNode("Page Not Found: " + request.getMethod() + " on " + request.buildUrl()));
-                    return true;
+                var sent = doSend(pluginContext, request, response);
+                if (!sent) {
+                    if (blockExternal) {
+                        response.setStatusCode(404);
+                        response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
+                        response.setResponseText(new TextNode("Page Not Found: " + request.getMethod() + " on " + request.buildUrl()));
+                        return true;
+                    }
                 }
-                return false;
+                return sent;
             }
         }
         return false;
@@ -85,7 +81,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         var context = pluginContext.getContext();
 
         query.setCaller(pluginContext.getCaller());
-        query.setType(in.getClass().getSimpleName());
+        query.setType(in.getMethod());
         for (var tag : buildTag(in).entrySet()) {
             query.addTag(tag.getKey(), tag.getValue());
         }
@@ -97,12 +93,14 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         }
 
         var item = lineToRead.getStorageItem();
+        System.out.println("READING "+item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
-        if (context.isUseCallDurationTimes()) {
+        if (settings.isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());
         }
         try {
             BeanUtils.copyProperties(out, outputItem);
+            completedIndexes.add((int) item.getIndex());
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }

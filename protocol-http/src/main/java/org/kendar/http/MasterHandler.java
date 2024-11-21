@@ -61,7 +61,7 @@ public class MasterHandler implements HttpHandler {
         byte[] data = new byte[0];
         var dataLength = 0;
         if (requestResponseBuilder.hasBody(response)) {
-            if (MimeChecker.isBinary(response)) {
+            if (MimeChecker.isBinary(response) && response.getResponseText() instanceof BinaryNode) {
                 data = ((BinaryNode) response.getResponseText()).binaryValue();
             } else if (response.getResponseText() != null) {
 
