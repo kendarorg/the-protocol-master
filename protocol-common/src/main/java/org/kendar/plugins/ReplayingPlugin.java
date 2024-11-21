@@ -78,7 +78,7 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
         if (lineToRead == null) {
             return;
         }
-
+        completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
 
         var item = lineToRead.getStorageItem();
 
