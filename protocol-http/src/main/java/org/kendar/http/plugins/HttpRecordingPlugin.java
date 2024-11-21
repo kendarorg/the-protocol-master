@@ -33,7 +33,7 @@ public class HttpRecordingPlugin extends RecordingPlugin {
                 if (!recordSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : recordSites) {
-                        if (pat.matcher(request.getHost()).matches() || pat.toString().equalsIgnoreCase(request.getHost())) {
+                        if (pat.matcher(request.getHost()).matches()){// || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }
@@ -63,7 +63,9 @@ public class HttpRecordingPlugin extends RecordingPlugin {
     private void setupSitesToRecord(List<String> recordSites) {
         this.recordSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
-                .map(Pattern::compile).collect(Collectors.toList());
+                .map(regex -> regex.startsWith("@")?
+                        Pattern.compile(regex.substring(1)):
+                        Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
     }
 
 

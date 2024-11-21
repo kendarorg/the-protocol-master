@@ -30,7 +30,7 @@ public class ReplayRecordFilters {
         settings.setActive(true);
         settings.getRecordSites().add("test_sites");
         settings.getRecordSites().add("www.sara.com");
-        settings.getRecordSites().add(".*microsoft.*");
+        settings.getRecordSites().add("@.*microsoft.*");
         rwPlugin.setSettings(settings);
 
         var pc = new PluginContext("http", null,0L,null);
@@ -78,7 +78,7 @@ public class ReplayRecordFilters {
         settings.setActive(true);
         settings.getMatchSites().add("test_sites");
         settings.getMatchSites().add("www.sara.com");
-        settings.getMatchSites().add(".*microsoft.*");
+        settings.getMatchSites().add("@.*microsoft.*");
         rwPlugin.setSettings(settings);
 
         var pc = new PluginContext("http", null,0L,null);
