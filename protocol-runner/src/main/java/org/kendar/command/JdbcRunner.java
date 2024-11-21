@@ -28,7 +28,7 @@ import java.util.function.Supplier;
 public class JdbcRunner extends CommonRunner {
     private static final TypeReference<List<ReplacerItem>> replaceItemsList = new TypeReference<>() {
     };
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private final String protocol;
     private TcpServer ps;
 

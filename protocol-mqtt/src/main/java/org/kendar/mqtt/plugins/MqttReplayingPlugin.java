@@ -18,7 +18,7 @@ import java.util.List;
 
 public class MqttReplayingPlugin extends ReplayingPlugin {
     private static final Logger log = LoggerFactory.getLogger(MqttReplayingPlugin.class);
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
 
     @Override
     public String getProtocol() {

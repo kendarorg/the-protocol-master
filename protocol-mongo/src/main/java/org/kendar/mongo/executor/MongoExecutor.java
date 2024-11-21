@@ -12,7 +12,7 @@ import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 
 public class MongoExecutor {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
 
     private String getDb(OpMsgContent data) {
 

@@ -31,7 +31,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
     private static final String H_AUTHORIZATION = "Authorization";
     private static final String BASIC_AUTH_MARKER = "basic";
     private static final String BASIC_AUTH_SEPARATOR = ":";
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private static Logger logger;
 
     public RequestResponseBuilderImpl() {

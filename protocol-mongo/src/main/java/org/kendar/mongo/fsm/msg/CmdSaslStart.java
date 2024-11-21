@@ -23,7 +23,7 @@ public class CmdSaslStart extends StandardOpMsgCommand {
 
     private static final String GS2_HEADER = "n,,";
     private static final int MINIMUM_ITERATION_COUNT = 4096;
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
 
     public CmdSaslStart(Class<?>... events) {
         super(events);

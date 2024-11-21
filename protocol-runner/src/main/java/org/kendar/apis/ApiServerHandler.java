@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(ApiServerHandler.class);
     private final ApiHandler handler;
 

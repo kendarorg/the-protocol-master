@@ -10,7 +10,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.Iterator;
 
 public class CmdGeneric extends StandardOpMsgCommand {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
 
     public CmdGeneric(Class<?>... events) {
         super(events);

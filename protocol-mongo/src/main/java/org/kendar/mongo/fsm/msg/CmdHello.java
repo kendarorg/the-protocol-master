@@ -11,7 +11,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.Iterator;
 
 public class CmdHello extends StandardOpMsgCommand {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
 
     public CmdHello(Class<?>... events) {
         super(events);

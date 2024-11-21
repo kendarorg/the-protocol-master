@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SettingsManager {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
 
     public static GlobalSettings load(String path) throws Exception {
         var file = Path.of(path).toAbsolutePath();

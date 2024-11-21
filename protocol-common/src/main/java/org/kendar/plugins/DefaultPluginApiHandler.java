@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class DefaultPluginApiHandler<T extends PluginDescriptor> implements PluginApiHandler {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private final T descriptor;
     private final String id;
     private final String instanceId;

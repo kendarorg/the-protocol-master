@@ -17,7 +17,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.HashMap;
 
 public abstract class BaseMessageData implements NetworkReturnMessage {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private int flags;
     private int requestId;
     private int responseId;

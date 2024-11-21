@@ -226,6 +226,7 @@ public class Main {
                     try {
                         om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, availablePlugins, stopWhenFalse);
                     } catch (Exception e) {
+                        //noinspection SuspiciousMethodCalls
                         protocolServer.remove(item);
                         throw new RuntimeException(e);
                     }

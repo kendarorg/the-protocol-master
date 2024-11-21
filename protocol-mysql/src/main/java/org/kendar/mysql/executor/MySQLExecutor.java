@@ -289,7 +289,7 @@ public class MySQLExecutor {
         Iterator<ProtoStep> lastOne = null;
         for (var parsed : parseds) {
             var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
-            lastOne = handleSingleQuery(sqlParseResult, (MySQLProtoContext) protoContext, parse, parameterValues, text);
+            lastOne = handleSingleQuery(sqlParseResult, protoContext, parse, parameterValues, text);
         }
         ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
         return lastOne;

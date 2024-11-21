@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 public class QueryHello extends ProtoState {
     private static final Logger log = LoggerFactory.getLogger(QueryHello.class);
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
 
     public QueryHello(Class<?>... events) {
         super(events);
