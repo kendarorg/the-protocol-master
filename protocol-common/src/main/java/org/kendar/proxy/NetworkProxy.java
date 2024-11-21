@@ -136,7 +136,6 @@ public abstract class NetworkProxy extends Proxy {
             }
         }
 
-
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of, getProtocol().buildBuffer());
         for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, new Object())) {

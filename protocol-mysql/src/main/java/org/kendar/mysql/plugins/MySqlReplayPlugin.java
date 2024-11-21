@@ -56,7 +56,13 @@ public class MySqlReplayPlugin extends JdbcReplayingPlugin {
         }
         if (idx != null) {
             JdbcResponse resp = new JdbcResponse();
-            if (idx.getTags().get("isIntResult").equalsIgnoreCase("true")) {
+            if(idx.getTags().get("query").toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
+                var selectResult = new JsonMapper().deserialize(SELECT_TRANS_RESULT, SelectResult.class);
+                var realResultValue = idx.getTags().get("resultsCount");
+                selectResult.getRecords().get(0).set(0, realResultValue);
+                resp.setSelectResult(selectResult);
+                resp.setIntResult(0);
+            }else if (idx.getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 resp.setIntResult(Integer.parseInt(idx.getTags().get("resultsCount")));
                 SelectResult resultset = new SelectResult();
                 resultset.setIntResult(true);
