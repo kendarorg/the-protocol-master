@@ -114,7 +114,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         return "http";
     }
 
-    private void setupSitesToRecord(List<String> recordSites) {
+    private void setupMatchSites(List<String> recordSites) {
         this.matchSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
                 .map(Pattern::compile).collect(Collectors.toList());
@@ -130,7 +130,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         super.setSettings(plugin);
         settings = (HttpReplayPluginSettings) plugin;
         blockExternal = settings.isBlockExternal();
-        setupSitesToRecord(settings.getMatchSites());
+        setupMatchSites(settings.getMatchSites());
     }
 
 }
