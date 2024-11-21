@@ -17,7 +17,7 @@ public class Sleeper {
 
         try {
             if(timeoutMillis == 0){
-                Thread.sleep(0);
+                Thread.yield();
                 return;
             }
             Object obj = new Object();
