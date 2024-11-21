@@ -239,10 +239,22 @@ public class FileStorageRepository implements StorageRepository {
 
             Optional<StorageItem> item = Optional.empty();
 
+            if (idx.isEmpty() && query.getTag("next")!=null && !query.getTag("next").isEmpty()){
+                var next = Integer.parseInt(query.getTag("next"));
+                idx = ctx.index.stream()
+                        .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
+                        .filter(a ->
+                                a.getIndex()>next &&
+                                typeMatching(query.getType(), a.getType()) &&
+                                        a.getCaller().equalsIgnoreCase(query.getCaller()) &&
+                                        query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
+                        ).findFirst();
+            }
             if (idx.isPresent()) {
+                var realItem = idx.get();
                 item = ctx.inMemoryDb.values().stream()
                         .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
-                        .filter(a -> a.getIndex() == idx.get().getIndex()).findFirst();
+                        .filter(a -> a.getIndex() == realItem.getIndex()).findFirst();
             } else {
                 log.warn("[TPM  ][WR]: Index not found!");
             }
@@ -371,6 +383,8 @@ public class FileStorageRepository implements StorageRepository {
             throw new RuntimeException(e);
         }
     }
+
+
 
     @Override
     public String getType() {
