@@ -33,7 +33,7 @@ public class HttpRecordingPlugin extends RecordingPlugin {
                 if (!recordSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : recordSites) {
-                        if (pat.matcher(request.getHost()).matches()) {
+                        if (pat.matcher(request.getHost()).matches() || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }

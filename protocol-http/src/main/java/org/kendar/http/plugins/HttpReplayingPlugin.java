@@ -58,7 +58,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
                 if (!matchSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : matchSites) {
-                        if (pat.matcher(request.getHost()).matches()) {
+                        if (pat.matcher(request.getHost()).matches() || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }
@@ -67,7 +67,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
                         return false;
                     }
                 }
-                if (blockExternal && !doSend(pluginContext, request, response)) {
+                if (!doSend(pluginContext, request, response) && blockExternal) {
                     response.setStatusCode(404);
                     response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
                     response.setResponseText(new TextNode("Page Not Found: " + request.getMethod() + " on " + request.buildUrl()));
