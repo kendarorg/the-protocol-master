@@ -116,16 +116,16 @@ public class MySQLExecutor {
     }
 
     private Iterator<ProtoStep> executeRealQuery(MySQLProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) {
-        if(!parse.trim().endsWith(";")) {
+        if (!parse.trim().endsWith(";")) {
             parse = parse + ";";
         }
         var parsed = parser.getTypes(parse);
         try {
             //CapabilityFlag.isFlagSet(protoContext.getClientCapabilities(), CapabilityFlag.CLIENT_MULTI_STATEMENTS)
             if (!shouldHandleAsSingleQuery(parsed) || (
-                    parsed.size()==2 && parsed.get(0).getType()== SqlStringType.INSERT
-                            && parsed.get(1).getType()== SqlStringType.SELECT
-                    )  ) {
+                    parsed.size() == 2 && parsed.get(0).getType() == SqlStringType.INSERT
+                            && parsed.get(1).getType() == SqlStringType.SELECT
+            )) {
                 return handleWithinTransaction(parsed, protoContext, parse, parameterValues, text);
                 //TODO transaction
             } else {
@@ -287,7 +287,7 @@ public class MySQLExecutor {
     private Iterator<ProtoStep> handleWithinTransaction(List<SqlParseResult> parseds, MySQLProtoContext protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
         ((JdbcProxy) protoContext.getProxy()).executeBegin(protoContext);
         Iterator<ProtoStep> lastOne = null;
-        for(var parsed:parseds){
+        for (var parsed : parseds) {
             var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
             lastOne = handleSingleQuery(sqlParseResult, (MySQLProtoContext) protoContext, parse, parameterValues, text);
         }

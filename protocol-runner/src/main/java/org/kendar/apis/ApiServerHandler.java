@@ -16,8 +16,8 @@ import java.util.Map;
 
 public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
     private static final JsonMapper mapper = new JsonMapper();
-    private final ApiHandler handler;
     private static final Logger log = LoggerFactory.getLogger(ApiServerHandler.class);
+    private final ApiHandler handler;
 
     public ApiServerHandler(ApiHandler handler) {
 
@@ -62,27 +62,27 @@ public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
         var path = exchange.getRequestURI().getPath();
         Map<String, String> parameters = new HashMap<>();
         var multiCall = false;
-        for(var instance: handler.getInstances()) {
+        for (var instance : handler.getInstances()) {
             for (var plugin : instance.getPlugins()) {
                 var handler = plugin.getApiHandler();
-                var rootPath = "/api/protocols/"+handler.getProtocolInstanceId()+"/plugins/"+handler.getId();
-                var wildcardProtocolPath = "/api/protocols/*/plugins/"+handler.getId();
-                if(isPartialPath(path,rootPath)){
-                    if(handler.handle(this,exchange,path.replace(rootPath,""))){
+                var rootPath = "/api/protocols/" + handler.getProtocolInstanceId() + "/plugins/" + handler.getId();
+                var wildcardProtocolPath = "/api/protocols/*/plugins/" + handler.getId();
+                if (isPartialPath(path, rootPath)) {
+                    if (handler.handle(this, exchange, path.replace(rootPath, ""))) {
                         return;
                     }
-                }else if(isPartialPath(path,wildcardProtocolPath)){
-                    multiCall=true;
-                    if(!handler.handle(new NotRespondingDecorator(this),exchange,path.replace(wildcardProtocolPath,""))){
-                        respond(exchange,new Ko("Unable to start for protocol instance "+
-                                instance.getProtocolInstanceId()+" the plugin "+plugin.getId()),500);
+                } else if (isPartialPath(path, wildcardProtocolPath)) {
+                    multiCall = true;
+                    if (!handler.handle(new NotRespondingDecorator(this), exchange, path.replace(wildcardProtocolPath, ""))) {
+                        respond(exchange, new Ko("Unable to start for protocol instance " +
+                                instance.getProtocolInstanceId() + " the plugin " + plugin.getId()), 500);
                         break;
                     }
                 }
             }
         }
-        if(multiCall){
-            respond(exchange,new Ok(),200);
+        if (multiCall) {
+            respond(exchange, new Ok(), 200);
             return;
         }
         if (isPath(path, "/api/global/shutdown")) {
@@ -91,8 +91,8 @@ public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
         } else if (isPath(path, "/api/protocols")) {
             respond(exchange, handler.getProtocols(), 200);
             return;
-        }  else if (isPath(path, "/api/storage/{action}",parameters)) {
-            respond(exchange, handler.handleStorage(parameters.get("action"),exchange), 200);
+        } else if (isPath(path, "/api/storage/{action}", parameters)) {
+            respond(exchange, handler.handleStorage(parameters.get("action"), exchange), 200);
             return;
         } else if (isPath(path, "/api/protocols/{protocolInstanceId}/plugins", parameters)) {
             respond(exchange, handler.getProtocolPlugins(parameters.get("protocolInstanceId")), 200);
@@ -102,17 +102,16 @@ public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
     }
 
 
-
     public void respond(HttpExchange exchange, Object toSend, int errorCode) {
         try {
             var os = exchange.getResponseBody();
-            if(toSend instanceof FileDownload){
-                exchange.getResponseHeaders().add("Content-Type", ((FileDownload)toSend).getContentType());
+            if (toSend instanceof FileDownload) {
+                exchange.getResponseHeaders().add("Content-Type", ((FileDownload) toSend).getContentType());
                 exchange.getResponseHeaders().add("Content-Transfer-Encoding", "binary");
-                exchange.getResponseHeaders().add("Content-Disposition", "attachment; filename=\""+((FileDownload)toSend).getFileName()+"\";");
-                exchange.sendResponseHeaders(errorCode, ((FileDownload)toSend).getData().length);
-                os.write(((FileDownload)toSend).getData());
-            }else {
+                exchange.getResponseHeaders().add("Content-Disposition", "attachment; filename=\"" + ((FileDownload) toSend).getFileName() + "\";");
+                exchange.sendResponseHeaders(errorCode, ((FileDownload) toSend).getData().length);
+                os.write(((FileDownload) toSend).getData());
+            } else {
                 String response = mapper.serialize(toSend);
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
                 exchange.sendResponseHeaders(errorCode, response.length());

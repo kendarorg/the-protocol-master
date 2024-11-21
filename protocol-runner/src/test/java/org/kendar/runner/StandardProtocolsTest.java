@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class StandardProtocolsTest extends BasicTest {
 
 
-
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();

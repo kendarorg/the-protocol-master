@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SqlSqlStringParserTest {
 
     @Test
-    void prepStatementForMysql(){
-        var  query= "INSERT INTO `task` (`archive_date`, `notes`, `priority`, `status`, `task_name`)\n" +
+    void prepStatementForMysql() {
+        var query = "INSERT INTO `task` (`archive_date`, `notes`, `priority`, `status`, `task_name`)\n" +
                 "\n" +
                 "VALUES (@NULL, 'vvv', 'High', @NULL, 'aa');\n" +
                 "\n" +
@@ -22,6 +22,7 @@ public class SqlSqlStringParserTest {
         assertEquals(2, result.size());
 
     }
+
     @Test
     void parseCalls() {
         var target = new SqlStringParser("$");

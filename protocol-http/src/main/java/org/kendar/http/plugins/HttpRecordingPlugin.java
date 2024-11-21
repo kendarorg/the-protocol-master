@@ -35,7 +35,7 @@ public class HttpRecordingPlugin extends RecordingPlugin {
                 if (!recordSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : recordSites) {
-                        if (pat.matcher(request.getHost()).matches()){// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                        if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }
@@ -46,13 +46,13 @@ public class HttpRecordingPlugin extends RecordingPlugin {
                 }
 
                 var all = request.getHeader("If-none-match");
-                if(all != null && !all.isEmpty()) all.clear();
+                if (all != null && !all.isEmpty()) all.clear();
                 all = request.getHeader("If-match");
-                if(all != null && !all.isEmpty()) all.clear();
+                if (all != null && !all.isEmpty()) all.clear();
                 all = request.getHeader("If-modified-since");
-                if(all != null && !all.isEmpty()) all.clear();
+                if (all != null && !all.isEmpty()) all.clear();
                 all = response.getHeader("ETag");
-                if(all != null && !all.isEmpty()) all.clear();
+                if (all != null && !all.isEmpty()) all.clear();
                 postCall(pluginContext, in, out);
             }
         }
@@ -74,8 +74,8 @@ public class HttpRecordingPlugin extends RecordingPlugin {
     private void setupSitesToRecord(List<String> recordSites) {
         this.recordSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
-                .map(regex -> regex.startsWith("@")?
-                        Pattern.compile(regex.substring(1)):
+                .map(regex -> regex.startsWith("@") ?
+                        Pattern.compile(regex.substring(1)) :
                         Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
     }
 

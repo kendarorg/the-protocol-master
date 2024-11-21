@@ -98,7 +98,6 @@ public class Request {
     }
 
 
-
     public String getHost() {
         return host;
     }

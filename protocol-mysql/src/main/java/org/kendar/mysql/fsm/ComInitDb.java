@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ComInitDb extends ProtoState {
+    private static final Logger log = LoggerFactory.getLogger(ComInitDb.class);
+
     public ComInitDb(Class<?>... messages) {
         super(messages);
     }
@@ -22,12 +24,11 @@ public class ComInitDb extends ProtoState {
         return event.getCommandType() == CommandType.COM_INIT_DB;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(ComInitDb.class);
     public Iterator<ProtoStep> execute(CommandEvent event) {
         var inputBuffer = (MySQLBBuffer) event.getBuffer();
         var context = (MySQLProtoContext) event.getContext();
         var database = inputBuffer.getString(5);
         var executor = new MySQLExecutor();
-        return executor.executeText(context, "USE " + database+";", new ArrayList<>(), true);
+        return executor.executeText(context, "USE " + database + ";", new ArrayList<>(), true);
     }
 }

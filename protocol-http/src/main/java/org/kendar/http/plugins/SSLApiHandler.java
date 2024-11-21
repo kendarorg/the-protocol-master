@@ -16,20 +16,20 @@ public class SSLApiHandler extends DefaultPluginApiHandler<SSLDummyPlugin> {
     }
 
     @Override
-    public boolean handle(BaseApiServerHandler apiServerHandler, HttpExchange exchange, String pathPart){
+    public boolean handle(BaseApiServerHandler apiServerHandler, HttpExchange exchange, String pathPart) {
         try {
             var frf = new FileResourcesUtils();
             switch (pathPart) {
                 case "/der":
                     var data = frf.getFileFromResourceAsByteArray(protocolSettings.getSSL().getDer());
-                    apiServerHandler.respond(exchange,new FileDownload(data,"certificate.der","application/pkix-crl"),200);
+                    apiServerHandler.respond(exchange, new FileDownload(data, "certificate.der", "application/pkix-crl"), 200);
                     return true;
                 case "/key":
                     var key = frf.getFileFromResourceAsByteArray(protocolSettings.getSSL().getKey());
-                    apiServerHandler.respond(exchange,new FileDownload(key,"certificate.key","application/pkix-crl"),200);
+                    apiServerHandler.respond(exchange, new FileDownload(key, "certificate.key", "application/pkix-crl"), 200);
                     return true;
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
         return false;

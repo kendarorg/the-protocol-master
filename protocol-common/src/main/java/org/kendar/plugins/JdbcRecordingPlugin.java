@@ -78,7 +78,7 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
 
     protected boolean shouldNotSave(StorageItem in, CompactLine out) {
         var result = in.retrieveInAs(JdbcRequest.class);
-        if(result.getQuery().trim().toLowerCase().startsWith("set"))return true;
+        if (result.getQuery().trim().toLowerCase().startsWith("set")) return true;
         return false;
     }
 

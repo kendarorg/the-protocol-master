@@ -16,7 +16,7 @@ public class Sleeper {
     public static void sleep(long timeoutMillis) {
 
         try {
-            if(timeoutMillis == 0){
+            if (timeoutMillis == 0) {
                 Thread.yield();
                 return;
             }

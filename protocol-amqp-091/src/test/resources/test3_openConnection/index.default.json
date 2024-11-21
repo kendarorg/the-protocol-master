@@ -1,43 +1,51 @@
-[ {
-  "index" : 1,
-  "type" : "byte[]",
-  "caller" : "AMQP",
-  "durationMs" : 2,
-  "tags" : { }
-}, {
-  "index" : 2,
-  "type" : "ConnectionStartOk",
-  "caller" : "AMQP",
-  "durationMs" : 3,
-  "tags" : { }
-}, {
-  "index" : 3,
-  "type" : "ConnectionTuneOk",
-  "caller" : "AMQP",
-  "durationMs" : 0,
-  "tags" : { }
-}, {
-  "index" : 4,
-  "type" : "ConnectionOpen",
-  "caller" : "AMQP",
-  "durationMs" : 1,
-  "tags" : { }
-}, {
-  "index" : 5,
-  "type" : "ChannelOpen",
-  "caller" : "AMQP",
-  "durationMs" : 6,
-  "tags" : { }
-}, {
-  "index" : 6,
-  "type" : "ChannelClose",
-  "caller" : "AMQP",
-  "durationMs" : 2,
-  "tags" : { }
-}, {
-  "index" : 7,
-  "type" : "ConnectionClose",
-  "caller" : "AMQP",
-  "durationMs" : 1,
-  "tags" : { }
-} ]
+[
+  {
+    "index": 1,
+    "type": "byte[]",
+    "caller": "AMQP",
+    "durationMs": 2,
+    "tags": {}
+  },
+  {
+    "index": 2,
+    "type": "ConnectionStartOk",
+    "caller": "AMQP",
+    "durationMs": 3,
+    "tags": {}
+  },
+  {
+    "index": 3,
+    "type": "ConnectionTuneOk",
+    "caller": "AMQP",
+    "durationMs": 0,
+    "tags": {}
+  },
+  {
+    "index": 4,
+    "type": "ConnectionOpen",
+    "caller": "AMQP",
+    "durationMs": 1,
+    "tags": {}
+  },
+  {
+    "index": 5,
+    "type": "ChannelOpen",
+    "caller": "AMQP",
+    "durationMs": 6,
+    "tags": {}
+  },
+  {
+    "index": 6,
+    "type": "ChannelClose",
+    "caller": "AMQP",
+    "durationMs": 2,
+    "tags": {}
+  },
+  {
+    "index": 7,
+    "type": "ConnectionClose",
+    "caller": "AMQP",
+    "durationMs": 1,
+    "tags": {}
+  }
+]

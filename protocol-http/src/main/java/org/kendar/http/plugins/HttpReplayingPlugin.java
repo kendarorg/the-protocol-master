@@ -51,7 +51,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
                 if (!matchSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : matchSites) {
-                        if (pat.matcher(request.getHost()).matches()){// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                        if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }
@@ -93,7 +93,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         }
 
         var item = lineToRead.getStorageItem();
-        System.out.println("READING "+item.getIndex());
+        System.out.println("READING " + item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
         if (settings.isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());
@@ -115,8 +115,8 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
     private void setupMatchSites(List<String> recordSites) {
         this.matchSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
-                .map(regex -> regex.startsWith("@")?
-                        Pattern.compile(regex.substring(1)):
+                .map(regex -> regex.startsWith("@") ?
+                        Pattern.compile(regex.substring(1)) :
                         Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
     }
 

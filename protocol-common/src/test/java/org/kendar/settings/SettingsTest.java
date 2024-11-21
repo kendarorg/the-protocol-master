@@ -8,6 +8,6 @@ public class SettingsTest {
     @Test
     void test() throws Exception {
         var target = new SettingsManager();
-        target.load(Path.of("src","test","resources","settings.json").toString());
+        target.load(Path.of("src", "test", "resources", "settings.json").toString());
     }
 }

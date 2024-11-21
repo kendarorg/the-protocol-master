@@ -44,7 +44,7 @@ public class ReplayerTest {
                 .getConnection(String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
                         "root", "test");
 
-        var runned =false;
+        var runned = false;
         var stmt = c.createStatement();
         var resultset = stmt.executeQuery("SHOW WARNINGS");
         while (resultset.next()) {
@@ -55,6 +55,8 @@ public class ReplayerTest {
         c.close();
 
         assertFalse(runned);
+        protocolServer.stop();
+        Sleeper.sleep(100);
     }
 
     @Test
@@ -104,5 +106,6 @@ public class ReplayerTest {
 
         assertTrue(atomicBoolean.get());
         protocolServer.stop();
+        Sleeper.sleep(100);
     }
 }

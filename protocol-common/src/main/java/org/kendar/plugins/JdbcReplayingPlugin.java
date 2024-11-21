@@ -88,7 +88,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
             var source = lineToRead.getStorageItem().retrieveOutAs(JdbcResponse.class);
             out.fill(source.getSelectResult());
             completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
-        } else if (lineToRead!=null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
+        } else if (lineToRead != null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
             completedIndexes.add((int) lineToRead.getCompactLine().getIndex());
             if (lineToRead.getCompactLine().getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 SelectResult resultset = new SelectResult();

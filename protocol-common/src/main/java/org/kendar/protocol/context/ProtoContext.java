@@ -32,15 +32,15 @@ import static org.kendar.protocol.descriptor.ProtoDescriptor.getNow;
 public abstract class ProtoContext {
 
     /**
-     * Stores the variable relatives to the current instance execution
-     */
-    protected final Map<String, Object> values = new HashMap<>();
-    /**
      * The executor to run asynchronously the system
      */
     protected static final ExecutorService executorService =
             new ThreadPoolExecutor(1, 100, 0L, TimeUnit.MILLISECONDS,
                     new LinkedBlockingQueue<>());
+    /**
+     * Stores the variable relatives to the current instance execution
+     */
+    protected final Map<String, Object> values = new HashMap<>();
     protected final int contextId;
     /**
      * The descriptor of the protocol

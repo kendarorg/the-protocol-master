@@ -336,10 +336,10 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void writeZip(byte[] byteArray) {
-        var destDir=Path.of(targetDir).toAbsolutePath().toString();
+        var destDir = Path.of(targetDir).toAbsolutePath().toString();
         File dir = new File(destDir);
         // create output directory if it doesn't exist
-        if(!dir.exists()) dir.mkdirs();
+        if (!dir.exists()) dir.mkdirs();
         ByteArrayInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
@@ -347,9 +347,9 @@ public class FileStorageRepository implements StorageRepository {
             fis = new ByteArrayInputStream(byteArray);
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry ze = zis.getNextEntry();
-            while(ze != null){
+            while (ze != null) {
                 String fileName = ze.getName();
-                File newFile = Path.of(destDir,fileName).toFile();
+                File newFile = Path.of(destDir, fileName).toFile();
                 //System.out.println("Unzipping to "+newFile.getAbsolutePath());
                 //create directories for sub directories in zip
                 new File(newFile.getParent()).mkdirs();

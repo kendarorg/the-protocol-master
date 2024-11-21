@@ -233,7 +233,7 @@ public class SimpleTest extends BasicTest {
     }
 
     void test5_noPublish() throws Exception {
-        
+
     }
 
     @Test

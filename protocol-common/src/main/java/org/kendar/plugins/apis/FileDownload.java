@@ -5,9 +5,10 @@ public class FileDownload {
     private String fileName;
     private String contentType;
 
-    public FileDownload(){
+    public FileDownload() {
 
     }
+
     public FileDownload(byte[] data, String fileName, String contentType) {
         this.data = data;
         this.fileName = fileName;

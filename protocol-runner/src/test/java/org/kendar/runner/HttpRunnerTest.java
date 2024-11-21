@@ -157,7 +157,7 @@ public class HttpRunnerTest extends BasicTest {
 
         var args = new String[]{
 
-                "-cfg", Path.of("src","test","resources","google.json").toString()
+                "-cfg", Path.of("src", "test", "resources", "google.json").toString()
         };
         startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000, () -> {

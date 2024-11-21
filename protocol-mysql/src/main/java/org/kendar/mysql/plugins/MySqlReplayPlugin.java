@@ -39,7 +39,7 @@ public class MySqlReplayPlugin extends JdbcReplayingPlugin {
         var si = lineToRead.getStorageItem();
         if (si != null) {
             var jdbcRequest = (JdbcRequest) si.retrieveInAs(JdbcRequest.class);
-            if(jdbcRequest!=null) {
+            if (jdbcRequest != null) {
                 if (jdbcRequest.getQuery().toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
                     var jdbcResponse = (JdbcResponse) si.retrieveOutAs(JdbcResponse.class);
                     var selectResult = new JsonMapper().deserialize(SELECT_TRANS_RESULT, SelectResult.class);
@@ -62,12 +62,12 @@ public class MySqlReplayPlugin extends JdbcReplayingPlugin {
                 resultset.setIntResult(true);
                 resultset.setCount(resp.getIntResult());
                 resp.setSelectResult(resultset);
-            }else{
+            } else {
                 resp.setIntResult(0);
                 SelectResult resultset = new SelectResult();
                 resultset.setIntResult(false);
                 resultset.setCount(0);
-                resultset.getMetadata().add(new ProxyMetadata("test",false, Types.INTEGER,11));
+                resultset.getMetadata().add(new ProxyMetadata("test", false, Types.INTEGER, 11));
                 resp.setSelectResult(resultset);
             }
             si.setOutput(resp);

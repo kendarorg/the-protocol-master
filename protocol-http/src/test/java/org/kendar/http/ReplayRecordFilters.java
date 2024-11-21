@@ -16,11 +16,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReplayRecordFilters {
     @Test
-    void testRecordSites(){
+    void testRecordSites() {
         var matched = new ChangeableReference<Boolean>(false);
-        var rwPlugin = new HttpRecordingPlugin(){
+        var rwPlugin = new HttpRecordingPlugin() {
             @Override
-            public boolean isActive(){return true;}
+            public boolean isActive() {
+                return true;
+            }
+
             @Override
             protected void postCall(PluginContext pluginContext, Object in, Object out) {
                 matched.set(true);
@@ -33,7 +36,7 @@ public class ReplayRecordFilters {
         settings.getRecordSites().add("@.*microsoft.*");
         rwPlugin.setSettings(settings);
 
-        var pc = new PluginContext("http", null,0L,null);
+        var pc = new PluginContext("http", null, 0L, null);
         var in = new Request();
         in.setMethod("GET");
         in.setPath("/test_sites");
@@ -42,32 +45,35 @@ public class ReplayRecordFilters {
 
         in.setHost("test_sites");
         matched.set(false);
-        rwPlugin.handle(pc,ProtocolPhase.POST_CALL,in,null);
+        rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
         assertTrue(matched.get());
 
         in.setHost("www.sara.com");
         matched.set(false);
-        rwPlugin.handle(pc,ProtocolPhase.POST_CALL,in,null);
+        rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
         assertTrue(matched.get());
 
         in.setHost("www.wetheaver.microsofto.com");
         matched.set(false);
-        rwPlugin.handle(pc,ProtocolPhase.POST_CALL,in,null);
+        rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
         assertTrue(matched.get());
 
 
         in.setHost("www.wetheaver.microsof.com");
         matched.set(false);
-        rwPlugin.handle(pc,ProtocolPhase.POST_CALL,in,null);
+        rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
         assertFalse(matched.get());
     }
 
     @Test
-    void testReplaySites(){
+    void testReplaySites() {
         var matched = new ChangeableReference<Boolean>(false);
-        var rwPlugin = new HttpReplayingPlugin(){
+        var rwPlugin = new HttpReplayingPlugin() {
             @Override
-            public boolean isActive(){return true;}
+            public boolean isActive() {
+                return true;
+            }
+
             @Override
             protected boolean doSend(PluginContext pluginContext, Request in, Response out) {
                 matched.set(true);
@@ -81,7 +87,7 @@ public class ReplayRecordFilters {
         settings.getMatchSites().add("@.*microsoft.*");
         rwPlugin.setSettings(settings);
 
-        var pc = new PluginContext("http", null,0L,null);
+        var pc = new PluginContext("http", null, 0L, null);
         var in = new Request();
         in.setMethod("GET");
         in.setPath("/test_sites");
@@ -90,23 +96,23 @@ public class ReplayRecordFilters {
 
         in.setHost("test_sites");
         matched.set(false);
-        rwPlugin.handle(pc,ProtocolPhase.PRE_CALL,in,null);
+        rwPlugin.handle(pc, ProtocolPhase.PRE_CALL, in, null);
         assertTrue(matched.get());
 
         in.setHost("www.sara.com");
         matched.set(false);
-        rwPlugin.handle(pc,ProtocolPhase.PRE_CALL,in,null);
+        rwPlugin.handle(pc, ProtocolPhase.PRE_CALL, in, null);
         assertTrue(matched.get());
 
         in.setHost("www.wetheaver.microsofto.com");
         matched.set(false);
-        rwPlugin.handle(pc,ProtocolPhase.PRE_CALL,in,null);
+        rwPlugin.handle(pc, ProtocolPhase.PRE_CALL, in, null);
         assertTrue(matched.get());
 
 
         in.setHost("www.wetheaver.microsof.com");
         matched.set(false);
-        rwPlugin.handle(pc,ProtocolPhase.PRE_CALL,in,null);
+        rwPlugin.handle(pc, ProtocolPhase.PRE_CALL, in, null);
         assertFalse(matched.get());
     }
 }

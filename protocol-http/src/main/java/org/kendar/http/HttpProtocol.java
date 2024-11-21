@@ -4,12 +4,12 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
 import org.kendar.http.plugins.SSLDummyPlugin;
 import org.kendar.http.settings.HttpProtocolSettings;
+import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
 import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
-import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -142,7 +142,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
 
             httpServer = HttpServer.create(address, backlog);
-            log.debug("[CL>TP][IN] Listening on *.:"+port+" Http");
+            log.info("[CL>TP][IN] Listening on *.:{} Http", port);
 
             var sslDer = getOrDefault(settings.getSSL().getDer(), "resource://certificates/ca.der");
             var sslKey = getOrDefault(settings.getSSL().getKey(), "resource://certificates/ca.key");
@@ -151,7 +151,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             var certificatesManager = new CertificatesManager(new FileResourcesUtils());
             httpsServer = createHttpsServer(certificatesManager,
                     sslAddress, backlog, cname, sslDer, sslKey, settings.getSSL().getHosts());
-            log.debug("[CL>TP][IN] Listening on *.:"+httpsPort+" Https");
+            log.info("[CL>TP][IN] Listening on *.:{} Https", httpsPort);
 
 
             proxy = new ProxyServer(proxyPort)
@@ -171,7 +171,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                     ignoringHosts("push.services.mozilla.com");
 
             proxy.start();
-            log.debug("[CL>TP][IN] Listening on *.:"+proxyPort+" Http Proxy");
+            log.info("[CL>TP][IN] Listening on *.:{} Http Proxy", proxyPort);
 
 
             for (var i = plugins.size() - 1; i >= 0; i--) {

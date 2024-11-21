@@ -70,10 +70,10 @@ public class Main {
         var options = ProtocolsRunner.getMainOptions();
         HashMap<String, List<PluginDescriptor>> plugins = new HashMap<>();
         CommandLine cmd = parser.parse(options, args, true);
-        if(cmd.hasOption("unattended")){
-            stopWhenFalse = ()->{
-              Sleeper.sleep(10000);
-              return true;
+        if (cmd.hasOption("unattended")) {
+            stopWhenFalse = () -> {
+                Sleeper.sleep(10000);
+                return true;
             };
         }
         var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
@@ -144,15 +144,15 @@ public class Main {
                 allPlugins.get(protocol).add(item);
             }
         }
-        var ssl =  new SSLDummyPlugin();
+        var ssl = new SSLDummyPlugin();
         ssl.setActive(true);
         addEmbedded(allPlugins, "http", List.of(
                 new HttpRecordingPlugin(),
                 new HttpErrorPlugin(),
                 new HttpReplayingPlugin(),
                 new HttpRewritePlugin(),
-                new HttpMockPlugin(),ssl
-               ));
+                new HttpMockPlugin(), ssl
+        ));
         addEmbedded(allPlugins, "mongodb", List.of(
                 new MongoRecordingPlugin(),
                 new MongoReplayingPlugin()));
@@ -242,7 +242,7 @@ public class Main {
             var apiServer = HttpServer.create(address, 10);
             apiServer.createContext("/", new ApiServerHandler(apiHandler));
             apiServer.start();
-            log.debug("[CL>TP][IN] Listening on *.:"+ini.getApiPort()+" TPM Apis");
+            log.info("[CL>TP][IN] Listening on *.:{} TPM Apis", ini.getApiPort());
         }
         while (stopWhenFalse.get()) {
             Sleeper.sleep(100);

@@ -1,11 +1,13 @@
 package org.kendar.apis.dtos;
 
 public class ProtocolIndex {
-    private  String id;
-    private  String protocol;
-    public ProtocolIndex(){
+    private String id;
+    private String protocol;
+
+    public ProtocolIndex() {
 
     }
+
     public ProtocolIndex(String id, String protocol) {
 
         this.id = id;
