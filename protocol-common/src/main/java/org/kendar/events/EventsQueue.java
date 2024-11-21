@@ -77,7 +77,7 @@ public class EventsQueue {
         new Thread(() -> {
             while (true) {
                 if (items.isEmpty()) {
-                    Sleeper.sleep(10);
+                    Sleeper.sleep(0);
                     continue;
                 }
                 var item = items.poll();
@@ -91,7 +91,6 @@ public class EventsQueue {
                     size.decrementAndGet();
                     item = items.poll();
                 }
-
             }
         }).start();
 
