@@ -7,8 +7,14 @@
 * Simulate wrong scenarios 
 * Block troubles before production
 * Simulate whole infrastructure
+* Make untestable apps testable
 
-Effortlessy
+Effortlessy and with zero budget
+
+### Get Started
+
+Look at "[The Protocol Master Samples](https://github.com/kendarorg/the-protocol-master-samples)" repository to create
+a complete docker environment to have a gimplse of the features
 
 ### How it works
 
@@ -19,13 +25,16 @@ Independent from the stack you are using
 
 * Simulate what-if without hitting real servers
 * Testing resiliency, errors and wrong data
-* Security analisys
+* Security analisys (what goes on the wire)
 * Test new APIs easily
-  
-## Get Started
+* Understand all consequences of changes
 
-Look at "[The Protocol Master Samples](https://github.com/kendarorg/the-protocol-master-samples)" repository to create
-a complete docker environment to have a gimplse of the features
+### Custom Plugins
+
+You can build your own plugins, just place the Jar into the plugins dir
+and intercept all it's intercepted by TPM. Add headers, change data, 
+simulate specific needs
+  
 
 ## Examples
 
