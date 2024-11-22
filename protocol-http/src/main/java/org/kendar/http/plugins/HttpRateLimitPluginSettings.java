@@ -16,14 +16,14 @@ public class HttpRateLimitPluginSettings extends PluginSettings {
     private int rateLimit = 120;//or custom?
     private String resetFormat="secondsLeft";//UtcEpochSeconds
     private String customResponseFile;
-    private List<String> recordSites = new ArrayList<>();
+    private List<String> limitSites = new ArrayList<>();
 
-    public List<String> getRecordSites() {
-        return recordSites;
+    public List<String> getLimitSites() {
+        return limitSites;
     }
 
-    public void setRecordSites(List<String> recordSites) {
-        this.recordSites = recordSites;
+    public void setLimitSites(List<String> limitSites) {
+        this.limitSites = limitSites;
     }
 
     public String getHeaderLimit() {

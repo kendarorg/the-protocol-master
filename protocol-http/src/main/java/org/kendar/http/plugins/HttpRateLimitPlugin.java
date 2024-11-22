@@ -62,7 +62,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
     public PluginDescriptor setSettings(PluginSettings plugin) {
         setActive(plugin.isActive());
         settings = (HttpRateLimitPluginSettings) plugin;
-        setupSitesToRecord(settings.getRecordSites());
+        setupSitesToRecord(settings.getLimitSites());
         if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
             var frr = new FileResourcesUtils();
             customResponse = mapper.deserialize(frr.getFileFromResourceAsString(settings.getCustomResponseFile()), Response.class);
