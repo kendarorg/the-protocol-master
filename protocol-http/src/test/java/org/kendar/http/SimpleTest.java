@@ -197,7 +197,7 @@ public class SimpleTest extends BasicTest {
     }
 
     @Test
-    void testLAtencyPlugin() throws Exception {
+    void testLatencyPlugin() throws Exception {
         var latencyPlugin = (HttpLatencyPlugin)baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("latency-plugin")).findFirst().get();
         var lps = new HttpLatencyPluginSettings();
         lps.setMinMs(2000);

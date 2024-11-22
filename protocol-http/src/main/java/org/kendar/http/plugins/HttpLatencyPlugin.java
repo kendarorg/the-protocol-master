@@ -56,6 +56,6 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptor<Request, Respons
 
     @Override
     public Class<?> getSettingClass() {
-        return HttpLatencyPlugin.class;
+        return HttpLatencyPluginSettings.class;
     }
 }
