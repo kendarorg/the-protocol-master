@@ -8,6 +8,8 @@ import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
 import org.kendar.utils.FileResourcesUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +28,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
-
+    private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
     @Override
     protected void handleActivation(boolean active) {
         synchronized (sync) {
@@ -124,7 +126,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
             resourcesRemaining -= settings.getCostPerRequest();
             if (resourcesRemaining < 0) {
                 resourcesRemaining = 0;
-
+                log.trace("Rate limit reached for {}", in.getHost());
                 var isnt = Calendar.getInstance();
                 isnt.setTimeInMillis(
                         resetTime.getTimeInMillis() - Calendar.getInstance().getTimeInMillis());
@@ -152,6 +154,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
                 }
             } else if (resourcesRemaining < (settings.getRateLimit() -
                     (settings.getRateLimit() * settings.getWarningThresholdPercent() / 100))) {
+                log.trace("Rate limit warn for {}", in.getHost());
                 out.addHeader(settings.getHeaderLimit(), settings.getRateLimit() + "");
                 out.addHeader(settings.getHeaderRemaining(), resourcesRemaining + "");
             }
