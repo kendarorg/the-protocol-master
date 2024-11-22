@@ -53,9 +53,9 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
         setActive(plugin.isActive());
         settings = (HttpRateLimitPluginSettings) plugin;
         setupSitesToRecord(settings.getRecordSites());
-        if(settings.getCustomResponseFile()!=null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
+        if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
             var frr = new FileResourcesUtils();
-            customResponse = mapper.deserialize(frr.getFileFromResourceAsString(settings.getCustomResponseFile()),Response.class);
+            customResponse = mapper.deserialize(frr.getFileFromResourceAsString(settings.getCustomResponseFile()), Response.class);
         }
         return this;
     }
@@ -75,7 +75,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
 
     @Override
     public String getId() {
-        return "ratelimit-plugin";
+        return "rate-limit-plugin";
     }
 
     @Override
@@ -124,26 +124,26 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
                 DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
                 decimalFormatSymbols.setGroupingSeparator('.');
                 decimalFormatSymbols.setDecimalSeparator(',');
-                var df = new DecimalFormat("###.###,##", decimalFormatSymbols);
+                var df = new DecimalFormat("#.###,##", decimalFormatSymbols);
 
                 var reset = settings.getResetFormat().equalsIgnoreCase("SecondsLeft") ?
                         df.format(isnt.getTimeInMillis() / 1000) :  // drop decimals
                         resetTime.toInstant().getEpochSecond() + "";
 
                 //Logger.LogRequest($"Exceeded resource limit when calling {request.Url}. Request will be throttled", MessageType.Failed, new LoggingContext(e.Session));
-                if (settings.getWhenLimitExceeded().equalsIgnoreCase("throttle")) {
-                    out.addHeader(settings.getHeaderLimit(), settings.getRateLimit() + "");
-                    out.addHeader(settings.getHeaderReset(), reset);
-                    out.addHeader(settings.getHeaderRetryAfter(), "" + (isnt.getTimeInMillis() / 1000));
-                    out.setStatusCode(429);
-                    return true;
-                } else if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
+                if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
                     out.getHeaders().clear();
                     out.getHeaders().putAll(customResponse.getHeaders());
                     out.removeHeader(settings.getHeaderRetryAfter());
                     out.addHeader(settings.getHeaderRetryAfter(), "" + (isnt.getTimeInMillis() / 1000));
                     out.setResponseText(customResponse.getResponseText());
                     out.setStatusCode(customResponse.getStatusCode());
+                    return true;
+                } else {
+                    out.addHeader(settings.getHeaderLimit(), settings.getRateLimit() + "");
+                    out.addHeader(settings.getHeaderReset(), reset);
+                    out.addHeader(settings.getHeaderRetryAfter(), "" + (isnt.getTimeInMillis() / 1000));
+                    out.setStatusCode(429);
                     return true;
                 }
             } else {
@@ -158,7 +158,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
     @Override
     protected void handleActivation(boolean active) {
         synchronized (sync) {
-            resetTime=null;
+            resetTime = null;
             resourcesRemaining = -1;
         }
     }

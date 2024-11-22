@@ -18,6 +18,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.kendar.http.plugins.HttpLatencyPlugin;
 import org.kendar.http.plugins.HttpLatencyPluginSettings;
+import org.kendar.http.plugins.HttpRateLimitPlugin;
+import org.kendar.http.plugins.HttpRateLimitPluginSettings;
 import org.kendar.http.utils.ConsumeException;
 import org.kendar.http.utils.NullEntity;
 import org.kendar.utils.ChangeableReference;
@@ -249,6 +251,26 @@ public class SimpleTest extends BasicTest {
         var httpresponse = httpclient.execute(httpPost);
         assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
         consumer.accept(httpresponse);
+    }
+
+    @Test
+    void testRateLimitSimple() throws Exception {
+        var latencyPlugin = (HttpRateLimitPlugin)baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("rate-limit-plugin")).findFirst().get();
+        var lps = new HttpRateLimitPluginSettings();
+        latencyPlugin.setSettings(lps);
+        latencyPlugin.setActive(true);
+
+        var httpclient = createHttpsHttpClient();
+        var httpget = new HttpGet("http://localhost:" + 8456 + "/jsonized");
+        for(var i=0;i<100;i++){
+            var httpresponse = httpclient.execute(httpget);
+            var sc = new Scanner(httpresponse.getEntity().getContent());
+            assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+            var content = "";
+            while (sc.hasNext()) {
+                content += sc.nextLine();
+            }
+        }
     }
 
 }

@@ -13,8 +13,7 @@ public class HttpRateLimitPluginSettings extends PluginSettings {
     private int costPerRequest = 2;
     private int resetTimeWindowSeconds =60;
     private int warningThresholdPercent = 80;
-    private int rateLimit = 120;
-    private String whenLimitExceeded= "throttle";//or custom?
+    private int rateLimit = 120;//or custom?
     private String resetFormat="secondsLeft";//UtcEpochSeconds
     private String customResponseFile;
     private List<String> recordSites = new ArrayList<>();
@@ -91,13 +90,6 @@ public class HttpRateLimitPluginSettings extends PluginSettings {
         this.rateLimit = rateLimit;
     }
 
-    public String getWhenLimitExceeded() {
-        return whenLimitExceeded;
-    }
-
-    public void setWhenLimitExceeded(String whenLimitExceeded) {
-        this.whenLimitExceeded = whenLimitExceeded;
-    }
 
     public String getResetFormat() {
         return resetFormat;
