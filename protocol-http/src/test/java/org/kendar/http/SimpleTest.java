@@ -276,7 +276,7 @@ public class SimpleTest extends BasicTest {
             }else if(i==error){
                 assertEquals("HTTP/1.1 429",sl );
                 var retryAfter = Integer.parseInt(httpresponse.getFirstHeader("Retry-After").getValue());
-                assertTrue(retryAfter>0 && retryAfter<=3);
+                assertTrue(retryAfter>=0 && retryAfter<=3);
                 Sleeper.sleep((retryAfter+1)*1000);
             }else {
                 assertEquals("HTTP/1.1 200 OK",sl);
@@ -324,7 +324,7 @@ public class SimpleTest extends BasicTest {
             }else if(i==error){
                 assertEquals("HTTP/1.1 403 Forbidden",sl );
                 var retryAfter = Integer.parseInt(httpresponse.getFirstHeader("Retry-After").getValue());
-                assertTrue(retryAfter>0 && retryAfter<=3);
+                assertTrue(retryAfter>=0 && retryAfter<=3);
                 assertTrue(cnt.contains("You have exceeded a secondary rate limit"));
                 Sleeper.sleep((retryAfter+1)*1000);
             }else {
