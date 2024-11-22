@@ -11,13 +11,13 @@ import org.kendar.utils.FileResourcesUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+
 
 public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Response> {
     private final Object sync = new Object();
@@ -26,6 +26,14 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
+
+    @Override
+    protected void handleActivation(boolean active) {
+        synchronized (sync) {
+            resetTime = null;
+            resourcesRemaining = -1;
+        }
+    }
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
@@ -94,6 +102,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
     }
 
     private boolean handleRateLimit(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
+
         synchronized (sync) {
             // set the initial values for the first request
             if (resetTime == null) {
@@ -121,14 +130,9 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
                         resetTime.getTimeInMillis() - Calendar.getInstance().getTimeInMillis());
 
 
-                DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
-                decimalFormatSymbols.setGroupingSeparator('.');
-                decimalFormatSymbols.setDecimalSeparator(',');
-                var df = new DecimalFormat("#.###,##", decimalFormatSymbols);
-
                 var reset = settings.getResetFormat().equalsIgnoreCase("SecondsLeft") ?
-                        df.format(isnt.getTimeInMillis() / 1000) :  // drop decimals
-                        resetTime.toInstant().getEpochSecond() + "";
+                        isnt.getTimeInMillis() / 1000 :  // drop decimals
+                        resetTime.toInstant().getEpochSecond();
 
                 //Logger.LogRequest($"Exceeded resource limit when calling {request.Url}. Request will be throttled", MessageType.Failed, new LoggingContext(e.Session));
                 if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
@@ -141,25 +145,18 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
                     return true;
                 } else {
                     out.addHeader(settings.getHeaderLimit(), settings.getRateLimit() + "");
-                    out.addHeader(settings.getHeaderReset(), reset);
+                    out.addHeader(settings.getHeaderReset(), reset + "");
                     out.addHeader(settings.getHeaderRetryAfter(), "" + (isnt.getTimeInMillis() / 1000));
                     out.setStatusCode(429);
                     return true;
                 }
-            } else {
+            } else if (resourcesRemaining < (settings.getRateLimit() -
+                    (settings.getRateLimit() * settings.getWarningThresholdPercent() / 100))) {
                 out.addHeader(settings.getHeaderLimit(), settings.getRateLimit() + "");
                 out.addHeader(settings.getHeaderRemaining(), resourcesRemaining + "");
             }
 
-            return false;
         }
-    }
-
-    @Override
-    protected void handleActivation(boolean active) {
-        synchronized (sync) {
-            resetTime = null;
-            resourcesRemaining = -1;
-        }
+        return false;
     }
 }

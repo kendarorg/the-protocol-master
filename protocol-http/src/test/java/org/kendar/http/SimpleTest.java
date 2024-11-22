@@ -28,6 +28,7 @@ import org.kendar.utils.Sleeper;
 import org.testcontainers.shaded.com.trilead.ssh2.crypto.Base64;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -254,22 +255,89 @@ public class SimpleTest extends BasicTest {
     }
 
     @Test
-    void testRateLimitSimple() throws Exception {
+    void testRateLimit() throws Exception {
         var latencyPlugin = (HttpRateLimitPlugin)baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("rate-limit-plugin")).findFirst().get();
         var lps = new HttpRateLimitPluginSettings();
+        lps.setResetTimeWindowSeconds(3);
         latencyPlugin.setSettings(lps);
         latencyPlugin.setActive(true);
 
         var httpclient = createHttpsHttpClient();
-        var httpget = new HttpGet("http://localhost:" + 8456 + "/jsonized");
+        var httpget = new HttpGet("http://localhost:" + 8456 + "/clean");
+
+        var startWarning = (((double)lps.getRateLimit()/100)*(double)lps.getWarningThresholdPercent())/(double)lps.getCostPerRequest();
+        var error= lps.getRateLimit()/ lps.getCostPerRequest();
         for(var i=0;i<100;i++){
             var httpresponse = httpclient.execute(httpget);
-            var sc = new Scanner(httpresponse.getEntity().getContent());
-            assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
-            var content = "";
-            while (sc.hasNext()) {
-                content += sc.nextLine();
+            var sl = httpresponse.getStatusLine().toString().trim();
+            if(i> error) {
+                assertEquals("HTTP/1.1 200 OK",sl);
+                assertNull(httpresponse.getFirstHeader("RateLimit-Limit"));
+            }else if(i==error){
+                assertEquals("HTTP/1.1 429",sl );
+                var retryAfter = Integer.parseInt(httpresponse.getFirstHeader("Retry-After").getValue());
+                assertTrue(retryAfter>0 && retryAfter<=3);
+                Sleeper.sleep((retryAfter+1)*1000);
+            }else {
+                assertEquals("HTTP/1.1 200 OK",sl);
+                if(i<startWarning){
+                    assertNull(httpresponse.getFirstHeader("RateLimit-Limit"));
+                }else{
+                    assertEquals(httpresponse.getFirstHeader("RateLimit-Limit").getValue(),"120");
+                    var limit = lps.getRateLimit()-((i+1)*lps.getCostPerRequest());
+                    assertEquals(httpresponse.getFirstHeader("RateLimit-Remaining").getValue(),""+limit);
+                }
             }
+            var sc = new Scanner(httpresponse.getEntity().getContent());
+            while (sc.hasNext()) {
+                sc.nextLine();
+            }
+        }
+    }
+
+
+    @Test
+    void testRateLimitCustom() throws Exception {
+        var latencyPlugin = (HttpRateLimitPlugin)baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("rate-limit-plugin")).findFirst().get();
+        var lps = new HttpRateLimitPluginSettings();
+        lps.setResetTimeWindowSeconds(3);
+        lps.setCustomResponseFile(Path.of("src","test","resources","ratelimitresponse.json").toString());
+        latencyPlugin.setSettings(lps);
+        latencyPlugin.setActive(true);
+
+        var httpclient = createHttpsHttpClient();
+        var httpget = new HttpGet("http://localhost:" + 8456 + "/clean");
+
+        var startWarning = (((double)lps.getRateLimit()/100)*(double)lps.getWarningThresholdPercent())/(double)lps.getCostPerRequest();
+        var error= lps.getRateLimit()/ lps.getCostPerRequest();
+        for(var i=0;i<100;i++){
+            var httpresponse = httpclient.execute(httpget);
+            var sl = httpresponse.getStatusLine().toString().trim();
+            var sc = new Scanner(httpresponse.getEntity().getContent());
+            var cnt = "";
+            while (sc.hasNext()) {
+                cnt+=sc.nextLine();
+            }
+            if(i> error) {
+                assertEquals("HTTP/1.1 200 OK",sl);
+                assertNull(httpresponse.getFirstHeader("RateLimit-Limit"));
+            }else if(i==error){
+                assertEquals("HTTP/1.1 403 Forbidden",sl );
+                var retryAfter = Integer.parseInt(httpresponse.getFirstHeader("Retry-After").getValue());
+                assertTrue(retryAfter>0 && retryAfter<=3);
+                assertTrue(cnt.contains("You have exceeded a secondary rate limit"));
+                Sleeper.sleep((retryAfter+1)*1000);
+            }else {
+                assertEquals("HTTP/1.1 200 OK",sl);
+                if(i<startWarning){
+                    assertNull(httpresponse.getFirstHeader("RateLimit-Limit"));
+                }else{
+                    assertEquals(httpresponse.getFirstHeader("RateLimit-Limit").getValue(),"120");
+                    var limit = lps.getRateLimit()-((i+1)*lps.getCostPerRequest());
+                    assertEquals(httpresponse.getFirstHeader("RateLimit-Remaining").getValue(),""+limit);
+                }
+            }
+
         }
     }
 

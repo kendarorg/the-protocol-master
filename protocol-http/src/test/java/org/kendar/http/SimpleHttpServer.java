@@ -19,7 +19,7 @@ public class SimpleHttpServer {
 
     public void start(int port) throws IOException {
         var address = new InetSocketAddress(port);
-        httpServer = new KendarHttpServer(address, 10);
+        httpServer = new KendarHttpServer(address, 1000);
         var srv = this;
         reqResBuilder = new RequestResponseBuilderImpl();
         httpServer.createContext("/", exchange -> {
@@ -39,10 +39,12 @@ public class SimpleHttpServer {
     private void handle(HttpExchange exchange) throws IOException, FileUploadException {
         try {
             var request = reqResBuilder.fromExchange(exchange, "http");
-
             var outputStream = exchange.getResponseBody();
             byte[] bytes = new byte[]{};
-            if (request.getPath().endsWith("image.gif")) {
+            if (request.getPath().endsWith("/clean")) {
+                exchange.getResponseHeaders().add("Content-Type", "text/plain");
+                bytes= "test".getBytes();
+            }else if (request.getPath().endsWith("image.gif")) {
                 var frf = new FileResourcesUtils();
                 bytes = frf.getFileFromResourceAsByteArray("resource://image.gif");
                 exchange.getResponseHeaders().add("Content-Type", "image/gif");
