@@ -138,13 +138,3 @@ without errors then the "executed incoming buffer" is purged from the received b
 The events are immediatly executed. If no bytes are present or there are not enough
 bytes to read, the events queue is seeked for "BytesEvent" and then the execution is
 retried.
-
-## Suggestion for run and compilation
-
-You can build the whole system at home, but to avoid messing with timeouts
-
-* Maven clean & install each project separately
-* Run the jacoco to check the coverage
-
-
-
