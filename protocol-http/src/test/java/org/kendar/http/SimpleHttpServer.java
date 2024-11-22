@@ -19,7 +19,7 @@ public class SimpleHttpServer {
 
     public void start(int port) throws IOException {
         var address = new InetSocketAddress(port);
-        httpServer = new KendarHttpServer(address, 1000);
+        httpServer = new KendarHttpServer(address, 60);
         var srv = this;
         reqResBuilder = new RequestResponseBuilderImpl();
         httpServer.createContext("/", exchange -> {

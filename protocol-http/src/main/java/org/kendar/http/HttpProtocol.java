@@ -128,7 +128,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 //        log.info("LISTEN HTTP: " + port);
 //        log.info("LISTEN HTTPS: " + httpsPort);
 //        log.info("LISTEN PROXY: " + proxyPort);
-            var backlog = 1000;
+            var backlog = 60;
             var useCachedExecutor = true;
             var address = new InetSocketAddress(port);
             var sslAddress = new InetSocketAddress(httpsPort);
