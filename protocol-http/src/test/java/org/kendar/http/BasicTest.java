@@ -158,6 +158,7 @@ public class BasicTest {
                 new HttpReplayingPlugin().withStorage(storage),
                 new HttpErrorPlugin(),
                 new HttpLatencyPlugin(),
+                new HttpRateLimitPlugin(),
                 new HttpMockPlugin(),
                 new HttpRewritePlugin()));
         baseProtocol.initialize();

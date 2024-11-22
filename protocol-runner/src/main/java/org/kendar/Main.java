@@ -153,7 +153,8 @@ public class Main {
                 new HttpReplayingPlugin(),
                 new HttpRewritePlugin(),
                 new HttpMockPlugin(),
-                new HttpLatencyPlugin(), ssl
+                new HttpLatencyPlugin(),
+                new HttpRateLimitPlugin(), ssl
         ));
         addEmbedded(allPlugins, "mongodb", List.of(
                 new MongoRecordingPlugin(),
