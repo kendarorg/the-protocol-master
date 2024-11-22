@@ -3,6 +3,7 @@ package org.kendar.storage;
 import org.kendar.storage.generic.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class NullStorageRepository implements StorageRepository {
 
@@ -39,6 +40,11 @@ public class NullStorageRepository implements StorageRepository {
     @Override
     public void writeZip(byte[] byteArray) {
 
+    }
+    private final AtomicLong counter = new AtomicLong(0);
+    @Override
+    public long generateIndex() {
+        return counter.incrementAndGet();
     }
 
     @Override
