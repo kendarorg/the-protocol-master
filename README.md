@@ -24,6 +24,9 @@ The whole project is covered with Jacoco (77% instructions coverage actually)
 
 Start looking at [tutorials](docs/tutorials.md) for a good start
 
+Or look at "[The Protocol Master Samples](https://github.com/kendarorg/the-protocol-master-samples)" repository to create
+a complete docker environment to have a gimplse of the features
+
 ## Examples
 
 Open a http/s proxy on port 9999 and record everything that goes through
