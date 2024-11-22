@@ -10,12 +10,11 @@ The main targets are testing and inspection
 
 You can use it to:
 
-* Block troubles BEFORE PRODUCTION
-* Simulate errors
-* Simulate behaviours and not yet ready APIs
-* Mock responses without coding
-* Mock entire infrastructures without coding
-* "Gold standard" test without infrastructure without coding
+* Simulate wrong scenarios 
+* Block troubles before production
+* Build reproducible test without infrastructure
+* Understand application interactions
+* Simulate not yet ready APIs
 
 The whole project is covered with Jacoco (77% instructions coverage actually)
 
