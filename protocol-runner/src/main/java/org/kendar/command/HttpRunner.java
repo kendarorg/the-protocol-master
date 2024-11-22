@@ -7,6 +7,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.kendar.http.HttpProtocol;
 import org.kendar.http.plugins.HttpErrorPluginSettings;
+import org.kendar.http.plugins.HttpLatencyPluginSettings;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
@@ -64,6 +65,10 @@ public class HttpRunner extends CommonRunner {
         options.addOption("showError", true, "The error to show (404/500 etc) default 0/none");
         options.addOption("errorPercent", true, "The error percent to generate (default 0)");
         options.addOption("errorMessage", true, "The error message");
+
+
+        options.addOption("latencyMin", true, "Min ms latency (default 0)");
+        options.addOption("latencyMax", true, "Max ms latency (default 0)");
         if (!isExecute) return;
         setCommonData(args, options, go, new HttpProtocolSettings());
     }
@@ -111,6 +116,12 @@ public class HttpRunner extends CommonRunner {
             pl.setErrorPercent(Integer.parseInt(cmd.getOptionValue("errorPercent", "0")));
             pl.setErrorMessage(cmd.getOptionValue("errorMessage", "Error"));
             section.getPlugins().put("error-plugin", pl);
+        }
+        if (cmd.hasOption("latencyMax")) {
+            var pl = new HttpLatencyPluginSettings();
+            pl.setMinMs(Integer.parseInt(cmd.getOptionValue("latencyMin", "0")));
+            pl.setMaxMs(Integer.parseInt(cmd.getOptionValue("latencyMax", cmd.getOptionValue("latencyMin", "0"))));
+            section.getPlugins().put("latency-plugin", pl);
         }
     }
 
