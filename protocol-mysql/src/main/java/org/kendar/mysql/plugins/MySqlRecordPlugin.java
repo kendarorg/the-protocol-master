@@ -61,10 +61,8 @@ public class MySqlRecordPlugin extends JdbcRecordingPlugin {
             return true;
         }
         if (cl.getTags().get("query").toUpperCase().startsWith(SELECT_TRANS.toUpperCase())) {
-            if (in != null) {
-                cl.getTags().put("isIntResult", "true");
-                cl.getTags().put("resultsCount", ((JdbcResponse) in.getOutput()).getSelectResult().getRecords().get(0).get(0));
-            }
+            cl.getTags().put("isIntResult", "true");
+            cl.getTags().put("resultsCount", ((JdbcResponse) in.getOutput()).getSelectResult().getRecords().get(0).get(0));
             return true;
         }
         return shouldNotSave;

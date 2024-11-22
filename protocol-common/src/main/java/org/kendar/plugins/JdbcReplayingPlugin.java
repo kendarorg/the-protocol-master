@@ -10,6 +10,7 @@ import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
@@ -22,7 +23,6 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     protected static JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected StorageRepository storage;
-    protected HashSet<Integer> completedOutIndexes = new HashSet<>();
 
     protected Object getData(Object of) {
         return of;
@@ -88,7 +88,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
         if (lineToRead != null && lineToRead.getStorageItem() != null
                 && lineToRead.getStorageItem().getOutput() != null) {
             var source = lineToRead.getStorageItem().retrieveOutAs(JdbcResponse.class);
-            ((SelectResult) outObj).fill(source.getSelectResult());
+            outObj.fill(source.getSelectResult());
             completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
         } else if (lineToRead != null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
             completedIndexes.add((int) lineToRead.getCompactLine().getIndex());
@@ -96,9 +96,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
                 SelectResult resultset = new SelectResult();
                 resultset.setIntResult(true);
                 resultset.setCount(Integer.parseInt(lineToRead.getCompactLine().getTags().get("resultsCount")));
-                ((SelectResult) outObj).fill(resultset);
-            } else if (((JdbcCall) inObj).getQuery().trim().toLowerCase().startsWith("set")) {
-
+                outObj.fill(resultset);
             }
         }
         /*if ((lineToRead == null || lineToRead.getStorageItem() == null
@@ -119,6 +117,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
             return lineToRead;
         }
         if (idx != null) {
+            si = new StorageItem();
             JdbcResponse resp = new JdbcResponse();
             if (idx.getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 resp.setIntResult(Integer.parseInt(idx.getTags().get("resultsCount")));

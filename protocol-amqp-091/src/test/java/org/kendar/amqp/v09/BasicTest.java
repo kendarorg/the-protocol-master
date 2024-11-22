@@ -70,7 +70,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new AmqpRecordingPlugin();
+        var pl = new AmqpRecordingPlugin().withStorage(storage);
         proxy.setPlugins(List.of(
                 pl));
         pl.setActive(true);

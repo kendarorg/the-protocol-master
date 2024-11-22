@@ -1,6 +1,5 @@
 package org.kendar.http.utils.converters;
 
-import org.apache.commons.fileupload.FileItem;
 import org.kendar.http.utils.MimeChecker;
 
 import java.util.HashMap;
@@ -18,18 +17,6 @@ public class MultipartPart {
 
     protected MultipartPart() {
 
-    }
-
-    public MultipartPart(FileItem fileItem) {
-        this.contentType = fileItem.getContentType();
-        this.file = !fileItem.isFormField();
-        setFieldName(fileItem.getFieldName());
-        if (fileItem.isFormField()) {
-            setStringData(fileItem.getString());
-        } else {
-            setByteData(fileItem.get());
-            setFileName(fileItem.getName());
-        }
     }
 
     public MultipartPart(RequestUtils.SimpleBlock simpleBlock) {
@@ -136,7 +123,7 @@ public class MultipartPart {
 
     public MultipartPart copy() {
         var r = new MultipartPart();
-        r.byteData = this.byteData != null ? this.byteData.clone() : this.byteData;
+        r.byteData = this.byteData != null ? this.byteData.clone() : null;
         r.contentType = this.contentType;
         r.fieldName = this.fieldName;
         r.file = this.file;

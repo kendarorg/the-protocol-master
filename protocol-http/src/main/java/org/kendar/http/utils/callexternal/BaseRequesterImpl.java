@@ -21,8 +21,6 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.impl.conn.SystemDefaultDnsResolver;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.kendar.http.utils.*;
@@ -32,29 +30,24 @@ import org.kendar.http.utils.converters.MultipartPart;
 import org.kendar.http.utils.converters.RequestResponseBuilder;
 import org.kendar.http.utils.converters.RequestUtils;
 import org.kendar.http.utils.dns.DnsMultiResolver;
-import org.kendar.http.utils.dns.ResolvedDomain;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("resource")
 public abstract class BaseRequesterImpl implements BaseRequester {
     @SuppressWarnings("UastIncorrectHttpHeaderInspection")
     public static final String BLOCK_RECURSION = "X-BLOCK-RECURSIVE";
-
+    private static final Logger logger = LoggerFactory.getLogger(BaseRequesterImpl.class);
     private static final HttpRequestRetryHandler requestRetryHandler =
             (exception, executionCount, context) -> executionCount != 1;
     protected final DnsMultiResolver multiResolver;
-    protected final ConcurrentHashMap<String, ResolvedDomain> domains = new ConcurrentHashMap<>();
     private final RequestResponseBuilder requestResponseBuilder;
     private final ConnectionBuilder connectionBuilder;
-    private Logger logger;
-    private PoolingHttpClientConnectionManager connManager;
-    private SystemDefaultDnsResolver dnsResolver;
 
     public BaseRequesterImpl(RequestResponseBuilder requestResponseBuilder,
                              DnsMultiResolver multiResolver,
@@ -70,12 +63,14 @@ public abstract class BaseRequesterImpl implements BaseRequester {
 
         var contentEncoding = "";
         if (null != request.getHeader(ConstantsHeader.CONTENT_ENCODING)) {
-            contentEncoding = request.getFirstHeader(ConstantsHeader.CONTENT_ENCODING).toLowerCase(Locale.ROOT);
+            var firstHeader  = request.getFirstHeader(ConstantsHeader.CONTENT_ENCODING);
+            if(firstHeader!=null) {
+                contentEncoding = firstHeader.toLowerCase(Locale.ROOT);
+            }
         }
-        if (contentEncoding == null) contentEncoding = "";
-
         var brotli = contentEncoding.equalsIgnoreCase("br");
         var gzip = contentEncoding.equalsIgnoreCase("gzip");
+
 
         if (request.getHeader(BLOCK_RECURSION) != null) {
             response.setStatusCode(500);

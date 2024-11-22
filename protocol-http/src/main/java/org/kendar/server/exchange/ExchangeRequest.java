@@ -39,7 +39,7 @@ public class ExchangeRequest {
                 return;
             }
             /* skip blank lines */
-        } while (startLine != null && startLine.isEmpty());
+        } while (startLine.isEmpty());
     }
 
     public InputStream inputStream() {

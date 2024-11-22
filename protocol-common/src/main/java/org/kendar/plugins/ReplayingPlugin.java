@@ -46,6 +46,7 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
         return of;
     }
 
+    @SuppressWarnings("IfStatementWithIdenticalBranches")
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {

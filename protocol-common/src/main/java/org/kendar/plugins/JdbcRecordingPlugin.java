@@ -19,9 +19,9 @@ import java.util.List;
 public abstract class JdbcRecordingPlugin extends RecordingPlugin {
 
     @Override
-    protected void postCall(PluginContext pluginContext,Object obIn,Object obOUt ) {
-        JdbcCall in = (JdbcCall)obIn;
-        SelectResult out = (SelectResult)obOUt;
+    protected void postCall(PluginContext pluginContext, Object obIn, Object obOUt) {
+        JdbcCall in = (JdbcCall) obIn;
+        SelectResult out = (SelectResult) obOUt;
         var duration = System.currentTimeMillis() - pluginContext.getStart();
         var req = new JdbcRequest(in.getQuery(), in.getParameterValues());
         JdbcResponse res;
@@ -31,7 +31,7 @@ public abstract class JdbcRecordingPlugin extends RecordingPlugin {
             res = new JdbcResponse(out.getCount());
             res.setSelectResult(out);
         }
-        var id = (long)pluginContext.getTags().get("id");
+        var id = (long) pluginContext.getTags().get("id");
 
 
         var storageItem = new StorageItem(

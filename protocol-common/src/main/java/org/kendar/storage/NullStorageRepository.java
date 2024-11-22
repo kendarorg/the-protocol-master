@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class NullStorageRepository implements StorageRepository {
 
+    private final AtomicLong counter = new AtomicLong(0);
+
     @Override
     public void initialize() {
 
@@ -41,7 +43,7 @@ public class NullStorageRepository implements StorageRepository {
     public void writeZip(byte[] byteArray) {
 
     }
-    private final AtomicLong counter = new AtomicLong(0);
+
     @Override
     public long generateIndex() {
         return counter.incrementAndGet();

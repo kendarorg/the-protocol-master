@@ -21,8 +21,8 @@ import java.util.Map;
 
 public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static final JsonMapper mapper = new JsonMapper();
-    private boolean ignoreTrivialCalls = true;
     protected StorageRepository storage;
+    private boolean ignoreTrivialCalls = true;
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldIgnoreTrivialCalls() {
@@ -34,13 +34,13 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         if (isActive()) {
             switch (phase) {
                 case PRE_CALL:
-                    pluginContext.getTags().put("id",storage.generateIndex());
+                    pluginContext.getTags().put("id", storage.generateIndex());
                     break;
                 case POST_CALL:
                     postCall(pluginContext, in, out);
                     break;
                 case ASYNC_RESPONSE:
-                    pluginContext.getTags().put("id",storage.generateIndex());
+                    pluginContext.getTags().put("id", storage.generateIndex());
                     asyncCall(pluginContext, out);
                     break;
             }
@@ -58,7 +58,7 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     protected void asyncCall(PluginContext pluginContext, Object out) {
         var duration = 0;
 
-        var id = (long)pluginContext.getTags().get("id");
+        var id = (long) pluginContext.getTags().get("id");
         var storageItem = new StorageItem(
                 pluginContext.getContextId(),
                 null,
@@ -70,13 +70,13 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
 
-        EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine,id)));
+        EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
     }
 
     protected void postCall(PluginContext pluginContext, Object in, Object out) {
         var duration = System.currentTimeMillis() - pluginContext.getStart();
 
-        var id = (long)pluginContext.getTags().get("id");
+        var id = (long) pluginContext.getTags().get("id");
         JsonNode resSerialized = null;
         String resType = null;
 
@@ -98,7 +98,7 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         if (!shouldNotSave(in, out, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine,id)));
+            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
         }
     }
 

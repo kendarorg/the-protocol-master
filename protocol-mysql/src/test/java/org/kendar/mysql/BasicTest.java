@@ -60,7 +60,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new MySqlRecordPlugin();
+        var pl = new MySqlRecordPlugin().withStorage(storage);
 
         var pl1 = new MySqlMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
@@ -100,7 +100,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new MySqlRecordPlugin();
+        var pl = new MySqlRecordPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         var pl1 = new MySqlMockPlugin();

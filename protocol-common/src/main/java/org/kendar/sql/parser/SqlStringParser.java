@@ -122,6 +122,7 @@ public class SqlStringParser {
         return sqls;
     }
 
+    @SuppressWarnings("IfStatementWithIdenticalBranches")
     public List<String> parseString(String input) {
         List<String> tokens = new ArrayList<>();
         int length = input.length();
