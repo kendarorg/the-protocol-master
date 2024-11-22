@@ -25,10 +25,9 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
 
     static {
         try {
-            var om = new JsonMapper();
             String text = new String(PostgresProtocol.class.getResourceAsStream("/postgresdtt.json")
                     .readAllBytes());
-            dataTypesConverter = new DataTypesConverter(om.deserialize(text, new TypeReference<>() {
+            dataTypesConverter = new DataTypesConverter(new JsonMapper().deserialize(text, new TypeReference<>() {
             }));
         } catch (Exception e) {
             log.trace("Ignorable", e);

@@ -58,7 +58,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new RedisRecordingPlugin();
+        var pl = new RedisRecordingPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

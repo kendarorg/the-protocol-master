@@ -27,9 +27,4 @@ public class ExternalRequesterImpl extends BaseRequesterImpl implements External
         }
         super.callSite(request, response);
     }
-
-    @Override
-    protected boolean useRemoteDnsOnly() {
-        return true;
-    }
 }

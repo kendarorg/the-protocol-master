@@ -5,12 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class EventsQueue {
     private static final Logger logger = LoggerFactory.getLogger(EventsQueue.class);
@@ -73,11 +75,15 @@ public class EventsQueue {
         }
     }
 
+    /**
+     * Start the event queue. Tried with SingleThreadExecutor BUT it uses LinkedBlockingQueue
+     * slowing down execution
+     */
     private void start() {
         new Thread(() -> {
             while (true) {
                 if (items.isEmpty()) {
-                    Sleeper.sleep(10);
+                    Sleeper.sleep(5);
                     continue;
                 }
                 var item = items.poll();
@@ -91,7 +97,6 @@ public class EventsQueue {
                     size.decrementAndGet();
                     item = items.poll();
                 }
-
             }
         }).start();
 
@@ -118,6 +123,12 @@ public class EventsQueue {
                 logger.error("Error executing TpmEvent {}", eventName, ex);
             }
         }
+    }
+
+    public List<TpmEvent> clean(){
+        var result= items.stream().sequential().collect(Collectors.toList());
+        items.clear();
+        return result;
     }
 
     private static class CommandConsumer {

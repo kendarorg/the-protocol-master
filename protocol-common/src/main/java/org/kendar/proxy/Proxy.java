@@ -118,21 +118,22 @@ public abstract class Proxy {
                 ProtocolPhase.class.getName(),
                 Object.class.getName(), Object.class.getName());
         var forData = allowedPlugins.get(anonymousData);
+        var result = new ArrayList<ProtocolPluginDescriptor>();
         //Handle Object,Object data
         if (forData != null) {
             var forPhase = forData.get(phase);
             if (forPhase != null) {
-                return forPhase;
+                result.addAll(forPhase);
             }
         }
         forData = allowedPlugins.get(data);
         if (forData != null) {
             var forPhase = forData.get(phase);
             if (forPhase != null) {
-                return forPhase;
+                result.addAll(forPhase);
             }
         }
-        return List.of();
+        return result;
     }
 
     public void terminateFilters() {

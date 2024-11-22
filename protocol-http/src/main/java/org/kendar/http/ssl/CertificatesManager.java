@@ -95,9 +95,8 @@ public class CertificatesManager {
 
         // Issued By and Issued To same for root certificate
         var rootCertIssuer = new X500Name(cnName);
-        X500Name rootCertSubject = rootCertIssuer;
         ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(BC_PROVIDER).build(rootKeyPair.getPrivate());
-        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(rootCertIssuer, rootSerialNum, startDate, endDate, rootCertSubject, rootKeyPair.getPublic());
+        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(rootCertIssuer, rootSerialNum, startDate, endDate, rootCertIssuer, rootKeyPair.getPublic());
 
         // Add Extensions
         // A BasicConstraint to mark root certificate as CA certificate

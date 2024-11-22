@@ -2,12 +2,11 @@ package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.beanutils.BeanUtils;
-import org.kendar.events.EventsQueue;
-import org.kendar.events.ReplayStatusEvent;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.ReplayingPlugin;
 import org.kendar.protocol.context.ProtoContext;
@@ -32,11 +31,6 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
 
     }
 
-    @Override
-    protected void handleActivation(boolean active) {
-        EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
-    }
-
     private Map<String, String> buildTag(Request in) {
         var result = new HashMap<String, String>();
         result.put("path", in.getPath());
@@ -58,7 +52,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
                 if (!matchSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : matchSites) {
-                        if (pat.matcher(request.getHost()).matches()) {
+                        if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }
@@ -67,13 +61,16 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
                         return false;
                     }
                 }
-                if (blockExternal && !doSend(pluginContext, request, response)) {
-                    response.setStatusCode(404);
-                    response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
-                    response.setResponseText(new TextNode("Page Not Found: " + request.getMethod() + " on " + request.buildUrl()));
-                    return true;
+                var sent = doSend(pluginContext, request, response);
+                if (!sent) {
+                    if (blockExternal) {
+                        response.setStatusCode(404);
+                        response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
+                        response.setResponseText(new TextNode("Page Not Found: " + request.getMethod() + " on " + request.buildUrl()));
+                        return true;
+                    }
                 }
-                return false;
+                return sent;
             }
         }
         return false;
@@ -85,7 +82,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         var context = pluginContext.getContext();
 
         query.setCaller(pluginContext.getCaller());
-        query.setType(in.getClass().getSimpleName());
+        query.setType(in.getMethod());
         for (var tag : buildTag(in).entrySet()) {
             query.addTag(tag.getKey(), tag.getValue());
         }
@@ -97,12 +94,14 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         }
 
         var item = lineToRead.getStorageItem();
+        System.out.println("READING " + item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
-        if (context.isUseCallDurationTimes()) {
+        if (settings.isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());
         }
         try {
             BeanUtils.copyProperties(out, outputItem);
+            completedIndexes.add((int) item.getIndex());
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
@@ -114,10 +113,12 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         return "http";
     }
 
-    private void setupSitesToRecord(List<String> recordSites) {
+    private void setupMatchSites(List<String> recordSites) {
         this.matchSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
-                .map(Pattern::compile).collect(Collectors.toList());
+                .map(regex -> regex.startsWith("@") ?
+                        Pattern.compile(regex.substring(1)) :
+                        Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
     }
 
     @Override
@@ -126,11 +127,12 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
     }
 
     @Override
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
         settings = (HttpReplayPluginSettings) plugin;
         blockExternal = settings.isBlockExternal();
-        setupSitesToRecord(settings.getMatchSites());
+        setupMatchSites(settings.getMatchSites());
+        return this;
     }
 
 }

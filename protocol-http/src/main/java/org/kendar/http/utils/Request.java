@@ -97,13 +97,6 @@ public class Request {
         this.multipartData = multipartData;
     }
 
-    public boolean isStaticRequest() {
-        return staticRequest;
-    }
-
-    public void setStaticRequest(boolean staticRequest) {
-        this.staticRequest = staticRequest;
-    }
 
     public String getHost() {
         return host;
@@ -264,7 +257,6 @@ public class Request {
         }
         r.requestText = this.requestText;
         r.soapRequest = this.soapRequest;
-        r.staticRequest = this.staticRequest;
         return r;
     }
 

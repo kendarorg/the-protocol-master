@@ -1,6 +1,5 @@
 package org.kendar.http;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.sun.net.httpserver.HttpExchange;
@@ -29,7 +28,6 @@ public class MasterHandler implements HttpHandler {
 
     public static final String BLOCK_RECURSION = "X-BLOCK-RECURSIVE";
     private static final Logger log = LoggerFactory.getLogger("org.kendar.http.Main");
-    private final ObjectMapper mapper = new ObjectMapper();
     private final PluginClassesHandler pluginClassesHandler;
     //private final SimpleRewriterHandler simpleProxyHandler;
     private final RequestResponseBuilder requestResponseBuilder;
@@ -61,7 +59,7 @@ public class MasterHandler implements HttpHandler {
         byte[] data = new byte[0];
         var dataLength = 0;
         if (requestResponseBuilder.hasBody(response)) {
-            if (MimeChecker.isBinary(response)) {
+            if (MimeChecker.isBinary(response) && response.getResponseText() instanceof BinaryNode) {
                 data = ((BinaryNode) response.getResponseText()).binaryValue();
             } else if (response.getResponseText() != null) {
 
@@ -182,7 +180,7 @@ public class MasterHandler implements HttpHandler {
                 }
             }
 
-            log.info("REQ {} {}", request.getMethod(), request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
+            log.info("[SERVER][REQ  ] {} {}", request.getMethod(), request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
 
             handleInternal(pluginContext, request, response, connManager);
             sendResponse(response, httpExchange);

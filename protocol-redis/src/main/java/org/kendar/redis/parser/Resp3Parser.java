@@ -89,7 +89,7 @@ public class Resp3Parser {
     }
 
     private String parseBulkString(Resp3Input line) throws Resp3ParseException {
-        int length = -1;
+        int length;
         try {
             length = parseInteger(line);
         } catch (Resp3ParseException ex) {
@@ -114,7 +114,7 @@ public class Resp3Parser {
     }
 
     private List<Object> parseArray(Resp3Input line) throws Resp3ParseException {
-        int length = -1;
+        int length;
         try {
             length = parseInteger(line);
         } catch (Resp3ParseException ex) {
@@ -222,7 +222,7 @@ public class Resp3Parser {
     }
 
     private RespVerbatimString parseVerbatimString(Resp3Input line) throws Resp3ParseException {
-        int length = -1;
+        int length;
         try {
             length = parseInteger(line);
         } catch (Resp3ParseException ex) {
@@ -252,7 +252,7 @@ public class Resp3Parser {
     }
 
     private List<Object> parseMap(Resp3Input line) throws Resp3ParseException {
-        int length = -1;
+        int length;
         try {
             length = parseInteger(line);
         } catch (Resp3ParseException ex) {
@@ -277,7 +277,7 @@ public class Resp3Parser {
     }
 
     private List<Object> parseSet(Resp3Input line) throws Resp3ParseException {
-        int length = -1;
+        int length;
         try {
             length = parseInteger(line);
         } catch (Resp3ParseException ex) {
@@ -346,7 +346,7 @@ public class Resp3Parser {
     }
 
     private RespPush parsePush(Resp3Input line) throws Resp3ParseException {
-        int length = -1;
+        int length;
         try {
             length = parseInteger(line);
         } catch (Resp3ParseException ex) {
@@ -369,6 +369,7 @@ public class Resp3Parser {
         return content;
     }
 
+    @SuppressWarnings("DuplicateExpressions")
     public String serialize(JsonNode jsonNode) throws Resp3ParseException {
         StringBuilder result = new StringBuilder();
         if (jsonNode.isArray()) {

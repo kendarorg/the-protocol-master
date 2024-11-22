@@ -10,21 +10,21 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
     protected final static JsonMapper mapper = new JsonMapper();
     private boolean active;
     private String instanceId = "default";
+    private PluginApiHandler apiHandler;
 
     public String getInstanceId() {
         return instanceId;
     }
-    private PluginApiHandler apiHandler;
 
     public PluginApiHandler getApiHandler() {
-        if(apiHandler == null) {
+        if (apiHandler == null) {
             apiHandler = buildApiHandler();
         }
         return apiHandler;
     }
 
     protected PluginApiHandler buildApiHandler() {
-        return new DefaultPluginApiHandler(this,getId(),getInstanceId());
+        return new DefaultPluginApiHandler<>(this, getId(), getInstanceId());
     }
 
     /**
@@ -51,8 +51,9 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
         }
     }
 
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         setActive(plugin.isActive());
+        return this;
     }
 
     protected void handleActivation(boolean active) {

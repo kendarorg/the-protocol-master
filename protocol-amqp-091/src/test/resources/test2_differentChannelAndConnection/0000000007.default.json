@@ -3,8 +3,6 @@
   "connectionId": 1,
   "index": 7,
   "input": {
-    "uuid": "70",
-    "optional": false,
     "channel": 1,
     "type": 1,
     "proxyed": false,
@@ -21,16 +19,14 @@
     "consumeId": 1
   },
   "output": {
-    "uuid": "71",
-    "optional": false,
     "channel": 1,
     "type": 1,
     "proxyed": false,
     "classId": 60,
     "methodId": 21,
-    "tag": "amq.ctag-FmXqPJK3K5YPwwaUXLwuEw"
+    "tag": "amq.ctag-qZcPnE1q2m9Vg3ICbroWHg"
   },
-  "durationMs": 1,
+  "durationMs": 4,
   "type": "BasicConsume",
   "caller": "AMQP",
   "inputType": "BasicConsume",

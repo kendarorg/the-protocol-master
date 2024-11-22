@@ -15,6 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,12 +26,12 @@ import java.util.zip.ZipOutputStream;
 
 public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
+    static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
     private final ConcurrentHashMap<String, ProtocolRepo> protocolRepo = new ConcurrentHashMap<>();
     private final AtomicInteger storageCounter = new AtomicInteger(0);
     private final TypeReference<StorageItem> typeReference = new TypeReference<>() {
     };
-
     private String targetDir;
 
     public FileStorageRepository(String targetDir) {
@@ -105,8 +107,8 @@ public class FileStorageRepository implements StorageRepository {
         });
     }
 
-    private ProtocolRepo initializeContentWrite(String protocolInstanceIdOuter) {
-        return protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
+    private void initializeContentWrite(String protocolInstanceIdOuter) {
+        protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
             if (currRepo == null) {
                 currRepo = new ProtocolRepo();
             }
@@ -129,33 +131,35 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void write(LineToWrite item) {
-        if (item == null) {
-            log.error("Blank item");
-            return;
-        }
-        try {
-            var valueId = generateIndex();
-            item.getCompactLine().setIndex(valueId);
-            if (item.getStorageItem() != null) {
-                item.getStorageItem().setIndex(valueId);
+        executor.submit(() -> {
+            if (item == null) {
+                log.error("Blank item");
+                return;
             }
-            initializeContentWrite(item.getInstanceId());
-            //}
-            var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
-
-            var repo = protocolRepo.get(item.getInstanceId());
-            repo.index.add(item.getCompactLine());
-            repo.somethingWritten = true;
-            if (item.getStorageItem() != null) {
-                var result = mapper.serializePretty(item.getStorageItem());
-                if (!Files.exists(Paths.get(targetDir))) {
-                    Files.createDirectories(Paths.get(targetDir));
+            try {
+                var valueId = item.getId();
+                item.getCompactLine().setIndex(valueId);
+                if (item.getStorageItem() != null) {
+                    item.getStorageItem().setIndex(valueId);
                 }
-                Files.writeString(Path.of(targetDir, id), result);
+                initializeContentWrite(item.getInstanceId());
+                //}
+                var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
+
+                var repo = protocolRepo.get(item.getInstanceId());
+                repo.index.add(item.getCompactLine());
+                repo.somethingWritten = true;
+                if (item.getStorageItem() != null) {
+                    var result = mapper.serializePretty(item.getStorageItem());
+                    if (!Files.exists(Paths.get(targetDir))) {
+                        Files.createDirectories(Paths.get(targetDir));
+                    }
+                    Files.writeString(Path.of(targetDir, id), result);
+                }
+            } catch (Exception e) {
+                log.warn("Trouble writing", e);
             }
-        } catch (Exception e) {
-            log.warn("Trouble writing", e);
-        }
+        });
     }
 
 
@@ -239,10 +243,22 @@ public class FileStorageRepository implements StorageRepository {
 
             Optional<StorageItem> item = Optional.empty();
 
+            if (idx.isEmpty() && query.getTag("next") != null && !query.getTag("next").isEmpty()) {
+                var next = Integer.parseInt(query.getTag("next"));
+                idx = ctx.index.stream()
+                        .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
+                        .filter(a ->
+                                a.getIndex() > next &&
+                                        typeMatching(query.getType(), a.getType()) &&
+                                        a.getCaller().equalsIgnoreCase(query.getCaller()) &&
+                                        query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
+                        ).findFirst();
+            }
             if (idx.isPresent()) {
+                var realItem = idx.get();
                 item = ctx.inMemoryDb.values().stream()
                         .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
-                        .filter(a -> a.getIndex() == idx.get().getIndex()).findFirst();
+                        .filter(a -> a.getIndex() == realItem.getIndex()).findFirst();
             } else {
                 log.warn("[TPM  ][WR]: Index not found!");
             }
@@ -250,14 +266,14 @@ public class FileStorageRepository implements StorageRepository {
             if (item.isPresent()) {
 
                 log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
-                ctx.inMemoryDb.remove(item.get().getIndex());
-                idx.ifPresent(compactLine -> ctx.index.remove(compactLine));
+                //ctx.inMemoryDb.remove(item.get().getIndex());
+                //idx.ifPresent(compactLine -> ctx.index.remove(compactLine));
                 return new LineToRead(item.get(), idx.get());
             }
 
             if (idx.isPresent()) {
                 log.debug("[SERVER][REPSHRT] {}:{}", idx.get().getIndex(), idx.get().getType());
-                ctx.index.remove(idx.get());
+                //ctx.index.remove(idx.get());
                 var si = new StorageItem();
                 si.setIndex(idx.get().getIndex());
 
@@ -329,17 +345,17 @@ public class FileStorageRepository implements StorageRepository {
                 zos.closeEntry();
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            log.error("ERROR Creating storage zip");
         }
         return baos.toByteArray();
     }
 
     @Override
     public void writeZip(byte[] byteArray) {
-        var destDir=Path.of(targetDir).toAbsolutePath().toString();
+        var destDir = Path.of(targetDir).toAbsolutePath().toString();
         File dir = new File(destDir);
         // create output directory if it doesn't exist
-        if(!dir.exists()) dir.mkdirs();
+        if (!dir.exists()) dir.mkdirs();
         ByteArrayInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
@@ -347,9 +363,9 @@ public class FileStorageRepository implements StorageRepository {
             fis = new ByteArrayInputStream(byteArray);
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry ze = zis.getNextEntry();
-            while(ze != null){
+            while (ze != null) {
                 String fileName = ze.getName();
-                File newFile = Path.of(destDir,fileName).toFile();
+                File newFile = Path.of(destDir, fileName).toFile();
                 //System.out.println("Unzipping to "+newFile.getAbsolutePath());
                 //create directories for sub directories in zip
                 new File(newFile.getParent()).mkdirs();
@@ -371,6 +387,7 @@ public class FileStorageRepository implements StorageRepository {
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public String getType() {

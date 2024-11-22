@@ -6,8 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HttpRecordPluginSettings extends BasicRecordingPluginSettings {
-
+    private boolean removeEtags = true;
     private List<String> recordSites = new ArrayList<>();
+
+    public boolean isRemoveEtags() {
+        return removeEtags;
+    }
+
+    public void setRemoveEtags(boolean removeEtags) {
+        this.removeEtags = removeEtags;
+    }
 
     public List<String> getRecordSites() {
         return recordSites;

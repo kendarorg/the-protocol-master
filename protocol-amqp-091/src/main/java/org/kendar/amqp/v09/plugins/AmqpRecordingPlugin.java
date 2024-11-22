@@ -34,7 +34,7 @@ public class AmqpRecordingPlugin extends RecordingPlugin {
         if (cl.getTags() == null || cl.getTags().get("input") == null) {
             return false;
         }
-        return toAvoid.contains(cl.getTags().get("input"));
+        return toAvoid.contains(cl.getTags().get("input")) || toAvoid.contains(cl.getTags().get("output"));
     }
 
     @Override
@@ -47,11 +47,15 @@ public class AmqpRecordingPlugin extends RecordingPlugin {
         data.put("output", null);
         data.put("consumeId", null);
         if (item.getInput() != null) {
+            data.put("input", item.getInputType().equalsIgnoreCase("BBuffer") ?
+                    "byte[]" : item.getInputType());
             if (item.getInputType() != null) {
                 consumeId = getConsumeId(out, consumeId);
             }
         }
         if (item.getOutput() != null) {
+            data.put("output", item.getOutputType().equalsIgnoreCase("BBuffer") ?
+                    "byte[]" : item.getOutputType());
             if (item.getOutputType() != null) {
                 consumeId = getConsumeId(out, consumeId);
             }

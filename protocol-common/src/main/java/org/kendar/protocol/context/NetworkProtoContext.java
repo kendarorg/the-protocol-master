@@ -7,8 +7,8 @@ import org.kendar.exceptions.ConnectionExeception;
 import org.kendar.exceptions.UnknownCommandException;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -64,7 +64,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * @param event
      * @return
      */
-    private static ProtoState continueOrThrowMissingHandler(BaseEvent event) {
+    private static ProtoState continueOrThrowMissingHandler(ProtocolEvent event) {
         var message = "Missing event handler for " + event.getClass().getSimpleName();
         if (event instanceof BytesEvent) {
             var remainingBytes = (BytesEvent) event;
@@ -146,7 +146,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
     }
 
     @Override
-    protected ProtoState findThePossibleNextStateOnStack(BaseEvent event, int maxDepth) {
+    protected ProtoState findThePossibleNextStateOnStack(ProtocolEvent event, int maxDepth) {
         var eventTags = event.getTagKeyValues();
         if (executionStack.get(eventTags).empty()) {
             //If no remaining bytes or no handeler throw
@@ -194,7 +194,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * @return
      */
     @Override
-    protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
+    protected List<ReturnMessage> runException(Exception ex, ProtoState state, ProtocolEvent event) {
         if (event instanceof BytesEvent) {
             var rb = ((BytesEvent) event).getBuffer();
             log.error("Exception buffer ({}):\n{}", rb.getAll().length, rb.toHexStringUpToLength(20));
@@ -208,7 +208,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * @param currentEvent
      */
     @Override
-    protected void postExecute(BaseEvent currentEvent) {
+    protected void postExecute(ProtocolEvent currentEvent) {
         if (currentEvent instanceof BytesEvent) {
             var remainingBytes = (BytesEvent) currentEvent;
             if (remainingBytes.getBuffer().size() >= remainingBytes.getBuffer().getPosition()) {
@@ -226,7 +226,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * @return
      */
     @Override
-    public boolean reactToEvent(BaseEvent currentEvent) {
+    public boolean reactToEvent(ProtocolEvent currentEvent) {
         try {
             updateLastAccess();
             if (currentEvent instanceof BytesEvent) {
@@ -300,7 +300,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * @param event
      */
     @Override
-    public void runSteps(Iterator<ProtoStep> stepsToInvoke, ProtoState executor, BaseEvent event) {
+    public void runSteps(Iterator<ProtoStep> stepsToInvoke, ProtoState executor, ProtocolEvent event) {
         updateLastAccess();
         executorService.execute(() -> {
             updateLastAccess();

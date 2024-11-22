@@ -83,7 +83,7 @@ public class SimpleTest extends BasicTest {
 
 
     @Test
-    void test0_sameChannel() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test0_sameChannel() throws Exception {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -161,7 +161,7 @@ public class SimpleTest extends BasicTest {
      * @throws TimeoutException
      */
     @Test
-    void test4_diffChannelSameConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test4_diffChannelSameConnection() throws Exception {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -232,8 +232,12 @@ public class SimpleTest extends BasicTest {
         assertTrue(messages.containsValue(exectedMessage + "3"));
     }
 
+    void test5_noPublish() throws Exception {
+
+    }
+
     @Test
-    void test2_differentChannelAndConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test2_differentChannelAndConnection() throws Exception {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
 
@@ -301,7 +305,7 @@ public class SimpleTest extends BasicTest {
 
 
     @Test
-    void test3_openConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+    void test3_openConnection() throws Exception {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();

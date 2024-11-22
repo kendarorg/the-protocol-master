@@ -26,20 +26,22 @@ import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ApiTest extends BasicTest{
+public class ApiTest extends BasicTest {
     private static BasicTest bs;
 
     @AfterAll
-    public static void cleanup(){
+    public static void cleanup() {
         bs.runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(1000);
     }
+
     @BeforeAll
     public static void setup() {
         try {
             Main.stop();
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
         Sleeper.sleep(1000);
         var args = new String[]{
 
@@ -49,16 +51,53 @@ public class ApiTest extends BasicTest{
         bs.startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000);
     }
+
+    private static <T> T getRequest(String target, CloseableHttpClient httpclient, TypeReference<T> typeReference) throws IOException {
+        var httpget = new HttpGet(target);
+        var httpresponse = httpclient.execute(httpget);
+
+        var sc = new Scanner(httpresponse.getEntity().getContent());
+        var result = "";
+        while (sc.hasNext()) {
+            result += (sc.nextLine());
+        }
+        return mapper.deserialize(result, typeReference);
+    }
+
+    private static byte[] downloadRequest(String target, CloseableHttpClient httpclient) throws IOException {
+        var httpget = new HttpGet(target);
+        var httpresponse = httpclient.execute(httpget);
+
+        var baos = new ByteArrayOutputStream();
+        httpresponse.getEntity().writeTo(baos);
+        return baos.toByteArray();
+    }
+
+    private static <T> T postRequest(String target, CloseableHttpClient httpclient, byte[] data, TypeReference<T> typeReference) throws IOException {
+        var httpget = new HttpPost(target);
+        var be = new ByteArrayEntity(data);
+        httpget.setEntity(be);
+        var httpresponse = httpclient.execute(httpget);
+
+        var sc = new Scanner(httpresponse.getEntity().getContent());
+        var result = "";
+        while (sc.hasNext()) {
+            result += (sc.nextLine());
+        }
+        return mapper.deserialize(result, typeReference);
+    }
+
     @Test
     void globalApiTest() throws Exception {
 
         var httpclient = HttpClients.createDefault();
-        var data = Files.readAllBytes(Path.of("src","test","resources","testcontent.zip"));
-        var okResult = postRequest("http://localhost:5005/api/storage/upload",httpclient,data,new TypeReference<Ok>(){});
-        assertEquals("OK",okResult.getResult());
+        var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent.zip"));
+        var okResult = postRequest("http://localhost:5005/api/storage/upload", httpclient, data, new TypeReference<Ok>() {
+        });
+        assertEquals("OK", okResult.getResult());
         var zip = downloadRequest("http://localhost:5005/api/storage/download", httpclient);
-        assertTrue(zip.length>100);
-        Files.write(Path.of("target","downloaded.zip"),zip);
+        assertTrue(zip.length > 100);
+        Files.write(Path.of("target", "downloaded.zip"), zip);
 
     }
 
@@ -69,12 +108,12 @@ public class ApiTest extends BasicTest{
         Sleeper.sleep(1000);
         var httpclient = HttpClients.createDefault();
         var expected = frsu.getFileFromResourceAsByteArray("resource://certificates/ca.der");
-        var actual = downloadRequest("http://localhost:5005/api/protocols/http-01/plugins/ssl-plugin/der",httpclient);
-        assertArrayEquals(expected,actual);
+        var actual = downloadRequest("http://localhost:5005/api/protocols/http-01/plugins/ssl-plugin/der", httpclient);
+        assertArrayEquals(expected, actual);
 
         expected = frsu.getFileFromResourceAsByteArray("resource://certificates/ca.key");
-        actual = downloadRequest("http://localhost:5005/api/protocols/http-01/plugins/ssl-plugin/key",httpclient);
-        assertArrayEquals(expected,actual);
+        actual = downloadRequest("http://localhost:5005/api/protocols/http-01/plugins/ssl-plugin/key", httpclient);
+        assertArrayEquals(expected, actual);
 
     }
 
@@ -83,64 +122,34 @@ public class ApiTest extends BasicTest{
 
         var httpclient = HttpClients.createDefault();
         //Creating a HttpGet object
-        var protocols = getRequest("http://localhost:5005/api/protocols", httpclient, new TypeReference<List<ProtocolIndex>>(){});
-        assertEquals(7,protocols.size());
+        var protocols = getRequest("http://localhost:5005/api/protocols", httpclient, new TypeReference<List<ProtocolIndex>>() {
+        });
+        assertEquals(7, protocols.size());
 
-        var plugins = getRequest("http://localhost:5005/api/protocols/redis-01/plugins", httpclient, new TypeReference<List<PluginIndex>>(){});
-        assertEquals(2,plugins.size());
-        assertTrue(plugins.stream().allMatch(p->!p.isActive()));
+        var plugins = getRequest("http://localhost:5005/api/protocols/redis-01/plugins", httpclient, new TypeReference<List<PluginIndex>>() {
+        });
+        assertEquals(2, plugins.size());
+        assertTrue(plugins.stream().allMatch(p -> !p.isActive()));
 
 
-        var okResult = getRequest("http://localhost:5005/api/protocols/*/plugins/record-plugin/start",httpclient,new TypeReference<Ok>(){});
-        assertEquals("OK",okResult.getResult());
-        for(var protocol : protocols) {
-            var status = getRequest("http://localhost:5005/api/protocols/"+protocol.getId()+"/plugins/record-plugin/status",httpclient,new TypeReference<Status>(){});
+        var okResult = getRequest("http://localhost:5005/api/protocols/*/plugins/record-plugin/start", httpclient, new TypeReference<Ok>() {
+        });
+        assertEquals("OK", okResult.getResult());
+        for (var protocol : protocols) {
+            var status = getRequest("http://localhost:5005/api/protocols/" + protocol.getId() + "/plugins/record-plugin/status", httpclient, new TypeReference<Status>() {
+            });
             assertTrue(status.isActive());
         }
-        for(var protocol : protocols) {
-            okResult = getRequest("http://localhost:5005/api/protocols/"+protocol.getId()+"/plugins/record-plugin/stop",httpclient,new TypeReference<Ok>(){});
-            assertEquals("OK",okResult.getResult());
+        for (var protocol : protocols) {
+            okResult = getRequest("http://localhost:5005/api/protocols/" + protocol.getId() + "/plugins/record-plugin/stop", httpclient, new TypeReference<Ok>() {
+            });
+            assertEquals("OK", okResult.getResult());
         }
-        for(var protocol : protocols) {
-            var status = getRequest("http://localhost:5005/api/protocols/"+protocol.getId()+"/plugins/record-plugin/start",httpclient,new TypeReference<Status>(){});
+        for (var protocol : protocols) {
+            var status = getRequest("http://localhost:5005/api/protocols/" + protocol.getId() + "/plugins/record-plugin/start", httpclient, new TypeReference<Status>() {
+            });
             assertFalse(status.isActive());
         }
 
-    }
-
-
-    private static <T> T getRequest(String target, CloseableHttpClient httpclient,TypeReference<T> typeReference) throws IOException {
-        var httpget = new HttpGet(target);
-        var  httpresponse = httpclient.execute(httpget);
-
-        var sc = new Scanner(httpresponse.getEntity().getContent());
-        var result = "";
-        while(sc.hasNext()) {
-            result+=(sc.nextLine());
-        }
-        return mapper.deserialize(result,typeReference);
-    }
-
-    private static byte[] downloadRequest(String target, CloseableHttpClient httpclient) throws IOException {
-        var httpget = new HttpGet(target);
-        var  httpresponse = httpclient.execute(httpget);
-
-        var baos = new ByteArrayOutputStream();
-        httpresponse.getEntity().writeTo(baos);
-        return baos.toByteArray();
-    }
-
-    private static <T> T postRequest(String target, CloseableHttpClient httpclient,byte[] data,TypeReference<T> typeReference) throws IOException {
-        var httpget = new HttpPost(target);
-        var be = new ByteArrayEntity(data);
-        httpget.setEntity(be);
-        var  httpresponse = httpclient.execute(httpget);
-
-        var sc = new Scanner(httpresponse.getEntity().getContent());
-        var result = "";
-        while(sc.hasNext()) {
-            result+=(sc.nextLine());
-        }
-        return mapper.deserialize(result,typeReference);
     }
 }

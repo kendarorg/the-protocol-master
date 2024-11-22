@@ -4,76 +4,48 @@
     "type": "byte[]",
     "caller": "AMQP",
     "durationMs": 2,
-    "tags": {
-      "output": "ConnectionStart",
-      "consumeId": null,
-      "input": "byte[]"
-    }
+    "tags": {}
   },
   {
     "index": 2,
     "type": "ConnectionStartOk",
     "caller": "AMQP",
-    "durationMs": 2,
-    "tags": {
-      "output": "ConnectionTune",
-      "consumeId": null,
-      "input": "ConnectionStartOk"
-    }
+    "durationMs": 3,
+    "tags": {}
   },
   {
     "index": 3,
     "type": "ConnectionTuneOk",
     "caller": "AMQP",
     "durationMs": 0,
-    "tags": {
-      "output": null,
-      "consumeId": null,
-      "input": "ConnectionTuneOk"
-    }
+    "tags": {}
   },
   {
     "index": 4,
     "type": "ConnectionOpen",
     "caller": "AMQP",
     "durationMs": 1,
-    "tags": {
-      "output": "ConnectionOpenOk",
-      "consumeId": null,
-      "input": "ConnectionOpen"
-    }
+    "tags": {}
   },
   {
     "index": 5,
     "type": "ChannelOpen",
     "caller": "AMQP",
-    "durationMs": 2,
-    "tags": {
-      "output": "ChannelOpenOk",
-      "consumeId": null,
-      "input": "ChannelOpen"
-    }
+    "durationMs": 6,
+    "tags": {}
   },
   {
     "index": 6,
     "type": "ChannelClose",
     "caller": "AMQP",
-    "durationMs": 1,
-    "tags": {
-      "output": "ChannelCloseOk",
-      "consumeId": null,
-      "input": "ChannelClose"
-    }
+    "durationMs": 2,
+    "tags": {}
   },
   {
     "index": 7,
     "type": "ConnectionClose",
     "caller": "AMQP",
     "durationMs": 1,
-    "tags": {
-      "output": "ConnectionCloseOk",
-      "consumeId": null,
-      "input": "ConnectionClose"
-    }
+    "tags": {}
   }
 ]

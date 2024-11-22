@@ -2,16 +2,13 @@
   "constant": false,
   "connectionId": 1,
   "index": 35,
-  "input": null,
   "output": {
-    "uuid": "250",
-    "optional": false,
     "channel": 1,
     "type": 1,
     "proxyed": false,
     "classId": 60,
     "methodId": 30,
-    "consumerTag": "amq.ctag-FmXqPJK3K5YPwwaUXLwuEw",
+    "consumerTag": "amq.ctag-qZcPnE1q2m9Vg3ICbroWHg",
     "noWait": true,
     "consumeId": 1
   },

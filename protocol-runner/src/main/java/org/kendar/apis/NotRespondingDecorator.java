@@ -29,6 +29,6 @@ public class NotRespondingDecorator implements BaseApiServerHandler {
 
     @Override
     public boolean isPath(String path, String api) {
-        return isPath(path, api);
+        return handler.isPath(path, api);
     }
 }

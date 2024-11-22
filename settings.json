@@ -36,19 +36,23 @@
       },
       "plugins": {
         "error-plugin": {
+          "active": false,
           "errorCode": 0,
           "errorMessage": "ERROR",
           "percentage": 0
         },
         "replay-plugin": {
-          "replay": false,
+          "active": true,
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
           "blockExternal": true,
-          "matchSites": []
+          "matchSites": [
+            "net_core_http",
+            "net_core_rest"
+          ]
         },
         "record-plugin": {
-          "record": false,
+          "active": false,
           "recordSites": []
         }
       }

@@ -1,16 +1,13 @@
 {
   "constant": false,
   "connectionId": 1,
-  "index": 33,
-  "input": null,
+  "index": 32,
   "output": {
-    "uuid": "214",
-    "optional": false,
     "channel": 1,
     "type": 3,
     "proxyed": false,
-    "contentBytes": "enp6eiBkZXRhaWxzMg==",
-    "contentString": "zzzz details2",
+    "contentBytes": "enp6eiBkZXRhaWxzMw==",
+    "contentString": "zzzz details3",
     "consumeId": 1
   },
   "durationMs": 0,

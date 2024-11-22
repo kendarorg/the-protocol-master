@@ -82,10 +82,11 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
     }
 
 
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
         this.mocksDir = ((BasicMockPluginSettings) plugin).getDataDir();
         loadMocks();
+        return this;
     }
 
     protected void loadMocks() {
@@ -94,7 +95,7 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
             mocks = new ArrayList<>();
             var presentAlready = new HashSet<Long>();
             for (var file : mocksPath.toFile().listFiles()) {
-                if (file.isFile() && file.getName().endsWith("."+getInstanceId()+".json")) {
+                if (file.isFile() && file.getName().endsWith("." + getInstanceId() + ".json")) {
                     var si = mapper.deserialize(Files.readString(file.toPath()), MockStorage.class);
                     if (presentAlready.contains(si.getIndex())) throw new RuntimeException(
                             "Duplicate id " + si.getIndex() + " found in " + file.getName());

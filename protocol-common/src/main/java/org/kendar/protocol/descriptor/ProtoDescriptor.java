@@ -6,15 +6,12 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.special.SpecialProtoState;
 import org.kendar.protocol.states.special.Tagged;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.Sleeper;
+import org.kendar.utils.TimerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,8 +31,7 @@ public abstract class ProtoDescriptor {
      */
     private final List<ProtoState> interrupts = new ArrayList<>();
     private ConcurrentHashMap<Integer, ProtoContext> contextsCache;
-    private Thread contextCleaner;
-    private volatile boolean runClean = false;
+    private TimerTask contextCleaner;
 
     public static long getNow() {
         return System.currentTimeMillis() / 1000;
@@ -87,45 +83,38 @@ public abstract class ProtoDescriptor {
 
     private void contextsClean() {
 
-        while (runClean) {
-            Sleeper.sleep(1000);
-            var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
-            for (var item : fixedItemsList) {
-                var now = getNow();
-                if (item.getValue().getLastAccess() < (now - timeout.get())) {
-                    var context = item.getValue();
-                    var contextConnection = context.getValue("CONNECTION");
-                    if (contextConnection == null) {
-                        contextsCache.remove(item.getKey());
-                    }
-
-                    try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.getContextId() + "")) {
-                        try {
-                            context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                            log.debug("[DISCONNECT]");
-                        } catch (Exception ex) {
-                            log.trace("[DISCONNECT] Error", ex);
-                        }
-                    }
+        var fixedItemsList = new ArrayList<>(contextsCache.entrySet());
+        for (var item : fixedItemsList) {
+            var now = getNow();
+            if (item.getValue().getLastAccess() < (now - timeout.get())) {
+                var context = item.getValue();
+                var contextConnection = context.getValue("CONNECTION");
+                if (contextConnection == null) {
                     contextsCache.remove(item.getKey());
-                } else {
-                    log.trace("[KEEPALIVE]");
                 }
+
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", context.getContextId() + "")) {
+                    try {
+                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                        log.debug("[DISCONNECT]");
+                    } catch (Exception ex) {
+                        log.trace("[DISCONNECT] Error", ex);
+                    }
+                }
+                contextsCache.remove(item.getKey());
+            } else {
+                log.trace("[KEEPALIVE]");
             }
         }
     }
 
     protected void initializeStatic(ProtoDescriptor protoDescriptor) {
-        runClean = false;
-        if (contextCleaner != null) {
-            if (contextCleaner.isAlive()) {
-                Sleeper.sleep(2000);
-            }
-        }
-        runClean = true;
         contextsCache = new ConcurrentHashMap<>();
-        contextCleaner = new Thread(this::contextsClean);
-        contextCleaner.start();
+        if (contextCleaner != null) {
+            contextCleaner.cancel();
+        }
+        var timerService = new TimerService();
+        contextCleaner = timerService.schedule(this::contextsClean, 1000, 2000);
     }
 
 

@@ -270,6 +270,7 @@ public class JdbcProxy extends Proxy {
 
         try {
             var result = new SelectResult();
+            query = query.trim();
             long start = System.currentTimeMillis();
             var pluginContext = new PluginContext("JDBC", "QUERY", start, context);
             var jdbcCall = new JdbcCall(query, parameterValues);

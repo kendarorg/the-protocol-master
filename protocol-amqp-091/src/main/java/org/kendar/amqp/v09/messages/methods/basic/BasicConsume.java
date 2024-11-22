@@ -2,7 +2,7 @@ package org.kendar.amqp.v09.messages.methods.basic;
 
 import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.AmqpProxy;
-import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.context.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.Basic;
 import org.kendar.amqp.v09.utils.FieldsReader;

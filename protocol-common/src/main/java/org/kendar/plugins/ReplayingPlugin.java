@@ -32,7 +32,6 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
     }
 
     public ReplayingPlugin withStorage(StorageRepository storage) {
-
         if (storage != null) {
             this.storage = storage;
         }
@@ -47,6 +46,7 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
         return of;
     }
 
+    @SuppressWarnings("IfStatementWithIdenticalBranches")
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
@@ -63,6 +63,7 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     protected void handleActivation(boolean active) {
+        completedOutIndexes.clear();
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
 
@@ -78,6 +79,7 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
             return;
         }
 
+        completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
 
         var item = lineToRead.getStorageItem();
 
@@ -114,6 +116,8 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
         query.setUsed(completedIndexes);
         var lineToRead = storage.read(getInstanceId(), query);
         var item = lineToRead.getStorageItem();
+
+        completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
         if (hasCallbacks()) {
 
             var afterIndex = item.getIndex();

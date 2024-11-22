@@ -10,6 +10,7 @@ import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
@@ -22,7 +23,6 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     protected static JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected StorageRepository storage;
-    protected HashSet<Integer> completedOutIndexes = new HashSet<>();
 
     protected Object getData(Object of) {
         return of;
@@ -55,19 +55,22 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     @Override
     protected void handleActivation(boolean active) {
         super.handleActivation(active);
+        completedIndexes.clear();
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
 
     protected void sendAndExpect(PluginContext pluginContext, JdbcCall inObj, SelectResult outObj) {
-        var in = (JdbcCall) inObj;
-        var out = (SelectResult) outObj;
         var query = new CallItemsQuery();
 
         query.setCaller(pluginContext.getCaller());
         query.setType("QUERY");
-        query.addTag("parametersCount", in.getParameterValues().size());
-        query.addTag("query", in.getQuery());
+        query.addTag("parametersCount", inObj.getParameterValues().size());
+        query.addTag("query", inObj.getQuery());
         query.setUsed(completedIndexes);
+        if (!completedIndexes.isEmpty()) {
+            var itemFounded = completedIndexes.stream().max(Integer::compareTo).get().toString();
+            query.addTag("next", itemFounded);
+        }
         var lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
         /*if ((lineToRead == null || lineToRead.getStorageItem() == null) ||
                 in.getQuery().trim().toLowerCase().startsWith("set")) {
@@ -85,16 +88,15 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
         if (lineToRead != null && lineToRead.getStorageItem() != null
                 && lineToRead.getStorageItem().getOutput() != null) {
             var source = lineToRead.getStorageItem().retrieveOutAs(JdbcResponse.class);
-            out.fill(source.getSelectResult());
-        } else if (lineToRead!=null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
-
+            outObj.fill(source.getSelectResult());
+            completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
+        } else if (lineToRead != null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
+            completedIndexes.add((int) lineToRead.getCompactLine().getIndex());
             if (lineToRead.getCompactLine().getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 SelectResult resultset = new SelectResult();
                 resultset.setIntResult(true);
                 resultset.setCount(Integer.parseInt(lineToRead.getCompactLine().getTags().get("resultsCount")));
-                out.fill(resultset);
-            } else if (in.getQuery().trim().toLowerCase().startsWith("set")) {
-
+                outObj.fill(resultset);
             }
         }
         /*if ((lineToRead == null || lineToRead.getStorageItem() == null
@@ -115,6 +117,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
             return lineToRead;
         }
         if (idx != null) {
+            si = new StorageItem();
             JdbcResponse resp = new JdbcResponse();
             if (idx.getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 resp.setIntResult(Integer.parseInt(idx.getTags().get("resultsCount")));

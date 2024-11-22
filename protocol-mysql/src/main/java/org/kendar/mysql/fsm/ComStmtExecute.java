@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("MagicConstant")
 public class ComStmtExecute extends ProtoState {
     private static final Logger log = LoggerFactory.getLogger(ComStmtExecute.class);
 

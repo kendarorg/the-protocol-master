@@ -86,9 +86,7 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
             return true;
         } else if (possiblePathPart.startsWith("@{") && possiblePathPart.endsWith("}")) {
             var regexp = possiblePathPart.substring(2, possiblePathPart.length() - 3);
-            if (Pattern.compile(regexp).matcher(toMatchPathPart).matches()) {
-                return true;
-            }
+            return Pattern.compile(regexp).matcher(toMatchPathPart).matches();
         }
         return false;
     }

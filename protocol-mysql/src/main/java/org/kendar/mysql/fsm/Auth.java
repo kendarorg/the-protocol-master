@@ -17,11 +17,6 @@ public class Auth extends MySQLProtoState {
     }
 
     @Override
-    public boolean canRunBytes(BytesEvent event) {
-        return true;
-    }
-
-    @Override
     public Iterator<ProtoStep> executeBytes(MySQLBBuffer inputBuffer, BytesEvent event, int packetLength, int packetIndex) {
         var clientFlag = inputBuffer.readUB4();
 

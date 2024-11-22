@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
 
-@SuppressWarnings("resource")
+@SuppressWarnings({"resource", "IfStatementWithIdenticalBranches"})
 public class ExchangeImpl {
 
     /* for formatting the Date: header */
@@ -53,7 +53,6 @@ public class ExchangeImpl {
     /* raw streams which access the socket directly */
     InputStream ris;
     OutputStream ros;
-    Thread thread;
     boolean closed;
     /* streams which take care of the HTTP protocol framing
      * and are passed up to higher layers
@@ -195,6 +194,7 @@ public class ExchangeImpl {
         return uos_orig;
     }
 
+    @SuppressWarnings("SimplifyOptionalCallChains")
     public void sendResponseHeaders(int rCode, long contentLen)
             throws IOException {
         final System.Logger logger = server.getLogger();

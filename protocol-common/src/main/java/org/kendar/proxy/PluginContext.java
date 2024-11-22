@@ -2,12 +2,15 @@ package org.kendar.proxy;
 
 import org.kendar.protocol.context.ProtoContext;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class PluginContext {
     private static final AtomicLong counter = new AtomicLong(0);
     private final String type;
     private final ProtoContext context;
+    private final Map<String, Object> tags = new HashMap<>();
     private long index;
     private long start;
     private String caller;
@@ -19,6 +22,10 @@ public class PluginContext {
         this.context = context;
         this.index = counter.incrementAndGet();
         this.start = start;
+    }
+
+    public Map<String, Object> getTags() {
+        return tags;
     }
 
     public ProtoContext getContext() {

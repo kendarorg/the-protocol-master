@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 
 public class QueryHello extends ProtoState {
+    protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(QueryHello.class);
-    private static final JsonMapper mapper = new JsonMapper();
 
     public QueryHello(Class<?>... events) {
         super(events);

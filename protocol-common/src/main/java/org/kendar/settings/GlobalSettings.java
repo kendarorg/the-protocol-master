@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GlobalSettings {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private final Map<String, Object> services = new HashMap<>();
     private String pluginsDir;
     private String logLevel;

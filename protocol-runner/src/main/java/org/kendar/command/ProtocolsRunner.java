@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 
 import static org.kendar.command.CommonRunner.createOpt;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class ProtocolsRunner {
     private final Map<String, CommonRunner> protocols = new HashMap<>();
 
@@ -51,6 +52,7 @@ public class ProtocolsRunner {
         return (T) value;
     }
 
+    @SuppressWarnings("ConstantValue")
     public GlobalSettings run(CommandLine cmd, String[] args, HashMap<String, List<PluginDescriptor>> filters) {
         var options = getMainOptions();
         try {

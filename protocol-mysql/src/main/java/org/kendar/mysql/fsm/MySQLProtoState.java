@@ -20,13 +20,12 @@ public abstract class MySQLProtoState extends ProtoState {
         var packetLength = inputBuffer.readUB3() + 4;
         inputBuffer.setPosition(0);
         if (inputBuffer.size() >= packetLength) {
-            return canRunBytes(event);
+            return true;
         } else {
             throw new AskMoreDataException();
         }
     }
 
-    protected abstract boolean canRunBytes(BytesEvent event);
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
         var inputBuffer = (MySQLBBuffer) event.getBuffer();

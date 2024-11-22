@@ -9,7 +9,7 @@ import org.kendar.utils.JsonMapper;
  * @param <O>
  */
 public class StorageItem {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private boolean constant;
     private int connectionId;
     private long index = -1;

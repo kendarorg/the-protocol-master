@@ -5,10 +5,10 @@ import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 
-public class MqttPacket extends BaseEvent implements NetworkReturnMessage {
+public class MqttPacket extends ProtocolEvent implements NetworkReturnMessage {
     private final MqttFixedHeader fixedHeader;
     private final MqttBBuffer buffer;
     private final byte fullFlag;

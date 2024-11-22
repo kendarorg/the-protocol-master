@@ -41,7 +41,9 @@ java -jar protocol-runner.jar -protocol postgres  \
     -login REALLOGIN -password REALPWD \
     -record
 ```
+
 Open a http/s proxy on port 9999 and return a 503 error, on 50% of calls
+
 ```
 java -jar protocol-runner.jar -protocol http -proxy 9999 \
     -showError 503 -errorPercent 40

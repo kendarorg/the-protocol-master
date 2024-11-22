@@ -1,89 +1,98 @@
-[ {
-  "index" : 1,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "durationMs" : 8,
-  "tags" : {
-    "query" : "/* mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c) */SELECT  @@session.auto_increment_increment AS auto_increment_increment, @@character_set_client AS character_set_client, @@character_set_connection AS character_set_connection, @@character_set_results AS character_set_results, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@collation_connection AS collation_connection, @@init_connect AS init_connect, @@interactive_timeout AS interactive_timeout, @@license AS license, @@lower_case_table_names AS lower_case_table_names, @@max_allowed_packet AS max_allowed_packet, @@net_write_timeout AS net_write_timeout, @@performance_schema AS performance_schema, @@sql_mode AS sql_mode, @@system_time_zone AS system_time_zone, @@time_zone AS time_zone, @@transaction_isolation AS transaction_isolation, @@wait_timeout AS wait_timeout;",
-    "isIntResult" : "false",
-    "resultsCount" : "1",
-    "parametersCount" : "0"
+[
+  {
+    "index": 1,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 8,
+    "tags": {
+      "query": "/* mysql-connector-j-8.2.0 (Revision: 06a1f724497fd81c6a659131fda822c9e5085b6c) */SELECT  @@session.auto_increment_increment AS auto_increment_increment, @@character_set_client AS character_set_client, @@character_set_connection AS character_set_connection, @@character_set_results AS character_set_results, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@collation_connection AS collation_connection, @@init_connect AS init_connect, @@interactive_timeout AS interactive_timeout, @@license AS license, @@lower_case_table_names AS lower_case_table_names, @@max_allowed_packet AS max_allowed_packet, @@net_write_timeout AS net_write_timeout, @@performance_schema AS performance_schema, @@sql_mode AS sql_mode, @@system_time_zone AS system_time_zone, @@time_zone AS time_zone, @@transaction_isolation AS transaction_isolation, @@wait_timeout AS wait_timeout;",
+      "isIntResult": "false",
+      "resultsCount": "1",
+      "parametersCount": "0"
+    }
+  },
+  {
+    "index": 2,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 5,
+    "tags": {
+      "query": "SELECT WORD FROM INFORMATION_SCHEMA.KEYWORDS WHERE RESERVED=1 ORDER BY WORD;",
+      "isIntResult": "false",
+      "resultsCount": "262",
+      "parametersCount": "0"
+    }
+  },
+  {
+    "index": 3,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 0,
+    "tags": {
+      "query": "SELECT @@session.transaction_read_only;",
+      "isIntResult": "true",
+      "resultsCount": "0",
+      "parametersCount": "0"
+    }
+  },
+  {
+    "index": 4,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 4,
+    "tags": {
+      "query": "drop table if exists COMPANY_JPA;",
+      "isIntResult": "true",
+      "resultsCount": "0",
+      "parametersCount": "0"
+    }
+  },
+  {
+    "index": 5,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 1,
+    "tags": {
+      "query": "SELECT @@session.transaction_read_only;",
+      "isIntResult": "true",
+      "resultsCount": "0",
+      "parametersCount": "0"
+    }
+  },
+  {
+    "index": 6,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 6,
+    "tags": {
+      "query": "create table COMPANY_JPA (ID bigint not null auto_increment, ADDRESS varchar(255), AGE integer, DENOMINATION varchar(255), SALARY double precision, primary key (ID));",
+      "isIntResult": "true",
+      "resultsCount": "0",
+      "parametersCount": "0"
+    }
+  },
+  {
+    "index": 7,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 7,
+    "tags": {
+      "query": "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ('TEST RD', 22, 'Test Ltd', 500.22);",
+      "isIntResult": "false",
+      "resultsCount": "1",
+      "parametersCount": "0"
+    }
+  },
+  {
+    "index": 8,
+    "type": "QUERY",
+    "caller": "JDBC",
+    "durationMs": 3,
+    "tags": {
+      "query": "select companyjpa0_.DENOMINATION as col_0_0_ from COMPANY_JPA companyjpa0_;",
+      "isIntResult": "false",
+      "resultsCount": "1",
+      "parametersCount": "0"
+    }
   }
-}, {
-  "index" : 2,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "durationMs" : 5,
-  "tags" : {
-    "query" : "SELECT WORD FROM INFORMATION_SCHEMA.KEYWORDS WHERE RESERVED=1 ORDER BY WORD;",
-    "isIntResult" : "false",
-    "resultsCount" : "262",
-    "parametersCount" : "0"
-  }
-}, {
-  "index" : 3,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "durationMs" : 0,
-  "tags" : {
-    "query" : "SELECT @@session.transaction_read_only;",
-    "isIntResult" : "true",
-    "resultsCount" : "0",
-    "parametersCount" : "0"
-  }
-}, {
-  "index" : 4,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "durationMs" : 4,
-  "tags" : {
-    "query" : "drop table if exists COMPANY_JPA;",
-    "isIntResult" : "true",
-    "resultsCount" : "0",
-    "parametersCount" : "0"
-  }
-}, {
-  "index" : 5,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "durationMs" : 1,
-  "tags" : {
-    "query" : "SELECT @@session.transaction_read_only;",
-    "isIntResult" : "true",
-    "resultsCount" : "0",
-    "parametersCount" : "0"
-  }
-}, {
-  "index" : 6,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "durationMs" : 6,
-  "tags" : {
-    "query" : "create table COMPANY_JPA (ID bigint not null auto_increment, ADDRESS varchar(255), AGE integer, DENOMINATION varchar(255), SALARY double precision, primary key (ID));",
-    "isIntResult" : "true",
-    "resultsCount" : "0",
-    "parametersCount" : "0"
-  }
-}, {
-  "index" : 7,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "durationMs" : 7,
-  "tags" : {
-    "query" : "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ('TEST RD', 22, 'Test Ltd', 500.22);",
-    "isIntResult" : "false",
-    "resultsCount" : "1",
-    "parametersCount" : "0"
-  }
-}, {
-  "index" : 8,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "durationMs" : 3,
-  "tags" : {
-    "query" : "select companyjpa0_.DENOMINATION as col_0_0_ from COMPANY_JPA companyjpa0_;",
-    "isIntResult" : "false",
-    "resultsCount" : "1",
-    "parametersCount" : "0"
-  }
-} ]
+]

@@ -29,7 +29,7 @@ public class RedisRecordingPlugin extends RecordingPlugin {
 
     protected void asyncCall(PluginContext pluginContext, Object out) {
         var duration = 0;
-
+        var id = (long) pluginContext.getTags().get("id");
         var storageItem = new StorageItem(pluginContext.getContextId(),
                 null,
                 mapper.toJsonNode(out),
@@ -39,6 +39,6 @@ public class RedisRecordingPlugin extends RecordingPlugin {
                 "RESPONSE");
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
-        EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
+        EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
     }
 }

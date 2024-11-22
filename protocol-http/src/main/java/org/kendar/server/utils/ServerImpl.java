@@ -133,6 +133,7 @@ public class ServerImpl {
 
     public static synchronized void dprint(Exception e) {
         if (debug) {
+            //noinspection ThrowablePrintedToSystemOut
             System.out.println(e);
             e.printStackTrace();
         }
@@ -325,6 +326,7 @@ public class ServerImpl {
         return logger;
     }
 
+    @SuppressWarnings("AssertWithSideEffects")
     private void closeConnection(HttpConnection conn) {
         conn.close();
         allConnections.remove(conn);

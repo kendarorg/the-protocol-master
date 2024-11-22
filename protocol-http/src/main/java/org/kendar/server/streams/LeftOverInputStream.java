@@ -40,6 +40,7 @@ public abstract class LeftOverInputStream extends FilterInputStream {
         }
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isClosed() {
         return closed;
     }

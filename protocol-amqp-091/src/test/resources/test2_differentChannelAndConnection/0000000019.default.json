@@ -2,10 +2,7 @@
   "constant": false,
   "connectionId": 1,
   "index": 19,
-  "input": null,
   "output": {
-    "uuid": "118",
-    "optional": false,
     "channel": 1,
     "type": 3,
     "proxyed": false,

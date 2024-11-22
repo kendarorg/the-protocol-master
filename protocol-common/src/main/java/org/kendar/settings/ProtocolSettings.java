@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProtocolSettings {
-    private static final JsonMapper mapper = new JsonMapper();
+    protected static final JsonMapper mapper = new JsonMapper();
     private String protocol;
     private String protocolInstanceId;
     private Map<String, Object> plugins = new HashMap<>();

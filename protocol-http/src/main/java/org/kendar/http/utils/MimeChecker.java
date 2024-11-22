@@ -57,7 +57,7 @@ public class MimeChecker {
         return true;
     }
 
-    public static boolean isStatic(String mime, String path) {
+    public static boolean isPossiblyStatic(String mime, String path) {
         if (mime != null) {
             var mimeLow = mime.toLowerCase(Locale.ROOT);
             if (mimeLow.startsWith("text") || mimeLow.startsWith("image")) {

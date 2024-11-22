@@ -77,7 +77,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new MongoRecordingPlugin();
+        var pl = new MongoRecordingPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

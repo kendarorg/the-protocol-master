@@ -27,11 +27,11 @@ import java.util.zip.GZIPInputStream;
 
 public class RequestResponseBuilderImpl implements RequestResponseBuilder {
 
+    protected static final JsonMapper mapper = new JsonMapper();
     private static final String H_SOAP_ACTION = "SOAPAction";
     private static final String H_AUTHORIZATION = "Authorization";
     private static final String BASIC_AUTH_MARKER = "basic";
     private static final String BASIC_AUTH_SEPARATOR = ":";
-    private static final JsonMapper mapper = new JsonMapper();
     private static Logger logger;
 
     public RequestResponseBuilderImpl() {
@@ -170,8 +170,6 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
         result.setSoapRequest(result.getHeader(H_SOAP_ACTION) != null);
         setupAuthHeaders(result);
 
-
-        result.setStaticRequest(MimeChecker.isStatic(headerContentType, result.getPath()));
         setupOptionalBody(exchange, result);
         // result.sanitizedPath = RequestUtils.sanitizePath(result);
         return result;

@@ -22,7 +22,7 @@ public interface PluginDescriptor extends ExtensionPoint {
 
     Class<?> getSettingClass();
 
-    void setSettings(PluginSettings plugin);
+    PluginDescriptor setSettings(PluginSettings plugin);
 
     boolean isActive();
 

@@ -13,6 +13,7 @@ import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 
 import java.util.List;
@@ -20,8 +21,10 @@ import java.util.Map;
 
 public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
     protected static final JsonMapper mapper = new JsonMapper();
+    protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldIgnoreTrivialCalls() {
         return ignoreTrivialCalls;
     }
@@ -29,25 +32,33 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
-            if (phase == ProtocolPhase.POST_CALL) {
-                postCall(pluginContext, in, out);
-            } else if (phase == ProtocolPhase.ASYNC_RESPONSE) {
-                asyncCall(pluginContext, out);
+            switch (phase) {
+                case PRE_CALL:
+                    pluginContext.getTags().put("id", storage.generateIndex());
+                    break;
+                case POST_CALL:
+                    postCall(pluginContext, in, out);
+                    break;
+                case ASYNC_RESPONSE:
+                    pluginContext.getTags().put("id", storage.generateIndex());
+                    asyncCall(pluginContext, out);
+                    break;
             }
         }
         return false;
     }
 
     @Override
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
         ignoreTrivialCalls = ((BasicRecordingPluginSettings) plugin).isIgnoreTrivialCalls();
+        return this;
     }
 
     protected void asyncCall(PluginContext pluginContext, Object out) {
         var duration = 0;
 
-
+        var id = (long) pluginContext.getTags().get("id");
         var storageItem = new StorageItem(
                 pluginContext.getContextId(),
                 null,
@@ -59,12 +70,13 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
 
-        EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
+        EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
     }
 
     protected void postCall(PluginContext pluginContext, Object in, Object out) {
         var duration = System.currentTimeMillis() - pluginContext.getStart();
 
+        var id = (long) pluginContext.getTags().get("id");
         JsonNode resSerialized = null;
         String resType = null;
 
@@ -84,9 +96,9 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(in, out, compactLine) || !shouldIgnoreTrivialCalls()) {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
+            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine)));
+            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
         }
     }
 
@@ -100,12 +112,20 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     public List<ProtocolPhase> getPhases() {
-        return List.of(ProtocolPhase.POST_CALL, ProtocolPhase.ASYNC_RESPONSE);
+        return List.of(ProtocolPhase.PRE_CALL, ProtocolPhase.POST_CALL, ProtocolPhase.ASYNC_RESPONSE);
     }
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         super.initialize(global, protocol);
+        withStorage((StorageRepository) global.getService("storage"));
+        return this;
+    }
+
+    public RecordingPlugin withStorage(StorageRepository storage) {
+        if (storage != null) {
+            this.storage = storage;
+        }
         return this;
     }
 

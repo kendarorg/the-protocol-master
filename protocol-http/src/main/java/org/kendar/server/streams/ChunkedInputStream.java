@@ -62,8 +62,7 @@ public class ChunkedInputStream extends LeftOverInputStream {
             }
             if (gotCR) {
                 if (ch == LF) {
-                    int l = numeric(len_arr, len_size);
-                    return l;
+                    return numeric(len_arr, len_size);
                 } else {
                     gotCR = false;
                 }
