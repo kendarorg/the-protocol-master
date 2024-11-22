@@ -70,7 +70,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new PostgresRecordPlugin();
+        var pl = new PostgresRecordPlugin().withStorage(storage);
         var pl1 = new PostgresMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());

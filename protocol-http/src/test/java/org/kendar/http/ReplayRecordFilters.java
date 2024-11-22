@@ -1,6 +1,7 @@
 package org.kendar.http;
 
 import org.junit.jupiter.api.Test;
+import org.kendar.events.EventsQueue;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpRecordingPlugin;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
@@ -17,16 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ReplayRecordFilters {
     @Test
     void testRecordSites() {
-        var matched = new ChangeableReference<Boolean>(false);
         var rwPlugin = new HttpRecordingPlugin() {
             @Override
             public boolean isActive() {
                 return true;
-            }
-
-            @Override
-            protected void postCall(PluginContext pluginContext, Object in, Object out) {
-                matched.set(true);
             }
         };
         var settings = new HttpRecordPluginSettings();
@@ -37,6 +32,7 @@ public class ReplayRecordFilters {
         rwPlugin.setSettings(settings);
 
         var pc = new PluginContext("http", null, 0L, null);
+        pc.getTags().put("id",1L);
         var in = new Request();
         in.setMethod("GET");
         in.setPath("/test_sites");
@@ -44,25 +40,21 @@ public class ReplayRecordFilters {
 
 
         in.setHost("test_sites");
-        matched.set(false);
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(matched.get());
+        assertTrue(EventsQueue.getInstance().clean().size()==1);
 
         in.setHost("www.sara.com");
-        matched.set(false);
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(matched.get());
+        assertTrue(EventsQueue.getInstance().clean().size()==1);
 
         in.setHost("www.wetheaver.microsofto.com");
-        matched.set(false);
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(matched.get());
+        assertTrue(EventsQueue.getInstance().clean().size()==1);
 
 
         in.setHost("www.wetheaver.microsof.com");
-        matched.set(false);
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertFalse(matched.get());
+        assertTrue(EventsQueue.getInstance().clean().size()==0);
     }
 
     @Test
