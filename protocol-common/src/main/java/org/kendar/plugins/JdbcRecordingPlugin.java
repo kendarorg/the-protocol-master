@@ -15,6 +15,7 @@ import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Map;
 public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
     protected static JsonMapper mapper = new JsonMapper();
     private boolean ignoreTrivialCalls = true;
+    private StorageRepository storage;
 
     public boolean shouldIgnoreTrivialCalls() {
         return ignoreTrivialCalls;
@@ -31,7 +33,11 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         if (isActive()) {
-            postCall(pluginContext, in, out);
+            if(phase==ProtocolPhase.PRE_CALL){
+                pluginContext.getTags().put("id",storage.generateIndex());
+            }else if(phase==ProtocolPhase.POST_CALL){
+                postCall(pluginContext, in, out);
+            }
         }
         return false;
     }
@@ -54,6 +60,7 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
             res = new JdbcResponse(out.getCount());
             res.setSelectResult(out);
         }
+        var id = (long)pluginContext.getTags().get("id");
 
 
         var storageItem = new StorageItem(
@@ -67,9 +74,9 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(storageItem, compactLine) || !shouldIgnoreTrivialCalls()) {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine)));
+            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine)));
+            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
         }
     }
 
@@ -85,12 +92,20 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
 
     @Override
     public List<ProtocolPhase> getPhases() {
-        return List.of(ProtocolPhase.POST_CALL, ProtocolPhase.ASYNC_RESPONSE);
+        return List.of(ProtocolPhase.PRE_CALL, ProtocolPhase.POST_CALL);
     }
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
         super.initialize(global, protocol);
+        withStorage((StorageRepository) global.getService("storage"));
+        return this;
+    }
+
+    public JdbcRecordingPlugin withStorage(StorageRepository storage) {
+        if (storage != null) {
+            this.storage = storage;
+        }
         return this;
     }
 

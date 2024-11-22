@@ -19,4 +19,5 @@ public interface StorageRepository extends Service {
     byte[] readAsZip();
 
     void writeZip(byte[] byteArray);
+    long generateIndex();
 }

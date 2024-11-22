@@ -7,17 +7,24 @@ public class LineToWrite {
     private final String instanceId;
     private final CompactLine compactLine;
     private StorageItem storageItem;
+    private final long id;
 
-    public LineToWrite(String instanceId, StorageItem storageItem, CompactLine compactLine) {
+    public LineToWrite(String instanceId, StorageItem storageItem, CompactLine compactLine,long id) {
         this.instanceId = instanceId;
         this.compactLine = compactLine;
         this.storageItem = storageItem;
+        this.id = id;
     }
 
-    public LineToWrite(String instanceId, CompactLine compactLine) {
+    public long getId() {
+        return id;
+    }
+
+    public LineToWrite(String instanceId, CompactLine compactLine, long id) {
 
         this.instanceId = instanceId;
         this.compactLine = compactLine;
+        this.id = id;
     }
 
     public String getInstanceId() {

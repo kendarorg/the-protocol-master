@@ -2,6 +2,8 @@ package org.kendar.proxy;
 
 import org.kendar.protocol.context.ProtoContext;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class PluginContext {
@@ -11,6 +13,12 @@ public class PluginContext {
     private long index;
     private long start;
     private String caller;
+
+    public Map<String, Object> getTags() {
+        return tags;
+    }
+
+    private final Map<String,Object> tags = new HashMap<>();
 
     public PluginContext(String caller, String type, long start, ProtoContext context) {
 

@@ -3,7 +3,6 @@ package org.kendar.http.plugins;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.RecordStatusEvent;
 import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.RecordingPlugin;
@@ -29,36 +28,41 @@ public class HttpRecordingPlugin extends RecordingPlugin {
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
-            if (phase == ProtocolPhase.POST_CALL) {
-                var request = (Request) in;
-                var response = (Response) out;
-                if (!recordSites.isEmpty()) {
-                    var matchFound = false;
-                    for (var pat : recordSites) {
-                        if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
-                            matchFound = true;
-                            break;
-                        }
-                    }
-                    if (!matchFound) {
-                        return false;
-                    }
-                }
-
-                if (settings.isRemoveEtags()) {
-                    var all = request.getHeader("If-none-match");
-                    if (all != null && !all.isEmpty()) all.clear();
-                    all = request.getHeader("If-match");
-                    if (all != null && !all.isEmpty()) all.clear();
-                    all = request.getHeader("If-modified-since");
-                    if (all != null && !all.isEmpty()) all.clear();
-                    all = request.getHeader("ETag");
-                    if (all != null && !all.isEmpty()) all.clear();
-                    postCall(pluginContext, in, out);
-                }
+            if(phase==ProtocolPhase.PRE_CALL) {
+                pluginContext.getTags().put("id",storage.generateIndex());
+            }else if (phase == ProtocolPhase.POST_CALL) {
+                handleHttpPostCall(pluginContext, in, out);
             }
         }
         return false;
+    }
+
+    private void handleHttpPostCall(PluginContext pluginContext, Object in, Object out) {
+        var request = (Request) in;
+        if (!recordSites.isEmpty()) {
+            var matchFound = false;
+            for (var pat : recordSites) {
+                if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                    matchFound = true;
+                    break;
+                }
+            }
+            if (!matchFound) {
+                return;
+            }
+        }
+
+        if (settings.isRemoveEtags()) {
+            var all = request.getHeader("If-none-match");
+            if (all != null && !all.isEmpty()) all.clear();
+            all = request.getHeader("If-match");
+            if (all != null && !all.isEmpty()) all.clear();
+            all = request.getHeader("If-modified-since");
+            if (all != null && !all.isEmpty()) all.clear();
+            all = request.getHeader("ETag");
+            if (all != null && !all.isEmpty()) all.clear();
+        }
+        postCall(pluginContext, in, out);
     }
 
     @Override

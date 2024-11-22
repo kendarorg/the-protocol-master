@@ -32,7 +32,6 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
     }
 
     public ReplayingPlugin withStorage(StorageRepository storage) {
-
         if (storage != null) {
             this.storage = storage;
         }

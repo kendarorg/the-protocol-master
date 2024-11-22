@@ -107,8 +107,8 @@ public class FileStorageRepository implements StorageRepository {
         });
     }
 
-    private ProtocolRepo initializeContentWrite(String protocolInstanceIdOuter) {
-        return protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
+    private void initializeContentWrite(String protocolInstanceIdOuter) {
+        protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
             if (currRepo == null) {
                 currRepo = new ProtocolRepo();
             }
@@ -137,7 +137,7 @@ public class FileStorageRepository implements StorageRepository {
                 return;
             }
             try {
-                var valueId = generateIndex();
+                var valueId = item.getId();
                 item.getCompactLine().setIndex(valueId);
                 if (item.getStorageItem() != null) {
                     item.getStorageItem().setIndex(valueId);
