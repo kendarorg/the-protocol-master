@@ -8,7 +8,7 @@ import org.kendar.mysql.messages.Error;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.ProxyConnection;
@@ -67,7 +67,7 @@ public class MySQLProtoContext extends NetworkProtoContext {
         }
     }
 
-    protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
+    protected List<ReturnMessage> runException(Exception ex, ProtoState state, ProtocolEvent event) {
         var result = new ArrayList<>(super.runException(ex, state, event));
         log.error(ex.getMessage(), ex);
         var error = new Error();

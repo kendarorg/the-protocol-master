@@ -60,16 +60,14 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     }
 
     protected void sendAndExpect(PluginContext pluginContext, JdbcCall inObj, SelectResult outObj) {
-        var in = (JdbcCall) inObj;
-        var out = (SelectResult) outObj;
         var query = new CallItemsQuery();
 
         query.setCaller(pluginContext.getCaller());
         query.setType("QUERY");
-        query.addTag("parametersCount", in.getParameterValues().size());
-        query.addTag("query", in.getQuery());
+        query.addTag("parametersCount", inObj.getParameterValues().size());
+        query.addTag("query", inObj.getQuery());
         query.setUsed(completedIndexes);
-        if(!completedIndexes.isEmpty()) {
+        if (!completedIndexes.isEmpty()) {
             var itemFounded = completedIndexes.stream().max(Integer::compareTo).get().toString();
             query.addTag("next", itemFounded);
         }
@@ -90,7 +88,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
         if (lineToRead != null && lineToRead.getStorageItem() != null
                 && lineToRead.getStorageItem().getOutput() != null) {
             var source = lineToRead.getStorageItem().retrieveOutAs(JdbcResponse.class);
-            out.fill(source.getSelectResult());
+            ((SelectResult) outObj).fill(source.getSelectResult());
             completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
         } else if (lineToRead != null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
             completedIndexes.add((int) lineToRead.getCompactLine().getIndex());
@@ -98,8 +96,8 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
                 SelectResult resultset = new SelectResult();
                 resultset.setIntResult(true);
                 resultset.setCount(Integer.parseInt(lineToRead.getCompactLine().getTags().get("resultsCount")));
-                out.fill(resultset);
-            } else if (in.getQuery().trim().toLowerCase().startsWith("set")) {
+                ((SelectResult) outObj).fill(resultset);
+            } else if (((JdbcCall) inObj).getQuery().trim().toLowerCase().startsWith("set")) {
 
             }
         }

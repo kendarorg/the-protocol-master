@@ -1,7 +1,7 @@
 package org.kendar.amqp.v09.fsm;
 
 import org.kendar.amqp.v09.AmqpProxy;
-import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.context.AmqpProtoContext;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionStart;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.events.BytesEvent;

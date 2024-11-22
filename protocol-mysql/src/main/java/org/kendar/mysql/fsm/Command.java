@@ -15,11 +15,6 @@ public class Command extends MySQLProtoState {
     }
 
     @Override
-    protected boolean canRunBytes(BytesEvent event) {
-        return true;
-    }
-
-    @Override
     protected Iterator<ProtoStep> executeBytes(MySQLBBuffer inputBuffer, BytesEvent event, int packetLength, int packetIndex) {
         var tt = inputBuffer.get();
         var context = (MySQLProtoContext) event.getContext();

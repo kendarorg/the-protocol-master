@@ -17,8 +17,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class MqttReplayingPlugin extends ReplayingPlugin {
-    private static final Logger log = LoggerFactory.getLogger(MqttReplayingPlugin.class);
     protected static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(MqttReplayingPlugin.class);
 
     @Override
     public String getProtocol() {

@@ -2,8 +2,8 @@ package org.kendar.proxy;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
-import org.kendar.protocol.events.BaseEvent;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -200,7 +200,7 @@ public abstract class NetworkProxySocket {
     public List<ReturnMessage> read(ProtoState protoState, boolean optional) {
 
         log.debug("[CL<TP][EX]: Expecting {}", protoState.getClass().getSimpleName());
-        BaseEvent founded = null;
+        ProtocolEvent founded = null;
         try {
             long maxCount = System.currentTimeMillis() + 2000;
             //FLW13 SEEK A SPECIFIC MESSAGE
@@ -216,7 +216,7 @@ public abstract class NetworkProxySocket {
                 //FLW15 GET THE MESSAGE TO RUN
                 for (int i = 0; i < received.size(); i++) {
                     BytesEvent fr = received.get(i);
-                    var eventsToTry = new ArrayList<BaseEvent>();
+                    var eventsToTry = new ArrayList<ProtocolEvent>();
                     eventsToTry.add(new BytesEvent(context, null, fr.getBuffer()));
                     eventsToTry.addAll(buildPossibleEvents(context, fr.getBuffer()));
                     //If can run the proto state
@@ -254,7 +254,7 @@ public abstract class NetworkProxySocket {
         return returnMessage;
     }
 
-    protected abstract List<? extends BaseEvent> buildPossibleEvents(NetworkProtoContext context, BBuffer buffer);
+    protected abstract List<? extends ProtocolEvent> buildPossibleEvents(NetworkProtoContext context, BBuffer buffer);
 
     public void close() {
         try {

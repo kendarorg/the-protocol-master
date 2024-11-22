@@ -1,22 +1,22 @@
 package org.kendar.exceptions;
 
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.states.NullState;
 import org.kendar.protocol.states.ProtoState;
 
 public class FailedStateException extends RuntimeException {
     private final String message;
     private final ProtoState state;
-    private final BaseEvent event;
+    private final ProtocolEvent event;
 
-    public FailedStateException(String message, ProtoState state, BaseEvent event) {
+    public FailedStateException(String message, ProtoState state, ProtocolEvent event) {
 
         this.message = message;
         this.state = state;
         this.event = event;
     }
 
-    public FailedStateException(String message, BaseEvent event) {
+    public FailedStateException(String message, ProtocolEvent event) {
 
         this.message = message;
         this.state = new NullState();
@@ -32,7 +32,7 @@ public class FailedStateException extends RuntimeException {
         return state;
     }
 
-    public BaseEvent getEvent() {
+    public ProtocolEvent getEvent() {
         return event;
     }
 }

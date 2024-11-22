@@ -73,6 +73,10 @@ public class EventsQueue {
         }
     }
 
+    /**
+     * Start the event queue. Tried with SingleThreadExecutor BUT it uses LinkedBlockingQueue
+     * slowing down execution
+     */
     private void start() {
         new Thread(() -> {
             while (true) {

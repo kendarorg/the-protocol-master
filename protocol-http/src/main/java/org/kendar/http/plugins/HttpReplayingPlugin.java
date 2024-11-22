@@ -6,6 +6,7 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
+import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.ReplayingPlugin;
 import org.kendar.protocol.context.ProtoContext;
@@ -126,11 +127,12 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
     }
 
     @Override
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
         settings = (HttpReplayPluginSettings) plugin;
         blockExternal = settings.isBlockExternal();
         setupMatchSites(settings.getMatchSites());
+        return this;
     }
 
 }

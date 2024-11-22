@@ -37,9 +37,10 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
     }
 
     @Override
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
         ignoreTrivialCalls = ((BasicRecordingPluginSettings) plugin).isIgnoreTrivialCalls();
+        return this;
     }
 
 
@@ -76,10 +77,10 @@ public abstract class JdbcRecordingPlugin extends ProtocolPluginDescriptor<JdbcC
         return Map.of();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     protected boolean shouldNotSave(StorageItem in, CompactLine out) {
         var result = in.retrieveInAs(JdbcRequest.class);
-        if (result.getQuery().trim().toLowerCase().startsWith("set")) return true;
-        return false;
+        return result.getQuery().trim().toLowerCase().startsWith("set");
     }
 
     @Override

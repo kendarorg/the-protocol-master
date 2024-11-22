@@ -11,9 +11,8 @@ public class UnmodifiableHeaders extends Headers {
     private final Map<String, List<String>> map;  // unmodifiable
 
     public UnmodifiableHeaders(Headers headers) {
-        var h = headers;
         var unmodHeaders = new Headers();
-        h.forEach((k, v) -> unmodHeaders.put(k, Collections.unmodifiableList(v)));
+        headers.forEach((k, v) -> unmodHeaders.put(k, Collections.unmodifiableList(v)));
         this.map = Collections.unmodifiableMap(unmodHeaders);
         this.headers = unmodHeaders;
     }

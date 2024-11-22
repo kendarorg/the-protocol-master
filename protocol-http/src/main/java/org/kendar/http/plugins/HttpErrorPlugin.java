@@ -67,11 +67,12 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response>
     }
 
     @Override
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
         var settings = (HttpErrorPluginSettings) plugin;
         this.errorCode = settings.getShowError();
         this.errorMessage = settings.getErrorMessage();
         this.percentage = ((double) settings.getErrorPercent()) / 100.0;
+        return this;
     }
 }

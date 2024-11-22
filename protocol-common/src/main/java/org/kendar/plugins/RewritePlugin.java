@@ -57,14 +57,14 @@ public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T,
     }
 
     @Override
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         var settings = (RewritePluginSettings) plugin;
         try {
             super.setSettings(plugin);
 
-            if (settings.getRewritesFile() == null) return;
+            if (settings.getRewritesFile() == null) return null;
             var path = Path.of(settings.getRewritesFile()).toAbsolutePath();
-            if (!path.toFile().exists()) return;
+            if (!path.toFile().exists()) return null;
 
             for (var replacer : mapper.deserialize(Files.readString(path), new TypeReference<List<ReplacerItem>>() {
             })) {
@@ -74,6 +74,7 @@ public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T,
             log.error("Unable to read rewrite file {}", settings.getRewritesFile(), e);
             throw new RuntimeException(e);
         }
+        return this;
     }
 
     protected boolean useTrailing() {

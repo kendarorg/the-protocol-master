@@ -1,6 +1,6 @@
 package org.kendar.protocol.states;
 
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
@@ -11,7 +11,7 @@ import java.util.Iterator;
  *
  * @param <T>
  */
-public interface HandlerDefinition<T extends BaseEvent> {
+public interface HandlerDefinition<T extends ProtocolEvent> {
     boolean canRun(T event);
 
     Iterator<ProtoStep> execute(T event);

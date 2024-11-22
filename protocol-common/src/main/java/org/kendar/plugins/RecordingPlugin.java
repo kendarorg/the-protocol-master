@@ -39,9 +39,10 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     }
 
     @Override
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
         ignoreTrivialCalls = ((BasicRecordingPluginSettings) plugin).isIgnoreTrivialCalls();
+        return this;
     }
 
     protected void asyncCall(PluginContext pluginContext, Object out) {

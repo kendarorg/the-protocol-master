@@ -95,7 +95,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                     disableRedirectHandling().
                     build();
         } else {
-            httpClient = connectionBuilder.buildClient(useRemoteDnsOnly(), true, request.getPort(), request.getProtocol());
+            httpClient = connectionBuilder.buildClient(true, true, request.getPort(), request.getProtocol());
         }
 
         HttpRequestBase fullRequest = null;
@@ -154,10 +154,6 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                                 ContentType.create(part.getContentType()),
                                 part.getFileName());*/
                     } else {
-                        var type = part.getContentType();
-                        if (type == null) {
-                            type = ConstantsMime.DEFAULT_CONTENT_TYPE;
-                        }
                         var cb = new StringBody(part.getStringData());
                         var fbd = new FormBodyPart(part.getFieldName(), cb);
                         for (var header : part.getHeaders().entrySet()) {
@@ -233,8 +229,6 @@ public abstract class BaseRequesterImpl implements BaseRequester {
             }
         }
     }
-
-    protected abstract boolean useRemoteDnsOnly();
 
 
     private HttpRequestBase createFullRequest(Request request, String stringAdress) throws Exception {

@@ -53,6 +53,7 @@ public class ApiHandler {
                 collect(Collectors.toList());
     }
 
+    @SuppressWarnings("finally")
     public Ok terminate() {
         try {
             return new Ok();

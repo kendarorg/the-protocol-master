@@ -13,17 +13,14 @@ import org.kendar.mongo.fsm.events.OpMsgRequest;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.utils.JsonMapper;
 
-import javax.security.sasl.SaslException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.Iterator;
 
 public class CmdSaslStart extends StandardOpMsgCommand {
 
+    protected static final JsonMapper mapper = new JsonMapper();
     private static final String GS2_HEADER = "n,,";
     private static final int MINIMUM_ITERATION_COUNT = 4096;
-    protected static final JsonMapper mapper = new JsonMapper();
 
     public CmdSaslStart(Class<?>... events) {
         super(events);
@@ -85,30 +82,4 @@ public class CmdSaslStart extends StandardOpMsgCommand {
             throw new RuntimeException(ex);
         }
     }
-
-    private HashMap<String, String> parseServerResponse(final String response) {
-        HashMap<String, String> map = new HashMap<>();
-        String[] pairs = response.split(",");
-        for (String pair : pairs) {
-            String[] parts = pair.split("=", 2);
-            map.put(parts[0], parts[1]);
-        }
-        return map;
-    }
-
-    private byte[] computeClientFinalMessage(final byte[] challenge, String clientFirstMessageBare) throws SaslException {
-        String serverFirstMessage = new String(challenge, StandardCharsets.UTF_8);
-        HashMap<String, String> map = parseServerResponse(serverFirstMessage);
-        String serverNonce = map.get("r");
-
-
-        String salt = map.get("s");
-        int iterationCount = Integer.parseInt(map.get("i"));
-
-
-        String clientFinalMessageWithoutProof = "c=" + Base64.getEncoder().encodeToString(GS2_HEADER.getBytes(StandardCharsets.UTF_8)) + ",r=" + serverNonce;
-        String authMessage = clientFirstMessageBare + "," + serverFirstMessage + "," + clientFinalMessageWithoutProof;
-        return null;
-    }
-
 }

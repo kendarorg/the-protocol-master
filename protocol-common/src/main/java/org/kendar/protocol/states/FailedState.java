@@ -1,6 +1,6 @@
 package org.kendar.protocol.states;
 
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,13 +12,13 @@ public class FailedState extends ProtoState {
     private static final Logger log = LoggerFactory.getLogger(FailedState.class);
     private final String message;
     private ProtoState state;
-    private BaseEvent event;
+    private ProtocolEvent event;
 
     public FailedState(String message) {
         this.message = message;
     }
 
-    public FailedState(String message, ProtoState state, BaseEvent event) {
+    public FailedState(String message, ProtoState state, ProtocolEvent event) {
         log.trace("Failed state for event {}", event.getClass().getSimpleName());
         this.message = message;
         this.state = state;
@@ -33,7 +33,7 @@ public class FailedState extends ProtoState {
         return state;
     }
 
-    public BaseEvent getEvent() {
+    public ProtocolEvent getEvent() {
         return event;
     }
 }

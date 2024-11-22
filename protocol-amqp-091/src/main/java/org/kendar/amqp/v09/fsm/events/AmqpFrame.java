@@ -3,12 +3,12 @@ package org.kendar.amqp.v09.fsm.events;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.states.TaggedObject;
 
 import java.util.ArrayList;
 
-public class AmqpFrame extends BaseEvent implements TaggedObject {
+public class AmqpFrame extends ProtocolEvent implements TaggedObject {
     private final BBuffer buffer;
     private final short channel;
 

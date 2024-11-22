@@ -45,15 +45,17 @@ public class HttpRecordingPlugin extends RecordingPlugin {
                     }
                 }
 
-                var all = request.getHeader("If-none-match");
-                if (all != null && !all.isEmpty()) all.clear();
-                all = request.getHeader("If-match");
-                if (all != null && !all.isEmpty()) all.clear();
-                all = request.getHeader("If-modified-since");
-                if (all != null && !all.isEmpty()) all.clear();
-                all = response.getHeader("ETag");
-                if (all != null && !all.isEmpty()) all.clear();
-                postCall(pluginContext, in, out);
+                if (settings.isRemoveEtags()) {
+                    var all = request.getHeader("If-none-match");
+                    if (all != null && !all.isEmpty()) all.clear();
+                    all = request.getHeader("If-match");
+                    if (all != null && !all.isEmpty()) all.clear();
+                    all = request.getHeader("If-modified-since");
+                    if (all != null && !all.isEmpty()) all.clear();
+                    all = request.getHeader("ETag");
+                    if (all != null && !all.isEmpty()) all.clear();
+                    postCall(pluginContext, in, out);
+                }
             }
         }
         return false;
@@ -65,10 +67,11 @@ public class HttpRecordingPlugin extends RecordingPlugin {
     }
 
     @Override
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         super.setSettings(plugin);
         settings = (HttpRecordPluginSettings) plugin;
         setupSitesToRecord(settings.getRecordSites());
+        return this;
     }
 
     private void setupSitesToRecord(List<String> recordSites) {

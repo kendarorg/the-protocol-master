@@ -47,6 +47,7 @@ public class Resp3Response extends ProtoState implements NetworkReturnMessage {
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     public boolean canRun(Resp3Message event) {
         return true;
     }

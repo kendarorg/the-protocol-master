@@ -3,7 +3,7 @@ package org.kendar.protocol.states;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.messages.RunnableStep;
@@ -163,7 +163,7 @@ public abstract class ProtoState {
      * @param event
      * @return
      */
-    public boolean canRunEvent(BaseEvent event) {
+    public boolean canRunEvent(ProtocolEvent event) {
         Method meth;
         try {
             meth = getClass().getMethod("canRun", event.getClass());
@@ -187,7 +187,7 @@ public abstract class ProtoState {
      * @param event
      * @return
      */
-    public Iterator<ProtoStep> executeEvent(BaseEvent event) {
+    public Iterator<ProtoStep> executeEvent(ProtocolEvent event) {
         Method meth;
         try {
             meth = getClass().getMethod("execute", event.getClass());

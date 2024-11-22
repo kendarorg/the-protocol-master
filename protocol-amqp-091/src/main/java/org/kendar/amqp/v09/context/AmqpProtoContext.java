@@ -1,4 +1,4 @@
-package org.kendar.amqp.v09.executor;
+package org.kendar.amqp.v09.context;
 
 import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.protocol.context.NetworkProtoContext;

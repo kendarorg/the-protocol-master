@@ -4,7 +4,7 @@ package org.kendar.protocol.context;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.exceptions.FailedStateException;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.FailedState;
@@ -114,7 +114,7 @@ public abstract class ProtoContext {
      * @param event
      * @return
      */
-    private static ProtoState retrieveExecutableState(ProtoState candidate, BaseEvent event) {
+    private static ProtoState retrieveExecutableState(ProtoState candidate, ProtocolEvent event) {
         ProtoState result;
         if (candidate.canRunEvent(event)) {
             result = candidate;
@@ -191,7 +191,7 @@ public abstract class ProtoContext {
      * @param event
      * @return
      */
-    public Future<Boolean> send(BaseEvent event) {
+    public Future<Boolean> send(ProtocolEvent event) {
         lastAccess.set(getNow());
         return executorService.submit(() -> {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
@@ -208,7 +208,7 @@ public abstract class ProtoContext {
      * @param event
      * @return
      */
-    public boolean sendSync(BaseEvent event) {
+    public boolean sendSync(ProtocolEvent event) {
 
         try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
             return reactToEvent(event);
@@ -221,7 +221,7 @@ public abstract class ProtoContext {
      * @param currentEvent
      * @return
      */
-    public boolean reactToEvent(BaseEvent currentEvent) {
+    public boolean reactToEvent(ProtocolEvent currentEvent) {
         try {
             lastAccess.set(getNow());
             log.trace("[CL>TP] RunFsmCycle");
@@ -270,7 +270,7 @@ public abstract class ProtoContext {
      * @param event
      * @return
      */
-    private ProtoState findThePossibleNextState(BaseEvent event) {
+    private ProtoState findThePossibleNextState(ProtocolEvent event) {
         //Check if there are interrupts
         var possible = findPossibleInterrupt(event);
         ProtoState foundedState;
@@ -297,7 +297,7 @@ public abstract class ProtoContext {
      * @param currentState
      * @param event
      */
-    public void runSteps(Iterator<ProtoStep> stepsToRun, ProtoState currentState, BaseEvent event) {
+    public void runSteps(Iterator<ProtoStep> stepsToRun, ProtoState currentState, ProtocolEvent event) {
 
         while (stepsToRun.hasNext()) {
             lastAccess.set(getNow());
@@ -342,7 +342,7 @@ public abstract class ProtoContext {
      *
      * @param event
      */
-    protected void preExecute(BaseEvent event) {
+    protected void preExecute(ProtocolEvent event) {
         var tagKey = event.getTagKeys();
         var tag = event.getTagKeyValues();
 
@@ -395,7 +395,7 @@ public abstract class ProtoContext {
      * @param depth
      * @return
      */
-    protected ProtoState findThePossibleNextStateOnStack(BaseEvent event, int depth) {
+    protected ProtoState findThePossibleNextStateOnStack(ProtocolEvent event, int depth) {
         if (depth > 10) {
             log.error("MAX RECURSION HIT");
             throw new RuntimeException("max recursion hit");
@@ -481,7 +481,7 @@ public abstract class ProtoContext {
      * @param depth           Recursion blocker
      * @return
      */
-    private ProtoState executeLoop(ProtoStackItem currentInstance, BaseEvent event, int depth) {
+    private ProtoState executeLoop(ProtoStackItem currentInstance, ProtocolEvent event, int depth) {
         ProtoState result = null;
         var eventTags = event.getTagKeyValues();
         //While it can run (has something to execute)
@@ -510,7 +510,7 @@ public abstract class ProtoContext {
         return result;
     }
 
-    private ProtoState getProtoState(ProtoState candidate, BaseEvent event, String eventTags, int depth) {
+    private ProtoState getProtoState(ProtoState candidate, ProtocolEvent event, String eventTags, int depth) {
 
         if (isNormalState(candidate)) {
             //If it's an executable return it
@@ -535,7 +535,7 @@ public abstract class ProtoContext {
      * @param candidate
      * @return
      */
-    private boolean shouldBlockRecursion(BaseEvent event, ProtoState candidate) {
+    private boolean shouldBlockRecursion(ProtocolEvent event, ProtoState candidate) {
         return recursionBlocker.contains(candidate.getUuid() + Tag.toString(event.getTag()));
     }
 
@@ -560,7 +560,7 @@ public abstract class ProtoContext {
      * @param depth
      * @return
      */
-    private ProtoState executeSwitchCase(ProtoStackItem currentInstance, BaseEvent event, int depth) {
+    private ProtoState executeSwitchCase(ProtoStackItem currentInstance, ProtocolEvent event, int depth) {
         ProtoState result = null;
         var eventTags = event.getTagKeyValues();
         //The switch case can run ONLY if the available executors are all set
@@ -597,7 +597,7 @@ public abstract class ProtoContext {
      * @param depth
      * @return
      */
-    private ProtoState executeSequence(ProtoStackItem currentInstance, BaseEvent event, int depth) {
+    private ProtoState executeSequence(ProtoStackItem currentInstance, ProtocolEvent event, int depth) {
         ProtoState result = null;
         var eventTags = event.getTagKeyValues();
         //While it can run (has something to execute)
@@ -636,7 +636,7 @@ public abstract class ProtoContext {
      *
      * @param currentEvent
      */
-    protected void postExecute(BaseEvent currentEvent) {
+    protected void postExecute(ProtocolEvent currentEvent) {
 
     }
 
@@ -646,7 +646,7 @@ public abstract class ProtoContext {
      * @param ex
      */
     public void handleExceptionInternal(Exception ex) {
-        BaseEvent event = null;
+        ProtocolEvent event = null;
         ProtoState state = null;
         if (ex instanceof FailedStateException) {
             event = ((FailedStateException) ex).getEvent();
@@ -668,7 +668,7 @@ public abstract class ProtoContext {
      * @param event
      * @return
      */
-    protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
+    protected List<ReturnMessage> runException(Exception ex, ProtoState state, ProtocolEvent event) {
         throw new RuntimeException(ex);
     }
 
@@ -678,7 +678,7 @@ public abstract class ProtoContext {
      * @param currentEvent
      * @return
      */
-    private Optional<ProtoState> findPossibleInterrupt(BaseEvent currentEvent) {
+    private Optional<ProtoState> findPossibleInterrupt(ProtocolEvent currentEvent) {
         return this.descriptor.getInterrupts().stream()
                 .filter(s -> s.canHandle(currentEvent.getClass()))
                 .filter(s -> s.canRunEvent(currentEvent))

@@ -6,7 +6,7 @@ import org.kendar.protocol.context.ProtoContext;
 /**
  * Default "bytes" kind event
  */
-public class BytesEvent extends BaseEvent {
+public class BytesEvent extends ProtocolEvent {
     private final BBuffer buffer;
 
     public BytesEvent(ProtoContext context, Class<?> prevState, BBuffer buffer) {

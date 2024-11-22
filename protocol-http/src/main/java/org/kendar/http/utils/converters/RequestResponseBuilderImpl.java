@@ -27,11 +27,11 @@ import java.util.zip.GZIPInputStream;
 
 public class RequestResponseBuilderImpl implements RequestResponseBuilder {
 
+    protected static final JsonMapper mapper = new JsonMapper();
     private static final String H_SOAP_ACTION = "SOAPAction";
     private static final String H_AUTHORIZATION = "Authorization";
     private static final String BASIC_AUTH_MARKER = "basic";
     private static final String BASIC_AUTH_SEPARATOR = ":";
-    protected static final JsonMapper mapper = new JsonMapper();
     private static Logger logger;
 
     public RequestResponseBuilderImpl() {

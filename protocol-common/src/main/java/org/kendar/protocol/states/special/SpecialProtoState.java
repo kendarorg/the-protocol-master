@@ -1,7 +1,7 @@
 package org.kendar.protocol.states.special;
 
 import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.states.ProtoState;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public abstract class SpecialProtoState extends ProtoState {
         return children;
     }
 
-    public boolean canHandle(BaseEvent event) {
+    public boolean canHandle(ProtocolEvent event) {
         var result = false;
         for (var child : children) {
             if (child.canHandle(event.getClass())) {
@@ -31,7 +31,8 @@ public abstract class SpecialProtoState extends ProtoState {
         return result;
     }
 
-    public boolean canRun(BaseEvent event) {
+    @SuppressWarnings("SameReturnValue")
+    public boolean canRun(ProtocolEvent event) {
         return true;
     }
 

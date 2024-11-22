@@ -19,8 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class AmqpReplayingPlugin extends ReplayingPlugin {
-    private static final Logger log = LoggerFactory.getLogger(AmqpReplayingPlugin.class);
     protected static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(AmqpReplayingPlugin.class);
 
     @Override
     public String getProtocol() {

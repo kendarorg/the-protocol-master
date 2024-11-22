@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Basic event
  */
-public class BaseEvent implements TaggedObject {
+public class ProtocolEvent implements TaggedObject {
 
     /**
      * Context handling this event
@@ -28,7 +28,7 @@ public class BaseEvent implements TaggedObject {
      */
     private List<Tag> tags = new ArrayList<>();
 
-    public BaseEvent(ProtoContext context, Class<?> prevState) {
+    public ProtocolEvent(ProtoContext context, Class<?> prevState) {
 
         this.context = context;
         this.prevState = prevState;

@@ -15,6 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,12 +26,12 @@ import java.util.zip.ZipOutputStream;
 
 public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
+    static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
     private final ConcurrentHashMap<String, ProtocolRepo> protocolRepo = new ConcurrentHashMap<>();
     private final AtomicInteger storageCounter = new AtomicInteger(0);
     private final TypeReference<StorageItem> typeReference = new TypeReference<>() {
     };
-
     private String targetDir;
 
     public FileStorageRepository(String targetDir) {
@@ -129,33 +131,35 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void write(LineToWrite item) {
-        if (item == null) {
-            log.error("Blank item");
-            return;
-        }
-        try {
-            var valueId = generateIndex();
-            item.getCompactLine().setIndex(valueId);
-            if (item.getStorageItem() != null) {
-                item.getStorageItem().setIndex(valueId);
+        executor.submit(() -> {
+            if (item == null) {
+                log.error("Blank item");
+                return;
             }
-            initializeContentWrite(item.getInstanceId());
-            //}
-            var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
-
-            var repo = protocolRepo.get(item.getInstanceId());
-            repo.index.add(item.getCompactLine());
-            repo.somethingWritten = true;
-            if (item.getStorageItem() != null) {
-                var result = mapper.serializePretty(item.getStorageItem());
-                if (!Files.exists(Paths.get(targetDir))) {
-                    Files.createDirectories(Paths.get(targetDir));
+            try {
+                var valueId = generateIndex();
+                item.getCompactLine().setIndex(valueId);
+                if (item.getStorageItem() != null) {
+                    item.getStorageItem().setIndex(valueId);
                 }
-                Files.writeString(Path.of(targetDir, id), result);
+                initializeContentWrite(item.getInstanceId());
+                //}
+                var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
+
+                var repo = protocolRepo.get(item.getInstanceId());
+                repo.index.add(item.getCompactLine());
+                repo.somethingWritten = true;
+                if (item.getStorageItem() != null) {
+                    var result = mapper.serializePretty(item.getStorageItem());
+                    if (!Files.exists(Paths.get(targetDir))) {
+                        Files.createDirectories(Paths.get(targetDir));
+                    }
+                    Files.writeString(Path.of(targetDir, id), result);
+                }
+            } catch (Exception e) {
+                log.warn("Trouble writing", e);
             }
-        } catch (Exception e) {
-            log.warn("Trouble writing", e);
-        }
+        });
     }
 
 
@@ -239,13 +243,13 @@ public class FileStorageRepository implements StorageRepository {
 
             Optional<StorageItem> item = Optional.empty();
 
-            if (idx.isEmpty() && query.getTag("next")!=null && !query.getTag("next").isEmpty()){
+            if (idx.isEmpty() && query.getTag("next") != null && !query.getTag("next").isEmpty()) {
                 var next = Integer.parseInt(query.getTag("next"));
                 idx = ctx.index.stream()
                         .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
                         .filter(a ->
-                                a.getIndex()>next &&
-                                typeMatching(query.getType(), a.getType()) &&
+                                a.getIndex() > next &&
+                                        typeMatching(query.getType(), a.getType()) &&
                                         a.getCaller().equalsIgnoreCase(query.getCaller()) &&
                                         query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
                         ).findFirst();
@@ -341,7 +345,7 @@ public class FileStorageRepository implements StorageRepository {
                 zos.closeEntry();
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            log.error("ERROR Creating storage zip");
         }
         return baos.toByteArray();
     }
@@ -383,7 +387,6 @@ public class FileStorageRepository implements StorageRepository {
             throw new RuntimeException(e);
         }
     }
-
 
 
     @Override

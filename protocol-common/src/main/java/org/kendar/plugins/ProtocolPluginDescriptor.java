@@ -51,8 +51,9 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
         }
     }
 
-    public void setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(PluginSettings plugin) {
         setActive(plugin.isActive());
+        return this;
     }
 
     protected void handleActivation(boolean active) {

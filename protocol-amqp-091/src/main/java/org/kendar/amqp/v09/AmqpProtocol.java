@@ -1,6 +1,6 @@
 package org.kendar.amqp.v09;
 
-import org.kendar.amqp.v09.executor.AmqpProtoContext;
+import org.kendar.amqp.v09.context.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.AmqpFrameTranslator;
 import org.kendar.amqp.v09.fsm.ProtocolHeader;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
@@ -28,10 +28,11 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
-import org.kendar.utils.Sleeper;
+import org.kendar.utils.TimerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -43,6 +44,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     private final ConcurrentHashMap<Integer, AmqpProtoContext> consumeContext;
     private final Logger log = LoggerFactory.getLogger(AmqpProtocol.class);
     private int port = PORT;
+    private TimerTask timer;
 
     private AmqpProtocol() {
         consumeContext = new ConcurrentHashMap<>();
@@ -103,27 +105,29 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     }
 
     public void start() {
-        new Thread(this::sendHeartbeat).start();
+        if (timer != null) {
+            timer.cancel();
+        }
+        var timerService = new TimerService();
+        timer = timerService.schedule(this::sendHeartbeat, 20 * 1000, 20 * 1000);
     }
 
     private void sendHeartbeat() {
-        while (running.get()) {
-            for (var ctx : consumeContext.values()) {
-                for (var ch : ctx.getChannels()) {
-                    var hb = new HearthBeatFrame();
-                    hb.setChannel(ch);
-                    hb.setProtoDescriptor(this);
-                    //ctx.write(hb);
-                    log.warn("Sending heartbeat");
-                }
+        for (var ctx : consumeContext.values()) {
+            for (var ch : ctx.getChannels()) {
+                var hb = new HearthBeatFrame();
+                hb.setChannel(ch);
+                hb.setProtoDescriptor(this);
+                //ctx.write(hb);
+                log.warn("Sending heartbeat");
             }
-            Sleeper.sleep(30000);
         }
     }
 
     @Override
     public void terminate() {
         running.set(false);
+        timer.cancel();
     }
 
     @Override

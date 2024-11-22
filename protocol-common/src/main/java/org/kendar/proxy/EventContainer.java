@@ -1,25 +1,25 @@
 package org.kendar.proxy;
 
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 
 public class EventContainer {
-    private BaseEvent event;
+    private ProtocolEvent event;
     private int length;
 
     public EventContainer() {
 
     }
 
-    public EventContainer(BaseEvent event, int size) {
+    public EventContainer(ProtocolEvent event, int size) {
         this.event = event;
         this.length = size;
     }
 
-    public BaseEvent getEvent() {
+    public ProtocolEvent getEvent() {
         return event;
     }
 
-    public void setEvent(BaseEvent event) {
+    public void setEvent(ProtocolEvent event) {
         this.event = event;
     }
 

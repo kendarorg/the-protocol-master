@@ -2,11 +2,11 @@ package org.kendar.proto.taggedfsm;
 
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 
 import java.util.ArrayList;
 
-public class TaggedEvent extends BaseEvent {
+public class TaggedEvent extends ProtocolEvent {
     public final String data;
 
     public TaggedEvent(ProtoContext context, Class<?> prevState, String data, String... tagsKvp) {

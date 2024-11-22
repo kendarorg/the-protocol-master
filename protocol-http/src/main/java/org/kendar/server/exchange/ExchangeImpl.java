@@ -195,6 +195,7 @@ public class ExchangeImpl {
         return uos_orig;
     }
 
+    @SuppressWarnings("SimplifyOptionalCallChains")
     public void sendResponseHeaders(int rCode, long contentLen)
             throws IOException {
         final System.Logger logger = server.getLogger();

@@ -1,8 +1,8 @@
 package org.kendar.amqp.v09.messages.frames;
 
 import org.kendar.amqp.v09.AmqpProxy;
+import org.kendar.amqp.v09.context.AmqpProtoContext;
 import org.kendar.amqp.v09.dtos.FrameType;
-import org.kendar.amqp.v09.executor.AmqpProtoContext;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.utils.FieldsReader;

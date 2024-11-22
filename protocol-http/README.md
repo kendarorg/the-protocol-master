@@ -32,6 +32,7 @@ The data will be stored in the global dataDir
 * active: If it is active
 * recordSites: list of matching hosts to record. When empty everything is recorded. When prepending with @ uses regexp
   else exact match
+* removeEtags: default to true, cleans all ETag-related fields to avoid caching
 
 ### replay-plugin
 

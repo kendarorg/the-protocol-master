@@ -3,9 +3,9 @@ package org.kendar.mysql.fsm.events;
 import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CommandType;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 
-public class CommandEvent extends BaseEvent {
+public class CommandEvent extends ProtocolEvent {
     private final MySQLBBuffer buffer;
     private final CommandType commandType;
 

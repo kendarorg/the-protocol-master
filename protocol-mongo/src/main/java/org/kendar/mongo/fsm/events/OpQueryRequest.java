@@ -2,9 +2,9 @@ package org.kendar.mongo.fsm.events;
 
 import org.kendar.mongo.dtos.OpQueryContent;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 
-public class OpQueryRequest extends BaseEvent {
+public class OpQueryRequest extends ProtocolEvent {
 
     private final OpQueryContent data;
 

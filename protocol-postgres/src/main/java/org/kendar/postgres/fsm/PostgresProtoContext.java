@@ -4,7 +4,7 @@ import org.kendar.iterators.IteratorOfLists;
 import org.kendar.postgres.messages.ErrorResponse;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.protocol.events.BaseEvent;
+import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
@@ -78,7 +78,7 @@ public class PostgresProtoContext extends NetworkProtoContext {
     }
 
     @Override
-    protected List<ReturnMessage> runException(Exception ex, ProtoState state, BaseEvent event) {
+    protected List<ReturnMessage> runException(Exception ex, ProtoState state, ProtocolEvent event) {
 
         var result = new ArrayList<>(super.runException(ex, state, event));
         log.error(ex.getMessage(), ex);
