@@ -11,6 +11,7 @@
 * Expose the connections for protocol on apis
 * Send mock messages amqp,mqtt,redis
 * Remove spring boot
+* Cleanup setSettings
 * Common
     * Test internal apis
 * Http

@@ -16,12 +16,18 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.kendar.http.plugins.HttpLatencyPlugin;
+import org.kendar.http.plugins.HttpLatencyPluginSettings;
 import org.kendar.http.utils.ConsumeException;
 import org.kendar.http.utils.NullEntity;
+import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
+import org.kendar.utils.Sleeper;
 import org.testcontainers.shaded.com.trilead.ssh2.crypto.Base64;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Stream;
@@ -188,6 +194,42 @@ public class SimpleTest extends BasicTest {
             content += sc.nextLine();
         }
         assertTrue(content.toLowerCase().contains("<title>google</title>"));
+    }
+
+    @Test
+    void testLAtencyPlugin() throws Exception {
+        var latencyPlugin = (HttpLatencyPlugin)baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("latency-plugin")).findFirst().get();
+        var lps = new HttpLatencyPluginSettings();
+        lps.setMinMs(2000);
+        lps.setMaxMs(3000);
+        latencyPlugin.setSettings(lps);
+        latencyPlugin.setActive(true);
+
+        var cf = new ChangeableReference<>("");
+        var realTime = new ChangeableReference<>(0L);
+        var httpclient = createHttpsHttpClient();
+        var httpget = new HttpGet("https://www.google.com");
+        new Thread(()->{
+            try {
+                Instant start_time = Instant.now();
+                var httpresponse = httpclient.execute(httpget);
+                var sc = new Scanner(httpresponse.getEntity().getContent());
+                Instant stop_time = Instant.now();
+                realTime.set(Duration.between(start_time, stop_time).toMillis());
+                //Printing the status line
+                assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+                var content = "";
+                while (sc.hasNext()) {
+                    content += sc.nextLine();
+                }
+                cf.set(content);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }).start();
+        Sleeper.sleep(4000);
+        assertTrue(realTime.get() >= 2000);
+        assertTrue(cf.get().toLowerCase().contains("<title>google</title>"));
     }
 
     @ParameterizedTest
