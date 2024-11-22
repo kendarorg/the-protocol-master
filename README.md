@@ -2,21 +2,22 @@
 
 ![](protocolmaster_s.gif)
 
-The "protocol-master" is an infrastructure simulator to test effortlessy your app in minutes (with no coding)
-supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091
-... and all the compatible ones!
-
-The main targets are testing and inspection
-
-You can use it to:
+"The Protocol Master" is an infrastructure simulator to test effortlessy your app in minutes (with no coding) supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091 ... and all the compatible ones!
 
 * Simulate wrong scenarios 
 * Block troubles before production
 * Build reproducible test without infrastructure
 * Understand application interactions
-* Simulate not yet ready APIs
+* Simulate not yet ready APIs/DBs
+* Verify security
+* Catalogue all called services and interactions
 
 The whole project is covered with Jacoco (77% instructions coverage actually)
+
+## How it works
+
+It's simple it's a multiprotocol proxy
+Independent from the stack you are using
 
 ## Get Started
 
