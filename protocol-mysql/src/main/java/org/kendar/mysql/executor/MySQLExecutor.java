@@ -127,7 +127,6 @@ public class MySQLExecutor {
                             && parsed.get(1).getType() == SqlStringType.SELECT
             )) {
                 return handleWithinTransaction(parsed, protoContext, parse, parameterValues, text);
-                //TODO transaction
             } else {
                 var sqlParseResult = new SqlParseResult(parse, parsed.get(0).getType());
                 return handleSingleQuery(sqlParseResult, protoContext, parse, parameterValues, text);
