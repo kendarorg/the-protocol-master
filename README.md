@@ -6,19 +6,22 @@
 
 * Simulate wrong scenarios 
 * Block troubles before production
-* Build reproducible test without infrastructure
-* Understand application interactions
-* Simulate not yet ready APIs/DBs
-* Verify security
-* Catalogue all called services and interactions
+* Simulate whole infrastructure
 
-The whole project is covered with Jacoco (77% instructions coverage actually)
+Effortlessy
 
-## How it works
+### How it works
 
-It's simple it's a multiprotocol proxy
+It's simple it's a multiprotocol proxy on your box (or wetheaver you want)
 Independent from the stack you are using
 
+### Scenarios
+
+* Simulate what-if without hitting real servers
+* Testing resiliency, errors and wrong data
+* Security analisys
+* Test new APIs easily
+  
 ## Get Started
 
 Look at "[The Protocol Master Samples](https://github.com/kendarorg/the-protocol-master-samples)" repository to create
