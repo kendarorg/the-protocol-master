@@ -43,8 +43,9 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
                     return false;
                 }
             }
+            return handleRateLimit(pluginContext, phase, in, out);
         }
-        return handleRateLimit(pluginContext, phase, in, out);
+        return false;
     }
 
     @Override
