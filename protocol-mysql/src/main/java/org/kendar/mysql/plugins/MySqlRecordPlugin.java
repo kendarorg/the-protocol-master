@@ -47,8 +47,8 @@ public class MySqlRecordPlugin extends JdbcRecordingPlugin {
     }
 
     @Override
-    protected boolean shouldNotSave(StorageItem in, CompactLine cl) {
-        var shouldNotSave = super.shouldNotSave(in, cl);
+    protected boolean shouldNotSaveJdbc(StorageItem in, CompactLine cl) {
+        var shouldNotSave = super.shouldNotSaveJdbc(in, cl);
         var result = in.retrieveInAs(JdbcRequest.class);
         if (result.getQuery().trim().toLowerCase().startsWith("show")) {
             cl.getTags().put("isIntResult", "false");

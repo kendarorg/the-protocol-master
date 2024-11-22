@@ -1,15 +1,11 @@
 package org.kendar.http.plugins;
 
-import org.kendar.events.EventsQueue;
-import org.kendar.events.RecordStatusEvent;
 import org.kendar.http.utils.Request;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.RecordingPlugin;
 import org.kendar.proxy.PluginContext;
-import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
-import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 
 import java.util.*;
@@ -20,24 +16,19 @@ public class HttpRecordingPlugin extends RecordingPlugin {
     private List<Pattern> recordSites = new ArrayList<>();
     private HttpRecordPluginSettings settings;
 
+
+    @Override
+    public List<ProtocolPhase> getPhases() {
+        return List.of(ProtocolPhase.PRE_CALL, ProtocolPhase.POST_CALL);
+    }
+
     @Override
     public String getProtocol() {
         return "http";
     }
 
     @Override
-    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
-        if (isActive()) {
-            if(phase==ProtocolPhase.PRE_CALL) {
-                pluginContext.getTags().put("id",storage.generateIndex());
-            }else if (phase == ProtocolPhase.POST_CALL) {
-                handleHttpPostCall(pluginContext, in, out);
-            }
-        }
-        return false;
-    }
-
-    private void handleHttpPostCall(PluginContext pluginContext, Object in, Object out) {
+    protected void postCall(PluginContext pluginContext, Object in, Object out) {
         var request = (Request) in;
         if (!recordSites.isEmpty()) {
             var matchFound = false;
@@ -62,7 +53,7 @@ public class HttpRecordingPlugin extends RecordingPlugin {
             all = request.getHeader("ETag");
             if (all != null && !all.isEmpty()) all.clear();
         }
-        postCall(pluginContext, in, out);
+        super.postCall(pluginContext, in, out);
     }
 
     @Override
@@ -86,13 +77,6 @@ public class HttpRecordingPlugin extends RecordingPlugin {
                         Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
     }
 
-
-    @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
-        return this;
-    }
-
     @Override
     public Map<String, String> buildTag(StorageItem item) {
         var in = item.retrieveInAs(Request.class);
@@ -105,13 +89,6 @@ public class HttpRecordingPlugin extends RecordingPlugin {
 
         result.put("query", query);
         return result;
-    }
-
-
-    @Override
-    protected void handleActivation(boolean active) {
-        EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
-        super.handleActivation(active);
     }
 
 }

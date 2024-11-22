@@ -24,6 +24,7 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     private boolean ignoreTrivialCalls = true;
     protected StorageRepository storage;
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldIgnoreTrivialCalls() {
         return ignoreTrivialCalls;
     }
