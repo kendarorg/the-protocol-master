@@ -2,7 +2,7 @@
 
 ![](protocolmaster_s.gif)
 
-The "protocol-master" is an infrastructure simulator to test effortlessy your app in minutes
+The "protocol-master" is an infrastructure simulator to test effortlessy your app in minutes (with no coding)
 supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091
 ... and all the compatible ones!
 
