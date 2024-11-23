@@ -54,6 +54,29 @@ Generate random errors
 * errorMessage: the error message to write to output
 * percentage: the percent of calls to generate errors
 
+### latency-plugin
+
+Introduce random latency
+
+* minMs: Minimum latency added (default 0)
+* maxMs: Max latency added (default 0)
+
+### rate-limit-plugin
+
+Add the handling of throttling and rate limits 
+
+* limitSites: list of matching hosts to throttle. When empty everything is replayed. When prepending with @ uses regexp else exact match
+* headerLimit: The header for the limit count (default RateLimit-Limit)
+* rateLimit: The limit count (default 120)
+* costPerRequest: How much each request will consume from rateLimit (default 2)
+* warningThresholdPercent: When reaching %of rate limit start warning
+* headerRemaining: How many hits remaining (default RateLimit-Remaining)
+* headerReset: Header for seconds/time till the reset of counters (default RateLimit-Reset)
+* resetFormat: Format of the headerReset value (default secondsLeft, can be utcEpochSeconds)
+* headerRetryAfter: Header for seconds after which should retry (default Retry-After)
+* resetTimeWindowSeconds: When counters are reset
+* customResponseFile: Custom response file to use instead of reponse (see an [example](src/test/resources/ratelimitresponse.json))
+
 ### mock-plugin
 
 To mock single requests

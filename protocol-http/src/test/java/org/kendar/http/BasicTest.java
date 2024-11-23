@@ -157,6 +157,8 @@ public class BasicTest {
                 new HttpRecordingPlugin().withStorage(storage).setSettings(recordingSettings),
                 new HttpReplayingPlugin().withStorage(storage),
                 new HttpErrorPlugin(),
+                new HttpLatencyPlugin(),
+                new HttpRateLimitPlugin(),
                 new HttpMockPlugin(),
                 new HttpRewritePlugin()));
         baseProtocol.initialize();
