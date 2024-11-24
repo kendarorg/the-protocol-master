@@ -50,6 +50,11 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public void isRecording(String instanceId, boolean b) {
+
+    }
+
+    @Override
     public String getType() {
         return "storage";
     }

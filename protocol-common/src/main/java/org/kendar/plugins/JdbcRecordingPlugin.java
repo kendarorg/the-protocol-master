@@ -72,6 +72,9 @@ public abstract class JdbcRecordingPlugin extends RecordingPlugin {
 
     @Override
     protected void handleActivation(boolean active) {
+        if(this.isActive()!=active){
+            this.storage.isRecording(getInstanceId(),active);
+        }
         if (!active) {
             terminate();
         }

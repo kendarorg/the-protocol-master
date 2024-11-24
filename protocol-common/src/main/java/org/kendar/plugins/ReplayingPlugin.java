@@ -63,6 +63,9 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     protected void handleActivation(boolean active) {
+        if(this.isActive()!=active){
+            this.storage.isRecording(getInstanceId(),!active);
+        }
         completedOutIndexes.clear();
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }

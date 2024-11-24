@@ -21,4 +21,6 @@ public interface StorageRepository extends Service {
     void writeZip(byte[] byteArray);
 
     long generateIndex();
+
+    void isRecording(String instanceId, boolean b);
 }

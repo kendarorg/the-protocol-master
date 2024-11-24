@@ -136,6 +136,9 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     protected void handleActivation(boolean active) {
+        if(this.isActive()!=active){
+            this.storage.isRecording(getInstanceId(),active);
+        }
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
         if (!active) {
             terminate();
