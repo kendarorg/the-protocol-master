@@ -1,13 +1,14 @@
 package org.kendar.sql.parser;
 
+import org.kendar.sql.parser.dtos.SimpleToken;
+import org.kendar.sql.parser.dtos.TokenType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("StringConcatenationInLoop")
 public class SqlStringParser {
@@ -124,7 +125,16 @@ public class SqlStringParser {
 
     @SuppressWarnings("IfStatementWithIdenticalBranches")
     public List<String> parseString(String input) {
-        List<String> tokens = new ArrayList<>();
+        return new ArrayList<>(parseStringSimpleTokens(input).stream().
+                filter(a -> a.getType() != TokenType.COMMENT).
+                map(SimpleToken::getValue).
+                collect(Collectors.toList()));
+    }
+
+
+    @SuppressWarnings("IfStatementWithIdenticalBranches")
+    public List<SimpleToken> parseStringSimpleTokens(String input) {
+        List<SimpleToken> tokens = new ArrayList<>();
         int length = input.length();
         int i = 0;
         while (i < length) {
@@ -161,14 +171,14 @@ public class SqlStringParser {
                         i++;
                     }
                 }
-                tokens.add(sb.toString());
+                tokens.add(new SimpleToken(TokenType.VALUE_ITEM, sb.toString()));
             } else {
                 // Handle non-string token
                 StringBuilder sb = new StringBuilder();
                 while (i < length) {
                     c = input.charAt(i);
                     if (c == '-' && (i + 1) < length && input.charAt(i + 1) == '-') {
-                        tokens.add(sb.toString());
+                        tokens.add(new SimpleToken(TokenType.BLOB, sb.toString()));
                         sb = new StringBuilder();
                         //noinspection ConstantValue It's a loop in loop
                         while ((i < length) && (c != '\n' && c != '\r' && c != '\f')) {
@@ -176,12 +186,13 @@ public class SqlStringParser {
                             i++;
                             c = input.charAt(i);
                         }
+                        tokens.add(new SimpleToken(TokenType.COMMENT, sb.toString()));
                         sb = new StringBuilder();
                         continue;
                     }
                     if (c == ',') {
                         sb.append(c);
-                        tokens.add(sb.toString());
+                        tokens.add(new SimpleToken(TokenType.BLOB, sb.toString()));
                         sb = new StringBuilder();
                         i++;
                         continue;
@@ -189,14 +200,14 @@ public class SqlStringParser {
 
                     if (c == ';') {
                         sb.append(c);
-                        tokens.add(sb.toString());
+                        tokens.add(new SimpleToken(TokenType.BLOB, sb.toString()));
                         sb = new StringBuilder();
                         i++;
                         continue;
                     }
 
                     if (c == '/' && (i + 1) < length && input.charAt(i + 1) == '*') {
-                        tokens.add(sb.toString());
+                        tokens.add(new SimpleToken(TokenType.BLOB, sb.toString()));
                         sb = new StringBuilder();
                         while (i < length - 1) {
                             if (c == '*' && input.charAt(i + 1) == '/') {
@@ -208,12 +219,12 @@ public class SqlStringParser {
                             i++;
                             c = input.charAt(i);
                         }
-                        //tokens.add(sb.toString());
+                        tokens.add(new SimpleToken(TokenType.COMMENT, sb.toString()));
                         sb = new StringBuilder();
                         continue;
                     }
                     if (c == '#') {
-                        tokens.add(sb.toString());
+                        tokens.add(new SimpleToken(TokenType.BLOB, sb.toString()));
                         sb = new StringBuilder();
                         //noinspection ConstantValue It's a loop in loop
                         while ((i < length) && (c != '\n' && c != '\r' && c != '\f')) {
@@ -221,11 +232,12 @@ public class SqlStringParser {
                             i++;
                             c = input.charAt(i);
                         }
+                        tokens.add(new SimpleToken(TokenType.COMMENT, sb.toString()));
                         sb = new StringBuilder();
                         continue;
                     }
                     if (parameterSeparator.equalsIgnoreCase(String.valueOf(c))) {
-                        tokens.add(sb.toString());
+                        tokens.add(new SimpleToken(TokenType.BLOB, sb.toString()));
                         sb = new StringBuilder();
                         sb.append(c);
                         i++;
@@ -236,7 +248,7 @@ public class SqlStringParser {
                                 sb.append(c);
                                 i++;
                             } else {
-                                tokens.add(sb.toString());
+                                tokens.add(new SimpleToken(TokenType.QUERY_PARAM, sb.toString()));
                                 sb = new StringBuilder();
                                 break;
                             }
@@ -251,7 +263,7 @@ public class SqlStringParser {
                         i++;
                     }
                 }
-                tokens.add(sb.toString());
+                tokens.add(new SimpleToken(TokenType.BLOB, sb.toString()));
             }
         }
         return tokens;
@@ -275,5 +287,128 @@ public class SqlStringParser {
 
         }
         return false;
+    }
+
+
+    public List<SimpleToken> tokenize(String input) {
+        var partial = parseStringSimpleTokens(input).stream().
+                filter(a -> !a.getValue().isEmpty()).collect(Collectors.toList());
+        var result = new ArrayList<SimpleToken>();
+        for(var token : partial) {
+            if(token.getType()==TokenType.BLOB) {
+                result.addAll(parseBlob(token));
+            }else{
+                result.add(token);
+            }
+        }
+        return result;
+    }
+
+    private List<SimpleToken> parseBlob(SimpleToken token) {
+        var ls = new ArrayList<SimpleToken>();
+
+        var test = token.getValue();
+
+        var p = Pattern.compile("`[a-zA-Z0-9_\\-\\.]+`");
+        var result = extractMatchingBlocks(test,p);
+        for(var item:result){
+            if(item.startsWith("`") && item.endsWith("`")){
+                ls.add(new SimpleToken(TokenType.SINGLE_ITEM, item));
+            }else{
+                for(var subItem:buildNumbers(item,Pattern.compile("([+-]*[0-9]+\\.[0-9]+)"))){
+                    if(subItem.getType()!=TokenType.BLOB){
+                        ls.add(subItem);
+                    }else{
+                        var px =Pattern.compile("([+-]*[0-9]+)");
+                        for(var sub:buildNumbers(subItem.getValue(),px)){
+                            if(sub.getType()!=TokenType.BLOB){
+                                ls.add(sub);
+                            }else{
+                                if(sub.getValue().indexOf(",")>=0){
+                                    ls.addAll(handleComma(sub));
+                                }else{
+                                    ls.add(sub);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        for(var item:ls){
+            if(item.getValue().equalsIgnoreCase("NULL")||item.getValue().equalsIgnoreCase("@NULL")){
+                item.setType(TokenType.VALUE_ITEM);
+            }
+        }
+        return ls;
+    }
+
+    private List<SimpleToken> handleComma(SimpleToken sub) {
+        var test = sub.getValue();
+        var result = new ArrayList<SimpleToken>();
+        var prev  ="";
+        for(var c:test.toCharArray()){
+            if(c==','){
+                if(prev.trim().length()>0){
+                    result.add(new SimpleToken(TokenType.BLOB,prev.trim()));
+                }
+                result.add(new SimpleToken(TokenType.SINGLE_ITEM,","));
+                prev="";
+            }else{
+                prev+=c;
+            }
+        }
+        if(prev.length()>0){
+            result.add(new SimpleToken(TokenType.BLOB,prev.trim()));
+        }
+        return result;
+    }
+
+    private List<SimpleToken> buildNumbers(String startItem, Pattern p) {
+        var ls = new ArrayList<SimpleToken>();
+        String[] items = startItem.trim().split("[\n\r\f\\s]+");
+        for(var subItem:items){
+            subItem = subItem.trim();
+            var result = extractMatchingBlocks(subItem,p);
+            for(var item:result){
+                if(p.matcher(item).matches()){
+                    ls.add(new SimpleToken(TokenType.VALUE_ITEM, item));
+                }else{
+                    ls.add(new SimpleToken(TokenType.BLOB, item));
+
+                }
+            }
+        }
+        return ls;
+    }
+
+    private static ArrayList<String> extractMatchingBlocks(String test, Pattern p) {
+
+        var m = p.matcher(test);
+        var result = new ArrayList<String>();
+        var prevStart = 0;
+        if(m.find()) {
+            do {
+                var start = m.start(0);
+                var end = m.end(0);
+                if(start>0){
+                    if(start-prevStart>0){
+                        result.add(test.substring(prevStart, start));
+                    }
+                }
+                if(end-start>0){
+                    result.add(test.substring(start, end));
+                }
+                prevStart = end;
+
+                System.out.println(m.group());
+            } while(m.find(prevStart));
+        }
+        var full = String.join("",result);
+        if(full.length()!= test.length()){
+            result.add(test.substring(prevStart));
+        }
+        return result;
     }
 }

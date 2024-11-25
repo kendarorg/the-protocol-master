@@ -12,8 +12,6 @@
 * Send mock messages amqp,mqtt,redis
 * Remove spring boot
 * Cleanup setSettings
-* Common
-    * Test internal apis
 * Http
     * test brotli compression
     * Use anonymous Object for serialization for HTTP Multipart

@@ -150,4 +150,6 @@ public class SqlSqlStringParserTest {
         var result = target.getTypes("insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *");
         assertEquals(1, result.size());
     }
+
+
 }
