@@ -6,6 +6,7 @@ import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.utils.FileResourcesUtils;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
         setActive(plugin.isActive());
         settings = (HttpRateLimitPluginSettings) plugin;
         setupSitesToRecord(settings.getLimitSites());

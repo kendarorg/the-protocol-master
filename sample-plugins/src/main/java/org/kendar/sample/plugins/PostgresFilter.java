@@ -59,8 +59,8 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
-        super.setSettings(plugin);
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        super.setSettings(globalSettings, plugin);
 
         return this;
     }

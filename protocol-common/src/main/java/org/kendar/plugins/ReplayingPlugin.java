@@ -6,6 +6,7 @@ import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
@@ -26,8 +27,8 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
         withStorage((StorageRepository) global.getService("storage"));
+        super.initialize(global, protocol);
         return this;
     }
 
@@ -63,6 +64,9 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     protected void handleActivation(boolean active) {
+        if(this.isActive()!=active){
+            this.storage.isRecording(getInstanceId(),!active);
+        }
         completedOutIndexes.clear();
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
@@ -155,5 +159,11 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
     @Override
     public Class<?> getSettingClass() {
         return BasicReplayPluginSettings.class;
+    }
+
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        withStorage((StorageRepository) globalSettings.getService("storage"));
+        super.setSettings(globalSettings, plugin);
+        return this;
     }
 }

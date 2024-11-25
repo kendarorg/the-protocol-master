@@ -54,8 +54,8 @@ public class HttpFilter extends ProtocolPluginDescriptor<Request, Response> impl
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
-        super.setSettings(plugin);
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        super.setSettings(globalSettings, plugin);
 
         return this;
     }

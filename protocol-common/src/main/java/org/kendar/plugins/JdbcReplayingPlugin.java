@@ -5,6 +5,7 @@ import org.kendar.events.ReplayStatusEvent;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
@@ -30,8 +31,8 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
         withStorage((StorageRepository) global.getService("storage"));
+        super.initialize(global, protocol);
         return this;
     }
 
@@ -54,6 +55,9 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
 
     @Override
     protected void handleActivation(boolean active) {
+        if(this.isActive()!=active){
+            this.storage.isRecording(getInstanceId(),!active);
+        }
         super.handleActivation(active);
         completedIndexes.clear();
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
@@ -66,12 +70,16 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
         query.setType("QUERY");
         query.addTag("parametersCount", inObj.getParameterValues().size());
         query.addTag("query", inObj.getQuery());
-        query.setUsed(completedIndexes);
-        if (!completedIndexes.isEmpty()) {
-            var itemFounded = completedIndexes.stream().max(Integer::compareTo).get().toString();
-            query.addTag("next", itemFounded);
-        }
-        var lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
+        //var lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
+        //if(lineToRead == null || lineToRead.getStorageItem()!=null) {
+
+            query.setUsed(completedIndexes);
+            if (!completedIndexes.isEmpty()) {
+                var itemFounded = completedIndexes.stream().max(Integer::compareTo).get().toString();
+                query.addTag("next", itemFounded);
+            }
+          var  lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
+        //}
         /*if ((lineToRead == null || lineToRead.getStorageItem() == null) ||
                 in.getQuery().trim().toLowerCase().startsWith("set")) {
             out.setCount(0);
@@ -91,7 +99,7 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
             outObj.fill(source.getSelectResult());
             completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
         } else if (lineToRead != null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
-            completedIndexes.add((int) lineToRead.getCompactLine().getIndex());
+            //completedIndexes.add((int) lineToRead.getCompactLine().getIndex());
             if (lineToRead.getCompactLine().getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 SelectResult resultset = new SelectResult();
                 resultset.setIntResult(true);
@@ -153,5 +161,12 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     @Override
     public Class<?> getSettingClass() {
         return BasicReplayPluginSettings.class;
+    }
+
+    @Override
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        withStorage((StorageRepository) globalSettings.getService("storage"));
+        super.setSettings(globalSettings, plugin);
+        return this;
     }
 }

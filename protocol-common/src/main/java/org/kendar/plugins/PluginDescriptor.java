@@ -22,11 +22,12 @@ public interface PluginDescriptor extends ExtensionPoint {
 
     Class<?> getSettingClass();
 
-    PluginDescriptor setSettings(PluginSettings plugin);
+    PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin);
 
     boolean isActive();
 
     void setActive(boolean active);
+    void forceActivation();
 
     PluginApiHandler getApiHandler();
 }

@@ -6,6 +6,8 @@ import org.kendar.http.utils.Request;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.RewritePluginSettings;
 import org.kendar.proxy.PluginContext;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.storage.NullStorageRepository;
 
 import java.nio.file.Path;
 
@@ -18,7 +20,10 @@ public class RewriterPluginTest {
         settings.setRewritesFile(Path.of("src", "test", "resources", "rewrite.json").toAbsolutePath().toString());
         settings.setActive(true);
         var target = new HttpRewritePlugin();
-        target.setSettings(settings);
+        var global = new GlobalSettings();
+        global.putService("storage",new NullStorageRepository());
+
+        target.setSettings(global, settings);
         var phase = ProtocolPhase.CONNECT;
         var pc = new PluginContext("http", "type", 0, null);
         var request = new Request();

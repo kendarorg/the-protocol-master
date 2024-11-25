@@ -10,6 +10,8 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.storage.NullStorageRepository;
 import org.kendar.utils.ChangeableReference;
 
 import static org.junit.Assert.assertFalse;
@@ -29,7 +31,9 @@ public class ReplayRecordFilters {
         settings.getRecordSites().add("test_sites");
         settings.getRecordSites().add("www.sara.com");
         settings.getRecordSites().add("@.*microsoft.*");
-        rwPlugin.setSettings(settings);
+        var global = new GlobalSettings();
+        global.putService("storage",new NullStorageRepository());
+        rwPlugin.setSettings(global, settings);
 
         var pc = new PluginContext("http", null, 0L, null);
         pc.getTags().put("id",1L);
@@ -77,7 +81,10 @@ public class ReplayRecordFilters {
         settings.getMatchSites().add("test_sites");
         settings.getMatchSites().add("www.sara.com");
         settings.getMatchSites().add("@.*microsoft.*");
-        rwPlugin.setSettings(settings);
+        var global = new GlobalSettings();
+        global.putService("storage",new NullStorageRepository());
+
+        rwPlugin.setSettings(global, settings);
 
         var pc = new PluginContext("http", null, 0L, null);
         var in = new Request();

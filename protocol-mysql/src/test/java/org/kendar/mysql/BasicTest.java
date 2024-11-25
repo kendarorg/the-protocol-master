@@ -5,6 +5,7 @@ import org.kendar.mysql.plugins.MySqlMockPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -63,9 +64,11 @@ public class BasicTest {
         var pl = new MySqlRecordPlugin().withStorage(storage);
 
         var pl1 = new MySqlMockPlugin();
+        var global = new GlobalSettings();
+        global.putService("storage",storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.setSettings(mockPluginSettings);
+        pl1.setSettings(global, mockPluginSettings);
         proxy.setPlugins(List.of(pl, pl1));
 
 
@@ -99,6 +102,8 @@ public class BasicTest {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
             }
         }
+        var global = new GlobalSettings();
+        global.putService("storage",storage);
         storage.initialize();
         var pl = new MySqlRecordPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
@@ -106,7 +111,7 @@ public class BasicTest {
         var pl1 = new MySqlMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.setSettings(mockPluginSettings);
+        pl1.setSettings(global, mockPluginSettings);
         proxy.setPlugins(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

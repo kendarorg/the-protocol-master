@@ -11,6 +11,7 @@ import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.ReplayingPlugin;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
@@ -127,8 +128,8 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
-        super.setSettings(plugin);
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        super.setSettings(globalSettings, plugin);
         settings = (HttpReplayPluginSettings) plugin;
         blockExternal = settings.isBlockExternal();
         setupMatchSites(settings.getMatchSites());

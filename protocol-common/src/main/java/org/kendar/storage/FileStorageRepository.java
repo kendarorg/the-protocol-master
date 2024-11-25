@@ -32,6 +32,7 @@ public class FileStorageRepository implements StorageRepository {
     private final AtomicInteger storageCounter = new AtomicInteger(0);
     private final TypeReference<StorageItem> typeReference = new TypeReference<>() {
     };
+    private final Object initializeContentLock = new Object();
     private String targetDir;
 
     public FileStorageRepository(String targetDir) {
@@ -79,56 +80,79 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     private ProtocolRepo initializeContent(String protocolInstanceIdOuter) {
-        return protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
-            if (currRepo == null) {
-                currRepo = new ProtocolRepo();
-            }
-            if (!currRepo.initialized) {
+        if (protocolRepo.contains(protocolInstanceIdOuter)) {
+            return protocolRepo.get(protocolInstanceIdOuter);
+        }
 
-                for (var item : readAllItems(protocolInstanceId)) {
-                    if (item == null) continue;
-                    if (item.getType() == null) continue;
-                    if (item.getType().equalsIgnoreCase("RESPONSE")) {
-                        currRepo.outItems.add(item);
-                        continue;
+        synchronized (initializeContentLock) {
+
+            return protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
+                if (currRepo == null) {
+                    currRepo = new ProtocolRepo();
+                }
+                if (!currRepo.initialized) {
+
+                    for (var item : readAllItems(protocolInstanceId)) {
+                        if (item == null) continue;
+                        if (item.getType() == null) continue;
+                        if (item.getType().equalsIgnoreCase("RESPONSE")) {
+                            currRepo.outItems.add(item);
+                            continue;
+                        }
+                        currRepo.inMemoryDb.put(item.getIndex(), item);
                     }
-                    currRepo.inMemoryDb.put(item.getIndex(), item);
-                }
 
-                currRepo.index = retrieveIndexFile(protocolInstanceId);
-                if (!currRepo.index.isEmpty()) {
-                    var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
-                    var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
-                    storageCounter.set((int) maxIndex);
+                    currRepo.index = retrieveIndexFile(protocolInstanceId);
+                    if (!currRepo.index.isEmpty()) {
+                        var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
+                        var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
+                        storageCounter.set((int) maxIndex);
+                    }
+                    currRepo.initialized = true;
                 }
-                currRepo.initialized = true;
-            }
-            return currRepo;
-        });
+                return currRepo;
+            });
+
+        }
     }
 
     private void initializeContentWrite(String protocolInstanceIdOuter) {
-        protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
-            if (currRepo == null) {
-                currRepo = new ProtocolRepo();
-            }
-            if (!currRepo.initialized) {
-                currRepo.index = retrieveIndexFile(protocolInstanceId);
-                if (!currRepo.index.isEmpty()) {
-                    var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
-                    var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
-                    storageCounter.set((int) maxIndex);
+        if (protocolRepo.contains(protocolInstanceIdOuter)) {
+            return;
+        }
+        synchronized (initializeContentLock) {
+            protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
+                if (currRepo == null) {
+                    currRepo = new ProtocolRepo();
                 }
-                currRepo.initialized = true;
-            }
-            return currRepo;
-        });
+                if (!currRepo.initialized) {
+                    currRepo.index = retrieveIndexFile(protocolInstanceId);
+                    if (!currRepo.index.isEmpty()) {
+                        var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
+                        var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
+                        storageCounter.set((int) maxIndex);
+                    }
+                    currRepo.initialized = true;
+                }
+                return currRepo;
+            });
+        }
     }
+
+    @Override
+    public void isRecording(String instanceId, boolean recording) {
+        if(recording){
+            initializeContentWrite(instanceId);
+        }else{
+            initializeContent(instanceId);
+        }
+
+    }
+
 
     public long generateIndex() {
         return storageCounter.incrementAndGet();
     }
-
     @Override
     public void write(LineToWrite item) {
         executor.submit(() -> {
@@ -142,7 +166,7 @@ public class FileStorageRepository implements StorageRepository {
                 if (item.getStorageItem() != null) {
                     item.getStorageItem().setIndex(valueId);
                 }
-                initializeContentWrite(item.getInstanceId());
+                //initializeContentWrite(item.getInstanceId());
                 //}
                 var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
 
@@ -208,6 +232,7 @@ public class FileStorageRepository implements StorageRepository {
         try {
             var repo = protocolRepo.get(protocolInstanceId);
             if (repo == null) return;
+            protocolRepo.remove(protocolInstanceId);
             if (!repo.somethingWritten) {
                 protocolRepo.remove(protocolInstanceId);
                 return;
@@ -218,7 +243,7 @@ public class FileStorageRepository implements StorageRepository {
             }
             Files.writeString(Path.of(targetDir, indexFile),
                     mapper.serializePretty(repo.index));
-            protocolRepo.remove(protocolInstanceId);
+
         } catch (IOException e) {
             log.error("[TPM  ][WR]: Unable to write index file");
             throw new RuntimeException(e);
@@ -229,7 +254,7 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public LineToRead read(String protocolInstanceId, CallItemsQuery query) {
-        var ctx = initializeContent(protocolInstanceId);
+        var ctx = protocolRepo.get(protocolInstanceId);//initializeContent(protocolInstanceId);
         synchronized (ctx.lockObject) {
 
             var idx = ctx.index.stream()

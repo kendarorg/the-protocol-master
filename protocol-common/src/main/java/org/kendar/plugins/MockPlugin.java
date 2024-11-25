@@ -82,8 +82,8 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
     }
 
 
-    public PluginDescriptor setSettings(PluginSettings plugin) {
-        super.setSettings(plugin);
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        super.setSettings(globalSettings, plugin);
         this.mocksDir = ((BasicMockPluginSettings) plugin).getDataDir();
         loadMocks();
         return this;
