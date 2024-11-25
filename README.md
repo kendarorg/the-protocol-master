@@ -8,6 +8,7 @@
 * Block troubles before production
 * Simulate whole infrastructure
 * Make untestable apps testable
+* Easy Chaos engineering
 
 Effortlessy and with zero budget
 
