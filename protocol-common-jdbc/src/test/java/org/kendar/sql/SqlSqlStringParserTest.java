@@ -1,6 +1,8 @@
-package org.kendar.sql.parser;
+package org.kendar.sql;
 
 import org.junit.jupiter.api.Test;
+import org.kendar.sql.parser.SqlStringParser;
+import org.kendar.sql.parser.SqlStringType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
