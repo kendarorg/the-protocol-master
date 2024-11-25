@@ -3,8 +3,6 @@ package org.kendar.tests.testcontainer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.kendar.tests.testcontainer.images.*;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.testcontainers.containers.Network;
@@ -19,8 +17,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ContainersTest {
-    @Test
-    @Disabled("Only callable directly")
+    //@Test
+    //@Disabled("Only callable directly")
     void testMysql() throws Exception {
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
@@ -47,8 +45,8 @@ public class ContainersTest {
     }
 
 
-    @Test
-    @Disabled("Only callable directly")
+    //@Test
+    //@Disabled("Only callable directly")
     void testPostgres() throws Exception {
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
@@ -74,8 +72,8 @@ public class ContainersTest {
         }
     }
 
-    @Test
-    @Disabled("Only callable directly")
+    //@Test
+    //@Disabled("Only callable directly")
     void testRabbitMq() throws Exception {
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
@@ -100,8 +98,8 @@ public class ContainersTest {
         }
     }
 
-    @Test
-    @Disabled("Only callable directly")
+    //@Test
+    //@Disabled("Only callable directly")
     void testRedis() throws Exception {
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
@@ -130,8 +128,8 @@ public class ContainersTest {
         }
     }
 
-    @Test
-    @Disabled("Only callable directly")
+    //@Test
+    //@Disabled("Only callable directly")
     void testJava() throws Exception {
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
