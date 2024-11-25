@@ -5,6 +5,7 @@ import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.RecordingPlugin;
 import org.kendar.proxy.PluginContext;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.StorageItem;
 
@@ -62,8 +63,8 @@ public class HttpRecordingPlugin extends RecordingPlugin {
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
-        super.setSettings(plugin);
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        super.setSettings(globalSettings, plugin);
         settings = (HttpRecordPluginSettings) plugin;
         setupSitesToRecord(settings.getRecordSites());
         return this;

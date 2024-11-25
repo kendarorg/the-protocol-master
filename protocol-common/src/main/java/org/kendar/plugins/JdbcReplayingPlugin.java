@@ -5,6 +5,7 @@ import org.kendar.events.ReplayStatusEvent;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
@@ -30,8 +31,8 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
         withStorage((StorageRepository) global.getService("storage"));
+        super.initialize(global, protocol);
         return this;
     }
 
@@ -160,5 +161,12 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     @Override
     public Class<?> getSettingClass() {
         return BasicReplayPluginSettings.class;
+    }
+
+    @Override
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        withStorage((StorageRepository) globalSettings.getService("storage"));
+        super.setSettings(globalSettings, plugin);
+        return this;
     }
 }

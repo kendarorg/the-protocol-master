@@ -49,8 +49,9 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
-        super.setSettings(plugin);
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        withStorage((StorageRepository) globalSettings.getService("storage"));
+        super.setSettings(globalSettings, plugin);
         ignoreTrivialCalls = ((BasicRecordingPluginSettings) plugin).isIgnoreTrivialCalls();
         return this;
     }
@@ -117,8 +118,8 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
         withStorage((StorageRepository) global.getService("storage"));
+        super.initialize(global, protocol);
         return this;
     }
 

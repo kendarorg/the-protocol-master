@@ -51,7 +51,7 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
         }
     }
 
-    public PluginDescriptor setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
         setActive(plugin.isActive());
         return this;
     }
@@ -67,5 +67,12 @@ public abstract class ProtocolPluginDescriptor<T, K> implements PluginDescriptor
     public void setActive(boolean active) {
         if (active != this.active) handleActivation(active);
         this.active = active;
+    }
+
+    public void forceActivation(){
+        if(active){
+            active=false;
+            setActive(true);
+        }
     }
 }

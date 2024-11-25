@@ -65,8 +65,8 @@ public abstract class JdbcRecordingPlugin extends RecordingPlugin {
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
         withStorage((StorageRepository) global.getService("storage"));
+        super.initialize(global, protocol);
         return this;
     }
 

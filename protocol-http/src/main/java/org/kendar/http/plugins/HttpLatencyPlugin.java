@@ -6,6 +6,7 @@ import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.utils.Sleeper;
 
@@ -28,7 +29,7 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptor<Request, Respons
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
         setActive(plugin.isActive());
         settings = (HttpLatencyPluginSettings)plugin;
         return this;

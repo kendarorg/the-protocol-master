@@ -143,6 +143,7 @@ public class HttpRunner extends CommonRunner {
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             plugin.initialize(ini, pset);
+            plugin.forceActivation();
         }
         var baseProtocol = new HttpProtocol(ini, settings, plugins);
         baseProtocol.initialize();

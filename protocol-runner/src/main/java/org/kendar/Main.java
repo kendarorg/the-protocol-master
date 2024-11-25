@@ -237,7 +237,7 @@ public class Main {
 
 
                 } catch (Exception ex) {
-
+                    log.error("Unable to start protocol "+item.getKey(),ex);
                 }
             }).start();
         }
@@ -264,14 +264,14 @@ public class Main {
             var availablePlugin = availablePlugins.stream().filter(av -> av.getId().equalsIgnoreCase(simplePlugin.getKey())).findFirst();
             if (availablePlugin.isPresent()) {
                 var pluginInstance = availablePlugin.get().clone();
-                pluginInstance.setSettings(protocol.getPlugin(simplePlugin.getKey(), pluginInstance.getSettingClass()));
+                pluginInstance.setSettings(global,protocol.getPlugin(simplePlugin.getKey(), pluginInstance.getSettingClass()));
                 plugins.add(pluginInstance);
             }
         }
         var alwaysActives = availablePlugins.stream().filter(av -> AlwaysActivePlugin.class.isAssignableFrom(av.getClass())).collect(Collectors.toList());
         for (var alwaysActive : alwaysActives) {
             var pluginInstance = alwaysActive.clone();
-            pluginInstance.setSettings(new PluginSettings());
+            pluginInstance.setSettings(global, new PluginSettings());
             plugins.add(pluginInstance);
         }
         return plugins;

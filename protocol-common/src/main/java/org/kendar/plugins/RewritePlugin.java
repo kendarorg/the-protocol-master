@@ -57,10 +57,10 @@ public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T,
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
         var settings = (RewritePluginSettings) plugin;
         try {
-            super.setSettings(plugin);
+            super.setSettings(globalSettings, plugin);
 
             if (settings.getRewritesFile() == null) return null;
             var path = Path.of(settings.getRewritesFile()).toAbsolutePath();

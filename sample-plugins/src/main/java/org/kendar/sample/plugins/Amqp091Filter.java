@@ -55,8 +55,8 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
     }
 
     @Override
-    public PluginDescriptor setSettings(PluginSettings plugin) {
-        super.setSettings(plugin);
+    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
+        super.setSettings(globalSettings, plugin);
 
         return this;
     }

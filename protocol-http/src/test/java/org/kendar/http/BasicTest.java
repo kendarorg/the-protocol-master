@@ -44,6 +44,7 @@ public class BasicTest {
     static int FAKE_PORT_HTTPS = 8487;
     static int FAKE_PORT_PROXY = 9999;
     private static SimpleHttpServer simpleServer;
+    protected GlobalSettings globalSettings;
 
     public static void beforeClassBase() throws Exception {
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
@@ -133,7 +134,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var globalSettings = new GlobalSettings();
+        globalSettings = new GlobalSettings();
         var httpProtocolSettings = new HttpProtocolSettings();
         httpProtocolSettings.setProtocol("http");
         httpProtocolSettings.setHttps(FAKE_PORT_HTTPS);
@@ -154,7 +155,7 @@ public class BasicTest {
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
-                new HttpRecordingPlugin().withStorage(storage).setSettings(recordingSettings),
+                new HttpRecordingPlugin().withStorage(storage).setSettings(globalSettings, recordingSettings),
                 new HttpReplayingPlugin().withStorage(storage),
                 new HttpErrorPlugin(),
                 new HttpLatencyPlugin(),
