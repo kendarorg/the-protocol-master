@@ -20,12 +20,11 @@ import org.kendar.utils.Sleeper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class HttpReplayingPlugin extends ReplayingPlugin<HttpReplayPluginSettings> {
     private boolean blockExternal = true;
-    private List<Pattern> matchSites = new ArrayList<>();
+    private List<MatchingRecRep> matchSites = new ArrayList<>();
 
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
@@ -53,7 +52,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin<HttpReplayPluginSetting
                 if (!matchSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : matchSites) {
-                        if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                        if (pat.match(request.getHost()+request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }
@@ -117,11 +116,8 @@ public class HttpReplayingPlugin extends ReplayingPlugin<HttpReplayPluginSetting
     private void setupMatchSites(List<String> recordSites) {
         this.matchSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
-                .map(regex -> regex.startsWith("@") ?
-                        Pattern.compile(regex.substring(1)) :
-                        Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
+                .map(MatchingRecRep::new).collect(Collectors.toList());
     }
-
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {

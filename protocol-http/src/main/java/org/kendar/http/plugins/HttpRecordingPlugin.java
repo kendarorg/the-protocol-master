@@ -12,11 +12,10 @@ import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
 
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class HttpRecordingPlugin extends RecordingPlugin<HttpRecordPluginSettings> {
-    private List<Pattern> recordSites = new ArrayList<>();
+    private List<MatchingRecRep> recordSites = new ArrayList<>();
 
 
     @Override
@@ -35,7 +34,7 @@ public class HttpRecordingPlugin extends RecordingPlugin<HttpRecordPluginSetting
         if (!recordSites.isEmpty()) {
             var matchFound = false;
             for (var pat : recordSites) {
-                if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                if (pat.match(request.getHost()+request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                     matchFound = true;
                     break;
                 }
@@ -62,9 +61,7 @@ public class HttpRecordingPlugin extends RecordingPlugin<HttpRecordPluginSetting
     private void setupSitesToRecord(List<String> recordSites) {
         this.recordSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
-                .map(regex -> regex.startsWith("@") ?
-                        Pattern.compile(regex.substring(1)) :
-                        Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
+                .map(MatchingRecRep::new).collect(Collectors.toList());
     }
 
     @Override
