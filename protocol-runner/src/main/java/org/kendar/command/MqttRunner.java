@@ -23,35 +23,10 @@ public class MqttRunner extends CommonRunner {
     @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go,
                     Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
-
         var options = getCommonOptions(mainOptions);
         optionLoginPassword(options);
         if (!isExecute) return;
         setCommonData(args, options, go, new ByteProtocolSettingsWithLogin());
-    }
-
-    protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
-        parseLoginPassword((ByteProtocolSettingsWithLogin) result, cmd);
-    }
-
-    @Override
-    public String getId() {
-        return "mqtt";
-    }
-
-    @Override
-    public Class<?> getSettingsClass() {
-        return ByteProtocolSettingsWithLogin.class;
-    }
-
-    @Override
-    public void stop() {
-        ps.stop();
-    }
-
-    @Override
-    public String getDefaultPort() {
-        return "1883";
     }
 
     @Override
@@ -60,10 +35,17 @@ public class MqttRunner extends CommonRunner {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public String getDefaultPort() {
+        return "1883";
+    }
 
-        var protocolSettings = (ByteProtocolSettingsWithLogin) protocol;
-
+    @Override
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServers,
+                      String key, GlobalSettings ini,
+                      ProtocolSettings opaqueProtocolSettings,
+                      StorageRepository storage,
+                      List<PluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
+        var protocolSettings = (ByteProtocolSettingsWithLogin) opaqueProtocolSettings;
         var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 1883);
         var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(), 30);
         var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(), "");
@@ -74,7 +56,7 @@ public class MqttRunner extends CommonRunner {
         var proxy = new MqttProxy(connectionString, login, password);
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
-            var specificPluginSetting = protocol.getPlugin(plugin.getId(), plugin.getSettingClass());
+            var specificPluginSetting = opaqueProtocolSettings.getPlugin(plugin.getId(), plugin.getSettingClass());
             plugin.initialize(ini, protocolSettings, specificPluginSetting);
             plugin.refreshStatus();
         }
@@ -84,6 +66,25 @@ public class MqttRunner extends CommonRunner {
         ps = new TcpServer(baseProtocol);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(key, ps);
+        protocolServers.put(key, ps);
+    }
+
+    @Override
+    public String getId() {
+        return "mqtt";
+    }
+
+    @Override
+    public Class<?> getSettingsClass() {
+        return ByteProtocolSettings.class;
+    }
+
+    @Override
+    public void stop() {
+        ps.stop();
+    }
+
+    protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
+        parseLoginPassword((ByteProtocolSettingsWithLogin) result, cmd);
     }
 }

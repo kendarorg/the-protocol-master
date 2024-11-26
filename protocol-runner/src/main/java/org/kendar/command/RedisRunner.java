@@ -38,10 +38,11 @@ public class RedisRunner extends CommonRunner {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServers, String key,
-                      GlobalSettings ini, ProtocolSettings opaqueProtocolSettings,
-                      StorageRepository storage, List<PluginDescriptor> plugins,
-                      Supplier<Boolean> stopWhenFalse) throws Exception {
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServers,
+                      String key, GlobalSettings ini,
+                      ProtocolSettings opaqueProtocolSettings,
+                      StorageRepository storage,
+                      List<PluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
         var protocolSettings = (ByteProtocolSettings) opaqueProtocolSettings;
         var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 6379);
         var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(), 30);

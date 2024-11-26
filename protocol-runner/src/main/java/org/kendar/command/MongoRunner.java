@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 public class MongoRunner extends CommonRunner {
     private TcpServer ps;
 
+    @Override
     public void run(String[] args, boolean isExecute, GlobalSettings go,
                     Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
 
@@ -59,7 +60,8 @@ public class MongoRunner extends CommonRunner {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key, GlobalSettings ini,
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
+                      String key, GlobalSettings ini,
                       ProtocolSettings protocol, StorageRepository storage,
                       List<PluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
 
@@ -73,7 +75,6 @@ public class MongoRunner extends CommonRunner {
         var baseProtocol = new org.kendar.mqtt.MqttProtocol(port);
         baseProtocol.setTimeout(timeoutSec);
         var proxy = new MongoProxy(connectionString);
-
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = protocol.getPlugin(plugin.getId(), plugin.getSettingClass());
@@ -84,10 +85,8 @@ public class MongoRunner extends CommonRunner {
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         ps = new TcpServer(baseProtocol);
-
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);
     }
-
 }
