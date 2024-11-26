@@ -41,10 +41,5 @@ public class MongoReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
         }
     }
 
-    @Override
-    protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
-        throw new RuntimeException("Not async");
-    }
-
 
 }

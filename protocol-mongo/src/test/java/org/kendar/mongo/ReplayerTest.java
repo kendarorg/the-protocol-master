@@ -13,8 +13,13 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.mongo.plugins.MongoReplayPlugin;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
 
@@ -49,7 +54,9 @@ public class ReplayerTest {
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "replay"));
         storage.initialize();
-        var pl = new MongoReplayPlugin().withStorage(storage);
+        var gs = new GlobalSettings();
+        gs.putService("storage",storage);
+        var pl = new MongoReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

@@ -9,12 +9,10 @@ import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.ReplayPlugin;
-import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.utils.Sleeper;
 
@@ -25,11 +23,6 @@ import java.util.stream.Collectors;
 public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     private boolean blockExternal = true;
     private List<MatchingRecRep> matchSites = new ArrayList<>();
-
-    @Override
-    protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
-
-    }
 
     private Map<String, String> buildTag(Request in) {
         var result = new HashMap<String, String>();

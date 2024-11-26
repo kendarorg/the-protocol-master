@@ -2,9 +2,11 @@ package org.kendar.postgres;
 
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.postgres.plugins.PostgresMockPlugin;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
@@ -72,7 +74,9 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new PostgresRecordPlugin().withStorage(storage);
+        var gs = new GlobalSettings();
+        gs.putService("storage",storage);
+        var pl = new PostgresRecordPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicRecordPluginSettings());
         var pl1 = new PostgresMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();

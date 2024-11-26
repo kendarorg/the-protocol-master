@@ -11,6 +11,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,19 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
+        long lastTimestamp =0;
         for (var item : storageItems) {
+            if(getSettings().isRespectCallDuration()) {
+                if (lastTimestamp == 0) {
+                    lastTimestamp = item.getTimestamp();
+                } else if (item.getTimestamp() > 0) {
+                    var wait = item.getTimestamp() - lastTimestamp;
+                    lastTimestamp = item.getTimestamp();
+                    if (wait > 0) {
+                        Sleeper.sleep(wait);
+                    }
+                }
+            }
             var out = mapper.toJsonNode(item.getOutput());
             var clazz = item.getOutputType();
             ReturnMessage fr;

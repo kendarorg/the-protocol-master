@@ -18,12 +18,15 @@ import org.kendar.utils.Sleeper;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
     protected StorageRepository storage;
+    static final ExecutorService executor = Executors.newCachedThreadPool();
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
@@ -99,7 +102,9 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.add((int) response.getIndex());
                 result.add(response);
             }
-            sendBackResponses(pluginContext.getContext(), result);
+            if(result.size()>0){
+                executor.submit(()->sendBackResponses(pluginContext.getContext(), result));
+            }
         }
         var outputItem = item.getOutput();
         if (context.isUseCallDurationTimes()) {
@@ -135,11 +140,15 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.add((int) response.getIndex());
                 result.add(response);
             }
-            sendBackResponses(pluginContext.getContext(), result);
+            if(result.size()>0){
+                executor.submit(()->sendBackResponses(pluginContext.getContext(), result));
+            }
         }
     }
 
-    protected abstract void sendBackResponses(ProtoContext context, List<StorageItem> result);
+    protected void sendBackResponses(ProtoContext context, List<StorageItem> result){
+
+    }
 
     @Override
     public List<ProtocolPhase> getPhases() {

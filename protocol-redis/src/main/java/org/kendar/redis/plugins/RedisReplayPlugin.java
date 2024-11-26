@@ -10,6 +10,7 @@ import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.storage.StorageItem;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.Sleeper;
 
 import java.util.List;
 
@@ -35,7 +36,19 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
+        long lastTimestamp =0;
         for (var item : storageItems) {
+            if(getSettings().isRespectCallDuration()) {
+                if (lastTimestamp == 0) {
+                    lastTimestamp = item.getTimestamp();
+                } else if (item.getTimestamp() > 0) {
+                    var wait = item.getTimestamp() - lastTimestamp;
+                    lastTimestamp = item.getTimestamp();
+                    if (wait > 0) {
+                        Sleeper.sleep(wait);
+                    }
+                }
+            }
             var out = mapper.toJsonNode(item.getOutput());
             var type = item.getOutputType();
 
