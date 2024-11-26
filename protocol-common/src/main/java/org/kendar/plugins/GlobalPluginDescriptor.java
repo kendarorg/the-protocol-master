@@ -6,15 +6,17 @@ import org.pf4j.ExtensionPoint;
 /**
  * Global plugin descriptor disconnected from protocols
  */
-public interface GlobalPluginDescriptor  extends ExtensionPoint {
+public interface GlobalPluginDescriptor extends ExtensionPoint {
     /**
      * Id of the plugin
+     *
      * @return
      */
     String getId();
 
     /**
      * Initialize with settings
+     *
      * @param global
      * @return
      */
@@ -22,6 +24,7 @@ public interface GlobalPluginDescriptor  extends ExtensionPoint {
 
     /**
      * Retrieve the settings class
+     *
      * @return
      */
     Class<?> getSettingClass();
@@ -33,12 +36,14 @@ public interface GlobalPluginDescriptor  extends ExtensionPoint {
 
     /**
      * Check if active
+     *
      * @return
      */
     boolean isActive();
 
     /**
      * Set active
+     *
      * @param active
      */
     void setActive(boolean active);
@@ -50,6 +55,7 @@ public interface GlobalPluginDescriptor  extends ExtensionPoint {
 
     /**
      * Retrieve the eventual APIs
+     *
      * @return
      */
     GlobalPluginApiHandler getApiHandler();

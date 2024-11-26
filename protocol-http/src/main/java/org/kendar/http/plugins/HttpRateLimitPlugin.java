@@ -22,14 +22,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-
-public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Response,HttpRateLimitPluginSettings> {
+public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Response, HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
+    private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
     private List<Pattern> recordSites = new ArrayList<>();
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
-    private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
+
     @Override
     protected void handleActivation(boolean active) {
         synchronized (sync) {
@@ -39,10 +39,9 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
     }
 
 
-
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global,protocol,pluginSetting);
+        super.initialize(global, protocol, pluginSetting);
         var settings = getSettings();
         setupSitesToRecord(settings.getLimitSites());
         if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {

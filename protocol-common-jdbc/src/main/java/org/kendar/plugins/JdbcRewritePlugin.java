@@ -6,7 +6,7 @@ import org.kendar.utils.ReplacerItemInstance;
 
 import java.util.List;
 
-public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectResult,RewritePluginSettings, String> {
+public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectResult, RewritePluginSettings, String> {
     @Override
     protected void replaceData(ReplacerItemInstance item, String toReplace, JdbcCall request, SelectResult response) {
         var replaced = item.run(toReplace);

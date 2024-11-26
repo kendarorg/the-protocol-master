@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HttpRateLimitPluginSettings extends PluginSettings {
-    private String headerLimit="RateLimit-Limit";
-    private String headerRemaining="RateLimit-Remaining";
-    private String headerReset="RateLimit-Reset";
-    private String headerRetryAfter="Retry-After";
+    private String headerLimit = "RateLimit-Limit";
+    private String headerRemaining = "RateLimit-Remaining";
+    private String headerReset = "RateLimit-Reset";
+    private String headerRetryAfter = "Retry-After";
     private int costPerRequest = 2;
-    private int resetTimeWindowSeconds =60;
+    private int resetTimeWindowSeconds = 60;
     private int warningThresholdPercent = 80;
     private int rateLimit = 120;//or custom?
-    private String resetFormat="secondsLeft";//UtcEpochSeconds
+    private String resetFormat = "secondsLeft";//UtcEpochSeconds
     private String customResponseFile;
     private List<String> limitSites = new ArrayList<>();
 

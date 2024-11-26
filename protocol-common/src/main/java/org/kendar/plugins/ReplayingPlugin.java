@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class ReplayingPlugin<W  extends BasicReplayPluginSettings> extends ProtocolPluginDescriptor<Object, Object,W> {
+public abstract class ReplayingPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
@@ -64,8 +64,8 @@ public abstract class ReplayingPlugin<W  extends BasicReplayPluginSettings> exte
 
     @Override
     protected void handleActivation(boolean active) {
-        if(this.isActive()!=active){
-            this.storage.isRecording(getInstanceId(),!active);
+        if (this.isActive() != active) {
+            this.storage.isRecording(getInstanceId(), !active);
         }
         completedOutIndexes.clear();
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));

@@ -13,18 +13,21 @@ import java.util.List;
 public interface PluginDescriptor<W extends PluginSettings> extends ExtensionPoint {
     /**
      * Phases for the protocol
+     *
      * @return
      */
     List<ProtocolPhase> getPhases();
 
     /**
      * Id of the plugin
+     *
      * @return
      */
     String getId();
 
     /**
      * Associable protocols
+     *
      * @return
      */
     String getProtocol();
@@ -46,12 +49,14 @@ public interface PluginDescriptor<W extends PluginSettings> extends ExtensionPoi
 
     /**
      * Clone, this is need to overcome the missing construtors in plugin system
+     *
      * @return
      */
     PluginDescriptor clone();
 
     /**
      * The settings class
+     *
      * @return
      */
     Class<?> getSettingClass();
@@ -60,6 +65,7 @@ public interface PluginDescriptor<W extends PluginSettings> extends ExtensionPoi
     boolean isActive();
 
     void setActive(boolean active);
+
     void refreshStatus();
 
     PluginApiHandler getApiHandler();

@@ -66,10 +66,10 @@ public class BasicTest {
 
         var pl1 = new MySqlMockPlugin();
         var global = new GlobalSettings();
-        global.putService("storage",storage);
+        global.putService("storage", storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.initialize(global,new JdbcProtocolSettings(), mockPluginSettings);
+        pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         proxy.setPlugins(List.of(pl, pl1));
 
 
@@ -104,7 +104,7 @@ public class BasicTest {
             }
         }
         var global = new GlobalSettings();
-        global.putService("storage",storage);
+        global.putService("storage", storage);
         storage.initialize();
         var pl = new MySqlRecordPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
@@ -112,7 +112,8 @@ public class BasicTest {
         var pl1 = new MySqlMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.initialize(global,new JdbcProtocolSettings(), mockPluginSettings);;
+        pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
+        ;
         proxy.setPlugins(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

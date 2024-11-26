@@ -10,16 +10,16 @@ import org.kendar.utils.Sleeper;
 import java.util.List;
 import java.util.Random;
 
-public class HttpLatencyPlugin extends ProtocolPluginDescriptor<Request, Response,HttpLatencyPluginSettings> {
+public class HttpLatencyPlugin extends ProtocolPluginDescriptor<Request, Response, HttpLatencyPluginSettings> {
 
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
-        if(isActive()){
-            HttpLatencyPluginSettings s=getSettings();
+        if (isActive()) {
+            HttpLatencyPluginSettings s = getSettings();
             Random r = new Random();
-            int waitMs = r.nextInt(s.getMaxMs()- s.getMinMs()) +s.getMinMs();
-            if(waitMs>0) {
+            int waitMs = r.nextInt(s.getMaxMs() - s.getMinMs()) + s.getMinMs();
+            if (waitMs > 0) {
                 Sleeper.sleep(waitMs);
             }
         }

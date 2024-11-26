@@ -9,7 +9,7 @@ import org.kendar.settings.ProtocolSettings;
 
 import java.util.List;
 
-public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String,SSLDummyPluginSettings> implements AlwaysActivePlugin {
+public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String, SSLDummyPluginSettings> implements AlwaysActivePlugin {
     private HttpProtocolSettings protocolSettings;
 
     @Override
@@ -19,7 +19,7 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String,SSLD
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global, protocol, pluginSetting==null?new SSLDummyPluginSettings():pluginSetting);
+        super.initialize(global, protocol, pluginSetting == null ? new SSLDummyPluginSettings() : pluginSetting);
         this.protocolSettings = (HttpProtocolSettings) protocol;
         return this;
     }

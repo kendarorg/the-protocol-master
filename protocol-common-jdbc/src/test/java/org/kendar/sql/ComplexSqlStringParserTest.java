@@ -78,7 +78,7 @@ public class ComplexSqlStringParserTest {
                 "language plpgsql    \n" +
                 "as", result.get(++i));
         assertEquals("$$", result.get(++i));
-        assertEquals("begin" , result.get(++i));
+        assertEquals("begin", result.get(++i));
         assertEquals("update accounts", result.get(++i));
         assertEquals("'test'", result.get(++i));
         assertEquals("set balance = balance - amount \n" +

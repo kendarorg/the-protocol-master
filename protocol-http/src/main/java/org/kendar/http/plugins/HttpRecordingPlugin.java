@@ -44,7 +44,7 @@ public class HttpRecordingPlugin extends RecordingPlugin<HttpRecordPluginSetting
                 return;
             }
         }
-        var settings = (HttpRecordPluginSettings)getSettings();
+        var settings = (HttpRecordPluginSettings) getSettings();
         if (settings.isRemoveEtags()) {
             var all = request.getHeader("If-none-match");
             if (all != null && !all.isEmpty()) all.clear();
@@ -57,7 +57,6 @@ public class HttpRecordingPlugin extends RecordingPlugin<HttpRecordPluginSetting
         }
         super.postCall(pluginContext, in, out);
     }
-
 
 
     private void setupSitesToRecord(List<String> recordSites) {

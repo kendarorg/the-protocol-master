@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K,BasicMockPluginSettings> {
+public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K, BasicMockPluginSettings> {
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     protected List<MockStorage> mocks = new ArrayList<>();
     private String mocksDir;

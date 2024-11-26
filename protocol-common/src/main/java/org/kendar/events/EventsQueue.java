@@ -125,8 +125,8 @@ public class EventsQueue {
         }
     }
 
-    public List<TpmEvent> clean(){
-        var result= items.stream().sequential().collect(Collectors.toList());
+    public List<TpmEvent> clean() {
+        var result = items.stream().sequential().collect(Collectors.toList());
         items.clear();
         return result;
     }

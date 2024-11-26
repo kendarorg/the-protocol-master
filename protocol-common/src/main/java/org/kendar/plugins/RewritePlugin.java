@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RewritePlugin<T, K,W extends RewritePluginSettings, J> extends ProtocolPluginDescriptor<T,K,W> {
+public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptor<T, K, W> {
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();

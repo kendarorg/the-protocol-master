@@ -20,7 +20,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult,BasicReplayPluginSettings> {
+public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult, BasicReplayPluginSettings> {
     protected static JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected StorageRepository storage;
@@ -55,8 +55,8 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
 
     @Override
     protected void handleActivation(boolean active) {
-        if(this.isActive()!=active){
-            this.storage.isRecording(getInstanceId(),!active);
+        if (this.isActive() != active) {
+            this.storage.isRecording(getInstanceId(), !active);
         }
         super.handleActivation(active);
         completedIndexes.clear();
@@ -73,12 +73,12 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
         //var lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
         //if(lineToRead == null || lineToRead.getStorageItem()!=null) {
 
-            query.setUsed(completedIndexes);
-            if (!completedIndexes.isEmpty()) {
-                var itemFounded = completedIndexes.stream().max(Integer::compareTo).get().toString();
-                query.addTag("next", itemFounded);
-            }
-          var  lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
+        query.setUsed(completedIndexes);
+        if (!completedIndexes.isEmpty()) {
+            var itemFounded = completedIndexes.stream().max(Integer::compareTo).get().toString();
+            query.addTag("next", itemFounded);
+        }
+        var lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
         //}
         /*if ((lineToRead == null || lineToRead.getStorageItem() == null) ||
                 in.getQuery().trim().toLowerCase().startsWith("set")) {

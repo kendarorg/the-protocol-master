@@ -15,7 +15,7 @@ import org.pf4j.Extension;
 import java.util.List;
 
 @Extension
-public class HttpFilter extends ProtocolPluginDescriptor<Request, Response,HttpFilterSettings> implements AlwaysActivePlugin {
+public class HttpFilter extends ProtocolPluginDescriptor<Request, Response, HttpFilterSettings> implements AlwaysActivePlugin {
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         return false;

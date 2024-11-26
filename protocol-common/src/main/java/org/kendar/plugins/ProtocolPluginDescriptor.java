@@ -8,7 +8,7 @@ import org.kendar.utils.JsonMapper;
 
 import java.lang.reflect.ParameterizedType;
 
-public abstract class ProtocolPluginDescriptor<T, K,W extends PluginSettings> implements PluginDescriptor<W> {
+public abstract class ProtocolPluginDescriptor<T, K, W extends PluginSettings> implements PluginDescriptor<W> {
     protected final static JsonMapper mapper = new JsonMapper();
     private boolean active;
     private String instanceId = "default";
@@ -16,30 +16,30 @@ public abstract class ProtocolPluginDescriptor<T, K,W extends PluginSettings> im
     private PluginSettings settings;
 
 
-    public W getSettings(){
-        return (W)settings;
+    public W getSettings() {
+        return (W) settings;
     }
 
-    public Class<?> getSettingClass(){
-        if(settings!=null)return settings.getClass();
+    public Class<?> getSettingClass() {
+        if (settings != null) return settings.getClass();
         try {
-            var startAt = (Class<?>)this.getClass();
-            while(startAt!=null){
+            var startAt = (Class<?>) this.getClass();
+            while (startAt != null) {
                 var possibleGenericSuperClass = startAt.getGenericSuperclass();
-                if(possibleGenericSuperClass instanceof ParameterizedType){
-                    var gss = (ParameterizedType)possibleGenericSuperClass;
+                if (possibleGenericSuperClass instanceof ParameterizedType) {
+                    var gss = (ParameterizedType) possibleGenericSuperClass;
                     var atta = gss.getActualTypeArguments();
-                    for(var att:atta){
-                        if(att instanceof Class){
-                            if(PluginSettings.class.isAssignableFrom((Class<?>) att)){
-                                return (Class<?>)att;
+                    for (var att : atta) {
+                        if (att instanceof Class) {
+                            if (PluginSettings.class.isAssignableFrom((Class<?>) att)) {
+                                return (Class<?>) att;
                             }
                         }
                     }
                 }
-                startAt=(Class<?>)startAt.getGenericSuperclass();
+                startAt = (Class<?>) startAt.getGenericSuperclass();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         throw new RuntimeException("Missing plugin settings");
@@ -72,10 +72,10 @@ public abstract class ProtocolPluginDescriptor<T, K,W extends PluginSettings> im
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         this.instanceId = protocol.getProtocolInstanceId();
-        if(this.instanceId==null||this.instanceId.isEmpty()){
-            this.instanceId="default";
+        if (this.instanceId == null || this.instanceId.isEmpty()) {
+            this.instanceId = "default";
         }
-        this.settings = (W)pluginSetting;
+        this.settings = (W) pluginSetting;
         setActive(pluginSetting.isActive());
         return this;
     }
@@ -102,9 +102,9 @@ public abstract class ProtocolPluginDescriptor<T, K,W extends PluginSettings> im
         this.active = active;
     }
 
-    public void refreshStatus(){
-        if(active){
-            active=false;
+    public void refreshStatus() {
+        if (active) {
+            active = false;
             setActive(true);
         }
     }

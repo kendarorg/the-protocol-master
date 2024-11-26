@@ -5,7 +5,10 @@ import org.kendar.sql.parser.dtos.TokenType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -44,6 +47,33 @@ public class SqlStringParser {
 
     public SqlStringParser(String parameterSeparator) {
         this.parameterSeparator = parameterSeparator;
+    }
+
+    private static ArrayList<String> extractMatchingBlocks(String test, Pattern p) {
+
+        var m = p.matcher(test);
+        var result = new ArrayList<String>();
+        var prevStart = 0;
+        if (m.find()) {
+            do {
+                var start = m.start(0);
+                var end = m.end(0);
+                if (start > 0) {
+                    if (start - prevStart > 0) {
+                        result.add(test.substring(prevStart, start));
+                    }
+                }
+                if (end - start > 0) {
+                    result.add(test.substring(start, end));
+                }
+                prevStart = end;
+            } while (m.find(prevStart));
+        }
+        var full = String.join("", result);
+        if (full.length() != test.length()) {
+            result.add(test.substring(prevStart));
+        }
+        return result;
     }
 
     public String getParameterSeparator() {
@@ -96,7 +126,7 @@ public class SqlStringParser {
             var trimmed = line.strip();
             if (trimmed.startsWith("'") || trimmed.startsWith("\"")) {
                 //Is a string
-                tempValue += line+ " ";
+                tempValue += line + " ";
                 continue;
             }
             if (line.toLowerCase().contains("function") || line.toLowerCase().contains("procedure")) {
@@ -130,7 +160,6 @@ public class SqlStringParser {
                 map(SimpleToken::getValue).
                 collect(Collectors.toList()));
     }
-
 
     @SuppressWarnings("IfStatementWithIdenticalBranches")
     public List<SimpleToken> parseStringSimpleTokens(String input) {
@@ -269,7 +298,6 @@ public class SqlStringParser {
         return tokens;
     }
 
-
     public boolean isMixed(List<SqlParseResult> parsed) {
         SqlStringType founded = SqlStringType.NONE;
         for (var single : parsed) {
@@ -289,15 +317,14 @@ public class SqlStringParser {
         return false;
     }
 
-
     public List<SimpleToken> tokenize(String input) {
         var partial = parseStringSimpleTokens(input).stream().
                 filter(a -> !a.getValue().isEmpty()).collect(Collectors.toList());
         var result = new ArrayList<SimpleToken>();
-        for(var token : partial) {
-            if(token.getType()==TokenType.BLOB) {
+        for (var token : partial) {
+            if (token.getType() == TokenType.BLOB) {
                 result.addAll(parseBlob(token));
-            }else{
+            } else {
                 result.add(token);
             }
         }
@@ -310,23 +337,23 @@ public class SqlStringParser {
         var test = token.getValue();
 
         var p = Pattern.compile("`[a-zA-Z0-9_\\-\\.]+`");
-        var result = extractMatchingBlocks(test,p);
-        for(var item:result){
-            if(item.startsWith("`") && item.endsWith("`")){
+        var result = extractMatchingBlocks(test, p);
+        for (var item : result) {
+            if (item.startsWith("`") && item.endsWith("`")) {
                 ls.add(new SimpleToken(TokenType.SINGLE_ITEM, item));
-            }else{
-                for(var subItem:buildNumbers(item,Pattern.compile("([+-]*[0-9]+\\.[0-9]+)"))){
-                    if(subItem.getType()!=TokenType.BLOB){
+            } else {
+                for (var subItem : buildNumbers(item, Pattern.compile("([+-]*[0-9]+\\.[0-9]+)"))) {
+                    if (subItem.getType() != TokenType.BLOB) {
                         ls.add(subItem);
-                    }else{
-                        var px =Pattern.compile("([+-]*[0-9]+)");
-                        for(var sub:buildNumbers(subItem.getValue(),px)){
-                            if(sub.getType()!=TokenType.BLOB){
+                    } else {
+                        var px = Pattern.compile("([+-]*[0-9]+)");
+                        for (var sub : buildNumbers(subItem.getValue(), px)) {
+                            if (sub.getType() != TokenType.BLOB) {
                                 ls.add(sub);
-                            }else{
-                                if(sub.getValue().indexOf(",")>=0){
+                            } else {
+                                if (sub.getValue().indexOf(",") >= 0) {
                                     ls.addAll(handleComma(sub));
-                                }else{
+                                } else {
                                     ls.add(sub);
                                 }
                             }
@@ -336,8 +363,8 @@ public class SqlStringParser {
 
             }
         }
-        for(var item:ls){
-            if(item.getValue().equalsIgnoreCase("NULL")||item.getValue().equalsIgnoreCase("@NULL")){
+        for (var item : ls) {
+            if (item.getValue().equalsIgnoreCase("NULL") || item.getValue().equalsIgnoreCase("@NULL")) {
                 item.setType(TokenType.VALUE_ITEM);
             }
         }
@@ -347,20 +374,20 @@ public class SqlStringParser {
     private List<SimpleToken> handleComma(SimpleToken sub) {
         var test = sub.getValue();
         var result = new ArrayList<SimpleToken>();
-        var prev  ="";
-        for(var c:test.toCharArray()){
-            if(c==','){
-                if(prev.trim().length()>0){
-                    result.add(new SimpleToken(TokenType.BLOB,prev.trim()));
+        var prev = "";
+        for (var c : test.toCharArray()) {
+            if (c == ',') {
+                if (prev.trim().length() > 0) {
+                    result.add(new SimpleToken(TokenType.BLOB, prev.trim()));
                 }
-                result.add(new SimpleToken(TokenType.SINGLE_ITEM,","));
-                prev="";
-            }else{
-                prev+=c;
+                result.add(new SimpleToken(TokenType.SINGLE_ITEM, ","));
+                prev = "";
+            } else {
+                prev += c;
             }
         }
-        if(prev.length()>0){
-            result.add(new SimpleToken(TokenType.BLOB,prev.trim()));
+        if (prev.length() > 0) {
+            result.add(new SimpleToken(TokenType.BLOB, prev.trim()));
         }
         return result;
     }
@@ -368,45 +395,18 @@ public class SqlStringParser {
     private List<SimpleToken> buildNumbers(String startItem, Pattern p) {
         var ls = new ArrayList<SimpleToken>();
         String[] items = startItem.trim().split("[\n\r\f\\s]+");
-        for(var subItem:items){
+        for (var subItem : items) {
             subItem = subItem.trim();
-            var result = extractMatchingBlocks(subItem,p);
-            for(var item:result){
-                if(p.matcher(item).matches()){
+            var result = extractMatchingBlocks(subItem, p);
+            for (var item : result) {
+                if (p.matcher(item).matches()) {
                     ls.add(new SimpleToken(TokenType.VALUE_ITEM, item));
-                }else{
+                } else {
                     ls.add(new SimpleToken(TokenType.BLOB, item));
 
                 }
             }
         }
         return ls;
-    }
-
-    private static ArrayList<String> extractMatchingBlocks(String test, Pattern p) {
-
-        var m = p.matcher(test);
-        var result = new ArrayList<String>();
-        var prevStart = 0;
-        if(m.find()) {
-            do {
-                var start = m.start(0);
-                var end = m.end(0);
-                if(start>0){
-                    if(start-prevStart>0){
-                        result.add(test.substring(prevStart, start));
-                    }
-                }
-                if(end-start>0){
-                    result.add(test.substring(start, end));
-                }
-                prevStart = end;
-            } while(m.find(prevStart));
-        }
-        var full = String.join("",result);
-        if(full.length()!= test.length()){
-            result.add(test.substring(prevStart));
-        }
-        return result;
     }
 }

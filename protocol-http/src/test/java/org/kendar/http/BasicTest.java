@@ -156,13 +156,13 @@ public class BasicTest {
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
-                new HttpRecordingPlugin().initialize(globalSettings,httpProtocolSettings, recordingSettings),
-                new HttpReplayingPlugin().initialize(globalSettings,httpProtocolSettings, replaySettings),
+                new HttpRecordingPlugin().initialize(globalSettings, httpProtocolSettings, recordingSettings),
+                new HttpReplayingPlugin().initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(),
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(),
-                new HttpMockPlugin().initialize(globalSettings,httpProtocolSettings, mockSettings),
-                new HttpRewritePlugin().initialize(globalSettings,httpProtocolSettings, rewriteSettings)));
+                new HttpMockPlugin().initialize(globalSettings, httpProtocolSettings, mockSettings),
+                new HttpRewritePlugin().initialize(globalSettings, httpProtocolSettings, rewriteSettings)));
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 

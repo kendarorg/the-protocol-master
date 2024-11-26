@@ -33,11 +33,11 @@ public class ReplayRecordFilters {
         settings.getRecordSites().add("www.sara.com");
         settings.getRecordSites().add("@.*microsoft.*");
         var global = new GlobalSettings();
-        global.putService("storage",new NullStorageRepository());
-        rwPlugin.initialize(global,new HttpProtocolSettings(), settings);
+        global.putService("storage", new NullStorageRepository());
+        rwPlugin.initialize(global, new HttpProtocolSettings(), settings);
 
         var pc = new PluginContext("http", null, 0L, null);
-        pc.getTags().put("id",1L);
+        pc.getTags().put("id", 1L);
         var in = new Request();
         in.setMethod("GET");
         in.setPath("/test_sites");
@@ -46,20 +46,20 @@ public class ReplayRecordFilters {
 
         in.setHost("test_sites");
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(EventsQueue.getInstance().clean().size()==1);
+        assertTrue(EventsQueue.getInstance().clean().size() == 1);
 
         in.setHost("www.sara.com");
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(EventsQueue.getInstance().clean().size()==1);
+        assertTrue(EventsQueue.getInstance().clean().size() == 1);
 
         in.setHost("www.wetheaver.microsofto.com");
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(EventsQueue.getInstance().clean().size()==1);
+        assertTrue(EventsQueue.getInstance().clean().size() == 1);
 
 
         in.setHost("www.wetheaver.microsof.com");
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(EventsQueue.getInstance().clean().size()==0);
+        assertTrue(EventsQueue.getInstance().clean().size() == 0);
     }
 
     @Test
@@ -83,9 +83,9 @@ public class ReplayRecordFilters {
         settings.getMatchSites().add("www.sara.com");
         settings.getMatchSites().add("@.*microsoft.*");
         var global = new GlobalSettings();
-        global.putService("storage",new NullStorageRepository());
+        global.putService("storage", new NullStorageRepository());
 
-        rwPlugin.initialize(global, new HttpProtocolSettings(),settings);
+        rwPlugin.initialize(global, new HttpProtocolSettings(), settings);
 
         var pc = new PluginContext("http", null, 0L, null);
         var in = new Request();

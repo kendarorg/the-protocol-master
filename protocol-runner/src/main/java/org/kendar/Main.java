@@ -178,7 +178,7 @@ public class Main {
         return allPlugins;
     }
 
-    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?,?>> embeddedPlugins) {
+    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?, ?>> embeddedPlugins) {
         if (!plugins.containsKey(prt)) {
             plugins.put(prt, new ArrayList<>());
         }
@@ -236,7 +236,7 @@ public class Main {
 
 
                 } catch (Exception ex) {
-                    log.error("Unable to start protocol "+item.getKey(),ex);
+                    log.error("Unable to start protocol " + item.getKey(), ex);
                 }
             }).start();
         }

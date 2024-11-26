@@ -19,7 +19,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordingPlugin<W  extends BasicRecordingPluginSettings> extends ProtocolPluginDescriptor<Object, Object,W> {
+public abstract class RecordingPlugin<W extends BasicRecordingPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
@@ -130,8 +130,8 @@ public abstract class RecordingPlugin<W  extends BasicRecordingPluginSettings> e
 
     @Override
     protected void handleActivation(boolean active) {
-        if(this.isActive()!=active){
-            this.storage.isRecording(getInstanceId(),active);
+        if (this.isActive() != active) {
+            this.storage.isRecording(getInstanceId(), active);
         }
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
         if (!active) {

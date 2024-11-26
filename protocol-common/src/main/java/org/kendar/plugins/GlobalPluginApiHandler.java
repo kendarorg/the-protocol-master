@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpExchange;
 public interface GlobalPluginApiHandler {
     /**
      * Handle http request
+     *
      * @param apiServerHandler
      * @param exchange
      * @param pathPart
@@ -17,6 +18,7 @@ public interface GlobalPluginApiHandler {
 
     /**
      * Id of the plugin
+     *
      * @return
      */
     String getId();

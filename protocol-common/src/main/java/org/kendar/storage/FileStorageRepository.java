@@ -141,9 +141,9 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void isRecording(String instanceId, boolean recording) {
-        if(recording){
+        if (recording) {
             initializeContentWrite(instanceId);
-        }else{
+        } else {
             initializeContent(instanceId);
         }
 
@@ -153,6 +153,7 @@ public class FileStorageRepository implements StorageRepository {
     public long generateIndex() {
         return storageCounter.incrementAndGet();
     }
+
     @Override
     public void write(LineToWrite item) {
         executor.submit(() -> {

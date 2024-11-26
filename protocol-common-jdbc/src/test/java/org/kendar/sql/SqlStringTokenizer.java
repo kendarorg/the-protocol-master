@@ -12,31 +12,31 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SqlStringTokenizer {
     @Test
-    void matcherSetupBackComma(){
+    void matcherSetupBackComma() {
         String test = "INSERT INTO `task` (`archive_date`, `notes`,`a``b`";
         var p = Pattern.compile("`[a-zA-Z0-9_\\-\\.]+`");
         var m = p.matcher(test);
         var result = new ArrayList<String>();
         var prevStart = 0;
-        if(m.find()) {
+        if (m.find()) {
             do {
                 var start = m.start(0);
                 var end = m.end(0);
-                if(start>0){
-                    if(start-prevStart>0){
+                if (start > 0) {
+                    if (start - prevStart > 0) {
                         result.add(test.substring(prevStart, start));
                     }
                 }
-                if(end-start>0){
+                if (end - start > 0) {
                     result.add(test.substring(start, end));
                 }
                 prevStart = end;
 
                 System.out.println(m.group());
-            } while(m.find(prevStart));
+            } while (m.find(prevStart));
         }
-        var full = String.join("",result);
-        if(full.length()!=test.length()){
+        var full = String.join("", result);
+        if (full.length() != test.length()) {
             result.add(test.substring(prevStart));
         }
 
@@ -44,7 +44,7 @@ public class SqlStringTokenizer {
     }
 
     @Test
-    void matcherSetupNumbers(){
+    void matcherSetupNumbers() {
         String test = "INSERT INTO `task` (`archive_date`, `notes`,`a``b`";
         var p = Pattern.compile("([+-]*[0-9]+)|([+-]*[0-9]+\\.[0-9]+)");
         assertTrue(p.matcher("+22").matches());
@@ -57,22 +57,22 @@ public class SqlStringTokenizer {
     }
 
     @Test
-    void splitDelimiters(){
+    void splitDelimiters() {
         String test = "INSERT,a,b,";
         var result = new ArrayList<String>();
-        var prev  ="";
-        for(var c:test.toCharArray()){
-            if(c==','){
-                if(prev.length()>0){
+        var prev = "";
+        for (var c : test.toCharArray()) {
+            if (c == ',') {
+                if (prev.length() > 0) {
                     result.add(prev);
                 }
                 result.add(",");
-                prev="";
-            }else{
-                prev+=c;
+                prev = "";
+            } else {
+                prev += c;
             }
         }
-        if(prev.length()>0){
+        if (prev.length() > 0) {
             result.add(prev);
         }
         System.out.println(result);
@@ -90,7 +90,7 @@ public class SqlStringTokenizer {
                 "#another comment\n" +
                 "WHERE ROW_COUNT() = +11 AND `id` = LAST_INSERT_ID()";
         var target = new SqlStringParser("$");
-        var result = target.tokenize(query).stream().filter(a->a.getType()== TokenType.VALUE_ITEM).collect(Collectors.toList());
+        var result = target.tokenize(query).stream().filter(a -> a.getType() == TokenType.VALUE_ITEM).collect(Collectors.toList());
         assertEquals(7, result.size());
 
     }

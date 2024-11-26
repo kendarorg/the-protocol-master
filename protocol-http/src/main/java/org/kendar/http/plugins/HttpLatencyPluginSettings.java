@@ -3,7 +3,8 @@ package org.kendar.http.plugins;
 import org.kendar.settings.PluginSettings;
 
 public class HttpLatencyPluginSettings extends PluginSettings {
-    private int minMs=0;
+    private int minMs = 0;
+    private int maxMs = 0;
 
     public int getMinMs() {
         return minMs;
@@ -20,6 +21,4 @@ public class HttpLatencyPluginSettings extends PluginSettings {
     public void setMaxMs(int maxMs) {
         this.maxMs = maxMs;
     }
-
-    private int maxMs=0;
 }

@@ -76,9 +76,9 @@ public class BasicTest {
         var pl1 = new PostgresMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
-        global.putService("storage",storage);
+        global.putService("storage", storage);
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.initialize(global,new JdbcProtocolSettings(), mockPluginSettings);
+        pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         proxy.setPlugins(List.of(pl, pl1));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

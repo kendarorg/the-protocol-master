@@ -43,8 +43,8 @@ public class SimpleHttpServer {
             byte[] bytes = new byte[]{};
             if (request.getPath().endsWith("/clean")) {
                 exchange.getResponseHeaders().add("Content-Type", "text/plain");
-                bytes= "test".getBytes();
-            }else if (request.getPath().endsWith("image.gif")) {
+                bytes = "test".getBytes();
+            } else if (request.getPath().endsWith("image.gif")) {
                 var frf = new FileResourcesUtils();
                 bytes = frf.getFileFromResourceAsByteArray("resource://image.gif");
                 exchange.getResponseHeaders().add("Content-Type", "image/gif");

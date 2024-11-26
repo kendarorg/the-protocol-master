@@ -80,7 +80,7 @@ public class Amqp091Runner extends CommonRunner {
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = protocol.getPlugin(plugin.getId(), plugin.getSettingClass());
-            plugin.initialize(ini, protocol,specificPluginSetting);
+            plugin.initialize(ini, protocol, specificPluginSetting);
             plugin.refreshStatus();
         }
         proxy.setPlugins(plugins);

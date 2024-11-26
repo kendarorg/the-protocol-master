@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response,HttpErrorPluginSettings> {
+public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response, HttpErrorPluginSettings> {
 
     private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
     private int errorCode;
@@ -36,7 +36,6 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response,
     public String getProtocol() {
         return "http";
     }
-
 
 
     @Override

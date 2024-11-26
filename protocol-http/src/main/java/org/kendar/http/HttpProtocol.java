@@ -177,7 +177,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             for (var i = plugins.size() - 1; i >= 0; i--) {
                 var plugin = plugins.get(i);
                 var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
-                if(specificPluginSetting!=null) {
+                if (specificPluginSetting != null) {
                     plugin.initialize(globalSettings, settings, specificPluginSetting);
                 }
             }
