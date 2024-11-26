@@ -102,7 +102,7 @@ public abstract class ProtocolPluginDescriptor<T, K,W extends PluginSettings> im
         this.active = active;
     }
 
-    public void forceActivation(){
+    public void refreshStatus(){
         if(active){
             active=false;
             setActive(true);

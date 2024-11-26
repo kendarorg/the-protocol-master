@@ -53,7 +53,7 @@ public class RedisRunner extends CommonRunner {
             var plugin = plugins.get(i);
             var specificPluginSetting = opaqueProtocolSettings.getPlugin(plugin.getId(), plugin.getSettingClass());
             plugin.initialize(ini, protocolSettings,specificPluginSetting);
-            plugin.forceActivation();
+            plugin.refreshStatus();
         }
         proxy.setPlugins(plugins);
         baseProtocol.setProxy(proxy);

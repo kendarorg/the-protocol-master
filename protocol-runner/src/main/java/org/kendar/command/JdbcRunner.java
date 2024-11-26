@@ -114,7 +114,7 @@ public class JdbcRunner extends CommonRunner {
             var plugin = plugins.get(i);
             var specificPluginSetting = protocolSettings.getPlugin(plugin.getId(), plugin.getSettingClass());
             plugin.initialize(ini, protocolSettings,specificPluginSetting);
-            plugin.forceActivation();
+            plugin.refreshStatus();
         }
         proxy.setPlugins(plugins);
 

@@ -78,7 +78,7 @@ public class MongoRunner extends CommonRunner {
             var plugin = plugins.get(i);
             var specificPluginSetting = protocol.getPlugin(plugin.getId(), plugin.getSettingClass());
             plugin.initialize(ini, protocolSettings,specificPluginSetting);
-            plugin.forceActivation();
+            plugin.refreshStatus();
         }
         proxy.setPlugins(plugins);
         baseProtocol.setProxy(proxy);

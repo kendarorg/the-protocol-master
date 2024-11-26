@@ -60,7 +60,7 @@ public interface PluginDescriptor<W extends PluginSettings> extends ExtensionPoi
     boolean isActive();
 
     void setActive(boolean active);
-    void forceActivation();
+    void refreshStatus();
 
     PluginApiHandler getApiHandler();
 }

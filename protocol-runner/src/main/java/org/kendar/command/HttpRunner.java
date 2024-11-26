@@ -144,7 +144,7 @@ public class HttpRunner extends CommonRunner {
             var plugin = plugins.get(i);
             var specificPluginSetting = pset.getPlugin(plugin.getId(), plugin.getSettingClass());
             plugin.initialize(ini, pset,specificPluginSetting);
-            plugin.forceActivation();
+            plugin.refreshStatus();
         }
         var baseProtocol = new HttpProtocol(ini, settings, plugins);
         baseProtocol.initialize();
