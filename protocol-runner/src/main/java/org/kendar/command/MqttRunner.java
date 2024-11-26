@@ -76,7 +76,7 @@ public class MqttRunner extends CommonRunner {
 
     @Override
     public Class<?> getSettingsClass() {
-        return ByteProtocolSettings.class;
+        return ByteProtocolSettingsWithLogin.class;
     }
 
     @Override
