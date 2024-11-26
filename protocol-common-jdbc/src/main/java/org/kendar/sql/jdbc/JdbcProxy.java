@@ -124,8 +124,9 @@ public class JdbcProxy extends Proxy {
             } else {
                 realQuery.append(item);
             }
+            realQuery.append(" ");
         }
-        query = realQuery.toString();
+        query = realQuery.toString().trim();
         return query;
     }
 
