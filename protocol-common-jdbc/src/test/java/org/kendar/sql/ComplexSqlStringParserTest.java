@@ -68,39 +68,29 @@ public class ComplexSqlStringParserTest {
         var sp = SP_EXAMPLE;
         var target = new SqlStringParser("$");
         var result = target.parseString(sp);
-        assertEquals(14, result.size());
+        assertEquals(12, result.size());
         var i = -1;
         assertEquals("create or replace procedure transfer(\n" +
                 "   sender int,", result.get(++i));
-        assertEquals("\n" +
-                "   receiver int,", result.get(++i));
-        assertEquals(" \n" +
-                "   amount dec\n" +
+        assertEquals("receiver int,", result.get(++i));
+        assertEquals("amount dec\n" +
                 ")\n" +
                 "language plpgsql    \n" +
-                "as ", result.get(++i));
+                "as", result.get(++i));
         assertEquals("$$", result.get(++i));
-        assertEquals("\n" +
-                "begin\n" +
-                "    ", result.get(++i));
-        assertEquals("\n" +
-                "    update accounts ", result.get(++i));
+        assertEquals("begin" , result.get(++i));
+        assertEquals("update accounts", result.get(++i));
         assertEquals("'test'", result.get(++i));
-        assertEquals(" \n" +
-                "    set balance = balance - amount \n" +
+        assertEquals("set balance = balance - amount \n" +
                 "    where id = sender;", result.get(++i));
-        i++;
-        assertEquals("\n" +
-                "    update accounts \n" +
+
+        assertEquals("update accounts \n" +
                 "    set balance = balance + amount \n" +
                 "    where id = receiver;", result.get(++i));
 
-        assertEquals("\n" +
-                "\n" +
-                "    commit;", result.get(++i));
-        assertEquals("\n" +
-                "end;", result.get(++i));
-        i++;
+        assertEquals("commit;", result.get(++i));
+        assertEquals("end;", result.get(++i));
+
         assertEquals("$$", result.get(++i));
 
     }

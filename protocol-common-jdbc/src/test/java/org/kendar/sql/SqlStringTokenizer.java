@@ -91,7 +91,7 @@ public class SqlStringTokenizer {
                 "WHERE ROW_COUNT() = +11 AND `id` = LAST_INSERT_ID()";
         var target = new SqlStringParser("$");
         var result = target.tokenize(query).stream().filter(a->a.getType()== TokenType.VALUE_ITEM).collect(Collectors.toList());
-        assertEquals(2, result.size());
+        assertEquals(7, result.size());
 
     }
 }

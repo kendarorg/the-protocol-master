@@ -29,7 +29,7 @@ public class SqlSqlStringParserTest {
     void parseCalls() {
         var target = new SqlStringParser("$");
         var result = target.parseString("select * from hello($1, $2 )  as result");
-        assertEquals(6, result.size());
+        assertEquals(5, result.size());
         assertEquals(",", result.get(2));
     }
 
@@ -37,7 +37,7 @@ public class SqlSqlStringParserTest {
     void somethingWeird() {
         var target = new SqlStringParser("$");
         var result = target.parseString("insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *");
-        assertEquals(15, result.size());
+        assertEquals(12, result.size());
     }
 
 
@@ -46,9 +46,9 @@ public class SqlSqlStringParserTest {
         var target = new SqlStringParser("$");
         var result = target.parseString("Example 'te''st' simple=$1");
         assertEquals(4, result.size());
-        assertEquals("Example ", result.get(0));
+        assertEquals("Example", result.get(0));
         assertEquals("'te''st'", result.get(1));
-        assertEquals(" simple=", result.get(2));
+        assertEquals("simple=", result.get(2));
         assertEquals("$1", result.get(3));
     }
 
@@ -57,11 +57,11 @@ public class SqlSqlStringParserTest {
         var target = new SqlStringParser("$");
         var result = target.parseString("Example 'te''st'a=$k simple");
         assertEquals(5, result.size());
-        assertEquals("Example ", result.get(0));
+        assertEquals("Example", result.get(0));
         assertEquals("'te''st'", result.get(1));
         assertEquals("a=", result.get(2));
         assertEquals("$k", result.get(3));
-        assertEquals(" simple", result.get(4));
+        assertEquals("simple", result.get(4));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class SqlSqlStringParserTest {
         var target = new SqlStringParser("$");
         var result = target.parseString("Example 'te''st$k'a= simple");
         assertEquals(3, result.size());
-        assertEquals("Example ", result.get(0));
+        assertEquals("Example", result.get(0));
         assertEquals("'te''st$k'", result.get(1));
         assertEquals("a= simple", result.get(2));
     }
@@ -79,33 +79,33 @@ public class SqlSqlStringParserTest {
         var target = new SqlStringParser("$");
         var result = target.parseString("Example 'te''st' simple");
         assertEquals(3, result.size());
-        assertEquals("Example ", result.get(0));
+        assertEquals("Example", result.get(0));
         assertEquals("'te''st'", result.get(1));
-        assertEquals(" simple", result.get(2));
+        assertEquals("simple", result.get(2));
 
         result = target.parseString("Example 'test' simple");
         assertEquals(3, result.size());
-        assertEquals("Example ", result.get(0));
+        assertEquals("Example", result.get(0));
         assertEquals("'test'", result.get(1));
-        assertEquals(" simple", result.get(2));
+        assertEquals("simple", result.get(2));
 
         result = target.parseString("Example 'te\\'st' simple");
         assertEquals(3, result.size());
-        assertEquals("Example ", result.get(0));
+        assertEquals("Example", result.get(0));
         assertEquals("'te\\'st'", result.get(1));
-        assertEquals(" simple", result.get(2));
+        assertEquals("simple", result.get(2));
 
         result = target.parseString("Example \"test\" simple");
         assertEquals(3, result.size());
-        assertEquals("Example ", result.get(0));
+        assertEquals("Example", result.get(0));
         assertEquals("\"test\"", result.get(1));
-        assertEquals(" simple", result.get(2));
+        assertEquals("simple", result.get(2));
 
         result = target.parseString("Example \"te\\\"st\" simple");
         assertEquals(3, result.size());
-        assertEquals("Example ", result.get(0));
+        assertEquals("Example", result.get(0));
         assertEquals("\"te\\\"st\"", result.get(1));
-        assertEquals(" simple", result.get(2));
+        assertEquals("simple", result.get(2));
     }
 
     @Test
@@ -138,9 +138,9 @@ public class SqlSqlStringParserTest {
         var target = new SqlStringParser("$");
         var result = target.getTypes("\r\nDROP TABLE IF EXISTS temp_table1 CASCADE;\r\n CREATE TABLE temp_table1 (intf int);\r\n");
         assertEquals(2, result.size());
-        assertEquals("\r\nDROP TABLE IF EXISTS temp_table1 CASCADE;", result.get(0).getValue());
+        assertEquals("DROP TABLE IF EXISTS temp_table1 CASCADE;", result.get(0).getValue());
         assertEquals(SqlStringType.UPDATE, result.get(0).getType());
-        assertEquals("\r\n CREATE TABLE temp_table1 (intf int);", result.get(1).getValue());
+        assertEquals("CREATE TABLE temp_table1 (intf int);", result.get(1).getValue());
         assertEquals(SqlStringType.UPDATE, result.get(1).getType());
     }
 

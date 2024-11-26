@@ -96,7 +96,7 @@ public class SqlStringParser {
             var trimmed = line.strip();
             if (trimmed.startsWith("'") || trimmed.startsWith("\"")) {
                 //Is a string
-                tempValue += line;
+                tempValue += line+ " ";
                 continue;
             }
             if (line.toLowerCase().contains("function") || line.toLowerCase().contains("procedure")) {
@@ -126,7 +126,7 @@ public class SqlStringParser {
     @SuppressWarnings("IfStatementWithIdenticalBranches")
     public List<String> parseString(String input) {
         return new ArrayList<>(parseStringSimpleTokens(input).stream().
-                filter(a -> a.getType() != TokenType.COMMENT).
+                filter(a -> a.getType() != TokenType.COMMENT && !a.getValue().trim().isEmpty()).
                 map(SimpleToken::getValue).
                 collect(Collectors.toList()));
     }
@@ -401,8 +401,6 @@ public class SqlStringParser {
                     result.add(test.substring(start, end));
                 }
                 prevStart = end;
-
-                System.out.println(m.group());
             } while(m.find(prevStart));
         }
         var full = String.join("",result);
