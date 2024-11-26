@@ -2,7 +2,7 @@ package org.kendar.plugins;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.WriteItemEvent;
-import org.kendar.plugins.settings.BasicRecordingPluginSettings;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -18,7 +18,8 @@ import org.kendar.storage.generic.StorageRepository;
 
 import java.util.List;
 
-public abstract class JdbcRecordingPlugin extends RecordingPlugin<BasicRecordingPluginSettings> {
+public abstract class JdbcRecordPlugin extends RecordPlugin<BasicRecordPluginSettings> {
+
 
     @Override
     protected void postCall(PluginContext pluginContext, Object obIn, Object obOUt) {

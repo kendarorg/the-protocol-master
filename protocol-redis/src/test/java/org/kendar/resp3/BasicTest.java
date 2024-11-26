@@ -4,7 +4,7 @@ package org.kendar.resp3;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
-import org.kendar.redis.plugins.RedisRecordingPlugin;
+import org.kendar.redis.plugins.RedisRecordPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -58,7 +58,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new RedisRecordingPlugin().withStorage(storage);
+        var pl = new RedisRecordPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

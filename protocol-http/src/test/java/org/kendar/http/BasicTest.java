@@ -156,8 +156,8 @@ public class BasicTest {
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
-                new HttpRecordingPlugin().initialize(globalSettings, httpProtocolSettings, recordingSettings),
-                new HttpReplayingPlugin().initialize(globalSettings, httpProtocolSettings, replaySettings),
+                new HttpRecordPlugin().initialize(globalSettings, httpProtocolSettings, recordingSettings),
+                new HttpReplayPlugin().initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(),
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(),

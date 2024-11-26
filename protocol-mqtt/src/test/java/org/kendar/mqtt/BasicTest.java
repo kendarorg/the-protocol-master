@@ -7,7 +7,7 @@ import io.moquette.interception.AbstractInterceptHandler;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.InterceptPublishMessage;
 import org.junit.jupiter.api.TestInfo;
-import org.kendar.mqtt.plugins.MqttRecordingPlugin;
+import org.kendar.mqtt.plugins.MqttRecordPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -95,7 +95,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new MqttRecordingPlugin().withStorage(storage);
+        var pl = new MqttRecordPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

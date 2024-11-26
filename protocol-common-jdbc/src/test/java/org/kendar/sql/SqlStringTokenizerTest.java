@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SqlStringTokenizer {
+public class SqlStringTokenizerTest {
     @Test
     void matcherSetupBackComma() {
         String test = "INSERT INTO `task` (`archive_date`, `notes`,`a``b`";

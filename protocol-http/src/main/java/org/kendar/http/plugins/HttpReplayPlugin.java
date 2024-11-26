@@ -8,7 +8,7 @@ import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ReplayingPlugin;
+import org.kendar.plugins.ReplayPlugin;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -22,7 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HttpReplayingPlugin extends ReplayingPlugin<HttpReplayPluginSettings> {
+public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     private boolean blockExternal = true;
     private List<MatchingRecRep> matchSites = new ArrayList<>();
 

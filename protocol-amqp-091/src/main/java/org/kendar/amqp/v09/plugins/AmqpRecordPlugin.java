@@ -1,8 +1,8 @@
 package org.kendar.amqp.v09.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.kendar.plugins.RecordingPlugin;
-import org.kendar.plugins.settings.BasicRecordingPluginSettings;
+import org.kendar.plugins.RecordPlugin;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AmqpRecordingPlugin extends RecordingPlugin<BasicRecordingPluginSettings> {
+public class AmqpRecordPlugin extends RecordPlugin<BasicRecordPluginSettings> {
     private static final List<String> toAvoid = List.of("byte[]",
             "ConnectionStartOk", "ConnectionTuneOk", "ConnectionOpen", "ChannelOpen", "BasicPublish",
             "HeaderFrame", "BasicPublish", "BodyFrame", "BasicAck", "ChannelClose", "ConnectionClose",

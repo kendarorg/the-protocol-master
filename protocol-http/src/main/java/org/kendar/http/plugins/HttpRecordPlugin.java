@@ -3,7 +3,7 @@ package org.kendar.http.plugins;
 import org.kendar.http.utils.Request;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.RecordingPlugin;
+import org.kendar.plugins.RecordPlugin;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -14,7 +14,7 @@ import org.kendar.storage.generic.StorageRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HttpRecordingPlugin extends RecordingPlugin<HttpRecordPluginSettings> {
+public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     private List<MatchingRecRep> recordSites = new ArrayList<>();
 
 

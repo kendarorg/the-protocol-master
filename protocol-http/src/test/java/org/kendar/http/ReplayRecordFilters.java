@@ -3,9 +3,9 @@ package org.kendar.http;
 import org.junit.jupiter.api.Test;
 import org.kendar.events.EventsQueue;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
-import org.kendar.http.plugins.HttpRecordingPlugin;
+import org.kendar.http.plugins.HttpRecordPlugin;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
-import org.kendar.http.plugins.HttpReplayingPlugin;
+import org.kendar.http.plugins.HttpReplayPlugin;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ReplayRecordFilters {
     @Test
     void testRecordSites() {
-        var rwPlugin = new HttpRecordingPlugin() {
+        var rwPlugin = new HttpRecordPlugin() {
             @Override
             public boolean isActive() {
                 return true;
@@ -65,7 +65,7 @@ public class ReplayRecordFilters {
     @Test
     void testReplaySites() {
         var matched = new ChangeableReference<Boolean>(false);
-        var rwPlugin = new HttpReplayingPlugin() {
+        var rwPlugin = new HttpReplayPlugin() {
             @Override
             public boolean isActive() {
                 return true;

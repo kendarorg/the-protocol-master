@@ -7,7 +7,7 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.junit.jupiter.api.TestInfo;
-import org.kendar.mongo.plugins.MongoRecordingPlugin;
+import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -77,7 +77,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new MongoRecordingPlugin().withStorage(storage);
+        var pl = new MongoRecordPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

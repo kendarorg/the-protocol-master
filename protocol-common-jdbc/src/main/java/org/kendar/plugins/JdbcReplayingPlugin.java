@@ -70,8 +70,6 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
         query.setType("QUERY");
         query.addTag("parametersCount", inObj.getParameterValues().size());
         query.addTag("query", inObj.getQuery());
-        //var lineToRead = beforeSendingReadResult(storage.read(getInstanceId(), query));
-        //if(lineToRead == null || lineToRead.getStorageItem()!=null) {
 
         query.setUsed(completedIndexes);
         if (!completedIndexes.isEmpty()) {

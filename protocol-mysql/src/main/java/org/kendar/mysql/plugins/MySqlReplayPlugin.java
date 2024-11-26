@@ -5,6 +5,7 @@ import org.kendar.sql.jdbc.ProxyMetadata;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.utils.JsonMapper;
 

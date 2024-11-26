@@ -2,7 +2,7 @@ package org.kendar.plugins.settings;
 
 import org.kendar.settings.PluginSettings;
 
-public class BasicRecordingPluginSettings extends PluginSettings {
+public class BasicRecordPluginSettings extends PluginSettings {
     private boolean ignoreTrivialCalls = true;
 
     public boolean isIgnoreTrivialCalls() {

@@ -1,7 +1,7 @@
 package org.kendar.resp3;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.redis.plugins.RedisRecordingPlugin;
+import org.kendar.redis.plugins.RedisRecordPlugin;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -11,7 +11,7 @@ public class ReflectionTest {
 
     @Test
     void testReflection() {
-        var example = new RedisRecordingPlugin();
+        var example = new RedisRecordPlugin();
         var clazz = example.getClass();
         var handle = Arrays.stream(clazz.getMethods()).filter(m ->
                 m.getName().equalsIgnoreCase("handle")).findFirst();

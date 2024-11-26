@@ -1,16 +1,18 @@
 package org.kendar.mysql.plugins;
 
-import org.kendar.plugins.JdbcRecordingPlugin;
+import org.kendar.plugins.JdbcRecordPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MySqlRecordPlugin extends JdbcRecordingPlugin {
+public class MySqlRecordPlugin extends JdbcRecordPlugin {
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
+
 
     @Override
     public String getProtocol() {

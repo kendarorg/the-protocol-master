@@ -2,7 +2,7 @@ package org.kendar.command;
 
 import org.apache.commons.cli.*;
 import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.settings.BasicRecordingPluginSettings;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
@@ -78,7 +78,7 @@ public abstract class CommonRunner {
             plugin.setReplayId(cmd.getOptionValue("plid", UUID.randomUUID().toString()));
             section.getPlugins().put("replay-plugin", plugin);
         } else if (cmd.hasOption("record")) {
-            var plugin = new BasicRecordingPluginSettings();
+            var plugin = new BasicRecordPluginSettings();
             section.getPlugins().put("record-plugin", plugin);
             plugin.setPlugin("record-plugin");
             plugin.setActive(true);

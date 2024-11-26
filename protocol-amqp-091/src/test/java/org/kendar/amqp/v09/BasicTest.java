@@ -3,7 +3,7 @@ package org.kendar.amqp.v09;
 
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
-import org.kendar.amqp.v09.plugins.AmqpRecordingPlugin;
+import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -70,7 +70,7 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new AmqpRecordingPlugin().withStorage(storage);
+        var pl = new AmqpRecordPlugin().withStorage(storage);
         proxy.setPlugins(List.of(
                 pl));
         pl.setActive(true);

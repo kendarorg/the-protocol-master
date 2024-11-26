@@ -5,7 +5,7 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.FinalizeWriteEvent;
 import org.kendar.events.RecordStatusEvent;
 import org.kendar.events.WriteItemEvent;
-import org.kendar.plugins.settings.BasicRecordingPluginSettings;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -19,7 +19,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordingPlugin<W extends BasicRecordingPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
+public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
@@ -111,12 +111,12 @@ public abstract class RecordingPlugin<W extends BasicRecordingPluginSettings> ex
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         withStorage((StorageRepository) global.getService("storage"));
-        ignoreTrivialCalls = ((BasicRecordingPluginSettings) pluginSetting).isIgnoreTrivialCalls();
+        ignoreTrivialCalls = ((BasicRecordPluginSettings) pluginSetting).isIgnoreTrivialCalls();
         super.initialize(global, protocol, pluginSetting);
         return this;
     }
 
-    public RecordingPlugin withStorage(StorageRepository storage) {
+    public RecordPlugin withStorage(StorageRepository storage) {
         if (storage != null) {
             this.storage = storage;
         }

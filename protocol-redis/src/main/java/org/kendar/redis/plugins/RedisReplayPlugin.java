@@ -1,6 +1,6 @@
 package org.kendar.redis.plugins;
 
-import org.kendar.plugins.ReplayingPlugin;
+import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -13,7 +13,7 @@ import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 
-public class RedisReplayingPlugin extends ReplayingPlugin<BasicReplayPluginSettings> {
+public class RedisReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
 
     @Override

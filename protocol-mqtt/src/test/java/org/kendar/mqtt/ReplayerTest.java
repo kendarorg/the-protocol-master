@@ -4,7 +4,7 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.kendar.mqtt.plugins.MqttReplayingPlugin;
+import org.kendar.mqtt.plugins.MqttReplayPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.utils.Sleeper;
@@ -51,7 +51,7 @@ public class ReplayerTest {
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos0Test"));
         storage.initialize();
-        var pl = new MqttReplayingPlugin().withStorage(storage);
+        var pl = new MqttReplayPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
@@ -100,7 +100,7 @@ public class ReplayerTest {
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos1Test"));
         storage.initialize();
-        var pl = new MqttReplayingPlugin().withStorage(storage);
+        var pl = new MqttReplayPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
@@ -149,7 +149,7 @@ public class ReplayerTest {
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos2Test"));
         storage.initialize();
-        var pl = new MqttReplayingPlugin().withStorage(storage);
+        var pl = new MqttReplayPlugin().withStorage(storage);
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
