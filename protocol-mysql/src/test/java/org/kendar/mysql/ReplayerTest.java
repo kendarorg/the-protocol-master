@@ -79,7 +79,6 @@ public class ReplayerTest {
 
 
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",
-                //postgresContainer.getJdbcUrl(),
                 String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
                 "test", "test",
                 "org.hibernate.dialect.MySQLDialect",
