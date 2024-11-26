@@ -7,6 +7,7 @@ import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
+import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -68,7 +69,7 @@ public class BasicTest {
         global.putService("storage",storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.setSettings(global, mockPluginSettings);
+        pl1.initialize(global,new JdbcProtocolSettings(), mockPluginSettings);
         proxy.setPlugins(List.of(pl, pl1));
 
 
@@ -111,7 +112,7 @@ public class BasicTest {
         var pl1 = new MySqlMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.setSettings(global, mockPluginSettings);
+        pl1.initialize(global,new JdbcProtocolSettings(), mockPluginSettings);;
         proxy.setPlugins(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

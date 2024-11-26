@@ -40,7 +40,7 @@ public class JpaTest extends BasicTest {
                 //postgresContainer.getJdbcUrl(),
                 String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
                 mysqlContainer.getUserId(), mysqlContainer.getPassword(),
-                "org.hibernate.dialect.MySQLDialect",
+                "org.hibernate.dialect.MySQL8Dialect",
                 CompanyJpa.class);
 
 

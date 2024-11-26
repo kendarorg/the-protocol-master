@@ -2,6 +2,7 @@ package org.kendar.mqtt.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.plugins.RecordingPlugin;
+import org.kendar.plugins.settings.BasicRecordingPluginSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 
@@ -9,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MqttRecordingPlugin extends RecordingPlugin {
+public class MqttRecordingPlugin extends RecordingPlugin<BasicRecordingPluginSettings> {
     private static final List<String> toAvoid = List.of("Disconnect", "PingReq");
 
     private static int getConsumeId(JsonNode data, int consumeId) {

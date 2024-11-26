@@ -20,7 +20,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult> {
+public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcCall, SelectResult,BasicReplayPluginSettings> {
     protected static JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected StorageRepository storage;
@@ -30,9 +30,9 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         withStorage((StorageRepository) global.getService("storage"));
-        super.initialize(global, protocol);
+        super.initialize(global, protocol, pluginSetting);
         return this;
     }
 
@@ -158,15 +158,4 @@ public abstract class JdbcReplayingPlugin extends ProtocolPluginDescriptor<JdbcC
 
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return BasicReplayPluginSettings.class;
-    }
-
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        withStorage((StorageRepository) globalSettings.getService("storage"));
-        super.setSettings(globalSettings, plugin);
-        return this;
-    }
 }

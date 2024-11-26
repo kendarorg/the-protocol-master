@@ -6,6 +6,7 @@ import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpRecordingPlugin;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.plugins.HttpReplayingPlugin;
+import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.plugins.ProtocolPhase;
@@ -33,7 +34,7 @@ public class ReplayRecordFilters {
         settings.getRecordSites().add("@.*microsoft.*");
         var global = new GlobalSettings();
         global.putService("storage",new NullStorageRepository());
-        rwPlugin.setSettings(global, settings);
+        rwPlugin.initialize(global,new HttpProtocolSettings(), settings);
 
         var pc = new PluginContext("http", null, 0L, null);
         pc.getTags().put("id",1L);
@@ -84,7 +85,7 @@ public class ReplayRecordFilters {
         var global = new GlobalSettings();
         global.putService("storage",new NullStorageRepository());
 
-        rwPlugin.setSettings(global, settings);
+        rwPlugin.initialize(global, new HttpProtocolSettings(),settings);
 
         var pc = new PluginContext("http", null, 0L, null);
         var in = new Request();

@@ -13,6 +13,7 @@ import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.utils.Sleeper;
@@ -22,8 +23,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class HttpReplayingPlugin extends ReplayingPlugin {
-    private HttpReplayPluginSettings settings;
+public class HttpReplayingPlugin extends ReplayingPlugin<HttpReplayPluginSettings> {
     private boolean blockExternal = true;
     private List<Pattern> matchSites = new ArrayList<>();
 
@@ -97,7 +97,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         var item = lineToRead.getStorageItem();
         System.out.println("READING " + item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
-        if (settings.isRespectCallDuration()) {
+        if (getSettings().isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());
         }
         try {
@@ -122,17 +122,13 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
                         Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return HttpReplayPluginSettings.class;
-    }
 
     @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        super.setSettings(globalSettings, plugin);
-        settings = (HttpReplayPluginSettings) plugin;
-        blockExternal = settings.isBlockExternal();
-        setupMatchSites(settings.getMatchSites());
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+
+        blockExternal = getSettings().isBlockExternal();
+        setupMatchSites(getSettings().getMatchSites());
         return this;
     }
 

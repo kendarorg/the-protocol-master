@@ -19,16 +19,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, Object> {
+public abstract class ReplayingPlugin<W  extends BasicReplayPluginSettings> extends ProtocolPluginDescriptor<Object, Object,W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
     protected StorageRepository storage;
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         withStorage((StorageRepository) global.getService("storage"));
-        super.initialize(global, protocol);
+        super.initialize(global, protocol, pluginSetting);
         return this;
     }
 
@@ -156,14 +156,4 @@ public abstract class ReplayingPlugin extends ProtocolPluginDescriptor<Object, O
 
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return BasicReplayPluginSettings.class;
-    }
-
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        withStorage((StorageRepository) globalSettings.getService("storage"));
-        super.setSettings(globalSettings, plugin);
-        return this;
-    }
 }

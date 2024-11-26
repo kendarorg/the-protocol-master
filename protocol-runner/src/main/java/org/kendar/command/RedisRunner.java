@@ -38,11 +38,11 @@ public class RedisRunner extends CommonRunner {
     }
 
     @Override
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
-                      GlobalSettings ini, ProtocolSettings protocol,
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServers, String key,
+                      GlobalSettings ini, ProtocolSettings opaqueProtocolSettings,
                       StorageRepository storage, List<PluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
-        var protocolSettings = (ByteProtocolSettings) protocol;
+        var protocolSettings = (ByteProtocolSettings) opaqueProtocolSettings;
         var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 6379);
         var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(), 30);
         var connectionString = ProtocolsRunner.getOrDefault(protocolSettings.getConnectionString(), "");
@@ -51,7 +51,8 @@ public class RedisRunner extends CommonRunner {
         var proxy = new Resp3Proxy(connectionString, null, null);
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
-            plugin.initialize(ini, protocolSettings);
+            var specificPluginSetting = opaqueProtocolSettings.getPlugin(plugin.getId(), plugin.getSettingClass());
+            plugin.initialize(ini, protocolSettings,specificPluginSetting);
             plugin.forceActivation();
         }
         proxy.setPlugins(plugins);
@@ -60,7 +61,7 @@ public class RedisRunner extends CommonRunner {
         ps = new TcpServer(baseProtocol);
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(key, ps);
+        protocolServers.put(key, ps);
     }
 
     @Override

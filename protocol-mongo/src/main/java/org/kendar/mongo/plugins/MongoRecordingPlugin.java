@@ -1,8 +1,9 @@
 package org.kendar.mongo.plugins;
 
 import org.kendar.plugins.RecordingPlugin;
+import org.kendar.plugins.settings.BasicRecordingPluginSettings;
 
-public class MongoRecordingPlugin extends RecordingPlugin {
+public class MongoRecordingPlugin extends RecordingPlugin<BasicRecordingPluginSettings> {
 
 
     @Override

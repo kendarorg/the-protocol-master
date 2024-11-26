@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response> {
+public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response,HttpErrorPluginSettings> {
 
     private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
     private int errorCode;
@@ -37,11 +37,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response>
         return "http";
     }
 
-    @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
-        return this;
-    }
+
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
@@ -62,14 +58,9 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response>
     }
 
     @Override
-    public Class<?> getSettingClass() {
-        return HttpErrorPluginSettings.class;
-    }
-
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        super.setSettings(globalSettings, plugin);
-        var settings = (HttpErrorPluginSettings) plugin;
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+        var settings = (HttpErrorPluginSettings) pluginSetting;
         this.errorCode = settings.getShowError();
         this.errorMessage = settings.getErrorMessage();
         this.percentage = ((double) settings.getErrorPercent()) / 100.0;

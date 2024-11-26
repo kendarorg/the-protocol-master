@@ -112,7 +112,8 @@ public class JdbcRunner extends CommonRunner {
                 realSttings.getLogin(), realSttings.getPassword());
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
-            plugin.initialize(ini, protocolSettings);
+            var specificPluginSetting = protocolSettings.getPlugin(plugin.getId(), plugin.getSettingClass());
+            plugin.initialize(ini, protocolSettings,specificPluginSetting);
             plugin.forceActivation();
         }
         proxy.setPlugins(plugins);

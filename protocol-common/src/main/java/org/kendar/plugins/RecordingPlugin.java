@@ -19,7 +19,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
+public abstract class RecordingPlugin<W  extends BasicRecordingPluginSettings> extends ProtocolPluginDescriptor<Object, Object,W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
@@ -46,14 +46,6 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
             }
         }
         return false;
-    }
-
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        withStorage((StorageRepository) globalSettings.getService("storage"));
-        super.setSettings(globalSettings, plugin);
-        ignoreTrivialCalls = ((BasicRecordingPluginSettings) plugin).isIgnoreTrivialCalls();
-        return this;
     }
 
     protected void asyncCall(PluginContext pluginContext, Object out) {
@@ -117,9 +109,10 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         withStorage((StorageRepository) global.getService("storage"));
-        super.initialize(global, protocol);
+        ignoreTrivialCalls = ((BasicRecordingPluginSettings) pluginSetting).isIgnoreTrivialCalls();
+        super.initialize(global, protocol, pluginSetting);
         return this;
     }
 
@@ -151,10 +144,6 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         return "record-plugin";
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return BasicRecordingPluginSettings.class;
-    }
 
     protected Object getData(Object of) {
         return of;

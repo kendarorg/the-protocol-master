@@ -205,7 +205,7 @@ public class SimpleTest extends BasicTest {
         var lps = new HttpLatencyPluginSettings();
         lps.setMinMs(2000);
         lps.setMaxMs(3000);
-        latencyPlugin.setSettings(globalSettings, lps);
+        latencyPlugin.initialize(globalSettings,httpProtocolSettings, lps);
         latencyPlugin.setActive(true);
 
         var cf = new ChangeableReference<>("");
@@ -259,7 +259,7 @@ public class SimpleTest extends BasicTest {
         var latencyPlugin = (HttpRateLimitPlugin)baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("rate-limit-plugin")).findFirst().get();
         var lps = new HttpRateLimitPluginSettings();
         lps.setResetTimeWindowSeconds(3);
-        latencyPlugin.setSettings(globalSettings, lps);
+        latencyPlugin.initialize(globalSettings,httpProtocolSettings, lps);
         latencyPlugin.setActive(true);
 
         var httpclient = createHttpsHttpClient();
@@ -302,7 +302,7 @@ public class SimpleTest extends BasicTest {
         var lps = new HttpRateLimitPluginSettings();
         lps.setResetTimeWindowSeconds(3);
         lps.setCustomResponseFile(Path.of("src","test","resources","ratelimitresponse.json").toString());
-        latencyPlugin.setSettings(globalSettings, lps);
+        latencyPlugin.initialize(globalSettings,httpProtocolSettings, lps);
         latencyPlugin.setActive(true);
 
         var httpclient = createHttpsHttpClient();

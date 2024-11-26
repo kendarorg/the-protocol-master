@@ -99,7 +99,7 @@ public abstract class Proxy {
                     var map = allowedPlugins.get(pars);
                     for (var phase : plugin.getPhases()) {
                         if (!map.containsKey(phase)) {
-                            map.put(phase, new ArrayList<>());
+                            map.put((ProtocolPhase) phase, new ArrayList<>());
                         }
                         map.get(phase).add((ProtocolPluginDescriptor) plugin);
                     }

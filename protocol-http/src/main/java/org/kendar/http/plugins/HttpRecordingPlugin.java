@@ -7,15 +7,16 @@ import org.kendar.plugins.RecordingPlugin;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.StorageRepository;
 
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class HttpRecordingPlugin extends RecordingPlugin {
+public class HttpRecordingPlugin extends RecordingPlugin<HttpRecordPluginSettings> {
     private List<Pattern> recordSites = new ArrayList<>();
-    private HttpRecordPluginSettings settings;
 
 
     @Override
@@ -43,7 +44,7 @@ public class HttpRecordingPlugin extends RecordingPlugin {
                 return;
             }
         }
-
+        var settings = (HttpRecordPluginSettings)getSettings();
         if (settings.isRemoveEtags()) {
             var all = request.getHeader("If-none-match");
             if (all != null && !all.isEmpty()) all.clear();
@@ -57,18 +58,7 @@ public class HttpRecordingPlugin extends RecordingPlugin {
         super.postCall(pluginContext, in, out);
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return HttpRecordPluginSettings.class;
-    }
 
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        super.setSettings(globalSettings, plugin);
-        settings = (HttpRecordPluginSettings) plugin;
-        setupSitesToRecord(settings.getRecordSites());
-        return this;
-    }
 
     private void setupSitesToRecord(List<String> recordSites) {
         this.recordSites = recordSites.stream()
@@ -92,4 +82,11 @@ public class HttpRecordingPlugin extends RecordingPlugin {
         return result;
     }
 
+    @Override
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+        withStorage((StorageRepository) global.getService("storage"));
+        setupSitesToRecord(getSettings().getRecordSites());
+        return this;
+    }
 }

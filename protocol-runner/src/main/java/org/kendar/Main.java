@@ -29,7 +29,6 @@ import org.kendar.redis.plugins.RedisRecordingPlugin;
 import org.kendar.redis.plugins.RedisReplayingPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -179,7 +178,7 @@ public class Main {
         return allPlugins;
     }
 
-    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?>> embeddedPlugins) {
+    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?,?>> embeddedPlugins) {
         if (!plugins.containsKey(prt)) {
             plugins.put(prt, new ArrayList<>());
         }
@@ -264,14 +263,12 @@ public class Main {
             var availablePlugin = availablePlugins.stream().filter(av -> av.getId().equalsIgnoreCase(simplePlugin.getKey())).findFirst();
             if (availablePlugin.isPresent()) {
                 var pluginInstance = availablePlugin.get().clone();
-                pluginInstance.setSettings(global,protocol.getPlugin(simplePlugin.getKey(), pluginInstance.getSettingClass()));
                 plugins.add(pluginInstance);
             }
         }
         var alwaysActives = availablePlugins.stream().filter(av -> AlwaysActivePlugin.class.isAssignableFrom(av.getClass())).collect(Collectors.toList());
         for (var alwaysActive : alwaysActives) {
             var pluginInstance = alwaysActive.clone();
-            pluginInstance.setSettings(global, new PluginSettings());
             plugins.add(pluginInstance);
         }
         return plugins;

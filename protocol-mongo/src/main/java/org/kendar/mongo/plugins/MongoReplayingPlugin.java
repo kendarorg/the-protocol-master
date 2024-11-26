@@ -4,13 +4,14 @@ import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.plugins.ReplayingPlugin;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
 
 import java.util.List;
 
-public class MongoReplayingPlugin extends ReplayingPlugin {
+public class MongoReplayingPlugin extends ReplayingPlugin<BasicReplayPluginSettings> {
     @Override
     public String getProtocol() {
         return "mongodb";

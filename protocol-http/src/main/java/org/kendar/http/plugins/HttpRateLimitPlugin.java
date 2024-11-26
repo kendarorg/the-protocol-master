@@ -8,6 +8,7 @@ import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.FileResourcesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +23,8 @@ import java.util.stream.Collectors;
 
 
 
-public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Response> {
+public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Response,HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
-    private HttpRateLimitPluginSettings settings;
     private List<Pattern> recordSites = new ArrayList<>();
     private Calendar resetTime;
     private int resourcesRemaining = -1;
@@ -36,6 +36,20 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
             resetTime = null;
             resourcesRemaining = -1;
         }
+    }
+
+
+
+    @Override
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global,protocol,pluginSetting);
+        var settings = getSettings();
+        setupSitesToRecord(settings.getLimitSites());
+        if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
+            var frr = new FileResourcesUtils();
+            customResponse = mapper.deserialize(frr.getFileFromResourceAsString(settings.getCustomResponseFile()), Response.class);
+        }
+        return this;
     }
 
     @Override
@@ -57,18 +71,6 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
             return handleRateLimit(pluginContext, phase, in, out);
         }
         return false;
-    }
-
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        setActive(plugin.isActive());
-        settings = (HttpRateLimitPluginSettings) plugin;
-        setupSitesToRecord(settings.getLimitSites());
-        if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
-            var frr = new FileResourcesUtils();
-            customResponse = mapper.deserialize(frr.getFileFromResourceAsString(settings.getCustomResponseFile()), Response.class);
-        }
-        return this;
     }
 
     private void setupSitesToRecord(List<String> recordSites) {
@@ -99,14 +101,12 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
 
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return HttpRateLimitPluginSettings.class;
-    }
 
     private boolean handleRateLimit(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
 
         synchronized (sync) {
+
+            var settings = (HttpRateLimitPluginSettings) getSettings();
             // set the initial values for the first request
             if (resetTime == null) {
                 resetTime = Calendar.getInstance();

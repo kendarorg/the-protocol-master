@@ -31,8 +31,8 @@ import java.util.logging.Level;
 public class HttpProtocol extends NetworkProtoDescriptor {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
     private final GlobalSettings globalSettings;
-    private final HttpProtocolSettings settings;
     private final List<PluginDescriptor> plugins;
+    private final HttpProtocolSettings settings;
     private ProxyServer proxy;
     private HttpsServer httpsServer;
     private HttpServer httpServer;
@@ -176,7 +176,10 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
             for (var i = plugins.size() - 1; i >= 0; i--) {
                 var plugin = plugins.get(i);
-                plugin.initialize(globalSettings, settings);
+                var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
+                if(specificPluginSetting!=null) {
+                    plugin.initialize(globalSettings, settings, specificPluginSetting);
+                }
             }
 
             var handler = new MasterHandler(

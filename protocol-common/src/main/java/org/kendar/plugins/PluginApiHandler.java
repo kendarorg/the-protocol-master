@@ -1,11 +1,13 @@
 package org.kendar.plugins;
 
-import com.sun.net.httpserver.HttpExchange;
+/**
+ * Protocol specific APIs handler
+ */
+public interface PluginApiHandler extends GlobalPluginApiHandler{
 
-public interface PluginApiHandler {
-    boolean handle(BaseApiServerHandler apiServerHandler, HttpExchange exchange, String pathPart);
-
-    String getId();
-
+    /**
+     * Retrieve the instance id of the protocol to which the API handler is connected
+     * @return
+     */
     String getProtocolInstanceId();
 }

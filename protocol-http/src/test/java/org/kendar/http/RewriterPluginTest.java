@@ -2,6 +2,7 @@ package org.kendar.http;
 
 import org.junit.jupiter.api.Test;
 import org.kendar.http.plugins.HttpRewritePlugin;
+import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.Request;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.RewritePluginSettings;
@@ -23,7 +24,7 @@ public class RewriterPluginTest {
         var global = new GlobalSettings();
         global.putService("storage",new NullStorageRepository());
 
-        target.setSettings(global, settings);
+        target.initialize(global,new HttpProtocolSettings(), settings);
         var phase = ProtocolPhase.CONNECT;
         var pc = new PluginContext("http", "type", 0, null);
         var request = new Request();

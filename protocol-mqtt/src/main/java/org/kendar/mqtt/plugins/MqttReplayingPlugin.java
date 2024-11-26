@@ -5,6 +5,7 @@ import org.kendar.mqtt.MqttProtocol;
 import org.kendar.mqtt.fsm.ConnectAck;
 import org.kendar.mqtt.fsm.Publish;
 import org.kendar.plugins.ReplayingPlugin;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class MqttReplayingPlugin extends ReplayingPlugin {
+public class MqttReplayingPlugin extends ReplayingPlugin<BasicReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(MqttReplayingPlugin.class);
 

@@ -74,7 +74,8 @@ public class MqttRunner extends CommonRunner {
         var proxy = new MqttProxy(connectionString, login, password);
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
-            plugin.initialize(ini, protocolSettings);
+            var specificPluginSetting = protocol.getPlugin(plugin.getId(), plugin.getSettingClass());
+            plugin.initialize(ini, protocolSettings,specificPluginSetting);
             plugin.forceActivation();
         }
         proxy.setPlugins(plugins);
