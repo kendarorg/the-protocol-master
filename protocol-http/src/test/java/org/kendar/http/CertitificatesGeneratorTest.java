@@ -1,7 +1,6 @@
 package org.kendar.http;
 
 import org.apache.commons.codec.binary.Base64;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.ssl.GeneratedCert;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 
 public class CertitificatesGeneratorTest {
     @Test
-    @Disabled
     public void generateFromScratch() throws Exception {
         var target = new CertificatesManager(null);
         var extraDomains = new ArrayList<String>();
