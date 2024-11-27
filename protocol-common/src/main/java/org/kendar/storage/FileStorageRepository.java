@@ -273,63 +273,6 @@ public class FileStorageRepository implements StorageRepository {
         return ctx.inMemoryDb.get(id);
     }
 
-    @Override
-    public LineToRead read(String protocolInstanceId, CallItemsQuery query) {
-        var ctx = protocolRepo.get(protocolInstanceId);//initializeContent(protocolInstanceId);
-        synchronized (ctx.lockObject) {
-
-            var idx = ctx.index.stream()
-                    .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
-                    .filter(a ->
-                            typeMatching(query.getType(), a.getType()) &&
-                                    a.getCaller().equalsIgnoreCase(query.getCaller()) &&
-                                    tagsMatching(a.getTags(), query) &&
-                                    query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
-                    ).findFirst();
-
-            Optional<StorageItem> item = Optional.empty();
-
-            if (idx.isEmpty() && query.getTag("next") != null && !query.getTag("next").isEmpty()) {
-                var next = Integer.parseInt(query.getTag("next"));
-                idx = ctx.index.stream()
-                        .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
-                        .filter(a ->
-                                a.getIndex() > next &&
-                                        typeMatching(query.getType(), a.getType()) &&
-                                        a.getCaller().equalsIgnoreCase(query.getCaller()) &&
-                                        query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
-                        ).findFirst();
-            }
-            if (idx.isPresent()) {
-                var realItem = idx.get();
-                item = ctx.inMemoryDb.values().stream()
-                        .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
-                        .filter(a -> a.getIndex() == realItem.getIndex()).findFirst();
-            } else {
-                log.warn("[TPM  ][WR]: Index not found!");
-            }
-
-            if (item.isPresent()) {
-
-                log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
-                //ctx.inMemoryDb.remove(item.get().getIndex());
-                //idx.ifPresent(compactLine -> ctx.index.remove(compactLine));
-                return new LineToRead(item.get(), idx.get());
-            }
-
-            if (idx.isPresent()) {
-                log.debug("[SERVER][REPSHRT] {}:{}", idx.get().getIndex(), idx.get().getType());
-                //ctx.index.remove(idx.get());
-                var si = new StorageItem();
-                si.setIndex(idx.get().getIndex());
-
-                return new LineToRead(si, idx.get());
-            }
-
-            return null;
-        }
-    }
-
     private boolean typeMatching(String type, String type1) {
         if ("RESPONSE".equalsIgnoreCase(type1)) return false;
         if (type == null || type.isEmpty()) return true;

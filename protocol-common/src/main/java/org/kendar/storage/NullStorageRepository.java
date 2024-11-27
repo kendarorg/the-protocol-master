@@ -25,11 +25,6 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
-    public LineToRead read(String instanceId, CallItemsQuery query) {
-        return null;
-    }
-
-    @Override
     public StorageItem readById(String instanceId, long id) {
         return null;
     }

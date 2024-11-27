@@ -10,6 +10,4 @@ public class MongoRecordPlugin extends RecordPlugin<BasicRecordPluginSettings> {
     public String getProtocol() {
         return "mongodb";
     }
-
-
 }
