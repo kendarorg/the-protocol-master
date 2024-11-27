@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 
 public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
     protected static final JsonMapper mapper = new JsonMapper();
+    static final ExecutorService executor = Executors.newCachedThreadPool();
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
     protected StorageRepository storage;
-    static final ExecutorService executor = Executors.newCachedThreadPool();
     private List<CompactLine> indexes;
 
     @Override
@@ -71,14 +71,13 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     protected void handleActivation(boolean active) {
         if (this.isActive() != active) {
             this.storage.isRecording(getInstanceId(), !active);
-            if(active){
+            if (active) {
                 indexes = this.storage.getIndexes(getInstanceId());
             }
         }
         completedOutIndexes.clear();
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
-
 
 
     protected void sendAndExpect(PluginContext pluginContext, Object in, Object out) {
@@ -89,13 +88,13 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         query.setType(pluginContext.getType());
         query.setUsed(completedIndexes);
         var index = findIndex(query);
-        var storageItem = storage.readById(getInstanceId(),index.getIndex());
-        if(storageItem == null){
+        var storageItem = storage.readById(getInstanceId(), index.getIndex());
+        if (storageItem == null) {
             storageItem = new StorageItem();
             storageItem.setIndex(index.getIndex());
         }
 
-        var lineToRead = new LineToRead(storageItem,index);
+        var lineToRead = new LineToRead(storageItem, index);
         if (lineToRead == null) {
             return;
         }
@@ -116,18 +115,23 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.add((int) response.getIndex());
                 result.add(response);
             }
-            if(result.size()>0){
-                executor.submit(()->sendBackResponses(pluginContext.getContext(), result));
+            if (result.size() > 0) {
+                executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
             }
         }
         var outputItem = item.getOutput();
         if (context.isUseCallDurationTimes()) {
             Sleeper.sleep(item.getDurationMs());
         }
-        buildState(pluginContext, context, in, outputItem, out);
+        lineToRead = beforeSendingReadResult(lineToRead);
+        buildState(pluginContext, context, in, outputItem, out,lineToRead);
     }
 
-    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outputItem, Object aClass) {
+    protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
+        return lineToRead;
+    }
+
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outputItem, Object aClass, LineToRead lineToRead) {
 
     }
 
@@ -138,13 +142,13 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         query.setType(in.getClass().getSimpleName());
         query.setUsed(completedIndexes);
         var index = findIndex(query);
-        var storageItem = storage.readById(getInstanceId(),index.getIndex());
-        if(storageItem == null){
+        var storageItem = storage.readById(getInstanceId(), index.getIndex());
+        if (storageItem == null) {
             storageItem = new StorageItem();
             storageItem.setIndex(index.getIndex());
         }
 
-        var lineToRead = new LineToRead(storageItem,index);
+        var lineToRead = new LineToRead(storageItem, index);
         var item = lineToRead.getStorageItem();
 
         completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
@@ -161,13 +165,13 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.add((int) response.getIndex());
                 result.add(response);
             }
-            if(result.size()>0){
-                executor.submit(()->sendBackResponses(pluginContext.getContext(), result));
+            if (result.size() > 0) {
+                executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
             }
         }
     }
 
-    protected void sendBackResponses(ProtoContext context, List<StorageItem> result){
+    protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
 
     }
 
@@ -186,7 +190,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     }
 
-    protected CompactLine findIndex(CallItemsQuery query){
+    protected CompactLine findIndex(CallItemsQuery query) {
         var idx = indexes.stream()
                 .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
                 .filter(a ->
@@ -196,11 +200,11 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 ).collect(Collectors.toList());
         CompactLine bestIndex = null;
         var maxMatch = -1;
-        for(var index:idx){
-            var currentMatch = tagsMatching(index.getTags(),query);
-            currentMatch+=addParametricMatching(index.getTags(),query.getTags());
-            if(currentMatch>maxMatch){
-                maxMatch=currentMatch;
+        for (var index : idx) {
+            var currentMatch = tagsMatching(index.getTags(), query);
+            currentMatch += addParametricMatching(index.getTags(), query.getTags());
+            if (currentMatch > maxMatch) {
+                maxMatch = currentMatch;
                 bestIndex = index;
             }
         }
@@ -208,7 +212,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         return bestIndex;
     }
 
-    protected int addParametricMatching(Map<String, String> possible, HashMap<String, String> query){
+    protected int addParametricMatching(Map<String, String> possible, HashMap<String, String> query) {
         return 0;
     }
 
@@ -227,7 +231,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 //noinspection StringEquality
                 if ((l == null || r == null) && l == r) {
                     result++;
-                }else if (l != null && l.equalsIgnoreCase(r)) {
+                } else if (l != null && l.equalsIgnoreCase(r)) {
                     result++;
                 }
             }

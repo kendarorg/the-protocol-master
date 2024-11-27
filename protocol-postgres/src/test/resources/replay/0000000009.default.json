@@ -1,8 +1,8 @@
 {
-  "timestamp" : 1732712148852,
+  "timestamp" : 1732712148955,
   "constant" : false,
   "connectionId" : 1,
-  "index" : 4,
+  "index" : 9,
   "input" : {
     "query" : "SELECT t.typname,t.oid FROM pg_catalog.pg_type t JOIN pg_catalog.pg_namespace n ON (t.typnamespace = n.oid)  WHERE n.nspname  != 'pg_toast' AND  (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid))",
     "parameterValues" : [ ]
@@ -27,7 +27,7 @@
     },
     "intResult" : 0
   },
-  "durationMs" : 14,
+  "durationMs" : 2,
   "type" : "QUERY",
   "caller" : "JDBC",
   "inputType" : "JdbcCall",

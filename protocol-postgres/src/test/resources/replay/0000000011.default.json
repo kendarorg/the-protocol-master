@@ -1,76 +1,25 @@
 {
-  "constant": false,
-  "connectionId": 1,
-  "index": 11,
-  "input": {
-    "query": "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *",
-    "parameterValues": [
-      {
-        "binary": false,
-        "output": false,
-        "type": "VARCHAR",
-        "value": "TEST RD"
-      },
-      {
-        "binary": false,
-        "output": false,
-        "type": "INTEGER",
-        "value": "22"
-      },
-      {
-        "binary": false,
-        "output": false,
-        "type": "VARCHAR",
-        "value": "Test Ltd"
-      },
-      {
-        "binary": false,
-        "output": false,
-        "type": "DOUBLE",
-        "value": "500.22"
-      }
-    ]
+  "timestamp" : 1732712149055,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 11,
+  "input" : {
+    "query" : "drop table if exists COMPANY_JPA cascade",
+    "parameterValues" : [ ]
   },
-  "output": {
-    "selectResult": {
-      "records": [
-        [
-          "1",
-          "TEST RD",
-          "22",
-          "Test Ltd",
-          "500.22"
-        ]
-      ],
-      "metadata": [
-        {
-          "columnName": "id",
-          "byteData": false
-        },
-        {
-          "columnName": "address",
-          "byteData": false
-        },
-        {
-          "columnName": "age",
-          "byteData": false
-        },
-        {
-          "columnName": "denomination",
-          "byteData": false
-        },
-        {
-          "columnName": "salary",
-          "byteData": false
-        }
-      ],
-      "count": 1,
-      "intResult": false,
-      "lastInsertedId": 0
+  "output" : {
+    "selectResult" : {
+      "records" : [ ],
+      "metadata" : [ ],
+      "count" : 0,
+      "intResult" : true,
+      "lastInsertedId" : 0
     },
-    "intResult": 0
+    "intResult" : 0
   },
-  "durationMs": 8,
-  "type": "QUERY",
-  "caller": "JDBC"
+  "durationMs" : 4,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
 }

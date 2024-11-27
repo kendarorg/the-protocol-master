@@ -6,6 +6,7 @@ import org.kendar.events.FinalizeWriteEvent;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.storage.generic.*;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,9 +81,9 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     private ProtocolRepo initializeContent(String protocolInstanceIdOuter) {
-        if (protocolRepo.contains(protocolInstanceIdOuter)) {
-            return protocolRepo.get(protocolInstanceIdOuter);
-        }
+//        if (protocolRepo.contains(protocolInstanceIdOuter)) {
+//            return protocolRepo.get(protocolInstanceIdOuter);
+//        }
 
         synchronized (initializeContentLock) {
 
@@ -117,9 +118,9 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     private void initializeContentWrite(String protocolInstanceIdOuter) {
-        if (protocolRepo.contains(protocolInstanceIdOuter)) {
-            return;
-        }
+//        if (protocolRepo.contains(protocolInstanceIdOuter)) {
+//            return;
+//        }
         synchronized (initializeContentLock) {
             protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
                 if (currRepo == null) {
@@ -159,9 +160,11 @@ public class FileStorageRepository implements StorageRepository {
     public long generateIndex() {
         return storageCounter.incrementAndGet();
     }
+    private AtomicInteger executorItems = new AtomicInteger(0);
 
     @Override
     public void write(LineToWrite item) {
+        executorItems.incrementAndGet();
         executor.submit(() -> {
             if (item == null) {
                 log.error("Blank item");
@@ -189,6 +192,8 @@ public class FileStorageRepository implements StorageRepository {
                 }
             } catch (Exception e) {
                 log.warn("Trouble writing", e);
+            }finally {
+                executorItems.decrementAndGet();
             }
         });
     }
@@ -237,6 +242,7 @@ public class FileStorageRepository implements StorageRepository {
     @Override
     public void finalizeWrite(String protocolInstanceId) {
         try {
+            Sleeper.sleepNoException(1000,()->executorItems.get()==0,true);
             var repo = protocolRepo.get(protocolInstanceId);
             if (repo == null) return;
             protocolRepo.remove(protocolInstanceId);

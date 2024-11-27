@@ -1,20 +1,20 @@
 {
-  "timestamp" : 1732712148941,
+  "timestamp" : 1732712149218,
   "constant" : false,
   "connectionId" : 1,
-  "index" : 6,
+  "index" : 14,
   "input" : {
-    "query" : "select current_schema()",
+    "query" : "select companyjpa0_.DENOMINATION as col_0_0_ from COMPANY_JPA companyjpa0_",
     "parameterValues" : [ ]
   },
   "output" : {
     "selectResult" : {
-      "records" : [ [ "public" ] ],
+      "records" : [ [ "Test Ltd" ] ],
       "metadata" : [ {
-        "columnName" : "current_schema",
+        "columnName" : "col_0_0_",
         "byteData" : false,
         "columnType" : "VARCHAR",
-        "precision" : 2147483647
+        "precision" : 255
       } ],
       "count" : 1,
       "intResult" : false,

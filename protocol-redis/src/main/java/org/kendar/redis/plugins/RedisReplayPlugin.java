@@ -9,6 +9,7 @@ import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.LineToRead;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
@@ -23,7 +24,7 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
     }
 
     @Override
-    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread, LineToRead lineToRead) {
         var out = mapper.toJsonNode(outObj);
         ((Resp3Response) toread).execute(new Resp3Message(context, null, out));
     }

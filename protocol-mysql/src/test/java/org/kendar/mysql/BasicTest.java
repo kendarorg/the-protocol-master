@@ -133,6 +133,8 @@ public class BasicTest {
 
         try {
             protocolServer.stop();
+
+            Sleeper.sleep(5000, () -> !protocolServer.isRunning());
         } catch (Exception ex) {
 
         }

@@ -7,9 +7,7 @@ import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
-import org.kendar.storage.StorageItem;
-
-import java.util.List;
+import org.kendar.storage.generic.LineToRead;
 
 public class MongoReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
     @Override
@@ -19,7 +17,7 @@ public class MongoReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
 
 
     protected void buildState(PluginContext pluginContext, ProtoContext context,
-                              Object in, Object outputData, Object out) {
+                              Object in, Object outputData, Object out, LineToRead lineToRead) {
         switch (pluginContext.getType()) {
             case ("OP_MSG"):
             case ("HELLO_OP_MSG"):

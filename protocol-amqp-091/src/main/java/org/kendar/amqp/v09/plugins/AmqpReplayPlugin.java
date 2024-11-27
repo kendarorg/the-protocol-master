@@ -12,6 +12,7 @@ import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.LineToRead;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
     }
 
     @Override
-    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread, LineToRead lineToRead) {
         if (outObj == null) return;
         if (toread == null) return;
         var out = mapper.toJsonNode(outObj);
