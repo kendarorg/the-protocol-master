@@ -149,6 +149,12 @@ public class FileStorageRepository implements StorageRepository {
 
     }
 
+    @Override
+    public List<CompactLine> getIndexes(String instanceId) {
+        var repo = protocolRepo.get(instanceId);
+        return new ArrayList<>(repo.index);
+    }
+
 
     public long generateIndex() {
         return storageCounter.incrementAndGet();
@@ -251,6 +257,14 @@ public class FileStorageRepository implements StorageRepository {
         }
 
         log.debug("[TPM  ][WR]: Optimized recording");
+    }
+
+
+
+    @Override
+    public StorageItem readById(String protocolInstanceId, long id) {
+        var ctx = protocolRepo.get(protocolInstanceId);
+        return ctx.inMemoryDb.get(id);
     }
 
     @Override

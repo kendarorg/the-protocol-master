@@ -30,6 +30,11 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public StorageItem readById(String instanceId, long id) {
+        return null;
+    }
+
+    @Override
     public List<StorageItem> readResponses(String instanceId, ResponseItemQuery query) {
         return List.of();
     }
@@ -52,6 +57,11 @@ public class NullStorageRepository implements StorageRepository {
     @Override
     public void isRecording(String instanceId, boolean b) {
 
+    }
+
+    @Override
+    public List<CompactLine> getIndexes(String instanceId) {
+        return List.of();
     }
 
     @Override

@@ -29,7 +29,7 @@ public class ReplayRecordFilters {
         };
         var settings = new HttpRecordPluginSettings();
         settings.setActive(true);
-        settings.getRecordSites().add("test_sites");
+        settings.getRecordSites().add("test_sites/*");
         settings.getRecordSites().add("www.sara.com");
         settings.getRecordSites().add("@.*microsoft.*");
         var global = new GlobalSettings();

@@ -13,7 +13,9 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
+import org.kendar.storage.generic.LineToRead;
 import org.kendar.utils.Sleeper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -81,11 +83,18 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
         }
 
         query.setUsed(completedIndexes);
-        var lineToRead = storage.read(getInstanceId(), query);
-        if (lineToRead == null) {
+
+        var index = findIndex(query);
+        if(index==null){
             return false;
         }
+        var storageItem = storage.readById(getInstanceId(),index.getIndex());
+        if(storageItem == null){
+            storageItem = new StorageItem();
+            storageItem.setIndex(index.getIndex());
+        }
 
+        var lineToRead = new LineToRead(storageItem,index);
         var item = lineToRead.getStorageItem();
         System.out.println("READING " + item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
