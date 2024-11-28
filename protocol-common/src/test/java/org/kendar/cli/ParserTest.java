@@ -249,9 +249,52 @@ public class ParserTest {
         assertEquals("3207", parser.getOptionValue("p.postgres.hp", "default"));
     }
 
+
+    @Test
+    void testGetSubs() {
+        var args = new String[]{"-s", "dir", "-p", "http", "-hp", "2035", "-p", "postgres", "-hp", "3207"};
+        var options = CommandOptions.of("main");
+        options.withOptions(
+                CommandOption.of("s", "Storage Dir")
+                        .withMandatoryParameter()
+                        .withLong("storage"),
+                CommandOption.of("p", "The protocol")
+                        .withParameter()
+                        .withMandatoryParameter()
+                        .withLong("protocol")
+                        .withSubChoices(
+
+                        ).withMultipleSubChoices());
+        var parser = new CommandParser(options);
+        parser.parseIgnoreMissing(args);
+        CommandOption co = options.getCommandOption("p");
+        co.withSubChoices(CommandOptions.of("http")
+                        .withOptions(
+                                CommandOption.of("hp", "Http Port")
+                        ),
+                CommandOptions.of("postgres")
+                        .withOptions(
+                                CommandOption.of("hp", "Port")
+                        ));
+
+        parser.parse(args);
+        assertTrue(parser.hasOption("storage"));
+        assertEquals("dir", parser.getOptionValue("storage"));
+        assertTrue(parser.hasOption("p"));
+        assertArrayEquals(new String[]{"http", "postgres"}, parser.getOptionValues("protocol").toArray(new String[]{}));
+        assertTrue(parser.hasOption("p.http"));
+        assertEquals("default", parser.getOptionValue("p.http", "default"));
+        assertTrue(parser.hasOption("p.http.hp"));
+        assertFalse(parser.hasOption("p.http.pp"));
+        assertEquals("2035", parser.getOptionValue("p.http.hp", "default"));
+        assertNull(parser.getOptionValue("p.http.ff"));
+        assertTrue(parser.hasOption("p.postgres.hp"));
+        assertEquals("3207", parser.getOptionValue("p.postgres.hp", "default"));
+    }
+
     @Test
     void testAutoFill() {
-        var args = new String[]{"-s", "dir", "-p", "postgres", "-hp", "3207", "-p", "http", "-hp", "2035"};
+        var args = new String[]{"-s", "dir", "-p", "postgres", "-hp", "3207", "-p", "http", "-hp", "2035","-activate"};
         var options = CommandOptions.of("main");
         var globalSettings = new GlobalSettings();
         options.withOptions(
@@ -260,19 +303,22 @@ public class ParserTest {
                         .withLong("storage")
                         .withCallback(globalSettings::setStorageDir),
                 CommandOption.of("p", "The protocol")
-                        .withParameter()
                         .withMandatoryParameter()
                         .withLong("protocol")
                         .withSubChoices(
                                 CommandOptions.of("http")
                                         .withOptions(
                                                 CommandOption.of("hp", "Http Port")
-                                                        .withCallback((s) -> ((HttpSettings) globalSettings.getProtocols().get("http")).setPort(Integer.parseInt(s)))
+                                                        .withMandatoryParameter()
+                                                        .withCallback((s) -> ((HttpSettings) globalSettings.getProtocols().get("http")).setPort(Integer.parseInt(s))),
+                                                CommandOption.of("activate", "Activate http")
+                                                        .withCallback((s) -> ((HttpSettings) globalSettings.getProtocols().get("http")).setActive(true))
                                         )
                                         .withCallback(s -> globalSettings.getProtocols().put(s, new HttpSettings())),
                                 CommandOptions.of("postgres")
                                         .withOptions(
                                                 CommandOption.of("hp", "Port")
+                                                        .withMandatoryParameter()
                                                         .withCallback((s) -> ((PostgresSettings) globalSettings.getProtocols().get("postgres")).setPort(Integer.parseInt(s)))
                                         )
                                         .withCallback(s -> globalSettings.getProtocols().put(s, new PostgresSettings()))
@@ -284,6 +330,7 @@ public class ParserTest {
         assertEquals(2, globalSettings.getProtocols().size());
         assertEquals(3207, ((PostgresSettings) globalSettings.getProtocols().get("postgres")).getPort());
         assertEquals(2035, ((HttpSettings) globalSettings.getProtocols().get("http")).getPort());
+        assertTrue(((HttpSettings) globalSettings.getProtocols().get("http")).isActive());
     }
 
     @Test
@@ -294,9 +341,7 @@ public class ParserTest {
         options.withOptions(
                 CommandOption.of("h", "Help")
                         .withLong("help")
-                        .withCallback((s)->{
-                            throw new RuntimeException();
-                        }),
+                        .withParameter()),
                 CommandOption.of("s", "Storage Dir")
                         .withMandatoryParameter()
                         .withLong("storage")

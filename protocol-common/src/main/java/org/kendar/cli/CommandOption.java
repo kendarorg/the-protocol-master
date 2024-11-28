@@ -128,7 +128,11 @@ public class CommandOption {
     public void setValues(List<String> values) {
         this.values = values;
         if ( callback != null) {
-            callback.accept(values.get(0));
+            if(!this.isHasParameter()){
+                callback.accept(null);
+            }else {
+                callback.accept(values.get(0));
+            }
         }
     }
 
@@ -180,5 +184,16 @@ public class CommandOption {
     public CommandOption withSubChoicesDescription(String subChoicesDescription) {
         this.subChoicesDescription = subChoicesDescription;
         return this;
+    }
+
+    public CommandOption getCommandOption(String id) {
+        var mainAndChild = id.toLowerCase().split("\\.", 2);
+        if (subChoicesValues.containsKey(mainAndChild[0])) {
+            if (mainAndChild.length == 1) {
+                return null;
+            }
+            return subChoicesValues.get(mainAndChild[0]).getCommandOption(mainAndChild[1]);
+        }
+        return null;
     }
 }

@@ -46,10 +46,17 @@ public class CommandParser {
     public void parse(String[] args) {
         try {
             buildArgs(args);
-            options.parse(mainArgs);
+            options.parse(mainArgs,false);
         }finally {
             printHelp();
         }
+    }
+
+    public void parseIgnoreMissing(String[] args) {
+
+        buildArgs(args);
+        options.parse(mainArgs,true);
+
     }
 
     public boolean hasOption(String id) {

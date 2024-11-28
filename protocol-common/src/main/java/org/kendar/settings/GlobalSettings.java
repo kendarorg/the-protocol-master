@@ -8,12 +8,13 @@ import java.util.Map;
 public class GlobalSettings {
     protected static final JsonMapper mapper = new JsonMapper();
     private final Map<String, Object> services = new HashMap<>();
-    private String pluginsDir;
-    private String logLevel;
-    private String dataDir;
-    private String logType;
-    private int apiPort;
+    private String pluginsDir = "plugins";
+    private String logLevel = "ERROR";
+    private String dataDir = "data";
+    private String logType = "file";
+    private int apiPort = 0;
     private Map<String, Object> protocols = new HashMap<>();
+    private boolean unattended =false;
 
     public int getApiPort() {
         return apiPort;
@@ -87,4 +88,11 @@ public class GlobalSettings {
     }
 
 
+    public void setUnattended(boolean unattended) {
+        this.unattended = unattended;
+    }
+
+    public boolean isUnattended() {
+        return unattended;
+    }
 }

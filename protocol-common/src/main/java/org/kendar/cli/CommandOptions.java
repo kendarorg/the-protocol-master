@@ -90,9 +90,9 @@ public class CommandOptions {
         return result;
     }
 
-    public void parse(List<MainArg> mainArgs) {
+    public void parse(List<MainArg> mainArgs,boolean ignoreMissing) {
         parseInternal(mainArgs);
-        if (!mainArgs.isEmpty()) {
+        if (!ignoreMissing && !mainArgs.isEmpty()) {
             throw new RuntimeException("Unknown options " + mainArgs);
         }
     }
@@ -161,11 +161,6 @@ public class CommandOptions {
                         return !item.getSubChoicesValues().isEmpty();
                     } else if (item.hasOption(mainAndChild[1])) {
                         return true;
-                    } else {
-                        if (item.isPresent()) {
-                            return true;
-                        }
-                        break;
                     }
                 } else if (item.isPresent()) {
                     return true;
@@ -185,11 +180,6 @@ public class CommandOptions {
                         return new ArrayList<>(item.getSubChoicesValues().keySet());
                     } else if (item.hasOption(mainAndChild[1])) {
                         return item.getOptionValues(mainAndChild[1]);
-                    } else {
-                        if (item.isPresent()) {
-                            return item.getValues();
-                        }
-                        break;
                     }
                 } else if (item.isPresent()) {
                     return item.getValues();
@@ -233,5 +223,22 @@ public class CommandOptions {
     public CommandOptions withDescription(String description) {
         this.description = description;
         return this;
+    }
+
+    public CommandOption getCommandOption(String id) {
+        var mainAndChild = id.toLowerCase().split("\\.", 2);
+        for(var item:commandOptions) {
+            if(mainAndChild[0].equalsIgnoreCase(item.getShortCommand())||mainAndChild[0].equalsIgnoreCase(item.getLongCommand())) {
+                if(!item.hasSubChoices() || mainAndChild.length==1){
+                    return item;
+                }else{
+                    var result = item.getCommandOption(mainAndChild[1]);
+                    if(result!=null){
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
