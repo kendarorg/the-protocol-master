@@ -3,19 +3,19 @@ package org.kendar.http.plugins;
 import org.kendar.http.utils.Request;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.RecordingPlugin;
+import org.kendar.plugins.RecordPlugin;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.StorageRepository;
 
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class HttpRecordingPlugin extends RecordingPlugin {
-    private List<Pattern> recordSites = new ArrayList<>();
-    private HttpRecordPluginSettings settings;
+public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
+    private List<MatchingRecRep> recordSites = new ArrayList<>();
 
 
     @Override
@@ -34,7 +34,7 @@ public class HttpRecordingPlugin extends RecordingPlugin {
         if (!recordSites.isEmpty()) {
             var matchFound = false;
             for (var pat : recordSites) {
-                if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                if (pat.match(request.getHost()+request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                     matchFound = true;
                     break;
                 }
@@ -43,7 +43,7 @@ public class HttpRecordingPlugin extends RecordingPlugin {
                 return;
             }
         }
-
+        var settings = (HttpRecordPluginSettings) getSettings();
         if (settings.isRemoveEtags()) {
             var all = request.getHeader("If-none-match");
             if (all != null && !all.isEmpty()) all.clear();
@@ -57,25 +57,11 @@ public class HttpRecordingPlugin extends RecordingPlugin {
         super.postCall(pluginContext, in, out);
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return HttpRecordPluginSettings.class;
-    }
-
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        super.setSettings(globalSettings, plugin);
-        settings = (HttpRecordPluginSettings) plugin;
-        setupSitesToRecord(settings.getRecordSites());
-        return this;
-    }
 
     private void setupSitesToRecord(List<String> recordSites) {
         this.recordSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
-                .map(regex -> regex.startsWith("@") ?
-                        Pattern.compile(regex.substring(1)) :
-                        Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
+                .map(MatchingRecRep::new).collect(Collectors.toList());
     }
 
     @Override
@@ -92,4 +78,11 @@ public class HttpRecordingPlugin extends RecordingPlugin {
         return result;
     }
 
+    @Override
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+        withStorage((StorageRepository) global.getService("storage"));
+        setupSitesToRecord(getSettings().getRecordSites());
+        return this;
+    }
 }

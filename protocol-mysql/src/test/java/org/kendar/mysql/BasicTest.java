@@ -4,9 +4,12 @@ import org.junit.jupiter.api.TestInfo;
 import org.kendar.mysql.plugins.MySqlMockPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
+import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -61,14 +64,16 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new MySqlRecordPlugin().withStorage(storage);
+        var gs = new GlobalSettings();
+        gs.putService("storage",storage);
+        var pl = new MySqlRecordPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicRecordPluginSettings());
 
         var pl1 = new MySqlMockPlugin();
         var global = new GlobalSettings();
-        global.putService("storage",storage);
+        global.putService("storage", storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.setSettings(global, mockPluginSettings);
+        pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         proxy.setPlugins(List.of(pl, pl1));
 
 
@@ -103,15 +108,18 @@ public class BasicTest {
             }
         }
         var global = new GlobalSettings();
-        global.putService("storage",storage);
+        global.putService("storage", storage);
         storage.initialize();
-        var pl = new MySqlRecordPlugin().withStorage(storage);
+        var gs = new GlobalSettings();
+        gs.putService("storage",storage);
+        var pl = new MySqlRecordPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicRecordPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         var pl1 = new MySqlMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.setSettings(global, mockPluginSettings);
+        pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
+        ;
         proxy.setPlugins(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -125,6 +133,8 @@ public class BasicTest {
 
         try {
             protocolServer.stop();
+
+            Sleeper.sleep(5000, () -> !protocolServer.isRunning());
         } catch (Exception ex) {
 
         }

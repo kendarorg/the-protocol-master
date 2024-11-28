@@ -2,11 +2,14 @@ package org.kendar.postgres;
 
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.postgres.plugins.PostgresMockPlugin;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
+import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -71,13 +74,15 @@ public class BasicTest {
             }
         }
         storage.initialize();
-        var pl = new PostgresRecordPlugin().withStorage(storage);
+        var gs = new GlobalSettings();
+        gs.putService("storage",storage);
+        var pl = new PostgresRecordPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicRecordPluginSettings());
         var pl1 = new PostgresMockPlugin();
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
-        global.putService("storage",storage);
+        global.putService("storage", storage);
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.setSettings(global, mockPluginSettings);
+        pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         proxy.setPlugins(List.of(pl, pl1));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

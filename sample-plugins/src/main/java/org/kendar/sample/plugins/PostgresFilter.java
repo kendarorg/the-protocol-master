@@ -15,7 +15,7 @@ import org.pf4j.Extension;
 import java.util.List;
 
 @Extension
-public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectResult> implements AlwaysActivePlugin {
+public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectResult, PostgresFilterSettings> implements AlwaysActivePlugin {
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         return false;
@@ -42,8 +42,8 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
         return this;
     }
 
@@ -53,15 +53,4 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
 
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return PostgresFilterSettings.class;
-    }
-
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        super.setSettings(globalSettings, plugin);
-
-        return this;
-    }
 }

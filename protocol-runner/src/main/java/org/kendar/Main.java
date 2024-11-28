@@ -6,16 +6,16 @@ import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.kendar.amqp.v09.plugins.AmqpRecordingPlugin;
-import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
+import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
+import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.apis.ApiHandler;
 import org.kendar.apis.ApiServerHandler;
 import org.kendar.command.*;
 import org.kendar.http.plugins.*;
-import org.kendar.mongo.plugins.MongoRecordingPlugin;
-import org.kendar.mongo.plugins.MongoReplayingPlugin;
-import org.kendar.mqtt.plugins.MqttRecordingPlugin;
-import org.kendar.mqtt.plugins.MqttReplayingPlugin;
+import org.kendar.mongo.plugins.MongoRecordPlugin;
+import org.kendar.mongo.plugins.MongoReplayPlugin;
+import org.kendar.mqtt.plugins.MqttRecordPlugin;
+import org.kendar.mqtt.plugins.MqttReplayPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.mysql.plugins.MySqlRewritePlugin;
@@ -25,11 +25,10 @@ import org.kendar.plugins.ProtocolPluginDescriptor;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.postgres.plugins.PostgresReplayPlugin;
 import org.kendar.postgres.plugins.PostgresRewritePlugin;
-import org.kendar.redis.plugins.RedisRecordingPlugin;
-import org.kendar.redis.plugins.RedisReplayingPlugin;
+import org.kendar.redis.plugins.RedisRecordPlugin;
+import org.kendar.redis.plugins.RedisReplayPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -148,26 +147,26 @@ public class Main {
         var ssl = new SSLDummyPlugin();
         ssl.setActive(true);
         addEmbedded(allPlugins, "http", List.of(
-                new HttpRecordingPlugin(),
+                new HttpRecordPlugin(),
                 new HttpErrorPlugin(),
-                new HttpReplayingPlugin(),
+                new HttpReplayPlugin(),
                 new HttpRewritePlugin(),
                 new HttpMockPlugin(),
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(), ssl
         ));
         addEmbedded(allPlugins, "mongodb", List.of(
-                new MongoRecordingPlugin(),
-                new MongoReplayingPlugin()));
+                new MongoRecordPlugin(),
+                new MongoReplayPlugin()));
         addEmbedded(allPlugins, "redis", List.of(
-                new RedisRecordingPlugin(),
-                new RedisReplayingPlugin()));
+                new RedisRecordPlugin(),
+                new RedisReplayPlugin()));
         addEmbedded(allPlugins, "amqp091", List.of(
-                new AmqpRecordingPlugin(),
-                new AmqpReplayingPlugin()));
+                new AmqpRecordPlugin(),
+                new AmqpReplayPlugin()));
         addEmbedded(allPlugins, "mqtt", List.of(
-                new MqttRecordingPlugin(),
-                new MqttReplayingPlugin()));
+                new MqttRecordPlugin(),
+                new MqttReplayPlugin()));
         addEmbedded(allPlugins, "postgres", List.of(
                 new PostgresRecordPlugin(),
                 new PostgresReplayPlugin(),
@@ -179,7 +178,7 @@ public class Main {
         return allPlugins;
     }
 
-    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?>> embeddedPlugins) {
+    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?, ?>> embeddedPlugins) {
         if (!plugins.containsKey(prt)) {
             plugins.put(prt, new ArrayList<>());
         }
@@ -237,7 +236,7 @@ public class Main {
 
 
                 } catch (Exception ex) {
-                    log.error("Unable to start protocol "+item.getKey(),ex);
+                    log.error("Unable to start protocol " + item.getKey(), ex);
                 }
             }).start();
         }
@@ -264,14 +263,12 @@ public class Main {
             var availablePlugin = availablePlugins.stream().filter(av -> av.getId().equalsIgnoreCase(simplePlugin.getKey())).findFirst();
             if (availablePlugin.isPresent()) {
                 var pluginInstance = availablePlugin.get().clone();
-                pluginInstance.setSettings(global,protocol.getPlugin(simplePlugin.getKey(), pluginInstance.getSettingClass()));
                 plugins.add(pluginInstance);
             }
         }
         var alwaysActives = availablePlugins.stream().filter(av -> AlwaysActivePlugin.class.isAssignableFrom(av.getClass())).collect(Collectors.toList());
         for (var alwaysActive : alwaysActives) {
             var pluginInstance = alwaysActive.clone();
-            pluginInstance.setSettings(global, new PluginSettings());
             plugins.add(pluginInstance);
         }
         return plugins;

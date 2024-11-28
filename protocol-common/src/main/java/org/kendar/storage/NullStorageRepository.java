@@ -25,7 +25,7 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
-    public LineToRead read(String instanceId, CallItemsQuery query) {
+    public StorageItem readById(String instanceId, long id) {
         return null;
     }
 
@@ -52,6 +52,11 @@ public class NullStorageRepository implements StorageRepository {
     @Override
     public void isRecording(String instanceId, boolean b) {
 
+    }
+
+    @Override
+    public List<CompactLine> getIndexes(String instanceId) {
+        return List.of();
     }
 
     @Override

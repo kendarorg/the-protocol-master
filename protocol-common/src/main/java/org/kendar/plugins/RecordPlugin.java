@@ -5,7 +5,7 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.FinalizeWriteEvent;
 import org.kendar.events.RecordStatusEvent;
 import org.kendar.events.WriteItemEvent;
-import org.kendar.plugins.settings.BasicRecordingPluginSettings;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -19,7 +19,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, Object> {
+public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
@@ -46,14 +46,6 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
             }
         }
         return false;
-    }
-
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        withStorage((StorageRepository) globalSettings.getService("storage"));
-        super.setSettings(globalSettings, plugin);
-        ignoreTrivialCalls = ((BasicRecordingPluginSettings) plugin).isIgnoreTrivialCalls();
-        return this;
     }
 
     protected void asyncCall(PluginContext pluginContext, Object out) {
@@ -117,13 +109,14 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         withStorage((StorageRepository) global.getService("storage"));
-        super.initialize(global, protocol);
+        ignoreTrivialCalls = ((BasicRecordPluginSettings) pluginSetting).isIgnoreTrivialCalls();
+        super.initialize(global, protocol, pluginSetting);
         return this;
     }
 
-    public RecordingPlugin withStorage(StorageRepository storage) {
+    protected RecordPlugin withStorage(StorageRepository storage) {
         if (storage != null) {
             this.storage = storage;
         }
@@ -137,8 +130,8 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
 
     @Override
     protected void handleActivation(boolean active) {
-        if(this.isActive()!=active){
-            this.storage.isRecording(getInstanceId(),active);
+        if (this.isActive() != active) {
+            this.storage.isRecording(getInstanceId(), active);
         }
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
         if (!active) {
@@ -151,10 +144,6 @@ public abstract class RecordingPlugin extends ProtocolPluginDescriptor<Object, O
         return "record-plugin";
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return BasicRecordingPluginSettings.class;
-    }
 
     protected Object getData(Object of) {
         return of;

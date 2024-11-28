@@ -6,6 +6,7 @@ import org.kendar.events.FinalizeWriteEvent;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.storage.generic.*;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,9 +81,9 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     private ProtocolRepo initializeContent(String protocolInstanceIdOuter) {
-        if (protocolRepo.contains(protocolInstanceIdOuter)) {
-            return protocolRepo.get(protocolInstanceIdOuter);
-        }
+//        if (protocolRepo.contains(protocolInstanceIdOuter)) {
+//            return protocolRepo.get(protocolInstanceIdOuter);
+//        }
 
         synchronized (initializeContentLock) {
 
@@ -117,9 +118,9 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     private void initializeContentWrite(String protocolInstanceIdOuter) {
-        if (protocolRepo.contains(protocolInstanceIdOuter)) {
-            return;
-        }
+//        if (protocolRepo.contains(protocolInstanceIdOuter)) {
+//            return;
+//        }
         synchronized (initializeContentLock) {
             protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
                 if (currRepo == null) {
@@ -141,20 +142,29 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void isRecording(String instanceId, boolean recording) {
-        if(recording){
+        if (recording) {
             initializeContentWrite(instanceId);
-        }else{
+        } else {
             initializeContent(instanceId);
         }
 
+    }
+
+    @Override
+    public List<CompactLine> getIndexes(String instanceId) {
+        var repo = protocolRepo.get(instanceId);
+        return new ArrayList<>(repo.index);
     }
 
 
     public long generateIndex() {
         return storageCounter.incrementAndGet();
     }
+    private AtomicInteger executorItems = new AtomicInteger(0);
+
     @Override
     public void write(LineToWrite item) {
+        executorItems.incrementAndGet();
         executor.submit(() -> {
             if (item == null) {
                 log.error("Blank item");
@@ -182,6 +192,8 @@ public class FileStorageRepository implements StorageRepository {
                 }
             } catch (Exception e) {
                 log.warn("Trouble writing", e);
+            }finally {
+                executorItems.decrementAndGet();
             }
         });
     }
@@ -230,6 +242,7 @@ public class FileStorageRepository implements StorageRepository {
     @Override
     public void finalizeWrite(String protocolInstanceId) {
         try {
+            Sleeper.sleepNoException(1000,()->executorItems.get()==0,true);
             var repo = protocolRepo.get(protocolInstanceId);
             if (repo == null) return;
             protocolRepo.remove(protocolInstanceId);
@@ -252,61 +265,12 @@ public class FileStorageRepository implements StorageRepository {
         log.debug("[TPM  ][WR]: Optimized recording");
     }
 
+
+
     @Override
-    public LineToRead read(String protocolInstanceId, CallItemsQuery query) {
-        var ctx = protocolRepo.get(protocolInstanceId);//initializeContent(protocolInstanceId);
-        synchronized (ctx.lockObject) {
-
-            var idx = ctx.index.stream()
-                    .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
-                    .filter(a ->
-                            typeMatching(query.getType(), a.getType()) &&
-                                    a.getCaller().equalsIgnoreCase(query.getCaller()) &&
-                                    tagsMatching(a.getTags(), query) &&
-                                    query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
-                    ).findFirst();
-
-            Optional<StorageItem> item = Optional.empty();
-
-            if (idx.isEmpty() && query.getTag("next") != null && !query.getTag("next").isEmpty()) {
-                var next = Integer.parseInt(query.getTag("next"));
-                idx = ctx.index.stream()
-                        .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
-                        .filter(a ->
-                                a.getIndex() > next &&
-                                        typeMatching(query.getType(), a.getType()) &&
-                                        a.getCaller().equalsIgnoreCase(query.getCaller()) &&
-                                        query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
-                        ).findFirst();
-            }
-            if (idx.isPresent()) {
-                var realItem = idx.get();
-                item = ctx.inMemoryDb.values().stream()
-                        .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
-                        .filter(a -> a.getIndex() == realItem.getIndex()).findFirst();
-            } else {
-                log.warn("[TPM  ][WR]: Index not found!");
-            }
-
-            if (item.isPresent()) {
-
-                log.debug("[SERVER][REPFULL]  {}:{}", item.get().getIndex(), item.get().getType());
-                //ctx.inMemoryDb.remove(item.get().getIndex());
-                //idx.ifPresent(compactLine -> ctx.index.remove(compactLine));
-                return new LineToRead(item.get(), idx.get());
-            }
-
-            if (idx.isPresent()) {
-                log.debug("[SERVER][REPSHRT] {}:{}", idx.get().getIndex(), idx.get().getType());
-                //ctx.index.remove(idx.get());
-                var si = new StorageItem();
-                si.setIndex(idx.get().getIndex());
-
-                return new LineToRead(si, idx.get());
-            }
-
-            return null;
-        }
+    public StorageItem readById(String protocolInstanceId, long id) {
+        var ctx = protocolRepo.get(protocolInstanceId);
+        return ctx.inMemoryDb.get(id);
     }
 
     private boolean typeMatching(String type, String type1) {

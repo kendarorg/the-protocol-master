@@ -7,27 +7,66 @@ import org.pf4j.ExtensionPoint;
 
 import java.util.List;
 
-public interface PluginDescriptor extends ExtensionPoint {
+/**
+ * Basic Protocol Plugin
+ */
+public interface PluginDescriptor<W extends PluginSettings> extends ExtensionPoint {
+    /**
+     * Phases for the protocol
+     *
+     * @return
+     */
     List<ProtocolPhase> getPhases();
 
+    /**
+     * Id of the plugin
+     *
+     * @return
+     */
     String getId();
 
+    /**
+     * Associable protocols
+     *
+     * @return
+     */
     String getProtocol();
 
-    PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol);
+    /**
+     * Initialize the plugin and protocol
+     *
+     * @param global
+     * @param protocol
+     * @param pluginSetting
+     * @return
+     */
+    PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting);
 
+    /**
+     * Terminate the plugin
+     */
     void terminate();
 
+    /**
+     * Clone, this is need to overcome the missing construtors in plugin system
+     *
+     * @return
+     */
     PluginDescriptor clone();
 
+    /**
+     * The settings class
+     *
+     * @return
+     */
     Class<?> getSettingClass();
 
-    PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin);
 
     boolean isActive();
 
     void setActive(boolean active);
-    void forceActivation();
+
+    void refreshStatus();
 
     PluginApiHandler getApiHandler();
 }

@@ -45,6 +45,7 @@ public class BasicTest {
     static int FAKE_PORT_PROXY = 9999;
     private static SimpleHttpServer simpleServer;
     protected GlobalSettings globalSettings;
+    protected HttpProtocolSettings httpProtocolSettings;
 
     public static void beforeClassBase() throws Exception {
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
@@ -135,7 +136,7 @@ public class BasicTest {
         }
         storage.initialize();
         globalSettings = new GlobalSettings();
-        var httpProtocolSettings = new HttpProtocolSettings();
+        httpProtocolSettings = new HttpProtocolSettings();
         httpProtocolSettings.setProtocol("http");
         httpProtocolSettings.setHttps(FAKE_PORT_HTTPS);
         httpProtocolSettings.setHttp(FAKE_PORT_HTTP);
@@ -143,7 +144,7 @@ public class BasicTest {
         httpProtocolSettings.setProtocolInstanceId("default");
         var rewriteSettings = new RewritePluginSettings();
         rewriteSettings.setRewritesFile(Path.of("src", "test", "resources", "rewrite.json").toAbsolutePath().toString());
-        httpProtocolSettings.getPlugins().put("replay-plugin", rewriteSettings);
+        httpProtocolSettings.getPlugins().put("rewrite-plugin", rewriteSettings);
 
         var recordingSettings = new HttpRecordPluginSettings();
         httpProtocolSettings.getPlugins().put("record-plugin", recordingSettings);
@@ -155,13 +156,13 @@ public class BasicTest {
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
-                new HttpRecordingPlugin().withStorage(storage).setSettings(globalSettings, recordingSettings),
-                new HttpReplayingPlugin().withStorage(storage),
+                new HttpRecordPlugin().initialize(globalSettings, httpProtocolSettings, recordingSettings),
+                new HttpReplayPlugin().initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(),
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(),
-                new HttpMockPlugin(),
-                new HttpRewritePlugin()));
+                new HttpMockPlugin().initialize(globalSettings, httpProtocolSettings, mockSettings),
+                new HttpRewritePlugin().initialize(globalSettings, httpProtocolSettings, rewriteSettings)));
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 

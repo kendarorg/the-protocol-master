@@ -15,7 +15,7 @@ import org.pf4j.Extension;
 import java.util.List;
 
 @Extension
-public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, ChannelOpenOk> implements AlwaysActivePlugin {
+public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, ChannelOpenOk, Amqp091FilterSettings> implements AlwaysActivePlugin {
 
 
     /**
@@ -39,8 +39,8 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
         return this;
     }
 
@@ -49,17 +49,6 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
 
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return Amqp091FilterSettings.class;
-    }
-
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        super.setSettings(globalSettings, plugin);
-
-        return this;
-    }
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, ChannelOpen in, ChannelOpenOk out) {

@@ -26,7 +26,7 @@ Independent from the stack you are using
 ### Scenarios
 
 * Simulate what-if without hitting real servers
-* Testing resiliency, errors, latency, throttling and wrong data
+* Testing resiliency, errors and wrong data
 * Security analisys (what goes on the wire)
 * Test new APIs easily
 * Understand all consequences of changes

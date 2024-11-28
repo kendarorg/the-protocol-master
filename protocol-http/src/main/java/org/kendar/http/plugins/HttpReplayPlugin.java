@@ -8,29 +8,23 @@ import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ReplayingPlugin;
-import org.kendar.protocol.context.ProtoContext;
+import org.kendar.plugins.ReplayPlugin;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
+import org.kendar.storage.generic.LineToRead;
 import org.kendar.utils.Sleeper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class HttpReplayingPlugin extends ReplayingPlugin {
-    private HttpReplayPluginSettings settings;
+public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     private boolean blockExternal = true;
-    private List<Pattern> matchSites = new ArrayList<>();
-
-    @Override
-    protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
-
-    }
+    private List<MatchingRecRep> matchSites = new ArrayList<>();
 
     private Map<String, String> buildTag(Request in) {
         var result = new HashMap<String, String>();
@@ -53,7 +47,7 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
                 if (!matchSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : matchSites) {
-                        if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                        if (pat.match(request.getHost()+request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }
@@ -89,15 +83,22 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
         }
 
         query.setUsed(completedIndexes);
-        var lineToRead = storage.read(getInstanceId(), query);
-        if (lineToRead == null) {
+
+        var index = findIndex(query);
+        if(index==null){
             return false;
         }
+        var storageItem = storage.readById(getInstanceId(),index.getIndex());
+        if(storageItem == null){
+            storageItem = new StorageItem();
+            storageItem.setIndex(index.getIndex());
+        }
 
+        var lineToRead = new LineToRead(storageItem,index);
         var item = lineToRead.getStorageItem();
         System.out.println("READING " + item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
-        if (settings.isRespectCallDuration()) {
+        if (getSettings().isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());
         }
         try {
@@ -117,22 +118,15 @@ public class HttpReplayingPlugin extends ReplayingPlugin {
     private void setupMatchSites(List<String> recordSites) {
         this.matchSites = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
-                .map(regex -> regex.startsWith("@") ?
-                        Pattern.compile(regex.substring(1)) :
-                        Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
+                .map(MatchingRecRep::new).collect(Collectors.toList());
     }
 
     @Override
-    public Class<?> getSettingClass() {
-        return HttpReplayPluginSettings.class;
-    }
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
 
-    @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        super.setSettings(globalSettings, plugin);
-        settings = (HttpReplayPluginSettings) plugin;
-        blockExternal = settings.isBlockExternal();
-        setupMatchSites(settings.getMatchSites());
+        blockExternal = getSettings().isBlockExternal();
+        setupMatchSites(getSettings().getMatchSites());
         return this;
     }
 

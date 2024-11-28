@@ -3,9 +3,10 @@ package org.kendar.http;
 import org.junit.jupiter.api.Test;
 import org.kendar.events.EventsQueue;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
-import org.kendar.http.plugins.HttpRecordingPlugin;
+import org.kendar.http.plugins.HttpRecordPlugin;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
-import org.kendar.http.plugins.HttpReplayingPlugin;
+import org.kendar.http.plugins.HttpReplayPlugin;
+import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.plugins.ProtocolPhase;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ReplayRecordFilters {
     @Test
     void testRecordSites() {
-        var rwPlugin = new HttpRecordingPlugin() {
+        var rwPlugin = new HttpRecordPlugin() {
             @Override
             public boolean isActive() {
                 return true;
@@ -28,15 +29,15 @@ public class ReplayRecordFilters {
         };
         var settings = new HttpRecordPluginSettings();
         settings.setActive(true);
-        settings.getRecordSites().add("test_sites");
+        settings.getRecordSites().add("test_sites/*");
         settings.getRecordSites().add("www.sara.com");
         settings.getRecordSites().add("@.*microsoft.*");
         var global = new GlobalSettings();
-        global.putService("storage",new NullStorageRepository());
-        rwPlugin.setSettings(global, settings);
+        global.putService("storage", new NullStorageRepository());
+        rwPlugin.initialize(global, new HttpProtocolSettings(), settings);
 
         var pc = new PluginContext("http", null, 0L, null);
-        pc.getTags().put("id",1L);
+        pc.getTags().put("id", 1L);
         var in = new Request();
         in.setMethod("GET");
         in.setPath("/test_sites");
@@ -45,26 +46,26 @@ public class ReplayRecordFilters {
 
         in.setHost("test_sites");
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(EventsQueue.getInstance().clean().size()==1);
+        assertTrue(EventsQueue.getInstance().clean().size() == 1);
 
         in.setHost("www.sara.com");
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(EventsQueue.getInstance().clean().size()==1);
+        assertTrue(EventsQueue.getInstance().clean().size() == 1);
 
         in.setHost("www.wetheaver.microsofto.com");
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(EventsQueue.getInstance().clean().size()==1);
+        assertTrue(EventsQueue.getInstance().clean().size() == 1);
 
 
         in.setHost("www.wetheaver.microsof.com");
         rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
-        assertTrue(EventsQueue.getInstance().clean().size()==0);
+        assertTrue(EventsQueue.getInstance().clean().size() == 0);
     }
 
     @Test
     void testReplaySites() {
         var matched = new ChangeableReference<Boolean>(false);
-        var rwPlugin = new HttpReplayingPlugin() {
+        var rwPlugin = new HttpReplayPlugin() {
             @Override
             public boolean isActive() {
                 return true;
@@ -82,9 +83,9 @@ public class ReplayRecordFilters {
         settings.getMatchSites().add("www.sara.com");
         settings.getMatchSites().add("@.*microsoft.*");
         var global = new GlobalSettings();
-        global.putService("storage",new NullStorageRepository());
+        global.putService("storage", new NullStorageRepository());
 
-        rwPlugin.setSettings(global, settings);
+        rwPlugin.initialize(global, new HttpProtocolSettings(), settings);
 
         var pc = new PluginContext("http", null, 0L, null);
         var in = new Request();

@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T, K> {
+public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptor<T, K, W> {
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();
@@ -25,11 +25,6 @@ public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T,
         return "rewrite-plugin";
     }
 
-    @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
-        return this;
-    }
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
@@ -51,21 +46,16 @@ public abstract class RewritePlugin<T, K, J> extends ProtocolPluginDescriptor<T,
 
     }
 
-    @Override
-    public Class<?> getSettingClass() {
-        return RewritePluginSettings.class;
-    }
 
     @Override
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        var settings = (RewritePluginSettings) plugin;
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+        var settings = getSettings();
+        if (settings.getRewritesFile() == null) return null;
+        var path = Path.of(settings.getRewritesFile()).toAbsolutePath();
+        if (!path.toFile().exists()) return null;
+
         try {
-            super.setSettings(globalSettings, plugin);
-
-            if (settings.getRewritesFile() == null) return null;
-            var path = Path.of(settings.getRewritesFile()).toAbsolutePath();
-            if (!path.toFile().exists()) return null;
-
             for (var replacer : mapper.deserialize(Files.readString(path), new TypeReference<List<ReplacerItem>>() {
             })) {
                 replacers.add(new ReplacerItemInstance(replacer, useTrailing()));

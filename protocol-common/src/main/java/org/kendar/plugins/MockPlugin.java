@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
+public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K, BasicMockPluginSettings> {
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     protected List<MockStorage> mocks = new ArrayList<>();
     private String mocksDir;
@@ -70,23 +70,13 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
     protected abstract List<MockStorage> firstCheckOnMainPart(T request);
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
 
-        super.initialize(global, protocol);
-        var thisPlugin = (BasicMockPluginSettings) protocol.getPlugins().get(getId());
-        if (thisPlugin != null) {
-            mocksDir = thisPlugin.getDataDir();
-        }
-        return this;
-
-    }
-
-
-    public PluginDescriptor setSettings(GlobalSettings globalSettings, PluginSettings plugin) {
-        super.setSettings(globalSettings, plugin);
-        this.mocksDir = ((BasicMockPluginSettings) plugin).getDataDir();
+        super.initialize(global, protocol, pluginSetting);
+        mocksDir = getSettings().getDataDir();
         loadMocks();
         return this;
+
     }
 
     protected void loadMocks() {
@@ -123,11 +113,6 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K> {
     @Override
     public void terminate() {
 
-    }
-
-    @Override
-    public Class<?> getSettingClass() {
-        return BasicMockPluginSettings.class;
     }
 
     public String getMocksDir() {
