@@ -37,7 +37,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         return this;
     }
 
-    public ReplayPlugin withStorage(StorageRepository storage) {
+    protected ReplayPlugin withStorage(StorageRepository storage) {
         if (storage != null) {
             this.storage = storage;
         }

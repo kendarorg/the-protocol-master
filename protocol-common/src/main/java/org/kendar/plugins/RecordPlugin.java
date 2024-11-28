@@ -116,7 +116,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
         return this;
     }
 
-    public RecordPlugin withStorage(StorageRepository storage) {
+    protected RecordPlugin withStorage(StorageRepository storage) {
         if (storage != null) {
             this.storage = storage;
         }
