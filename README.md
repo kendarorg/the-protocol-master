@@ -2,12 +2,14 @@
 
 ![](protocolmaster_s.gif)
 
-"The Protocol Master" is an infrastructure simulator to test effortlessy your app in minutes (with no coding) supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091 ... and all the compatible ones!
+"The Protocol Master" is an infrastructure simulator to test effortlessy your app in minutes (with no coding) supporting
+HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091 ... and all the compatible ones!
 
-* Simulate wrong scenarios 
+* Simulate wrong scenarios
 * Block troubles before production
 * Simulate whole infrastructure
 * Make untestable apps testable
+* Easy Chaos engineering
 
 Effortlessy and with zero budget
 
@@ -32,9 +34,8 @@ Independent from the stack you are using
 ### Custom Plugins
 
 You can build your own plugins, just place the Jar into the plugins dir
-and intercept all it's intercepted by TPM. Add headers, change data, 
+and intercept all it's intercepted by TPM. Add headers, change data,
 simulate specific needs
-  
 
 ## Examples
 
@@ -87,6 +88,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Translate postgres and MySQL to any Jdbc supported db like Oracle!
 * Plugin-based architecture
 * Custom maven repository on [https://maven.kendar.org](https://maven.kendar.org/maven2/releases/org/kendar/protocol/)
+* More than 70% Instructions coverage
 
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
@@ -121,15 +123,24 @@ If you want to go on the specific functions by protocol:
 
 ## How it was Born
 
-I had an always missing QA environment and all changes should be checked by legal (it was in Electronic ID field). I needed to simulate APIs, Database calls, and full scenarios, from UI to the DB.
+I had an always missing QA environment and all changes should be checked by legal (it was in Electronic ID field). I
+needed to simulate APIs, Database calls, and full scenarios, from UI to the DB.
 
-I started developing a series of docker container in PHP to intercept all incoming and outgoing HTTP/S call, with DNS server and certificates, you can find it [here](https://github.com/kendarorg/HttpAnsweringMachine.php).
+I started developing a series of docker container in PHP to intercept all incoming and outgoing HTTP/S call, with DNS
+server and certificates, you can find it [here](https://github.com/kendarorg/HttpAnsweringMachine.php).
 
-Becoming the thing too hard to cope with i started the development of a Java integrated version with fancy UI and all integrated service, the [HttpAnsweringMachine](https://github.com/kendarorg/HttpAnsweringMachine) based on Spring-Boot and leveraging a custom routing system, dns server and so on.
+Becoming the thing too hard to cope with i started the development of a Java integrated version with fancy UI and all
+integrated service, the [HttpAnsweringMachine](https://github.com/kendarorg/HttpAnsweringMachine) based on Spring-Boot
+and leveraging a custom routing system, dns server and so on.
 
-But that was too really hard to interact with. I started developing a JDBC->HTTP->JDBC driver, [Janus-Jdbc](https://github.com/kendarorg/janus-jdbc) from scratch, then started creating a similar thing for .NET, thing went rogues in a short time with [Janus-Ado](https://github.com/kendarorg/janus-ado). But i started understanding Postgres protocol.
+But that was too really hard to interact with. I started developing a JDBC->HTTP->JDBC
+driver, [Janus-Jdbc](https://github.com/kendarorg/janus-jdbc) from scratch, then started creating a similar thing for
+.NET, thing went rogues in a short time with [Janus-Ado](https://github.com/kendarorg/janus-ado). But i started
+understanding Postgres protocol.
 
-I started then with a command line utility to parse and translate binary protocols and that's how "The Protocol Master" was born. Always with a plugin-based architecture. Then i started adapting all the knowledge of HttpAnsweringMachine inside it to handle HTTP/S.
+I started then with a command line utility to parse and translate binary protocols and that's how "The Protocol Master"
+was born. Always with a plugin-based architecture. Then i started adapting all the knowledge of HttpAnsweringMachine
+inside it to handle HTTP/S.
 
 ## If you like it Buy me a coffe :)
 

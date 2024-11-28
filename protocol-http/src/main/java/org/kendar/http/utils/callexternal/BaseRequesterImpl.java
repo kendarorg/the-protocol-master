@@ -63,8 +63,8 @@ public abstract class BaseRequesterImpl implements BaseRequester {
 
         var contentEncoding = "";
         if (null != request.getHeader(ConstantsHeader.CONTENT_ENCODING)) {
-            var firstHeader  = request.getFirstHeader(ConstantsHeader.CONTENT_ENCODING);
-            if(firstHeader!=null) {
+            var firstHeader = request.getFirstHeader(ConstantsHeader.CONTENT_ENCODING);
+            if (firstHeader != null) {
                 contentEncoding = firstHeader.toLowerCase(Locale.ROOT);
             }
         }

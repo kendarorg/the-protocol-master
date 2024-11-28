@@ -34,7 +34,7 @@ public class ComplexOperationsTest extends BasicTest {
     }
 
     @Test
-    void postgresProxyTestTransactionsNonStandard() throws Exception {
+    void mysqlProxyTestTransactionsNonStandard() throws Exception {
 
         var runned = false;
 
@@ -97,7 +97,7 @@ public class ComplexOperationsTest extends BasicTest {
     }
 
     @Test
-    void postgresFunctionTest() throws Exception {
+    void mysqlFunctionTest() throws Exception {
 
 
         Connection c = getProxyConnection();
@@ -125,7 +125,7 @@ public class ComplexOperationsTest extends BasicTest {
     }
 
     @Test
-    void postgresProcedureSingleOut() throws Exception {
+    void mysqlProcedureSingleOut() throws Exception {
 
 
         Connection c = getProxyConnection();
@@ -150,7 +150,7 @@ public class ComplexOperationsTest extends BasicTest {
     }
 
     @Test
-    void postgresProcedureMultiOut() throws Exception {
+    void mysqlProcedureMultiOut() throws Exception {
 
 
         Connection c = getProxyConnection();

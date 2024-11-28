@@ -4,12 +4,13 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.plugins.ProtocolPhase;
 import org.kendar.plugins.RewritePlugin;
+import org.kendar.plugins.RewritePluginSettings;
 import org.kendar.utils.ReplacerItemInstance;
 
 import java.net.URL;
 import java.util.List;
 
-public class HttpRewritePlugin extends RewritePlugin<Request, Response, String> {
+public class HttpRewritePlugin extends RewritePlugin<Request, Response, RewritePluginSettings, String> {
 
     private static final String HTTP = "http";
     private static final String HTTPS = "https";

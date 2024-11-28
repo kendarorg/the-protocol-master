@@ -7,6 +7,8 @@
     <file url="file://$PROJECT_DIR$/protocol-amqp-091/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-amqp-100/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-amqp-100/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-common-jdbc/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/protocol-common-jdbc/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/protocol-http/src/main/java" charset="UTF-8" />

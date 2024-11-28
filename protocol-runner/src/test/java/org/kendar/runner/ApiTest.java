@@ -49,7 +49,7 @@ public class ApiTest extends BasicTest {
         };
         bs = new BasicTest();
         bs.startAndHandleUnexpectedErrors(args);
-        Sleeper.sleep(1000);
+        Sleeper.sleep(2000);
     }
 
     private static <T> T getRequest(String target, CloseableHttpClient httpclient, TypeReference<T> typeReference) throws IOException {

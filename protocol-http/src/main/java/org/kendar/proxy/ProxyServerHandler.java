@@ -98,7 +98,6 @@ public class ProxyServerHandler {
             if (ignore.contains(proxyRequest.getHost())) {
                 return;
             }
-            log.debug(request);
             if (proxyRequest.isConnect()) {
                 handleHttpsRequest(proxyRequest);
             } else {

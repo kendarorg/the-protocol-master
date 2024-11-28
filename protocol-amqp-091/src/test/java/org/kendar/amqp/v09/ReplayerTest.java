@@ -4,8 +4,11 @@ import com.rabbitmq.client.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.kendar.amqp.v09.plugins.AmqpReplayingPlugin;
+import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
@@ -66,7 +69,9 @@ public class ReplayerTest {
         StorageRepository storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "test2_differentChannelAndConnection"));
         storage.initialize();
-        var pl = new AmqpReplayingPlugin().withStorage(storage);
+        var gs = new GlobalSettings();
+        gs.putService("storage",storage);
+        var pl = new AmqpReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
@@ -150,7 +155,9 @@ public class ReplayerTest {
         StorageRepository storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "test5_noPublish"));
         storage.initialize();
-        var pl = new AmqpReplayingPlugin().withStorage(storage);
+        var gs = new GlobalSettings();
+        gs.putService("storage",storage);
+        var pl = new AmqpReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
@@ -224,7 +231,9 @@ public class ReplayerTest {
         StorageRepository storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "test3_openConnection"));
         storage.initialize();
-        var pl = new AmqpReplayingPlugin().withStorage(storage);
+        var gs = new GlobalSettings();
+        gs.putService("storage",storage);
+        var pl = new AmqpReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 

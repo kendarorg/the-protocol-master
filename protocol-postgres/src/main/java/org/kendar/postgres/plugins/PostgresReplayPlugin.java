@@ -1,11 +1,13 @@
 package org.kendar.postgres.plugins;
 
-import org.kendar.plugins.JdbcReplayingPlugin;
+import org.kendar.plugins.JdbcReplayPlugin;
 
-public class PostgresReplayPlugin extends JdbcReplayingPlugin {
+public class PostgresReplayPlugin extends JdbcReplayPlugin {
 
     @Override
     public String getProtocol() {
         return "postgres";
     }
+
+
 }

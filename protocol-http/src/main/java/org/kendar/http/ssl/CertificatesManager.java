@@ -199,7 +199,7 @@ public class CertificatesManager {
         if (hostsSize == registeredHosts.size() && port.getHttpsConfigurator() != null) {
             return;
         }
-        sslLog.debug("ADD HOST: {}", String.join(",", inserted));
+        sslLog.debug("[SERVER] ADD HOST: {}", String.join(",", inserted));
         var sslContextInt = getSslContext(new ArrayList<>(registeredHosts.values()), cname, der, key);
         port.setHttpsConfigurator(
                 new HttpsConfigurator(sslContextInt) {

@@ -30,7 +30,7 @@ on localhost the sites to build must be added on the "ssl/hosts"
 The data will be stored in the global dataDir
 
 * active: If it is active
-* recordSites: list of matching hosts to record. When empty everything is recorded. When prepending with @ uses regexp
+* recordSites: list of matching ```hosts/path``` to record. When empty everything is recorded. When prepending with @ uses regexp instead can use a simple string with * as wildcard
   else exact match
 * removeEtags: default to true, cleans all ETag-related fields to avoid caching
 
@@ -40,8 +40,7 @@ The data will be loaded from the global dataDir. This is used to replay a whole 
 without the need to mock a single request
 
 * active: If it is active
-* matchSites: list of matching hosts to replay. When empty everything is replayed. When prepending with @ uses regexp
-  else exact match
+* matchSites: list of matching ```hosts/path``` to replay. When empty everything is replayed. When prepending with @ uses regexp instead can use a simple string with * as wildcard
 * respectCallDuration: respect the duration of the round trip
 * blockExternal: default to true, block any calls to not recorded website
 
@@ -63,9 +62,10 @@ Introduce random latency
 
 ### rate-limit-plugin
 
-Add the handling of throttling and rate limits 
+Add the handling of throttling and rate limits
 
-* limitSites: list of matching hosts to throttle. When empty everything is replayed. When prepending with @ uses regexp else exact match
+* limitSites: list of matching hosts to throttle. When empty everything is replayed. When prepending with @ uses regexp
+  else exact match
 * headerLimit: The header for the limit count (default RateLimit-Limit)
 * rateLimit: The limit count (default 120)
 * costPerRequest: How much each request will consume from rateLimit (default 2)
@@ -75,7 +75,8 @@ Add the handling of throttling and rate limits
 * resetFormat: Format of the headerReset value (default secondsLeft, can be utcEpochSeconds)
 * headerRetryAfter: Header for seconds after which should retry (default Retry-After)
 * resetTimeWindowSeconds: When counters are reset
-* customResponseFile: Custom response file to use instead of reponse (see an [example](src/test/resources/ratelimitresponse.json))
+* customResponseFile: Custom response file to use instead of reponse (see
+  an [example](src/test/resources/ratelimitresponse.json))
 
 ### mock-plugin
 

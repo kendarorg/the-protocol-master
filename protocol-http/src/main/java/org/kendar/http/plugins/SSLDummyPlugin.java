@@ -4,11 +4,12 @@ import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.*;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 
 import java.util.List;
 
-public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String> implements AlwaysActivePlugin {
+public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String, SSLDummyPluginSettings> implements AlwaysActivePlugin {
     private HttpProtocolSettings protocolSettings;
 
     @Override
@@ -17,8 +18,8 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String> imp
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol) {
-        super.initialize(global, protocol);
+    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting == null ? new SSLDummyPluginSettings() : pluginSetting);
         this.protocolSettings = (HttpProtocolSettings) protocol;
         return this;
     }
@@ -50,10 +51,5 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String> imp
     @Override
     public void terminate() {
 
-    }
-
-    @Override
-    public Class<?> getSettingClass() {
-        return null;
     }
 }

@@ -10,6 +10,16 @@ import org.kendar.utils.JsonMapper;
  */
 public class StorageItem {
     protected static final JsonMapper mapper = new JsonMapper();
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    private long timestamp = System.currentTimeMillis();
     private boolean constant;
     private int connectionId;
     private long index = -1;
