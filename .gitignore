@@ -32,6 +32,4 @@ target
 ### The protocol master
 /plugins/*.jar
 /data/*.*
-/protocol-runner/data/0000000001.http.json
-/protocol-runner/data/0000000003.http.json
-/protocol-runner/data/index.http.json
+/protocol-runner/data/*.*
