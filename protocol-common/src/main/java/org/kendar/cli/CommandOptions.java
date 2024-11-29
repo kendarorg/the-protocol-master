@@ -61,19 +61,6 @@ public class CommandOptions implements CommandItem {
                     continue;
                 }
             }
-
-
-            /*var firstDifferent =-1;
-            for(int z=i+1;z<co.size();z++) {
-                var tz = co.get(z);
-                if()
-                if(co.)
-            }
-            for (int j = 0; j < mainArgs.size(); j++) {
-                var arg = mainArgs.get(j);
-
-
-            }*/
             var arg = mainArgs.stream().filter(a -> a.getId().equalsIgnoreCase(item.getShortCommand()) || a.getId().equalsIgnoreCase(item.getLongCommand())).findFirst();
             if (arg.isEmpty()) {
                 continue;
