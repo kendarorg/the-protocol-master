@@ -4,17 +4,14 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
-import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.PluginSettings;
-import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
-import org.kendar.storage.generic.StorageRepository;
 
 import java.util.List;
 
@@ -54,6 +51,8 @@ public abstract class JdbcRecordPlugin extends RecordPlugin<BasicRecordPluginSet
         }
     }
 
+    protected abstract SqlStringParser getParser();
+
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 
     protected boolean shouldNotSaveJdbc(StorageItem in, CompactLine out) {
@@ -66,20 +65,4 @@ public abstract class JdbcRecordPlugin extends RecordPlugin<BasicRecordPluginSet
         return List.of(ProtocolPhase.PRE_CALL, ProtocolPhase.POST_CALL);
     }
 
-    @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        withStorage((StorageRepository) global.getService("storage"));
-        super.initialize(global, protocol, pluginSetting);
-        return this;
-    }
-
-    @Override
-    protected void handleActivation(boolean active) {
-        if (this.isActive() != active) {
-            this.storage.isRecording(getInstanceId(), active);
-        }
-        if (!active) {
-            terminate();
-        }
-    }
 }

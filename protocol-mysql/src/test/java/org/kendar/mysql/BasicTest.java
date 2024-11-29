@@ -65,8 +65,8 @@ public class BasicTest {
         }
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new MySqlRecordPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicRecordPluginSettings());
+        gs.putService("storage", storage);
+        var pl = new MySqlRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
         var pl1 = new MySqlMockPlugin();
         var global = new GlobalSettings();
@@ -111,8 +111,8 @@ public class BasicTest {
         global.putService("storage", storage);
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new MySqlRecordPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicRecordPluginSettings());
+        gs.putService("storage", storage);
+        var pl = new MySqlRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         var pl1 = new MySqlMockPlugin();

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HttpSSLSettings {
-    private String cname;
-    private String der;
-    private String key;
+    private String cname = "C=US,O=Local Development,CN=local.org";
+    private String der = "resource://certificates/ca.der";
+    private String key = "resource://certificates/ca.key";
     private List<String> hosts = new ArrayList<>();
 
     public List<String> getHosts() {

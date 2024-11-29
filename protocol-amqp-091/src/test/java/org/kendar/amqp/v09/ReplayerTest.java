@@ -70,8 +70,8 @@ public class ReplayerTest {
                 "test", "resources", "test2_differentChannelAndConnection"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new AmqpReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
+        gs.putService("storage", storage);
+        var pl = new AmqpReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
@@ -156,8 +156,8 @@ public class ReplayerTest {
                 "test", "resources", "test5_noPublish"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new AmqpReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
+        gs.putService("storage", storage);
+        var pl = new AmqpReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
@@ -232,8 +232,8 @@ public class ReplayerTest {
                 "test", "resources", "test3_openConnection"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new AmqpReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
+        gs.putService("storage", storage);
+        var pl = new AmqpReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 

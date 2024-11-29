@@ -34,7 +34,7 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
         if (!recordSites.isEmpty()) {
             var matchFound = false;
             for (var pat : recordSites) {
-                if (pat.match(request.getHost()+request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                if (pat.match(request.getHost() + request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                     matchFound = true;
                     break;
                 }

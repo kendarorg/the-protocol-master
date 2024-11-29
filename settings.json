@@ -1,6 +1,6 @@
 {
   "pluginsDir": "plugins",
-  "logLevel": "ERROR",
+  "logLevel": "INFO",
   "dataDir": "data",
   "apiPort": 8095,
   "protocols": {
@@ -42,7 +42,7 @@
           "percentage": 0
         },
         "replay-plugin": {
-          "active": true,
+          "active": false,
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
           "blockExternal": true,

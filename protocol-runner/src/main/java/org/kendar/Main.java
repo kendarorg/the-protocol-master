@@ -3,13 +3,11 @@ package org.kendar;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.sun.net.httpserver.HttpServer;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
 import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.apis.ApiHandler;
 import org.kendar.apis.ApiServerHandler;
+import org.kendar.cli.CommandParser;
 import org.kendar.command.*;
 import org.kendar.http.plugins.*;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
@@ -33,6 +31,7 @@ import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.Sleeper;
 import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
@@ -66,21 +65,27 @@ public class Main {
                 new MqttRunner(),
                 new RedisRunner()
         );
-        CommandLineParser parser = new DefaultParser();
-        var options = ProtocolsRunner.getMainOptions();
+        var settings = new ChangeableReference<>(new GlobalSettings());
+
+        var options = ProtocolsRunner.getMainOptions(settings);
+        var parser = new CommandParser(options);
         HashMap<String, List<PluginDescriptor>> plugins = new HashMap<>();
-        CommandLine cmd = parser.parse(options, args, true);
-        if (cmd.hasOption("unattended")) {
+        parser.parseIgnoreMissing(args);
+
+        if (parser.hasOption("unattended")||settings.get().isUnattended()) {
             stopWhenFalse = () -> {
                 Sleeper.sleep(10000);
                 return true;
             };
         }
-        var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
+        var pluginsDir = settings.get().getPluginsDir();
         plugins = loadPlugins(pluginsDir);
-
-        var ini = om.run(cmd, args, plugins);
-        execute(ini, stopWhenFalse, plugins);
+        if (!parser.hasOption("cfg")) {
+            if(!om.prepareSettingsFromCommandLine(options, args, plugins, settings.get(), parser)){
+                return;
+            }
+        }
+        execute(settings.get(), stopWhenFalse, plugins);
     }
 
     public static void stop() {
@@ -236,7 +241,7 @@ public class Main {
 
 
                 } catch (Exception ex) {
-                    log.error("Unable to start protocol " + item.getKey(), ex);
+                    log.error("Unable to start protocol {}", item.getKey(), ex);
                 }
             }).start();
         }

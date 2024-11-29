@@ -1,27 +1,28 @@
 package org.kendar.command;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
+import org.kendar.cli.CommandOption;
+import org.kendar.cli.CommandOptions;
+import org.kendar.cli.CommandParser;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.settings.SettingsManager;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.ChangeableReference;
+import org.kendar.utils.FileResourcesUtils;
+import org.kendar.utils.JsonMapper;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import static org.kendar.command.CommonRunner.createOpt;
-
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class ProtocolsRunner {
+    private static final JsonMapper mapper = new JsonMapper();
     private final Map<String, CommonRunner> protocols = new HashMap<>();
 
     public ProtocolsRunner(CommonRunner... input) {
@@ -30,19 +31,48 @@ public class ProtocolsRunner {
         }
     }
 
-    public static Options getMainOptions() {
-        Options options = new Options();
-        options.addOption("un", "unattended", false, "Unattended run");
-        options.addOption(createOpt("cfg", null, true, "Load config file"));
-        options.addOption(createOpt("pld", "pluginsDir", true, "Plugins directory"));
-        options.addOption(createOpt("dd", "datadir", true, "Data directory/connection string"));
-        options.addOption(createOpt("ll", "loglevel", true, "Log4j log level"));
-        options.addOption(createOpt("ap", "apis", true, "The port TPM controllers (def 0, as not active)"));
-        options.addOption(createOpt("lt", "logType", true, "The log type: default [none|file]"));
-        options.addOption(createOpt("p", "protocol", true, "Protocol (http|mqtt|amqp091|mysql|postgres|redis|mongo"));
-        options.addOption(Option.builder().option("help").optionalArg(true).desc("Show contestual help").build());
-        options.addOption(Option.builder().option("tpmapi").optionalArg(true).desc("Expose The Protocol Master apis on port").build());
-        return options;
+    public static CommandOptions getMainOptions(ChangeableReference<GlobalSettings> settings) {
+
+
+        var coptions = CommandOptions.of("main", "The Protocol Master");
+        coptions.withOptions(
+                CommandOption.of("un", "Unattended run (default false)")
+                        .withLong("unattended")
+                        .withCallback((s) -> settings.get().setUnattended(true)),
+                CommandOption.of("cfg", "Load config file")
+                        .withLong("config")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> {
+                            var fr = new FileResourcesUtils().getFileFromResourceAsString(s);
+                            settings.set(mapper.deserialize(fr, GlobalSettings.class));
+                        }),
+                CommandOption.of("pld", "Plugins directory (default plugins)")
+                        .withLong("pluginsDir")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.get().setPluginsDir(s)),
+                CommandOption.of("dd", "Data directory (default data)")
+                        .withLong("datadir")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.get().setDataDir(s)),
+                CommandOption.of("ll", "Log4j loglevel (default ERROR)")
+                        .withLong("loglevel")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.get().setLogLevel(s)),
+                CommandOption.of("ap", "The port TPM controllers (default 0, as not active)")
+                        .withLong("apis")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.get().setApiPort(Integer.parseInt(s))),
+                CommandOption.of("lt", "The log type (default file)")
+                        .withLong("logType")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.get().setDataDir(s)),
+                CommandOption.of("p", "The protocols to start")
+                        .withLong("protocol")
+                        .withMandatoryParameter(),
+                CommandOption.of("h", "Show help")
+                        .withLong("help")
+        );
+        return coptions;
     }
 
     public static <T> T getOrDefault(Object value, T defaultValue) {
@@ -52,47 +82,61 @@ public class ProtocolsRunner {
         return (T) value;
     }
 
-    @SuppressWarnings("ConstantValue")
-    public GlobalSettings run(CommandLine cmd, String[] args, HashMap<String, List<PluginDescriptor>> filters) {
-        var options = getMainOptions();
+    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<PluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
+
         try {
+            var protocolMotherOption = options.getCommandOption("p");
+            var protocolOptionsToAdd = new ArrayList<CommandOptions>();
+
 
             var isExecute = false;
-            if (cmd.hasOption("cfg")) {
-                var configFile = cmd.getOptionValue("cfg");
-                return SettingsManager.load(configFile);
-            } else if (cmd.hasOption("help")) {
-                var helpValue = cmd.getOptionValue("help");
-                checkOptions(helpValue);
-                runWithParams(args, helpValue, isExecute, null, options, filters);
+            if (parser.hasOption("help")) {
+                var helpValue = parser.getOptionValue("help");
+                if (helpValue == null) {
+                    for (var protocol : protocols.values()) {
+                        protocolOptionsToAdd.add(protocol.getOptions(settings));
+                    }
+                    protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
+                } else {
+                    var protocol = protocols.values().stream().filter(p -> p.getId().equalsIgnoreCase(helpValue)).findFirst().get();
+                    protocolOptionsToAdd.add(protocol.getOptions(settings));
+                    protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
+                }
                 throw new Exception();
             } else {
                 isExecute = true;
 
-                var datadir = cmd.getOptionValue("datadir", "data");
+                for (var protocol : protocols.values()) {
+                    protocolOptionsToAdd.add(protocol.getOptions(settings));
+                }
+                protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
+                parser.parse(args);
+                return true;
+
+                /*var datadir = cmd.getOptionValue("datadir", "data");
                 var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
                 var protocol = cmd.getOptionValue("protocol");
                 var loglevel = cmd.getOptionValue("loglevel", "ERROR");
                 var logType = cmd.getOptionValue("logType", "file");
                 var tpmApi = Integer.parseInt(cmd.getOptionValue("apis", "0"));
-                checkOptions(datadir, pluginsDir, protocol);
-                var ini = new GlobalSettings();
+                checkOptions(settings.getDataDir(), settings.getPluginsDir(), protocol);*/
+                /*var ini = new GlobalSettings();
                 ini.setDataDir(datadir);
                 ini.setPluginsDir(pluginsDir);
                 ini.setLogLevel(loglevel);
                 ini.setLogType(logType);
-                ini.setApiPort(tpmApi);
-                runWithParams(args, protocol, isExecute, ini, options, filters);
-                return ini;
+                ini.setApiPort(tpmApi);*/
+                /*runWithParams(args, protocol, isExecute, ini, options, filters);
+                return ini;*/
             }
         } catch (Exception ex) {
             if (ex.getMessage() != null) {
                 System.err.println("ERROR: " + ex.getMessage());
             }
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("runner", options);
+            parser.printHelp();
+            //exit(0);
         }
-        return null;
+        return false;
     }
 
     private void checkOptions(String... args) throws Exception {
@@ -103,12 +147,6 @@ public class ProtocolsRunner {
         }
     }
 
-    private void runWithParams(String[] args, String protocol, boolean isExecute,
-                               GlobalSettings go, Options options,
-                               HashMap<String, List<PluginDescriptor>> filters) throws Exception {
-        var founded = protocols.get(protocol);
-        founded.run(args, isExecute, go, options, filters);
-    }
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
                       GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> filters,

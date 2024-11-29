@@ -1,10 +1,7 @@
 package org.kendar.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.kendar.events.EventsQueue;
-import org.kendar.events.FinalizeWriteEvent;
-import org.kendar.events.RecordStatusEvent;
-import org.kendar.events.WriteItemEvent;
+import org.kendar.events.*;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -15,6 +12,8 @@ import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -127,15 +126,15 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     public void terminate() {
         EventsQueue.send(new FinalizeWriteEvent(getInstanceId()));
     }
+    private static final Logger log = LoggerFactory.getLogger(RecordPlugin.class);
 
     @Override
     protected void handleActivation(boolean active) {
-        if (this.isActive() != active) {
-            this.storage.isRecording(getInstanceId(), active);
-        }
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
-        if (!active) {
+        if (isActive()!=active && !active) {
             terminate();
+        }else if (isActive()!=active && active) {
+            EventsQueue.send(new StartWriteEvent(getInstanceId()));
         }
     }
 

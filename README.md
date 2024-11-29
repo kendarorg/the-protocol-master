@@ -121,6 +121,100 @@ If you want to go on the specific functions by protocol:
     * Support QOS 1,2,3
     * Support 3.x and 5.x protocols
 
+## Help
+
+```
+The Protocol Master
+
+	un     	unattended	Unattended run (default false)
+	cfg    	config    	Load config file
+	pld    	pluginsDir	Plugins directory (default plugins)
+	dd     	datadir   	Data directory (default data)
+	ll     	loglevel  	Log4j loglevel (default ERROR)
+	ap     	apis      	The port TPM controllers (default 0, as not active)
+	lt     	logType   	The log type (default file)
+	h      	help      	Show help
+	p      	protocol  	The protocols to start
+	       	          	Options: amqp091|mqtt|http|mysql|mongodb|postgres|redis
+
+Amqp 0.9.1 Protocol
+
+	po     	port      	Listening port (default 5672)
+	pc     	connection	Connection (example amqp://localhost:5372)
+	pt     	timeout   	Timeout (deafult 30)
+	pu     	login     	Remote login
+	pw     	password  	Remote password
+	record 	          	Record Calls
+	replay 	          	Replay calls
+
+Mqtt Protocol
+
+	po     	port      	Listening port (default 1883)
+	pc     	connection	Connection (example tcp://localhost:1884)
+	pt     	timeout   	Timeout (deafult 30)
+	pu     	login     	Remote login
+	pw     	password  	Remote password
+	record 	          	Record Calls
+	replay 	          	Replay calls
+
+http Protocol
+
+	ht     	http      	Http port (default 80
+	hs     	https     	Https port (default 443
+	prx    	proxy     	Proxy port (default 9999
+	cn     	cname     	Cname (default C=US,O=Local Development,CN=local.org
+	der    	          	Der file (default resource://certificates/ca.der
+	key    	          	Key file (default resource://certificates/ca.key
+	rew    	rewrite   	Path of the rewrite queries file
+	record 	          	Record Calls
+	replay 	          	Replay calls
+	errors 	          	Random errors
+	latency	          	Random latency
+
+mysql Protocol
+
+	po     	port      	Listening port (default 3306)
+	pc     	connection	Connection (example jdbc:mysql://localhost:3306)
+	pt     	timeout   	Timeout (deafult 30)
+	pu     	login     	Remote login
+	pw     	password  	Remote password
+	js     	schema    	Force schema name
+	rew    	rewrite   	Path of the rewrite queries file
+	record 	          	Record Calls
+	replay 	          	Replay calls
+
+MongoDb Protocol
+
+	po     	port      	Listening port (default 27018)
+	pc     	connection	Connection (example mongodb://localhost:27018)
+	pt     	timeout   	Timeout (deafult 30)
+	pu     	login     	Remote login
+	pw     	password  	Remote password
+	record 	          	Record Calls
+	replay 	          	Replay calls
+
+postgres Protocol
+
+	po     	port      	Listening port (default 5432)
+	pc     	connection	Connection (example jdbc:postgresql://localhost:5432/db?ssl=false)
+	pt     	timeout   	Timeout (deafult 30)
+	pu     	login     	Remote login
+	pw     	password  	Remote password
+	js     	schema    	Force schema name
+	rew    	rewrite   	Path of the rewrite queries file
+	record 	          	Record Calls
+	replay 	          	Replay calls
+
+Redis Protocol
+
+	po     	port      	Listening port (default 6379)
+	pc     	connection	Connection (example redis://localhost:5372)
+	pt     	timeout   	Timeout (deafult 30)
+	record 	          	Record Calls
+	replay 	          	Replay calls
+
+```
+
 ## How it was Born
 
 I had an always missing QA environment and all changes should be checked by legal (it was in Electronic ID field). I

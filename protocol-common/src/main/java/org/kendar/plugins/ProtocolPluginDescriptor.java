@@ -76,7 +76,7 @@ public abstract class ProtocolPluginDescriptor<T, K, W extends PluginSettings> i
             this.instanceId = "default";
         }
         this.settings = (W) pluginSetting;
-        setActive(pluginSetting.isActive());
+        if(settings!=null)setActive(pluginSetting.isActive());
         return this;
     }
 
@@ -107,5 +107,9 @@ public abstract class ProtocolPluginDescriptor<T, K, W extends PluginSettings> i
             active = false;
             setActive(true);
         }
+    }
+
+    public void terminate(){
+
     }
 }

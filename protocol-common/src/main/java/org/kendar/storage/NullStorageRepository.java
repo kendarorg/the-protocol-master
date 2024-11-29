@@ -1,6 +1,8 @@
 package org.kendar.storage;
 
-import org.kendar.storage.generic.*;
+import org.kendar.storage.generic.LineToWrite;
+import org.kendar.storage.generic.ResponseItemQuery;
+import org.kendar.storage.generic.StorageRepository;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -51,6 +53,11 @@ public class NullStorageRepository implements StorageRepository {
 
     @Override
     public void isRecording(String instanceId, boolean b) {
+
+    }
+
+    @Override
+    public void isReplaying(String instanceId, boolean b) {
 
     }
 

@@ -52,9 +52,9 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
-        long lastTimestamp =0;
+        long lastTimestamp = 0;
         for (var item : storageItems) {
-            if(getSettings().isRespectCallDuration()) {
+            if (getSettings().isRespectCallDuration()) {
                 if (lastTimestamp == 0) {
                     lastTimestamp = item.getTimestamp();
                 } else if (item.getTimestamp() > 0) {

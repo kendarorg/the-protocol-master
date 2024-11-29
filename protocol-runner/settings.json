@@ -1,6 +1,6 @@
 {
   "pluginsDir": "plugins",
-  "logLevel": "ERROR",
+  "logLevel": "INFO",
   "dataDir": "data",
   "protocols": {
     "postgres-01": {
