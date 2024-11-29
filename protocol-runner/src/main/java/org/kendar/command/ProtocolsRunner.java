@@ -82,7 +82,7 @@ public class ProtocolsRunner {
         return (T) value;
     }
 
-    public GlobalSettings prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<PluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
+    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<PluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
 
         try {
             var protocolMotherOption = options.getCommandOption("p");
@@ -111,7 +111,7 @@ public class ProtocolsRunner {
                 }
                 protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
                 parser.parse(args);
-                return settings;
+                return true;
 
                 /*var datadir = cmd.getOptionValue("datadir", "data");
                 var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
@@ -136,7 +136,7 @@ public class ProtocolsRunner {
             parser.printHelp();
             //exit(0);
         }
-        return null;
+        return false;
     }
 
     private void checkOptions(String... args) throws Exception {

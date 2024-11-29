@@ -81,7 +81,9 @@ public class Main {
         var pluginsDir = settings.get().getPluginsDir();
         plugins = loadPlugins(pluginsDir);
         if (!parser.hasOption("cfg")) {
-            om.prepareSettingsFromCommandLine(options, args, plugins, settings.get(), parser);
+            if(!om.prepareSettingsFromCommandLine(options, args, plugins, settings.get(), parser)){
+                return;
+            }
         }
         execute(settings.get(), stopWhenFalse, plugins);
     }
