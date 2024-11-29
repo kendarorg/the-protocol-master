@@ -47,9 +47,4 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String, SSL
     public String getProtocol() {
         return "http";
     }
-
-    @Override
-    public void terminate() {
-
-    }
 }

@@ -43,9 +43,4 @@ public class HttpFilter extends ProtocolPluginDescriptor<Request, Response, Http
     }
 
 
-    @Override
-    public void terminate() {
-
-    }
-
 }

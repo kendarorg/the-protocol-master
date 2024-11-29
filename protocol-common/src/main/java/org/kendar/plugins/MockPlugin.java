@@ -110,11 +110,6 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K, Ba
         return "mock-plugin";
     }
 
-    @Override
-    public void terminate() {
-
-    }
-
     public String getMocksDir() {
         return mocksDir;
     }

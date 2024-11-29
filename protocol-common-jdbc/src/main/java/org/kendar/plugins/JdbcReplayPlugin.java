@@ -6,10 +6,29 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.sql.parser.SqlStringParser;
+import org.kendar.sql.parser.dtos.TokenType;
 import org.kendar.storage.generic.LineToRead;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class JdbcReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
 
+    protected abstract SqlStringParser getParser();
+    @Override
+    protected Map<String, String> buildTag(Object in) {
+        var jdbcCall = (JdbcCall) in;
+        var result = new HashMap<String, String>();
+        result.put("query", jdbcCall.getQuery());
+        var tokenized = getParser().tokenize(jdbcCall.getQuery()).stream().filter(a -> a.getType() != TokenType.VALUE_ITEM)
+                .map(t->t.getValue())
+                .collect(Collectors.toList());
+        result.put("tokenized",String.join(" ",tokenized));
+        result.put("parametersCount", jdbcCall.getParameterValues().size() + "");
+        return result;
+    }
     public abstract String getProtocol();
 
     @Override

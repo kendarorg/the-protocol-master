@@ -44,11 +44,6 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
         return this;
     }
 
-    @Override
-    public void terminate() {
-
-    }
-
 
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, ChannelOpen in, ChannelOpenOk out) {

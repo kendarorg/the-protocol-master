@@ -23,14 +23,14 @@
           "percentage": 0
         },
         "replay-plugin": {
-          "replay": false,
+          "active": false,
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
           "blockExternal": true,
           "matchSites": []
         },
         "record-plugin": {
-          "record": false,
+          "active": false,
           "recordSites": []
         }
       }

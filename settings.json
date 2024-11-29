@@ -42,7 +42,7 @@
           "percentage": 0
         },
         "replay-plugin": {
-          "active": true,
+          "active": false,
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
           "blockExternal": true,

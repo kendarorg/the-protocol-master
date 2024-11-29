@@ -52,11 +52,6 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response,
     }
 
     @Override
-    public void terminate() {
-
-    }
-
-    @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         var settings = (HttpErrorPluginSettings) pluginSetting;

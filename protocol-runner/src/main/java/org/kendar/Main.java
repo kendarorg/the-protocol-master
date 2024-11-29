@@ -72,7 +72,7 @@ public class Main {
         HashMap<String, List<PluginDescriptor>> plugins = new HashMap<>();
         parser.parseIgnoreMissing(args);
 
-        if (settings.get().isUnattended()) {
+        if (parser.hasOption("unattended")||settings.get().isUnattended()) {
             stopWhenFalse = () -> {
                 Sleeper.sleep(10000);
                 return true;

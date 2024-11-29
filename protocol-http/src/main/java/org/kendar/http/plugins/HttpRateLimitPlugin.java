@@ -94,11 +94,6 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
         return "http";
     }
 
-    @Override
-    public void terminate() {
-
-    }
-
 
     private boolean handleRateLimit(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
 

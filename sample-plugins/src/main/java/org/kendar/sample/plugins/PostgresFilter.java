@@ -47,10 +47,4 @@ public class PostgresFilter extends ProtocolPluginDescriptor<JdbcCall, SelectRes
         return this;
     }
 
-
-    @Override
-    public void terminate() {
-
-    }
-
 }

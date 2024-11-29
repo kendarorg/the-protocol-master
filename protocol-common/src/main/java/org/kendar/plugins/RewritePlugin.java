@@ -41,11 +41,6 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
 
     protected abstract void replaceData(ReplacerItemInstance item, J toReplace, T request, K response);
 
-    @Override
-    public void terminate() {
-
-    }
-
 
     @Override
     public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {

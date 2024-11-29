@@ -1,9 +1,7 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.events.EventsQueue;
-import org.kendar.events.FinalizeWriteEvent;
-import org.kendar.events.WriteItemEvent;
+import org.kendar.events.*;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
@@ -40,8 +38,8 @@ public class FileStorageRepository implements StorageRepository {
     private final TypeReference<StorageItem> typeReference = new TypeReference<>() {
     };
     private final Object initializeContentLock = new Object();
-    private String targetDir;
     private final AtomicInteger executorItems = new AtomicInteger(0);
+    private String targetDir;
 
     public FileStorageRepository(String targetDir) {
 
@@ -79,22 +77,33 @@ public class FileStorageRepository implements StorageRepository {
                     log.error("Error creating target dir {}", targetDir);
                 }
             }
-
             EventsQueue.register("FileStorageRepository", (e) -> write(e.getLineToWrite()), WriteItemEvent.class);
             EventsQueue.register("FileStorageRepository", (e) -> finalizeWrite(e.getInstanceId()), FinalizeWriteEvent.class);
+            EventsQueue.register("FileStorageRepository", (e) -> initializeContentWrite(e.getInstanceId()), StartWriteEvent.class);
+            EventsQueue.register("FileStorageRepository", (e) -> finalizePlay(e.getInstanceId()), EndPlayEvent.class);
+            EventsQueue.register("FileStorageRepository", (e) -> initializeContent(e.getInstanceId()), StartPlayEvent.class);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private ProtocolRepo initializeContent(String protocolInstanceIdOuter) {
-//        if (protocolRepo.contains(protocolInstanceIdOuter)) {
-//            return protocolRepo.get(protocolInstanceIdOuter);
+    private void finalizePlay(String instanceId) {
+        synchronized (initializeContentLock) {
+            log.info("Stop replaying "+instanceId);
+            protocolRepo.remove(instanceId);
+        }
+    }
+
+    private ProtocolRepo initializeContent(String instanceId) {
+
+//        if (protocolRepo.contains(instanceId)) {
+//            return protocolRepo.get(instanceId);
 //        }
 
-        synchronized (initializeContentLock) {
+        //synchronized (initializeContentLock) {
 
-            return protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
+            return protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
                 if (currRepo == null) {
                     currRepo = new ProtocolRepo();
                 }
@@ -117,19 +126,21 @@ public class FileStorageRepository implements StorageRepository {
                         storageCounter.set((int) maxIndex);
                     }
                     currRepo.initialized = true;
+                    log.info("Start replaying "+instanceId);
                 }
                 return currRepo;
             });
 
-        }
+        //}
     }
 
-    private void initializeContentWrite(String protocolInstanceIdOuter) {
-//        if (protocolRepo.contains(protocolInstanceIdOuter)) {
+    private void initializeContentWrite(String instanceId) {
+
+//        if (protocolRepo.contains(instanceId)) {
 //            return;
 //        }
-        synchronized (initializeContentLock) {
-            protocolRepo.compute(protocolInstanceIdOuter, (protocolInstanceId, currRepo) -> {
+        //synchronized (initializeContentLock) {
+            protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
                 if (currRepo == null) {
                     currRepo = new ProtocolRepo();
                 }
@@ -141,24 +152,39 @@ public class FileStorageRepository implements StorageRepository {
                         storageCounter.set((int) maxIndex);
                     }
                     currRepo.initialized = true;
+                    log.info("Start recording "+instanceId);
                 }
                 return currRepo;
             });
-        }
+        //}
     }
 
     @Override
     public void isRecording(String instanceId, boolean recording) {
         if (recording) {
+            protocolRepo.remove(instanceId);
             initializeContentWrite(instanceId);
         } else {
-            initializeContent(instanceId);
+            protocolRepo.remove(instanceId);
         }
 
     }
 
     @Override
+    public void isReplaying(String instanceId, boolean replaying) {
+        if (replaying) {
+            protocolRepo.remove(instanceId);
+            initializeContent(instanceId);
+        } else {
+            protocolRepo.remove(instanceId);
+        }
+    }
+
+    @Override
     public List<CompactLine> getIndexes(String instanceId) {
+        if(protocolRepo.get(instanceId)==null){
+            initializeContent(instanceId);
+        }
         var repo = protocolRepo.get(instanceId);
         return new ArrayList<>(repo.index);
     }
@@ -245,17 +271,17 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     @Override
-    public void finalizeWrite(String protocolInstanceId) {
+    public void finalizeWrite(String instanceId) {
         try {
             Sleeper.sleepNoException(1000, () -> executorItems.get() == 0, true);
-            var repo = protocolRepo.get(protocolInstanceId);
+            var repo = protocolRepo.get(instanceId);
             if (repo == null) return;
-            protocolRepo.remove(protocolInstanceId);
+            protocolRepo.remove(instanceId);
             if (!repo.somethingWritten) {
-                protocolRepo.remove(protocolInstanceId);
+                protocolRepo.remove(instanceId);
                 return;
             }
-            var indexFile = "index." + protocolInstanceId + ".json";
+            var indexFile = "index." + instanceId + ".json";
             if (Files.exists(Path.of(targetDir, indexFile))) {
                 Files.delete(Path.of(targetDir, indexFile));
             }
@@ -267,7 +293,7 @@ public class FileStorageRepository implements StorageRepository {
             throw new RuntimeException(e);
         }
 
-        log.debug("[TPM  ][WR]: Optimized recording");
+        log.info("Stop recording "+instanceId);
     }
 
 

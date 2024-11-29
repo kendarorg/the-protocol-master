@@ -40,9 +40,4 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptor<Request, Respons
     public String getProtocol() {
         return "http";
     }
-
-    @Override
-    public void terminate() {
-
-    }
 }

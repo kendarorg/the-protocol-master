@@ -47,4 +47,14 @@ public class CallItemsQuery {
     public String getTag(String tag) {
         return tags.get(tag);
     }
+
+    @Override
+    public String toString() {
+        return "CallItemsQuery{" +
+                "tags=" + tags +
+                ", type='" + type + '\'' +
+                ", used=" + used +
+                ", caller='" + caller + '\'' +
+                '}';
+    }
 }
