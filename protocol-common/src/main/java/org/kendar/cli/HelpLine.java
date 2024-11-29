@@ -5,7 +5,7 @@ public class HelpLine {
     private String longCommand;
     private String description;
     private String availableOptions;
-    private boolean block;
+    private final boolean block;
 
     public HelpLine(String shortCommand, String longCommand, String description, String availableOptions) {
         this.shortCommand = shortCommand;

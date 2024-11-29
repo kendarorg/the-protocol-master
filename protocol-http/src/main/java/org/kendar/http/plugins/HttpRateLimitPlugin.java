@@ -54,11 +54,10 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
-            var request = (Request) in;
             if (!recordSites.isEmpty()) {
                 var matchFound = false;
                 for (var pat : recordSites) {
-                    if (pat.matcher(request.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                    if (pat.matcher(((Request) in).getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                         matchFound = true;
                         break;
                     }

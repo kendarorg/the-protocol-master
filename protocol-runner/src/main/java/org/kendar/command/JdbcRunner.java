@@ -62,7 +62,7 @@ public class JdbcRunner extends CommonRunner {
                 CommandOption.of("js", "Force schema name")
                         .withLong("schema")
                         .withMandatoryParameter()
-                        .withCallback((s) -> settings.setForceSchema(s)),
+                        .withCallback(settings::setForceSchema),
                 CommandOption.of("rew", "Path of the rewrite queries file")
                         .withLong("rewrite")
                         .withMandatoryParameter()
@@ -76,7 +76,7 @@ public class JdbcRunner extends CommonRunner {
         return CommandOptions.of(getId())
                 .withDescription(getId() + " Protocol")
                 .withOptions(
-                        commandOptionList.toArray(new CommandOption[commandOptionList.size()])
+                        commandOptionList.toArray(new CommandOption[0])
                 )
                 .withCallback(s -> globalSettings.getProtocols().put(s, settings));
     }

@@ -115,7 +115,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.add((int) response.getIndex());
                 result.add(response);
             }
-            if (result.size() > 0) {
+            if (!result.isEmpty()) {
                 executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
             }
         }
@@ -165,7 +165,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.add((int) response.getIndex());
                 result.add(response);
             }
-            if (result.size() > 0) {
+            if (!result.isEmpty()) {
                 executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
             }
         }

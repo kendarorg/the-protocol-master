@@ -31,7 +31,7 @@ public abstract class CommonRunner {
                 CommandOption.of("pc", "Connection (example " + getConnectionDescription() + ")")
                         .withLong("connection")
                         .withMandatoryParameter()
-                        .withCallback((s) -> settings.setConnectionString(s)),
+                        .withCallback(settings::setConnectionString),
                 CommandOption.of("pt", "Timeout (deafult " + settings.getTimeoutSeconds() + ")")
                         .withLong("timeout")
                         .withMandatoryParameter()
@@ -53,7 +53,7 @@ public abstract class CommonRunner {
                                         "(default to timestamp_uuid).")
                                 .withMandatoryParameter()
                                 .withLong("replayid")
-                                .withCallback((s) -> replaying.setReplayId(s))
+                                .withCallback(replaying::setReplayId)
                 )
                 .withCallback(s -> {
                     replaying.setActive(true);
@@ -70,12 +70,12 @@ public abstract class CommonRunner {
                 CommandOption.of("pu", "Remote login")
                         .withLong("login")
                         .withMandatoryParameter()
-                        .withCallback((s) -> settings.setLogin(s)),
+                        .withCallback(settings::setLogin),
 
                 CommandOption.of("pw", "Remote password")
                         .withLong("password")
                         .withMandatoryParameter()
-                        .withCallback((s) -> settings.setPassword(s)));
+                        .withCallback(settings::setPassword));
 
         return new ArrayList<>(options);
     }

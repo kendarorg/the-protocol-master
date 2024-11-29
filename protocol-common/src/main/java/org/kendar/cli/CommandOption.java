@@ -22,7 +22,7 @@ public class CommandOption implements CommandItem {
     private Consumer<String> callback;
     private boolean present;
     private String subChoicesDescription;
-    private List<CommandOption> subOptions = new ArrayList<>();
+    private final List<CommandOption> subOptions = new ArrayList<>();
     private CommandItem parent;
 
     private CommandOption(String shortCommand, String description) {

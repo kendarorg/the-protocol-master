@@ -89,7 +89,7 @@ public class Amqp091Runner extends CommonRunner {
         return CommandOptions.of(getId())
                 .withDescription("Amqp 0.9.1 Protocol")
                 .withOptions(
-                        commandOptionList.toArray(new CommandOption[commandOptionList.size()])
+                        commandOptionList.toArray(new CommandOption[0])
                 )
                 .withCallback(s -> globalSettings.getProtocols().put(s, settings));
     }

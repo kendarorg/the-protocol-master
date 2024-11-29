@@ -239,7 +239,7 @@ public class Main {
 
 
                 } catch (Exception ex) {
-                    log.error("Unable to start protocol " + item.getKey(), ex);
+                    log.error("Unable to start protocol {}", item.getKey(), ex);
                 }
             }).start();
         }

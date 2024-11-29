@@ -153,15 +153,12 @@ public class SqlStringParser {
         return sqls;
     }
 
-    @SuppressWarnings("IfStatementWithIdenticalBranches")
     public List<String> parseString(String input) {
-        return new ArrayList<>(parseStringSimpleTokens(input).stream().
+        return parseStringSimpleTokens(input).stream().
                 filter(a -> a.getType() != TokenType.COMMENT && !a.getValue().trim().isEmpty()).
-                map(SimpleToken::getValue).
-                collect(Collectors.toList()));
+                map(SimpleToken::getValue).collect(Collectors.toList());
     }
 
-    @SuppressWarnings("IfStatementWithIdenticalBranches")
     public List<SimpleToken> parseStringSimpleTokens(String input) {
         List<SimpleToken> tokens = new ArrayList<>();
         int length = input.length();
@@ -351,7 +348,7 @@ public class SqlStringParser {
                             if (sub.getType() != TokenType.BLOB) {
                                 ls.add(sub);
                             } else {
-                                if (sub.getValue().indexOf(",") >= 0) {
+                                if (sub.getValue().contains(",")) {
                                     ls.addAll(handleComma(sub));
                                 } else {
                                     ls.add(sub);
@@ -377,7 +374,7 @@ public class SqlStringParser {
         var prev = "";
         for (var c : test.toCharArray()) {
             if (c == ',') {
-                if (prev.trim().length() > 0) {
+                if (!prev.trim().isEmpty()) {
                     result.add(new SimpleToken(TokenType.BLOB, prev.trim()));
                 }
                 result.add(new SimpleToken(TokenType.SINGLE_ITEM, ","));
@@ -386,7 +383,7 @@ public class SqlStringParser {
                 prev += c;
             }
         }
-        if (prev.length() > 0) {
+        if (!prev.isEmpty()) {
             result.add(new SimpleToken(TokenType.BLOB, prev.trim()));
         }
         return result;

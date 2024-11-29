@@ -41,7 +41,7 @@ public class MqttRunner extends CommonRunner {
         return CommandOptions.of(getId())
                 .withDescription("Mqtt Protocol")
                 .withOptions(
-                        commandOptionList.toArray(new CommandOption[commandOptionList.size()])
+                        commandOptionList.toArray(new CommandOption[0])
                 )
                 .withCallback(s -> globalSettings.getProtocols().put(s, settings));
     }

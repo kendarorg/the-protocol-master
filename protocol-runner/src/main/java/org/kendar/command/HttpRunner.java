@@ -96,7 +96,7 @@ public class HttpRunner extends CommonRunner {
                                                 "(default to timestamp_uuid).")
                                         .withMandatoryParameter()
                                         .withLong("replayid")
-                                        .withCallback((s) -> replaying.setReplayId(s)),
+                                        .withCallback(replaying::setReplayId),
                                 CommandOption.of("ae", "Allow external calls\n" +
                                                 "(default to false if not set).")
                                         .withMandatoryParameter()
@@ -117,7 +117,7 @@ public class HttpRunner extends CommonRunner {
                                         .withCallback((s) -> error.setErrorPercent(Integer.parseInt(s))),
                                 CommandOption.of("errorMessage", "Error message to show\n" +
                                                 "(default `Error`)")
-                                        .withCallback((s) -> error.setErrorMessage(s))
+                                        .withCallback(error::setErrorMessage)
                         )
                         .withCallback(s -> {
                             recording.setActive(true);
@@ -142,7 +142,7 @@ public class HttpRunner extends CommonRunner {
         return CommandOptions.of(getId())
                 .withDescription(getId() + " Protocol")
                 .withOptions(
-                        commandOptionList.toArray(new CommandOption[commandOptionList.size()])
+                        commandOptionList.toArray(new CommandOption[0])
                 )
                 .withCallback(s -> globalSettings.getProtocols().put(s, settings));
     }

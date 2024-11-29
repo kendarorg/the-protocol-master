@@ -30,8 +30,7 @@ public class CommandOptions implements CommandItem {
     }
 
     protected static void parseListOfCommands(List<MainArg> mainArgs, List<CommandOption> co, CommandItem caller) {
-        for (int i = 0; i < co.size(); i++) {
-            var item = co.get(i);
+        for (CommandOption item : co) {
             var matchingArgIndex = 0;
             var foundedMatchingArg = false;
             for (; matchingArgIndex < mainArgs.size(); matchingArgIndex++) {
@@ -48,12 +47,12 @@ public class CommandOptions implements CommandItem {
             if (parent != null) {
                 var isMine = true;
                 var commandOptions = parent.getCommandOptions();
-                for (var matchingCo = 0; matchingCo < commandOptions.size(); matchingCo++) {
-                    var coFounded = commandOptions.get(matchingCo);
+                for (CommandOption coFounded : commandOptions) {
                     for (var arg = 0; arg < matchingArgIndex; arg++) {
                         var wrongArg = mainArgs.get(arg);
                         if (wrongArg.getId().equalsIgnoreCase(coFounded.getLongCommand()) || wrongArg.getId().equalsIgnoreCase(coFounded.getShortCommand())) {
                             isMine = false;
+                            break;
                         }
                     }
 

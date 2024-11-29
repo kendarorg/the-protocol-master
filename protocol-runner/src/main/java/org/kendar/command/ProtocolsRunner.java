@@ -24,7 +24,7 @@ import static java.lang.System.exit;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class ProtocolsRunner {
-    private static JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = new JsonMapper();
     private final Map<String, CommonRunner> protocols = new HashMap<>();
 
     public ProtocolsRunner(CommonRunner... input) {
@@ -84,7 +84,6 @@ public class ProtocolsRunner {
         return (T) value;
     }
 
-    @SuppressWarnings("ConstantValue")
     public GlobalSettings prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<PluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
 
         try {
