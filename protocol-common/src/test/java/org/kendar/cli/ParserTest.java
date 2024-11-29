@@ -16,7 +16,7 @@ public class ParserTest {
                 CommandOption.of("s", "Storage Dir")
                         .withMandatoryParameter()
                         .withLong("storage")));
-        assertEquals("Duplicate inherited command s on option CommandOption{shortCommand='s', longCommand='storage'}", res.getMessage());
+        assertEquals("Duplicate inherited command s on option CommandOption{shortCommand='s',longCommand='storage'}", res.getMessage());
     }
 
     @Test
@@ -29,7 +29,7 @@ public class ParserTest {
                 CommandOption.of("s", "Storage Dir")
                         .withMandatoryParameter()
                         .withLong("xxx")));
-        assertEquals("Duplicate inherited command s on option CommandOption{shortCommand='s', longCommand='xxx'}", res.getMessage());
+        assertEquals("Duplicate inherited command s on option CommandOption{shortCommand='s',longCommand='xxx'}", res.getMessage());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class ParserTest {
                                                 CommandOption.of("pp", "Port")
                                         )
                         )));
-        assertEquals("Duplicate inherited command p on option CommandOption{shortCommand='p', longCommand='protocol'}", res.getMessage());
+        assertEquals("Duplicate inherited command p on option CommandOption{shortCommand='p',longCommand='protocol'}", res.getMessage());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class ParserTest {
 
         var parser = new CommandParser(options);
         var res = assertThrows(RuntimeException.class, () -> parser.parse(args));
-        assertEquals("Mandatory parameter CommandOption{shortCommand='a', longCommand='xxx'} not present", res.getMessage());
+        assertEquals("Mandatory parameter CommandOption{shortCommand='a',longCommand='xxx'} not present", res.getMessage());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ParserTest {
         var parser = new CommandParser(options);
         var res = assertThrows(RuntimeException.class, () -> parser.parse(args));
         assertEquals("Wrong value missing in command option " +
-                "CommandOption{shortCommand='p', longCommand='protocol'} available choices are http, postgres", res.getMessage());
+                "CommandOption{shortCommand='p',longCommand='protocol'} available choices are http, postgres", res.getMessage());
     }
 
     @Test
@@ -294,7 +294,7 @@ public class ParserTest {
 
     @Test
     void testAutoFill() {
-        var args = new String[]{"-s", "dir", "-p", "postgres", "-hp", "3207", "-p", "http", "-hp", "2035","-activate"};
+        var args = new String[]{"-s", "dir", "-p", "postgres", "-hp", "3207", "-p", "http", "-hp", "2035", "-activate"};
         var options = CommandOptions.of("main");
         var globalSettings = new GlobalSettings();
         options.withOptions(
@@ -336,12 +336,12 @@ public class ParserTest {
     @Test
     void printHelp() {
         var args = new String[]{"-xxx"};
-        var options = CommandOptions.of("main","The Protocol Master\ndo all!");
+        var options = CommandOptions.of("main", "The Protocol Master\ndo all!");
         var globalSettings = new GlobalSettings();
         options.withOptions(
                 CommandOption.of("h", "Help")
                         .withLong("help")
-                        .withParameter()),
+                        .withParameter(),
                 CommandOption.of("s", "Storage Dir")
                         .withMandatoryParameter()
                         .withLong("storage")
@@ -370,5 +370,90 @@ public class ParserTest {
         var parser = new CommandParser(options);
         //parser.parse(args);
         parser.printHelp();
+    }
+
+    @Test
+    void testAutoFillSubCommand() {
+        var args = "-a a -c c -d d -e e -b b -c cd".split(" ");
+        var options = CommandOptions.of("main");
+        options.withOptions(
+                CommandOption.of("a", "ad")
+                        .withMandatoryParameter()
+                        .withCommandOptions(
+                                CommandOption.of("c", "cd")
+                                        .withMandatoryParameter()
+                                        .withCommandOptions(
+                                                CommandOption.of("d", "dd"),
+                                                CommandOption.of("e", "ed")
+                                        )
+
+                        ),
+                CommandOption.of("b", "bd")
+                        .withCommandOptions(
+                                CommandOption.of("c", "cd")
+                                        .withMandatoryParameter()
+                        ));
+        var parser = new CommandParser(options);
+        parser.parse(args);
+        assertTrue(parser.hasOption("a"));
+        assertEquals("a", parser.getOptionValue("a"));
+        assertTrue(parser.hasOption("a.c"));
+        assertEquals("c", parser.getOptionValue("a.c"));
+        assertTrue(parser.hasOption("a.c.d"));
+        assertEquals("d", parser.getOptionValue("a.c.d"));
+        assertTrue(parser.hasOption("a.c.e"));
+        assertEquals("e", parser.getOptionValue("a.c.e"));
+
+        assertTrue(parser.hasOption("b"));
+        assertEquals("b", parser.getOptionValue("b"));
+        assertTrue(parser.hasOption("b.c"));
+        assertEquals("cd", parser.getOptionValue("b.c"));
+    }
+
+
+    @Test
+    void testAutoFillSubCommandNotPresent() {
+        var args = "-a a -c c -d d -b b -c cd -e e".split(" ");
+        var options = CommandOptions.of("main");
+        options.withOptions(
+                CommandOption.of("a", "ad")
+                        .withMandatoryParameter()
+                        .withCommandOptions(
+                                CommandOption.of("c", "cd")
+                                        .withMandatoryParameter()
+                                        .withCommandOptions(
+                                                CommandOption.of("d", "dd"),
+                                                CommandOption.of("e", "ed")
+                                        )
+
+                        ),
+                CommandOption.of("b", "bd")
+                        .withCommandOptions(
+                                CommandOption.of("c", "cd")
+                                        .withMandatoryParameter()
+                        ));
+        var parser = new CommandParser(options);
+        var res = assertThrows(RuntimeException.class, () -> parser.parse(args));
+        assertEquals("Unknown options [MainArg{id='e', values=[e]}]", res.getMessage());
+    }
+
+    @Test
+    void testWrongMat() {
+        var args = "-a a -c c -d d -b b -c cd -e e".split(" ");
+        var options = CommandOptions.of("main");
+        var res = assertThrows(RuntimeException.class, () -> options.withOptions(
+                CommandOption.of("a", "ad")
+                        .withMandatoryParameter()
+                        .withCommandOptions(
+                                CommandOption.of("c", "cd")
+                                        .withMandatoryParameter()
+                                        .withCommandOptions(
+                                                CommandOption.of("d", "dd"),
+                                                CommandOption.of("e", "ed")
+                                        )
+
+                        ),
+                CommandOption.of("c", "bd")));
+        assertEquals("Duplicate inherited command c on option CommandOption{shortCommand='a'}", res.getMessage());
     }
 }

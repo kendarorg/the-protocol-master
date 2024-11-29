@@ -1,6 +1,6 @@
 {
   "pluginsDir": "plugins",
-  "logLevel": "ERROR",
+  "logLevel": "DEBUG",
   "dataDir": "data",
   "protocols": {
     "http": {

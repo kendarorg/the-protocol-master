@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.FinalizeWriteEvent;
 import org.kendar.events.WriteItemEvent;
-import org.kendar.storage.generic.*;
+import org.kendar.storage.generic.CallItemsQuery;
+import org.kendar.storage.generic.LineToWrite;
+import org.kendar.storage.generic.ResponseItemQuery;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -14,7 +17,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +41,7 @@ public class FileStorageRepository implements StorageRepository {
     };
     private final Object initializeContentLock = new Object();
     private String targetDir;
+    private AtomicInteger executorItems = new AtomicInteger(0);
 
     public FileStorageRepository(String targetDir) {
 
@@ -156,11 +163,9 @@ public class FileStorageRepository implements StorageRepository {
         return new ArrayList<>(repo.index);
     }
 
-
     public long generateIndex() {
         return storageCounter.incrementAndGet();
     }
-    private AtomicInteger executorItems = new AtomicInteger(0);
 
     @Override
     public void write(LineToWrite item) {
@@ -192,7 +197,7 @@ public class FileStorageRepository implements StorageRepository {
                 }
             } catch (Exception e) {
                 log.warn("Trouble writing", e);
-            }finally {
+            } finally {
                 executorItems.decrementAndGet();
             }
         });
@@ -242,7 +247,7 @@ public class FileStorageRepository implements StorageRepository {
     @Override
     public void finalizeWrite(String protocolInstanceId) {
         try {
-            Sleeper.sleepNoException(1000,()->executorItems.get()==0,true);
+            Sleeper.sleepNoException(1000, () -> executorItems.get() == 0, true);
             var repo = protocolRepo.get(protocolInstanceId);
             if (repo == null) return;
             protocolRepo.remove(protocolInstanceId);
@@ -264,7 +269,6 @@ public class FileStorageRepository implements StorageRepository {
 
         log.debug("[TPM  ][WR]: Optimized recording");
     }
-
 
 
     @Override

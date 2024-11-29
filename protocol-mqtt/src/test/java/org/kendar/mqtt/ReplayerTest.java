@@ -55,8 +55,9 @@ public class ReplayerTest {
                 "test", "resources", "qos0Test"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new MqttReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());;
+        gs.putService("storage", storage);
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        ;
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
@@ -104,9 +105,11 @@ public class ReplayerTest {
 
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos1Test"));
-        storage.initialize();var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new MqttReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());;
+        storage.initialize();
+        var gs = new GlobalSettings();
+        gs.putService("storage", storage);
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        ;
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
@@ -154,9 +157,11 @@ public class ReplayerTest {
 
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos2Test"));
-        storage.initialize();var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new MqttReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());;
+        storage.initialize();
+        var gs = new GlobalSettings();
+        gs.putService("storage", storage);
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        ;
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 

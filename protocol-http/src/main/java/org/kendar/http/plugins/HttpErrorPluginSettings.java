@@ -5,7 +5,7 @@ import org.kendar.settings.PluginSettings;
 public class HttpErrorPluginSettings extends PluginSettings {
     private int showError;
     private int errorPercent;
-    private String errorMessage;
+    private String errorMessage = "Error";
 
     public int getShowError() {
         return showError;

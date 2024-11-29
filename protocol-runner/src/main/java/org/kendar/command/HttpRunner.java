@@ -1,17 +1,14 @@
 package org.kendar.command;
 
 import com.sun.net.httpserver.HttpsServer;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
+import org.kendar.cli.CommandOption;
+import org.kendar.cli.CommandOptions;
 import org.kendar.http.HttpProtocol;
 import org.kendar.http.plugins.HttpErrorPluginSettings;
 import org.kendar.http.plugins.HttpLatencyPluginSettings;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.http.settings.HttpSSLSettings;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.plugins.PluginDescriptor;
 import org.kendar.plugins.RewritePluginSettings;
@@ -25,9 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -44,85 +40,111 @@ public class HttpRunner extends CommonRunner {
         return httpsServer;
     }
 
+
     @Override
-    public void run(String[] args, boolean isExecute, GlobalSettings go,
-                    Options options, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
-        options.addOption(createOpt("rew", "rewrite", true, "Rewrite request url (requires a file)."));
-        options.addOption(createOpt("ht", "http", true, "Http port (def 4080)"));
-        options.addOption(createOpt("hs", "https", true, "Https port (def 4443)"));
-        options.addOption(createOpt("prx", "proxy", true, "Http/s proxy port (def 9999)"));
-        options.addOption(createOpt("prp", "replay", false, "Replay from log/replay source."));
-        options.addOption(createOpt("prc", "record", false, "Record to log/replay source."));
-        options.addOption(createOpt("plid", "replayid", true, "Set an id for the replay instance (default to timestamp_uuid)."));
-        options.addOption(createOpt("ae", "allowExternal", false, "Allow external calls during replay ."));
+    public CommandOptions getOptions(GlobalSettings globalSettings) {
+        var settings = new HttpProtocolSettings();
+        settings.setProtocol(getId());
+        var recording = new HttpRecordPluginSettings();
+        var replaying = new HttpReplayPluginSettings();
+        var rewrite = new RewritePluginSettings();
+        var error = new HttpErrorPluginSettings();
+        var latency = new HttpLatencyPluginSettings();
+        List<CommandOption> commandOptionList = new ArrayList<>(List.of(
+                CommandOption.of("ht", "Http port (default " + settings.getHttp())
+                        .withLong("http")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.setHttp(Integer.parseInt(s))),
+                CommandOption.of("hs", "Https port (default " + settings.getHttps())
+                        .withLong("https")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.setHttps(Integer.parseInt(s))),
+                CommandOption.of("prx", "Proxy port (default " + settings.getProxy())
+                        .withLong("proxy")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.setProxy(Integer.parseInt(s))),
+                CommandOption.of("cn", "Cname (default " + settings.getSSL().getCname())
+                        .withLong("cname")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.getSSL().setDer(s)),
+                CommandOption.of("der", "Der file (default " + settings.getSSL().getDer())
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.getSSL().setDer(s)),
+                CommandOption.of("key", "Key file (default " + settings.getSSL().getKey())
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.getSSL().setKey(s)),
+                CommandOption.of("rew", "Path of the rewrite queries file")
+                        .withLong("rewrite")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> {
+                            settings.getPlugins().put("rewrite-plugin", rewrite);
+                            rewrite.setActive(true);
+                            rewrite.setRewritesFile(s);
+                        }),
+                CommandOption.of("record", "Record Calls")
+                        .withCallback(s -> {
+                            recording.setActive(true);
+                            settings.getPlugins().put("record-plugin", recording);
+                        }),
+                CommandOption.of("replay", "Replay calls")
+                        .withCommandOptions(
+                                CommandOption.of("cdt", "Respect call duration timing\n" +
+                                                "and distance between calls if applicable")
+                                        .withLong("respectcallduration")
+                                        .withCallback((s) -> replaying.setRespectCallDuration(true)),
+                                CommandOption.of("plid", "Set an id for the replay instance\n" +
+                                                "(default to timestamp_uuid).")
+                                        .withMandatoryParameter()
+                                        .withLong("replayid")
+                                        .withCallback((s) -> replaying.setReplayId(s)),
+                                CommandOption.of("ae", "Allow external calls\n" +
+                                                "(default to false if not set).")
+                                        .withMandatoryParameter()
+                                        .withLong("allowExternal")
+                                        .withCallback((s) -> replaying.setBlockExternal(false))
+                        )
+                        .withCallback(s -> {
+                            replaying.setActive(true);
+                            settings.getPlugins().put("replay-plugin", replaying);
+                        }),
+                CommandOption.of("errors", "Random errors")
+                        .withCommandOptions(
+                                CommandOption.of("showError", "Http error code to show\n" +
+                                                "(default 0 aka none)")
+                                        .withCallback((s) -> error.setShowError(Integer.parseInt(s))),
+                                CommandOption.of("errorPercent", "Percentage of calls in error\n" +
+                                                "(default 0 aka none)")
+                                        .withCallback((s) -> error.setErrorPercent(Integer.parseInt(s))),
+                                CommandOption.of("errorMessage", "Error message to show\n" +
+                                                "(default `Error`)")
+                                        .withCallback((s) -> error.setErrorMessage(s))
+                        )
+                        .withCallback(s -> {
+                            recording.setActive(true);
+                            settings.getPlugins().put("error-plugin", error);
+                        }),
+                CommandOption.of("latency", "Random latency")
+                        .withCommandOptions(
+                                CommandOption.of("latencyMin", "Minimum latency milliseconds\n" +
+                                                "(default 0)")
+                                        .withCallback((s) -> latency.setMinMs(Integer.parseInt(s))),
 
-        options.addOption(createOpt("cn", "cname", true, "Root cname"));
-        options.addOption("der", true, "Root certificate");
-        options.addOption("key", true, "Root certificate keys");
-
-        options.addOption(createOpt("be", "blockExternal", false, "Set if should block external sites replaying"));
-
-        options.addOption("showError", true, "The error to show (404/500 etc) default 0/none");
-        options.addOption("errorPercent", true, "The error percent to generate (default 0)");
-        options.addOption("errorMessage", true, "The error message");
-
-
-        options.addOption("latencyMin", true, "Min ms latency (default 0)");
-        options.addOption("latencyMax", true, "Max ms latency (default 0)");
-        if (!isExecute) return;
-        setCommonData(args, options, go, new HttpProtocolSettings());
-    }
-
-    protected void setCommonData(String[] args, Options options, GlobalSettings ini,
-                                 HttpProtocolSettings section) throws Exception {
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args);
-        ini.getProtocols().put(getId(), section);
-        section.setProtocol(getId());
-        section.setProtocolInstanceId(getId());
-        section.setHttp(Integer.parseInt(cmd.getOptionValue("http", "4080")));
-        section.setHttps(Integer.parseInt(cmd.getOptionValue("https", "4443")));
-        section.setProxy(Integer.parseInt(cmd.getOptionValue("proxy", "9999")));
-        var sslSettings = new HttpSSLSettings();
-        sslSettings.setCname(cmd.getOptionValue("cname", "C=US,O=Local Development,CN=local.org"));
-        sslSettings.setDer(cmd.getOptionValue("der", "resource://certificates/ca.der"));
-        sslSettings.setKey(cmd.getOptionValue("key", "resource://certificates/ca.key"));
-        section.setSSL(sslSettings);
+                                CommandOption.of("latencyMax", "Maximum latency milliseconds\n" +
+                                                "(default 0)")
+                                        .withCallback((s) -> latency.setMaxMs(Integer.parseInt(s)))
+                        )
+                        .withCallback(s -> {
+                            recording.setActive(true);
+                            settings.getPlugins().put("latency-plugin", latency);
+                        })));
 
 
-        if (cmd.hasOption("replay")) {
-            var pl = new HttpReplayPluginSettings();
-            pl.setPlugin("replay-plugin");
-            pl.setActive(true);
-            pl.setRespectCallDuration(cmd.hasOption("cdt"));
-            pl.setReplayId(cmd.getOptionValue("replayid", UUID.randomUUID().toString()));
-            pl.setBlockExternal(!cmd.hasOption("allowExternal"));
-            section.getPlugins().put("replay-plugin", pl);
-        } else if (cmd.hasOption("record")) {
-            var pl = new HttpRecordPluginSettings();
-            pl.setPlugin("record-plugin");
-            pl.setActive(true);
-            section.getPlugins().put("record-plugin", pl);
-        }
-        if (cmd.hasOption("rewrite")) {
-            var pl = new RewritePluginSettings();
-            pl.setRewritesFile(cmd.getOptionValue("rewrite", "rewrite.json"));
-            section.getPlugins().put("rewrite-plugin", pl);
-        }
-        if (cmd.hasOption("showError") && cmd.hasOption("errorPercent")) {
-            var pl = new HttpErrorPluginSettings();
-            pl.setActive(true);
-            pl.setShowError(Integer.parseInt(cmd.getOptionValue("showError", "0")));
-            pl.setErrorPercent(Integer.parseInt(cmd.getOptionValue("errorPercent", "0")));
-            pl.setErrorMessage(cmd.getOptionValue("errorMessage", "Error"));
-            section.getPlugins().put("error-plugin", pl);
-        }
-        if (cmd.hasOption("latencyMax")) {
-            var pl = new HttpLatencyPluginSettings();
-            pl.setMinMs(Integer.parseInt(cmd.getOptionValue("latencyMin", "0")));
-            pl.setMaxMs(Integer.parseInt(cmd.getOptionValue("latencyMax", cmd.getOptionValue("latencyMin", "0"))));
-            section.getPlugins().put("latency-plugin", pl);
-        }
+        return CommandOptions.of(getId())
+                .withDescription(getId() + " Protocol")
+                .withOptions(
+                        commandOptionList.toArray(new CommandOption[commandOptionList.size()])
+                )
+                .withCallback(s -> globalSettings.getProtocols().put(s, settings));
     }
 
     @Override

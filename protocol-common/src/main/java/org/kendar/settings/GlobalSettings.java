@@ -9,12 +9,12 @@ public class GlobalSettings {
     protected static final JsonMapper mapper = new JsonMapper();
     private final Map<String, Object> services = new HashMap<>();
     private String pluginsDir = "plugins";
-    private String logLevel = "ERROR";
+    private String logLevel = "INFO";
     private String dataDir = "data";
     private String logType = "file";
     private int apiPort = 0;
     private Map<String, Object> protocols = new HashMap<>();
-    private boolean unattended =false;
+    private boolean unattended = false;
 
     public int getApiPort() {
         return apiPort;
@@ -43,6 +43,9 @@ public class GlobalSettings {
     public ProtocolSettings getProtocolForKey(String protocol) {
         if (!protocols.containsKey(protocol)) {
             return null;
+        }
+        if (ProtocolSettings.class.isAssignableFrom(protocols.get(protocol).getClass())) {
+            return (ProtocolSettings) protocols.get(protocol);
         }
         return mapper.deserialize(mapper.serialize(protocols.get(protocol)), ProtocolSettings.class);
     }
@@ -87,12 +90,11 @@ public class GlobalSettings {
         this.dataDir = dataDir;
     }
 
+    public boolean isUnattended() {
+        return unattended;
+    }
 
     public void setUnattended(boolean unattended) {
         this.unattended = unattended;
-    }
-
-    public boolean isUnattended() {
-        return unattended;
     }
 }

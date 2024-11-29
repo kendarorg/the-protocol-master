@@ -3,7 +3,6 @@ package org.kendar.mysql;
 import org.junit.jupiter.api.Test;
 import org.kendar.mysql.jpa.CompanyJpa;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
@@ -35,8 +34,8 @@ public class ReplayerTest {
         storage.initialize();
 
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new MySqlReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
+        gs.putService("storage", storage);
+        var pl = new MySqlReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
@@ -76,8 +75,8 @@ public class ReplayerTest {
         storage.initialize();
 
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
-        var pl = new MySqlReplayPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new BasicReplayPluginSettings());
+        gs.putService("storage", storage);
+        var pl = new MySqlReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

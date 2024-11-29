@@ -35,9 +35,9 @@ public class ReplayerTest {
                 "test", "resources", "replay"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage",storage);
+        gs.putService("storage", storage);
 
-        var pl = new RedisReplayPlugin().initialize(gs,new ByteProtocolSettings(),new BasicReplayPluginSettings());
+        var pl = new RedisReplayPlugin().initialize(gs, new ByteProtocolSettings(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 

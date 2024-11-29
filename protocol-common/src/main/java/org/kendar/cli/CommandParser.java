@@ -6,11 +6,12 @@ import java.util.List;
 public class CommandParser {
     private final CommandOptions options;
     private List<MainArg> mainArgs;
+    private boolean printedHelp = false;
+
 
     public CommandParser(CommandOptions options) {
         this.options = options;
     }
-
 
     public CommandOptions getOptions() {
         return options;
@@ -19,7 +20,6 @@ public class CommandParser {
     public List<MainArg> getMainArgs() {
         return mainArgs;
     }
-
 
     private void buildArgs(String[] args) {
         mainArgs = new ArrayList<>();
@@ -44,18 +44,24 @@ public class CommandParser {
     }
 
     public void parse(String[] args) {
+
         try {
             buildArgs(args);
-            options.parse(mainArgs,false);
-        }finally {
-            printHelp();
+            options.parse(mainArgs, false);
+            if (!mainArgs.isEmpty()) {
+                printHelp();
+            }
+        } finally {
+            if (!mainArgs.isEmpty()) {
+                printHelp();
+            }
         }
     }
 
     public void parseIgnoreMissing(String[] args) {
 
         buildArgs(args);
-        options.parse(mainArgs,true);
+        options.parse(mainArgs, true);
 
     }
 
@@ -68,20 +74,24 @@ public class CommandParser {
     }
 
     public String getOptionValue(String id, String defaultValue) {
-        if (options.getOptionValues(id) == null || options.getOptionValues(id).isEmpty()) {
+        var v = options.getOptionValues(id);
+        if (v == null || v.isEmpty()) {
             return defaultValue;
         }
-        return options.getOptionValues(id).get(0);
+        return v.get(0);
     }
 
     public List<String> getOptionValues(String id, String... defaultValues) {
-        if (options.getOptionValues(id) == null || options.getOptionValues(id).isEmpty()) {
-            return List.of(defaultValues);
+        var v = options.getOptionValues(id);
+        if (v == null || v.isEmpty()) {
+            return new ArrayList<>(List.of(defaultValues));
         }
-        return options.getOptionValues(id);
+        return v;
     }
 
     public void printHelp() {
+        if (printedHelp) return;
+        printedHelp = true;
         var toPrint = buildHelp();
         System.out.println(toPrint);
     }
@@ -90,22 +100,22 @@ public class CommandParser {
         var result = new ArrayList<HelpLine>();
         var toPrint = new StringBuilder();
 
-        if(options.getDescription()!=null)result.add(new HelpLine(options.getDescription()));
+        if (options.getDescription() != null) result.add(new HelpLine(options.getDescription()));
         options.printHelp(result);
-        var maxShort =0;
-        var maxLong =0;
-        for(var item:result){
-            if(item.getShortCommand()!=null){
-                maxShort = Math.max(maxShort,item.getShortCommand().length());
-            }else{
+        var maxShort = 0;
+        var maxLong = 0;
+        for (var item : result) {
+            if (item.getShortCommand() != null) {
+                maxShort = Math.max(maxShort, item.getShortCommand().length());
+            } else {
                 item.setShortCommand("");
             }
-            if(item.getLongCommand()!=null){
-                maxLong = Math.max(maxLong,item.getLongCommand().length());
-            }else{
+            if (item.getLongCommand() != null) {
+                maxLong = Math.max(maxLong, item.getLongCommand().length());
+            } else {
                 item.setLongCommand("");
             }
-            if(item.getDescription()==null){
+            if (item.getDescription() == null) {
                 item.setDescription("");
             }
         }
@@ -117,32 +127,32 @@ public class CommandParser {
         for (int i = 0; i < maxLong; i++) {
             sbLong.append(' ');
         }
-        var max = 130-maxLong-maxShort-3;
+        var max = 130 - maxLong - maxShort - 3;
         var firstLine = true;
-        for(var item:result){
-            if(!item.isBlock()){
-                item.setShortCommand(item.getShortCommand()+sbShort.substring(item.getShortCommand().length()));
-                item.setLongCommand(item.getLongCommand()+sbLong.substring(item.getLongCommand().length()));
+        for (var item : result) {
+            if (!item.isBlock()) {
+                item.setShortCommand(item.getShortCommand() + sbShort.substring(item.getShortCommand().length()));
+                item.setLongCommand(item.getLongCommand() + sbLong.substring(item.getLongCommand().length()));
                 var description = item.getDescription();
-                if(item.getAvailableOptions()!=null){
-                    description+="\nOptions: "+item.getAvailableOptions();
+                if (item.getAvailableOptions() != null) {
+                    description += "\nOptions: " + item.getAvailableOptions();
                 }
                 String[] split = description.split("[\r\n\f]+");
                 for (int i = 0; i < split.length; i++) {
                     var descline = split[i];
-                    if(i==0) {
-                        toPrint.append("\t"+item.getShortCommand() + "\t" + item.getLongCommand() + "\t" + descline+"\n");
-                    }else{
-                        toPrint.append("\t"+sbShort + "\t" + sbLong + "\t" + descline+"\n");
+                    if (i == 0) {
+                        toPrint.append("\t" + item.getShortCommand() + "\t" + item.getLongCommand() + "\t" + descline + "\n");
+                    } else {
+                        toPrint.append("\t" + sbShort + "\t" + sbLong + "\t" + descline + "\n");
                     }
                 }
-            }else{
-                if(!firstLine) {
+            } else {
+                if (!firstLine) {
                     toPrint.append("\n");
                 }
-                toPrint.append(item.getDescription()+"\n");
+                toPrint.append(item.getDescription() + "\n");
                 toPrint.append("\n");
-                firstLine=false;
+                firstLine = false;
             }
         }
         return toPrint.toString();

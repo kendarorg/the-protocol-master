@@ -24,7 +24,7 @@
     </modules>
 
     <properties>
-        <revision>2.1.3</revision>
+        <revision>2.1.4</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
@@ -41,7 +41,6 @@
         <zstd.version>1.5.2-2</zstd.version>
         <hibernate.version>5.4.0.Final</hibernate.version>
         <jaxb.api.version>2.3.0</jaxb.api.version>
-        <commons.cli.version>1.6.0</commons.cli.version>
         <amqp.client.version>5.20.0</amqp.client.version>
         <jedis.version>5.1.2</jedis.version>
         <commons.io.version>2.7</commons.io.version>
@@ -52,7 +51,6 @@
         <apache.http.version>4.5.13</apache.http.version>
         <json.schema.validator.version>1.0.66</json.schema.validator.version>
         <pl4j.version>3.12.1</pl4j.version>
-        <commons.cli.version>1.6.0</commons.cli.version>
         <bouncycastle.version>1.68</bouncycastle.version>
     </properties>
     <dependencies>

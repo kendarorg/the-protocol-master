@@ -124,7 +124,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             Sleeper.sleep(item.getDurationMs());
         }
         lineToRead = beforeSendingReadResult(lineToRead);
-        buildState(pluginContext, context, in, outputItem, out,lineToRead);
+        buildState(pluginContext, context, in, outputItem, out, lineToRead);
     }
 
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {

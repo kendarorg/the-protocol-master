@@ -31,6 +31,7 @@ import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.Sleeper;
 import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
@@ -64,25 +65,25 @@ public class Main {
                 new MqttRunner(),
                 new RedisRunner()
         );
-        GlobalSettings settings = new GlobalSettings();
+        var settings = new ChangeableReference<>(new GlobalSettings());
 
         var options = ProtocolsRunner.getMainOptions(settings);
         var parser = new CommandParser(options);
         HashMap<String, List<PluginDescriptor>> plugins = new HashMap<>();
         parser.parseIgnoreMissing(args);
 
-        if(settings.isUnattended()){
+        if (settings.get().isUnattended()) {
             stopWhenFalse = () -> {
                 Sleeper.sleep(10000);
                 return true;
             };
         }
-        var pluginsDir = settings.getPluginsDir();
+        var pluginsDir = settings.get().getPluginsDir();
         plugins = loadPlugins(pluginsDir);
-        if(!parser.hasOption("cfg")) {
-            om.run(options, args, plugins,settings,parser);
+        if (!parser.hasOption("cfg")) {
+            om.prepareSettingsFromCommandLine(options, args, plugins, settings.get(), parser);
         }
-        execute(settings, stopWhenFalse, plugins);
+        execute(settings.get(), stopWhenFalse, plugins);
     }
 
     public static void stop() {

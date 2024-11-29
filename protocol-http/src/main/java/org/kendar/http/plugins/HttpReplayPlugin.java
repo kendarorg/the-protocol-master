@@ -47,7 +47,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
                 if (!matchSites.isEmpty()) {
                     var matchFound = false;
                     for (var pat : matchSites) {
-                        if (pat.match(request.getHost()+request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                        if (pat.match(request.getHost() + request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                             matchFound = true;
                             break;
                         }
@@ -85,16 +85,16 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
         query.setUsed(completedIndexes);
 
         var index = findIndex(query);
-        if(index==null){
+        if (index == null) {
             return false;
         }
-        var storageItem = storage.readById(getInstanceId(),index.getIndex());
-        if(storageItem == null){
+        var storageItem = storage.readById(getInstanceId(), index.getIndex());
+        if (storageItem == null) {
             storageItem = new StorageItem();
             storageItem.setIndex(index.getIndex());
         }
 
-        var lineToRead = new LineToRead(storageItem,index);
+        var lineToRead = new LineToRead(storageItem, index);
         var item = lineToRead.getStorageItem();
         System.out.println("READING " + item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);

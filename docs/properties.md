@@ -12,7 +12,7 @@ The first section contains the main settings:
 ```
 {
   "pluginsDir": "plugins",
-  "logLevel": "ERROR",
+  "logLevel": "INFO",
   "dataDir": "data",
   "apiPort": 8095,
   ...

@@ -1,18 +1,18 @@
 package org.kendar.command;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
 import org.kendar.amqp.v09.AmqpProxy;
+import org.kendar.cli.CommandOption;
+import org.kendar.cli.CommandOptions;
 import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
-import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -20,14 +20,6 @@ import java.util.function.Supplier;
 public class Amqp091Runner extends CommonRunner {
     private TcpServer ps;
 
-    @Override
-    public void run(String[] args, boolean isExecute, GlobalSettings go,
-                    Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
-        var options = getCommonOptions(mainOptions);
-        optionLoginPassword(options);
-        if (!isExecute) return;
-        setCommonData(args, options, go, new ByteProtocolSettings());
-    }
 
     @Override
     protected String getConnectionDescription() {
@@ -87,7 +79,18 @@ public class Amqp091Runner extends CommonRunner {
         ps.stop();
     }
 
-    protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
-        parseLoginPassword((ByteProtocolSettingsWithLogin) result, cmd);
+    @Override
+    public CommandOptions getOptions(GlobalSettings globalSettings) {
+        var settings = new ByteProtocolSettingsWithLogin();
+        settings.setProtocol(getId());
+        var recording = new BasicRecordPluginSettings();
+        var replaying = new BasicReplayPluginSettings();
+        List<CommandOption> commandOptionList = getCommonOptions(globalSettings, settings, recording, replaying, optionLoginPassword(settings));
+        return CommandOptions.of(getId())
+                .withDescription("Amqp 0.9.1 Protocol")
+                .withOptions(
+                        commandOptionList.toArray(new CommandOption[commandOptionList.size()])
+                )
+                .withCallback(s -> globalSettings.getProtocols().put(s, settings));
     }
 }

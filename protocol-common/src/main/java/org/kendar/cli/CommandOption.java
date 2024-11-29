@@ -3,20 +3,27 @@ package org.kendar.cli;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class CommandOption {
+import static org.kendar.cli.CommandOptions.parseListOfCommands;
+import static org.kendar.cli.CommandOptions.printHelpListOfCommands;
+
+public class CommandOption implements CommandItem {
     private final String shortCommand;
     private final String description;
+    private final List<CommandOptions> subChoices = new ArrayList<>();
+    private final Map<String, CommandOptions> subChoicesValues = new HashMap<>();
+    private final Map<String, CommandOption> subOptionsValues = new HashMap<>();
+    private final HashSet<String> duplicateGuardSubChoices = new HashSet<>();
+    private final HashSet<String> duplicateGuardSubOptions = new HashSet<>();
     private boolean hasParameter;
     private boolean mandatoryParameter;
     private String longCommand;
-    private final List<CommandOptions> subChoices = new ArrayList<>();
-    private final Map<String, CommandOptions> subChoicesValues = new HashMap<>();
     private List<String> values;
     private boolean multipleSubChoices;
     private Consumer<String> callback;
     private boolean present;
-    private final HashSet<String> duplicateGuardSubChoices = new HashSet<>();
     private String subChoicesDescription;
+    private List<CommandOption> subOptions = new ArrayList<>();
+    private CommandItem parent;
 
     private CommandOption(String shortCommand, String description) {
 
@@ -46,9 +53,15 @@ public class CommandOption {
 
     @Override
     public String toString() {
+        var all = new ArrayList<String>();
+        if (shortCommand != null) {
+            all.add("shortCommand='" + shortCommand + '\'');
+        }
+        if (longCommand != null) {
+            all.add("longCommand='" + longCommand + '\'');
+        }
         return "CommandOption{" +
-                "shortCommand='" + shortCommand + '\'' +
-                ", longCommand='" + longCommand + '\'' +
+                String.join(",", all) +
                 '}';
     }
 
@@ -93,6 +106,8 @@ public class CommandOption {
 
     public CommandOption withSubChoices(CommandOptions... subChoices) {
         for (var commandOption : subChoices) {
+
+            commandOption.setParent(this);
             if (duplicateGuardSubChoices.contains(commandOption.getId().toLowerCase())) {
                 throw new RuntimeException("Duplicate sub choice " + commandOption.getId());
             }
@@ -106,6 +121,9 @@ public class CommandOption {
     public List<String> getLongShortCommandsChild() {
         var result = new ArrayList<String>();
         for (var commandOption : subChoices) {
+            result.addAll(commandOption.getLongShortCommands());
+        }
+        for (var commandOption : subOptions) {
             result.addAll(commandOption.getLongShortCommands());
         }
         return result;
@@ -127,10 +145,10 @@ public class CommandOption {
 
     public void setValues(List<String> values) {
         this.values = values;
-        if ( callback != null) {
-            if(!this.isHasParameter()){
+        if (callback != null) {
+            if (!this.isHasParameter()) {
                 callback.accept(null);
-            }else {
+            } else {
                 callback.accept(values.get(0));
             }
         }
@@ -158,6 +176,13 @@ public class CommandOption {
             }
             return subChoicesValues.get(mainAndChild[0]).hasOption(mainAndChild[1]);
         }
+
+        if (subOptionsValues.containsKey(mainAndChild[0])) {
+            if (mainAndChild.length == 1) {
+                return subOptionsValues.get(mainAndChild[0]).isPresent();
+            }
+            return subOptionsValues.get(mainAndChild[0]).hasOption(mainAndChild[1]);
+        }
         return false;
     }
 
@@ -168,6 +193,13 @@ public class CommandOption {
                 return new ArrayList<>();
             }
             return subChoicesValues.get(mainAndChild[0]).getOptionValues(mainAndChild[1]);
+        }
+
+        if (subOptionsValues.containsKey(mainAndChild[0])) {
+            if (mainAndChild.length == 1) {
+                return subOptionsValues.get(mainAndChild[0]).getValues();
+            }
+            return subOptionsValues.get(mainAndChild[0]).getOptionValues(mainAndChild[1]);
         }
         return new ArrayList<>();
     }
@@ -194,6 +226,60 @@ public class CommandOption {
             }
             return subChoicesValues.get(mainAndChild[0]).getCommandOption(mainAndChild[1]);
         }
+        if (subOptionsValues.containsKey(mainAndChild[0])) {
+            if (mainAndChild.length == 1) {
+                return subOptionsValues.get(mainAndChild[0]);
+            }
+            return subOptionsValues.get(mainAndChild[0]).getCommandOption(mainAndChild[1]);
+        }
+
         return null;
+    }
+
+    public CommandOption withCommandOptions(CommandOption... subOptionsList) {
+        for (var commandOption : subOptionsList) {
+
+            commandOption.setParent(this);
+            if (commandOption.getShortCommand() != null && duplicateGuardSubOptions.contains(commandOption.getShortCommand().toLowerCase())) {
+                throw new RuntimeException("Duplicate sub option " + commandOption);
+            }
+            if (commandOption.getLongCommand() != null && duplicateGuardSubOptions.contains(commandOption.getLongCommand().toLowerCase())) {
+                throw new RuntimeException("Duplicate sub option " + commandOption);
+            }
+            if (commandOption.getShortCommand() != null) {
+                subOptionsValues.put(commandOption.getShortCommand().toLowerCase(), commandOption);
+                duplicateGuardSubOptions.add(commandOption.getShortCommand().toLowerCase());
+            }
+            if (commandOption.getLongCommand() != null) {
+                subOptionsValues.put(commandOption.getLongCommand().toLowerCase(), commandOption);
+                duplicateGuardSubOptions.add(commandOption.getLongCommand().toLowerCase());
+            }
+        }
+        this.subOptions.addAll(List.of(subOptionsList));
+        return this;
+    }
+
+    public boolean hasSubOptions() {
+        return !subOptions.isEmpty();
+    }
+
+    public void parseInternal(List<MainArg> mainArgs) {
+        parseListOfCommands(mainArgs, subOptions, this);
+    }
+
+    public List<CommandOption> getCommandOptions() {
+        return subOptions;
+    }
+
+    public void printHelp(ArrayList<HelpLine> result) {
+        printHelpListOfCommands(result, subOptions);
+    }
+
+    public CommandItem getParent() {
+        return parent;
+    }
+
+    public void setParent(CommandItem parent) {
+        this.parent = parent;
     }
 }

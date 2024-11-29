@@ -3,9 +3,9 @@ package org.kendar.http.settings;
 import org.kendar.settings.ProtocolSettings;
 
 public class HttpProtocolSettings extends ProtocolSettings {
-    private int http;
-    private int https;
-    private int proxy;
+    private int http = 80;
+    private int https = 443;
+    private int proxy = 9999;
     private HttpSSLSettings ssl = new HttpSSLSettings();
 
     public int getHttp() {

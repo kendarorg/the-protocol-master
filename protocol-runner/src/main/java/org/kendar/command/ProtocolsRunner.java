@@ -1,7 +1,5 @@
 package org.kendar.command;
 
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.cli.CommandParser;
@@ -15,14 +13,18 @@ import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import static java.lang.System.exit;
+
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class ProtocolsRunner {
+    private static JsonMapper mapper = new JsonMapper();
     private final Map<String, CommonRunner> protocols = new HashMap<>();
 
     public ProtocolsRunner(CommonRunner... input) {
@@ -30,42 +32,47 @@ public class ProtocolsRunner {
             protocols.put(protocol.getId(), protocol);
         }
     }
-    private static JsonMapper mapper = new JsonMapper();
-    public static CommandOptions getMainOptions(GlobalSettings settings) {
+
+    public static CommandOptions getMainOptions(ChangeableReference<GlobalSettings> settings) {
 
 
-        var contained = new ChangeableReference<>(settings);
-        var coptions = CommandOptions.of("main","The Protocol Master");
+        var coptions = CommandOptions.of("main", "The Protocol Master");
         coptions.withOptions(
                 CommandOption.of("un", "Unattended run (default false)")
                         .withLong("unattended")
-                        .withCallback((s)->settings.setUnattended(true)),
+                        .withCallback((s) -> settings.get().setUnattended(true)),
                 CommandOption.of("cfg", "Load config file")
                         .withLong("config")
                         .withMandatoryParameter()
-                        .withCallback((s)->{
+                        .withCallback((s) -> {
                             var fr = new FileResourcesUtils().getFileFromResourceAsString(s);
-                            contained.set(mapper.deserialize(fr,GlobalSettings.class));
+                            settings.set(mapper.deserialize(fr, GlobalSettings.class));
                         }),
                 CommandOption.of("pld", "Plugins directory (default plugins)")
                         .withLong("pluginsDir")
                         .withMandatoryParameter()
-                        .withCallback((s)->settings.setPluginsDir(s)),
+                        .withCallback((s) -> settings.get().setPluginsDir(s)),
+                CommandOption.of("dd", "Data directory (default data)")
+                        .withLong("datadir")
+                        .withMandatoryParameter()
+                        .withCallback((s) -> settings.get().setDataDir(s)),
                 CommandOption.of("ll", "Log4j loglevel (default ERROR)")
                         .withLong("loglevel")
                         .withMandatoryParameter()
-                        .withCallback((s)->settings.setLogLevel(s)),
+                        .withCallback((s) -> settings.get().setLogLevel(s)),
                 CommandOption.of("ap", "The port TPM controllers (default 0, as not active)")
                         .withLong("apis")
                         .withMandatoryParameter()
-                        .withCallback((s)->settings.setApiPort(Integer.parseInt(s))),
+                        .withCallback((s) -> settings.get().setApiPort(Integer.parseInt(s))),
                 CommandOption.of("lt", "The log type (default file)")
                         .withLong("logType")
                         .withMandatoryParameter()
-                        .withCallback((s)->settings.setDataDir(s)),
+                        .withCallback((s) -> settings.get().setDataDir(s)),
+                CommandOption.of("p", "The protocols to start")
+                        .withLong("protocol")
+                        .withMandatoryParameter(),
                 CommandOption.of("h", "Show help")
                         .withLong("help")
-                        .withCallback((s)->{throw new RuntimeException();})
         );
         return coptions;
     }
@@ -78,19 +85,36 @@ public class ProtocolsRunner {
     }
 
     @SuppressWarnings("ConstantValue")
-    public GlobalSettings run(CommandOptions options, String[] args, HashMap<String, List<PluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
+    public GlobalSettings prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<PluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
 
         try {
+            var protocolMotherOption = options.getCommandOption("p");
+            var protocolOptionsToAdd = new ArrayList<CommandOptions>();
+
 
             var isExecute = false;
             if (parser.hasOption("help")) {
                 var helpValue = parser.getOptionValue("help");
-                runWithParams(args, helpValue, isExecute, null, options, filters);
+                if (helpValue == null) {
+                    for (var protocol : protocols.values()) {
+                        protocolOptionsToAdd.add(protocol.getOptions(settings));
+                    }
+                    protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
+                } else {
+                    var protocol = protocols.values().stream().filter(p -> p.getId().equalsIgnoreCase(helpValue)).findFirst().get();
+                    protocolOptionsToAdd.add(protocol.getOptions(settings));
+                    protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
+                }
                 throw new Exception();
             } else {
                 isExecute = true;
 
-
+                for (var protocol : protocols.values()) {
+                    protocolOptionsToAdd.add(protocol.getOptions(settings));
+                }
+                protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
+                parser.parse(args);
+                return settings;
 
                 /*var datadir = cmd.getOptionValue("datadir", "data");
                 var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
@@ -105,14 +129,15 @@ public class ProtocolsRunner {
                 ini.setLogLevel(loglevel);
                 ini.setLogType(logType);
                 ini.setApiPort(tpmApi);*/
-                runWithParams(args, protocol, isExecute, ini, options, filters);
-                return ini;
+                /*runWithParams(args, protocol, isExecute, ini, options, filters);
+                return ini;*/
             }
         } catch (Exception ex) {
             if (ex.getMessage() != null) {
                 System.err.println("ERROR: " + ex.getMessage());
             }
             parser.printHelp();
+            exit(0);
         }
         return null;
     }
@@ -125,12 +150,6 @@ public class ProtocolsRunner {
         }
     }
 
-    private void runWithParams(String[] args, String protocol, boolean isExecute,
-                               GlobalSettings go, Options options,
-                               HashMap<String, List<PluginDescriptor>> filters) throws Exception {
-        var founded = protocols.get(protocol);
-        founded.run(args, isExecute, go, options, filters);
-    }
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
                       GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> filters,

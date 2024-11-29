@@ -7,19 +7,6 @@ public class HelpLine {
     private String availableOptions;
     private boolean block;
 
-    public boolean isBlock() {
-        return block;
-    }
-
-    @Override
-    public String toString() {
-        if(block){
-            return description;
-        }else{
-            return shortCommand + "\t" + longCommand + "\t" + description;
-        }
-    }
-
     public HelpLine(String shortCommand, String longCommand, String description, String availableOptions) {
         this.shortCommand = shortCommand;
         this.longCommand = longCommand;
@@ -27,9 +14,23 @@ public class HelpLine {
         this.availableOptions = availableOptions;
         this.block = false;
     }
+
     public HelpLine(String description) {
         this.description = description;
         this.block = true;
+    }
+
+    public boolean isBlock() {
+        return block;
+    }
+
+    @Override
+    public String toString() {
+        if (block) {
+            return description;
+        } else {
+            return shortCommand + "\t" + longCommand + "\t" + description;
+        }
     }
 
     public String getShortCommand() {

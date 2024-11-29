@@ -1,18 +1,18 @@
 package org.kendar.command;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
+import org.kendar.cli.CommandOption;
+import org.kendar.cli.CommandOptions;
 import org.kendar.mqtt.MqttProxy;
 import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
-import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.Sleeper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -20,14 +20,6 @@ import java.util.function.Supplier;
 public class MqttRunner extends CommonRunner {
     private TcpServer ps;
 
-    @Override
-    public void run(String[] args, boolean isExecute, GlobalSettings go,
-                    Options mainOptions, HashMap<String, List<PluginDescriptor>> filters) throws Exception {
-        var options = getCommonOptions(mainOptions);
-        optionLoginPassword(options);
-        if (!isExecute) return;
-        setCommonData(args, options, go, new ByteProtocolSettingsWithLogin());
-    }
 
     @Override
     protected String getConnectionDescription() {
@@ -37,6 +29,21 @@ public class MqttRunner extends CommonRunner {
     @Override
     public String getDefaultPort() {
         return "1883";
+    }
+
+    @Override
+    public CommandOptions getOptions(GlobalSettings globalSettings) {
+        var settings = new ByteProtocolSettingsWithLogin();
+        settings.setProtocol(getId());
+        var recording = new BasicRecordPluginSettings();
+        var replaying = new BasicReplayPluginSettings();
+        List<CommandOption> commandOptionList = getCommonOptions(globalSettings, settings, recording, replaying, optionLoginPassword(settings));
+        return CommandOptions.of(getId())
+                .withDescription("Mqtt Protocol")
+                .withOptions(
+                        commandOptionList.toArray(new CommandOption[commandOptionList.size()])
+                )
+                .withCallback(s -> globalSettings.getProtocols().put(s, settings));
     }
 
     @Override
@@ -84,7 +91,4 @@ public class MqttRunner extends CommonRunner {
         ps.stop();
     }
 
-    protected void parseExtra(ByteProtocolSettings result, CommandLine cmd) {
-        parseLoginPassword((ByteProtocolSettingsWithLogin) result, cmd);
-    }
 }

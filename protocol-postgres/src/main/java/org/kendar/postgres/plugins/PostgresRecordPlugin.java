@@ -3,7 +3,6 @@ package org.kendar.postgres.plugins;
 import org.kendar.plugins.JdbcRecordPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
-import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.storage.StorageItem;
 
 import java.util.HashMap;

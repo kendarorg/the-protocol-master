@@ -3,6 +3,7 @@ package org.kendar.sql.parser.dtos;
 public class SimpleToken {
     private TokenType type;
     private String value;
+
     public SimpleToken(TokenType type, String value) {
         this.type = type;
         setValue(value);

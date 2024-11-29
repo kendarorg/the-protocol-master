@@ -30,7 +30,8 @@ on localhost the sites to build must be added on the "ssl/hosts"
 The data will be stored in the global dataDir
 
 * active: If it is active
-* recordSites: list of matching ```hosts/path``` to record. When empty everything is recorded. When prepending with @ uses regexp instead can use a simple string with * as wildcard
+* recordSites: list of matching ```hosts/path``` to record. When empty everything is recorded. When prepending with @
+  uses regexp instead can use a simple string with * as wildcard
   else exact match
 * removeEtags: default to true, cleans all ETag-related fields to avoid caching
 
@@ -40,7 +41,8 @@ The data will be loaded from the global dataDir. This is used to replay a whole 
 without the need to mock a single request
 
 * active: If it is active
-* matchSites: list of matching ```hosts/path``` to replay. When empty everything is replayed. When prepending with @ uses regexp instead can use a simple string with * as wildcard
+* matchSites: list of matching ```hosts/path``` to replay. When empty everything is replayed. When prepending with @
+  uses regexp instead can use a simple string with * as wildcard
 * respectCallDuration: respect the duration of the round trip
 * blockExternal: default to true, block any calls to not recorded website
 
