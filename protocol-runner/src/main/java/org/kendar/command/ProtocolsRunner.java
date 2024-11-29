@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import static java.lang.System.exit;
-
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class ProtocolsRunner {
     private static final JsonMapper mapper = new JsonMapper();
@@ -136,7 +134,7 @@ public class ProtocolsRunner {
                 System.err.println("ERROR: " + ex.getMessage());
             }
             parser.printHelp();
-            exit(0);
+            //exit(0);
         }
         return null;
     }
