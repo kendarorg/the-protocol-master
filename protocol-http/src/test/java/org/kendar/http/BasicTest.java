@@ -159,6 +159,7 @@ public class BasicTest {
                 new HttpRecordPlugin().initialize(globalSettings, httpProtocolSettings, recordingSettings),
                 new HttpReplayPlugin().initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(),
+                new HttpReportPlugin(),
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(),
                 new HttpMockPlugin().initialize(globalSettings, httpProtocolSettings, mockSettings),

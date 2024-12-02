@@ -1,6 +1,5 @@
 package org.kendar.events;
 
-import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +55,16 @@ public class EventsQueue {
             instance.eventHandlers.put(eventName, new HashMap<>());
         }
         instance.eventHandlers.get(eventName).put(id, realConsumer);
+    }
+
+
+
+    public static <T extends TpmEvent> void unregister(String id, Class<T> clazz) {
+        var eventName = clazz.getSimpleName().toLowerCase(Locale.ROOT);
+        if (instance.eventHandlers.containsKey(eventName)) {
+            instance.eventHandlers.get(eventName).remove(id);
+        }
+        instance.commandHandlers.remove(eventName);
     }
 
     public static <T extends TpmEvent> void registerCommand(String id, Function<T, Object> function, Class<T> clazz) {

@@ -33,7 +33,6 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<T, K
                                           ChangeableReference<Integer> matchingQuery,
                                           ChangeableReference<Long> foundedIndex);
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
         if (!isActive()) return false;
         var matchingQuery = new ChangeableReference<>(0);

@@ -30,7 +30,6 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
     }
 
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
         if (!isActive()) return false;
         if (replacers.isEmpty()) return false;

@@ -61,7 +61,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     }
 
     @SuppressWarnings("IfStatementWithIdenticalBranches")
-    @Override
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
             if (out == null) {

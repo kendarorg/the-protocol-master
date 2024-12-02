@@ -5,8 +5,12 @@ import ch.qos.logback.classic.LoggerContext;
 import com.sun.net.httpserver.HttpServer;
 import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
+import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
 import org.kendar.apis.ApiHandler;
 import org.kendar.apis.ApiServerHandler;
+import org.kendar.mongo.plugins.MongoReportPlugin;
+import org.kendar.mqtt.plugins.MqttReportPlugin;
+import org.kendar.mysql.plugins.MySqlReportPlugin;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.cli.CommandParser;
 import org.kendar.command.*;
@@ -23,9 +27,11 @@ import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.postgres.plugins.PostgresReplayPlugin;
+import org.kendar.postgres.plugins.PostgresReportPlugin;
 import org.kendar.postgres.plugins.PostgresRewritePlugin;
 import org.kendar.redis.plugins.RedisRecordPlugin;
 import org.kendar.redis.plugins.RedisReplayPlugin;
+import org.kendar.redis.plugins.RedisReportPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -162,6 +168,7 @@ public class Main {
                 new HttpRecordPlugin(),
                 new HttpErrorPlugin(),
                 new HttpReplayPlugin(),
+                new HttpReportPlugin(),
                 new HttpRewritePlugin(),
                 new HttpMockPlugin(),
                 new HttpLatencyPlugin(),
@@ -169,24 +176,30 @@ public class Main {
         ));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mongodb", List.of(
                 new MongoRecordPlugin(),
-                new MongoReplayPlugin()));
+                new MongoReplayPlugin(),
+                new MongoReportPlugin()));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "redis", List.of(
                 new RedisRecordPlugin(),
-                new RedisReplayPlugin()));
+                new RedisReplayPlugin(),
+                new RedisReportPlugin()));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "amqp091", List.of(
                 new AmqpRecordPlugin(),
-                new AmqpReplayPlugin()));
+                new AmqpReplayPlugin(),
+                new AmqpReportPlugin()));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mqtt", List.of(
                 new MqttRecordPlugin(),
-                new MqttReplayPlugin()));
+                new MqttReplayPlugin(),
+                new MqttReportPlugin()));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "postgres", List.of(
                 new PostgresRecordPlugin(),
                 new PostgresReplayPlugin(),
-                new PostgresRewritePlugin()));
+                new PostgresRewritePlugin(),
+                new PostgresReportPlugin()));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mysql", List.of(
                 new MySqlRecordPlugin(),
                 new MySqlReplayPlugin(),
-                new MySqlRewritePlugin()));
+                new MySqlRewritePlugin(),
+                new MySqlReportPlugin()));
         return allProtocolSpecificPlugins;
     }
 

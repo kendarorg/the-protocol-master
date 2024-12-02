@@ -11,7 +11,7 @@ import java.util.List;
  * Basic Protocol Plugin
  */
 public interface ProtocolPluginDescriptor<T,K,W extends PluginSettings> extends
-        ExtensionPoint, BasePluginDescriptor<W>,RequestResponseHandler<T,K> {
+        ExtensionPoint, BasePluginDescriptor<W> {
     /**
      * Phases for the protocol
      *

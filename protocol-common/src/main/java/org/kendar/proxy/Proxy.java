@@ -2,14 +2,16 @@ package org.kendar.proxy;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReplayStatusEvent;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Base proxy implementation
@@ -86,10 +88,21 @@ public abstract class Proxy {
     public void setPlugins(List<ProtocolPluginDescriptor> filters) {
         for (var plugin : filters) {
             var clazz = plugin.getClass();
-            var handle = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase("handle")).findFirst();
+            var handles = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase("handle")).collect(Collectors.toList());
 
-            if (handle.isPresent()) {
-                var matcher = pattern.matcher(handle.get().toString());
+            for(var handle:handles){
+                var matcher = pattern.matcher(handle.toString());
+                if(handle.getParameterCount()!=4)continue;
+                if(handle.getParameters()[0].getType()!=PluginContext.class ||
+                        handle.getParameters()[1].getType()!=ProtocolPhase.class)continue;
+
+                Class<?>[] pType  = handle.getParameterTypes();
+                Type[] gpType = handle.getGenericParameterTypes();
+                for (int i = 0; i < pType.length; i++) {
+                    System.out.println("ParameterType"+ pType[i]);
+                    System.out.println("GenericParameterType"+ gpType[i]);
+                }
+
                 if (matcher.find()) {
                     var pars = matcher.group(2);
                     if (!allowedPlugins.containsKey(pars)) {
@@ -100,6 +113,7 @@ public abstract class Proxy {
                         if (!map.containsKey(phase)) {
                             map.put((ProtocolPhase) phase, new ArrayList<>());
                         }
+                        var result = new PluginHandler(plugin,handle.getParameterTypes()[2],handle.getParameterTypes()[3]);
                         map.get(phase).add((ProtocolPluginDescriptor) plugin);
                     }
                 }

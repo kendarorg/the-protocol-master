@@ -37,7 +37,6 @@ public class AmqpReportPlugin extends ReportPlugin<BodyFrame,Object, PluginSetti
         return false;
     }
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, BodyFrame in, Object out) {
         if(!isActive())return false;
         var context = pluginContext.getContext();

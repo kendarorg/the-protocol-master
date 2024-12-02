@@ -31,7 +31,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
         return ignoreTrivialCalls;
     }
 
-    @Override
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
             switch (phase) {
