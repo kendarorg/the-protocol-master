@@ -1,6 +1,6 @@
 package org.kendar.plugins;
 
-import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class MockPlugin<T, K> extends BaseProtocolPluginDescriptor<T, K, BasicMockPluginSettings> {
+public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<T, K, BasicMockPluginSettings> {
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     protected List<MockStorage> mocks = new ArrayList<>();
     private String mocksDir;

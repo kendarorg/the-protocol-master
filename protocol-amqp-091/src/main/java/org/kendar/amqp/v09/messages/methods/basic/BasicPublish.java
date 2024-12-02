@@ -106,6 +106,9 @@ public class BasicPublish extends Basic {
         queueDeclare.routingKey = (routingKey);
         queueDeclare.exchange = (exchange);
 
+        context.setValue("BASIC_PUBLISH_RK_" + channel,routingKey);
+        context.setValue("BASIC_PUBLISH_XC_" + channel,exchange);
+
         return iteratorOfRunnable(() -> proxy.sendAndForget(context,
                 connection,
                 queueDeclare

@@ -1,7 +1,7 @@
 package org.kendar.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.RewritePluginSettings;
@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends BaseProtocolPluginDescriptor<T, K, W> {
+public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptorBase<T, K, W> {
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();

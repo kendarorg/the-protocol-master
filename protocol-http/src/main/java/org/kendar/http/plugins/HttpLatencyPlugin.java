@@ -3,14 +3,14 @@ package org.kendar.http.plugins;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.utils.Sleeper;
 
 import java.util.List;
 import java.util.Random;
 
-public class HttpLatencyPlugin extends BaseProtocolPluginDescriptor<Request, Response, HttpLatencyPluginSettings> {
+public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<Request, Response, HttpLatencyPluginSettings> {
 
 
     @Override

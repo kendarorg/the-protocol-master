@@ -3,7 +3,7 @@ package org.kendar.http.plugins;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class HttpErrorPlugin extends BaseProtocolPluginDescriptor<Request, Response, HttpErrorPluginSettings> {
+public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<Request, Response, HttpErrorPluginSettings> {
 
     private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
     private int errorCode;

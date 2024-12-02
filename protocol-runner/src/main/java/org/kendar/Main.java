@@ -7,6 +7,7 @@ import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.apis.ApiHandler;
 import org.kendar.apis.ApiServerHandler;
+import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.cli.CommandParser;
 import org.kendar.command.*;
 import org.kendar.http.plugins.*;
@@ -18,6 +19,7 @@ import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.mysql.plugins.MySqlRewritePlugin;
 import org.kendar.plugins.base.AlwaysActivePlugin;
+import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.postgres.plugins.PostgresReplayPlugin;
@@ -26,6 +28,7 @@ import org.kendar.redis.plugins.RedisRecordPlugin;
 import org.kendar.redis.plugins.RedisReplayPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -46,16 +49,17 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ThrowablePrintedToSystemOut")
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
-    private static final ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
-    private static ProtocolsRunner om;
-    private static HashMap<String, List<ProtocolPluginDescriptor>> allPlugins = new HashMap<>();
+    private static final ConcurrentHashMap<String, TcpServer> protocolServersCache = new ConcurrentHashMap<>();
+    private static ProtocolsRunner protocolsRunner;
+    private static HashMap<String, List<ProtocolPluginDescriptor>> allProtocolSpecificPlugins = new HashMap<>();
+    private static List<GlobalPluginDescriptor> allGlobalPlugins = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
         execute(args, Main::stopWhenQuitCommand);
     }
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
-        om = new ProtocolsRunner(
+        protocolsRunner = new ProtocolsRunner(
                 new Amqp091Runner(),
                 new MongoRunner(),
                 new HttpRunner(),
@@ -68,7 +72,6 @@ public class Main {
 
         var options = ProtocolsRunner.getMainOptions(settings);
         var parser = new CommandParser(options);
-        HashMap<String, List<ProtocolPluginDescriptor>> plugins = new HashMap<>();
         parser.parseIgnoreMissing(args);
 
         if (parser.hasOption("unattended")||settings.get().isUnattended()) {
@@ -78,17 +81,19 @@ public class Main {
             };
         }
         var pluginsDir = settings.get().getPluginsDir();
-        plugins = loadProtocolPlugins(pluginsDir);
+        var protocolPlugins = loadProtocolPlugins(pluginsDir);
+        var globalPlugins = loadGlobalPlugins(pluginsDir);
         if (!parser.hasOption("cfg")) {
-            if(!om.prepareSettingsFromCommandLine(options, args, plugins, settings.get(), parser)){
+            if(!protocolsRunner.prepareSettingsFromCommandLine(options, args, protocolPlugins, settings.get(), parser)){
                 return;
             }
         }
-        execute(settings.get(), stopWhenFalse, plugins);
+
+        execute(settings.get(), stopWhenFalse, protocolPlugins,globalPlugins);
     }
 
     public static void stop() {
-        for (var server : protocolServer.values()) {
+        for (var server : protocolServersCache.values()) {
             server.stop();
         }
     }
@@ -129,9 +134,12 @@ public class Main {
         return storage;
     }
 
+
+
+
     private static HashMap<String, List<ProtocolPluginDescriptor>> loadProtocolPlugins(String pluginsDir) {
-        if (!allPlugins.isEmpty()) {
-            return allPlugins;
+        if (!allProtocolSpecificPlugins.isEmpty()) {
+            return allProtocolSpecificPlugins;
         }
         var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
         if (pathOfPluginsDir.toFile().exists()) {
@@ -139,18 +147,18 @@ public class Main {
             var pluginManager = new JarPluginManager(pathOfPluginsDir);
             pluginManager.loadPlugins();
             pluginManager.startPlugins();
-            allPlugins = new HashMap<>();
+            allProtocolSpecificPlugins = new HashMap<>();
             for (var item : pluginManager.getExtensions(ProtocolPluginDescriptor.class)) {
                 var protocol = item.getProtocol().toLowerCase();
-                if (!allPlugins.containsKey(protocol)) {
-                    allPlugins.put(protocol, new ArrayList<>());
+                if (!allProtocolSpecificPlugins.containsKey(protocol)) {
+                    allProtocolSpecificPlugins.put(protocol, new ArrayList<>());
                 }
-                allPlugins.get(protocol).add(item);
+                allProtocolSpecificPlugins.get(protocol).add(item);
             }
         }
         var ssl = new SSLDummyPlugin();
         ssl.setActive(true);
-        addEmbeddedProtocolPlugin(allPlugins, "http", List.of(
+        addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "http", List.of(
                 new HttpRecordPlugin(),
                 new HttpErrorPlugin(),
                 new HttpReplayPlugin(),
@@ -159,27 +167,27 @@ public class Main {
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(), ssl
         ));
-        addEmbeddedProtocolPlugin(allPlugins, "mongodb", List.of(
+        addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mongodb", List.of(
                 new MongoRecordPlugin(),
                 new MongoReplayPlugin()));
-        addEmbeddedProtocolPlugin(allPlugins, "redis", List.of(
+        addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "redis", List.of(
                 new RedisRecordPlugin(),
                 new RedisReplayPlugin()));
-        addEmbeddedProtocolPlugin(allPlugins, "amqp091", List.of(
+        addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "amqp091", List.of(
                 new AmqpRecordPlugin(),
                 new AmqpReplayPlugin()));
-        addEmbeddedProtocolPlugin(allPlugins, "mqtt", List.of(
+        addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mqtt", List.of(
                 new MqttRecordPlugin(),
                 new MqttReplayPlugin()));
-        addEmbeddedProtocolPlugin(allPlugins, "postgres", List.of(
+        addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "postgres", List.of(
                 new PostgresRecordPlugin(),
                 new PostgresReplayPlugin(),
                 new PostgresRewritePlugin()));
-        addEmbeddedProtocolPlugin(allPlugins, "mysql", List.of(
+        addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mysql", List.of(
                 new MySqlRecordPlugin(),
                 new MySqlReplayPlugin(),
                 new MySqlRewritePlugin()));
-        return allPlugins;
+        return allProtocolSpecificPlugins;
     }
 
     private static void addEmbeddedProtocolPlugin(HashMap<String, List<ProtocolPluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?, ?>> embeddedPlugins) {
@@ -191,11 +199,13 @@ public class Main {
 
 
     public static boolean isRunning() {
-        return protocolServer.values().stream().anyMatch(TcpServer::isRunning);
+        return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning);
     }
 
 
-    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<ProtocolPluginDescriptor>> allPlugins) throws Exception {
+    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse,
+                               HashMap<String, List<ProtocolPluginDescriptor>> protocolPlugins,
+                               List<GlobalPluginDescriptor> globalPlugins) throws Exception {
         if (ini == null) return;
         var logsDir = ProtocolsRunner.getOrDefault(
                 ini.getDataDir(),
@@ -206,10 +216,16 @@ public class Main {
         ini.putService(storage.getType(), storage);
 
         var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
-        if (allPlugins == null || allPlugins.isEmpty()) {
-            allPlugins = loadProtocolPlugins(pluginsDir);
+        if (protocolPlugins == null || protocolPlugins.isEmpty()) {
+            protocolPlugins = loadProtocolPlugins(pluginsDir);
         }
-        var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "ERROR");
+        if (globalPlugins == null || globalPlugins.isEmpty()) {
+            globalPlugins = loadGlobalPlugins(pluginsDir);
+        }
+
+
+
+        var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
 
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -218,31 +234,37 @@ public class Main {
 
         var apiHandler = new ApiHandler(ini);
 
-        var finalAllPlugins = allPlugins;
+        var finalAllPlugins = protocolPlugins;
         for (var item : ini.getProtocols().entrySet()) {
             new Thread(() -> {
                 try {
 
                     var protocol = ini.getProtocolForKey(item.getKey());
                     if (protocol == null) return;
-                    var protocolManager = om.getManagerFor(protocol);
+                    var protocolManager = protocolsRunner.getManagerFor(protocol);
                     var availableProtocolPlugins = loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
                     var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
 
                     try {
-                        om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, availableProtocolPlugins, stopWhenFalse);
+                        protocolsRunner.start(protocolServersCache, item.getKey(), ini, protocolFullSettings, storage, availableProtocolPlugins, stopWhenFalse);
                     } catch (Exception e) {
                         //noinspection SuspiciousMethodCalls
-                        protocolServer.remove(item);
+                        protocolServersCache.remove(item);
                         throw new RuntimeException(e);
                     }
-                    apiHandler.addProtocol(item.getKey(), protocolManager, availableProtocolPlugins, protocolFullSettings);
-
+                    var pi = new ProtocolInstance(item.getKey(),
+                            protocolServersCache.get(item.getKey()), availableProtocolPlugins, protocolFullSettings);
+                    apiHandler.addProtocol(pi);
+                    ini.putService(item.getKey(),pi);
 
                 } catch (Exception ex) {
                     log.error("Unable to start protocol {}", item.getKey(), ex);
                 }
             }).start();
+        }
+        for(var plugin : globalPlugins) {
+            var pluginSettings = (PluginSettings)ini.getPlugin(plugin.getId(), plugin.getSettingClass());
+            plugin.initialize(ini,pluginSettings);
         }
         if (ini.getApiPort() > 0) {
             var address = new InetSocketAddress(ini.getApiPort());
@@ -276,5 +298,27 @@ public class Main {
             plugins.add((ProtocolPluginDescriptor) pluginInstance);
         }
         return plugins;
+    }
+
+
+
+
+
+    private static List<GlobalPluginDescriptor> loadGlobalPlugins(String pluginsDir) {
+        if (!allGlobalPlugins.isEmpty()) {
+            return allGlobalPlugins;
+        }
+        var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
+        if (pathOfPluginsDir.toFile().exists()) {
+
+            var pluginManager = new JarPluginManager(pathOfPluginsDir);
+            pluginManager.loadPlugins();
+            pluginManager.startPlugins();
+            allGlobalPlugins = new ArrayList<>();
+            for (var item : pluginManager.getExtensions(GlobalPluginDescriptor.class)) {
+                allGlobalPlugins.add(item);
+            }
+        }
+        return allGlobalPlugins;
     }
 }

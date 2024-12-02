@@ -83,7 +83,7 @@ public class EventsQueue {
         new Thread(() -> {
             while (true) {
                 if (items.isEmpty()) {
-                    Sleeper.sleep(5);
+                    Thread.onSpinWait();
                     continue;
                 }
                 var item = items.poll();

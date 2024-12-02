@@ -9,7 +9,7 @@ import org.kendar.settings.ProtocolSettings;
 
 import java.util.List;
 
-public class SSLDummyPlugin extends BaseProtocolPluginDescriptor<String, String, SSLDummyPluginSettings> implements AlwaysActivePlugin {
+public class SSLDummyPlugin extends ProtocolPluginDescriptorBase<String, String, SSLDummyPluginSettings> implements AlwaysActivePlugin {
     private HttpProtocolSettings protocolSettings;
 
     @Override

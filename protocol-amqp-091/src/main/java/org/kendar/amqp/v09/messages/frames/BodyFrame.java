@@ -67,6 +67,9 @@ public class BodyFrame extends Frame {
         }
 
 
+        var routingKey = context.getValue("BASIC_PUBLISH_RK_" + channel);
+        var exchange = context.getValue("BASIC_PUBLISH_XC_" + channel);
+
         var bf = new BodyFrame();
         bf.setChannel(channel);
         bf.setContentBytes(contentBytes);

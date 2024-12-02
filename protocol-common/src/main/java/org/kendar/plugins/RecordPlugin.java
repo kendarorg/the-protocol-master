@@ -2,7 +2,7 @@ package org.kendar.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.events.*;
-import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends BaseProtocolPluginDescriptor<Object, Object, W> {
+public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase<Object, Object, W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
@@ -112,7 +112,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        withStorage((StorageRepository) global.getService("storage"));
+        withStorage(global.getService("storage"));
         ignoreTrivialCalls = ((BasicRecordPluginSettings) pluginSetting).isIgnoreTrivialCalls();
         super.initialize(global, protocol, pluginSetting);
         return this;

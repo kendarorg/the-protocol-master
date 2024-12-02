@@ -14,6 +14,7 @@ public class GlobalSettings {
     private String logType = "file";
     private int apiPort = 0;
     private Map<String, Object> protocols = new HashMap<>();
+    private Map<String, Object> plugins = new HashMap<>();
     private boolean unattended = false;
 
     public int getApiPort() {
@@ -28,8 +29,18 @@ public class GlobalSettings {
         services.put(key, value);
     }
 
-    public Object getService(String key) {
-        return services.get(key);
+    public <K> K  getService(String key) {
+        return (K)services.get(key);
+    }
+
+    public <K> Map<String,K> getServices(Class<K> type) {
+        var result = new HashMap<String,K>();
+        for(var kvp : services.entrySet()) {
+            if(type.isAssignableFrom(kvp.getValue().getClass())) {
+                result.put(kvp.getKey(),(K) kvp.getValue());
+            }
+        }
+        return result;
     }
 
     public String getLogType() {
@@ -50,6 +61,16 @@ public class GlobalSettings {
         return mapper.deserialize(mapper.serialize(protocols.get(protocol)), ProtocolSettings.class);
     }
 
+    public PluginSettings getPluginForKey(String protocol) {
+        if (!plugins.containsKey(protocol)) {
+            return null;
+        }
+        if (ProtocolSettings.class.isAssignableFrom(plugins.get(protocol).getClass())) {
+            return (PluginSettings) plugins.get(protocol);
+        }
+        return mapper.deserialize(mapper.serialize(plugins.get(protocol)), PluginSettings.class);
+    }
+
     public ProtocolSettings getProtocol(String protocol, Class<?> clazz) {
         if (!protocols.containsKey(protocol)) {
             return null;
@@ -58,12 +79,26 @@ public class GlobalSettings {
         return (ProtocolSettings) mapper.deserialize(mapper.serialize(protocolData), clazz);
     }
 
+    public PluginSettings getPlugin(String plugin, Class<?> clazz) {
+        if (!plugins.containsKey(plugin)) {
+            return null;
+        }
+        var pluginsData = plugins.get(plugin);
+        return (PluginSettings) mapper.deserialize(mapper.serialize(pluginsData), clazz);
+    }
+
     public Map<String, Object> getProtocols() {
         return protocols;
+    }
+    public Map<String, Object> getPlugins() {
+        return plugins;
     }
 
     public void setProtocols(Map<String, Object> protocols) {
         this.protocols = protocols;
+    }
+    public void setPlugins(Map<String, Object> protocols) {
+        this.plugins = protocols;
     }
 
     public String getPluginsDir() {

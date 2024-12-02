@@ -149,7 +149,8 @@ public class ProtocolsRunner {
 
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
-                      GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<ProtocolPluginDescriptor> filters,
+                      GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage,
+                      List<ProtocolPluginDescriptor> filters,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var pr = protocols.get(protocol.getProtocol());
         var datadir = Path.of(ini.getDataDir()).toAbsolutePath().toFile();

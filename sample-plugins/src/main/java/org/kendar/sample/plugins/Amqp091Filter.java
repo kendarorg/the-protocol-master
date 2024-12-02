@@ -3,7 +3,7 @@ package org.kendar.sample.plugins;
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpen;
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpenOk;
 import org.kendar.plugins.base.AlwaysActivePlugin;
-import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
@@ -15,7 +15,7 @@ import org.pf4j.Extension;
 import java.util.List;
 
 @Extension
-public class Amqp091Filter extends BaseProtocolPluginDescriptor<ChannelOpen, ChannelOpenOk, Amqp091FilterSettings> implements AlwaysActivePlugin {
+public class Amqp091Filter extends ProtocolPluginDescriptorBase<ChannelOpen, ChannelOpenOk, Amqp091FilterSettings> implements AlwaysActivePlugin {
 
 
     /**
