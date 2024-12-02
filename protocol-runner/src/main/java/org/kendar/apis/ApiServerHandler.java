@@ -2,7 +2,7 @@ package org.kendar.apis;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.kendar.plugins.BaseApiServerHandler;
+import org.kendar.plugins.base.BaseApiServerHandler;
 import org.kendar.plugins.apis.FileDownload;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;

@@ -9,7 +9,7 @@ import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.NullStorageRepository;

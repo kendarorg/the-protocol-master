@@ -12,7 +12,7 @@ import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
 import org.kendar.http.utils.converters.RequestResponseBuilder;
 import org.kendar.http.utils.plugins.PluginClassesHandler;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

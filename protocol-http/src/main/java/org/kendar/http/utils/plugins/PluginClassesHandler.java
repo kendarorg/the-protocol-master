@@ -3,7 +3,7 @@ package org.kendar.http.utils.plugins;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 
 import java.lang.reflect.InvocationTargetException;

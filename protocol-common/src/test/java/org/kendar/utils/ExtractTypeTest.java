@@ -1,8 +1,8 @@
 package org.kendar.utils;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 public class ExtractTypeTest {
     @Test
     void testExtractType() {
-        var target = new ProtocolPluginDescriptor<Object, Object, TestPluginSettings>() {
+        var target = new BaseProtocolPluginDescriptor<Object, Object, TestPluginSettings>() {
             @Override
             public List<ProtocolPhase> getPhases() {
                 return List.of();

@@ -2,10 +2,10 @@ package org.kendar.sample.plugins;
 
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.plugins.AlwaysActivePlugin;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.AlwaysActivePlugin;
+import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -15,7 +15,7 @@ import org.pf4j.Extension;
 import java.util.List;
 
 @Extension
-public class HttpFilter extends ProtocolPluginDescriptor<Request, Response, HttpFilterSettings> implements AlwaysActivePlugin {
+public class HttpFilter extends BaseProtocolPluginDescriptor<Request, Response, HttpFilterSettings> implements AlwaysActivePlugin {
     @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         return false;
@@ -37,7 +37,7 @@ public class HttpFilter extends ProtocolPluginDescriptor<Request, Response, Http
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         return this;
     }

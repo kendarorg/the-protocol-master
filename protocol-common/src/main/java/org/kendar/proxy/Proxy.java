@@ -2,9 +2,8 @@ package org.kendar.proxy;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReplayStatusEvent;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 
@@ -71,8 +70,8 @@ public abstract class Proxy {
      */
     public abstract void initialize();
 
-    public List<PluginDescriptor> getPlugins() {
-        var result = new HashMap<String, PluginDescriptor>();
+    public List<ProtocolPluginDescriptor> getPlugins() {
+        var result = new HashMap<String, ProtocolPluginDescriptor>();
         for (var item : allowedPlugins.entrySet()) {
             for (var phase : item.getValue().entrySet()) {
                 for (var plugin : phase.getValue()) {
@@ -84,7 +83,7 @@ public abstract class Proxy {
         return new ArrayList<>(result.values());
     }
 
-    public void setPlugins(List<PluginDescriptor> filters) {
+    public void setPlugins(List<ProtocolPluginDescriptor> filters) {
         for (var plugin : filters) {
             var clazz = plugin.getClass();
             var handle = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase("handle")).findFirst();

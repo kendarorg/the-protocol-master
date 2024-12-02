@@ -3,7 +3,7 @@ package org.kendar.command;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.mqtt.MqttProxy;
-import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
@@ -51,7 +51,7 @@ public class MqttRunner extends CommonRunner {
                       String key, GlobalSettings ini,
                       ProtocolSettings opaqueProtocolSettings,
                       StorageRepository storage,
-                      List<PluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
+                      List<ProtocolPluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
         var protocolSettings = (ByteProtocolSettingsWithLogin) opaqueProtocolSettings;
         var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 1883);
         var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(), 30);

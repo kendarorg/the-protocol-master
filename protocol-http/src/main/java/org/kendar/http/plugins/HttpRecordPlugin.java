@@ -1,8 +1,8 @@
 package org.kendar.http.plugins;
 
 import org.kendar.http.utils.Request;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.RecordPlugin;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -79,7 +79,7 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         withStorage((StorageRepository) global.getService("storage"));
         setupSitesToRecord(getSettings().getRecordSites());

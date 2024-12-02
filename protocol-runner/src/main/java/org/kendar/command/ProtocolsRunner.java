@@ -3,7 +3,7 @@ package org.kendar.command;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.cli.CommandParser;
-import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -82,7 +82,7 @@ public class ProtocolsRunner {
         return (T) value;
     }
 
-    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<PluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
+    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<ProtocolPluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
 
         try {
             var protocolMotherOption = options.getCommandOption("p");
@@ -149,7 +149,7 @@ public class ProtocolsRunner {
 
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
-                      GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> filters,
+                      GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<ProtocolPluginDescriptor> filters,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var pr = protocols.get(protocol.getProtocol());
         var datadir = Path.of(ini.getDataDir()).toAbsolutePath().toFile();

@@ -3,9 +3,8 @@ package org.kendar.http.utils.plugins;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,9 +12,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PluginClassesHandlerImpl implements PluginClassesHandler {
-    private final List<PluginDescriptor> handlers;
+    private final List<ProtocolPluginDescriptor> handlers;
 
-    public PluginClassesHandlerImpl(List<PluginDescriptor> handlers) {
+    public PluginClassesHandlerImpl(List<ProtocolPluginDescriptor> handlers) {
         this.handlers = handlers;
     }
 

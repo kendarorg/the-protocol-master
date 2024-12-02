@@ -1,5 +1,7 @@
 package org.kendar.plugins;
 
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.utils.ReplacerItemInstance;

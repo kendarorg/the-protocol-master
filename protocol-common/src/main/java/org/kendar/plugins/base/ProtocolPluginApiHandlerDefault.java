@@ -1,4 +1,4 @@
-package org.kendar.plugins;
+package org.kendar.plugins.base;
 
 import com.sun.net.httpserver.HttpExchange;
 import org.kendar.plugins.apis.Ko;
@@ -9,13 +9,13 @@ import org.kendar.utils.JsonMapper;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class DefaultPluginApiHandler<T extends PluginDescriptor> implements PluginApiHandler {
+public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor> implements ProtocolPluginApiHandler {
     protected static final JsonMapper mapper = new JsonMapper();
     private final T descriptor;
     private final String id;
     private final String instanceId;
 
-    public DefaultPluginApiHandler(T descriptor, String id, String instanceId) {
+    public ProtocolPluginApiHandlerDefault(T descriptor, String id, String instanceId) {
         this.descriptor = descriptor;
         this.id = id;
         this.instanceId = instanceId;

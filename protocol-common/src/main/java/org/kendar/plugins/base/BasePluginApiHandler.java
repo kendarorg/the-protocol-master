@@ -1,11 +1,11 @@
-package org.kendar.plugins;
+package org.kendar.plugins.base;
 
 import com.sun.net.httpserver.HttpExchange;
 
 /**
  * Apis exposed by a global plugin
  */
-public interface GlobalPluginApiHandler {
+public interface BasePluginApiHandler {
     /**
      * Handle http request
      *

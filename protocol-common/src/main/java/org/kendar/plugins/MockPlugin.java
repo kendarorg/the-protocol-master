@@ -1,5 +1,8 @@
 package org.kendar.plugins;
 
+import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K, BasicMockPluginSettings> {
+public abstract class MockPlugin<T, K> extends BaseProtocolPluginDescriptor<T, K, BasicMockPluginSettings> {
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     protected List<MockStorage> mocks = new ArrayList<>();
     private String mocksDir;
@@ -70,7 +73,7 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptor<T, K, Ba
     protected abstract List<MockStorage> firstCheckOnMainPart(T request);
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
 
         super.initialize(global, protocol, pluginSetting);
         mocksDir = getSettings().getDataDir();

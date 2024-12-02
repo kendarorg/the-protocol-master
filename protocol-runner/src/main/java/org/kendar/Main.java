@@ -17,9 +17,8 @@ import org.kendar.mqtt.plugins.MqttReplayPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.mysql.plugins.MySqlRewritePlugin;
-import org.kendar.plugins.AlwaysActivePlugin;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.AlwaysActivePlugin;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.postgres.plugins.PostgresReplayPlugin;
 import org.kendar.postgres.plugins.PostgresRewritePlugin;
@@ -49,7 +48,7 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final ConcurrentHashMap<String, TcpServer> protocolServer = new ConcurrentHashMap<>();
     private static ProtocolsRunner om;
-    private static HashMap<String, List<PluginDescriptor>> allPlugins = new HashMap<>();
+    private static HashMap<String, List<ProtocolPluginDescriptor>> allPlugins = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
         execute(args, Main::stopWhenQuitCommand);
@@ -69,7 +68,7 @@ public class Main {
 
         var options = ProtocolsRunner.getMainOptions(settings);
         var parser = new CommandParser(options);
-        HashMap<String, List<PluginDescriptor>> plugins = new HashMap<>();
+        HashMap<String, List<ProtocolPluginDescriptor>> plugins = new HashMap<>();
         parser.parseIgnoreMissing(args);
 
         if (parser.hasOption("unattended")||settings.get().isUnattended()) {
@@ -79,7 +78,7 @@ public class Main {
             };
         }
         var pluginsDir = settings.get().getPluginsDir();
-        plugins = loadPlugins(pluginsDir);
+        plugins = loadProtocolPlugins(pluginsDir);
         if (!parser.hasOption("cfg")) {
             if(!om.prepareSettingsFromCommandLine(options, args, plugins, settings.get(), parser)){
                 return;
@@ -130,7 +129,7 @@ public class Main {
         return storage;
     }
 
-    private static HashMap<String, List<PluginDescriptor>> loadPlugins(String pluginsDir) {
+    private static HashMap<String, List<ProtocolPluginDescriptor>> loadProtocolPlugins(String pluginsDir) {
         if (!allPlugins.isEmpty()) {
             return allPlugins;
         }
@@ -141,7 +140,7 @@ public class Main {
             pluginManager.loadPlugins();
             pluginManager.startPlugins();
             allPlugins = new HashMap<>();
-            for (var item : pluginManager.getExtensions(PluginDescriptor.class)) {
+            for (var item : pluginManager.getExtensions(ProtocolPluginDescriptor.class)) {
                 var protocol = item.getProtocol().toLowerCase();
                 if (!allPlugins.containsKey(protocol)) {
                     allPlugins.put(protocol, new ArrayList<>());
@@ -151,7 +150,7 @@ public class Main {
         }
         var ssl = new SSLDummyPlugin();
         ssl.setActive(true);
-        addEmbedded(allPlugins, "http", List.of(
+        addEmbeddedProtocolPlugin(allPlugins, "http", List.of(
                 new HttpRecordPlugin(),
                 new HttpErrorPlugin(),
                 new HttpReplayPlugin(),
@@ -160,30 +159,30 @@ public class Main {
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(), ssl
         ));
-        addEmbedded(allPlugins, "mongodb", List.of(
+        addEmbeddedProtocolPlugin(allPlugins, "mongodb", List.of(
                 new MongoRecordPlugin(),
                 new MongoReplayPlugin()));
-        addEmbedded(allPlugins, "redis", List.of(
+        addEmbeddedProtocolPlugin(allPlugins, "redis", List.of(
                 new RedisRecordPlugin(),
                 new RedisReplayPlugin()));
-        addEmbedded(allPlugins, "amqp091", List.of(
+        addEmbeddedProtocolPlugin(allPlugins, "amqp091", List.of(
                 new AmqpRecordPlugin(),
                 new AmqpReplayPlugin()));
-        addEmbedded(allPlugins, "mqtt", List.of(
+        addEmbeddedProtocolPlugin(allPlugins, "mqtt", List.of(
                 new MqttRecordPlugin(),
                 new MqttReplayPlugin()));
-        addEmbedded(allPlugins, "postgres", List.of(
+        addEmbeddedProtocolPlugin(allPlugins, "postgres", List.of(
                 new PostgresRecordPlugin(),
                 new PostgresReplayPlugin(),
                 new PostgresRewritePlugin()));
-        addEmbedded(allPlugins, "mysql", List.of(
+        addEmbeddedProtocolPlugin(allPlugins, "mysql", List.of(
                 new MySqlRecordPlugin(),
                 new MySqlReplayPlugin(),
                 new MySqlRewritePlugin()));
         return allPlugins;
     }
 
-    private static void addEmbedded(HashMap<String, List<PluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?, ?>> embeddedPlugins) {
+    private static void addEmbeddedProtocolPlugin(HashMap<String, List<ProtocolPluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?, ?>> embeddedPlugins) {
         if (!plugins.containsKey(prt)) {
             plugins.put(prt, new ArrayList<>());
         }
@@ -196,7 +195,7 @@ public class Main {
     }
 
 
-    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<PluginDescriptor>> allPlugins) throws Exception {
+    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse, HashMap<String, List<ProtocolPluginDescriptor>> allPlugins) throws Exception {
         if (ini == null) return;
         var logsDir = ProtocolsRunner.getOrDefault(
                 ini.getDataDir(),
@@ -208,7 +207,7 @@ public class Main {
 
         var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
         if (allPlugins == null || allPlugins.isEmpty()) {
-            allPlugins = loadPlugins(pluginsDir);
+            allPlugins = loadProtocolPlugins(pluginsDir);
         }
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "ERROR");
 
@@ -227,17 +226,17 @@ public class Main {
                     var protocol = ini.getProtocolForKey(item.getKey());
                     if (protocol == null) return;
                     var protocolManager = om.getManagerFor(protocol);
-                    var availablePlugins = loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
+                    var availableProtocolPlugins = loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
                     var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
 
                     try {
-                        om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, availablePlugins, stopWhenFalse);
+                        om.start(protocolServer, item.getKey(), ini, protocolFullSettings, storage, availableProtocolPlugins, stopWhenFalse);
                     } catch (Exception e) {
                         //noinspection SuspiciousMethodCalls
                         protocolServer.remove(item);
                         throw new RuntimeException(e);
                     }
-                    apiHandler.addProtocol(item.getKey(), protocolManager, availablePlugins, protocolFullSettings);
+                    apiHandler.addProtocol(item.getKey(), protocolManager, availableProtocolPlugins, protocolFullSettings);
 
 
                 } catch (Exception ex) {
@@ -257,24 +256,24 @@ public class Main {
         }
     }
 
-    private static List<PluginDescriptor> loadAvailablePluginsForProtocol(ProtocolSettings protocol, GlobalSettings global,
-                                                                          HashMap<String, List<PluginDescriptor>> allPlugins) {
+    private static List<ProtocolPluginDescriptor> loadAvailablePluginsForProtocol(ProtocolSettings protocol, GlobalSettings global,
+                                                                                  HashMap<String, List<ProtocolPluginDescriptor>> allPlugins) {
         var availablePlugins = allPlugins.get(protocol.getProtocol());
         if (availablePlugins == null) availablePlugins = new ArrayList<>();
         var simplePlugins = protocol.getSimplePlugins();
-        var plugins = new ArrayList<PluginDescriptor>();
+        var plugins = new ArrayList<ProtocolPluginDescriptor>();
 
         for (var simplePlugin : simplePlugins.entrySet()) {
             var availablePlugin = availablePlugins.stream().filter(av -> av.getId().equalsIgnoreCase(simplePlugin.getKey())).findFirst();
             if (availablePlugin.isPresent()) {
-                var pluginInstance = availablePlugin.get().clone();
-                plugins.add(pluginInstance);
+                var pluginInstance = availablePlugin.get().duplicate();
+                plugins.add((ProtocolPluginDescriptor) pluginInstance);
             }
         }
         var alwaysActives = availablePlugins.stream().filter(av -> AlwaysActivePlugin.class.isAssignableFrom(av.getClass())).collect(Collectors.toList());
         for (var alwaysActive : alwaysActives) {
-            var pluginInstance = alwaysActive.clone();
-            plugins.add(pluginInstance);
+            var pluginInstance = alwaysActive.duplicate();
+            plugins.add((ProtocolPluginDescriptor) pluginInstance);
         }
         return plugins;
     }

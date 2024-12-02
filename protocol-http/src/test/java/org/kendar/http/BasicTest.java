@@ -19,7 +19,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.plugins.RewritePluginSettings;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;

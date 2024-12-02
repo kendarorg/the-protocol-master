@@ -2,6 +2,7 @@ package org.kendar.plugins;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.WriteItemEvent;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.sql.jdbc.SelectResult;

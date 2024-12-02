@@ -1,4 +1,4 @@
-package org.kendar.plugins;
+package org.kendar.plugins.base;
 
 import com.sun.net.httpserver.HttpExchange;
 

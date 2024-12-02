@@ -10,7 +10,7 @@ import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
 import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
-import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -31,7 +31,7 @@ import java.util.logging.Level;
 public class HttpProtocol extends NetworkProtoDescriptor {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
     private final GlobalSettings globalSettings;
-    private final List<PluginDescriptor> plugins;
+    private final List<ProtocolPluginDescriptor> plugins;
     private final HttpProtocolSettings settings;
     private ProxyServer proxy;
     private HttpsServer httpsServer;
@@ -39,7 +39,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private boolean httpRunning;
     private boolean httpsRunning;
 
-    public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<PluginDescriptor> plugins) {
+    public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<ProtocolPluginDescriptor> plugins) {
 
         this.globalSettings = globalSettings;
         this.settings = settings;
@@ -68,7 +68,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         return httpsServer;
     }
 
-    public List<PluginDescriptor> getPlugins() {
+    public List<ProtocolPluginDescriptor> getPlugins() {
         return plugins;
     }
 

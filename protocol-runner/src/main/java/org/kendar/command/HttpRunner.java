@@ -10,8 +10,8 @@ import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.ssl.CertificatesManager;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.RewritePluginSettings;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -159,7 +159,7 @@ public class HttpRunner extends CommonRunner {
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
                       String sectionKey, GlobalSettings ini, ProtocolSettings pset, StorageRepository storage,
-                      List<PluginDescriptor> plugins,
+                      List<ProtocolPluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalseAction) throws Exception {
         var settings = (HttpProtocolSettings) pset;
         for (var i = plugins.size() - 1; i >= 0; i--) {

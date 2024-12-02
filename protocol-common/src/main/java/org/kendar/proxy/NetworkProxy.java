@@ -1,7 +1,7 @@
 package org.kendar.proxy;
 
 import org.kendar.buffers.BBuffer;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ReturnMessage;

@@ -2,7 +2,7 @@ package org.kendar.command;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
-import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.server.TcpServer;
@@ -82,7 +82,7 @@ public abstract class CommonRunner {
 
     public abstract void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
                                GlobalSettings ini, ProtocolSettings protocol,
-                               StorageRepository storage, List<PluginDescriptor> filters,
+                               StorageRepository storage, List<ProtocolPluginDescriptor> filters,
                                Supplier<Boolean> stopWhenFalse) throws Exception;
 
     public abstract String getId();

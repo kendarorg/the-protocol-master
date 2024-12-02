@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import org.kendar.apis.dtos.PluginIndex;
 import org.kendar.apis.dtos.ProtocolIndex;
 import org.kendar.command.CommonRunner;
-import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.apis.FileDownload;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
@@ -34,7 +34,7 @@ public class ApiHandler {
 
     public void addProtocol(String protocolInstanceId,
                             CommonRunner protocolManager,
-                            List<PluginDescriptor> plugins, ProtocolSettings settings) {
+                            List<ProtocolPluginDescriptor> plugins, ProtocolSettings settings) {
         instances.add(new ProtocolInstance(protocolInstanceId,
                 protocolManager, plugins, settings));
     }

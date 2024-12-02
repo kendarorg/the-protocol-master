@@ -1,6 +1,5 @@
-package org.kendar.plugins;
+package org.kendar.plugins.base;
 
-import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -8,11 +7,11 @@ import org.kendar.utils.JsonMapper;
 
 import java.lang.reflect.ParameterizedType;
 
-public abstract class ProtocolPluginDescriptor<T, K, W extends PluginSettings> implements PluginDescriptor<W> {
+public abstract class BaseProtocolPluginDescriptor<T, K, W extends PluginSettings> implements ProtocolPluginDescriptor<T,K,W> {
     protected final static JsonMapper mapper = new JsonMapper();
     private boolean active;
     private String instanceId = "default";
-    private PluginApiHandler apiHandler;
+    private ProtocolPluginApiHandler apiHandler;
     private PluginSettings settings;
 
 
@@ -49,28 +48,21 @@ public abstract class ProtocolPluginDescriptor<T, K, W extends PluginSettings> i
         return instanceId;
     }
 
-    public PluginApiHandler getApiHandler() {
+    public ProtocolPluginApiHandler getApiHandler() {
         if (apiHandler == null) {
             apiHandler = buildApiHandler();
         }
         return apiHandler;
     }
 
-    protected PluginApiHandler buildApiHandler() {
-        return new DefaultPluginApiHandler<>(this, getId(), getInstanceId());
+    protected ProtocolPluginApiHandler buildApiHandler() {
+        return new ProtocolPluginApiHandlerDefault<>(this, getId(), getInstanceId());
     }
 
-    /**
-     * @param request
-     * @param response
-     * @param pluginContext
-     * @param phase
-     * @return true when is blocking
-     */
-    public abstract boolean handle(PluginContext pluginContext, ProtocolPhase phase, T in, K out);
+
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         this.instanceId = protocol.getProtocolInstanceId();
         if (this.instanceId == null || this.instanceId.isEmpty()) {
             this.instanceId = "default";
@@ -80,8 +72,7 @@ public abstract class ProtocolPluginDescriptor<T, K, W extends PluginSettings> i
         return this;
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public PluginDescriptor clone() {
+    public ProtocolPluginDescriptor duplicate() {
         try {
             return this.getClass().getDeclaredConstructor().newInstance();
         } catch (Exception e) {

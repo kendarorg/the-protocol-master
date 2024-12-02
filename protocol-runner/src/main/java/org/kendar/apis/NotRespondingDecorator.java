@@ -1,7 +1,7 @@
 package org.kendar.apis;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.kendar.plugins.BaseApiServerHandler;
+import org.kendar.plugins.base.BaseApiServerHandler;
 
 import java.util.Map;
 

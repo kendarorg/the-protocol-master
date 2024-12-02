@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.mysql.MySQLProtocol;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.RewritePluginSettings;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.postgres.PostgresProtocol;
@@ -99,7 +99,7 @@ public class JdbcRunner extends CommonRunner {
     @Override
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
                       GlobalSettings ini, ProtocolSettings protocolSettings,
-                      StorageRepository repo, List<PluginDescriptor> plugins,
+                      StorageRepository repo, List<ProtocolPluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         NetworkProtoDescriptor baseProtocol = null;
         var realSttings = (JdbcProtocolSettings) protocolSettings;

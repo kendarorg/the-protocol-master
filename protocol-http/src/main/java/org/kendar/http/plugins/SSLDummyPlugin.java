@@ -1,7 +1,7 @@
 package org.kendar.http.plugins;
 
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.plugins.*;
+import org.kendar.plugins.base.*;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -9,7 +9,7 @@ import org.kendar.settings.ProtocolSettings;
 
 import java.util.List;
 
-public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String, SSLDummyPluginSettings> implements AlwaysActivePlugin {
+public class SSLDummyPlugin extends BaseProtocolPluginDescriptor<String, String, SSLDummyPluginSettings> implements AlwaysActivePlugin {
     private HttpProtocolSettings protocolSettings;
 
     @Override
@@ -18,7 +18,7 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String, SSL
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting == null ? new SSLDummyPluginSettings() : pluginSetting);
         this.protocolSettings = (HttpProtocolSettings) protocol;
         return this;
@@ -29,7 +29,7 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptor<String, String, SSL
         return true;
     }
 
-    protected PluginApiHandler buildApiHandler() {
+    protected ProtocolPluginApiHandler buildApiHandler() {
         return new SSLApiHandler(this, getId(), getInstanceId(), protocolSettings);
     }
 

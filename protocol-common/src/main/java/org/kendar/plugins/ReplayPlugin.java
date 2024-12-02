@@ -4,6 +4,9 @@ import org.kendar.events.EndPlayEvent;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReplayStatusEvent;
 import org.kendar.events.StartPlayEvent;
+import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
@@ -26,7 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
+public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends BaseProtocolPluginDescriptor<Object, Object, W> {
     protected static final JsonMapper mapper = new JsonMapper();
     static final ExecutorService executor = Executors.newCachedThreadPool();
     private static final Logger log = LoggerFactory.getLogger(ReplayPlugin.class);
@@ -36,7 +39,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     private List<CompactLine> indexes;
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         withStorage((StorageRepository) global.getService("storage"));
         super.initialize(global, protocol, pluginSetting);
         return this;

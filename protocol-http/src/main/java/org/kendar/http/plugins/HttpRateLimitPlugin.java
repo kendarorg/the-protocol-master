@@ -2,9 +2,9 @@ package org.kendar.http.plugins;
 
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.BaseProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Response, HttpRateLimitPluginSettings> {
+public class HttpRateLimitPlugin extends BaseProtocolPluginDescriptor<Request, Response, HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
     private List<Pattern> recordSites = new ArrayList<>();
@@ -40,7 +40,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
 
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         var settings = getSettings();
         setupSitesToRecord(settings.getLimitSites());
