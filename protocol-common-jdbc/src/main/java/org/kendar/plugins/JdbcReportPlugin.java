@@ -24,7 +24,7 @@ public abstract class JdbcReportPlugin extends ReportPlugin<JdbcCall, SelectResu
                 connectionId,
                 pluginContext.getStart(),
                 duration,
-                Map.of( "parametersCount",in.getParameterValues().size()+"",
+                Map.of( "inputsCount",in.getParameterValues().size()+"",
                         "resultsCount",out.getCount()+"")
         ));
         return false;

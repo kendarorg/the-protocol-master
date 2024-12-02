@@ -27,9 +27,16 @@ public class MongoReportPlugin extends ReportPlugin<OpMsgContent, OpMsgContent, 
                 }
             }
             var query = mapper.serialize(mapper.toJsonNode(in.getSections().get(0).getDocuments().get(0)));
-            var resultsCount = 0;
+            var inputsCount = 0;
             if(in.getSections().size()>1) {
-                resultsCount= in.getSections().get(1).getDocuments().size();
+                inputsCount= in.getSections().get(1).getDocuments().size();
+            }
+
+            var resultsCount=0;
+
+
+            if(out.getSections()!=null && out.getSections().size()>0) {
+                resultsCount= out.getSections().get(0).getDocuments().size();
             }
 
 
@@ -43,12 +50,11 @@ public class MongoReportPlugin extends ReportPlugin<OpMsgContent, OpMsgContent, 
                     connectionId,
                     pluginContext.getStart(),
                     duration,
-                    Map.of("dataCount",resultsCount+"",
+                    Map.of("inputsCount",inputsCount+"",
+                            "resultsCount",resultsCount+"",
                             "query",query)
             ));
         }
-
-
 
         return false;
     }
