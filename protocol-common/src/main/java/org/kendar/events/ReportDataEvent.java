@@ -2,7 +2,7 @@ package org.kendar.events;
 
 import java.util.Map;
 
-public class ReportingData implements TpmEvent {
+public class ReportDataEvent implements TpmEvent {
 
     private final String instanceId;
     private final String protocol;
@@ -40,13 +40,13 @@ public class ReportingData implements TpmEvent {
         return connectionId;
     }
 
-    public ReportingData(String instanceId,
-                         String protocol,
-                         String query,
-                         long connectionId,
-                         long timestamp,
-                         long duration,
-                         Map<String,String> tags) {
+    public ReportDataEvent(String instanceId,
+                           String protocol,
+                           String query,
+                           long connectionId,
+                           long timestamp,
+                           long duration,
+                           Map<String,String> tags) {
         this.instanceId = instanceId;
         this.protocol = protocol;
         this.query = query;

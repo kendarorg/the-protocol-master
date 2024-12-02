@@ -1,6 +1,8 @@
 package org.kendar.http.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.BinaryNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.http.utils.converters.MultipartPart;
 import org.kendar.http.utils.converters.RequestUtils;
 
@@ -141,6 +143,15 @@ public class Request {
     public List<String> getHeader(String id) {
 
         return RequestUtils.getFromMapList(this.headers, id);
+    }
+
+    public String getFirstHeader(String id,String defaultValue) {
+
+        var result = getHeader(id);
+        if (result != null && !result.isEmpty()) {
+            return result.get(0);
+        }
+        return defaultValue;
     }
 
     public String getFirstHeader(String id) {
@@ -312,5 +323,14 @@ public class Request {
                 return;
             }
         }
+    }
+
+    public int getSize() {
+        if(this.getRequestText() instanceof BinaryNode){
+            return ((BinaryNode)this.getRequestText()).size();
+        }else if(this.getRequestText() instanceof TextNode){
+            return ((TextNode)this.getRequestText()).size();
+        }
+        return 0;
     }
 }

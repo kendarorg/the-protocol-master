@@ -1,6 +1,5 @@
 package org.kendar.plugins.base;
 
-import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -11,7 +10,8 @@ import java.util.List;
 /**
  * Basic Protocol Plugin
  */
-public interface ProtocolPluginDescriptor<T,K,W extends PluginSettings> extends ExtensionPoint, BasePluginDescriptor<W> {
+public interface ProtocolPluginDescriptor<T,K,W extends PluginSettings> extends
+        ExtensionPoint, BasePluginDescriptor<W>,RequestResponseHandler<T,K> {
     /**
      * Phases for the protocol
      *
@@ -35,14 +35,6 @@ public interface ProtocolPluginDescriptor<T,K,W extends PluginSettings> extends 
      * @return
      */
     ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting);
-    /**
-     * @param request
-     * @param response
-     * @param pluginContext
-     * @param phase
-     * @return true when is blocking
-     */
-    boolean handle(PluginContext pluginContext, ProtocolPhase phase, T in, K out);
 
     ProtocolPluginApiHandler getApiHandler();
 
