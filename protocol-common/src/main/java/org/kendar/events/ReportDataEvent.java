@@ -4,13 +4,16 @@ import java.util.Map;
 
 public class ReportDataEvent implements TpmEvent {
 
-    private final String instanceId;
-    private final String protocol;
-    private final String query;
-    private final long connectionId;
-    private final long timestamp;
-    private final long duration;
-    private final Map<String, Object> tags;
+    private String instanceId;
+    private String protocol;
+    private String query;
+    private long connectionId;
+    private long timestamp;
+    private long duration;
+    private  Map<String, Object> tags;
+
+    public ReportDataEvent() {
+    }
 
     public ReportDataEvent(String instanceId,
                            String protocol,

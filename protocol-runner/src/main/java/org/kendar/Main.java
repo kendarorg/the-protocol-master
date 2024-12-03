@@ -60,10 +60,13 @@ public class Main {
     private static ProtocolsRunner protocolsRunner;
     private static HashMap<String, List<ProtocolPluginDescriptor>> allProtocolSpecificPlugins = new HashMap<>();
     private static List<GlobalPluginDescriptor> allGlobalPlugins = new ArrayList<>();
+    private static List<GlobalPluginDescriptor> globalPlugins;
+
 
     public static void main(String[] args) throws Exception {
         execute(args, Main::stopWhenQuitCommand);
     }
+
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
         protocolsRunner = new ProtocolsRunner(
@@ -89,7 +92,7 @@ public class Main {
         }
         var pluginsDir = settings.get().getPluginsDir();
         var protocolPlugins = loadProtocolPlugins(pluginsDir);
-        var globalPlugins = loadGlobalPlugins(pluginsDir);
+        globalPlugins = loadGlobalPlugins(pluginsDir);
         if (!parser.hasOption("cfg")) {
             if (!protocolsRunner.prepareSettingsFromCommandLine(options, args, protocolPlugins, settings.get(), parser)) {
                 return;
@@ -108,7 +111,7 @@ public class Main {
     private static Boolean stopWhenQuitCommand() {
         var scanner = new Scanner(System.in);
         System.out.println("Press Q to quit");
-        String line = "";
+        String line;
         line = scanner.nextLine();
         try {
             if (line != null && line.trim().equalsIgnoreCase("q")) {

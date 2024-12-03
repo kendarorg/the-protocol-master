@@ -21,12 +21,13 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
 
     @Override
     public GlobalPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings) {
+        setActive(pluginSettings.isActive());
         EventsQueue.register("GlobalReportPlugin", m->executor.submit(()-> handleReport(m)), ReportDataEvent.class);
         return this;
     }
 
-    private List<ReportDataEvent> events = new ArrayList<>();
-    private Map<String,Long> counters = new HashMap<>();
+    private final List<ReportDataEvent> events = new ArrayList<>();
+    private final Map<String,Long> counters = new HashMap<>();
 
 
     private void handleReport(ReportDataEvent m) {

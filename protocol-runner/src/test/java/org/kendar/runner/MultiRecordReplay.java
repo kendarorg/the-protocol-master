@@ -8,6 +8,7 @@ import org.junit.jupiter.api.*;
 import org.kendar.Main;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
+import org.kendar.plugins.GlobalReport;
 import org.kendar.runner.utils.SimpleHttpServer;
 import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.FileResourcesUtils;
@@ -24,8 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MultiRecordReplay extends BasicTest {
 
@@ -141,14 +141,29 @@ public class MultiRecordReplay extends BasicTest {
                 verifyTestRun.set(true);
             }
         });
+
+
+
+        var getReport = new HttpGet("http://localhost:9127/api/plugins/report-plugin/download");
+        httpresponse = httpclient.execute(getReport);
+        sc = new Scanner(httpresponse.getEntity().getContent());
+
+        //Printing the status line
+        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+        content = new StringBuilder();
+        while (sc.hasNext()) {
+            content.append(sc.nextLine());
+        }
+        var data = mapper.deserialize(content.toString(), GlobalReport.class);
+
+        assertEquals(14, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("postgres")).count());
+        assertEquals(1, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("http")).count());
+
+
         runTheServer.set(false);
         Main.stop();
         assertTrue(verifyTestRun.get());
 
-        var events = getEvents().stream().collect(Collectors.toList());
-
-        assertEquals(14, events.stream().filter(e -> e.getProtocol().equalsIgnoreCase("postgres")).count());
-        assertEquals(1, events.stream().filter(e -> e.getProtocol().equalsIgnoreCase("http")).count());
 
         System.out.println("RECORDING COMPLETED ==============================================");
 
@@ -165,6 +180,9 @@ public class MultiRecordReplay extends BasicTest {
         replaySettings = replaySettings.replaceAll(Pattern.quote("{replayActive}"), "true");
         var replayConfig = Path.of("target", "multiRecording", "replaying.json").toAbsolutePath();
         Files.writeString(replayConfig, replaySettings);
+
+
+
 
         System.out.println("STARTING ==============================================");
         startAndHandleUnexpectedErrors("-cfg", replayConfig.toString());

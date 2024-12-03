@@ -2,7 +2,12 @@
   "pluginsDir": "plugins",
   "logLevel": "DEBUG",
   "dataDir": "{dataDir}",
-  "apiPort": 0,
+  "apiPort": 9127,
+  "plugins": {
+    "report-plugin": {
+        "active": true
+    }
+  },
   "protocols": {
     "postgres-01": {
       "protocol": "postgres",
