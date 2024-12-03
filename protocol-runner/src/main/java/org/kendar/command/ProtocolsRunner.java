@@ -112,29 +112,12 @@ public class ProtocolsRunner {
                 protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
                 parser.parse(args);
                 return true;
-
-                /*var datadir = cmd.getOptionValue("datadir", "data");
-                var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
-                var protocol = cmd.getOptionValue("protocol");
-                var loglevel = cmd.getOptionValue("loglevel", "ERROR");
-                var logType = cmd.getOptionValue("logType", "file");
-                var tpmApi = Integer.parseInt(cmd.getOptionValue("apis", "0"));
-                checkOptions(settings.getDataDir(), settings.getPluginsDir(), protocol);*/
-                /*var ini = new GlobalSettings();
-                ini.setDataDir(datadir);
-                ini.setPluginsDir(pluginsDir);
-                ini.setLogLevel(loglevel);
-                ini.setLogType(logType);
-                ini.setApiPort(tpmApi);*/
-                /*runWithParams(args, protocol, isExecute, ini, options, filters);
-                return ini;*/
             }
         } catch (Exception ex) {
             if (ex.getMessage() != null) {
                 System.err.println("ERROR: " + ex.getMessage());
             }
             parser.printHelp();
-            //exit(0);
         }
         return false;
     }

@@ -2,9 +2,9 @@ package org.kendar.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.events.*;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -21,8 +21,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase< W> {
+public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase<W> {
     protected static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(RecordPlugin.class);
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
 
@@ -30,7 +31,6 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     public boolean shouldIgnoreTrivialCalls() {
         return ignoreTrivialCalls;
     }
-
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
@@ -129,14 +129,13 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     public void terminate() {
         EventsQueue.send(new FinalizeWriteEvent(getInstanceId()));
     }
-    private static final Logger log = LoggerFactory.getLogger(RecordPlugin.class);
 
     @Override
     protected void handleActivation(boolean active) {
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
-        if (isActive()!=active && !active) {
+        if (isActive() != active && !active) {
             terminate();
-        }else if (isActive()!=active && active) {
+        } else if (isActive() != active && active) {
             EventsQueue.send(new StartWriteEvent(getInstanceId()));
         }
     }

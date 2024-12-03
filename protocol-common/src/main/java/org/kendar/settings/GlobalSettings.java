@@ -29,15 +29,15 @@ public class GlobalSettings {
         services.put(key, value);
     }
 
-    public <K> K  getService(String key) {
-        return (K)services.get(key);
+    public <K> K getService(String key) {
+        return (K) services.get(key);
     }
 
-    public <K> Map<String,K> getServices(Class<K> type) {
-        var result = new HashMap<String,K>();
-        for(var kvp : services.entrySet()) {
-            if(type.isAssignableFrom(kvp.getValue().getClass())) {
-                result.put(kvp.getKey(),(K) kvp.getValue());
+    public <K> Map<String, K> getServices(Class<K> type) {
+        var result = new HashMap<String, K>();
+        for (var kvp : services.entrySet()) {
+            if (type.isAssignableFrom(kvp.getValue().getClass())) {
+                result.put(kvp.getKey(), (K) kvp.getValue());
             }
         }
         return result;
@@ -90,13 +90,15 @@ public class GlobalSettings {
     public Map<String, Object> getProtocols() {
         return protocols;
     }
-    public Map<String, Object> getPlugins() {
-        return plugins;
-    }
 
     public void setProtocols(Map<String, Object> protocols) {
         this.protocols = protocols;
     }
+
+    public Map<String, Object> getPlugins() {
+        return plugins;
+    }
+
     public void setPlugins(Map<String, Object> protocols) {
         this.plugins = protocols;
     }

@@ -38,6 +38,7 @@ public class BasicTest {
     protected static PostgresSqlImage postgresContainer;
     protected static TcpServer protocolServer;
     protected static PostgresProtocol baseProtocol;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -89,25 +90,20 @@ public class BasicTest {
         global.putService("storage", storage);
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
-        var rep = new PostgresReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        var rep = new PostgresReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl, pl1,rep));
+        proxy.setPlugins(List.of(pl, pl1, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
 
-        EventsQueue.register("recorder",(r)->{
+        EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
-    }
-
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    public List<ReportDataEvent> getEvents(){
-        return events.stream().collect(Collectors.toList());
     }
 
     public static void afterEachBase() {
@@ -139,5 +135,9 @@ public class BasicTest {
                         postgresContainer.getUserId(), postgresContainer.getPassword());
         assertNotNull(c);
         return c;
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 }

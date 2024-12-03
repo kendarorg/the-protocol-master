@@ -228,7 +228,7 @@ public abstract class NetworkProxy extends Proxy {
         var pluginContext = new PluginContext(getCaller(), "byte[]", start, context);
 
         for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
-            if( plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
         }

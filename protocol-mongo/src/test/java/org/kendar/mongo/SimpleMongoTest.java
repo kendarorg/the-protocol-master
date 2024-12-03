@@ -61,13 +61,13 @@ public class SimpleMongoTest extends BasicTest {
         assertNotNull(doc);
         assertNotNull(c);
 
-        var events =getEvents().stream().collect(Collectors.toList());
-        assertEquals(3,events.size());
-        var evt= events.get(0);
-        assertEquals("mongodb",evt.getProtocol());
-        assertEquals(1,events.stream().filter(e->e.getQuery().contains(":dbStats")).count());
-        assertEquals(1,events.stream().filter(e->e.getQuery().contains(":insert")).count());
-        assertEquals(1,events.stream().filter(e->e.getQuery().contains(":find")).count());
+        var events = getEvents().stream().collect(Collectors.toList());
+        assertEquals(3, events.size());
+        var evt = events.get(0);
+        assertEquals("mongodb", evt.getProtocol());
+        assertEquals(1, events.stream().filter(e -> e.getQuery().contains(":dbStats")).count());
+        assertEquals(1, events.stream().filter(e -> e.getQuery().contains(":insert")).count());
+        assertEquals(1, events.stream().filter(e -> e.getQuery().contains(":find")).count());
     }
 
     @Test

@@ -4,9 +4,9 @@ import org.kendar.events.EndPlayEvent;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReplayStatusEvent;
 import org.kendar.events.StartPlayEvent;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
@@ -81,16 +81,16 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             if (this.isActive() != active) {
                 completedOutIndexes.clear();
                 completedIndexes.clear();
-                if(active) {
+                if (active) {
                     EventsQueue.send(new StartPlayEvent(getInstanceId()));
                     Sleeper.sleep(100);
                     indexes = new ArrayList<>(this.storage.getIndexes(getInstanceId()));
-                }else{
+                } else {
                     EventsQueue.send(new EndPlayEvent(getInstanceId()));
                     indexes.clear();
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
@@ -106,11 +106,11 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         query.setUsed(completedIndexes);
         query.getTags().putAll(buildTag(in));
         var index = findIndex(query);
-        if(storage==null){
+        if (storage == null) {
             log.error("LOGGER NULL");
         }
-        if(index==null){
-            log.error("INDEX NULL "+query);
+        if (index == null) {
+            log.error("INDEX NULL {}", query);
         }
         var storageItem = storage.readById(getInstanceId(), index.getIndex());
         if (storageItem == null) {
@@ -231,7 +231,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 bestIndex = index;
             }
         }
-        log.debug("Matched query: {}", query.getTag("query"),bestIndex);
+        log.debug("Matched query: {} {}", query.getTag("query"), bestIndex);
         return bestIndex;
     }
 

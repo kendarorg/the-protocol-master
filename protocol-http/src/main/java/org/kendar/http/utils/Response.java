@@ -58,7 +58,7 @@ public class Response {
         return null;
     }
 
-    public String getFirstHeader(String s,String defaultValue) {
+    public String getFirstHeader(String s, String defaultValue) {
         var result = getHeader(s);
         if (result != null && !result.isEmpty()) {
             return result.get(0);
@@ -95,10 +95,10 @@ public class Response {
     }
 
     public int getSize() {
-        if(this.getResponseText() instanceof BinaryNode){
-            return ((BinaryNode)this.getResponseText()).size();
-        }else if(this.getResponseText() instanceof TextNode){
-            return ((TextNode)this.getResponseText()).size();
+        if (this.getResponseText() instanceof BinaryNode) {
+            return this.getResponseText().size();
+        } else if (this.getResponseText() instanceof TextNode) {
+            return this.getResponseText().size();
         }
         return 0;
     }

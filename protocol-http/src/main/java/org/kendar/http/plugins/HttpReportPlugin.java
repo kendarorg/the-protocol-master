@@ -14,8 +14,6 @@ import java.util.Map;
 public class HttpReportPlugin extends ReportPlugin<PluginSettings> {
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (!isActive()) return false;
-        //var context = pluginContext.getContext();
-        //var connectionId = context.getContextId();
         var duration = System.currentTimeMillis() - pluginContext.getStart();
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),
@@ -27,9 +25,9 @@ public class HttpReportPlugin extends ReportPlugin<PluginSettings> {
                 Map.of(
                         "query", in.getQuery() + "",
                         "contentType", in.getFirstHeader("content-type", "unknown"),
-                            "requestSize",in.getSize()+"",
+                        "requestSize", in.getSize() + "",
                         "returnType", out.getFirstHeader("content-type", "unknown"),
-                        "responseSize",out.getSize()+"")
+                        "responseSize", out.getSize() + "")
         ));
         return false;
     }

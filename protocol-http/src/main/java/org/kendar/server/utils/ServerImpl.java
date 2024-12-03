@@ -65,8 +65,6 @@ public class ServerImpl {
     private final AtomicReference<InternalSSLConfig> internalSSLConfig = new AtomicReference<>();
     private final String protocol;
     private final boolean https;
-    //private HttpsConfigurator httpsConfig;
-    //private SSLContext sslContext;
     private final ContextList contexts;
     private final InetSocketAddress address;
     private final ServerSocketChannel schan;
@@ -217,13 +215,8 @@ public class ServerImpl {
         if (config == null) {
             throw new NullPointerException("null HttpsConfigurator");
         }
-//        if (started) {
-//            throw new IllegalStateException ("server already started");
-//        }
+
         this.internalSSLConfig.set(new InternalSSLConfig(config));
-        //KENDAR
-//        this.httpsConfig = config;
-//        sslContext = config.getSSLContext();
     }
 
     public final boolean isFinishing() {

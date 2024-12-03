@@ -63,9 +63,9 @@ public class JpaTest extends BasicTest {
 
         assertTrue(atomicBoolean.get());
 
-        var events =getEvents().stream().collect(Collectors.toList());
-        assertEquals(8,events.size());
-        var evt= events.get(0);
-        assertEquals("mysql",evt.getProtocol());
+        var events = getEvents().stream().collect(Collectors.toList());
+        assertEquals(8, events.size());
+        var evt = events.get(0);
+        assertEquals("mysql", evt.getProtocol());
     }
 }

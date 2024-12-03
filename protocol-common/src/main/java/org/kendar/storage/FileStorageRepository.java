@@ -90,7 +90,7 @@ public class FileStorageRepository implements StorageRepository {
 
     private void finalizePlay(String instanceId) {
         synchronized (initializeContentLock) {
-            log.info("Stop replaying "+instanceId);
+            log.info("Stop replaying {}", instanceId);
             protocolRepo.remove(instanceId);
         }
     }
@@ -103,33 +103,33 @@ public class FileStorageRepository implements StorageRepository {
 
         //synchronized (initializeContentLock) {
 
-            return protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
-                if (currRepo == null) {
-                    currRepo = new ProtocolRepo();
-                }
-                if (!currRepo.initialized) {
+        return protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
+            if (currRepo == null) {
+                currRepo = new ProtocolRepo();
+            }
+            if (!currRepo.initialized) {
 
-                    for (var item : readAllItems(protocolInstanceId)) {
-                        if (item == null) continue;
-                        if (item.getType() == null) continue;
-                        if (item.getType().equalsIgnoreCase("RESPONSE")) {
-                            currRepo.outItems.add(item);
-                            continue;
-                        }
-                        currRepo.inMemoryDb.put(item.getIndex(), item);
+                for (var item : readAllItems(protocolInstanceId)) {
+                    if (item == null) continue;
+                    if (item.getType() == null) continue;
+                    if (item.getType().equalsIgnoreCase("RESPONSE")) {
+                        currRepo.outItems.add(item);
+                        continue;
                     }
-
-                    currRepo.index = retrieveIndexFile(protocolInstanceId);
-                    if (!currRepo.index.isEmpty()) {
-                        var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
-                        var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
-                        storageCounter.set((int) maxIndex);
-                    }
-                    currRepo.initialized = true;
-                    log.info("Start replaying "+instanceId);
+                    currRepo.inMemoryDb.put(item.getIndex(), item);
                 }
-                return currRepo;
-            });
+
+                currRepo.index = retrieveIndexFile(protocolInstanceId);
+                if (!currRepo.index.isEmpty()) {
+                    var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
+                    var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
+                    storageCounter.set((int) maxIndex);
+                }
+                currRepo.initialized = true;
+                log.info("Start replaying {}", instanceId);
+            }
+            return currRepo;
+        });
 
         //}
     }
@@ -140,22 +140,22 @@ public class FileStorageRepository implements StorageRepository {
 //            return;
 //        }
         //synchronized (initializeContentLock) {
-            protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
-                if (currRepo == null) {
-                    currRepo = new ProtocolRepo();
+        protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
+            if (currRepo == null) {
+                currRepo = new ProtocolRepo();
+            }
+            if (!currRepo.initialized) {
+                currRepo.index = retrieveIndexFile(protocolInstanceId);
+                if (!currRepo.index.isEmpty()) {
+                    var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
+                    var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
+                    storageCounter.set((int) maxIndex);
                 }
-                if (!currRepo.initialized) {
-                    currRepo.index = retrieveIndexFile(protocolInstanceId);
-                    if (!currRepo.index.isEmpty()) {
-                        var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
-                        var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
-                        storageCounter.set((int) maxIndex);
-                    }
-                    currRepo.initialized = true;
-                    log.info("Start recording "+instanceId);
-                }
-                return currRepo;
-            });
+                currRepo.initialized = true;
+                log.info("Start recording {}", instanceId);
+            }
+            return currRepo;
+        });
         //}
     }
 
@@ -182,7 +182,7 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public List<CompactLine> getIndexes(String instanceId) {
-        if(protocolRepo.get(instanceId)==null){
+        if (protocolRepo.get(instanceId) == null) {
             initializeContent(instanceId);
         }
         var repo = protocolRepo.get(instanceId);
@@ -293,7 +293,7 @@ public class FileStorageRepository implements StorageRepository {
             throw new RuntimeException(e);
         }
 
-        log.info("Stop recording "+instanceId);
+        log.info("Stop recording {}", instanceId);
     }
 
 

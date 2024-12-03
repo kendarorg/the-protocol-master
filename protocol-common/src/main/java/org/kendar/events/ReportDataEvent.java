@@ -12,6 +12,22 @@ public class ReportDataEvent implements TpmEvent {
     private final long duration;
     private final Map<String, String> tags;
 
+    public ReportDataEvent(String instanceId,
+                           String protocol,
+                           String query,
+                           long connectionId,
+                           long timestamp,
+                           long duration,
+                           Map<String, String> tags) {
+        this.instanceId = instanceId;
+        this.protocol = protocol;
+        this.query = query;
+        this.connectionId = connectionId;
+        this.timestamp = timestamp;
+        this.duration = duration;
+        this.tags = tags;
+    }
+
     @Override
     public String toString() {
         return "ReportDataEvent{" +
@@ -47,21 +63,5 @@ public class ReportDataEvent implements TpmEvent {
 
     public long getConnectionId() {
         return connectionId;
-    }
-
-    public ReportDataEvent(String instanceId,
-                           String protocol,
-                           String query,
-                           long connectionId,
-                           long timestamp,
-                           long duration,
-                           Map<String,String> tags) {
-        this.instanceId = instanceId;
-        this.protocol = protocol;
-        this.query = query;
-        this.connectionId = connectionId;
-        this.timestamp = timestamp;
-        this.duration = duration;
-        this.tags = tags;
     }
 }

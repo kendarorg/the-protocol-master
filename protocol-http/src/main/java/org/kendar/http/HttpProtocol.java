@@ -124,9 +124,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             int port = getOrDefault(settings.getHttp(), 4080);
             int httpsPort = getOrDefault(settings.getHttps(), 4443);
             var proxyPort = getOrDefault(settings.getProxy(), 9999);
-//        log.info("LISTEN HTTP: " + port);
-//        log.info("LISTEN HTTPS: " + httpsPort);
-//        log.info("LISTEN PROXY: " + proxyPort);
+
             var backlog = 60;
             var useCachedExecutor = true;
             var address = new InetSocketAddress(port);

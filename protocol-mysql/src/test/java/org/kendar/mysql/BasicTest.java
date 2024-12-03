@@ -38,6 +38,7 @@ public class BasicTest {
     protected static MysqlImage mysqlContainer;
     protected static TcpServer protocolServer;
     protected static MySQLProtocol baseProtocol;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -50,7 +51,6 @@ public class BasicTest {
 
 
     }
-
 
     public static void beforeEachBase(TestInfo testInfo) {
         baseProtocol = new MySQLProtocol(FAKE_PORT);
@@ -80,13 +80,13 @@ public class BasicTest {
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
-        var rep = new MySqlReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        var rep = new MySqlReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl, pl1,rep));
+        proxy.setPlugins(List.of(pl, pl1, rep));
 
 
         pl.setActive(true);
-        EventsQueue.register("recorder",(r)->{
+        EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
         baseProtocol.setProxy(proxy);
@@ -97,10 +97,6 @@ public class BasicTest {
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    public List<ReportDataEvent> getEvents(){
-        return events.stream().collect(Collectors.toList());
-    }
     public static void beforeEachBasePrep(TestInfo testInfo) {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
@@ -134,7 +130,7 @@ public class BasicTest {
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
-        EventsQueue.register("recorder",(r)->{
+        EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
         proxy.setPlugins(List.of(pl, pl1));
@@ -201,5 +197,9 @@ public class BasicTest {
                         mysqlContainer.getUserId(), mysqlContainer.getPassword());
         assertNotNull(c);
         return c;
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 }

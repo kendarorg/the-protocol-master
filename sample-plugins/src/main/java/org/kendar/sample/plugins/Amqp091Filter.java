@@ -11,7 +11,7 @@ import org.pf4j.Extension;
 import java.util.List;
 
 @Extension
-public class Amqp091Filter extends ProtocolPluginDescriptorBase< Amqp091FilterSettings> implements AlwaysActivePlugin {
+public class Amqp091Filter extends ProtocolPluginDescriptorBase<Amqp091FilterSettings> implements AlwaysActivePlugin {
 
 
     /**

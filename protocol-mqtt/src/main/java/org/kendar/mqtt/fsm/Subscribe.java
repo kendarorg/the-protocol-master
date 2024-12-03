@@ -18,25 +18,25 @@ import java.util.List;
  */
 public class Subscribe extends BasePropertiesMqttState {
 
+    private final List<Topic> topics = new ArrayList<>();
     private short packetIdentifier;
-
 
     public Subscribe() {
         super();
         setFixedHeader(MqttFixedHeader.SUBSCRIBE);
     }
 
+
     public Subscribe(Class<?>... events) {
         super(events);
         setFixedHeader(MqttFixedHeader.SUBSCRIBE);
     }
 
-
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.writeShort(getPacketIdentifier());
         writeProperties(rb);
-        for(var topic : getTopics()) {
+        for (var topic : getTopics()) {
             rb.writeUtf8String(topic.getTopic());
             rb.write(topic.getType());
         }
@@ -45,8 +45,6 @@ public class Subscribe extends BasePropertiesMqttState {
     public List<Topic> getTopics() {
         return topics;
     }
-
-    private List<Topic> topics = new ArrayList<>();
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
@@ -59,8 +57,8 @@ public class Subscribe extends BasePropertiesMqttState {
         //Variable header for MQTT >=5
         readProperties(publish, bb);
 
-        var payload = bb.getBytes(bb.getPosition(),bb.size()-bb.getPosition());
-        while(bb.getPosition()<bb.size()){
+        var payload = bb.getBytes(bb.getPosition(), bb.size() - bb.getPosition());
+        while (bb.getPosition() < bb.size()) {
             var topic = bb.readUtf8String();
             var options = bb.get();
             publish.getTopics().add(new Topic(topic, options));

@@ -38,6 +38,7 @@ public class BasicTest {
     //protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     private static Server mqttBroker;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -107,23 +108,19 @@ public class BasicTest {
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
         var pl = new MqttRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        var rep = new MqttReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
-        proxy.setPlugins(List.of(pl,rep));
+        var rep = new MqttReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        proxy.setPlugins(List.of(pl, rep));
         rep.setActive(true);
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        EventsQueue.register("recorder",(r)->{
+        EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
-    }
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    public List<ReportDataEvent> getEvents(){
-        return events.stream().collect(Collectors.toList());
     }
 
     public static void afterEachBase() {
@@ -134,6 +131,10 @@ public class BasicTest {
 
     public static void afterClassBase() throws Exception {
         mqttBroker.stopServer();
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 
     static class PublisherListener extends AbstractInterceptHandler {

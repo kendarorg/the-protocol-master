@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> {
 
 
-
     @Override
     protected Class<?> getIn() {
         return JdbcCall.class;
@@ -26,6 +25,7 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
     protected Class<?> getOut() {
         return SelectResult.class;
     }
+
     @Override
     protected void checkMatching(MockStorage data, JdbcCall callToSimulate, ChangeableReference<Integer> matchingQuery, ChangeableReference<Long> foundedIndex) {
         ChangeableReference<Integer> matchedQuery = new ChangeableReference<>(0);

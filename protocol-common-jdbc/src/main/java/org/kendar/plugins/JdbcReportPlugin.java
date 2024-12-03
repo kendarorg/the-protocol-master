@@ -13,7 +13,7 @@ import java.util.Map;
 public abstract class JdbcReportPlugin extends ReportPlugin<PluginSettings> {
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
-        if(!isActive())return false;
+        if (!isActive()) return false;
         var context = pluginContext.getContext();
         var connectionId = context.getContextId();
         var duration = System.currentTimeMillis() - pluginContext.getStart();
@@ -24,8 +24,8 @@ public abstract class JdbcReportPlugin extends ReportPlugin<PluginSettings> {
                 connectionId,
                 pluginContext.getStart(),
                 duration,
-                Map.of( "inputsCount",in.getParameterValues().size()+"",
-                        "resultsCount",out.getCount()+"")
+                Map.of("inputsCount", in.getParameterValues().size() + "",
+                        "resultsCount", out.getCount() + "")
         ));
         return false;
     }

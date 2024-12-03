@@ -86,7 +86,7 @@ public abstract class Proxy {
     public void setPlugins(List<ProtocolPluginDescriptor> filters) {
         for (var plugin : filters) {
             var handlers = PluginHandler.of(plugin);
-            for(var handler : handlers) {
+            for (var handler : handlers) {
                 var pars = handler.getKey();
                 if (!allowedPlugins.containsKey(pars)) {
                     allowedPlugins.put(pars, new HashMap<>());

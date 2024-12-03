@@ -1,6 +1,9 @@
 package org.kendar.mqtt.fsm.dtos;
 
 public class Topic {
+    private String topic;
+    private byte type;
+
     public Topic() {
     }
 
@@ -8,9 +11,6 @@ public class Topic {
         this.topic = topic;
         this.type = type;
     }
-
-    private String topic;
-    private byte type;
 
     public String getTopic() {
         return topic;

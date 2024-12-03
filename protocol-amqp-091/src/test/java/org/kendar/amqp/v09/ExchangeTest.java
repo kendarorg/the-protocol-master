@@ -78,8 +78,8 @@ public class ExchangeTest extends BasicTest {
         assertTrue(Square.results.containsKey("Square of 3 is: 9"));
         assertTrue(Square.results.containsKey("Square of 4 is: 16"));
         assertTrue(Square.results.containsKey("Square of 5 is: 25"));
-        var events =getEvents().stream().collect(Collectors.toList());
-        assertEquals(7,events.size());
-        assertEquals(2,events.stream().filter(e->e.getQuery().equalsIgnoreCase("CONNECT")).count());
+        var events = getEvents().stream().collect(Collectors.toList());
+        assertEquals(7, events.size());
+        assertEquals(2, events.stream().filter(e -> e.getQuery().equalsIgnoreCase("CONNECT")).count());
     }
 }

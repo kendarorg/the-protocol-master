@@ -2,8 +2,8 @@ package org.kendar.http.plugins;
 
 import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
-import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.RewritePlugin;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.utils.ReplacerItemInstance;
 

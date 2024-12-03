@@ -6,9 +6,9 @@ import org.kendar.http.utils.Request;
 import org.kendar.http.utils.Response;
 import org.kendar.http.utils.constants.ConstantsHeader;
 import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.ReplayPlugin;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -25,9 +25,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
+    private static final Logger log = LoggerFactory.getLogger(HttpReplayPlugin.class);
     private boolean blockExternal = true;
     private List<MatchingRecRep> matchSites = new ArrayList<>();
-    private static final Logger log = LoggerFactory.getLogger(HttpReplayPlugin.class);
+
     private Map<String, String> buildTag(Request in) {
         var result = new HashMap<String, String>();
         result.put("path", in.getPath());
@@ -98,7 +99,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
         var lineToRead = new LineToRead(storageItem, index);
         var item = lineToRead.getStorageItem();
-        log.debug("READING " + item.getIndex());
+        log.debug("READING {}", item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
         if (getSettings().isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());

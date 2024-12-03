@@ -32,6 +32,7 @@ public class BasicTest {
     protected static final int FAKE_PORT = 5682;
     protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -60,7 +61,6 @@ public class BasicTest {
 
     }
 
-
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy(rabbitContainer.getConnectionString(),
@@ -82,26 +82,21 @@ public class BasicTest {
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
         var pl = new AmqpRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        var rep = new AmqpReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        var rep = new AmqpReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(
-                pl,rep));
+                pl, rep));
         pl.setActive(true);
         rep.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        EventsQueue.register("recorder",(r)->{
+        EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
-    }
-
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    public List<ReportDataEvent> getEvents(){
-        return events.stream().collect(Collectors.toList());
     }
 
     public static void afterEachBase() {
@@ -112,5 +107,9 @@ public class BasicTest {
 
     public static void afterClassBase() throws Exception {
         rabbitContainer.close();
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 }

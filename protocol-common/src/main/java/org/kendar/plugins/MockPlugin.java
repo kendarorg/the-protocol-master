@@ -1,8 +1,8 @@
 package org.kendar.plugins;
 
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -23,31 +23,31 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
     protected List<MockStorage> mocks = new ArrayList<>();
     private String mocksDir;
 
-    protected abstract Class<?> getIn();
-    protected abstract Class<?> getOut();
-
-
     protected static boolean isTemplateParameter(String tplSeg) {
         return tplSeg.startsWith("${") && tplSeg.endsWith("}") || tplSeg.startsWith("@{") && tplSeg.endsWith("}");
     }
+
+    protected abstract Class<?> getIn();
+
+    protected abstract Class<?> getOut();
 
     protected abstract void checkMatching(MockStorage data,
                                           T requestToSimulate,
                                           ChangeableReference<Integer> matchingQuery,
                                           ChangeableReference<Long> foundedIndex);
 
-    public boolean handle(PluginContext pluginContext, ProtocolPhase phase,Object request, Object response) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object request, Object response) {
         if (!isActive()) return false;
-        if(request!=null && !request.getClass().equals(getIn())){
+        if (request != null && !request.getClass().equals(getIn())) {
             return false;
         }
-        if(response!=null && !response.getClass().equals(getOut())){
+        if (response != null && !response.getClass().equals(getOut())) {
             return false;
         }
         var matchingQuery = new ChangeableReference<>(0);
         var foundedIndex = new ChangeableReference<>(-1L);
-        var withHost = firstCheckOnMainPart((T)request);
-        withHost.forEach(a -> checkMatching(a, (T)request, matchingQuery, foundedIndex));
+        var withHost = firstCheckOnMainPart((T) request);
+        withHost.forEach(a -> checkMatching(a, (T) request, matchingQuery, foundedIndex));
         if (foundedIndex.get() > 0) {
             var foundedResponse = mocks.stream().filter(a -> a.getIndex() == foundedIndex.get()).findFirst();
             if (foundedResponse.isPresent()) {
@@ -61,13 +61,13 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
                         if (founded.getCount() > 0) {
                             founded.setCount(founded.getCount() - 1);
                         }
-                        writeOutput((T)request, (K)response, founded);
+                        writeOutput((T) request, (K) response, founded);
                         return true;
                     }
                     return false;
                 } else if (founded.getCount() > 0) {
                     founded.setCount(founded.getCount() - 1);
-                    writeOutput((T)request, (K)response, founded);
+                    writeOutput((T) request, (K) response, founded);
                     return true;
                 }
             }

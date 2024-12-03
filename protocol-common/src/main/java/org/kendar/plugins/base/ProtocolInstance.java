@@ -10,11 +10,6 @@ public class ProtocolInstance {
     private final TcpServer server;
     private final List<ProtocolPluginDescriptor> plugins;
     private final ProtocolSettings settings;
-
-    public String getProtocol() {
-        return protocol;
-    }
-
     private final String protocol;
 
     public ProtocolInstance(String protocolInstanceId,
@@ -27,6 +22,10 @@ public class ProtocolInstance {
         this.plugins = plugins;
         this.settings = settings;
         this.protocol = settings.getProtocol();
+    }
+
+    public String getProtocol() {
+        return protocol;
     }
 
     public String getProtocolInstanceId() {

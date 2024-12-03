@@ -35,6 +35,7 @@ public class MultiRecordReplay extends BasicTest {
     private static String HTTPS_PORT = "12443";
     private static String PROXY_PORT = "1281";
     private static int SIMPLE_SERVER_HTTP_PORT = 18080;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     @BeforeAll
@@ -51,15 +52,14 @@ public class MultiRecordReplay extends BasicTest {
         simpleServer.stop();
     }
 
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    public List<ReportDataEvent> getEvents(){
+    public List<ReportDataEvent> getEvents() {
         return events.stream().collect(Collectors.toList());
     }
 
     @BeforeEach
     public void beforeEach() throws IOException {
         runTheServer.set(true);
-        EventsQueue.register("recorder",(r)->{
+        EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
     }
@@ -145,10 +145,10 @@ public class MultiRecordReplay extends BasicTest {
         Main.stop();
         assertTrue(verifyTestRun.get());
 
-        var events =getEvents().stream().collect(Collectors.toList());
+        var events = getEvents().stream().collect(Collectors.toList());
 
-        assertEquals(14,events.stream().filter(e->e.getProtocol().equalsIgnoreCase("postgres")).count());
-        assertEquals(1,events.stream().filter(e->e.getProtocol().equalsIgnoreCase("http")).count());
+        assertEquals(14, events.stream().filter(e -> e.getProtocol().equalsIgnoreCase("postgres")).count());
+        assertEquals(1, events.stream().filter(e -> e.getProtocol().equalsIgnoreCase("http")).count());
 
         System.out.println("RECORDING COMPLETED ==============================================");
 

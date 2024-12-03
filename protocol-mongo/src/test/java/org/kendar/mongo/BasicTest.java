@@ -36,6 +36,7 @@ public class BasicTest {
     protected static final int FAKE_PORT = 27077;
     protected static MongoDbImage mongoContainer;
     protected static TcpServer protocolServer;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -69,7 +70,6 @@ public class BasicTest {
         });
     }
 
-
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new MongoProtocol(FAKE_PORT);
         var proxy = new MongoProxy(mongoContainer.getConnectionString());
@@ -89,12 +89,12 @@ public class BasicTest {
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
         var pl = new MongoRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        var rep = new MongoReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        var rep = new MongoReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl,rep));
+        proxy.setPlugins(List.of(pl, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
-        EventsQueue.register("recorder",(r)->{
+        EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
         baseProtocol.initialize();
@@ -152,11 +152,6 @@ public class BasicTest {
         return MongoClients.create(settings);
     }
 
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    public List<ReportDataEvent> getEvents(){
-        return events.stream().collect(Collectors.toList());
-    }
-
     protected static MongoClient getRealConnection() {
 //        var serverApi = ServerApi.builder()
 //                .version(ServerApiVersion.V1)
@@ -166,5 +161,9 @@ public class BasicTest {
                 //.serverApi(serverApi)
                 .build();
         return MongoClients.create(settings);
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 }

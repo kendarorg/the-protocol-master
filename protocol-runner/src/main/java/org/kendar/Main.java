@@ -8,22 +8,22 @@ import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
 import org.kendar.apis.ApiHandler;
 import org.kendar.apis.ApiServerHandler;
-import org.kendar.mongo.plugins.MongoReportPlugin;
-import org.kendar.mqtt.plugins.MqttReportPlugin;
-import org.kendar.mysql.plugins.MySqlReportPlugin;
-import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.cli.CommandParser;
 import org.kendar.command.*;
 import org.kendar.http.plugins.*;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.mongo.plugins.MongoReplayPlugin;
+import org.kendar.mongo.plugins.MongoReportPlugin;
 import org.kendar.mqtt.plugins.MqttRecordPlugin;
 import org.kendar.mqtt.plugins.MqttReplayPlugin;
+import org.kendar.mqtt.plugins.MqttReportPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
+import org.kendar.mysql.plugins.MySqlReportPlugin;
 import org.kendar.mysql.plugins.MySqlRewritePlugin;
 import org.kendar.plugins.base.AlwaysActivePlugin;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
+import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.postgres.plugins.PostgresReplayPlugin;
@@ -80,7 +80,7 @@ public class Main {
         var parser = new CommandParser(options);
         parser.parseIgnoreMissing(args);
 
-        if (parser.hasOption("unattended")||settings.get().isUnattended()) {
+        if (parser.hasOption("unattended") || settings.get().isUnattended()) {
             stopWhenFalse = () -> {
                 Sleeper.sleep(10000);
                 return true;
@@ -90,12 +90,12 @@ public class Main {
         var protocolPlugins = loadProtocolPlugins(pluginsDir);
         var globalPlugins = loadGlobalPlugins(pluginsDir);
         if (!parser.hasOption("cfg")) {
-            if(!protocolsRunner.prepareSettingsFromCommandLine(options, args, protocolPlugins, settings.get(), parser)){
+            if (!protocolsRunner.prepareSettingsFromCommandLine(options, args, protocolPlugins, settings.get(), parser)) {
                 return;
             }
         }
 
-        execute(settings.get(), stopWhenFalse, protocolPlugins,globalPlugins);
+        execute(settings.get(), stopWhenFalse, protocolPlugins, globalPlugins);
     }
 
     public static void stop() {
@@ -139,8 +139,6 @@ public class Main {
         }
         return storage;
     }
-
-
 
 
     private static HashMap<String, List<ProtocolPluginDescriptor>> loadProtocolPlugins(String pluginsDir) {
@@ -203,7 +201,7 @@ public class Main {
         return allProtocolSpecificPlugins;
     }
 
-    private static void addEmbeddedProtocolPlugin(HashMap<String, List<ProtocolPluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor< ?>> embeddedPlugins) {
+    private static void addEmbeddedProtocolPlugin(HashMap<String, List<ProtocolPluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?>> embeddedPlugins) {
         if (!plugins.containsKey(prt)) {
             plugins.put(prt, new ArrayList<>());
         }
@@ -237,7 +235,6 @@ public class Main {
         }
 
 
-
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
 
 
@@ -268,16 +265,16 @@ public class Main {
                     var pi = new ProtocolInstance(item.getKey(),
                             protocolServersCache.get(item.getKey()), availableProtocolPlugins, protocolFullSettings);
                     apiHandler.addProtocol(pi);
-                    ini.putService(item.getKey(),pi);
+                    ini.putService(item.getKey(), pi);
 
                 } catch (Exception ex) {
                     log.error("Unable to start protocol {}", item.getKey(), ex);
                 }
             }).start();
         }
-        for(var plugin : globalPlugins) {
-            var pluginSettings = (PluginSettings)ini.getPlugin(plugin.getId(), plugin.getSettingClass());
-            plugin.initialize(ini,pluginSettings);
+        for (var plugin : globalPlugins) {
+            var pluginSettings = (PluginSettings) ini.getPlugin(plugin.getId(), plugin.getSettingClass());
+            plugin.initialize(ini, pluginSettings);
         }
         if (ini.getApiPort() > 0) {
             var address = new InetSocketAddress(ini.getApiPort());
@@ -314,9 +311,6 @@ public class Main {
     }
 
 
-
-
-
     private static List<GlobalPluginDescriptor> loadGlobalPlugins(String pluginsDir) {
         if (!allGlobalPlugins.isEmpty()) {
             return allGlobalPlugins;
@@ -328,9 +322,7 @@ public class Main {
             pluginManager.loadPlugins();
             pluginManager.startPlugins();
             allGlobalPlugins = new ArrayList<>();
-            for (var item : pluginManager.getExtensions(GlobalPluginDescriptor.class)) {
-                allGlobalPlugins.add(item);
-            }
+            allGlobalPlugins.addAll(pluginManager.getExtensions(GlobalPluginDescriptor.class));
         }
         return allGlobalPlugins;
     }

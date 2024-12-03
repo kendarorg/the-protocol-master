@@ -11,7 +11,7 @@ import org.pf4j.Extension;
 import java.util.List;
 
 @Extension
-public class PostgresFilter extends ProtocolPluginDescriptorBase< PostgresFilterSettings> implements AlwaysActivePlugin {
+public class PostgresFilter extends ProtocolPluginDescriptorBase<PostgresFilterSettings> implements AlwaysActivePlugin {
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         return false;
     }

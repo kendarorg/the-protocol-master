@@ -255,13 +255,12 @@ public class SimpleTest extends BasicTest {
         consumer.accept(httpresponse);
 
 
+        var method = httpPost.getMethod().toUpperCase();
 
-        var method= httpPost.getMethod().toUpperCase();
-
-        var events =getEvents().stream().collect(Collectors.toList());
-        assertEquals(1,events.size());
-        var evt= events.get(0);
-        assertEquals("http",evt.getProtocol());
+        var events = getEvents().stream().collect(Collectors.toList());
+        assertEquals(1, events.size());
+        var evt = events.get(0);
+        assertEquals("http", evt.getProtocol());
         assertTrue(evt.getQuery().startsWith(method));
     }
 

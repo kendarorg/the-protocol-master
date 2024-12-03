@@ -26,11 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ReplayRecordFilters {
 
     private ConcurrentLinkedQueue<TpmEvent> events = new ConcurrentLinkedQueue<>();
+
     @Test
     void testRecordSites() {
         try {
             events.clear();
-            EventsQueue.register("testRecordSites",(e)->events.add(e), WriteItemEvent.class);
+            EventsQueue.register("testRecordSites", (e) -> events.add(e), WriteItemEvent.class);
             var rwPlugin = new HttpRecordPlugin() {
                 @Override
                 public boolean isActive() {
@@ -78,7 +79,7 @@ public class ReplayRecordFilters {
             Sleeper.sleep(10);
             assertTrue(events.size() == 0);
             events.clear();
-        }finally {
+        } finally {
 
             EventsQueue.unregister("testRecordSites", WriteItemEvent.class);
         }

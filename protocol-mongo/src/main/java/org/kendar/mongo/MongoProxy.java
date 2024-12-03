@@ -178,9 +178,7 @@ public class MongoProxy extends Proxy {
                 return out;
             }
         }
-//        if (replayer) {
-//            var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_QUERY");
-//            var res = new OpReplyContent();
+
 //            res.doDeserialize(item.getOutput(), mapper);
 //            res.setRequestId(protoContext.getReqResId());
 //            res.setResponseId(lsatOp.getRequestId());

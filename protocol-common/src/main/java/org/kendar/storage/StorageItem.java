@@ -25,12 +25,14 @@ public class StorageItem {
     private Object inAs;
     private String inputType;
     private String outputType;
+
     /**
      * Needed for serialization
      */
     public StorageItem() {
 
     }
+
     public StorageItem(int connectionId, Object input, Object output, long durationMs, String type, String caller,
                        String inputType, String outputType) {
         this.connectionId = connectionId;

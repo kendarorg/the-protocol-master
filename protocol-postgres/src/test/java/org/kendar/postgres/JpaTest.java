@@ -61,10 +61,10 @@ public class JpaTest extends BasicTest {
 
         assertTrue(atomicBoolean.get());
 
-        var events =getEvents().stream().collect(Collectors.toList());
-        assertEquals(14,events.size());
-        var evt= events.get(12);
-        assertEquals("postgres",evt.getProtocol());
+        var events = getEvents().stream().collect(Collectors.toList());
+        assertEquals(14, events.size());
+        var evt = events.get(12);
+        assertEquals("postgres", evt.getProtocol());
         assertTrue(evt.getQuery().contains("$1"));
     }
 }

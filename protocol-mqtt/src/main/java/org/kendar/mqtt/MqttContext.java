@@ -36,9 +36,6 @@ public class MqttContext extends NetworkProtoContext {
     @Override
     public void disconnect(Object connection) {
         ProxyConnection conn = ((ProxyConnection) getValue("CONNECTION"));
-//        var sock = (MqttProxySocket) conn.getConnection();
-//        if (sock != null) {
-//            sock.close();
-//        }
+
     }
 }

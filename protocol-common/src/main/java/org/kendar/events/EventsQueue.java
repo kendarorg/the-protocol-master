@@ -58,7 +58,6 @@ public class EventsQueue {
     }
 
 
-
     public static <T extends TpmEvent> void unregister(String id, Class<T> clazz) {
         var eventName = clazz.getSimpleName().toLowerCase(Locale.ROOT);
         if (instance.eventHandlers.containsKey(eventName)) {
@@ -135,7 +134,7 @@ public class EventsQueue {
     }
 
     public List<TpmEvent> clean() {
-        var result = items.stream().sequential().collect(Collectors.toList());
+        var result = items.stream().collect(Collectors.toList());
         items.clear();
         return result;
     }
@@ -149,22 +148,4 @@ public class EventsQueue {
             this.consumer = consumer;
         }
     }
-/*
-    @SuppressWarnings("unchecked")
-    public void handle(String eventType, String jsonEvent) {
-        eventType = eventType.toLowerCase(Locale.ROOT);
-        if (!conversions.containsKey(eventType)) return;
-        var clazz = conversions.get(eventType);
-        var event = (TpmEvent) mapper.deserialize(jsonEvent, clazz);
-        handle(event);
-    }
-
-
-    public <T> T execute(TpmEvent event, Class<T> clazz) throws Exception {
-        var eventName = event.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        if (!commandHandlers.containsKey(eventName)) return null;
-        var handler = commandHandlers.get(eventName);
-
-        return (T) handler.apply(event);
-    }*/
 }

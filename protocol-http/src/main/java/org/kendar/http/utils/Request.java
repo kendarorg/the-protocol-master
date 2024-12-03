@@ -145,7 +145,7 @@ public class Request {
         return RequestUtils.getFromMapList(this.headers, id);
     }
 
-    public String getFirstHeader(String id,String defaultValue) {
+    public String getFirstHeader(String id, String defaultValue) {
 
         var result = getHeader(id);
         if (result != null && !result.isEmpty()) {
@@ -326,10 +326,10 @@ public class Request {
     }
 
     public int getSize() {
-        if(this.getRequestText() instanceof BinaryNode){
-            return ((BinaryNode)this.getRequestText()).size();
-        }else if(this.getRequestText() instanceof TextNode){
-            return ((TextNode)this.getRequestText()).size();
+        if (this.getRequestText() instanceof BinaryNode) {
+            return this.getRequestText().size();
+        } else if (this.getRequestText() instanceof TextNode) {
+            return this.getRequestText().size();
         }
         return 0;
     }

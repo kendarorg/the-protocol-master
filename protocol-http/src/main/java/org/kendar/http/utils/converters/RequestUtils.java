@@ -222,14 +222,6 @@ public class RequestUtils {
             }
         }
 
-//        Charset encoding = UTF_8;
-//        RequestContext requestContext = new SimpleRequestContext(encoding, contentType, body);
-//        FileUploadBase fileUploadBase = new PortletFileUpload();
-//        FileItemFactory fileItemFactory = new DiskFileItemFactory();
-//        fileUploadBase.setFileItemFactory(fileItemFactory);
-//        fileUploadBase.setHeaderEncoding(encoding.displayName());
-//        List<FileItem> fileItems = fileUploadBase.parseRequest(requestContext);
-
 
         List<MultipartPart> result = new ArrayList<>();
         for (var simpleBlock : blocks) {

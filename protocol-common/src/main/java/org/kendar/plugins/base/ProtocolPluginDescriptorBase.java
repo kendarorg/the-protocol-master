@@ -60,15 +60,14 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     }
 
 
-
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         this.instanceId = protocol.getProtocolInstanceId();
         if (this.instanceId == null || this.instanceId.isEmpty()) {
             this.instanceId = "default";
         }
-        this.settings = (W) pluginSetting;
-        if(settings!=null)setActive(pluginSetting.isActive());
+        this.settings = pluginSetting;
+        if (settings != null) setActive(pluginSetting.isActive());
         return this;
     }
 
@@ -100,7 +99,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         }
     }
 
-    public void terminate(){
+    public void terminate() {
 
     }
 }

@@ -11,9 +11,10 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class AmqpReportPlugin extends ReportPlugin< PluginSettings> {
+public class AmqpReportPlugin extends ReportPlugin<PluginSettings> {
 
 
     @Override
@@ -22,13 +23,13 @@ public class AmqpReportPlugin extends ReportPlugin< PluginSettings> {
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, ConnectionOpen in, ConnectionOpenOk out) {
-        if(!isActive())return false;
+        if (!isActive()) return false;
         var context = pluginContext.getContext();
         var connectionId = context.getContextId();
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),
                 getProtocol(),
-                String.format("CONNECT"),
+                "CONNECT",
                 connectionId,
                 pluginContext.getStart(),
                 0,
@@ -38,28 +39,28 @@ public class AmqpReportPlugin extends ReportPlugin< PluginSettings> {
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, BodyFrame in, Object out) {
-        if(!isActive())return false;
+        if (!isActive()) return false;
         var context = pluginContext.getContext();
         var connectionId = context.getContextId();
         var channel = in.getChannel();
         var routingKey = context.getValue("BASIC_PUBLISH_RK_" + in.getChannel());
         var exchange = context.getValue("BASIC_PUBLISH_XC_" + in.getChannel());
-        var payload= "";
-        if(in.getContentString()!=null && in.getContentString().length()>0){
+        var payload = "";
+        if (in.getContentString() != null && !in.getContentString().isEmpty()) {
             payload = in.getContentString();
-        }else if(in.getContentBytes()!=null && in.getContentBytes().length>0){
+        } else if (in.getContentBytes() != null && in.getContentBytes().length > 0) {
             try {
                 payload = new String(in.getContentBytes());
-                var converted = payload.getBytes("UTF-8");
-                if(in.getContentBytes().length==converted.length){
-                    for(var i=0;i<converted.length;i++){
-                        if(converted[i]!=in.getContentBytes()[i]){
-                            payload=Base64.toBase64String(in.getContentBytes());
+                var converted = payload.getBytes(StandardCharsets.UTF_8);
+                if (in.getContentBytes().length == converted.length) {
+                    for (var i = 0; i < converted.length; i++) {
+                        if (converted[i] != in.getContentBytes()[i]) {
+                            payload = Base64.toBase64String(in.getContentBytes());
                             break;
                         }
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 payload = Base64.toBase64String(in.getContentBytes());
             }
         }
@@ -68,11 +69,11 @@ public class AmqpReportPlugin extends ReportPlugin< PluginSettings> {
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),
                 getProtocol(),
-                String.format("SEND:%s:%s",exchange,routingKey),
+                String.format("SEND:%s:%s", exchange, routingKey),
                 connectionId,
                 pluginContext.getStart(),
                 duration,
-                Map.of("body",payload)
+                Map.of("body", payload)
         ));
         return false;
     }

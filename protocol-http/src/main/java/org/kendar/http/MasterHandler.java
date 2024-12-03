@@ -49,10 +49,6 @@ public class MasterHandler implements HttpHandler {
         this.externalRequester = externalRequester;
         this.connectionBuilder = connectionBuilder;
 
-//
-//
-//        eventQueue.registerCommand(this::remoteRequest, ExecuteRemoteRequest.class);
-//        eventQueue.registerCommand(this::localRequest, ExecuteLocalRequest.class);
     }
 
     private void sendResponse(Response response, HttpExchange httpExchange) throws IOException {

@@ -30,7 +30,7 @@ public class MySqlReplayPlugin extends JdbcReplayPlugin {
             "      \"intResult\" : false,\n" +
             "      \"lastInsertedId\" : 0\n" +
             "    }";
-
+    private static final SqlStringParser parser = new SqlStringParser("?");
 
     @Override
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {
@@ -86,7 +86,6 @@ public class MySqlReplayPlugin extends JdbcReplayPlugin {
 
         return lineToRead;
     }
-    private static final SqlStringParser parser = new SqlStringParser("?");
 
     @Override
     protected SqlStringParser getParser() {

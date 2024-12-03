@@ -98,11 +98,11 @@ public class SubscribeTest extends BasicTest {
         assertEquals(2, mesg.getQos());
 
 
-        var events =getEvents().stream().collect(Collectors.toList());
-        Assertions.assertEquals(3,events.size());
-        Assertions.assertEquals(1,events.stream().filter(e->e.getQuery().startsWith("SEND")).count());
-        Assertions.assertEquals(1,events.stream().filter(e->e.getQuery().startsWith("CONNECT")).count());
-        Assertions.assertEquals(1,events.stream().filter(e->e.getQuery().startsWith("SUBSCRIBE")).count());
+        var events = getEvents().stream().collect(Collectors.toList());
+        Assertions.assertEquals(3, events.size());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("SEND")).count());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("CONNECT")).count());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("SUBSCRIBE")).count());
 
     }
 

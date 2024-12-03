@@ -7,7 +7,7 @@ import org.pf4j.ExtensionPoint;
 /**
  * Global plugin descriptor disconnected from protocols
  */
-public interface GlobalPluginDescriptor<W extends PluginSettings> extends ExtensionPoint,BasePluginDescriptor<W> {
+public interface GlobalPluginDescriptor<W extends PluginSettings> extends ExtensionPoint, BasePluginDescriptor<W> {
 
 
     /**
@@ -18,7 +18,6 @@ public interface GlobalPluginDescriptor<W extends PluginSettings> extends Extens
      * @return
      */
     ProtocolPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings);
-
 
 
     /**

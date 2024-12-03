@@ -4,6 +4,7 @@ import org.kendar.plugins.JdbcRecordPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.sql.parser.SqlStringParser;
+import org.kendar.sql.parser.dtos.SimpleToken;
 import org.kendar.sql.parser.dtos.TokenType;
 import org.kendar.storage.StorageItem;
 
@@ -12,11 +13,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class PostgresRecordPlugin extends JdbcRecordPlugin {
+    private static final SqlStringParser parser = new SqlStringParser("$");
+
     @Override
     public String getProtocol() {
         return "postgres";
     }
-
 
     @Override
     public Map<String, String> buildTag(StorageItem item) {
@@ -30,9 +32,9 @@ public class PostgresRecordPlugin extends JdbcRecordPlugin {
             if (input.getQuery() != null) {
                 data.put("query", input.getQuery());
                 var tokenized = getParser().tokenize(input.getQuery()).stream().filter(a -> a.getType() != TokenType.VALUE_ITEM)
-                        .map(t->t.getValue())
+                        .map(SimpleToken::getValue)
                         .collect(Collectors.toList());
-                data.put("tokenized",String.join(" ",tokenized));
+                data.put("tokenized", String.join(" ", tokenized));
             }
             if (input.getParameterValues() != null) {
                 data.put("parametersCount", input.getParameterValues().size() + "");
@@ -50,9 +52,6 @@ public class PostgresRecordPlugin extends JdbcRecordPlugin {
         }
         return data;
     }
-
-
-    private static final SqlStringParser parser = new SqlStringParser("$");
 
     @Override
     protected SqlStringParser getParser() {

@@ -2,9 +2,9 @@ package org.kendar.http.plugins;
 
 import com.sun.net.httpserver.HttpExchange;
 import org.kendar.http.settings.HttpProtocolSettings;
+import org.kendar.plugins.apis.FileDownload;
 import org.kendar.plugins.base.BaseApiServerHandler;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
-import org.kendar.plugins.apis.FileDownload;
 import org.kendar.utils.FileResourcesUtils;
 
 public class SSLApiHandler extends ProtocolPluginApiHandlerDefault<SSLDummyPlugin> {
