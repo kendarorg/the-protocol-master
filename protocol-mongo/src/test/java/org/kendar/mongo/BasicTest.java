@@ -10,10 +10,12 @@ import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
+import org.kendar.mongo.plugins.MongoReportPlugin;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -87,7 +89,9 @@ public class BasicTest {
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
         var pl = new MongoRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        var rep = new MongoReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        rep.setActive(true);
+        proxy.setPlugins(List.of(pl,rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         EventsQueue.register("recorder",(r)->{

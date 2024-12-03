@@ -5,11 +5,13 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mysql.plugins.MySqlMockPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
+import org.kendar.mysql.plugins.MySqlReportPlugin;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
@@ -78,7 +80,9 @@ public class BasicTest {
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
-        proxy.setPlugins(List.of(pl, pl1));
+        var rep = new MySqlReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        rep.setActive(true);
+        proxy.setPlugins(List.of(pl, pl1,rep));
 
 
         pl.setActive(true);

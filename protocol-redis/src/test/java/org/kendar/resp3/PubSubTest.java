@@ -8,6 +8,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -68,5 +70,10 @@ public class PubSubTest extends BasicTest {
         assertTrue(subscriber.results.containsKey("FIRST"));
         assertTrue(subscriber.results.containsKey("SECOND"));
         assertTrue(subscriber.results.containsKey("THIRD"));
+
+        var events =getEvents().stream().collect(Collectors.toList());
+        assertEquals(4,events.size());
+        Assertions.assertEquals(1,events.stream().filter(e->e.getQuery().startsWith("SUBSCRIBE")).count());
+        Assertions.assertEquals(3,events.stream().filter(e->e.getQuery().startsWith("PUBLISH")).count());
     }
 }

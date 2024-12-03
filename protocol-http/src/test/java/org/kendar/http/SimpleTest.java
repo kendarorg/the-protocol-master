@@ -33,6 +33,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -252,6 +253,16 @@ public class SimpleTest extends BasicTest {
         var httpresponse = httpclient.execute(httpPost);
         assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
         consumer.accept(httpresponse);
+
+
+
+        var method= httpPost.getMethod().toUpperCase();
+
+        var events =getEvents().stream().collect(Collectors.toList());
+        assertEquals(1,events.size());
+        var evt= events.get(0);
+        assertEquals("http",evt.getProtocol());
+        assertTrue(evt.getQuery().startsWith(method));
     }
 
     @Test

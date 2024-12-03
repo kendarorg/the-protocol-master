@@ -25,6 +25,7 @@ import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -159,11 +160,13 @@ public class BasicTest {
         httpProtocolSettings.getPlugins().put("mock-plugin", mockSettings);
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
+        var settings = new PluginSettings();
+        settings.setActive(true);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
                 new HttpRecordPlugin().initialize(globalSettings, httpProtocolSettings, recordingSettings),
                 new HttpReplayPlugin().initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(),
-                new HttpReportPlugin(),
+                new HttpReportPlugin().initialize(globalSettings, httpProtocolSettings, settings),
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(),
                 new HttpMockPlugin().initialize(globalSettings, httpProtocolSettings, mockSettings),

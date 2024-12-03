@@ -83,6 +83,7 @@ public class BasicTest {
         gs.putService("storage", storage);
         var pl = new AmqpRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         var rep = new AmqpReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        rep.setActive(true);
         proxy.setPlugins(List.of(
                 pl,rep));
         pl.setActive(true);

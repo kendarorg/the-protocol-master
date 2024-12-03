@@ -23,7 +23,20 @@ public class RedisReportPlugin extends ReportPlugin<PluginSettings> {
                     EventsQueue.send(new ReportDataEvent(
                             getInstanceId(),
                             getProtocol(),
-                            String.format("PUBLISH:%s:%s:%s",data.get(0).textValue(),data.get(1).textValue(),data.get(2).textValue()),
+                            String.format("%s:%s:%s",data.get(0).textValue(),data.get(1).textValue(),data.get(2).textValue()),
+                            connectionId,
+                            pluginContext.getStart(),
+                            duration,
+                            Map.of()
+                    ));
+                }else if(data.get(0).textValue().equalsIgnoreCase("subscribe")){
+                    var context = pluginContext.getContext();
+                    var connectionId = context.getContextId();
+                    var duration = System.currentTimeMillis() - pluginContext.getStart();
+                    EventsQueue.send(new ReportDataEvent(
+                            getInstanceId(),
+                            getProtocol(),
+                            String.format("%s:%s",data.get(0).textValue(),data.get(1).textValue()),
                             connectionId,
                             pluginContext.getStart(),
                             duration,

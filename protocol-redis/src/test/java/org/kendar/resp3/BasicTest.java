@@ -8,9 +8,11 @@ import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.plugins.RedisRecordPlugin;
+import org.kendar.redis.plugins.RedisReportPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -68,7 +70,10 @@ public class BasicTest {
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
         var pl = new RedisRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        proxy.setPlugins(List.of(pl));
+
+        var rep = new RedisReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        rep.setActive(true);
+        proxy.setPlugins(List.of(pl,rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

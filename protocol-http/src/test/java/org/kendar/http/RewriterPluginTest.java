@@ -11,6 +11,7 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.NullStorageRepository;
 
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

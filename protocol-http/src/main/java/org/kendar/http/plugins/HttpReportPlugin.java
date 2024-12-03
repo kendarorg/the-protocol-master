@@ -14,14 +14,14 @@ import java.util.Map;
 public class HttpReportPlugin extends ReportPlugin<PluginSettings> {
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (!isActive()) return false;
-        var context = pluginContext.getContext();
-        var connectionId = context.getContextId();
+        //var context = pluginContext.getContext();
+        //var connectionId = context.getContextId();
         var duration = System.currentTimeMillis() - pluginContext.getStart();
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),
                 getProtocol(),
                 in.getMethod() + " " + in.getProtocol() + "://" + in.getHost() + in.getPath(),
-                connectionId,
+                0,
                 pluginContext.getStart(),
                 duration,
                 Map.of(
