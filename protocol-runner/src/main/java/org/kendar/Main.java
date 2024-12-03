@@ -21,6 +21,7 @@ import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.mysql.plugins.MySqlReportPlugin;
 import org.kendar.mysql.plugins.MySqlRewritePlugin;
+import org.kendar.plugins.GlobalReportPlugin;
 import org.kendar.plugins.base.AlwaysActivePlugin;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
@@ -233,6 +234,7 @@ public class Main {
         if (globalPlugins == null || globalPlugins.isEmpty()) {
             globalPlugins = loadGlobalPlugins(pluginsDir);
         }
+        globalPlugins.add(new GlobalReportPlugin());
 
 
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
@@ -243,6 +245,7 @@ public class Main {
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
 
         var apiHandler = new ApiHandler(ini);
+        apiHandler.addGlobalPlugins(globalPlugins);
 
         var finalAllPlugins = protocolPlugins;
         for (var item : ini.getProtocols().entrySet()) {

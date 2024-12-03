@@ -17,7 +17,7 @@ public interface GlobalPluginDescriptor<W extends PluginSettings> extends Extens
      * @param pluginSettings
      * @return
      */
-    ProtocolPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings);
+    GlobalPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings);
 
 
     /**

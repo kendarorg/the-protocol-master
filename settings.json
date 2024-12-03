@@ -3,6 +3,11 @@
   "logLevel": "INFO",
   "dataDir": "data",
   "apiPort": 8095,
+  "plugins": {
+    "report-plugin": {
+      "active": true
+    }
+  },
   "protocols": {
     "postgres-01": {
       "protocol": "postgres",
@@ -40,6 +45,9 @@
           "errorCode": 0,
           "errorMessage": "ERROR",
           "percentage": 0
+        },
+        "report-plugin": {
+          "active": true
         },
         "replay-plugin": {
           "active": false,

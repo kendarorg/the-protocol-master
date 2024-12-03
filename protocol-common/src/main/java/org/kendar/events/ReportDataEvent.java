@@ -10,7 +10,7 @@ public class ReportDataEvent implements TpmEvent {
     private final long connectionId;
     private final long timestamp;
     private final long duration;
-    private final Map<String, String> tags;
+    private final Map<String, Object> tags;
 
     public ReportDataEvent(String instanceId,
                            String protocol,
@@ -18,7 +18,7 @@ public class ReportDataEvent implements TpmEvent {
                            long connectionId,
                            long timestamp,
                            long duration,
-                           Map<String, String> tags) {
+                           Map<String, Object> tags) {
         this.instanceId = instanceId;
         this.protocol = protocol;
         this.query = query;
@@ -57,7 +57,7 @@ public class ReportDataEvent implements TpmEvent {
         return duration;
     }
 
-    public Map<String, String> getTags() {
+    public Map<String, Object> getTags() {
         return tags;
     }
 

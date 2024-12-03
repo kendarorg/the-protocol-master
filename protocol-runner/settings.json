@@ -2,6 +2,11 @@
   "pluginsDir": "plugins",
   "logLevel": "INFO",
   "dataDir": "data",
+  "plugins": {
+    "report-plugin": {
+      "active": true
+    }
+  },
   "protocols": {
     "postgres-01": {
       "protocol": "postgres",
@@ -9,7 +14,12 @@
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
-      "connectionString": "jdbc:mysql://localhost:3306"
+      "connectionString": "jdbc:mysql://localhost:3306",
+      "plugins": {
+        "report-plugin": {
+          "active": true
+        }
+      }
     },
     "mqtt-01": {
       "protocol": "mqtt",
@@ -17,7 +27,12 @@
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
-      "connectionString": "tcp://localhost:1885"
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {
+        "report-plugin": {
+          "active": true
+        }
+      }
     }
   }
 }

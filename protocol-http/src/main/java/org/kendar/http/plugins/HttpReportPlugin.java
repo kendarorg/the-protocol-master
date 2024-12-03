@@ -14,6 +14,7 @@ import java.util.Map;
 public class HttpReportPlugin extends ReportPlugin<PluginSettings> {
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (!isActive()) return false;
+
         var duration = System.currentTimeMillis() - pluginContext.getStart();
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),

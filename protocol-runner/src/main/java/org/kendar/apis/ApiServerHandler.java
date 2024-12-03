@@ -81,6 +81,15 @@ public class ApiServerHandler implements HttpHandler, BaseApiServerHandler {
                 }
             }
         }
+        for (var globalPlugin : handler.getGlobalPlugins()) {
+            var handler = globalPlugin.getApiHandler();
+            var rootPath = "/api/plugins/" + handler.getId();
+            if (isPartialPath(path, rootPath)) {
+                if (handler.handle(this, exchange, path.replace(rootPath, ""))) {
+                    return;
+                }
+            }
+        }
         if (multiCall) {
             respond(exchange, new Ok(), 200);
             return;

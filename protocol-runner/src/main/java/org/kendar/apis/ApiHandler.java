@@ -6,11 +6,13 @@ import org.kendar.apis.dtos.ProtocolIndex;
 import org.kendar.plugins.apis.FileDownload;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
+import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.generic.StorageRepository;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -21,6 +23,12 @@ import static java.lang.System.exit;
 public class ApiHandler {
     private final GlobalSettings settings;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
+
+    public List<GlobalPluginDescriptor> getGlobalPlugins() {
+        return globalPlugins;
+    }
+
+    private List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
     public ApiHandler(GlobalSettings settings) {
         this.settings = settings;
@@ -82,5 +90,10 @@ public class ApiHandler {
                 storage.initialize();
         }
         return new Ok();
+    }
+
+    public void addGlobalPlugins(List<GlobalPluginDescriptor> globalPlugins) {
+
+        this.globalPlugins = globalPlugins;
     }
 }
