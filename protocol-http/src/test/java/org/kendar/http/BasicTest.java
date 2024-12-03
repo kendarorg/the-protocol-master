@@ -17,6 +17,8 @@ import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.settings.RewritePluginSettings;
@@ -32,7 +34,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -165,6 +169,10 @@ public class BasicTest {
                 new HttpMockPlugin().initialize(globalSettings, httpProtocolSettings, mockSettings),
                 new HttpRewritePlugin().initialize(globalSettings, httpProtocolSettings, rewriteSettings)));
         baseProtocol.initialize();
+        EventsQueue.register("recorder",(r)->{
+            events.add(r);
+        }, ReportDataEvent.class);
+        baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 
 
@@ -172,8 +180,15 @@ public class BasicTest {
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
-    public void afterEachBase() {
 
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    public List<ReportDataEvent> getEvents(){
+        return events.stream().collect(Collectors.toList());
+    }
+
+    public void afterEachBase() {
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
         Sleeper.sleep(5000, () -> !protocolServer.isRunning());
     }

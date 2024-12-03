@@ -1,6 +1,8 @@
 package org.kendar.postgres;
 
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.postgres.plugins.PostgresMockPlugin;
@@ -23,6 +25,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -87,13 +91,25 @@ public class BasicTest {
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
+
+        EventsQueue.register("recorder",(r)->{
+            events.add(r);
+        }, ReportDataEvent.class);
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    public List<ReportDataEvent> getEvents(){
+        return events.stream().collect(Collectors.toList());
+    }
+
     public static void afterEachBase() {
+
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
     }
 

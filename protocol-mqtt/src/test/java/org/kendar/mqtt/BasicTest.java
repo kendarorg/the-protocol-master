@@ -128,6 +128,7 @@ public class BasicTest {
 
     public static void afterEachBase() {
         EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
     }
 

@@ -7,6 +7,8 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.server.TcpServer;
@@ -22,6 +24,8 @@ import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -86,6 +90,9 @@ public class BasicTest {
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
+        EventsQueue.register("recorder",(r)->{
+            events.add(r);
+        }, ReportDataEvent.class);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 
@@ -94,6 +101,8 @@ public class BasicTest {
     }
 
     public static void afterEachBase() {
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
     }
 
@@ -137,6 +146,11 @@ public class BasicTest {
                 .serverApi(serverApi)
                 .build();
         return MongoClients.create(settings);
+    }
+
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    public List<ReportDataEvent> getEvents(){
+        return events.stream().collect(Collectors.toList());
     }
 
     protected static MongoClient getRealConnection() {

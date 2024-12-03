@@ -1,6 +1,8 @@
 package org.kendar.mysql;
 
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.mysql.plugins.MySqlMockPlugin;
 import org.kendar.mysql.plugins.MySqlRecordPlugin;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
@@ -23,6 +25,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -78,6 +82,9 @@ public class BasicTest {
 
 
         pl.setActive(true);
+        EventsQueue.register("recorder",(r)->{
+            events.add(r);
+        }, ReportDataEvent.class);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
@@ -86,6 +93,10 @@ public class BasicTest {
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    public List<ReportDataEvent> getEvents(){
+        return events.stream().collect(Collectors.toList());
+    }
     public static void beforeEachBasePrep(TestInfo testInfo) {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
         var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
@@ -119,7 +130,9 @@ public class BasicTest {
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
-        ;
+        EventsQueue.register("recorder",(r)->{
+            events.add(r);
+        }, ReportDataEvent.class);
         proxy.setPlugins(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -132,6 +145,8 @@ public class BasicTest {
     public static void afterEachBase() {
 
         try {
+            EventsQueue.unregister("recorder", ReportDataEvent.class);
+            events.clear();
             protocolServer.stop();
 
             Sleeper.sleep(5000, () -> !protocolServer.isRunning());
