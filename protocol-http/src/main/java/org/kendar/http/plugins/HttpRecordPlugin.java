@@ -1,22 +1,20 @@
 package org.kendar.http.plugins;
 
 import org.kendar.http.utils.Request;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.RecordPlugin;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
-import org.kendar.storage.generic.StorageRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     private List<MatchingRecRep> recordSites = new ArrayList<>();
-
 
     @Override
     public List<ProtocolPhase> getPhases() {

@@ -13,8 +13,7 @@ import org.kendar.settings.PluginSettings;
 
 import java.util.Map;
 
-public class MqttReportPlugin extends ReportPlugin<Publish,Object, PluginSettings> {
-    @Override
+public class MqttReportPlugin extends ReportPlugin<PluginSettings> {
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Publish in, Object out) {
         handlePublish(pluginContext,in,0);
         return false;

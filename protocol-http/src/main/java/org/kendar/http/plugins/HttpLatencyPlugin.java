@@ -10,10 +10,9 @@ import org.kendar.utils.Sleeper;
 import java.util.List;
 import java.util.Random;
 
-public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<Request, Response, HttpLatencyPluginSettings> {
+public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyPluginSettings> {
 
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
             HttpLatencyPluginSettings s = getSettings();

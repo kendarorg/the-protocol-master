@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Basic Protocol Plugin
  */
-public interface ProtocolPluginDescriptor<T,K,W extends PluginSettings> extends
+public interface ProtocolPluginDescriptor<W extends PluginSettings> extends
         ExtensionPoint, BasePluginDescriptor<W> {
     /**
      * Phases for the protocol

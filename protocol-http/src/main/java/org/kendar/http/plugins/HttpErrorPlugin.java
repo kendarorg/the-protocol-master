@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<Request, Response, HttpErrorPluginSettings> {
+public class HttpErrorPlugin extends ProtocolPluginDescriptorBase< HttpErrorPluginSettings> {
 
     private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
     private int errorCode;
@@ -38,7 +38,6 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<Request, Respo
     }
 
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
         if (!isActive()) return false;
         if (Math.random() < percentage) {

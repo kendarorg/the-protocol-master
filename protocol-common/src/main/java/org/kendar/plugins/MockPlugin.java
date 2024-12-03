@@ -18,10 +18,13 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<T, K, BasicMockPluginSettings> {
+public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<BasicMockPluginSettings> {
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     protected List<MockStorage> mocks = new ArrayList<>();
     private String mocksDir;
+
+    protected abstract Class<?> getIn();
+    protected abstract Class<?> getOut();
 
 
     protected static boolean isTemplateParameter(String tplSeg) {
@@ -33,12 +36,18 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<T, K
                                           ChangeableReference<Integer> matchingQuery,
                                           ChangeableReference<Long> foundedIndex);
 
-    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase,Object request, Object response) {
         if (!isActive()) return false;
+        if(request!=null && !request.getClass().equals(getIn())){
+            return false;
+        }
+        if(response!=null && !response.getClass().equals(getOut())){
+            return false;
+        }
         var matchingQuery = new ChangeableReference<>(0);
         var foundedIndex = new ChangeableReference<>(-1L);
-        var withHost = firstCheckOnMainPart(request);
-        withHost.forEach(a -> checkMatching(a, request, matchingQuery, foundedIndex));
+        var withHost = firstCheckOnMainPart((T)request);
+        withHost.forEach(a -> checkMatching(a, (T)request, matchingQuery, foundedIndex));
         if (foundedIndex.get() > 0) {
             var foundedResponse = mocks.stream().filter(a -> a.getIndex() == foundedIndex.get()).findFirst();
             if (foundedResponse.isPresent()) {
@@ -52,13 +61,13 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<T, K
                         if (founded.getCount() > 0) {
                             founded.setCount(founded.getCount() - 1);
                         }
-                        writeOutput(request, response, founded);
+                        writeOutput((T)request, (K)response, founded);
                         return true;
                     }
                     return false;
                 } else if (founded.getCount() > 0) {
                     founded.setCount(founded.getCount() - 1);
-                    writeOutput(request, response, founded);
+                    writeOutput((T)request, (K)response, founded);
                     return true;
                 }
             }

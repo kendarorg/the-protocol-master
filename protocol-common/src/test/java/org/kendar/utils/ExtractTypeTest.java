@@ -10,7 +10,7 @@ import java.util.List;
 public class ExtractTypeTest {
     @Test
     void testExtractType() {
-        var target = new ProtocolPluginDescriptorBase<Object, Object, TestPluginSettings>() {
+        var target = new ProtocolPluginDescriptorBase<TestPluginSettings>() {
             @Override
             public List<ProtocolPhase> getPhases() {
                 return List.of();

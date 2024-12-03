@@ -67,6 +67,16 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
     }
 
     @Override
+    protected Class<?> getIn() {
+        return Request.class;
+    }
+
+    @Override
+    protected Class<?> getOut() {
+        return Response.class;
+    }
+
+    @Override
     protected void checkMatching(MockStorage data,
                                  Request requestToSimulate,
                                  ChangeableReference<Integer> matchingQuery,

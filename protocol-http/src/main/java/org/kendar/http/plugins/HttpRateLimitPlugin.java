@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<Request, Response, HttpRateLimitPluginSettings> {
+public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase< HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
     private List<Pattern> recordSites = new ArrayList<>();
@@ -51,7 +51,6 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<Request, R
         return this;
     }
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
             if (!recordSites.isEmpty()) {

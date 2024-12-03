@@ -9,7 +9,6 @@ import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
-import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -184,7 +183,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
             var handler = new MasterHandler(
                     new PluginClassesHandlerImpl(plugins),
-                    //new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
                     new RequestResponseBuilderImpl(),
                     new ExternalRequesterImpl(requestResponseBuilder, dnsHandler, connectionBuilder),
                     connectionBuilder);

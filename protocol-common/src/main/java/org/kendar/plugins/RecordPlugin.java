@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase<Object, Object, W> {
+public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase< W> {
     protected static final JsonMapper mapper = new JsonMapper();
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;

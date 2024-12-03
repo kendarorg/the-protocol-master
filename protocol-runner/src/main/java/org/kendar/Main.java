@@ -203,7 +203,7 @@ public class Main {
         return allProtocolSpecificPlugins;
     }
 
-    private static void addEmbeddedProtocolPlugin(HashMap<String, List<ProtocolPluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?, ?, ?>> embeddedPlugins) {
+    private static void addEmbeddedProtocolPlugin(HashMap<String, List<ProtocolPluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor< ?>> embeddedPlugins) {
         if (!plugins.containsKey(prt)) {
             plugins.put(prt, new ArrayList<>());
         }

@@ -7,7 +7,7 @@ import org.kendar.utils.JsonMapper;
 
 import java.lang.reflect.ParameterizedType;
 
-public abstract class ProtocolPluginDescriptorBase<T, K, W extends PluginSettings> implements ProtocolPluginDescriptor<T,K,W> {
+public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> implements ProtocolPluginDescriptor<W> {
     protected final static JsonMapper mapper = new JsonMapper();
     private boolean active;
     private String instanceId = "default";

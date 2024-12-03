@@ -1,13 +1,9 @@
 package org.kendar.sample.plugins;
 
 import org.kendar.plugins.base.AlwaysActivePlugin;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
-import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.PluginSettings;
-import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.pf4j.Extension;
@@ -15,8 +11,7 @@ import org.pf4j.Extension;
 import java.util.List;
 
 @Extension
-public class PostgresFilter extends ProtocolPluginDescriptorBase<JdbcCall, SelectResult, PostgresFilterSettings> implements AlwaysActivePlugin {
-    @Override
+public class PostgresFilter extends ProtocolPluginDescriptorBase< PostgresFilterSettings> implements AlwaysActivePlugin {
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         return false;
     }
@@ -41,10 +36,5 @@ public class PostgresFilter extends ProtocolPluginDescriptorBase<JdbcCall, Selec
         return "postgres";
     }
 
-    @Override
-    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global, protocol, pluginSetting);
-        return this;
-    }
 
 }

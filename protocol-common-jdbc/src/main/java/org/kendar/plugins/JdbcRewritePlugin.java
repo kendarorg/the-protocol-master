@@ -19,6 +19,16 @@ public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectRe
     }
 
     @Override
+    protected Class<?> getIn() {
+        return JdbcCall.class;
+    }
+
+    @Override
+    protected Class<?> getOut() {
+        return SelectResult.class;
+    }
+
+    @Override
     protected String prepare(JdbcCall request, SelectResult response) {
         return request.getQuery().replaceAll("\r\n", "\n").trim();
     }

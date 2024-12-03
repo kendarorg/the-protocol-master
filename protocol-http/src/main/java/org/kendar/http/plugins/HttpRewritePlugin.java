@@ -15,6 +15,17 @@ public class HttpRewritePlugin extends RewritePlugin<Request, Response, RewriteP
     private static final String HTTP = "http";
     private static final String HTTPS = "https";
 
+
+    @Override
+    protected Class<?> getIn() {
+        return Request.class;
+    }
+
+    @Override
+    protected Class<?> getOut() {
+        return Response.class;
+    }
+
     @Override
     public List<ProtocolPhase> getPhases() {
         return List.of(ProtocolPhase.CONNECT);

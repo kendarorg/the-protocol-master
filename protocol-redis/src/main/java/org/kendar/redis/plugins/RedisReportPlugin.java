@@ -11,8 +11,7 @@ import org.kendar.settings.PluginSettings;
 
 import java.util.Map;
 
-public class RedisReportPlugin extends ReportPlugin<Resp3Message, Resp3Response, PluginSettings> {
-    @Override
+public class RedisReportPlugin extends ReportPlugin<PluginSettings> {
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Resp3Message in, Resp3Response out) {
         if(isActive()){
             var data = mapper.toJsonNode(in.getData());

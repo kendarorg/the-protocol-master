@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptorBase<Object, Object, W> {
+public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptorBase<W> {
     protected static final JsonMapper mapper = new JsonMapper();
     static final ExecutorService executor = Executors.newCachedThreadPool();
     private static final Logger log = LoggerFactory.getLogger(ReplayPlugin.class);

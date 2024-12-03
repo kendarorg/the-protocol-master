@@ -13,7 +13,7 @@ import org.kendar.settings.PluginSettings;
 
 import java.util.Map;
 
-public class AmqpReportPlugin extends ReportPlugin<BodyFrame,Object, PluginSettings> {
+public class AmqpReportPlugin extends ReportPlugin< PluginSettings> {
 
 
     @Override

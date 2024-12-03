@@ -10,8 +10,8 @@ import org.kendar.sql.jdbc.proxy.JdbcCall;
 
 import java.util.Map;
 
-public abstract class JdbcReportPlugin extends ReportPlugin<JdbcCall, SelectResult, PluginSettings> {
-    @Override
+public abstract class JdbcReportPlugin extends ReportPlugin<PluginSettings> {
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         if(!isActive())return false;
         var context = pluginContext.getContext();

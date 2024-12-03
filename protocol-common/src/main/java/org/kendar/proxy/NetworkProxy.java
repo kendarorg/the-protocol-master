@@ -2,7 +2,6 @@ package org.kendar.proxy;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -132,7 +131,7 @@ public abstract class NetworkProxy extends Proxy {
         long start = System.currentTimeMillis();
         var pluginContext = new PluginContext(getCaller(), of.getClass().getSimpleName(), start, context);
         for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, new Object())) {
-            if (handle(plugin,pluginContext, ProtocolPhase.PRE_CALL, of, null)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, null)) {
                 return;
             }
         }
@@ -140,7 +139,7 @@ public abstract class NetworkProxy extends Proxy {
         var sock = (NetworkProxySocket) connection.getConnection();
         sock.write(of, getProtocol().buildBuffer());
         for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, new Object())) {
-            if (handle(plugin,pluginContext, ProtocolPhase.POST_CALL, of, null)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, null)) {
                 break;
             }
         }
@@ -185,7 +184,7 @@ public abstract class NetworkProxy extends Proxy {
         var pluginContext = new PluginContext(getCaller(), of.getClass().getSimpleName(), start, context);
 
         for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
-            if (handle(plugin,pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
         }
@@ -202,7 +201,7 @@ public abstract class NetworkProxy extends Proxy {
         }
 
         for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, toRead)) {
-            if (handle(plugin,pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
                 break;
             }
         }
@@ -229,7 +228,7 @@ public abstract class NetworkProxy extends Proxy {
         var pluginContext = new PluginContext(getCaller(), "byte[]", start, context);
 
         for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
-            if( handle(plugin,pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
+            if( plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
         }
@@ -239,7 +238,7 @@ public abstract class NetworkProxy extends Proxy {
         sock.read(toRead, optional);
 
         for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, toRead)) {
-            if (handle(plugin,pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
                 break;
             }
         }
@@ -248,15 +247,10 @@ public abstract class NetworkProxy extends Proxy {
 
     public void respond(Object publish, PluginContext pluginContext) {
         for (var plugin : getPlugins(ProtocolPhase.ASYNC_RESPONSE, new Object(), publish)) {
-            if (handle(plugin,pluginContext, ProtocolPhase.ASYNC_RESPONSE, null, publish)) {
+            if (plugin.handle(pluginContext, ProtocolPhase.ASYNC_RESPONSE, null, publish)) {
                 break;
             }
         }
-    }
-
-    protected boolean handle(ProtocolPluginDescriptor plugin, PluginContext pluginContext, ProtocolPhase phase,
-                             Object in, Object out){
-        return false;
     }
 
 }

@@ -11,8 +11,8 @@ import org.kendar.settings.PluginSettings;
 
 import java.util.Map;
 
-public class MongoReportPlugin extends ReportPlugin<OpMsgContent, OpMsgContent, PluginSettings> {
-    @Override
+public class MongoReportPlugin extends ReportPlugin< PluginSettings> {
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, OpMsgContent in, OpMsgContent out) {
         if(!isActive())return false;
         if(in.getSections()!=null && in.getSections().size()>0) {

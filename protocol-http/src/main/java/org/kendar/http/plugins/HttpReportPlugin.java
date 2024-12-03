@@ -11,8 +11,7 @@ import org.kendar.settings.PluginSettings;
 
 import java.util.Map;
 
-public class HttpReportPlugin extends ReportPlugin<Request, Response, PluginSettings> {
-    @Override
+public class HttpReportPlugin extends ReportPlugin<PluginSettings> {
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (!isActive()) return false;
         var context = pluginContext.getContext();

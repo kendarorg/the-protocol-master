@@ -1,9 +1,9 @@
 package org.kendar.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -19,10 +19,13 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptorBase<T, K, W> {
+public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptorBase< W> {
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();
+
+    protected abstract Class<?> getIn();
+    protected abstract Class<?> getOut();
 
     @Override
     public String getId() {
@@ -30,12 +33,19 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
     }
 
 
-    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object request, Object response) {
+
         if (!isActive()) return false;
         if (replacers.isEmpty()) return false;
-        J toReplace = prepare(request, response);
+        if(request!=null && !request.getClass().equals(getIn())){
+            return false;
+        }
+        if(response!=null && !response.getClass().equals(getOut())){
+            return false;
+        }
+        J toReplace = prepare((T)request,(K) response);
         for (var item : replacers) {
-            replaceData(item, toReplace, request, response);
+            replaceData(item, toReplace, (T)request,(K) response);
         }
         return false;
     }
