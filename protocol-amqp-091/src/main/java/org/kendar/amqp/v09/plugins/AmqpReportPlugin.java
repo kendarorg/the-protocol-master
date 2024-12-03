@@ -44,11 +44,24 @@ public class AmqpReportPlugin extends ReportPlugin< PluginSettings> {
         var channel = in.getChannel();
         var routingKey = context.getValue("BASIC_PUBLISH_RK_" + in.getChannel());
         var exchange = context.getValue("BASIC_PUBLISH_XC_" + in.getChannel());
-        var data= "";
+        var payload= "";
         if(in.getContentString()!=null && in.getContentString().length()>0){
-            data = in.getContentString();
+            payload = in.getContentString();
         }else if(in.getContentBytes()!=null && in.getContentBytes().length>0){
-            data = Base64.toBase64String(in.getContentBytes());
+            try {
+                payload = new String(in.getContentBytes());
+                var converted = payload.getBytes("UTF-8");
+                if(in.getContentBytes().length==converted.length){
+                    for(var i=0;i<converted.length;i++){
+                        if(converted[i]!=in.getContentBytes()[i]){
+                            payload=Base64.toBase64String(in.getContentBytes());
+                            break;
+                        }
+                    }
+                }
+            }catch (Exception e){
+                payload = Base64.toBase64String(in.getContentBytes());
+            }
         }
 
         var duration = System.currentTimeMillis() - pluginContext.getStart();
@@ -59,7 +72,7 @@ public class AmqpReportPlugin extends ReportPlugin< PluginSettings> {
                 connectionId,
                 pluginContext.getStart(),
                 duration,
-                Map.of("body",data)
+                Map.of("body",payload)
         ));
         return false;
     }

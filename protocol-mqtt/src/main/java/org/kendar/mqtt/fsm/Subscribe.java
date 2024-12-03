@@ -3,19 +3,21 @@ package org.kendar.mqtt.fsm;
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.MqttProxy;
 import org.kendar.mqtt.enums.MqttFixedHeader;
+import org.kendar.mqtt.fsm.dtos.Topic;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * https://www.emqx.com/en/blog/mqtt-5-0-control-packets-02-publish-puback
  */
 public class Subscribe extends BasePropertiesMqttState {
 
-    private byte[] payload;
     private short packetIdentifier;
 
 
@@ -34,8 +36,17 @@ public class Subscribe extends BasePropertiesMqttState {
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.writeShort(getPacketIdentifier());
         writeProperties(rb);
-        rb.write(getPayload());
+        for(var topic : getTopics()) {
+            rb.writeUtf8String(topic.getTopic());
+            rb.write(topic.getType());
+        }
     }
+
+    public List<Topic> getTopics() {
+        return topics;
+    }
+
+    private List<Topic> topics = new ArrayList<>();
 
     @Override
     protected Iterator<ProtoStep> executeFrame(MqttFixedHeader fixedHeader, MqttBBuffer bb, MqttPacket event) {
@@ -48,7 +59,12 @@ public class Subscribe extends BasePropertiesMqttState {
         //Variable header for MQTT >=5
         readProperties(publish, bb);
 
-        publish.setPayload(bb.getRemaining());
+        var payload = bb.getBytes(bb.getPosition(),bb.size()-bb.getPosition());
+        while(bb.getPosition()<bb.size()){
+            var topic = bb.readUtf8String();
+            var options = bb.get();
+            publish.getTopics().add(new Topic(topic, options));
+        }
 
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
@@ -60,13 +76,6 @@ public class Subscribe extends BasePropertiesMqttState {
         ));
     }
 
-    public byte[] getPayload() {
-        return payload;
-    }
-
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
-    }
 
     public short getPacketIdentifier() {
         return packetIdentifier;

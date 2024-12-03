@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -95,6 +96,13 @@ public class SubscribeTest extends BasicTest {
         var mesg = messages.get(0);
         assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
         assertEquals(2, mesg.getQos());
+
+
+        var events =getEvents().stream().collect(Collectors.toList());
+        Assertions.assertEquals(3,events.size());
+        Assertions.assertEquals(1,events.stream().filter(e->e.getQuery().startsWith("SEND")).count());
+        Assertions.assertEquals(1,events.stream().filter(e->e.getQuery().startsWith("CONNECT")).count());
+        Assertions.assertEquals(1,events.stream().filter(e->e.getQuery().startsWith("SUBSCRIBE")).count());
 
     }
 

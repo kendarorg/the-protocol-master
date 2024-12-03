@@ -7,11 +7,15 @@ import io.moquette.interception.AbstractInterceptHandler;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.InterceptPublishMessage;
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.plugins.MqttRecordPlugin;
+import org.kendar.mqtt.plugins.MqttReportPlugin;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -23,6 +27,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -80,7 +86,7 @@ public class BasicTest {
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
-
+        events.clear();
         moquetteMessages.clear();
         var baseProtocol = new MqttProtocol(FAKE_PORT);
         var proxy = new MqttProxy("tcp://localhost:1883",
@@ -101,19 +107,27 @@ public class BasicTest {
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
         var pl = new MqttRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        ;
-        proxy.setPlugins(List.of(pl));
+        var rep = new MqttReportPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        proxy.setPlugins(List.of(pl,rep));
+        rep.setActive(true);
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
+        EventsQueue.register("recorder",(r)->{
+            events.add(r);
+        }, ReportDataEvent.class);
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    public List<ReportDataEvent> getEvents(){
+        return events.stream().collect(Collectors.toList());
+    }
 
     public static void afterEachBase() {
-
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
         protocolServer.stop();
     }
 
