@@ -6,6 +6,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.junit.jupiter.api.*;
 import org.kendar.Main;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.runner.utils.SimpleHttpServer;
 import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.FileResourcesUtils;
@@ -14,10 +16,13 @@ import org.kendar.utils.Sleeper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,16 +51,27 @@ public class MultiRecordReplay extends BasicTest {
         simpleServer.stop();
     }
 
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    public List<ReportDataEvent> getEvents(){
+        return events.stream().collect(Collectors.toList());
+    }
+
     @BeforeEach
     public void beforeEach() throws IOException {
         runTheServer.set(true);
+        EventsQueue.register("recorder",(r)->{
+            events.add(r);
+        }, ReportDataEvent.class);
     }
 
     @AfterEach
     public void afterEach() {
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+
         runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(100);
+        events.clear();
     }
 
 
@@ -128,6 +144,12 @@ public class MultiRecordReplay extends BasicTest {
         runTheServer.set(false);
         Main.stop();
         assertTrue(verifyTestRun.get());
+
+        var events =getEvents().stream().collect(Collectors.toList());
+
+        assertEquals(14,events.stream().filter(e->e.getProtocol().equalsIgnoreCase("postgres")).count());
+        assertEquals(1,events.stream().filter(e->e.getProtocol().equalsIgnoreCase("http")).count());
+
         System.out.println("RECORDING COMPLETED ==============================================");
 
         var replaySettings = fr.getFileFromResourceAsString(Path.of("src", "test", "resources", "multiRecording.json.template").toAbsolutePath().toString());
