@@ -1,7 +1,7 @@
 package org.kendar.server.utils;
 
 import com.sun.net.httpserver.*;
-import org.kendar.http.utils.constants.ConstantsHeader;
+import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.server.config.ServerConfig;
 import org.kendar.server.events.Event;
 import org.kendar.server.events.WriteFinishedEvent;

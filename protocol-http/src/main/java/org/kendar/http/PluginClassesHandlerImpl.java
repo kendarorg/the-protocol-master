@@ -1,8 +1,8 @@
 package org.kendar.http;
 
 import org.apache.http.conn.HttpClientConnectionManager;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
 import org.kendar.http.utils.plugins.PluginClassesHandler;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;

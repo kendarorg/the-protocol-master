@@ -1,9 +1,9 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.kendar.http.utils.MimeChecker;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
+import org.kendar.apis.utils.MimeChecker;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
 import org.kendar.plugins.MockPlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.utils.ChangeableReference;

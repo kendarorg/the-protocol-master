@@ -6,8 +6,8 @@ import com.sun.net.httpserver.HttpServer;
 import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
+import org.kendar.apis.ApiFiltersLoader;
 import org.kendar.apis.ApiHandler;
-import org.kendar.apis.ApiServerHandler;
 import org.kendar.cli.CommandParser;
 import org.kendar.command.*;
 import org.kendar.http.plugins.*;
@@ -61,6 +61,7 @@ public class Main {
     private static HashMap<String, List<ProtocolPluginDescriptor>> allProtocolSpecificPlugins = new HashMap<>();
     private static List<GlobalPluginDescriptor> allGlobalPlugins = new ArrayList<>();
     private static List<GlobalPluginDescriptor> globalPlugins;
+    private static JarPluginManager pluginManager;
 
 
     public static void main(String[] args) throws Exception {
@@ -91,6 +92,13 @@ public class Main {
             };
         }
         var pluginsDir = settings.get().getPluginsDir();
+        var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
+        if (pathOfPluginsDir.toFile().exists()) {
+            pluginManager = new JarPluginManager(pathOfPluginsDir);
+            pluginManager.loadPlugins();
+            pluginManager.startPlugins();
+        }
+
         var protocolPlugins = loadProtocolPlugins(pluginsDir);
         globalPlugins = loadGlobalPlugins(pluginsDir);
         if (!parser.hasOption("cfg")) {
@@ -152,9 +160,7 @@ public class Main {
         var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
         if (pathOfPluginsDir.toFile().exists()) {
 
-            var pluginManager = new JarPluginManager(pathOfPluginsDir);
-            pluginManager.loadPlugins();
-            pluginManager.startPlugins();
+
             allProtocolSpecificPlugins = new HashMap<>();
             for (var item : pluginManager.getExtensions(ProtocolPluginDescriptor.class)) {
                 var protocol = item.getProtocol().toLowerCase();
@@ -231,6 +237,8 @@ public class Main {
         ini.putService(storage.getType(), storage);
 
         var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
+
+
         if (protocolPlugins == null || protocolPlugins.isEmpty()) {
             protocolPlugins = loadProtocolPlugins(pluginsDir);
         }
@@ -246,9 +254,15 @@ public class Main {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
-
+        var apisFiltersLoader = new ApiFiltersLoader(new ArrayList<>());
         var apiHandler = new ApiHandler(ini);
-        apiHandler.addGlobalPlugins(globalPlugins);
+        apisFiltersLoader.getFilters().add(apiHandler);
+        apiHandler.addGLobalPlugins(globalPlugins);
+
+        for(var gp:globalPlugins){
+            var ah = gp.getApiHandler();
+            apisFiltersLoader.getFilters().add(ah);
+        }
 
         var finalAllPlugins = protocolPlugins;
         for (var item : ini.getProtocols().entrySet()) {
@@ -271,6 +285,10 @@ public class Main {
                     var pi = new ProtocolInstance(item.getKey(),
                             protocolServersCache.get(item.getKey()), availableProtocolPlugins, protocolFullSettings);
                     apiHandler.addProtocol(pi);
+                    for(var pl:pi.getPlugins()){
+                        var apiHandlerPlugin = pl.getApiHandler();
+                        apisFiltersLoader.getFilters().add(apiHandlerPlugin);
+                    }
                     ini.putService(item.getKey(), pi);
 
                 } catch (Exception ex) {
@@ -282,10 +300,11 @@ public class Main {
             var pluginSettings = (PluginSettings) ini.getPlugin(plugin.getId(), plugin.getSettingClass());
             plugin.initialize(ini, pluginSettings);
         }
+        apisFiltersLoader.loadFilters();
         if (ini.getApiPort() > 0) {
             var address = new InetSocketAddress(ini.getApiPort());
             var apiServer = HttpServer.create(address, 10);
-            apiServer.createContext("/", new ApiServerHandler(apiHandler));
+            apiServer.createContext("/", apisFiltersLoader);
             apiServer.start();
             log.info("[CL>TP][IN] Listening on *.:{} TPM Apis", ini.getApiPort());
         }
@@ -321,15 +340,9 @@ public class Main {
         if (!allGlobalPlugins.isEmpty()) {
             return allGlobalPlugins;
         }
-        var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
-        if (pathOfPluginsDir.toFile().exists()) {
-
-            var pluginManager = new JarPluginManager(pathOfPluginsDir);
-            pluginManager.loadPlugins();
-            pluginManager.startPlugins();
             allGlobalPlugins = new ArrayList<>();
             allGlobalPlugins.addAll(pluginManager.getExtensions(GlobalPluginDescriptor.class));
-        }
+
         return allGlobalPlugins;
     }
 }

@@ -52,6 +52,9 @@
         <json.schema.validator.version>1.0.66</json.schema.validator.version>
         <pl4j.version>3.12.1</pl4j.version>
         <bouncycastle.version>1.68</bouncycastle.version>
+        <commons.fileupload.version>1.3.3</commons.fileupload.version>
+        <guava.version>31.1-jre</guava.version>
+        <swagger.version>2.2.1</swagger.version>
     </properties>
     <dependencies>
         <!--        <dependency>-->

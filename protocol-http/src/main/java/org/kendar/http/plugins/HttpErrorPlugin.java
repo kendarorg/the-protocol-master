@@ -1,8 +1,8 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;

@@ -1,6 +1,6 @@
 package org.kendar.http.plugins;
 
-import org.kendar.http.utils.Request;
+import org.kendar.apis.base.Request;
 import org.kendar.plugins.RecordPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;

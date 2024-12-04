@@ -1,20 +1,11 @@
 package org.kendar.plugins.base;
 
-import com.sun.net.httpserver.HttpExchange;
+import org.kendar.apis.FilteringClass;
 
 /**
  * Apis exposed by a global plugin
  */
-public interface BasePluginApiHandler {
-    /**
-     * Handle http request
-     *
-     * @param apiServerHandler
-     * @param exchange
-     * @param pathPart
-     * @return
-     */
-    boolean handle(BaseApiServerHandler apiServerHandler, HttpExchange exchange, String pathPart);
+public interface BasePluginApiHandler extends FilteringClass {
 
     /**
      * Id of the plugin

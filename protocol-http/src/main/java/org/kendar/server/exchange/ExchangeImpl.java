@@ -4,7 +4,7 @@ package org.kendar.server.exchange;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpPrincipal;
-import org.kendar.http.utils.constants.ConstantsHeader;
+import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.server.events.WriteFinishedEvent;
 import org.kendar.server.streams.*;
 import org.kendar.server.utils.ServerImpl;

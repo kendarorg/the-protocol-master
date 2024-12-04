@@ -2,10 +2,10 @@ package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.beanutils.BeanUtils;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
-import org.kendar.http.utils.constants.ConstantsHeader;
-import org.kendar.http.utils.constants.ConstantsMime;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
+import org.kendar.apis.utils.ConstantsHeader;
+import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
