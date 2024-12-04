@@ -1,7 +1,6 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.BinaryNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.annotations.HamDoc;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
@@ -13,7 +12,6 @@ import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.apis.Ko;
-import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
 import org.kendar.utils.FileResourcesUtils;
 
@@ -30,11 +28,13 @@ public class SSLApiHandler extends ProtocolPluginApiHandlerDefault<SSLDummyPlugi
             pathAddress = "/api/protocols/{id}/plugins/ssl-plugin/{action}",
             method = "GET", id = "GET /api/protocols/{id}/plugins/ssl-plugin/{action}")
     @HamDoc(
-            description = "Handle the global report plugin actions start,stop,status,download",
-            path = @PathParameter(key = "action"),
+            description = "Retrieve the root certificates",
+            path = @PathParameter(key = "action",
+            allowedValues = {"der","key"}),
             responses = @HamResponse(
-                    body = Ok.class,
-                    description = "Handle the global report plugin actions start,stop,status,download"
+                    body = byte[].class,
+                    content = "application/pkix-crl",
+                    description = "Retrieve the root certificates"
             ),
             tags = {"base/utils"})
     public boolean retrieveDerKey(Request reqp, Response resp){

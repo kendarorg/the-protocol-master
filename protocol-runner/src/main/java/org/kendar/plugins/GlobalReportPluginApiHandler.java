@@ -30,7 +30,8 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             method = "GET", id = "GET /api/global/plugins/report-plugin/{action}")
     @HamDoc(
             description = "Handle the global report plugin actions start,stop,status,download",
-            path = @PathParameter(key = "action"),
+            path = @PathParameter(key = "action",
+            allowedValues = {"start","stop","status","download"}),
             responses = {
                     @HamResponse(
                             body = Ok.class

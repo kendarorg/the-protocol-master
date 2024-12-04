@@ -276,14 +276,26 @@ public class SwaggerApi implements FilteringClass {
                 var examples = new ArrayList<String>();
                 if(res.example()!=null){
                     for(var ex:res.example()){
+                        if(ex.length()==0)continue;
                         examples.add(ex);
                     }
                 }
+                var enums = new ArrayList<String>();
+                if(res.allowedValues()!=null){
+                    for(var ex:res.allowedValues()){
+                        if(ex.length()==0)continue;
+                        enums.add(ex);
+                    }
+                }
+                var schema =new Schema()
+                        .type(res.type())
+                        .examples(examples);
+                if(enums.size()>0){
+                    schema._enum(enums);
+                }
                 parameters.add(new PathParameter()
                         .name(res.key())
-                        .schema(new Schema()
-                                .type(res.type())
-                                .examples(examples)));
+                        .schema(schema));
             }
         }
     }

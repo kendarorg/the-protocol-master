@@ -12,4 +12,6 @@ public @interface PathParameter {
     String type() default "string";
 
     String[] example() default "string";
+
+    String[] allowedValues() default "";
 }

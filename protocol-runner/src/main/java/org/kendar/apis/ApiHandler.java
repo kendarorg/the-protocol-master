@@ -209,7 +209,7 @@ public class ApiHandler implements FilteringClass {
             path = {@PathParameter(key = "id", description = "* to act on all protocols"),
                     @PathParameter(key = "plugin", description = "The plugin id"),
                     @PathParameter(key = "action",
-                            example = {"start","stop","status"},
+                            allowedValues = {"start","stop","status"},
                             description = "The action, start,stop,status"),
             },
             responses = {@HamResponse(

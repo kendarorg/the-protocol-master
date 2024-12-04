@@ -50,6 +50,7 @@ import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -265,6 +266,7 @@ public class Main {
         }
 
         var finalAllPlugins = protocolPlugins;
+        var started = new AtomicInteger(0);
         for (var item : ini.getProtocols().entrySet()) {
             new Thread(() -> {
                 try {
@@ -289,6 +291,7 @@ public class Main {
                         var apiHandlerPlugin = pl.getApiHandler();
                         apisFiltersLoader.getFilters().add(apiHandlerPlugin);
                     }
+                    started.incrementAndGet();
                     ini.putService(item.getKey(), pi);
 
                 } catch (Exception ex) {
@@ -300,14 +303,24 @@ public class Main {
             var pluginSettings = (PluginSettings) ini.getPlugin(plugin.getId(), plugin.getSettingClass());
             plugin.initialize(ini, pluginSettings);
         }
-        apisFiltersLoader.loadFilters();
-        if (ini.getApiPort() > 0) {
-            var address = new InetSocketAddress(ini.getApiPort());
-            var apiServer = HttpServer.create(address, 10);
-            apiServer.createContext("/", apisFiltersLoader);
-            apiServer.start();
-            log.info("[CL>TP][IN] Listening on *.:{} TPM Apis", ini.getApiPort());
-        }
+        new Thread(()->{
+            try {
+                while (started.get() < ini.getProtocols().size()) {
+                    Sleeper.sleep(100);
+                }
+                apisFiltersLoader.loadFilters();
+                if (ini.getApiPort() > 0) {
+                    var address = new InetSocketAddress(ini.getApiPort());
+                    var apiServer = HttpServer.create(address, 10);
+                    apiServer.createContext("/", apisFiltersLoader);
+                    apiServer.start();
+                    log.info("[SERVER][IN] Listening on *.:{} TPM Apis", ini.getApiPort());
+                }
+            }catch (Exception e) {
+                log.error("Unable to start API serer", e);
+            }
+        }).start();
+
         while (stopWhenFalse.get()) {
             Sleeper.sleep(100);
         }
