@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 @Inherited
-public @interface HamDoc {
+public @interface TpmDoc {
     String[] tags() default {};
 
     boolean todo() default false;
@@ -22,9 +22,9 @@ public @interface HamDoc {
 
     Header[] header() default {};
 
-    HamRequest[] requests() default {};
+    TpmRequest[] requests() default {};
 
-    HamResponse[] responses() default {};
+    TpmResponse[] responses() default {};
 
-    HamSecurity[] security() default {};
+    TpmSecurity[] security() default {};
 }

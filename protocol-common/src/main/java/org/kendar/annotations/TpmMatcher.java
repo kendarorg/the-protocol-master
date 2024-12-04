@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 @Inherited
-public @interface HamMatcher {
+public @interface TpmMatcher {
     String value();
 
     MatcherFunction function() default MatcherFunction.STARTS;

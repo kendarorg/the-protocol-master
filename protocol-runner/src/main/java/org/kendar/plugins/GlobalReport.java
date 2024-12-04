@@ -6,10 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 public class GlobalReport {
-    private  List<ReportDataEvent> events;
-    private  Map<String, Long> counters;
+    private List<ReportDataEvent> events;
+    private Map<String, Long> counters;
 
     public GlobalReport() {
+    }
+
+    public GlobalReport(List<ReportDataEvent> events, Map<String, Long> counters) {
+
+        this.events = events;
+        this.counters = counters;
     }
 
     public List<ReportDataEvent> getEvents() {
@@ -25,12 +31,6 @@ public class GlobalReport {
     }
 
     public void setCounters(Map<String, Long> counters) {
-        this.counters = counters;
-    }
-
-    public GlobalReport(List<ReportDataEvent> events, Map<String, Long> counters) {
-
-        this.events = events;
         this.counters = counters;
     }
 }

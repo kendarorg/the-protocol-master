@@ -1,11 +1,11 @@
 package org.kendar.plugins;
 
 import com.fasterxml.jackson.databind.node.BinaryNode;
-import org.kendar.annotations.HamDoc;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
-import org.kendar.annotations.multi.HamResponse;
+import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.PathParameter;
+import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.ConstantsHeader;
@@ -15,61 +15,61 @@ import org.kendar.plugins.apis.Status;
 import org.kendar.plugins.base.BasePluginApiHandler;
 import org.kendar.utils.JsonMapper;
 
+import static org.kendar.apis.ApiUtils.respondJson;
+import static org.kendar.apis.ApiUtils.respondOk;
+
 @HttpTypeFilter(hostAddress = "*")
 public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
+    private static final JsonMapper mapper = new JsonMapper();
     private final GlobalReportPlugin plugin;
 
     public GlobalReportPluginApiHandler(GlobalReportPlugin plugin) {
 
         this.plugin = plugin;
     }
-    private static JsonMapper mapper = new JsonMapper();
 
     @HttpMethodFilter(
             pathAddress = "/api/global/plugins/report-plugin/{action}",
             method = "GET", id = "GET /api/global/plugins/report-plugin/{action}")
-    @HamDoc(
+    @TpmDoc(
             description = "Handle the global report plugin actions start,stop,status,download",
             path = @PathParameter(key = "action",
-            allowedValues = {"start","stop","status","download"}),
+                    allowedValues = {"start", "stop", "status", "download"}),
             responses = {
-                    @HamResponse(
+                    @TpmResponse(
                             body = Ok.class
                     ),
-                    @HamResponse(
+                    @TpmResponse(
                             body = Status.class,
                             description = "In case of status reqest"
                     ),
-                    @HamResponse(
+                    @TpmResponse(
                             body = GlobalReport.class,
                             description = "In case of download"
                     )
             },
-            tags = {"base/utils"})
+            tags = {"plugins/global"})
     public boolean handleGlobalPluginActions(Request reqp, Response resp) {
         var action = reqp.getPathParameter("action");
-        if("download".equalsIgnoreCase(action)) {
+        if ("download".equalsIgnoreCase(action)) {
             GlobalReport report = plugin.getReport();
             resp.setResponseText(new BinaryNode(mapper.serializePretty(report).getBytes()));
             resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
             resp.addHeader("Content-Transfer-Encoding", "binary");
             resp.addHeader("Content-Disposition", "attachment; filename=\"report.json\";");
             return true;
-        }else if("start".equalsIgnoreCase(action)) {
+        } else if ("start".equalsIgnoreCase(action)) {
             plugin.setActive(true);
-            resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-            resp.setResponseText(mapper.toJsonNode(new Ok()));
+            respondOk(resp);
             return true;
-        }else if("stop".equalsIgnoreCase(action)) {
+        } else if ("stop".equalsIgnoreCase(action)) {
             plugin.setActive(false);
-            resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-            resp.setResponseText(mapper.toJsonNode(new Ok()));
+            respondOk(resp);
             return true;
-        }else if("status".equalsIgnoreCase(action)) {
-            var status= new Status();
+        } else if ("status".equalsIgnoreCase(action)) {
+            var status = new Status();
             status.setActive(plugin.isActive());
-            resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-            resp.setResponseText(mapper.toJsonNode(status));
+            respondJson(resp, status);
             return true;
         }
         return false;
@@ -77,6 +77,6 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
 
     @Override
     public String getId() {
-        return "global."+plugin.getId();
+        return "global." + plugin.getId();
     }
 }

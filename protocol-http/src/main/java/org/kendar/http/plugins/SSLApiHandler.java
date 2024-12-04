@@ -1,19 +1,18 @@
 package org.kendar.http.plugins;
 
-import com.fasterxml.jackson.databind.node.BinaryNode;
-import org.kendar.annotations.HamDoc;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
-import org.kendar.annotations.multi.HamResponse;
+import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.PathParameter;
+import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
-import org.kendar.apis.utils.ConstantsHeader;
-import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
 import org.kendar.utils.FileResourcesUtils;
+
+import static org.kendar.apis.ApiUtils.respondFile;
+import static org.kendar.apis.ApiUtils.respondKo;
 
 @HttpTypeFilter(hostAddress = "*")
 public class SSLApiHandler extends ProtocolPluginApiHandlerDefault<SSLDummyPlugin> {
@@ -25,47 +24,37 @@ public class SSLApiHandler extends ProtocolPluginApiHandlerDefault<SSLDummyPlugi
     }
 
     @HttpMethodFilter(
-            pathAddress = "/api/protocols/{id}/plugins/ssl-plugin/{action}",
-            method = "GET", id = "GET /api/protocols/{id}/plugins/ssl-plugin/{action}")
-    @HamDoc(
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/{action}",
+            method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/{action}")
+    @TpmDoc(
             description = "Retrieve the root certificates",
-            path = @PathParameter(key = "action",
-            allowedValues = {"der","key"}),
-            responses = @HamResponse(
+            path = {@PathParameter(key = "action",
+                    allowedValues = {"der", "key"})},
+            responses = @TpmResponse(
                     body = byte[].class,
                     content = "application/pkix-crl",
                     description = "Retrieve the root certificates"
             ),
-            tags = {"base/utils"})
-    public boolean retrieveDerKey(Request reqp, Response resp){
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+    public boolean retrieveDerKey(Request reqp, Response resp) {
         var action = reqp.getPathParameter("action");
-        var protocolInstanceId = reqp.getPathParameter("id");
-        if(protocolSettings.getProtocolInstanceId().equals(protocolInstanceId)){
-            try {
-                var frf = new FileResourcesUtils();
-                switch (action) {
-                    case "/der":
-                        var data = frf.getFileFromResourceAsByteArray(protocolSettings.getSSL().getDer());
-                        resp.setResponseText(new BinaryNode(data));
-                        resp.addHeader(ConstantsHeader.CONTENT_TYPE, "application/pkix-crl");
-                        resp.addHeader("Content-Transfer-Encoding", "binary");
-                        resp.addHeader("Content-Disposition", "attachment; filename=\"certificate.der\";");
-                        return true;
-                    case "/key":
-                        var key = frf.getFileFromResourceAsByteArray(protocolSettings.getSSL().getKey());
-                        resp.setResponseText(new BinaryNode(key));
-                        resp.addHeader(ConstantsHeader.CONTENT_TYPE, "application/pkix-crl");
-                        resp.addHeader("Content-Transfer-Encoding", "binary");
-                        resp.addHeader("Content-Disposition", "attachment; filename=\"certificate.key\";");
-                        return true;
-                }
-            }catch (Exception ex){
 
-                resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-                resp.setResponseText(mapper.toJsonNode(new Ko(ex.getMessage())));
-                return true;
-
+        try {
+            var frf = new FileResourcesUtils();
+            switch (action) {
+                case "der":
+                    var data = frf.getFileFromResourceAsByteArray(protocolSettings.getSSL().getDer());
+                    respondFile(resp, data, "application/pkix-crl", "certificate.der");
+                    return true;
+                case "key":
+                    var key = frf.getFileFromResourceAsByteArray(protocolSettings.getSSL().getKey());
+                    respondFile(resp, key, "application/pkix-crl", "certificate.key");
+                    return true;
             }
+        } catch (Exception ex) {
+            respondKo(resp, ex);
+            return true;
+
         }
         return false;
     }

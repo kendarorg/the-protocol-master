@@ -144,10 +144,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
         } else if (data instanceof BinaryNode) {
             if (((BinaryNode) data).binaryValue() == null) return false;
             return ((BinaryNode) data).binaryValue().length > 0;
-        } else if (data instanceof JsonNode) {
-            return !data.isEmpty();
-        }
-        return false;
+        } else return data instanceof JsonNode;
     }
 
     @Override

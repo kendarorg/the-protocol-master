@@ -23,6 +23,11 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
     private double percentage;
 
     @Override
+    public Class<?> getSettingClass() {
+        return HttpErrorPluginSettings.class;
+    }
+
+    @Override
     public List<ProtocolPhase> getPhases() {
         return List.of(ProtocolPhase.PRE_CALL);
     }

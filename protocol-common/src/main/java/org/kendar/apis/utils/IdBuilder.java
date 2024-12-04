@@ -5,9 +5,9 @@ import org.kendar.annotations.HttpTypeFilter;
 
 public class IdBuilder {
 
-    public static String buildId(HttpTypeFilter type, HttpMethodFilter method, Object clazz) {
-        if (method.id() != null && method.id().length() > 0) {
-            return method.id();
+    public static String buildId(HttpTypeFilter type, HttpMethodFilter method, Object clazz, String id) {
+        if (id != null && !id.isEmpty()) {
+            return id;
         }
         String result = "";
         if (clazz != null) {
@@ -18,17 +18,17 @@ public class IdBuilder {
             }
         }
         result += method.method() + ":";
-        if (type.hostPattern() != null && type.hostPattern().length() > 0) {
+        if (type.hostPattern() != null && !type.hostPattern().isEmpty()) {
             result += type.hostPattern() + "/";
         } else {
             result += type.hostAddress() + "/";
         }
-        if (method.pathPattern() != null && method.pathPattern().length() > 0) {
+        if (method.pathPattern() != null && !method.pathPattern().isEmpty()) {
             result += method.pathPattern();
         } else {
             result += method.pathAddress();
         }
-        result += ":"  + type.priority();
+        result += ":" + type.priority();
         return result;
     }
 }

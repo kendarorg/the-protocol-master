@@ -26,10 +26,10 @@ public class PathRegexpMatcher {
         if (pathPatternReal != null) {
             var matcher = pathPatternReal.matcher(req.getPath());
             if (matcher.matches()) {
-                for (int i = 0; i < pathMatchers.size(); i++) {
-                    var group = matcher.group(pathMatchers.get(i));
+                for (String pathMatcher : pathMatchers) {
+                    var group = matcher.group(pathMatcher);
                     if (group != null) {
-                        req.addPathParameter(pathMatchers.get(i), group);
+                        req.addPathParameter(pathMatcher, group);
                     }
                 }
                 return true;

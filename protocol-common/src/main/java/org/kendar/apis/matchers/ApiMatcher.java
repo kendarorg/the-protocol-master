@@ -95,12 +95,8 @@ public class ApiMatcher implements FilterMatcher, PathMatcher, HostMatcher {
         if (pathSimpleMatchers != null && pathSimpleMatchers.matches(req)) {
             return true;
         }
-        if (pathSimpleMatchers != null && pathSimpleMatchers.notMatch(req.getPath(),
-                this.pathAddress)) {
-            return false;
-        }
-
-        return true;
+        return pathSimpleMatchers == null || !pathSimpleMatchers.notMatch(req.getPath(),
+                this.pathAddress);
     }
 
 
@@ -124,6 +120,6 @@ public class ApiMatcher implements FilterMatcher, PathMatcher, HostMatcher {
     }
 
     private boolean isValid(String val) {
-        return val != null && val.length() > 0;
+        return val != null && !val.isEmpty();
     }
 }

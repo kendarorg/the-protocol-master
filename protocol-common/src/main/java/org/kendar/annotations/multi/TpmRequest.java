@@ -7,20 +7,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HamResponse {
+public @interface TpmRequest {
     Example[] examples() default {};
 
-    String content() default ConstantsMime.JSON;
-
-    int code() default 200;
+    String accept() default ConstantsMime.JSON;
 
     Class<?> body() default Object.class;
 
-    String bodyType() default "";
-
-    boolean array() default false;
-
-    Header[] headers() default {};
-
-    String description() default "";
+    boolean optional() default false;
 }

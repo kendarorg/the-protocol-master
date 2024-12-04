@@ -18,13 +18,13 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
-import org.kendar.annotations.HamDoc;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.SwaggerEnricher;
-import org.kendar.annotations.multi.HamRequest;
-import org.kendar.annotations.multi.HamResponse;
+import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.Header;
+import org.kendar.annotations.multi.TpmRequest;
+import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.filters.FiltersConfiguration;
@@ -40,14 +40,17 @@ import java.util.stream.Collectors;
 @HttpTypeFilter(hostAddress = "*",
         blocking = true)
 public class SwaggerApi implements FilteringClass {
+    private static final JsonMapper mapper = new JsonMapper();
     private final String localAddress;
     private final List<SwaggerEnricher> enrichers;
     private final FiltersConfiguration filtersConfiguration;
+    private final int port;
 
     public SwaggerApi(FiltersConfiguration filtersConfiguration,
-                      List<SwaggerEnricher> enrichers) {
+                      List<SwaggerEnricher> enrichers, int port) {
 
         this.filtersConfiguration = filtersConfiguration;
+        this.port = port;
         this.localAddress = "localhost";
         this.enrichers = enrichers;
     }
@@ -55,26 +58,25 @@ public class SwaggerApi implements FilteringClass {
     @HttpMethodFilter(
             pathAddress = "/api/swagger/map.json",
             method = "GET", id = "GET /api/swagger/map.json")
-    @HamDoc(
+    @TpmDoc(
             description = "Retrieve the swagger api",
-            responses = @HamResponse(
+            responses = @TpmResponse(
                     body = String.class,
                     description = "The json for the swagger api"
             ),
-            tags = {"base/utils"})
+            tags = {"base/swagger"})
     public void loadSwagger(Request reqp, Response resp) throws JsonProcessingException {
-        var config = filtersConfiguration;
 
         OpenAPI swagger = new OpenAPI()
-                .addServersItem(new Server().url("http://" + localAddress));
+                .addServersItem(new Server().url("http://" + localAddress + ":" + port));
         swagger.setInfo(new Info()
                 .title("Local API")
                 .version("1.0.0"));
         Map<String, Schema> schemas = new HashMap<>();
         Map<String, PathItem> expectedPaths = new HashMap<>();
-        for (var kvp : config.filters) {
+        for (var kvp : filtersConfiguration.filters) {
 
-                handleSingleFilter(swagger, schemas, expectedPaths, kvp);
+            handleSingleFilter(swagger, schemas, expectedPaths, kvp);
 
         }
 
@@ -85,7 +87,7 @@ public class SwaggerApi implements FilteringClass {
     }
 
     private void handleSingleFilter(OpenAPI swagger, Map<String, Schema> schemas, Map<String, PathItem> expectedPaths, FilterDescriptor filter) {
-        HamDoc doc = filter.getHamDoc();
+        TpmDoc doc = filter.getHamDoc();
         if (doc == null) return;
 
         if (!expectedPaths.containsKey(filter.getMethodFilter().pathAddress())) {
@@ -100,8 +102,6 @@ public class SwaggerApi implements FilteringClass {
         }
     }
 
-    private static JsonMapper mapper = new JsonMapper();
-
     private void publishResponse(Response resp, OpenAPI swagger, Map<String, Schema> schemas) {
         try {
             var components = swagger.getComponents();
@@ -109,7 +109,7 @@ public class SwaggerApi implements FilteringClass {
                 components = new Components();
             }
             var scc = components;
-            schemas.entrySet().stream().forEach(es ->
+            schemas.entrySet().forEach(es ->
                     scc.addSchemas(es.getKey(), es.getValue())
             );
             swagger.components(components);
@@ -123,7 +123,7 @@ public class SwaggerApi implements FilteringClass {
         }
     }
 
-    private void setupTodoApi(OpenAPI swagger, FilterDescriptor descriptor, HamDoc doc, PathItem expectedPath) {
+    private void setupTodoApi(OpenAPI swagger, FilterDescriptor descriptor, TpmDoc doc, PathItem expectedPath) {
         var matcher = descriptor.getMatchers().stream().filter(m -> m instanceof ApiMatcher).findFirst();
         if (matcher.isEmpty()) return;
         var filter = (ApiMatcher) matcher.get();
@@ -153,7 +153,7 @@ public class SwaggerApi implements FilteringClass {
                 .path("/health/{pp}", expectedPath);
     }
 
-    private void setupRealApi(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, HamDoc doc, PathItem expectedPath) {
+    private void setupRealApi(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, TpmDoc doc, PathItem expectedPath) {
         List<Parameter> parameters = new ArrayList<>();
 
         prepareQuery(doc, parameters);
@@ -205,12 +205,12 @@ public class SwaggerApi implements FilteringClass {
         apiResponses.addApiResponse(singres.getKey() + "", toAddResponse);
     }
 
-    private void prepareResponse(Map<String, Schema> schemas, HashMap<Integer, List<mt>> responses, HamResponse res) {
+    private void prepareResponse(Map<String, Schema> schemas, HashMap<Integer, List<mt>> responses, TpmResponse res) {
         var hasBody = extractSchemasForMethod(schemas, res.body());
 
         if (hasBody) {
             var mmt = new mt();
-            if (res.headers() != null && res.headers().length > 0) {
+            if (res.headers() != null) {
                 for (var hea : res.headers()) {
                     mmt.headers.put(hea.key(), hea);
                 }
@@ -232,7 +232,7 @@ public class SwaggerApi implements FilteringClass {
         }
     }
 
-    private void buildRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, HamDoc doc, PathItem expectedPath, List<Parameter> parameters, ApiResponses apiResponses, HamRequest res) {
+    private void buildRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, TpmDoc doc, PathItem expectedPath, List<Parameter> parameters, ApiResponses apiResponses, TpmRequest res) {
         var resBody = res.body();
         var resExamples = res.examples();
         var resAccept = res.accept();
@@ -241,7 +241,7 @@ public class SwaggerApi implements FilteringClass {
         setupRequest(swagger, schemas, filter, doc, expectedPath, parameters, apiResponses, resBody, resExamples, resAccept, resOptional);
     }
 
-    private void buildEmptyRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, HamDoc doc,
+    private void buildEmptyRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, TpmDoc doc,
                                    PathItem expectedPath, List<Parameter> parameters, ApiResponses apiResponses) {
         Class<?> resBody = Object.class;
         org.kendar.annotations.multi.Example[] resExamples = null;
@@ -256,7 +256,7 @@ public class SwaggerApi implements FilteringClass {
         apiResponses.addApiResponse("200", toAddResponse);
     }
 
-    private void prepareQuery(HamDoc doc, List<Parameter> parameters) {
+    private void prepareQuery(TpmDoc doc, List<Parameter> parameters) {
         // Setup query strings
         if (doc.query() != null) {
             for (var res : doc.query()) {
@@ -269,28 +269,28 @@ public class SwaggerApi implements FilteringClass {
         }
     }
 
-    private void prpearePath(HamDoc doc, List<Parameter> parameters) {
+    private void prpearePath(TpmDoc doc, List<Parameter> parameters) {
         // Setup path variables
         if (doc.path() != null) {
             for (var res : doc.path()) {
                 var examples = new ArrayList<String>();
-                if(res.example()!=null){
-                    for(var ex:res.example()){
-                        if(ex.length()==0)continue;
+                if (res.example() != null) {
+                    for (var ex : res.example()) {
+                        if (ex.isEmpty()) continue;
                         examples.add(ex);
                     }
                 }
                 var enums = new ArrayList<String>();
-                if(res.allowedValues()!=null){
-                    for(var ex:res.allowedValues()){
-                        if(ex.length()==0)continue;
+                if (res.allowedValues() != null) {
+                    for (var ex : res.allowedValues()) {
+                        if (ex.isEmpty()) continue;
                         enums.add(ex);
                     }
                 }
-                var schema =new Schema()
+                var schema = new Schema()
                         .type(res.type())
                         .examples(examples);
-                if(enums.size()>0){
+                if (!enums.isEmpty()) {
                     schema._enum(enums);
                 }
                 parameters.add(new PathParameter()
@@ -300,7 +300,7 @@ public class SwaggerApi implements FilteringClass {
         }
     }
 
-    private void prepareHeaders(HamDoc doc, List<Parameter> parameters) {
+    private void prepareHeaders(TpmDoc doc, List<Parameter> parameters) {
         // Setup header variables
         if (doc.header() != null) {
             for (var res : doc.header()) {
@@ -314,7 +314,7 @@ public class SwaggerApi implements FilteringClass {
         }
     }
 
-    private void setupRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor descriptor, HamDoc doc,
+    private void setupRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor descriptor, TpmDoc doc,
                               PathItem expectedPath, List<Parameter> parameters, ApiResponses apiResponses, Class<?> resBody, org.kendar.annotations.multi.Example[] resExamples,
                               String resAccept, boolean optionalBody) {
         var matcher = descriptor.getMatchers().stream().filter(m -> m instanceof ApiMatcher).findFirst();
@@ -333,7 +333,7 @@ public class SwaggerApi implements FilteringClass {
         if (doc.tags() != null && doc.tags().length > 0) {
             operation.tags(Arrays.asList(doc.tags()));
         }
-        if (doc.security() != null && doc.security().length > 0) {
+        if (doc.security() != null) {
             for (var sec : doc.security()) {
                 SecurityRequirement securityRequirement = new SecurityRequirement();
                 securityRequirement.put(sec.name(), Arrays.stream(sec.scopes()).collect(Collectors.toList()));

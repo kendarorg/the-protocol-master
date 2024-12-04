@@ -17,19 +17,13 @@ import org.kendar.mongo.plugins.MongoReportPlugin;
 import org.kendar.mqtt.plugins.MqttRecordPlugin;
 import org.kendar.mqtt.plugins.MqttReplayPlugin;
 import org.kendar.mqtt.plugins.MqttReportPlugin;
-import org.kendar.mysql.plugins.MySqlRecordPlugin;
-import org.kendar.mysql.plugins.MySqlReplayPlugin;
-import org.kendar.mysql.plugins.MySqlReportPlugin;
-import org.kendar.mysql.plugins.MySqlRewritePlugin;
+import org.kendar.mysql.plugins.*;
 import org.kendar.plugins.GlobalReportPlugin;
 import org.kendar.plugins.base.AlwaysActivePlugin;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.postgres.plugins.PostgresRecordPlugin;
-import org.kendar.postgres.plugins.PostgresReplayPlugin;
-import org.kendar.postgres.plugins.PostgresReportPlugin;
-import org.kendar.postgres.plugins.PostgresRewritePlugin;
+import org.kendar.postgres.plugins.*;
 import org.kendar.redis.plugins.RedisRecordPlugin;
 import org.kendar.redis.plugins.RedisReplayPlugin;
 import org.kendar.redis.plugins.RedisReportPlugin;
@@ -203,12 +197,14 @@ public class Main {
                 new PostgresRecordPlugin(),
                 new PostgresReplayPlugin(),
                 new PostgresRewritePlugin(),
-                new PostgresReportPlugin()));
+                new PostgresReportPlugin(),
+                new PostgresMockPlugin()));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mysql", List.of(
                 new MySqlRecordPlugin(),
                 new MySqlReplayPlugin(),
                 new MySqlRewritePlugin(),
-                new MySqlReportPlugin()));
+                new MySqlReportPlugin(),
+                new MySqlMockPlugin()));
         return allProtocolSpecificPlugins;
     }
 
@@ -255,12 +251,12 @@ public class Main {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
-        var apisFiltersLoader = new ApiFiltersLoader(new ArrayList<>());
+        var apisFiltersLoader = new ApiFiltersLoader(new ArrayList<>(), ini.getApiPort());
         var apiHandler = new ApiHandler(ini);
         apisFiltersLoader.getFilters().add(apiHandler);
         apiHandler.addGLobalPlugins(globalPlugins);
 
-        for(var gp:globalPlugins){
+        for (var gp : globalPlugins) {
             var ah = gp.getApiHandler();
             apisFiltersLoader.getFilters().add(ah);
         }
@@ -287,7 +283,7 @@ public class Main {
                     var pi = new ProtocolInstance(item.getKey(),
                             protocolServersCache.get(item.getKey()), availableProtocolPlugins, protocolFullSettings);
                     apiHandler.addProtocol(pi);
-                    for(var pl:pi.getPlugins()){
+                    for (var pl : pi.getPlugins()) {
                         var apiHandlerPlugin = pl.getApiHandler();
                         apisFiltersLoader.getFilters().add(apiHandlerPlugin);
                     }
@@ -303,7 +299,7 @@ public class Main {
             var pluginSettings = (PluginSettings) ini.getPlugin(plugin.getId(), plugin.getSettingClass());
             plugin.initialize(ini, pluginSettings);
         }
-        new Thread(()->{
+        new Thread(() -> {
             try {
                 while (started.get() < ini.getProtocols().size()) {
                     Sleeper.sleep(100);
@@ -316,7 +312,7 @@ public class Main {
                     apiServer.start();
                     log.info("[SERVER][IN] Listening on *.:{} TPM Apis", ini.getApiPort());
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Unable to start API serer", e);
             }
         }).start();
@@ -353,8 +349,8 @@ public class Main {
         if (!allGlobalPlugins.isEmpty()) {
             return allGlobalPlugins;
         }
-            allGlobalPlugins = new ArrayList<>();
-            allGlobalPlugins.addAll(pluginManager.getExtensions(GlobalPluginDescriptor.class));
+        allGlobalPlugins = new ArrayList<>();
+        allGlobalPlugins.addAll(pluginManager.getExtensions(GlobalPluginDescriptor.class));
 
         return allGlobalPlugins;
     }

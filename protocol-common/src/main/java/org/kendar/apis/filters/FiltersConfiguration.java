@@ -13,7 +13,7 @@ public class FiltersConfiguration {
 
     public FiltersConfiguration copy() {
         var result = new FiltersConfiguration();
-            result.filters.addAll(filters);
+        result.filters.addAll(filters);
         result.filtersById.putAll(filtersById);
         for (var item : filtersByClass.entrySet()) {
             result.filtersByClass.put(item.getKey(), new ArrayList<>(item.getValue()));

@@ -25,7 +25,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultiRecordReplay extends BasicTest {
 
@@ -143,7 +144,6 @@ public class MultiRecordReplay extends BasicTest {
         });
 
 
-
         var getReport = new HttpGet("http://localhost:9127/api/plugins/report-plugin/download");
         httpresponse = httpclient.execute(getReport);
         sc = new Scanner(httpresponse.getEntity().getContent());
@@ -180,8 +180,6 @@ public class MultiRecordReplay extends BasicTest {
         replaySettings = replaySettings.replaceAll(Pattern.quote("{replayActive}"), "true");
         var replayConfig = Path.of("target", "multiRecording", "replaying.json").toAbsolutePath();
         Files.writeString(replayConfig, replaySettings);
-
-
 
 
         System.out.println("STARTING ==============================================");

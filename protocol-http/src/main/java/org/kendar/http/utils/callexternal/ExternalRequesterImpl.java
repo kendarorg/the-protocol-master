@@ -2,10 +2,10 @@ package org.kendar.http.utils.callexternal;
 
 
 import com.networknt.schema.format.InetAddressValidator;
-import org.kendar.http.utils.ConnectionBuilder;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.converters.RequestResponseBuilder;
+import org.kendar.http.utils.ConnectionBuilder;
 import org.kendar.http.utils.dns.DnsMultiResolver;
 
 public class ExternalRequesterImpl extends BaseRequesterImpl implements ExternalRequester {

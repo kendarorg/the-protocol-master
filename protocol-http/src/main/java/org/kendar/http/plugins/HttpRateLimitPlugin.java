@@ -31,6 +31,11 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     private Response customResponse;
 
     @Override
+    public Class<?> getSettingClass() {
+        return HttpRateLimitPluginSettings.class;
+    }
+
+    @Override
     protected void handleActivation(boolean active) {
         synchronized (sync) {
             resetTime = null;

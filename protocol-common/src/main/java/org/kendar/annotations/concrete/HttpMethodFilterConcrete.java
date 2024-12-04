@@ -1,7 +1,7 @@
 package org.kendar.annotations.concrete;
 
-import org.kendar.annotations.HamMatcher;
 import org.kendar.annotations.HttpMethodFilter;
+import org.kendar.annotations.TpmMatcher;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -15,12 +15,12 @@ public class HttpMethodFilterConcrete implements HttpMethodFilter {
     private final String method;
     private final String description;
     private final String id;
-    private final HamMatcher[] extraMatches;
+    private final TpmMatcher[] extraMatches;
 
-    public HttpMethodFilterConcrete( boolean methodBlocking,
+    public HttpMethodFilterConcrete(boolean methodBlocking,
                                     String pathAddress, Pattern pathPattern,
                                     String method, String description,
-                                    String id, HamMatcher[] extraMatches) {
+                                    String id, TpmMatcher[] extraMatches) {
 
         this.methodBlocking = methodBlocking;
         this.pathAddress = pathAddress;
@@ -68,14 +68,14 @@ public class HttpMethodFilterConcrete implements HttpMethodFilter {
     }
 
     @Override
-    public HamMatcher[] matcher() {
-        var result = new ArrayList<HamMatcher>();
-        if (extraMatches != null && extraMatches.length > 0) {
+    public TpmMatcher[] matcher() {
+        var result = new ArrayList<TpmMatcher>();
+        if (extraMatches != null) {
             for (var matcher :
                     extraMatches) {
-                result.add(new HamMatcherConcrete(matcher));
+                result.add(new TpmMatcherConcrete(matcher));
             }
         }
-        return result.toArray(new HamMatcher[0]);
+        return result.toArray(new TpmMatcher[0]);
     }
 }

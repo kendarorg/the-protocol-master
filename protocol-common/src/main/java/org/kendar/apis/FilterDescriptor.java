@@ -2,13 +2,13 @@ package org.kendar.apis;
 
 
 import org.apache.commons.lang3.ClassUtils;
-import org.kendar.annotations.HamDoc;
-import org.kendar.annotations.HamMatcher;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
-import org.kendar.annotations.concrete.HamDocConcrete;
+import org.kendar.annotations.TpmDoc;
+import org.kendar.annotations.TpmMatcher;
 import org.kendar.annotations.concrete.HttpMethodFilterConcrete;
 import org.kendar.annotations.concrete.HttpTypeFilterConcrete;
+import org.kendar.annotations.concrete.TpmDocConcrete;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.matchers.ApiMatcher;
@@ -16,6 +16,7 @@ import org.kendar.apis.matchers.FilterMatcher;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.GenericFilterExecutor;
 import org.kendar.apis.utils.IdBuilder;
+import org.kendar.plugins.base.ProtocolPluginApiHandler;
 
 import java.lang.annotation.IncompleteAnnotationException;
 import java.lang.reflect.InvocationTargetException;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FilterDescriptor {
@@ -38,12 +40,12 @@ public class FilterDescriptor {
     private final CustomFiltersLoader loader;
     private final List<String> pathMatchers = new ArrayList<>();
     private List<FilterMatcher> matchers = new ArrayList<>();
-    private HamMatcher[] extraMatches;
+    private TpmMatcher[] extraMatches;
     private String description;
     private HttpTypeFilter typeFilter;
     private HttpMethodFilter methodFilter;
 
-    private HamDoc doc;
+    private TpmDocConcrete doc;
     private Method callback;
     private String id;
 
@@ -53,20 +55,36 @@ public class FilterDescriptor {
             HttpMethodFilter methodFilter,
             Method callback,
             FilteringClass filterClass,
-            HamDoc hamDoc) {
-        this.doc = hamDoc;
+            TpmDoc tpmDoc) {
+        if (tpmDoc != null) {
+            this.doc = new TpmDocConcrete(tpmDoc);
+            var tags = this.doc.tags();
+            for (int i = 0; i < tags.length; i++) {
+                var tag = tags[i];
+                tags[i] = replaceFilterSpecific(tag, filterClass);
+            }
+        }
         this.loader = loader;
-        this.id = IdBuilder.buildId(typeFilter, methodFilter, filterClass);
+        var id = methodFilter.id();
+        if (id != null && !id.isEmpty()) {
+            id = replaceFilterSpecific(id, filterClass);
+        }
+        this.id = IdBuilder.buildId(typeFilter, methodFilter, filterClass, id);
         this.description = methodFilter.description();
         this.callback = callback;
         this.filterClass = filterClass;
         try {
-            this.id = IdBuilder.buildId(typeFilter, methodFilter, filterClass);
+            this.id = IdBuilder.buildId(typeFilter, methodFilter, filterClass, id);
         } catch (IncompleteAnnotationException ex) {
             throw new RuntimeException("Missing id", ex);
         }
+        var pathPattern = methodFilter.pathPattern();
+        var pathAddress = methodFilter.pathAddress();
+        pathPattern = replaceFilterSpecific(pathPattern, filterClass);
+        pathAddress = replaceFilterSpecific(pathAddress, filterClass);
+
         var matcher = new ApiMatcher(typeFilter.hostAddress(), typeFilter.hostPattern(),
-                methodFilter.method(), methodFilter.pathPattern(), methodFilter.pathAddress());
+                methodFilter.method(), pathPattern, pathAddress);
         matcher.initialize();
         priority = typeFilter.priority();
         methodBlocking = methodFilter.blocking();
@@ -105,6 +123,22 @@ public class FilterDescriptor {
         this.methodFilter = buildMethodFilter();
     }
 
+    public static List<String> getAllMatches(String text, String regex) {
+        List<String> matches = new ArrayList<>();
+        if (text == null || text.isEmpty()) {
+            return matches;
+        }
+        var m = Pattern.compile("(?=(" + regex + "))").matcher(text);
+        while (m.find()) {
+            matches.add(m.group(1));
+        }
+        return matches;
+    }
+
+    private static List<String> getAllReflectionPatterns(String text) {
+        return getAllMatches(text, "\\{#[a-zA-Z_\\-\\.]+\\}");
+    }
+
     private static List<String> getNamedGroupCandidates(String regex) {
         Set<String> matchedGroups = new TreeSet<>();
         var m = namedGroupsPattern.matcher(regex);
@@ -134,12 +168,12 @@ public class FilterDescriptor {
         var matcherUnknown = matchers.get(0);
         if (ClassUtils.isAssignable(matcherUnknown.getClass(), ApiMatcher.class)) {
             var matcher = (ApiMatcher) matcherUnknown;
-            return new HttpMethodFilterConcrete( methodBlocking,
+            return new HttpMethodFilterConcrete(methodBlocking,
                     matcher.getPathAddress(), matcher.getPathPatternReal(), matcher.getMethod(),
                     description,
                     id, extraMatches);
         } else {
-            return new HttpMethodFilterConcrete( methodBlocking,
+            return new HttpMethodFilterConcrete(methodBlocking,
                     "*", null, "*",
                     description,
                     id, extraMatches);
@@ -184,7 +218,7 @@ public class FilterDescriptor {
                 result = false;
             }
             return (boolean) result;
-        }else{
+        } else {
             return true;
         }
     }
@@ -210,11 +244,28 @@ public class FilterDescriptor {
         return loader;
     }
 
-    public HamDoc getHamDoc() {
+    public TpmDoc getHamDoc() {
 
         var loc = this;
         if (this.doc == null) return null;
-        return new HamDocConcrete(doc);
+        return new TpmDocConcrete(doc);
+    }
+
+    private String replaceFilterSpecific(String pathPattern, FilteringClass filterClass) {
+        if (ProtocolPluginApiHandler.class.isAssignableFrom(filterClass.getClass())) {
+            var ppah = (ProtocolPluginApiHandler) filterClass;
+            pathPattern = pathPattern.replaceAll(
+                    Pattern.quote("{#protocolInstanceId}"),
+                    Matcher.quoteReplacement(ppah.getProtocolInstanceId()));
+
+            pathPattern = pathPattern.replaceAll(
+                    Pattern.quote("{#protocol}"),
+                    Matcher.quoteReplacement(ppah.getProtocol()));
+            pathPattern = pathPattern.replaceAll(
+                    Pattern.quote("{#plugin}"),
+                    Matcher.quoteReplacement(ppah.getPluginId()));
+        }
+        return pathPattern;
     }
 }
 

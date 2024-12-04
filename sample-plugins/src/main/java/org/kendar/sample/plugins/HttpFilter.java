@@ -17,6 +17,11 @@ public class HttpFilter extends ProtocolPluginDescriptorBase<HttpFilterSettings>
     }
 
     @Override
+    public Class<?> getSettingClass() {
+        return HttpFilterSettings.class;
+    }
+
+    @Override
     public List<ProtocolPhase> getPhases() {
         return List.of(ProtocolPhase.PRE_CALL);
     }

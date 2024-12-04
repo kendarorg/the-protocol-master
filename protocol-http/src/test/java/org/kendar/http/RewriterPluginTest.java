@@ -1,9 +1,9 @@
 package org.kendar.http;
 
 import org.junit.jupiter.api.Test;
+import org.kendar.apis.base.Request;
 import org.kendar.http.plugins.HttpRewritePlugin;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.apis.base.Request;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.proxy.PluginContext;

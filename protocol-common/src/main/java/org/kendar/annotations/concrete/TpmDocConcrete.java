@@ -1,17 +1,19 @@
 package org.kendar.annotations.concrete;
 
-import org.kendar.annotations.HamDoc;
+import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.*;
 
 import java.lang.annotation.Annotation;
 
 @SuppressWarnings("ClassExplicitlyAnnotation")
-public class HamDocConcrete implements HamDoc {
-    private final HamDoc doc;
+public class TpmDocConcrete implements TpmDoc {
+    private final TpmDoc doc;
+    private final String[] tags;
 
-    public HamDocConcrete(HamDoc doc) {
+    public TpmDocConcrete(TpmDoc doc) {
 
         this.doc = doc;
+        this.tags = doc.tags();
     }
 
     @Override
@@ -21,7 +23,7 @@ public class HamDocConcrete implements HamDoc {
 
     @Override
     public String[] tags() {
-        return doc.tags();
+        return tags;
     }
 
     @Override
@@ -55,17 +57,17 @@ public class HamDocConcrete implements HamDoc {
     }
 
     @Override
-    public HamRequest[] requests() {
+    public TpmRequest[] requests() {
         return doc.requests();
     }
 
     @Override
-    public HamResponse[] responses() {
+    public TpmResponse[] responses() {
         return doc.responses();
     }
 
     @Override
-    public HamSecurity[] security() {
+    public TpmSecurity[] security() {
         return doc.security();
     }
 }

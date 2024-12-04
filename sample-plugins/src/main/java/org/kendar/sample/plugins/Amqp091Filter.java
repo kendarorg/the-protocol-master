@@ -13,6 +13,10 @@ import java.util.List;
 @Extension
 public class Amqp091Filter extends ProtocolPluginDescriptorBase<Amqp091FilterSettings> implements AlwaysActivePlugin {
 
+    @Override
+    public Class<?> getSettingClass() {
+        return Amqp091FilterSettings.class;
+    }
 
     /**
      * Only PRE_CALL and POST_CALL for things different from http

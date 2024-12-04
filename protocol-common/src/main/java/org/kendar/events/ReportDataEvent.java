@@ -10,7 +10,7 @@ public class ReportDataEvent implements TpmEvent {
     private long connectionId;
     private long timestamp;
     private long duration;
-    private  Map<String, Object> tags;
+    private Map<String, Object> tags;
 
     public ReportDataEvent() {
     }

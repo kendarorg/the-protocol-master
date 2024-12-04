@@ -4,20 +4,19 @@ import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.kendar.annotations.HamDoc;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
+import org.kendar.annotations.TpmDoc;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.converters.RequestResponseBuilderImpl;
 import org.kendar.apis.filters.FiltersConfiguration;
 import org.kendar.apis.utils.ConstantsHeader;
-import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.MimeChecker;
-import org.kendar.plugins.apis.Ko;
 import org.kendar.utils.FileResourcesUtils;
-import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,28 +25,47 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static org.kendar.apis.ApiUtils.respondKo;
+import static org.kendar.apis.ApiUtils.respondText;
+
 public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
     private final List<FilteringClass> filteringClassList;
-    private FiltersConfiguration filtersConfiguration;
+    private final FiltersConfiguration filtersConfiguration;
+    private final RequestResponseBuilderImpl requestResponseBuilder = new RequestResponseBuilderImpl();
+    private final Logger log = LoggerFactory.getLogger(ApiFiltersLoader.class);
+
+    public ApiFiltersLoader(List<FilteringClass> filteringClassList, int port) {
+        this.filteringClassList = filteringClassList;
+        filtersConfiguration = new FiltersConfiguration();
+        this.filteringClassList.add(new SwaggerApi(filtersConfiguration, new ArrayList<>(), port));
+        this.filteringClassList.add(new MainWebSite(new FileResourcesUtils()));
+    }
+
+    public static Method[] getAllMethodsInHierarchy(Class<?> objectClass) {
+        Set<Method> allMethods = new HashSet<>();
+        Method[] declaredMethods = objectClass.getDeclaredMethods();
+        Method[] methods = objectClass.getMethods();
+        if (objectClass.getSuperclass() != null) {
+            Class<?> superClass = objectClass.getSuperclass();
+            Method[] superClassMethods = getAllMethodsInHierarchy(superClass);
+            allMethods.addAll(Arrays.asList(superClassMethods));
+        }
+        allMethods.addAll(Arrays.asList(declaredMethods));
+        allMethods.addAll(Arrays.asList(methods));
+        return allMethods.toArray(new Method[0]);
+    }
 
     public List<FilteringClass> getFilters() {
         return filteringClassList;
     }
 
-    public ApiFiltersLoader(List<FilteringClass> filteringClassList) {
-        this.filteringClassList = filteringClassList;
-        filtersConfiguration = new FiltersConfiguration();
-        this.filteringClassList.add(new SwaggerApi(filtersConfiguration,new ArrayList<>()));
-        this.filteringClassList.add(new MainWebSite(new FileResourcesUtils()));
-    }
-
     private List<FilterDescriptor> getAnnotatedMethods(FilteringClass cl) {
         var result = new ArrayList<FilterDescriptor>();
         var typeFilter = cl.getClass().getAnnotation(HttpTypeFilter.class);
-        for (Method m : cl.getClass().getMethods()) {
+        for (Method m : getAllMethodsInHierarchy(cl.getClass())) {
             var methodFilter = m.getAnnotation(HttpMethodFilter.class);
             if (methodFilter == null) continue;
-            var hamDoc = m.getAnnotation(HamDoc.class);
+            var hamDoc = m.getAnnotation(TpmDoc.class);
             result.add(new FilterDescriptor(this, typeFilter, methodFilter, m, cl, hamDoc));
         }
         return result;
@@ -76,7 +94,7 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
             }
             filtersConfiguration.filtersByClass.get(ds.getClassId()).add(ds);
         }
-            filtersConfiguration.filters.sort(Comparator.comparingInt(FilterDescriptor::getPriority).reversed());
+        filtersConfiguration.filters.sort(Comparator.comparingInt(FilterDescriptor::getPriority).reversed());
 
         return result;
     }
@@ -94,31 +112,24 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
             possibleMatches.add(filterEntry);
         }
         for (var filterEntry : possibleMatches) {
-            if(filterEntry.execute(request, response)) {
+            if (filterEntry.execute(request, response)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static JsonMapper mapper = new JsonMapper();
-
-    private RequestResponseBuilderImpl requestResponseBuilder =new RequestResponseBuilderImpl();
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        Request request = null;
         Response response = new Response();
         try {
-
-            request = requestResponseBuilder.fromExchange(httpExchange, "http");
-            if(!handle(request, response)){
-                response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
+            var request = requestResponseBuilder.fromExchange(httpExchange, "http");
+            if (!handle(request, response)) {
                 response.setStatusCode(404);
-                response.setResponseText(mapper.toJsonNode(new Ko(request.buildUrl()+" Not Found")));
+                respondText(response, request.buildUrl() + " Not Found");
             }
-        }catch (Exception e) {
-            response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-            response.setResponseText(mapper.toJsonNode(new Ko(e.getMessage())));
+        } catch (Exception e) {
+            respondKo(response, e);
         }
         sendResponse(response, httpExchange);
     }

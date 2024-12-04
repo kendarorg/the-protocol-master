@@ -1,41 +1,30 @@
 package org.kendar.utils;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
-import org.kendar.proxy.PluginContext;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ExtractTypeTest {
-    @Test
-    void testExtractType() {
-        var target = new ProtocolPluginDescriptorBase<TestPluginSettings>() {
-            @Override
-            public List<ProtocolPhase> getPhases() {
-                return List.of();
-            }
 
-            @Override
-            public String getId() {
-                return "";
-            }
-
-            @Override
-            public String getProtocol() {
-                return "";
-            }
-
-            @Override
-            public void terminate() {
-
-            }
-
-            public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
-                return false;
-            }
-        };
-        var type = target.getSettingClass();
-        System.out.println(type);
+    public static List<String> getAllMatches(String text, String regex) {
+        List<String> matches = new ArrayList<String>();
+        var m = Pattern.compile("(?=(" + regex + "))").matcher(text);
+        while (m.find()) {
+            matches.add(m.group(1));
+        }
+        return matches;
     }
+
+    @Test
+    void test() {
+
+        List<String> matches = getAllMatches(
+                "/a/{#aaa}/bb/{#ccc}/test",
+                "\\{#[a-zA-Z_\\-\\.]+\\}");
+        System.out.println("");
+
+    }
+
 }

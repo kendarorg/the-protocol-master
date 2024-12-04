@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
 
 public class FileResourcesUtils {
     private static final String JAR_PATH_DELIMITER = "/";
-    private Logger logger = LoggerFactory.getLogger(FileResourcesUtils.class);
+    private final Logger logger = LoggerFactory.getLogger(FileResourcesUtils.class);
 
 
     // get a file from the resources folder

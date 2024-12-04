@@ -13,8 +13,8 @@ public class PathSimpleMatcher {
         pathSimpleMatchers = new ArrayList<>();
         if (pathAddress != null && pathAddress.contains("{")) {
             var explTemplate = pathAddress.split("/");
-            for (var i = 0; i < explTemplate.length; i++) {
-                var partTemplate = explTemplate[i];
+            for (String s : explTemplate) {
+                var partTemplate = s;
                 if (partTemplate.startsWith("{")) {
                     partTemplate = partTemplate.substring(1);
                     partTemplate = "*" + partTemplate.substring(0, partTemplate.length() - 1);
@@ -27,12 +27,11 @@ public class PathSimpleMatcher {
     public boolean notMatch(String real, String provided) {
         if (provided == null) return false;
         if (provided.equalsIgnoreCase("*")) return false;
-        if (real.equalsIgnoreCase(provided)) return false;
-        return true;
+        return !real.equalsIgnoreCase(provided);
     }
 
     public boolean matches(Request req) {
-        if (pathSimpleMatchers != null && pathSimpleMatchers.size() > 0) {
+        if (pathSimpleMatchers != null && !pathSimpleMatchers.isEmpty()) {
             var explPath = req.getPath().split("/");
             if (pathSimpleMatchers.size() != explPath.length) return false;
             for (var i = 0; i < pathSimpleMatchers.size(); i++) {

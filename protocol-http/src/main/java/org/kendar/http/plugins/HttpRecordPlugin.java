@@ -22,6 +22,11 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     }
 
     @Override
+    public Class<?> getSettingClass() {
+        return HttpRecordPluginSettings.class;
+    }
+
+    @Override
     public String getProtocol() {
         return "http";
     }

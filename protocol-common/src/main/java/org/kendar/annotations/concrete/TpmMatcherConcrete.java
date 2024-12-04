@@ -1,16 +1,16 @@
 package org.kendar.annotations.concrete;
 
-import org.kendar.annotations.HamMatcher;
 import org.kendar.annotations.MatcherFunction;
 import org.kendar.annotations.MatcherType;
+import org.kendar.annotations.TpmMatcher;
 
 import java.lang.annotation.Annotation;
 
 @SuppressWarnings("ClassExplicitlyAnnotation")
-public class HamMatcherConcrete implements HamMatcher {
-    private final HamMatcher matcher;
+public class TpmMatcherConcrete implements TpmMatcher {
+    private final TpmMatcher matcher;
 
-    public HamMatcherConcrete(HamMatcher matcher) {
+    public TpmMatcherConcrete(TpmMatcher matcher) {
 
         this.matcher = matcher;
     }
@@ -37,7 +37,7 @@ public class HamMatcherConcrete implements HamMatcher {
 
     @Override
     public String id() {
-        if (matcher.id().length() > 0) {
+        if (!matcher.id().isEmpty()) {
             return matcher.id();
         }
         return null;

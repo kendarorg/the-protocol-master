@@ -29,6 +29,11 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     private boolean blockExternal = true;
     private List<MatchingRecRep> matchSites = new ArrayList<>();
 
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpReplayPluginSettings.class;
+    }
+
     private Map<String, String> buildTag(Request in) {
         var result = new HashMap<String, String>();
         result.put("path", in.getPath());

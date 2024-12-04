@@ -27,6 +27,11 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
 
+    @Override
+    public Class<?> getSettingClass() {
+        return BasicRecordPluginSettings.class;
+    }
+
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldIgnoreTrivialCalls() {
         return ignoreTrivialCalls;

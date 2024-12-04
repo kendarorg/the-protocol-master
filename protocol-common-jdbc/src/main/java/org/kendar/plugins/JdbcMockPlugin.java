@@ -8,6 +8,7 @@ import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.ExtraStringReplacer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -104,7 +105,7 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
 
     @Override
     protected List<MockStorage> firstCheckOnMainPart(JdbcCall request) {
-        return mocks;
+        return new ArrayList<>(mocks.values());
     }
 
 

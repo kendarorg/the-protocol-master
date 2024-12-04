@@ -12,6 +12,10 @@ import java.util.List;
 public class SSLDummyPlugin extends ProtocolPluginDescriptorBase<SSLDummyPluginSettings> implements AlwaysActivePlugin {
     private HttpProtocolSettings protocolSettings;
 
+    @Override
+    public Class<?> getSettingClass() {
+        return SSLDummyPluginSettings.class;
+    }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, String in, String out) {
         return false;

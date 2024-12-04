@@ -1,6 +1,8 @@
 package org.kendar.http;
 
 import org.junit.jupiter.api.Test;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.TpmEvent;
 import org.kendar.events.WriteItemEvent;
@@ -9,8 +11,6 @@ import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPlugin;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.apis.base.Request;
-import org.kendar.apis.base.Response;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;

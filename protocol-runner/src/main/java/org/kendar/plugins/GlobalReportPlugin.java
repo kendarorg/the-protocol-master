@@ -17,30 +17,28 @@ import java.util.concurrent.Executors;
 
 public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final List<ReportDataEvent> events = new ArrayList<>();
+    private final Map<String, Long> counters = new HashMap<>();
     private boolean active;
 
     @Override
     public GlobalPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings) {
         setActive(pluginSettings.isActive());
-        EventsQueue.register("GlobalReportPlugin", m->executor.submit(()-> handleReport(m)), ReportDataEvent.class);
+        EventsQueue.register("GlobalReportPlugin", m -> executor.submit(() -> handleReport(m)), ReportDataEvent.class);
         return this;
     }
 
-    private final List<ReportDataEvent> events = new ArrayList<>();
-    private final Map<String,Long> counters = new HashMap<>();
-
-
     private void handleReport(ReportDataEvent m) {
-        if(isActive()){
+        if (isActive()) {
             events.add(m);
-            var tagId = m.getProtocol()+"."+m.getInstanceId();
-            for(var tag:m.getTags().entrySet()){
+            var tagId = m.getProtocol() + "." + m.getInstanceId();
+            for (var tag : m.getTags().entrySet()) {
                 var id = tag.getKey();
-                if(id.startsWith("@")){
-                    if(!counters.containsKey(tagId+"."+id)){
-                        counters.put(tagId+"."+id, 0L);
+                if (id.startsWith("@")) {
+                    if (!counters.containsKey(tagId + "." + id)) {
+                        counters.put(tagId + "." + id, 0L);
                     }
-                    counters.put(tagId+"."+id, counters.get(tagId+"."+id)+(long)tag.getValue());
+                    counters.put(tagId + "." + id, counters.get(tagId + "." + id) + (long) tag.getValue());
                 }
             }
 
@@ -88,6 +86,6 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     }
 
     public GlobalReport getReport() {
-        return new GlobalReport(events,counters);
+        return new GlobalReport(events, counters);
     }
 }

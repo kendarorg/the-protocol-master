@@ -130,11 +130,11 @@ public abstract class StaticWebFilter implements FilteringClass {
                     mimeType = ConstantsMime.STREAM;
                 }
             }
-            var isBinary=(MimeChecker.isBinary(mimeType, null));
+            var isBinary = (MimeChecker.isBinary(mimeType, null));
             if (resourceFiles == null || resourceFiles.isEmpty()) {
-                renderRealFile(fullPath, response, stringPath,isBinary);
+                renderRealFile(fullPath, response, stringPath, isBinary);
             } else {
-                renderResourceFile(response, stringPath,isBinary);
+                renderResourceFile(response, stringPath, isBinary);
             }
             response.addHeader(ConstantsHeader.CONTENT_TYPE, mimeType);
             response.setStatusCode(200);
@@ -144,7 +144,7 @@ public abstract class StaticWebFilter implements FilteringClass {
         }
     }
 
-    private void renderResourceFile(Response response, String stringPath,boolean isBinary) {
+    private void renderResourceFile(Response response, String stringPath, boolean isBinary) {
         var resourcePath = stringPath.replace('\\', '/');
         if (isBinary) {
             response.setResponseText(new BinaryNode((byte[]) resourceFiles.get(resourcePath)));
@@ -153,7 +153,7 @@ public abstract class StaticWebFilter implements FilteringClass {
         }
     }
 
-    private void renderRealFile(Path fullPath, Response response, String stringPath,boolean isBinary) throws IOException {
+    private void renderRealFile(Path fullPath, Response response, String stringPath, boolean isBinary) throws IOException {
         if (isBinary) {
             response.setResponseText(new BinaryNode(Files.readAllBytes(fullPath)));
         } else {

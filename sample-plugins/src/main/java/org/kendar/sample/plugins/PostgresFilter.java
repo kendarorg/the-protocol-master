@@ -16,6 +16,11 @@ public class PostgresFilter extends ProtocolPluginDescriptorBase<PostgresFilterS
         return false;
     }
 
+    @Override
+    public Class<?> getSettingClass() {
+        return PostgresFilterSettings.class;
+    }
+
     /**
      * Only PRE_CALL and POST_CALL for things different from http
      *

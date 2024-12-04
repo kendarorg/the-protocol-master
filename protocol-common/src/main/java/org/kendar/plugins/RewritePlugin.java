@@ -33,6 +33,10 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
         return "rewrite-plugin";
     }
 
+    @Override
+    public Class<?> getSettingClass() {
+        return RewritePluginSettings.class;
+    }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object request, Object response) {
 

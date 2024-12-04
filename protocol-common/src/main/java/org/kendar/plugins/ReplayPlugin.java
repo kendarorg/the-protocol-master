@@ -39,6 +39,11 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     private List<CompactLine> indexes;
 
     @Override
+    public Class<?> getSettingClass() {
+        return BasicReplayPluginSettings.class;
+    }
+
+    @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         withStorage(global.getService("storage"));
         super.initialize(global, protocol, pluginSetting);

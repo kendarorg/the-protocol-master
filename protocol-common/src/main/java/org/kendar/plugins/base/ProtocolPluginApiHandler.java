@@ -11,4 +11,8 @@ public interface ProtocolPluginApiHandler extends BasePluginApiHandler {
      * @return
      */
     String getProtocolInstanceId();
+
+    String getProtocol();
+
+    String getPluginId();
 }

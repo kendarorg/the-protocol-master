@@ -12,6 +12,10 @@ import java.util.Random;
 
 public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyPluginSettings> {
 
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpLatencyPluginSettings.class;
+    }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {

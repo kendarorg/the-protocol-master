@@ -5,8 +5,6 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.JsonMapper;
 
-import java.lang.reflect.ParameterizedType;
-
 public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> implements ProtocolPluginDescriptor<W> {
     protected final static JsonMapper mapper = new JsonMapper();
     private boolean active;
@@ -21,27 +19,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
 
     public Class<?> getSettingClass() {
         if (settings != null) return settings.getClass();
-        try {
-            var startAt = (Class<?>) this.getClass();
-            while (startAt != null) {
-                var possibleGenericSuperClass = startAt.getGenericSuperclass();
-                if (possibleGenericSuperClass instanceof ParameterizedType) {
-                    var gss = (ParameterizedType) possibleGenericSuperClass;
-                    var atta = gss.getActualTypeArguments();
-                    for (var att : atta) {
-                        if (att instanceof Class) {
-                            if (PluginSettings.class.isAssignableFrom((Class<?>) att)) {
-                                return (Class<?>) att;
-                            }
-                        }
-                    }
-                }
-                startAt = (Class<?>) startAt.getGenericSuperclass();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        throw new RuntimeException("Missing plugin settings");
+        return PluginSettings.class;
     }
 
     public String getInstanceId() {
