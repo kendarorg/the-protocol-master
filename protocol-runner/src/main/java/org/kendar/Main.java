@@ -113,6 +113,7 @@ public class Main {
     }
 
     public static void stop() {
+        if(protocolServersCache==null)return;
         for (var server : protocolServersCache.values()) {
             server.stop();
         }
