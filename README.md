@@ -93,7 +93,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
 
-For the api usage [here](docs/apis.md)
+For the api usage here is the swagger: http//localhost:apisPort/swagger/index.html
 
 If you want to go on the specific functions by protocol:
 

@@ -144,7 +144,7 @@ public class MultiRecordReplay extends BasicTest {
         });
 
 
-        var getReport = new HttpGet("http://localhost:9127/api/plugins/report-plugin/download");
+        var getReport = new HttpGet("http://localhost:9127/api/global/plugins/report-plugin/download");
         httpresponse = httpclient.execute(getReport);
         sc = new Scanner(httpresponse.getEntity().getContent());
 

@@ -1,6 +1,5 @@
 package org.kendar.plugins;
 
-import com.fasterxml.jackson.databind.node.BinaryNode;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -8,8 +7,6 @@ import org.kendar.annotations.multi.PathParameter;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
-import org.kendar.apis.utils.ConstantsHeader;
-import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.apis.Status;
 import org.kendar.plugins.base.BasePluginApiHandler;
@@ -53,10 +50,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
         var action = reqp.getPathParameter("action");
         if ("download".equalsIgnoreCase(action)) {
             GlobalReport report = plugin.getReport();
-            resp.setResponseText(new BinaryNode(mapper.serializePretty(report).getBytes()));
-            resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-            resp.addHeader("Content-Transfer-Encoding", "binary");
-            resp.addHeader("Content-Disposition", "attachment; filename=\"report.json\";");
+            respondJson(resp,report);
             return true;
         } else if ("start".equalsIgnoreCase(action)) {
             plugin.setActive(true);

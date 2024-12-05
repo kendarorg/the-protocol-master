@@ -8,6 +8,14 @@ public class ProtocolIndex {
 
     }
 
+    @Override
+    public String toString() {
+        return "ProtocolIndex{" +
+                "id='" + id + '\'' +
+                ", protocol='" + protocol + '\'' +
+                '}';
+    }
+
     public ProtocolIndex(String id, String protocol) {
 
         this.id = id;

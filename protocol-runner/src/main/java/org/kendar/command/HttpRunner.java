@@ -4,10 +4,7 @@ import com.sun.net.httpserver.HttpsServer;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.http.HttpProtocol;
-import org.kendar.http.plugins.HttpErrorPluginSettings;
-import org.kendar.http.plugins.HttpLatencyPluginSettings;
-import org.kendar.http.plugins.HttpRecordPluginSettings;
-import org.kendar.http.plugins.HttpReplayPluginSettings;
+import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -165,8 +162,12 @@ public class HttpRunner extends CommonRunner {
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = pset.getPlugin(plugin.getId(), plugin.getSettingClass());
-            plugin.initialize(ini, pset, specificPluginSetting);
-            plugin.refreshStatus();
+            if(specificPluginSetting!=null || plugin instanceof SSLDummyPlugin) {
+                plugin.initialize(ini, settings, specificPluginSetting);
+                plugin.refreshStatus();
+            }else{
+                plugins.remove(i);
+            }
         }
         var baseProtocol = new HttpProtocol(ini, settings, plugins);
         baseProtocol.initialize();

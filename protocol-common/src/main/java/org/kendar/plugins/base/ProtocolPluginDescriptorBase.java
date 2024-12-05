@@ -4,6 +4,8 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> implements ProtocolPluginDescriptor<W> {
     protected final static JsonMapper mapper = new JsonMapper();
@@ -11,7 +13,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     private String instanceId = "default";
     private ProtocolPluginApiHandler apiHandler;
     private PluginSettings settings;
-
+    private static final Logger log = LoggerFactory.getLogger(ProtocolPluginDescriptorBase.class);
 
     public W getSettings() {
         return (W) settings;
@@ -46,6 +48,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         }
         this.settings = pluginSetting;
         if (settings != null) setActive(pluginSetting.isActive());
+        log.debug("Init plugin {} {} {}",this.getInstanceId(),this.getProtocol(),this.getId());
         return this;
     }
 

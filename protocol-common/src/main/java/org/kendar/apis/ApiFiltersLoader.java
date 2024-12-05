@@ -65,8 +65,8 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
         for (Method m : getAllMethodsInHierarchy(cl.getClass())) {
             var methodFilter = m.getAnnotation(HttpMethodFilter.class);
             if (methodFilter == null) continue;
-            var hamDoc = m.getAnnotation(TpmDoc.class);
-            result.add(new FilterDescriptor(this, typeFilter, methodFilter, m, cl, hamDoc));
+            var tpmDoc = m.getAnnotation(TpmDoc.class);
+            result.add(new FilterDescriptor(this, typeFilter, methodFilter, m, cl, tpmDoc));
         }
         return result;
     }

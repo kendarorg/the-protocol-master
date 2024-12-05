@@ -61,6 +61,7 @@ public class ApiTest extends BasicTest {
         while (sc.hasNext()) {
             result += (sc.nextLine());
         }
+        System.out.println(result);
         return mapper.deserialize(result, typeReference);
     }
 
@@ -92,10 +93,10 @@ public class ApiTest extends BasicTest {
 
         var httpclient = HttpClients.createDefault();
         var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent.zip"));
-        var okResult = postRequest("http://localhost:5005/api/storage/upload", httpclient, data, new TypeReference<Ok>() {
+        var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
         });
         assertEquals("OK", okResult.getResult());
-        var zip = downloadRequest("http://localhost:5005/api/storage/download", httpclient);
+        var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
         assertTrue(zip.length > 100);
         Files.write(Path.of("target", "downloaded.zip"), zip);
 
@@ -132,7 +133,7 @@ public class ApiTest extends BasicTest {
         assertTrue(plugins.stream().allMatch(p -> !p.isActive()));
 
 
-        var okResult = getRequest("http://localhost:5005/api/protocols/*/plugins/record-plugin/start", httpclient, new TypeReference<Ok>() {
+        var okResult = getRequest("http://localhost:5005/api/protocols/all/plugins/record-plugin/start", httpclient, new TypeReference<Ok>() {
         });
         assertEquals("OK", okResult.getResult());
         for (var protocol : protocols) {

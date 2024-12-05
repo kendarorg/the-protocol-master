@@ -45,6 +45,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         this.plugins = new ArrayList<>(plugins);
         var sslPlugin = new SSLDummyPlugin();
         sslPlugin.setActive(true);
+        sslPlugin.initialize(globalSettings,settings,null);
         this.plugins.add(sslPlugin);
         //Disable logging for apache http client
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);

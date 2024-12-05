@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,10 +52,10 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ThrowablePrintedToSystemOut")
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
-    private static final ConcurrentHashMap<String, TcpServer> protocolServersCache = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, TcpServer> protocolServersCache;
     private static ProtocolsRunner protocolsRunner;
-    private static HashMap<String, List<ProtocolPluginDescriptor>> allProtocolSpecificPlugins = new HashMap<>();
-    private static List<GlobalPluginDescriptor> allGlobalPlugins = new ArrayList<>();
+    private static HashMap<String, List<ProtocolPluginDescriptor>> allProtocolSpecificPlugins;
+    private static List<GlobalPluginDescriptor> allGlobalPlugins;
     private static List<GlobalPluginDescriptor> globalPlugins;
     private static JarPluginManager pluginManager;
 
@@ -65,6 +66,10 @@ public class Main {
 
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
+        protocolServersCache = new ConcurrentHashMap<>();
+        allProtocolSpecificPlugins = new HashMap<>();
+        allGlobalPlugins = new ArrayList<>();
+        globalPlugins = new ArrayList<>();
         protocolsRunner = new ProtocolsRunner(
                 new Amqp091Runner(),
                 new MongoRunner(),
@@ -88,11 +93,13 @@ public class Main {
         }
         var pluginsDir = settings.get().getPluginsDir();
         var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
-        if (pathOfPluginsDir.toFile().exists()) {
-            pluginManager = new JarPluginManager(pathOfPluginsDir);
-            pluginManager.loadPlugins();
-            pluginManager.startPlugins();
+        if (!pathOfPluginsDir.toFile().exists()) {
+            Files.createDirectories(pathOfPluginsDir);
         }
+
+        pluginManager = new JarPluginManager(pathOfPluginsDir);
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
 
         var protocolPlugins = loadProtocolPlugins(pluginsDir);
         globalPlugins = loadGlobalPlugins(pluginsDir);
@@ -217,6 +224,7 @@ public class Main {
 
 
     public static boolean isRunning() {
+        if(protocolServersCache==null)return false;
         return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning);
     }
 
@@ -295,9 +303,14 @@ public class Main {
                 }
             }).start();
         }
-        for (var plugin : globalPlugins) {
+        for (int i = globalPlugins.size() - 1; i >= 0; i--) {
+            var plugin = globalPlugins.get(i);
             var pluginSettings = (PluginSettings) ini.getPlugin(plugin.getId(), plugin.getSettingClass());
-            plugin.initialize(ini, pluginSettings);
+            if (pluginSettings != null) {
+                plugin.initialize(ini, pluginSettings);
+            }else{
+                globalPlugins.remove(i);
+            }
         }
         new Thread(() -> {
             try {

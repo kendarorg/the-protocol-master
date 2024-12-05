@@ -64,8 +64,12 @@ public class MqttRunner extends CommonRunner {
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = opaqueProtocolSettings.getPlugin(plugin.getId(), plugin.getSettingClass());
-            plugin.initialize(ini, protocolSettings, specificPluginSetting);
-            plugin.refreshStatus();
+            if (specificPluginSetting != null) {
+                plugin.initialize(ini, opaqueProtocolSettings, specificPluginSetting);
+                plugin.refreshStatus();
+            } else {
+                plugins.remove(i);
+            }
         }
         proxy.setPlugins(plugins);
         baseProtocol.setProxy(proxy);

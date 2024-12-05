@@ -87,7 +87,7 @@ public class SwaggerApi implements FilteringClass {
     }
 
     private void handleSingleFilter(OpenAPI swagger, Map<String, Schema> schemas, Map<String, PathItem> expectedPaths, FilterDescriptor filter) {
-        TpmDoc doc = filter.getHamDoc();
+        TpmDoc doc = filter.getTpmDoc();
         if (doc == null) return;
 
         if (!expectedPaths.containsKey(filter.getMethodFilter().pathAddress())) {
@@ -194,7 +194,7 @@ public class SwaggerApi implements FilteringClass {
                 toAddResponse.addHeaderObject(
                         hea.key(),
                         new io.swagger.v3.oas.models.headers.Header()
-                                .schema(getSchemaHam(String.class))
+                                .schema(getSchemaTpm(String.class))
                                 .description(hea.description())
                                 .example(hea.value())
                 );
@@ -215,7 +215,7 @@ public class SwaggerApi implements FilteringClass {
                     mmt.headers.put(hea.key(), hea);
                 }
             }
-            var schema = getSchemaHam(res.body());
+            var schema = getSchemaTpm(res.body());
             var mediaType = new MediaType().schema(schema);
             if (res.examples() != null) {
                 for (var ex : res.examples()) {
@@ -347,7 +347,7 @@ public class SwaggerApi implements FilteringClass {
 
     private void setupRequestBody(Class<?> resBody, org.kendar.annotations.multi.Example[] resExamples,
                                   String resAccept, Operation operation, boolean optionalBody) {
-        var schema = getSchemaHam(resBody);
+        var schema = getSchemaTpm(resBody);
         var mediaType = new MediaType().schema(schema);
         if (resExamples != null) {
             for (var ex : resExamples) {
@@ -389,7 +389,7 @@ public class SwaggerApi implements FilteringClass {
         return true;
     }
 
-    private Schema getSchemaHam(Class<?> bodyRequest) {
+    private Schema getSchemaTpm(Class<?> bodyRequest) {
         if (bodyRequest == byte[].class) {
             return new Schema().type("string").format("byte");
 
@@ -406,17 +406,17 @@ public class SwaggerApi implements FilteringClass {
         if (bodyRequest.isArray()) {
             return new Schema()
                     .type("array")
-                    .items(getSchemaHam(bodyRequest.getComponentType()));
+                    .items(getSchemaTpm(bodyRequest.getComponentType()));
         }
         if (List.class.isAssignableFrom(bodyRequest)) {
             return new Schema()
                     .type("array")
-                    .items(getSchemaHam(bodyRequest.getComponentType()));
+                    .items(getSchemaTpm(bodyRequest.getComponentType()));
         }
         if (Collection.class.isAssignableFrom(bodyRequest)) {
             return new Schema()
                     .type("array")
-                    .items(getSchemaHam(bodyRequest.getComponentType()));
+                    .items(getSchemaTpm(bodyRequest.getComponentType()));
         }
 
         return new Schema().$ref(bodyRequest.getSimpleName());

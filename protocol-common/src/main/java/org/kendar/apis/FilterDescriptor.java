@@ -244,7 +244,7 @@ public class FilterDescriptor {
         return loader;
     }
 
-    public TpmDoc getHamDoc() {
+    public TpmDoc getTpmDoc() {
 
         var loc = this;
         if (this.doc == null) return null;
