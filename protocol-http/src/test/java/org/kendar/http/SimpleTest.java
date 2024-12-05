@@ -4,18 +4,16 @@ import com.fasterxml.jackson.databind.node.BinaryNode;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.GzipCompressingEntity;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.kendar.apis.base.Request;
 import org.kendar.http.plugins.HttpLatencyPlugin;
 import org.kendar.http.plugins.HttpLatencyPluginSettings;
 import org.kendar.http.plugins.HttpRateLimitPlugin;
@@ -24,6 +22,7 @@ import org.kendar.http.utils.ConsumeException;
 import org.kendar.http.utils.NullEntity;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.shaded.com.trilead.ssh2.crypto.Base64;
 
@@ -36,6 +35,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.http.entity.ContentType.IMAGE_JPEG;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
@@ -93,7 +93,7 @@ public class SimpleTest extends BasicTest {
                                     .addTextBody("number", "5555555555")
                                     .addTextBody("clip", "rickroll")
                                     .addBinaryBody("upload_file", getConfusingByteArray(),
-                                            ContentType.IMAGE_JPEG, "filename")
+                                            IMAGE_JPEG, "filename")
                                     .addTextBody("tos", "agree")
                                     .build(),
                             new HttpPost("http://localhost:" + 8456 + "/jsonized"),
@@ -303,6 +303,29 @@ public class SimpleTest extends BasicTest {
                 sc.nextLine();
             }
         }
+    }
+
+    @Test
+    void testMultipart() throws Exception {
+
+        HttpEntity data = MultipartEntityBuilder.create()
+                .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                .addBinaryBody("upfile", new byte[]{0,1,2,3,4},  org.apache.http.entity.ContentType.DEFAULT_BINARY, "test.txt")
+                .addTextBody("text", "message", org.apache.http.entity.ContentType.DEFAULT_BINARY)
+                .build();
+
+        // build http request and assign multipart upload data
+        var request = RequestBuilder
+                .post("http://localhost:" + 8456 + "/jsonized")
+                .setEntity(data)
+                .build();
+        var httpclient = createHttpsHttpClient();
+        var httpResponse = httpclient.execute(request);
+        var content = getContentString(httpResponse);
+        System.out.println(content);
+        var result = new JsonMapper().deserialize(content, Request.class);
+        assertTrue(result.getFirstHeader("content-type").contains("multipart/form-data"));
+        assertEquals(2,result.getMultipartData().size());
     }
 
 
