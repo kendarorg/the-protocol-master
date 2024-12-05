@@ -106,7 +106,7 @@ For example calling the following
 
 ```
 java -cp "ojdbc11.jar;protocol-runner.jar" \
-  org.springframework.boot.loader.JarLauncher \
+  org.kendar.Main \
   -cfg oracleSettings.json
 ```
 
