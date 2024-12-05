@@ -1,5 +1,5 @@
 {
-  "pluginsDir": "plugins",
+  "pluginsDir": "target/plugins",
   "logLevel": "INFO",
   "dataDir": "data",
   "plugins": {

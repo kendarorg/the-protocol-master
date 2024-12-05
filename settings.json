@@ -1,5 +1,5 @@
 {
-  "pluginsDir": "plugins",
+  "pluginsDir": "target/plugins",
   "logLevel": "INFO",
   "dataDir": "target/data",
   "apiPort": 8095,
