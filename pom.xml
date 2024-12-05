@@ -40,7 +40,6 @@
         <snappy.version>1.1.8.4</snappy.version>
         <zstd.version>1.5.2-2</zstd.version>
         <hibernate.version>5.4.0.Final</hibernate.version>
-        <jaxb.api.version>2.3.0</jaxb.api.version>
         <amqp.client.version>5.20.0</amqp.client.version>
         <jedis.version>5.1.2</jedis.version>
         <commons.io.version>2.7</commons.io.version>

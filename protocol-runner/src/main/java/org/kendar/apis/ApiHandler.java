@@ -57,6 +57,20 @@ public class ApiHandler implements FilteringClass {
     }
 
     @HttpMethodFilter(
+            pathAddress = "/api/status",
+            method = "GET", id = "GET /api/status")
+    @TpmDoc(
+            description = "Retrieve the status of the application",
+            responses = @TpmResponse(
+                    body = String.class
+            ),
+            tags = {"base/utils"})
+    public boolean getStatus(Request reqp, Response resp) {
+        respondJson(resp, new Ok());
+        return true;
+    }
+
+    @HttpMethodFilter(
             pathAddress = "/api/global/plugins",
             method = "GET", id = "GET /api/global/plugins")
     @TpmDoc(

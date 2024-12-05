@@ -9,6 +9,20 @@
     }
   },
   "protocols": {
+    "mysql-01": {
+      "protocol": "mysql",
+      "port": 3306,
+      "login": "root",
+      "password": "password",
+      "timeout": 30,
+      "connectionString": "jdbc:mysql://192.168.56.2:23306/db",
+      "plugins": {
+        "mock-plugin": {
+          "active": false,
+          "dataDir": "target/mocks"
+        }
+      }
+    },
     "postgres-01": {
       "protocol": "postgres",
       "port": 5432,
