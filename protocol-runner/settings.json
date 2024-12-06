@@ -1,7 +1,7 @@
 {
   "pluginsDir": "target/plugins",
   "logLevel": "INFO",
-  "dataDir": "data",
+  "dataDir": "target/data",
   "plugins": {
     "report-plugin": {
       "active": true

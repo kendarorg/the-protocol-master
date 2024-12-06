@@ -139,7 +139,7 @@ public class ApiHandler implements FilteringClass {
             method = "POST", id = "POST /api/global/storage")
     @TpmDoc(
             description = "Upload existing recording can call with " +
-                    "<a href='upload.html?path=/api/global/storage&contentType=text/plain&binary=false'>Upload</a>",
+                    "<a href='upload.html?path=/api/global/storage&contentType=application/octet-stream&binary=true'>Upload</a>",
             requests = @TpmRequest(
                     accept = ConstantsMime.ZIP
             ),
