@@ -2,6 +2,7 @@ package org.kendar.mqtt.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.mqtt.MqttProtocol;
+import org.kendar.mqtt.fsm.Connect;
 import org.kendar.mqtt.fsm.ConnectAck;
 import org.kendar.mqtt.fsm.Publish;
 import org.kendar.plugins.ReplayPlugin;
@@ -9,7 +10,9 @@ import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
+import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -85,5 +88,43 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
             }
 
         }
+    }
+
+    @Override
+    protected CompactLine findIndex(CallItemsQuery query){
+        if(query.getType().equalsIgnoreCase("Connect")){
+            var cl = new CompactLine();
+            cl.setType("Connect");
+            cl.setCaller("MQTT");
+            cl.setIndex(-1);
+            cl.getTags().put("input","Connect");
+            cl.getTags().put("output","ConnectAck");
+            return cl;
+        }
+
+        return super.findIndex(query);
+    }
+
+    @Override
+    protected StorageItem readStorageItem(CompactLine index, Object in, PluginContext pluginContext) {
+        var result = super.readStorageItem(index, in, pluginContext);
+        if(result==null && index.getIndex()==-1){
+            if(index.getType().equalsIgnoreCase("Connect")){
+                var connect = (Connect)in;
+                var connectAck = new ConnectAck();
+                connectAck.setFullFlag((byte) 32);
+                connectAck.setSessionSet(false);
+                connectAck.setConnectReasonCode((byte) 0);
+                result = new StorageItem();
+                result.setType("Connect");
+                result.setInputType("Connect");
+                result.setOutputType("ConnectAck");
+                result.setConnectionId(pluginContext.getContextId());
+                result.setInput(connect);
+                result.setOutput(connectAck);
+                return result;
+            }
+        }
+        return result;
     }
 }

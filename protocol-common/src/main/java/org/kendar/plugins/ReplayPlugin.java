@@ -117,7 +117,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         if (index == null) {
             log.error("INDEX NULL {}", query);
         }
-        var storageItem = storage.readById(getInstanceId(), index.getIndex());
+        var storageItem = readStorageItem(index,in, pluginContext);
         if (storageItem == null) {
             storageItem = new StorageItem();
             storageItem.setIndex(index.getIndex());
@@ -156,6 +156,14 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         buildState(pluginContext, context, in, outputItem, out, lineToRead);
     }
 
+    protected StorageItem readStorageItem(CompactLine index, Object in, PluginContext pluginContext) {
+        return storage.readById(getInstanceId(), index.getIndex());
+    }
+
+    protected StorageItem mockResponse(CompactLine index) {
+        return null;
+    }
+
     protected Map<String, String> buildTag(Object in) {
         return Map.of();
     }
@@ -176,7 +184,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         query.setUsed(completedIndexes);
         query.getTags().putAll(buildTag(in));
         var index = findIndex(query);
-        var storageItem = storage.readById(getInstanceId(), index.getIndex());
+        var storageItem = readStorageItem(index, in,pluginContext);
         if (storageItem == null) {
             storageItem = new StorageItem();
             storageItem.setIndex(index.getIndex());

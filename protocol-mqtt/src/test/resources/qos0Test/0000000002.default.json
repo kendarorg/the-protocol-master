@@ -6,7 +6,12 @@
     "uuid": "10",
     "fullFlag": -126,
     "fixedHeader": "SUBSCRIBE",
-    "payload": "AAsvc3Vic2NyaWJlLwA=",
+    "topics": [
+      {
+        "topic": "/subscribe/",
+        "type": 0
+      }
+    ],
     "packetIdentifier": 1
   },
   "output": {

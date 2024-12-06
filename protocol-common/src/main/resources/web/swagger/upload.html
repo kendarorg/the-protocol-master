@@ -1,0 +1,100 @@
+<html>
+<body>
+<!--
+<input id="fileupload" type="file" name="fileupload" />
+<button id="upload-button" onclick="uploadFile()"> Upload </button>
+<script>
+    async function uploadFile() {
+        let formData = new FormData();
+        formData.append("file", fileupload.files[0]);
+        await fetch('/upload.php', {
+            method: "POST",
+            body: formData
+        });
+        alert('The file has been uploaded successfully.');
+    }
+</script>
+-->
+<!--http://localhost:8095/swagger/upload.html?path=/fuffa&contentType=application/octet-stream&binary=true-->
+<form enctype="multipart/form-data">
+    <input id="upload" type="file" name="files" size=30/"application/octet-stream">
+    <!--    <input id="uploadContentType" type="hidden" name="uploadContentType"-->
+    <!--           value="application/octet-stream"/>-->
+    <!--    <input id="uploadBinary" type="hidden" name="uploadBinary"-->
+    <!--           value="true"/>-->
+    <br>
+    <br>
+    <b>Output Code:</b><br>
+    <div id="uploadCode" name="uploadCode"></div>
+    <br>
+    <b>Output Result:</b><br>
+    <div id="uploadOutput" name="uploadOutput"></div>
+</form>
+<script>
+    function send(path, data, contentType, output, outputCode) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", path);
+
+// Send the proper header information along with the request
+        xhr.setRequestHeader("Content-Type", contentType);
+
+        xhr.onreadystatechange = () => {
+            // Call a function when the state changes.
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                outputCode.innerHTML = xhr.status;
+                output.innerHTML = xhr.response;
+                // Request finished. Do processing here.
+            }
+        };
+        xhr.send(data);
+    }
+
+    function handle_file_select(evt) {
+        console.info("[Event] file chooser");
+
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+// Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
+        let path = params.path; // "some_value"
+        let parent = evt.currentTarget.parentNode;
+        let contentType = params.contentType;
+        //let path = parent.querySelector("#"+evt.currentTarget.id+"Path").value;
+        let binary = params.binary == "true";
+        let output = parent.querySelector("#" + evt.currentTarget.id + "Output");
+        let outputCode = parent.querySelector("#" + evt.currentTarget.id + "Code");
+
+        let fl_files = evt.target.files; // JS FileList object
+
+        // use the 1st file from the list
+        let fl_file = fl_files[0];
+
+        let reader = new FileReader(); // built in API
+
+        let display_file = (e) => { // set the contents of the <textarea>
+            console.info('. . got: ', e.target.result.length, e);
+            //document.getElementById( 'upload_file' ).innerHTML = e.target.result;
+            send(path, e.target.result, contentType, output, outputCode)
+        };
+
+        let on_reader_load = (fl) => {
+            console.info('. file reader load', fl);
+            return display_file; // a function
+        };
+
+        // Closure to capture the file information.
+        reader.onload = on_reader_load(fl_file);
+
+        // Read the file as text.
+        if (binary) {
+            reader.readAsArrayBuffer(fl_file);
+        } else {
+            reader.readAsText(fl_file);
+        }
+    }
+
+    // add a function to call when the <input type=file> status changes, but don't "submit" the form
+    document.getElementById('upload').addEventListener('change', handle_file_select, false);
+</script>
+</body>
+</html>

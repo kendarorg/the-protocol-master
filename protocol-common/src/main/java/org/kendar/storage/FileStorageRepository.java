@@ -382,8 +382,12 @@ public class FileStorageRepository implements StorageRepository {
             fis = new ByteArrayInputStream(byteArray);
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry ze = zis.getNextEntry();
+            if(ze==null){
+                throw new RuntimeException("Not a zip file!");
+            }
             while (ze != null) {
                 String fileName = ze.getName();
+                if(fileName.length()==0)continue;
                 File newFile = Path.of(destDir, fileName).toFile();
                 //System.out.println("Unzipping to "+newFile.getAbsolutePath());
                 //create directories for sub directories in zip
