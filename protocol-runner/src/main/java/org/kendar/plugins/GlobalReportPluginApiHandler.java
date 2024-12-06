@@ -38,7 +38,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
                     ),
                     @TpmResponse(
                             body = Status.class,
-                            description = "In case of status reqest"
+                            description = "In case of status request"
                     ),
                     @TpmResponse(
                             body = GlobalReport.class,

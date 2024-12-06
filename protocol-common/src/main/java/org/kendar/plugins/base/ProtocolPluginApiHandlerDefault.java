@@ -70,7 +70,7 @@ public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor>
                     description = "In case of errors"
             ), @TpmResponse(
                     body = Status.class,
-                    description = "In case of status reqest"
+                    description = "In case of status request"
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
     public boolean actionOnAllPlugins(Request reqp, Response resp) {

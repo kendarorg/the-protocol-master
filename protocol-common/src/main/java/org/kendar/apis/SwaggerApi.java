@@ -32,6 +32,8 @@ import org.kendar.apis.matchers.ApiMatcher;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,7 +47,7 @@ public class SwaggerApi implements FilteringClass {
     private final List<SwaggerEnricher> enrichers;
     private final FiltersConfiguration filtersConfiguration;
     private final int port;
-
+    private static final Logger log = LoggerFactory.getLogger(SwaggerApi.class);
     public SwaggerApi(FiltersConfiguration filtersConfiguration,
                       List<SwaggerEnricher> enrichers, int port) {
 
@@ -89,9 +91,11 @@ public class SwaggerApi implements FilteringClass {
     private void handleSingleFilter(OpenAPI swagger, Map<String, Schema> schemas, Map<String, PathItem> expectedPaths, FilterDescriptor filter) {
         TpmDoc doc = filter.getTpmDoc();
         if (doc == null) return;
-
+        var mf = filter.getMethodFilter();
         if (!expectedPaths.containsKey(filter.getMethodFilter().pathAddress())) {
             expectedPaths.put(filter.getMethodFilter().pathAddress(), new PathItem());
+        }else{
+            log.warn("Duplicate path "+mf.method()+" "+filter.getMethodFilter().pathAddress());
         }
         var expectedPath = expectedPaths.get(filter.getMethodFilter().pathAddress());
 

@@ -8,18 +8,23 @@ import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
+import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.utils.FileResourcesUtils;
 
 import static org.kendar.apis.ApiUtils.respondFile;
 import static org.kendar.apis.ApiUtils.respondKo;
 
 @HttpTypeFilter(hostAddress = "*")
-public class SSLApiHandler extends ProtocolPluginApiHandlerDefault<SSLDummyPlugin> {
+public class SSLApiHandler implements ProtocolPluginApiHandler {
     private final HttpProtocolSettings protocolSettings;
+    private final SSLDummyPlugin descriptor;
+    private final String id;
+    private final String instanceId;
 
     public SSLApiHandler(SSLDummyPlugin descriptor, String id, String instanceId, HttpProtocolSettings protocolSettings) {
-        super(descriptor, id, instanceId);
+        this.descriptor = descriptor;
+        this.id = id;
+        this.instanceId = instanceId;
         this.protocolSettings = protocolSettings;
     }
 
@@ -57,5 +62,27 @@ public class SSLApiHandler extends ProtocolPluginApiHandlerDefault<SSLDummyPlugi
 
         }
         return false;
+    }
+
+    public SSLDummyPlugin getDescriptor() {
+        return descriptor;
+    }
+
+    public String getId() {
+        return id + "." + instanceId;
+    }
+
+    public String getProtocolInstanceId() {
+        return instanceId;
+    }
+
+    @Override
+    public String getProtocol() {
+        return descriptor.getProtocol();
+    }
+
+    @Override
+    public String getPluginId() {
+        return descriptor.getId();
     }
 }
