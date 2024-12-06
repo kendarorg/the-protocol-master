@@ -154,17 +154,14 @@ public class ReplayerTest {
         messages.clear();
         var baseProtocol = new MqttProtocol(1885);
         var proxy = new MqttProxy();
-
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos2Test"));
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
         var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
-        ;
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
-
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);

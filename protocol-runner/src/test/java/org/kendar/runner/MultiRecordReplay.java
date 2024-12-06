@@ -203,6 +203,14 @@ public class MultiRecordReplay extends BasicTest {
         });
 
 
+        var httpFail = new HttpGet("http://localhost:" + SIMPLE_SERVER_HTTP_PORT+"/notRecorded");
+        httpresponse = httpclient.execute(httpFail);
+        sc = new Scanner(httpresponse.getEntity().getContent());
+
+        //Printing the status line
+        assertEquals("HTTP/1.1 500 Internal Server Error", httpresponse.getStatusLine().toString());
+
+
         httpresponse = httpclient.execute(httpget);
         sc = new Scanner(httpresponse.getEntity().getContent());
 

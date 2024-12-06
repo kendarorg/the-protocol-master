@@ -79,6 +79,16 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
         return false;
     }
 
+    @Override
+    protected int tagsMatching(Map<String, String> tags, CallItemsQuery query) {
+        if(!tags.get("path").equalsIgnoreCase(query.getTag("path"))){
+            return -1;
+        }
+        if(!tags.get("host").equalsIgnoreCase(query.getTag("host"))){
+            return -1;
+        }
+        return super.tagsMatching(tags, query);
+    }
 
     protected boolean doSend(PluginContext pluginContext, Request in, Response out) {
         var query = new CallItemsQuery();
@@ -92,9 +102,16 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
         query.setUsed(completedIndexes);
 
-        var index = findIndex(query);
+        var index = findIndex(query,in);
         if (index == null) {
+            if(getSettings().isBlockExternal()){
+                out.setStatusCode(500);
+                out.setResponseText(new TextNode("Not Found replaying: " + in.getMethod() + " on " + in.buildUrl()));
+                out.addHeader("Content-Type", ConstantsMime.TEXT);
+                return true;
+            }
             return false;
+
         }
         var storageItem = storage.readById(getInstanceId(), index.getIndex());
         if (storageItem == null) {

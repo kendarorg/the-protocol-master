@@ -73,7 +73,6 @@
           "active": false,
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
-          "blockExternal": true,
           "matchSites": [
             "net_core_http",
             "net_core_rest"

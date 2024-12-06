@@ -38,7 +38,7 @@ public class BasicTest {
     //protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     private static Server mqttBroker;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -84,6 +84,14 @@ public class BasicTest {
             mqttBroker.stopServer();
             System.out.println("Broker stopped");
         }));
+    }
+
+    public static void beforeEachNotStarting(TestInfo testInfo){
+        events.clear();
+        moquetteMessages.clear();
+        EventsQueue.register("recorder", (r) -> {
+            events.add(r);
+        }, ReportDataEvent.class);
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
