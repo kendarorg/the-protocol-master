@@ -71,6 +71,21 @@ public class ApiHandler implements FilteringClass {
     }
 
     @HttpMethodFilter(
+            pathAddress = "/api/global/settings",
+            method = "GET", id = "GET /api/global/settings")
+    @TpmDoc(
+            description = "Retrieve the settings of the application",
+            responses = @TpmResponse(
+                    body = String.class,
+                    content = ConstantsMime.JSON
+            ),
+            tags = {"base/utils"})
+    public boolean getSettings(Request reqp, Response resp) {
+        respondJson(resp, settings);
+        return true;
+    }
+
+    @HttpMethodFilter(
             pathAddress = "/api/global/plugins",
             method = "GET", id = "GET /api/global/plugins")
     @TpmDoc(

@@ -74,6 +74,11 @@ public class ApiTest extends BasicTest {
         return baos.toByteArray();
     }
 
+    private static String downloadRequestString(String target, CloseableHttpClient httpclient) throws IOException {
+        var bytes = downloadRequest(target, httpclient);
+        return new String(bytes);
+    }
+
     private static <T> T postRequest(String target, CloseableHttpClient httpclient, byte[] data, TypeReference<T> typeReference) throws IOException {
         var httpget = new HttpPost(target);
         var be = new ByteArrayEntity(data);
@@ -142,6 +147,10 @@ public class ApiTest extends BasicTest {
         var protocols = getRequest("http://localhost:5005/api/protocols", httpclient, new TypeReference<List<ProtocolIndex>>() {
         });
         assertEquals(7, protocols.size());
+
+        var settings = downloadRequestString("http://localhost:5005/api/global/settings", httpclient);
+        assertTrue(settings.contains("target/tests/apitest"));
+        assertTrue(settings.contains("5005"));
 
         var plugins = getRequest("http://localhost:5005/api/protocols/redis-01/plugins", httpclient, new TypeReference<List<PluginIndex>>() {
         });
