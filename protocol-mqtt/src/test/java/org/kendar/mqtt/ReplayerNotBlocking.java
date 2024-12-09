@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.plugins.MqttReplayPlugin;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class ReplayerNotBlocking extends BasicTest {
@@ -83,7 +85,7 @@ public class ReplayerNotBlocking extends BasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var settings = new BasicReplayPluginSettings();
+        var settings = new BasicAysncReplayPluginSettings();
         settings.setBlockExternal(false);
         var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
         proxy.setPlugins(List.of(pl));
@@ -112,6 +114,65 @@ public class ReplayerNotBlocking extends BasicTest {
                 message.setQos(2);
                 client.publish(TOPIC_NAME, message);
             }
+            Sleeper.sleep(1000, () -> !messages.isEmpty());
+            client.disconnect();
+            client.close();
+            Assertions.assertEquals(1, messages.size());
+            var mesg = messages.get(0);
+            Assertions.assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
+            Assertions.assertEquals(2, mesg.getQos());
+        } finally {
+            protocolServer.stop();
+        }
+
+    }
+
+
+    @Test
+    void qos2TestDisconnect() throws MqttException {
+        messages.clear();
+        var baseProtocol = new MqttProtocol(1885);
+        var proxy = new MqttProxy("tcp://localhost:1883",
+                null, null);
+        var storage = new FileStorageRepository(Path.of("src",
+                "test", "resources", "qos2Test"));
+        storage.initialize();
+        var gs = new GlobalSettings();
+        gs.putService("storage", storage);
+        var settings = new BasicAysncReplayPluginSettings();
+        settings.setBlockExternal(false);
+        settings.setResetConnectionsOnStart(true);
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
+        proxy.setPlugins(List.of(pl));
+        pl.setActive(false);
+        baseProtocol.setProxy(proxy);
+        baseProtocol.initialize();
+        var protocolServer = new TcpServer(baseProtocol);
+
+        try {
+            protocolServer.start();
+
+            Sleeper.sleep(5000, protocolServer::isRunning);
+
+            String publisherId = UUID.randomUUID().toString();
+            var client = new MqttClient("tcp://localhost:1885", publisherId);
+
+            MqttConnectOptions options = new MqttConnectOptions();
+            client.connect(options);
+
+            assertTrue(client.isConnected());
+            setupCallBack(client);
+
+            client.subscribe(TOPIC_NAME, 2);
+
+            pl.setActive(true);
+
+
+
+            MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
+            message.setQos(2);
+            client.publish(TOPIC_NAME, message);
+
             Sleeper.sleep(1000, () -> !messages.isEmpty());
             client.disconnect();
             client.close();

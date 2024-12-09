@@ -1,5 +1,6 @@
 package org.kendar.plugins.base;
 
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -38,4 +39,6 @@ public interface ProtocolPluginDescriptor<W extends PluginSettings> extends
 
     ProtocolPluginApiHandler getApiHandler();
 
+    void setProtocolInstance(ProtoDescriptor protocol);
+    ProtoDescriptor getProtocolInstance();
 }

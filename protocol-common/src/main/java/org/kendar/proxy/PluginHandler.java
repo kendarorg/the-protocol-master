@@ -3,6 +3,7 @@ package org.kendar.proxy;
 
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,12 +30,13 @@ public class PluginHandler {
         }
     }
 
-    public static List<PluginHandler> of(ProtocolPluginDescriptor plugin) {
-        return of(plugin, "handle");
+    public static List<PluginHandler> of(ProtocolPluginDescriptor plugin, ProtoDescriptor protocol) {
+        return of(plugin, "handle",protocol);
     }
 
-    public static List<PluginHandler> of(ProtocolPluginDescriptor plugin, String methodName) {
+    public static List<PluginHandler> of(ProtocolPluginDescriptor plugin, String methodName, ProtoDescriptor protocol) {
         var result = new ArrayList<PluginHandler>();
+        plugin.setProtocolInstance(protocol);
         var clazz = plugin.getClass();
         var handles = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase(methodName)).collect(Collectors.toList());
         for (var handle : handles) {
@@ -87,3 +89,4 @@ public class PluginHandler {
         return target.getPhases();
     }
 }
+

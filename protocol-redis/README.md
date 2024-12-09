@@ -31,6 +31,7 @@ All callback are replayed automatically
 
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
+* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server
 
 ## Missing features
 

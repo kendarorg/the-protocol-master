@@ -181,7 +181,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             }
 
             var handler = new MasterHandler(
-                    new PluginClassesHandlerImpl(plugins),
+                    new PluginClassesHandlerImpl(plugins,this),
                     new RequestResponseBuilderImpl(),
                     new ExternalRequesterImpl(requestResponseBuilder, dnsHandler, connectionBuilder),
                     connectionBuilder);

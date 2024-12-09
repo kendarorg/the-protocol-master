@@ -54,6 +54,15 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     private BytesEvent remainingBytes;
 
+    @Override
+    public void disconnect(Object connection){
+        try {
+            if(client!=null)client.close();
+        } catch (IOException e) {
+
+        }
+    }
+
     public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
         super(descriptor, contextId);
     }

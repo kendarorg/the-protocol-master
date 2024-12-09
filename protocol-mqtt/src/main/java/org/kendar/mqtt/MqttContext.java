@@ -35,6 +35,7 @@ public class MqttContext extends NetworkProtoContext {
 
     @Override
     public void disconnect(Object connection) {
+        super.disconnect(connection);
         ProxyConnection conn = ((ProxyConnection) getValue("CONNECTION"));
 
     }

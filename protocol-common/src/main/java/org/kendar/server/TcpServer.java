@@ -55,8 +55,10 @@ public class TcpServer {
             }
         } else {
             try {
-                server.close();
-                Sleeper.sleepNoException(2000, () -> !server.isOpen());
+                if(server!=null) {
+                    server.close();
+                    Sleeper.sleepNoException(2000, () -> !server.isOpen());
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {

@@ -1,7 +1,7 @@
 package org.kendar.redis.plugins;
 
 import org.kendar.plugins.ReplayPlugin;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
@@ -15,8 +15,14 @@ import org.kendar.utils.Sleeper;
 
 import java.util.List;
 
-public class RedisReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
+public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
+
+
+    @Override
+    public Class<?> getSettingClass() {
+        return BasicAysncReplayPluginSettings.class;
+    }
 
     @Override
     public String getProtocol() {

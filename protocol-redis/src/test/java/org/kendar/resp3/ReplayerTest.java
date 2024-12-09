@@ -1,7 +1,7 @@
 package org.kendar.resp3;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.plugins.RedisReplayPlugin;
@@ -37,7 +37,7 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
 
-        var pl = new RedisReplayPlugin().initialize(gs, new ByteProtocolSettings(), new BasicReplayPluginSettings());
+        var pl = new RedisReplayPlugin().initialize(gs, new ByteProtocolSettings(), new BasicAysncReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 

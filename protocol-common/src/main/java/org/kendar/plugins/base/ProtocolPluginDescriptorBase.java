@@ -1,5 +1,6 @@
 package org.kendar.plugins.base;
 
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -13,6 +14,17 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     private String instanceId = "default";
     private ProtocolPluginApiHandler apiHandler;
     private PluginSettings settings;
+    private ProtoDescriptor protocolInstance;
+
+
+    public ProtoDescriptor getProtocolInstance() {
+        return protocolInstance;
+    }
+
+    public void setProtocolInstance(ProtoDescriptor procotolInstance) {
+        this.protocolInstance = procotolInstance;
+    }
+
     private static final Logger log = LoggerFactory.getLogger(ProtocolPluginDescriptorBase.class);
 
     public W getSettings() {

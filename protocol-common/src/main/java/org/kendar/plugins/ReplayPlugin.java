@@ -7,9 +7,11 @@ import org.kendar.events.StartPlayEvent;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
+import org.kendar.proxy.ProxyConnection;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -91,6 +93,16 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.clear();
                 completedIndexes.clear();
                 if (active) {
+                    var pi = getProtocolInstance();
+                    if(hasCallbacks() && pi!=null){
+                        var settings = (BasicAysncReplayPluginSettings)getSettings();
+                        if(settings.isResetConnectionsOnStart()){
+                            for(var context:pi.getContextsCache().values()){
+                                var contextConnection = context.getValue("CONNECTION");
+                                context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                            }
+                        }
+                    }
                     EventsQueue.send(new StartPlayEvent(getInstanceId()));
                     Sleeper.sleep(100);
                     indexes = new ArrayList<>(this.storage.getIndexes(getInstanceId()));
@@ -253,7 +265,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 bestIndex = index;
             }
         }
-        log.debug("Matched query: {} {}", query.getTag("query"), bestIndex);
+        log.debug("Matched for replay: {}.{}", bestIndex.getCaller(),  bestIndex.getIndex());
         return bestIndex;
     }
 

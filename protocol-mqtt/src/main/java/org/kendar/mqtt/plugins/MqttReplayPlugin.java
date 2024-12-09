@@ -5,7 +5,7 @@ import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.MqttProtocol;
 import org.kendar.mqtt.fsm.*;
 import org.kendar.plugins.ReplayPlugin;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
@@ -21,9 +21,15 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class MqttReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
+public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(MqttReplayPlugin.class);
+
+
+    @Override
+    public Class<?> getSettingClass() {
+        return BasicAysncReplayPluginSettings.class;
+    }
 
     @Override
     public String getProtocol() {

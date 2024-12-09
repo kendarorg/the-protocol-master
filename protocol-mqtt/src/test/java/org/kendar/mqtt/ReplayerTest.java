@@ -5,7 +5,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.kendar.mqtt.plugins.MqttReplayPlugin;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
@@ -56,7 +56,7 @@ public class ReplayerTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         ;
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
@@ -108,7 +108,7 @@ public class ReplayerTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         ;
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
@@ -159,7 +159,7 @@ public class ReplayerTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
