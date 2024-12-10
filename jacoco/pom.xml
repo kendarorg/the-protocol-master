@@ -10,7 +10,7 @@
     <artifactId>jacoco</artifactId>
     <dependencies>
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mongo</artifactId>
             <version>${revision}</version>
@@ -54,7 +54,7 @@
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-http</artifactId>
             <version>${revision}</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
 
