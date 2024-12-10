@@ -159,7 +159,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         }
         lineToRead = beforeSendingReadResult(lineToRead);
         buildState(pluginContext, context, in, outputItem, out, lineToRead);
-
+        lineToRead.getStorageItem().setConnectionId(pluginContext.getContextId());
 
         if (hasCallbacks()) {
             var afterIndex = item.getIndex();
@@ -172,6 +172,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             var result = new ArrayList<StorageItem>();
             for (var response : responses) {
                 completedOutIndexes.add((int) response.getIndex());
+                response.setConnectionId(pluginContext.getContextId());
                 result.add(response);
             }
             if (!result.isEmpty()) {
@@ -217,6 +218,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             storageItem = new StorageItem();
             storageItem.setIndex(index.getIndex());
         }
+        storageItem.setConnectionId(pluginContext.getContextId());
 
         var lineToRead = new LineToRead(storageItem, index);
         var item = lineToRead.getStorageItem();
@@ -234,6 +236,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             var result = new ArrayList<StorageItem>();
             for (var response : responses) {
                 completedOutIndexes.add((int) response.getIndex());
+                storageItem.setConnectionId(pluginContext.getContextId());
                 result.add(response);
             }
             if (!result.isEmpty()) {
