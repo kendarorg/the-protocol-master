@@ -2,7 +2,6 @@ package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.kendar.events.*;
-import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.storage.generic.StorageRepository;
@@ -290,11 +289,11 @@ public class FileStorageRepository implements StorageRepository {
         return type.equalsIgnoreCase(type1);
     }
 
-    private boolean tagsMatching(Map<String, String> tags, CallItemsQuery query) {
-        for (var tag : query.getTags().entrySet()) {
+    private boolean tagsMatching(Map<String, String> tags, Map<String, String> query) {
+        for (var tag : query.entrySet()) {
             if (tags.containsKey(tag.getKey())) {
                 var l = tags.get(tag.getKey());
-                var r = query.getTags().get(tag.getKey());
+                var r = query.get(tag.getKey());
                 //noinspection StringEquality
                 if ((l == null || r == null) && l == r) {
                     continue;
@@ -324,8 +323,6 @@ public class FileStorageRepository implements StorageRepository {
                 if (outItem.isPresent()) {
                     result.add(outItem.get());
                     log.debug("[CL<FF][CB] After: {} Index: {} Type: {}", query.getStartAt(), item.getIndex(), outItem.get().getType());
-                }else{
-                    System.out.println("");
                 }
             } else {
                 break;

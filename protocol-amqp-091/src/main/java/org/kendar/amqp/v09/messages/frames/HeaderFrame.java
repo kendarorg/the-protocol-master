@@ -285,8 +285,12 @@ public class HeaderFrame extends Frame {
         hf.clusterId = clusterId_present ? ShortStringHelper.read(rb) : null;
         hf.setChannel(channel);
 
+
+
         if (isProxyed()) {
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
+            var consumeOrigin = basicConsume.getQueue()+"|"+basicConsume.getChannel()+"|"+mapper.serialize(basicConsume.getArguments());
+            hf.setConsumeOrigin(consumeOrigin);
             hf.setConsumeId(basicConsume.getConsumeId());
             proxy.respond(hf, new PluginContext("AMQP", "RESPONSE", System.currentTimeMillis(), context));
             return iteratorOfList(hf);
@@ -303,5 +307,14 @@ public class HeaderFrame extends Frame {
 
     public void setConsumeId(int consumeId) {
         this.consumeId = consumeId;
+    }
+
+    private String consumeOrigin;
+    public void setConsumeOrigin(String consumeOrigin) {
+        this.consumeOrigin = consumeOrigin;
+    }
+
+    public String getConsumeOrigin() {
+        return consumeOrigin;
     }
 }

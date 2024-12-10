@@ -8,6 +8,7 @@ import org.kendar.proxy.ProxyConnection;
 import org.kendar.redis.Resp3Context;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.fsm.events.Resp3Message;
+import org.kendar.redis.parser.Resp3Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,8 @@ public class Resp3Subscribe extends ProtoState implements NetworkReturnMessage {
         return false;
     }
 
+    private final Resp3Parser parser = new Resp3Parser();
+
     public Iterator<ProtoStep> execute(Resp3Message event) {
         var context = (Resp3Context) event.getContext();
         var proxy = (Resp3Proxy) context.getProxy();
@@ -68,6 +71,20 @@ public class Resp3Subscribe extends ProtoState implements NetworkReturnMessage {
             return iteratorOfEmpty();
 
         }
+        try{
+            var parsed = parser.parse(event.getMessage());
+            if(List.class.isAssignableFrom(parsed.getClass())) {
+                var list = (List<?>) parsed;
+                if(list.size()>=2){
+                    if(list.get(0).toString().equalsIgnoreCase("subscribe")){
+                        context.setValue("QUEUE",list.get(1).toString());
+                    }
+                }
+            }
+        }catch (Exception ex){
+
+        }
+
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 event,

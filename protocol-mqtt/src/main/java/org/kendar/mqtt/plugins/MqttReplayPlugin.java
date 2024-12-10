@@ -2,7 +2,6 @@ package org.kendar.mqtt.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.mqtt.MqttContext;
-import org.kendar.mqtt.MqttProtocol;
 import org.kendar.mqtt.fsm.*;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
@@ -13,7 +12,6 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
-import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -57,16 +55,6 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         }
     }
 
-    protected void buildTagFromContext(ResponseItemQuery respQuery, PluginContext pluginContext) {
-        var topics = pluginContext.getContext().getValue("TOPICS");
-        if(topics==null) return;
-        var hashTopic = (HashSet<String>)topics;
-        for(var topic : hashTopic) {
-            var spl = topic.split("|",2);
-            pluginContext.getTags().put(spl[1], spl[0]);
-        }
-    }
-
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
@@ -100,7 +88,8 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             }
             if (fr != null) {
                 log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
-                var ctx = MqttProtocol.consumeContext.get(consumeId);
+
+                var ctx = context.getDescriptor().getContextsCache().get(consumeId);;
                 ctx.write(fr);
             } else {
                 throw new RuntimeException("MISSING CLASS " + clazz);
@@ -216,6 +205,20 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         result.setInput(publish);
         result.setOutput(subscribeAck);
         return result;
+    }
+
+
+    protected Map<String, String> getContextTags(ProtoContext context) {
+        if(context.getValue("TOPICS")!=null){
+            var hashTopic = (HashSet<String>)context.getValue("TOPICS");
+            var result = new HashMap<String, String>();
+            for(var topic : hashTopic) {
+                var spl = topic.split("|",2);
+                result.put(spl[1].substring(1), spl[0]);
+            }
+            return result;
+        }
+        return Map.of();
     }
 
     @Override

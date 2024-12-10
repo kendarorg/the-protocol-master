@@ -4,13 +4,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class CallItemsQuery {
-    private final HashMap<String, String> tags = new HashMap<>();
     private String type;
     private HashSet<Integer> used = new HashSet<>();
     private String caller;
 
+    private final HashMap<String, String> tags = new HashMap<>();
     public HashMap<String, String> getTags() {
         return tags;
+    }
+    public String getTag(String tag) {
+        return tags.get(tag);
+    }
+
+    public void addTag(String tag, Object value) {
+        tags.put(tag, value != null ? value.toString() : null);
     }
 
     public String getType() {
@@ -32,10 +39,6 @@ public class CallItemsQuery {
         this.used = used;
     }
 
-    public void addTag(String tag, Object value) {
-        tags.put(tag, value != null ? value.toString() : null);
-    }
-
     public String getCaller() {
         return caller;
     }
@@ -44,9 +47,6 @@ public class CallItemsQuery {
         this.caller = caller;
     }
 
-    public String getTag(String tag) {
-        return tags.get(tag);
-    }
 
     @Override
     public String toString() {

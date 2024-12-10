@@ -22,6 +22,7 @@ public class BasicDeliver extends Basic {
     private String exchange;
     private String routingKey;
     private int consumeId;
+    private String consumeOrigin;
 
     public BasicDeliver() {
         super();
@@ -105,6 +106,9 @@ public class BasicDeliver extends Basic {
         bd.exchange = ShortStringHelper.read(rb);
         bd.routingKey = ShortStringHelper.read(rb);
 
+        var consumeOrigin = basicConsume.getQueue()+"|"+basicConsume.getChannel()+"|"+mapper.serialize(basicConsume.getArguments());
+        bd.setConsumeOrigin(consumeOrigin);
+
 
         proxy.respond(bd, new PluginContext("AMQP", "RESPONSE", System.currentTimeMillis(), context));
         return iteratorOfList(bd);
@@ -116,5 +120,13 @@ public class BasicDeliver extends Basic {
 
     public void setConsumeId(int consumeId) {
         this.consumeId = consumeId;
+    }
+
+    public void setConsumeOrigin(String consumeOrigin) {
+        this.consumeOrigin = consumeOrigin;
+    }
+
+    public String getConsumeOrigin() {
+        return consumeOrigin;
     }
 }

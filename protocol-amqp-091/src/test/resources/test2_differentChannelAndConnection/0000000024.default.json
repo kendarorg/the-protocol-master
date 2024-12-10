@@ -1,8 +1,8 @@
 {
-  "timestamp" : 1733870617200,
+  "timestamp" : 1733870617300,
   "constant" : false,
   "connectionId" : 1,
-  "index" : 17,
+  "index" : 24,
   "output" : {
     "channel" : 1,
     "type" : 1,
@@ -10,7 +10,7 @@
     "classId" : 60,
     "methodId" : 60,
     "consumerTag" : "amq.ctag-sQzqNeFgzmseb97B8DI2PQ",
-    "deliveryTag" : 1,
+    "deliveryTag" : 2,
     "redelivered" : false,
     "exchange" : "",
     "routingKey" : "fuffa_queue",

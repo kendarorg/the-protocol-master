@@ -5,6 +5,7 @@ import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
+import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
@@ -19,7 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
@@ -104,7 +108,46 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             } else {
                 throw new RuntimeException("MISSING CLASS " + clazz);
             }
-
         }
+    }
+
+    protected Map<String, String> getContextTags(ProtoContext context) {
+        if(context.getValue("QUEUE")!=null){
+            var hashTopic = (HashSet<String>)context.getValue("QUEUE");
+            var result = new HashMap<String, String>();
+            for(var topic : hashTopic) {
+               // var spl = topic.split("|",3);
+                //TODO RABBITCONTEXT
+                result.put("queue", topic);
+            }
+            return result;
+        }
+        return Map.of();
+    }
+
+    @Override
+    protected Map<String, String> buildTag(Object cll) {
+        var data = new HashMap<String, String>();
+        if(cll instanceof BasicConsume){
+            data.put("queue",((BasicConsume)cll).getConsumeOrigin());
+        }else if(cll instanceof BodyFrame){
+            data.put("queue",((BodyFrame)cll).getConsumeOrigin());
+        }else if(cll instanceof BasicDeliver){
+            data.put("queue",((BasicDeliver)cll).getConsumeOrigin());
+        }else if(cll instanceof HeaderFrame){
+            data.put("queue",((HeaderFrame)cll).getConsumeOrigin());
+        }
+        //var in = mapper.toJsonNode(cll);
+//        if(in.has("packetIdentifier")){
+//            //data.put("packetIdentifier", in.get("packetIdentifier").asText());
+//        }
+//        if(in.has("topicName")){
+//            data.put(in.get("topicName").asText(), in.get("qos").asText());
+//        }else if(in.has("topics")){
+//            for(var topic : in.get("topics")){
+//                data.put(topic.get("topic").asText(), topic.get("type").asText());
+//            }
+//        }
+        return data;
     }
 }

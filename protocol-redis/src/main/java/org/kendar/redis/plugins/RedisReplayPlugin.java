@@ -14,6 +14,7 @@ import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.util.List;
+import java.util.Map;
 
 public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
@@ -42,6 +43,7 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettin
 
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
+        Sleeper.sleep(10);
         if (storageItems.isEmpty()) return;
         long lastTimestamp = 0;
         for (var item : storageItems) {
@@ -69,5 +71,13 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettin
             }
 
         }
+    }
+
+
+    protected Map<String, String> getContextTags(ProtoContext context) {
+        if(context.getValue("QUEUE")!=null){
+            return Map.of("queue",(String)context.getValue("QUEUE"));
+        }
+        return Map.of();
     }
 }

@@ -68,3 +68,5 @@ test section)
 When the Paho client does not know what packet identifier it should generate,
 simply create a new one. This happened for example when during development. I
 had not set the packet Identifier when returning a PUBREL packet
+
+The packets can arrive even in out of order kind...

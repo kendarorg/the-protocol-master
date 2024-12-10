@@ -72,15 +72,9 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
             if (out == null) {
-                if(!sendAndForget(pluginContext, in) && !getSettings().isBlockExternal()){
-                    return false;
-                }
-                return true;
+                return sendAndForget(pluginContext, in) || getSettings().isBlockExternal();
             } else {
-                if(!sendAndExpect(pluginContext, in, out) && !getSettings().isBlockExternal()){
-                    return false;
-                }
-                return true;
+                return sendAndExpect(pluginContext, in, out) || getSettings().isBlockExternal();
             }
         }
         return false;
@@ -94,7 +88,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedIndexes.clear();
                 if (active) {
                     EventsQueue.send(new StartPlayEvent(getInstanceId()));
-                    Sleeper.sleep(1000,()-> this.storage.getIndexes(getInstanceId())!=null);
+                    Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
                     indexes = new ArrayList<>(this.storage.getIndexes(getInstanceId()));
                 } else {
                     EventsQueue.send(new EndPlayEvent(getInstanceId()));
@@ -110,10 +104,10 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     @Override
     protected void handlePostActivation(boolean active) {
         var pi = getProtocolInstance();
-        if(pi!=null && BasicAysncReplayPluginSettings.class.isAssignableFrom(getSettings().getClass())){
-            var settings = (BasicAysncReplayPluginSettings)getSettings();
-            if(settings.isResetConnectionsOnStart()){
-                for(var context:pi.getContextsCache().values()){
+        if (pi != null && BasicAysncReplayPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
+            var settings = (BasicAysncReplayPluginSettings) getSettings();
+            if (settings.isResetConnectionsOnStart()) {
+                for (var context : pi.getContextsCache().values()) {
                     var contextConnection = context.getValue("CONNECTION");
                     context.disconnect(((ProxyConnection) contextConnection).getConnection());
                 }
@@ -126,11 +120,12 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         var query = new CallItemsQuery();
         var context = pluginContext.getContext();
 
+
         query.setCaller(pluginContext.getCaller());
         query.setType(pluginContext.getType());
         query.setUsed(completedIndexes);
         query.getTags().putAll(buildTag(in));
-        var index = findIndex(query,in);
+        var index = findIndex(query, in);
         if (storage == null) {
             log.error("LOGGER NULL");
         }
@@ -138,9 +133,9 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             log.error("INDEX NULL {}", query);
             return false;
         }
-        var storageItem = readStorageItem(index,in, pluginContext);
+        var storageItem = readStorageItem(index, in, pluginContext);
         if (storageItem == null) {
-            if(index.getIndex()==-1 && !getSettings().isBlockExternal()){
+            if (index.getIndex() == -1 && !getSettings().isBlockExternal()) {
                 return false;
             }
             storageItem = new StorageItem();
@@ -161,25 +156,42 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         buildState(pluginContext, context, in, outputItem, out, lineToRead);
         lineToRead.getStorageItem().setConnectionId(pluginContext.getContextId());
 
-        if (hasCallbacks()) {
+        if (hasCallbacks() && item != null) {
             var afterIndex = item.getIndex();
             var respQuery = new ResponseItemQuery();
             respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
+            //respQuery.getTags().putAll(getContextTags(pluginContext.getContext()));
 
             var responses = storage.readResponses(getInstanceId(), respQuery);
             var result = new ArrayList<StorageItem>();
             for (var response : responses) {
-                completedOutIndexes.add((int) response.getIndex());
-                response.setConnectionId(pluginContext.getContextId());
-                result.add(response);
+                var idx = indexes.stream().filter(a -> a.getIndex() == response.getIndex()).findFirst();
+                if (idx.isPresent()) {
+                    for (var contextCached : pluginContext.getContext().getDescriptor().getContextsCache().values()) {
+                        var tags = getContextTags(contextCached);
+                        if (tagsMatching(idx.get().getTags(), tags) > 0) {
+                            completedOutIndexes.add((int) response.getIndex());
+                            response.setConnectionId(contextCached.getContextId());
+                            result.add(response);
+                            break;
+                        }
+                    }
+
+                }
+
             }
             if (!result.isEmpty()) {
                 executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
             }
         }
+
         return true;
+    }
+
+    protected Map<String, String> getContextTags(ProtoContext context) {
+        return Map.of();
     }
 
     protected StorageItem readStorageItem(CompactLine index, Object in, PluginContext pluginContext) {
@@ -209,11 +221,12 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         query.setType(in.getClass().getSimpleName());
         query.setUsed(completedIndexes);
         query.getTags().putAll(buildTag(in));
-        var index = findIndex(query,in);
-        if(index == null) {
+        var index = findIndex(query, in);
+
+        if (index == null) {
             return false;
         }
-        var storageItem = readStorageItem(index, in,pluginContext);
+        var storageItem = readStorageItem(index, in, pluginContext);
         if (storageItem == null) {
             storageItem = new StorageItem();
             storageItem.setIndex(index.getIndex());
@@ -222,32 +235,37 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
         var lineToRead = new LineToRead(storageItem, index);
         var item = lineToRead.getStorageItem();
-
         completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
-        if (hasCallbacks()) {
-
+        if (hasCallbacks() && item != null) {
             var afterIndex = item.getIndex();
             var respQuery = new ResponseItemQuery();
             respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
-            buildTagFromContext(respQuery,pluginContext);
             var responses = storage.readResponses(getInstanceId(), respQuery);
             var result = new ArrayList<StorageItem>();
             for (var response : responses) {
-                completedOutIndexes.add((int) response.getIndex());
-                storageItem.setConnectionId(pluginContext.getContextId());
-                result.add(response);
+                var idx = indexes.stream().filter(a -> a.getIndex() == response.getIndex()).findFirst();
+                if (idx.isPresent()) {
+                    for (var contextCached : pluginContext.getContext().getDescriptor().getContextsCache().values()) {
+                        var tags = getContextTags(contextCached);
+                        if (tagsMatching(idx.get().getTags(), tags) > 0) {
+                            completedOutIndexes.add((int) response.getIndex());
+                            response.setConnectionId(contextCached.getContextId());
+                            result.add(response);
+                            break;
+                        }
+                    }
+
+                }
+
             }
             if (!result.isEmpty()) {
                 executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
             }
+
         }
         return true;
-    }
-
-    protected void buildTagFromContext(ResponseItemQuery respQuery, PluginContext pluginContext) {
-
     }
 
     protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
@@ -264,7 +282,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         return "replay-plugin";
     }
 
-    protected CompactLine findIndex(CallItemsQuery query,Object in) {
+    protected CompactLine findIndex(CallItemsQuery query, Object in) {
         var idx = indexes.stream()
                 .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
                 .filter(a ->
@@ -275,16 +293,16 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         CompactLine bestIndex = null;
         var maxMatch = -1;
         for (var index : idx) {
-            var currentMatch = tagsMatching(index.getTags(), query);
+            var currentMatch = tagsMatching(index.getTags(), query.getTags());
             if (currentMatch > maxMatch) {
                 maxMatch = currentMatch;
                 bestIndex = index;
             }
         }
-        if(bestIndex!=null) {
+        if (bestIndex != null) {
             log.debug("Matched for replay: {}.{}", bestIndex.getCaller(), bestIndex.getIndex());
-        }else{
-            log.debug("No match for reply: {}.{} {}", query.getCaller(),query.getType(),query.getTags());
+        } else {
+            log.debug("No match for reply: {}.{} {}", query.getCaller(), query.getType(), query.getTags());
         }
         return bestIndex;
     }
@@ -299,12 +317,12 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         return type.equalsIgnoreCase(type1);
     }
 
-    protected int tagsMatching(Map<String, String> tags, CallItemsQuery query) {
+    protected int tagsMatching(Map<String, String> tags, Map<String, String> query) {
         var result = 0;
-        for (var tag : query.getTags().entrySet()) {
+        for (var tag : query.entrySet()) {
             if (tags.containsKey(tag.getKey())) {
                 var l = tags.get(tag.getKey());
-                var r = query.getTags().get(tag.getKey());
+                var r = query.get(tag.getKey());
                 //noinspection StringEquality
                 if ((l == null || r == null) && l == r) {
                     result++;

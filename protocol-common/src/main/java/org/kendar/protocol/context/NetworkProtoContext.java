@@ -14,6 +14,7 @@ import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.NullState;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.protocol.states.Stop;
 import org.kendar.proxy.Proxy;
 import org.kendar.server.ClientServerChannel;
 import org.kendar.utils.Sleeper;
@@ -98,6 +99,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     @Override
     public void write(ReturnMessage rm) {
+        if(rm instanceof Stop)return;
         updateLastAccess();
         var returnMessage = (NetworkReturnMessage) rm;
         //Create a new buffer fit for the destination
@@ -110,7 +112,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
         response.put(resultBuffer.toArray());
         //To send
         response.flip();
-        log.trace("[CL<TP][TX]: Sending back: {}", returnMessage.getClass().getSimpleName());
+        log.debug("[CL<TP][TX]: Sending back: {}", returnMessage.getClass().getSimpleName());
         var res = client.write(response);
         if (res != null) {
             try {

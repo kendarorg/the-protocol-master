@@ -22,6 +22,7 @@ public class BodyFrame extends Frame {
     private byte[] contentBytes;
     private String contentString;
     private int consumeId;
+    private String consumeOrigin;
 
     public BodyFrame() {
         setType(FrameType.BODY.asByte());
@@ -77,7 +78,8 @@ public class BodyFrame extends Frame {
         if (isProxyed()) {
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             bf.setConsumeId(basicConsume.getConsumeId());
-
+            var consumeOrigin = basicConsume.getQueue()+"|"+basicConsume.getChannel()+"|"+mapper.serialize(basicConsume.getArguments());
+            bf.setConsumeOrigin(consumeOrigin);
 
             //If it is a recorder
             if (!proxy.isReplayer()) {
@@ -116,5 +118,13 @@ public class BodyFrame extends Frame {
 
     public void setConsumeId(int consumeId) {
         this.consumeId = consumeId;
+    }
+
+    public void setConsumeOrigin(String consumeOrigin) {
+        this.consumeOrigin = consumeOrigin;
+    }
+
+    public String getConsumeOrigin() {
+        return consumeOrigin;
     }
 }

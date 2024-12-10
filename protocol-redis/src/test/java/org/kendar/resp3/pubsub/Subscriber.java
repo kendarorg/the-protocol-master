@@ -13,8 +13,8 @@ public class Subscriber extends JedisPubSub {
 
     @Override
     public void onMessage(String channel, String message) {
+        logger.debug("===========Message received. Channel: {}, Msg: {}", channel, message);
         results.put(message, channel);
-        logger.info("Message received. Channel: {}, Msg: {}", channel, message);
     }
 
     @Override

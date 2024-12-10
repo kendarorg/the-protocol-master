@@ -1,22 +1,24 @@
 {
-  "constant": false,
-  "connectionId": 1,
-  "index": 30,
-  "output": {
-    "channel": 1,
-    "type": 1,
-    "proxyed": false,
-    "classId": 60,
-    "methodId": 60,
-    "consumerTag": "amq.ctag-qZcPnE1q2m9Vg3ICbroWHg",
-    "deliveryTag": 3,
-    "redelivered": false,
-    "exchange": "",
-    "routingKey": "fuffa_queue",
-    "consumeId": 1
+  "timestamp" : 1733870617303,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 30,
+  "output" : {
+    "channel" : 1,
+    "type" : 1,
+    "proxyed" : false,
+    "classId" : 60,
+    "methodId" : 60,
+    "consumerTag" : "amq.ctag-sQzqNeFgzmseb97B8DI2PQ",
+    "deliveryTag" : 3,
+    "redelivered" : false,
+    "exchange" : "",
+    "routingKey" : "fuffa_queue",
+    "consumeId" : 1,
+    "consumeOrigin" : "fuffa_queue|1|{}"
   },
-  "durationMs": 0,
-  "type": "RESPONSE",
-  "caller": "AMQP",
-  "outputType": "BasicDeliver"
+  "durationMs" : 0,
+  "type" : "RESPONSE",
+  "caller" : "AMQP",
+  "outputType" : "BasicDeliver"
 }

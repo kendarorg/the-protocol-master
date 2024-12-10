@@ -1,86 +1,81 @@
-[
-  {
-    "index": 1,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 1,
-    "tags": {}
-  },
-  {
-    "index": 2,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 0,
-    "tags": {}
-  },
-  {
-    "index": 3,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 2,
-    "tags": {}
-  },
-  {
-    "index": 4,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 2,
-    "tags": {}
-  },
-  {
-    "index": 5,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 2,
-    "tags": {}
-  },
-  {
-    "index": 6,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 0,
-    "tags": {}
-  },
-  {
-    "index": 7,
-    "type": "RESPONSE",
-    "caller": "RESP3",
-    "durationMs": 0,
-    "tags": {}
-  },
-  {
-    "index": 8,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 2,
-    "tags": {}
-  },
-  {
-    "index": 9,
-    "type": "RESPONSE",
-    "caller": "RESP3",
-    "durationMs": 0,
-    "tags": {}
-  },
-  {
-    "index": 10,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 1,
-    "tags": {}
-  },
-  {
-    "index": 11,
-    "type": "RESPONSE",
-    "caller": "RESP3",
-    "durationMs": 0,
-    "tags": {}
-  },
-  {
-    "index": 12,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 1,
-    "tags": {}
+[ {
+  "index" : 1,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 2,
+  "tags" : { }
+}, {
+  "index" : 2,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 3,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : {
+    "queue" : "commonChannel"
   }
-]
+}, {
+  "index" : 4,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 2,
+  "tags" : { }
+}, {
+  "index" : 5,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 6,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 7,
+  "type" : "RESPONSE",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : {
+    "queue" : "commonChannel"
+  }
+}, {
+  "index" : 9,
+  "type" : "RESPONSE",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : {
+    "queue" : "commonChannel"
+  }
+}, {
+  "index" : 8,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 11,
+  "type" : "RESPONSE",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : {
+    "queue" : "commonChannel"
+  }
+}, {
+  "index" : 10,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 1,
+  "tags" : { }
+}, {
+  "index" : 12,
+  "type" : "Resp3Message",
+  "caller" : "RESP3",
+  "durationMs" : 0,
+  "tags" : { }
+} ]
