@@ -188,9 +188,12 @@ public class FileStorageRepository implements StorageRepository {
         var repo = protocolRepo.get(instanceId);
         return new ArrayList<>(repo.index);
     }
+    private Object lock = new Object();
 
     public long generateIndex() {
-        return storageCounter.incrementAndGet();
+        synchronized (lock) {
+            return storageCounter.incrementAndGet();
+        }
     }
 
     @Override
@@ -331,14 +334,20 @@ public class FileStorageRepository implements StorageRepository {
     public List<StorageItem> readResponses(String protocolInstanceId, ResponseItemQuery query) {
         var ctx = initializeContent(protocolInstanceId);
         var result = new ArrayList<StorageItem>();
+
         for (var item : ctx.index.stream()
-                .sorted(Comparator.comparingInt(value -> (int) value.getIndex())).filter(a -> a.getIndex() > query.getStartAt()).collect(Collectors.toList())) {
+                .sorted(Comparator.comparingInt(value -> (int) value.getIndex())).
+                filter(value->value.getIndex()> query.getStartAt()).
+                collect(Collectors.toList())) {
+            if(query.getUsed().contains(item.getIndex()))continue;
             if (item.getType().equalsIgnoreCase("RESPONSE")) {
                 log.debug("[CL<FF] loading response");
                 var outItem = ctx.outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
                 if (outItem.isPresent()) {
                     result.add(outItem.get());
                     log.debug("[CL<FF][CB] After: {} Index: {} Type: {}", query.getStartAt(), item.getIndex(), outItem.get().getType());
+                }else{
+                    System.out.println("");
                 }
             } else {
                 break;

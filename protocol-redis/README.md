@@ -21,6 +21,7 @@ All callback are recorded
 
 * active: If it is active
 * ignoreTrivialCalls: store in full only calls that cannot be generated automatically (the ones with real data)
+* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server
 
 ### replay-plugin
 
@@ -32,6 +33,7 @@ All callback are replayed automatically
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
 * resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server
+* blockExternal: Block calls to real service when not matching (default true)
 
 ## Missing features
 

@@ -10,6 +10,7 @@ import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -56,11 +57,17 @@ public class Subscribe extends BasePropertiesMqttState {
         publish.setProtocolVersion(context.getProtocolVersion());
         //Variable header for MQTT >=5
         readProperties(publish, bb);
+        var subscriptions = (HashSet<String>)context.getValue("TOPICS");
+        if(subscriptions==null){
+            subscriptions = new HashSet<>();
+            context.setValue("TOPICS", subscriptions);
+        }
 
         var payload = bb.getBytes(bb.getPosition(), bb.size() - bb.getPosition());
         while (bb.getPosition() < bb.size()) {
             var topic = bb.readUtf8String();
             var options = bb.get();
+            subscriptions.add(options+"|"+topic);
             publish.getTopics().add(new Topic(topic, options));
         }
 

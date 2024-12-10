@@ -4,7 +4,7 @@ package org.kendar.resp3;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.plugins.RedisRecordPlugin;
@@ -69,7 +69,7 @@ public class BasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new RedisRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new RedisRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
 
         var rep = new RedisReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);

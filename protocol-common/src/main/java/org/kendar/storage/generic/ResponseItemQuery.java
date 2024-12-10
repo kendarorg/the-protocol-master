@@ -30,4 +30,6 @@ public class ResponseItemQuery {
     public void setStartAt(long startAt) {
         this.startAt = startAt;
     }
+
+
 }

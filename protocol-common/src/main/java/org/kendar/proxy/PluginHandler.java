@@ -74,6 +74,8 @@ public class PluginHandler {
                 } else if (out == null) {
                     return (boolean) method.invoke(target, context, phase, in, out);
                 }
+            }else if (in == null && out != null && typeOut.isAssignableFrom(out.getClass())) {
+                return (boolean) method.invoke(target, context, phase, in, out);
             }
             return false;
         } catch (IllegalAccessException | InvocationTargetException e) {

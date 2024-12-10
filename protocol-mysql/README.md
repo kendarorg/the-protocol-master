@@ -34,6 +34,7 @@ without the need to mock a single request
 
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
+* blockExternal: Block calls to real service when not matching (default true)
 
 ### mock-plugin
 

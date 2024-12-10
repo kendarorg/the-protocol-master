@@ -5,8 +5,10 @@ import org.kendar.events.*;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
+import org.kendar.proxy.ProxyConnection;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -67,6 +69,8 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
                 pluginContext.getCaller(),
                 null,
                 out.getClass().getSimpleName());
+
+        storageItem.setTimestamp(pluginContext.getStart());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
 
@@ -93,6 +97,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
                 pluginContext.getCaller(),
                 in.getClass().getSimpleName(),
                 resType);
+        storageItem.setTimestamp(pluginContext.getStart());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(in, out, compactLine) || !shouldIgnoreTrivialCalls()) {
@@ -141,7 +146,22 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
         if (isActive() != active && !active) {
             terminate();
         } else if (isActive() != active && active) {
+
             EventsQueue.send(new StartWriteEvent(getInstanceId()));
+        }
+    }
+
+    @Override
+    protected void handlePostActivation(boolean active) {
+        var pi = getProtocolInstance();
+        if(pi!=null && BasicAysncRecordPluginSettings.class.isAssignableFrom(getSettings().getClass())){
+            var settings = (BasicAysncRecordPluginSettings)getSettings();
+            if(settings.isResetConnectionsOnStart()){
+                for(var context:pi.getContextsCache().values()){
+                    var contextConnection = context.getValue("CONNECTION");
+                    context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                }
+            }
         }
     }
 

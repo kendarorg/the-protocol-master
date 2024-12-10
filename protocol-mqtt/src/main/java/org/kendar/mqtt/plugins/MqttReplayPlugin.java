@@ -13,13 +13,17 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
@@ -50,6 +54,16 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    protected void buildTagFromContext(ResponseItemQuery respQuery, PluginContext pluginContext) {
+        var topics = pluginContext.getContext().getValue("TOPICS");
+        if(topics==null) return;
+        var hashTopic = (HashSet<String>)topics;
+        for(var topic : hashTopic) {
+            var spl = topic.split("|",2);
+            pluginContext.getTags().put(spl[1], spl[0]);
         }
     }
 
@@ -202,6 +216,23 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         result.setInput(publish);
         result.setOutput(subscribeAck);
         return result;
+    }
+
+    @Override
+    protected Map<String, String> buildTag(Object cll) {
+        var data = new HashMap<String, String>();
+        var in = mapper.toJsonNode(cll);
+        if(in.has("packetIdentifier")){
+            //data.put("packetIdentifier", in.get("packetIdentifier").asText());
+        }
+        if(in.has("topicName")){
+            data.put(in.get("topicName").asText(), in.get("qos").asText());
+        }else if(in.has("topics")){
+            for(var topic : in.get("topics")){
+                data.put(topic.get("topic").asText(), topic.get("type").asText());
+            }
+        }
+        return data;
     }
 
     private StorageItem handleFakePublish(Publish in, PluginContext pluginContext) {

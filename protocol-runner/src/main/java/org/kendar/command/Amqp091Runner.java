@@ -4,8 +4,8 @@ import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
@@ -87,8 +87,8 @@ public class Amqp091Runner extends CommonRunner {
     public CommandOptions getOptions(GlobalSettings globalSettings) {
         var settings = new ByteProtocolSettingsWithLogin();
         settings.setProtocol(getId());
-        var recording = new BasicRecordPluginSettings();
-        var replaying = new BasicReplayPluginSettings();
+        var recording = new BasicAysncRecordPluginSettings();
+        var replaying = new BasicAysncReplayPluginSettings();
         List<CommandOption> commandOptionList = getCommonOptions(globalSettings, settings, recording, replaying, optionLoginPassword(settings));
         return CommandOptions.of(getId())
                 .withDescription("Amqp 0.9.1 Protocol")

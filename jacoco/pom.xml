@@ -17,6 +17,21 @@
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-common-jdbc</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-runner</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-postgres</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -79,6 +94,9 @@
                                         <fileset dir="${basedir}/../protocol-common/target">
                                             <include name="*.exec"/>
                                         </fileset>
+                                        <fileset dir="${basedir}/../protocol-common-jdbc/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
                                         <fileset dir="${basedir}/../protocol-mongo/target">
                                             <include name="*.exec"/>
                                         </fileset>
@@ -92,6 +110,12 @@
                                             <include name="*.exec"/>
                                         </fileset>
                                         <fileset dir="${basedir}/../protocol-redis/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-runner/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-http/target">
                                             <include name="*.exec"/>
                                         </fileset>
                                     </executiondata>
@@ -112,12 +136,24 @@
                                             <dirset dir="${basedir}/../protocol-postgres">
                                                 <include name="**/src/main/java"/>
                                             </dirset>
+                                            <dirset dir="${basedir}/../protocol-runner">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-http">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-common-jdbc">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
                                         </sourcefiles>
                                         <classfiles>
                                             <fileset dir="${basedir}/../protocol-amqp-091/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-common/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-common-jdbc/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-mongo/target/classes">
@@ -127,6 +163,12 @@
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-postgres/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-mongo/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-runner/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                         </classfiles>

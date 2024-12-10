@@ -23,7 +23,7 @@ public class ProxyedBehaviour {
         if (input.isProxyed()) {
             var basicConsume = (ConsumeConnected) context.getValue("BASIC_CONSUME_CH_" + channel);
             ((ConsumeConnected) toSend).setConsumeId(basicConsume.getConsumeId());
-            proxy.respond(toSend, new PluginContext("AMQP", "RESPONSE", -1, context));
+            proxy.respond(toSend, new PluginContext("AMQP", "RESPONSE", System.currentTimeMillis(), context));
             return Frame.iteratorOfList(toSend);
         }
         return iteratorOfRunnable(() -> proxy.sendAndForget(context, connection, toSend));

@@ -1,0 +1,28 @@
+{
+  "pluginsDir": "target/plugins",
+  "logLevel": "DEBUG",
+  "dataDir": "target/data",
+  "apiPort": 8095,
+  "plugins": {
+    "report-plugin": {
+      "active": true
+    }
+  },
+  "protocols": {
+    "mqtt-01": {
+      "protocol": "mqtt",
+      "port": 1883,
+      "login": "",
+      "password": "",
+      "timeout": 60,
+      "connectionString": "tcp://java-mosquitto:1883",
+      "plugins": {
+        "record-plugin": {
+          "resetConnectionsOnStart": false
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": false}
+      }
+    }
+  }
+}

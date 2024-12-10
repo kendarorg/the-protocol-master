@@ -82,7 +82,7 @@ public class BodyFrame extends Frame {
             //If it is a recorder
             if (!proxy.isReplayer()) {
 
-                proxy.respond(bf, new PluginContext("AMQP", "RESPONSE", -1, context));
+                proxy.respond(bf, new PluginContext("AMQP", "RESPONSE", System.currentTimeMillis(), context));
             }
             //Return itself
             return iteratorOfList(bf);

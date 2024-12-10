@@ -2,7 +2,7 @@ package org.kendar.amqp.v09.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.plugins.RecordPlugin;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AmqpRecordPlugin extends RecordPlugin<BasicRecordPluginSettings> {
+public class AmqpRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettings> {
     private static final List<String> toAvoid = List.of("byte[]",
             "ConnectionStartOk", "ConnectionTuneOk", "ConnectionOpen", "ChannelOpen", "BasicPublish",
             "HeaderFrame", "BasicPublish", "BodyFrame", "BasicAck", "ChannelClose", "ConnectionClose",
@@ -21,6 +21,12 @@ public class AmqpRecordPlugin extends RecordPlugin<BasicRecordPluginSettings> {
         var cid = data.get("consumeId");
         if (cid == null) return consumeId;
         return Math.max(cid.asInt(), consumeId);
+    }
+
+
+    @Override
+    public Class<?> getSettingClass() {
+        return BasicAysncRecordPluginSettings.class;
     }
 
 

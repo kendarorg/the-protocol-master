@@ -3,7 +3,7 @@ package org.kendar.redis.plugins;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.RecordPlugin;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
@@ -11,7 +11,7 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 
-public class RedisRecordPlugin extends RecordPlugin<BasicRecordPluginSettings> {
+public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettings> {
     @Override
     protected Object getData(Object of) {
         if (of instanceof Resp3Message) {
@@ -21,6 +21,11 @@ public class RedisRecordPlugin extends RecordPlugin<BasicRecordPluginSettings> {
             return getData(((Resp3Response) of).getEvent());
         }
         return of;
+    }
+
+    @Override
+    public Class<?> getSettingClass() {
+        return BasicAysncRecordPluginSettings.class;
     }
 
     @Override

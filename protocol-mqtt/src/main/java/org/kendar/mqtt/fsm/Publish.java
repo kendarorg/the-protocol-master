@@ -68,7 +68,7 @@ public class Publish extends BasePropertiesMqttState {
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
         if (isProxyed()) {
-            proxy.respond(publish, new PluginContext("MQTT", "RESPONSE", -1, context));
+            proxy.respond(publish, new PluginContext("MQTT", "RESPONSE", System.currentTimeMillis(), context));
             return iteratorOfList(publish);
         }
         if (qos == 1) {

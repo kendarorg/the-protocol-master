@@ -93,16 +93,6 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.clear();
                 completedIndexes.clear();
                 if (active) {
-                    var pi = getProtocolInstance();
-                    if(hasCallbacks() && pi!=null){
-                        var settings = (BasicAysncReplayPluginSettings)getSettings();
-                        if(settings.isResetConnectionsOnStart()){
-                            for(var context:pi.getContextsCache().values()){
-                                var contextConnection = context.getValue("CONNECTION");
-                                context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                            }
-                        }
-                    }
                     EventsQueue.send(new StartPlayEvent(getInstanceId()));
                     Sleeper.sleep(100);
                     indexes = new ArrayList<>(this.storage.getIndexes(getInstanceId()));
@@ -115,6 +105,20 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             log.error(e.getMessage(), e);
         }
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
+    }
+
+    @Override
+    protected void handlePostActivation(boolean active) {
+        var pi = getProtocolInstance();
+        if(pi!=null && BasicAysncReplayPluginSettings.class.isAssignableFrom(getSettings().getClass())){
+            var settings = (BasicAysncReplayPluginSettings)getSettings();
+            if(settings.isResetConnectionsOnStart()){
+                for(var context:pi.getContextsCache().values()){
+                    var contextConnection = context.getValue("CONNECTION");
+                    context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                }
+            }
+        }
     }
 
 
@@ -148,12 +152,22 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
         var item = lineToRead.getStorageItem();
 
+
+        var outputItem = item.getOutput();
+        if (context.isUseCallDurationTimes()) {
+            Sleeper.sleep(item.getDurationMs());
+        }
+        lineToRead = beforeSendingReadResult(lineToRead);
+        buildState(pluginContext, context, in, outputItem, out, lineToRead);
+
+
         if (hasCallbacks()) {
             var afterIndex = item.getIndex();
             var respQuery = new ResponseItemQuery();
             respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
+
             var responses = storage.readResponses(getInstanceId(), respQuery);
             var result = new ArrayList<StorageItem>();
             for (var response : responses) {
@@ -164,12 +178,6 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
             }
         }
-        var outputItem = item.getOutput();
-        if (context.isUseCallDurationTimes()) {
-            Sleeper.sleep(item.getDurationMs());
-        }
-        lineToRead = beforeSendingReadResult(lineToRead);
-        buildState(pluginContext, context, in, outputItem, out, lineToRead);
         return true;
     }
 
@@ -221,6 +229,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
+            buildTagFromContext(respQuery,pluginContext);
             var responses = storage.readResponses(getInstanceId(), respQuery);
             var result = new ArrayList<StorageItem>();
             for (var response : responses) {
@@ -232,6 +241,10 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             }
         }
         return true;
+    }
+
+    protected void buildTagFromContext(ResponseItemQuery respQuery, PluginContext pluginContext) {
+
     }
 
     protected void sendBackResponses(ProtoContext context, List<StorageItem> result) {
@@ -265,7 +278,11 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 bestIndex = index;
             }
         }
-        log.debug("Matched for replay: {}.{}", bestIndex.getCaller(),  bestIndex.getIndex());
+        if(bestIndex!=null) {
+            log.debug("Matched for replay: {}.{}", bestIndex.getCaller(), bestIndex.getIndex());
+        }else{
+            log.debug("No match for reply: {}.{} {}", query.getCaller(),query.getType(),query.getTags());
+        }
         return bestIndex;
     }
 

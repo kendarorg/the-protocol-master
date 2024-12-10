@@ -11,7 +11,7 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.plugins.MqttRecordPlugin;
 import org.kendar.mqtt.plugins.MqttReportPlugin;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
@@ -115,7 +115,7 @@ public class BasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new MqttRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new MqttRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new MqttReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         proxy.setPlugins(List.of(pl, rep));
         rep.setActive(true);

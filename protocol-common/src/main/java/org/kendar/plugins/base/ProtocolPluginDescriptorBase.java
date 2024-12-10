@@ -81,8 +81,14 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     }
 
     public void setActive(boolean active) {
-        if (active != this.active) handleActivation(active);
+        var isChanged = active!=this.isActive();
+        if (isChanged) handleActivation(active);
         this.active = active;
+        if(isChanged)handlePostActivation(active);
+    }
+
+    protected void handlePostActivation(boolean active) {
+
     }
 
     public void refreshStatus() {

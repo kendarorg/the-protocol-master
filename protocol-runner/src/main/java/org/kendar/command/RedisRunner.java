@@ -3,8 +3,8 @@ package org.kendar.command;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.server.TcpServer;
@@ -26,8 +26,8 @@ public class RedisRunner extends CommonRunner {
     public CommandOptions getOptions(GlobalSettings globalSettings) {
         var settings = new ByteProtocolSettings();
         settings.setProtocol(getId());
-        var recording = new BasicRecordPluginSettings();
-        var replaying = new BasicReplayPluginSettings();
+        var recording = new BasicAysncRecordPluginSettings();
+        var replaying = new BasicAysncReplayPluginSettings();
         List<CommandOption> commandOptionList = getCommonOptions(globalSettings, settings, recording, replaying, new ArrayList<>());
         return CommandOptions.of(getId())
                 .withDescription("Redis Protocol")

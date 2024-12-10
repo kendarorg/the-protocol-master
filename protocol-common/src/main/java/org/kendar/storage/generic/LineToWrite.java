@@ -38,4 +38,8 @@ public class LineToWrite {
     public StorageItem getStorageItem() {
         return storageItem;
     }
+
+    public long retrieveTimestamp(){
+        return storageItem.getTimestamp();
+    }
 }
