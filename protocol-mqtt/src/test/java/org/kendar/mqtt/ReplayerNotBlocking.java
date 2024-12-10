@@ -89,10 +89,11 @@ public class ReplayerNotBlocking extends BasicTest {
         settings.setBlockExternal(false);
         var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
         proxy.setPlugins(List.of(pl));
-        pl.setActive(true);
+
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);
+        pl.setActive(true);
 
         try {
             protocolServer.start();

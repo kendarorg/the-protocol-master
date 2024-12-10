@@ -94,7 +94,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedIndexes.clear();
                 if (active) {
                     EventsQueue.send(new StartPlayEvent(getInstanceId()));
-                    Sleeper.sleep(100);
+                    Sleeper.sleep(1000,()-> this.storage.getIndexes(getInstanceId())!=null);
                     indexes = new ArrayList<>(this.storage.getIndexes(getInstanceId()));
                 } else {
                     EventsQueue.send(new EndPlayEvent(getInstanceId()));

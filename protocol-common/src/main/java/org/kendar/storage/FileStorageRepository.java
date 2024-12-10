@@ -156,34 +156,12 @@ public class FileStorageRepository implements StorageRepository {
             }
             return currRepo;
         });
-        //}
-    }
-
-    @Override
-    public void isRecording(String instanceId, boolean recording) {
-        if (recording) {
-            protocolRepo.remove(instanceId);
-            initializeContentWrite(instanceId);
-        } else {
-            protocolRepo.remove(instanceId);
-        }
-
-    }
-
-    @Override
-    public void isReplaying(String instanceId, boolean replaying) {
-        if (replaying) {
-            protocolRepo.remove(instanceId);
-            initializeContent(instanceId);
-        } else {
-            protocolRepo.remove(instanceId);
-        }
     }
 
     @Override
     public List<CompactLine> getIndexes(String instanceId) {
         if (protocolRepo.get(instanceId) == null) {
-            initializeContent(instanceId);
+           return null;
         }
         var repo = protocolRepo.get(instanceId);
         return new ArrayList<>(repo.index);
@@ -332,7 +310,7 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public List<StorageItem> readResponses(String protocolInstanceId, ResponseItemQuery query) {
-        var ctx = initializeContent(protocolInstanceId);
+        var ctx = protocolRepo.get(protocolInstanceId);
         var result = new ArrayList<StorageItem>();
 
         for (var item : ctx.index.stream()

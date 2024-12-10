@@ -17,6 +17,7 @@ import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,6 +149,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
         } else if (isActive() != active && active) {
 
             EventsQueue.send(new StartWriteEvent(getInstanceId()));
+            Sleeper.sleep(1000,()-> this.storage.getIndexes(getInstanceId())!=null);
         }
     }
 

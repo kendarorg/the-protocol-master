@@ -23,9 +23,6 @@ public interface StorageRepository extends Service {
 
     long generateIndex();
 
-    void isRecording(String instanceId, boolean b);
-
-    void isReplaying(String instanceId, boolean b);
 
     List<CompactLine> getIndexes(String instanceId);
 }
