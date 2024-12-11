@@ -183,7 +183,10 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
             }
             if (!result.isEmpty()) {
-                executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
+                executor.submit(() -> {
+                    Sleeper.sleep(10);
+                    sendBackResponses(pluginContext.getContext(), result);
+                });
             }
         }
 
@@ -260,9 +263,10 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 }
 
             }
-            if (!result.isEmpty()) {
-                executor.submit(() -> sendBackResponses(pluginContext.getContext(), result));
-            }
+            executor.submit(() -> {
+                Sleeper.sleep(10);
+                sendBackResponses(pluginContext.getContext(), result);
+            });
 
         }
         return true;
