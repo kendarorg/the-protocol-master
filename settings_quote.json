@@ -21,7 +21,8 @@
           "resetConnectionsOnStart": false
         },
         "replay-plugin": {
-          "resetConnectionsOnStart": false}
+          "resetConnectionsOnStart": false
+        }
       }
     }
   }

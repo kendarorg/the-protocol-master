@@ -154,7 +154,7 @@ public class ApiHandler implements FilteringClass {
             method = "DELETE", id = "DELETE /api/global/storage")
     @TpmDoc(
             description = "Delete recorded data",
-            responses = { @TpmResponse(
+            responses = {@TpmResponse(
                     body = Ok.class
 
             ), @TpmResponse(

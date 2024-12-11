@@ -18,6 +18,7 @@ import java.util.List;
 
 public class Resp3Subscribe extends ProtoState implements NetworkReturnMessage {
     private static final Logger log = LoggerFactory.getLogger(Resp3Subscribe.class);
+    private final Resp3Parser parser = new Resp3Parser();
     private Resp3Message event;
     private boolean proxy;
 
@@ -60,8 +61,6 @@ public class Resp3Subscribe extends ProtoState implements NetworkReturnMessage {
         return false;
     }
 
-    private final Resp3Parser parser = new Resp3Parser();
-
     public Iterator<ProtoStep> execute(Resp3Message event) {
         var context = (Resp3Context) event.getContext();
         var proxy = (Resp3Proxy) context.getProxy();
@@ -71,17 +70,17 @@ public class Resp3Subscribe extends ProtoState implements NetworkReturnMessage {
             return iteratorOfEmpty();
 
         }
-        try{
+        try {
             var parsed = parser.parse(event.getMessage());
-            if(List.class.isAssignableFrom(parsed.getClass())) {
+            if (List.class.isAssignableFrom(parsed.getClass())) {
                 var list = (List<?>) parsed;
-                if(list.size()>=2){
-                    if(list.get(0).toString().equalsIgnoreCase("subscribe")){
-                        context.setValue("QUEUE",list.get(1).toString());
+                if (list.size() >= 2) {
+                    if (list.get(0).toString().equalsIgnoreCase("subscribe")) {
+                        context.setValue("QUEUE", list.get(1).toString());
                     }
                 }
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
 
         }
 

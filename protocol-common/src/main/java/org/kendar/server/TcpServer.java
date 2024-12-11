@@ -55,7 +55,7 @@ public class TcpServer {
             }
         } else {
             try {
-                if(server!=null) {
+                if (server != null) {
                     server.close();
                     Sleeper.sleepNoException(2000, () -> !server.isOpen());
                 }

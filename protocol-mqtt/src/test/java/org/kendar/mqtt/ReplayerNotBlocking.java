@@ -169,7 +169,6 @@ public class ReplayerNotBlocking extends BasicTest {
             pl.setActive(true);
 
 
-
             MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
             message.setQos(2);
             client.publish(TOPIC_NAME, message);

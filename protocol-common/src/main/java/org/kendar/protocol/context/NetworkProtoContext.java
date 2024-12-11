@@ -34,43 +34,23 @@ import java.util.concurrent.ExecutionException;
  */
 public abstract class NetworkProtoContext extends ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(NetworkProtoContext.class);
-
-    public List<Runnable> getRunnables() {
-        try {
-            return new ArrayList<>(runnables);
-        }finally {
-            runnables.clear();
-        }
-    }
-
     /**
      * If had sent the greeting message (to send data immediatly after connection without further ado)
      */
     private boolean greetingsSent = false;
-
     /**
      * Wrapper for the connection with the client
      */
     private ClientServerChannel client;
-
     /**
      * Proxy to call the real server
      */
     private Proxy proxy;
-
     /**
      * Storage for the bytes not consumed
      */
     private BytesEvent remainingBytes;
-
-    @Override
-    public void disconnect(Object connection){
-        try {
-            if(client!=null)client.close();
-        } catch (IOException e) {
-
-        }
-    }
+    private List<Runnable> runnables = new ArrayList<>();
 
     public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
         super(descriptor, contextId);
@@ -100,6 +80,23 @@ public abstract class NetworkProtoContext extends ProtoContext {
         throw new UnknownCommandException("Unknown command issued: " + message);
     }
 
+    public List<Runnable> getRunnables() {
+        try {
+            return new ArrayList<>(runnables);
+        } finally {
+            runnables.clear();
+        }
+    }
+
+    @Override
+    public void disconnect(Object connection) {
+        try {
+            if (client != null) client.close();
+        } catch (IOException e) {
+
+        }
+    }
+
     /**
      * Write to the client socket, calls the method to serialize the message
      *
@@ -107,7 +104,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     @Override
     public void write(ReturnMessage rm) {
-        if(rm instanceof Stop)return;
+        if (rm instanceof Stop) return;
         updateLastAccess();
         var returnMessage = (NetworkReturnMessage) rm;
         //Create a new buffer fit for the destination
@@ -134,11 +131,10 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     }
 
-
     @Override
     protected void postWrite(ReturnMessage stepResult) {
         var toRun = getRunnables();
-        for(var runnable : toRun) {
+        for (var runnable : toRun) {
             runnable.run();
         }
     }
@@ -343,9 +339,6 @@ public abstract class NetworkProtoContext extends ProtoContext {
     public void setActive() {
         updateLastAccess();
     }
-
-    private List<Runnable> runnables = new ArrayList<>();
-
 
     public void addResponse(Runnable toRun) {
         runnables.add(toRun);

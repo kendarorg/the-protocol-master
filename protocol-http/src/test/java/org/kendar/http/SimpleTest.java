@@ -256,7 +256,7 @@ public class SimpleTest extends BasicTest {
 
         var method = httpPost.getMethod().toUpperCase();
 
-        Sleeper.sleepNoException(1000,()->getEvents()!=null && !getEvents().isEmpty());
+        Sleeper.sleepNoException(1000, () -> getEvents() != null && !getEvents().isEmpty());
         var events = getEvents();
         assertEquals(1, events.size());
         var evt = events.get(0);
@@ -310,7 +310,7 @@ public class SimpleTest extends BasicTest {
 
         HttpEntity data = MultipartEntityBuilder.create()
                 .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-                .addBinaryBody("upfile", new byte[]{0,1,2,3,4},  org.apache.http.entity.ContentType.DEFAULT_BINARY, "test.txt")
+                .addBinaryBody("upfile", new byte[]{0, 1, 2, 3, 4}, org.apache.http.entity.ContentType.DEFAULT_BINARY, "test.txt")
                 .addTextBody("text", "message", org.apache.http.entity.ContentType.DEFAULT_BINARY)
                 .build();
 
@@ -325,7 +325,7 @@ public class SimpleTest extends BasicTest {
         System.out.println(content);
         var result = new JsonMapper().deserialize(content, Request.class);
         assertTrue(result.getFirstHeader("content-type").contains("multipart/form-data"));
-        assertEquals(2,result.getMultipartData().size());
+        assertEquals(2, result.getMultipartData().size());
     }
 
 

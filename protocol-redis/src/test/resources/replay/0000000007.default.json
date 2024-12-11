@@ -1,11 +1,15 @@
 {
-  "timestamp" : 1733847873507,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 7,
-  "output" : [ "message", "commonChannel", "FIRST" ],
-  "durationMs" : 0,
-  "type" : "RESPONSE",
-  "caller" : "RESP3",
-  "outputType" : "RESPONSE"
+  "timestamp": 1733847873507,
+  "constant": false,
+  "connectionId": 1,
+  "index": 7,
+  "output": [
+    "message",
+    "commonChannel",
+    "FIRST"
+  ],
+  "durationMs": 0,
+  "type": "RESPONSE",
+  "caller": "RESP3",
+  "outputType": "RESPONSE"
 }

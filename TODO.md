@@ -8,12 +8,12 @@
 ### Code
 
 * findIndex,readStorageItem
-  * AMQP
-  * Redis
-  * Mongo
-  * Jdbc (set)
-  * Mysql (show warnings)
-  * Http (favicon)
+    * AMQP
+    * Redis
+    * Mongo
+    * Jdbc (set)
+    * Mysql (show warnings)
+    * Http (favicon)
 * Mocked specific responses for mongo, redis
 * Expose the connections for protocol on apis
 * Send mock messages amqp,mqtt,redis

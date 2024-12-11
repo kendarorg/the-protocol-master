@@ -162,10 +162,10 @@ public class HttpRunner extends CommonRunner {
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = pset.getPlugin(plugin.getId(), plugin.getSettingClass());
-            if(specificPluginSetting!=null || plugin instanceof SSLDummyPlugin) {
+            if (specificPluginSetting != null || plugin instanceof SSLDummyPlugin) {
                 plugin.initialize(ini, settings, specificPluginSetting);
                 plugin.refreshStatus();
-            }else{
+            } else {
                 plugins.remove(i);
             }
         }

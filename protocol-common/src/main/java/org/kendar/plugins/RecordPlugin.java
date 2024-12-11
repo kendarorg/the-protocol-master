@@ -149,19 +149,20 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
         } else if (isActive() != active && active) {
 
             EventsQueue.send(new StartWriteEvent(getInstanceId()));
-            Sleeper.sleep(1000,()-> this.storage.getIndexes(getInstanceId())!=null);
+            Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
         }
     }
 
     @Override
     protected void handlePostActivation(boolean active) {
         var pi = getProtocolInstance();
-        if(pi!=null && BasicAysncRecordPluginSettings.class.isAssignableFrom(getSettings().getClass())){
-            var settings = (BasicAysncRecordPluginSettings)getSettings();
-            if(settings.isResetConnectionsOnStart()){
-                for(var context:pi.getContextsCache().values()){
-                    var contextConnection = context.getValue("CONNECTION");
-                    context.disconnect(((ProxyConnection) contextConnection).getConnection());
+        if (pi != null && BasicAysncRecordPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
+            var settings = (BasicAysncRecordPluginSettings) getSettings();
+            if (settings.isResetConnectionsOnStart() && active) {
+                for (var context : pi.getContextsCache().entrySet()) {
+                    var contextConnection = context.getValue().getValue("CONNECTION");
+                    context.getValue().disconnect(((ProxyConnection) contextConnection).getConnection());
+                    pi.getContextsCache().remove(context.getKey());
                 }
             }
         }

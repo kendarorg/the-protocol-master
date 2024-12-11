@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class ResponseItemQuery {
+    private final HashMap<String, String> tags = new HashMap<>();
     private HashSet<Integer> used = new HashSet<>();
     private String caller;
     private long startAt;
@@ -32,10 +33,10 @@ public class ResponseItemQuery {
         this.startAt = startAt;
     }
 
-    private final HashMap<String, String> tags = new HashMap<>();
     public HashMap<String, String> getTags() {
         return tags;
     }
+
     public String getTag(String tag) {
         return tags.get(tag);
     }

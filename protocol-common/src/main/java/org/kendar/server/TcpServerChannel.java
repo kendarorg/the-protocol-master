@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TcpServerChannel implements ClientServerChannel {
     private final AsynchronousSocketChannel client;
+    private Object lock = new Object();
 
     public TcpServerChannel(AsynchronousSocketChannel client) {
         this.client = client;
@@ -26,8 +27,6 @@ public class TcpServerChannel implements ClientServerChannel {
     public void close() throws IOException {
         this.client.close();
     }
-
-    private Object lock = new Object();
 
     @Override
     public Future<Integer> write(ByteBuffer response) {

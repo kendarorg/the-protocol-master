@@ -35,27 +35,28 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
     public String getProtocol() {
         return "redis";
     }
+
     @Override
     public Map<String, String> buildTag(StorageItem item) {
-        if(item.getInput()!=null && ArrayNode.class.isAssignableFrom(item.getInput().getClass())){
+        if (item.getInput() != null && ArrayNode.class.isAssignableFrom(item.getInput().getClass())) {
             var input = (ArrayNode) item.getInput();
-            if(input.size()>=2){
+            if (input.size() >= 2) {
 
-                if(input.get(0).asText().equalsIgnoreCase("SUBSCRIBE")){
-                    return Map.of("queue",input.get(1).asText());
-                }else if(input.get(0).asText().equalsIgnoreCase("MESSAGE")){
-                    return Map.of("queue",input.get(1).asText());
+                if (input.get(0).asText().equalsIgnoreCase("SUBSCRIBE")) {
+                    return Map.of("queue", input.get(1).asText());
+                } else if (input.get(0).asText().equalsIgnoreCase("MESSAGE")) {
+                    return Map.of("queue", input.get(1).asText());
                 }
             }
         }
-        if(item.getOutput()!=null && ArrayNode.class.isAssignableFrom(item.getOutput().getClass())){
+        if (item.getOutput() != null && ArrayNode.class.isAssignableFrom(item.getOutput().getClass())) {
             var out = (ArrayNode) item.getOutput();
-            if(out.size()>=2){
+            if (out.size() >= 2) {
 
-                if(out.get(0).asText().equalsIgnoreCase("SUBSCRIBE")){
-                    return Map.of("queue",out.get(1).asText());
-                }else if(out.get(0).asText().equalsIgnoreCase("MESSAGE")){
-                    return Map.of("queue",out.get(1).asText());
+                if (out.get(0).asText().equalsIgnoreCase("SUBSCRIBE")) {
+                    return Map.of("queue", out.get(1).asText());
+                } else if (out.get(0).asText().equalsIgnoreCase("MESSAGE")) {
+                    return Map.of("queue", out.get(1).asText());
                 }
             }
         }

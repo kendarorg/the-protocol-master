@@ -190,7 +190,7 @@ public abstract class NetworkProxy extends Proxy {
         }
 
         var sock = (NetworkProxySocket) connection.getConnection();
-        if(sock==null){
+        if (sock == null) {
             return null;
         }
         var bufferToWrite = getProtocol().buildBuffer();

@@ -31,7 +31,7 @@ public class PluginHandler {
     }
 
     public static List<PluginHandler> of(ProtocolPluginDescriptor plugin, ProtoDescriptor protocol) {
-        return of(plugin, "handle",protocol);
+        return of(plugin, "handle", protocol);
     }
 
     public static List<PluginHandler> of(ProtocolPluginDescriptor plugin, String methodName, ProtoDescriptor protocol) {
@@ -74,7 +74,7 @@ public class PluginHandler {
                 } else if (out == null) {
                     return (boolean) method.invoke(target, context, phase, in, out);
                 }
-            }else if (in == null && out != null && typeOut.isAssignableFrom(out.getClass())) {
+            } else if (in == null && out != null && typeOut.isAssignableFrom(out.getClass())) {
                 return (boolean) method.invoke(target, context, phase, in, out);
             }
             return false;

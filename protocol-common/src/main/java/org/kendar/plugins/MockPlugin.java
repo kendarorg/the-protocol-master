@@ -92,7 +92,7 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
 
         super.initialize(global, protocol, pluginSetting);
-        if(getSettings().getDataDir()==null){
+        if (getSettings().getDataDir() == null) {
             return null;
         }
         mocksDir = getSettings().getDataDir();

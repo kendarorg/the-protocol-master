@@ -80,11 +80,11 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     }
 
     @Override
-    protected int tagsMatching(Map<String, String> tags, Map<String,String> query) {
-        if(!tags.get("path").equalsIgnoreCase(query.get("path"))){
+    protected int tagsMatching(Map<String, String> tags, Map<String, String> query) {
+        if (!tags.get("path").equalsIgnoreCase(query.get("path"))) {
             return -1;
         }
-        if(!tags.get("host").equalsIgnoreCase(query.get("host"))){
+        if (!tags.get("host").equalsIgnoreCase(query.get("host"))) {
             return -1;
         }
         return super.tagsMatching(tags, query);
@@ -102,9 +102,9 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
         query.setUsed(completedIndexes);
 
-        var index = findIndex(query,in);
+        var index = findIndex(query, in);
         if (index == null) {
-            if(getSettings().isBlockExternal()){
+            if (getSettings().isBlockExternal()) {
                 out.setStatusCode(500);
                 out.setResponseText(new TextNode("Not Found replaying: " + in.getMethod() + " on " + in.buildUrl()));
                 out.addHeader("Content-Type", ConstantsMime.TEXT);

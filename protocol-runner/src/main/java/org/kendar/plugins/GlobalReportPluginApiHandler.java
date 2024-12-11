@@ -50,7 +50,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
         var action = reqp.getPathParameter("action");
         if ("download".equalsIgnoreCase(action)) {
             GlobalReport report = plugin.getReport();
-            respondJson(resp,report);
+            respondJson(resp, report);
             return true;
         } else if ("start".equalsIgnoreCase(action)) {
             plugin.setActive(true);

@@ -49,13 +49,13 @@ public class MqttRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSetting
         data.put("output", null);
         data.put("consumeId", null);
         if (item.getInput() != null) {
-            if(in.has("packetIdentifier")){
+            if (in.has("packetIdentifier")) {
                 //data.put("packetIdentifier", in.get("packetIdentifier").asText());
             }
-            if(in.has("topicName")){
+            if (in.has("topicName")) {
                 data.put(in.get("topicName").asText(), in.get("qos").asText());
-            }else if(in.has("topics")){
-                for(var topic : in.get("topics")){
+            } else if (in.has("topics")) {
+                for (var topic : in.get("topics")) {
                     data.put(topic.get("topic").asText(), topic.get("type").asText());
                 }
             }
@@ -64,10 +64,10 @@ public class MqttRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSetting
             }
         }
         if (item.getOutput() != null) {
-            if(out.has("packetIdentifier")){
+            if (out.has("packetIdentifier")) {
                 //data.put("packetIdentifier", out.get("packetIdentifier").asText());
             }
-            if(out.has("topicName")){
+            if (out.has("topicName")) {
                 data.put(out.get("topicName").asText(), out.get("qos").asText());
             }
             if (item.getOutputType() != null) {

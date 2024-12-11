@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 
 public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> implements ProtocolPluginDescriptor<W> {
     protected final static JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(ProtocolPluginDescriptorBase.class);
     private boolean active;
     private String instanceId = "default";
     private ProtocolPluginApiHandler apiHandler;
     private PluginSettings settings;
     private ProtoDescriptor protocolInstance;
-
 
     public ProtoDescriptor getProtocolInstance() {
         return protocolInstance;
@@ -24,8 +24,6 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     public void setProtocolInstance(ProtoDescriptor procotolInstance) {
         this.protocolInstance = procotolInstance;
     }
-
-    private static final Logger log = LoggerFactory.getLogger(ProtocolPluginDescriptorBase.class);
 
     public W getSettings() {
         return (W) settings;
@@ -60,7 +58,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         }
         this.settings = pluginSetting;
         if (settings != null) setActive(pluginSetting.isActive());
-        log.debug("Init plugin {} {} {}",this.getInstanceId(),this.getProtocol(),this.getId());
+        log.debug("Init plugin {} {} {}", this.getInstanceId(), this.getProtocol(), this.getId());
         return this;
     }
 
@@ -81,10 +79,10 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     }
 
     public void setActive(boolean active) {
-        var isChanged = active!=this.isActive();
+        var isChanged = active != this.isActive();
         if (isChanged) handleActivation(active);
         this.active = active;
-        if(isChanged)handlePostActivation(active);
+        if (isChanged) handlePostActivation(active);
     }
 
     protected void handlePostActivation(boolean active) {

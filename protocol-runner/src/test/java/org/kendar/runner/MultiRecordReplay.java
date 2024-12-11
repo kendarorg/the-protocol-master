@@ -203,7 +203,7 @@ public class MultiRecordReplay extends BasicTest {
         });
 
 
-        var httpFail = new HttpGet("http://localhost:" + SIMPLE_SERVER_HTTP_PORT+"/notRecorded");
+        var httpFail = new HttpGet("http://localhost:" + SIMPLE_SERVER_HTTP_PORT + "/notRecorded");
         httpresponse = httpclient.execute(httpFail);
         sc = new Scanner(httpresponse.getEntity().getContent());
 

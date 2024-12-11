@@ -67,7 +67,7 @@ public class ReplayerTest {
 
             final Jedis publisherJedis = jedisPool.getResource();
 
-            new Thread(()->new Publisher(publisherJedis, CHANNEL_NAME).start("FIRST", "SECOND", "THIRD")).start();
+            new Thread(() -> new Publisher(publisherJedis, CHANNEL_NAME).start("FIRST", "SECOND", "THIRD")).start();
 
 
             Sleeper.sleepNoException(3000, () -> subscriber.results.size() == 3);

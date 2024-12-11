@@ -16,11 +16,14 @@ import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 
 public class BasicConsume extends Basic {
 
     private static final Logger log = LoggerFactory.getLogger(BasicConsume.class);
+    private static JsonMapper mapper = new JsonMapper();
     private short reserved1;
     private String queue;
     private String consumerTag;
@@ -123,7 +126,6 @@ public class BasicConsume extends Basic {
         rb.write(bits);
         FieldsWriter.writeTable(arguments, rb);
     }
-    private static JsonMapper mapper=   new JsonMapper();
 
     @Override
     protected Iterator<ProtoStep> executeMethod(short channel, short classId, short methodId, BBuffer rb, AmqpFrame event) {
@@ -165,13 +167,13 @@ public class BasicConsume extends Basic {
         context.setValue("BASIC_CONSUME_CI_" + basicConsume.getConsumeId(), basicConsume);
 
 
-        if(context.getValue("QUEUE")==null){
+        if (context.getValue("QUEUE") == null) {
             context.setValue("QUEUE", new HashSet<String>());
         }
 
-        var list = (HashSet<String>)context.getValue("QUEUE");
-        list.add(queue+"|"+channel+"|"+mapper.serialize(arguments));
-        basicConsume.setConsumeOrigin(queue+"|"+channel+"|"+mapper.serialize(arguments));
+        var list = (HashSet<String>) context.getValue("QUEUE");
+        list.add(queue + "|" + channel + "|" + mapper.serialize(arguments));
+        basicConsume.setConsumeOrigin(queue + "|" + channel + "|" + mapper.serialize(arguments));
         //Send back the consume ok
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
@@ -188,11 +190,11 @@ public class BasicConsume extends Basic {
         this.consumeId = consumeId;
     }
 
-    public void setConsumeOrigin(String consumeOrigin) {
-        this.consumeOrigin = consumeOrigin;
-    }
-
     public String getConsumeOrigin() {
         return consumeOrigin;
+    }
+
+    public void setConsumeOrigin(String consumeOrigin) {
+        this.consumeOrigin = consumeOrigin;
     }
 }

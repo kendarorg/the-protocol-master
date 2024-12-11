@@ -4,14 +4,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class CallItemsQuery {
+    private final HashMap<String, String> tags = new HashMap<>();
     private String type;
     private HashSet<Integer> used = new HashSet<>();
     private String caller;
 
-    private final HashMap<String, String> tags = new HashMap<>();
     public HashMap<String, String> getTags() {
         return tags;
     }
+
     public String getTag(String tag) {
         return tags.get(tag);
     }

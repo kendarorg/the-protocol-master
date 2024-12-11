@@ -54,17 +54,17 @@ public class AmqpRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSetting
         var in = mapper.toJsonNode(item.getInput());
         var out = mapper.toJsonNode(item.getOutput());
 
-        if(item.getInputType()!=null && item.getInputType().equalsIgnoreCase("basicConsume")){
+        if (item.getInputType() != null && item.getInputType().equalsIgnoreCase("basicConsume")) {
             var bs = mapper.deserialize(item.getInput(), BasicConsume.class);
-            var queue = bs.getQueue()+"|"+bs.getChannel()+"|"+mapper.serialize(bs.getArguments());
+            var queue = bs.getQueue() + "|" + bs.getChannel() + "|" + mapper.serialize(bs.getArguments());
             data.put("queue", queue);
-        }else if(item.getOutputType()!=null && item.getOutputType().equalsIgnoreCase("bodyFrame")){
+        } else if (item.getOutputType() != null && item.getOutputType().equalsIgnoreCase("bodyFrame")) {
             var bs = mapper.deserialize(item.getOutput(), BodyFrame.class);
             data.put("queue", bs.getConsumeOrigin());
-        }else if(item.getOutputType()!=null && item.getOutputType().equalsIgnoreCase("basicDeliver")){
+        } else if (item.getOutputType() != null && item.getOutputType().equalsIgnoreCase("basicDeliver")) {
             var bs = mapper.deserialize(item.getOutput(), BasicDeliver.class);
             data.put("queue", bs.getConsumeOrigin());
-        }else if(item.getOutputType()!=null && item.getOutputType().equalsIgnoreCase("headerFrame")){
+        } else if (item.getOutputType() != null && item.getOutputType().equalsIgnoreCase("headerFrame")) {
             var bs = mapper.deserialize(item.getOutput(), HeaderFrame.class);
             data.put("queue", bs.getConsumeOrigin());
         }

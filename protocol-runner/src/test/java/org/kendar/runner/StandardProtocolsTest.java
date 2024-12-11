@@ -238,7 +238,7 @@ public class StandardProtocolsTest extends BasicTest {
 
         Sleeper.sleep(15 * 1000);
         var exstmt = c.createStatement();
-        assertThrows(PSQLException.class,()-> exstmt.executeQuery("SELECT DENOMINATION FROM COMPANY_GG;"));
+        assertThrows(PSQLException.class, () -> exstmt.executeQuery("SELECT DENOMINATION FROM COMPANY_GG;"));
 
         runTheServer.set(false);
         Main.stop();

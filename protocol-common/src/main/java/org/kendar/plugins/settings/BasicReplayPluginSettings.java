@@ -6,7 +6,7 @@ public class BasicReplayPluginSettings extends PluginSettings {
     private boolean respectCallDuration;
     private String replayId;
 
-    private boolean blockExternal=true;
+    private boolean blockExternal = true;
 
     public String getReplayId() {
         return replayId;

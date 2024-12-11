@@ -57,8 +57,8 @@ public class Subscribe extends BasePropertiesMqttState {
         publish.setProtocolVersion(context.getProtocolVersion());
         //Variable header for MQTT >=5
         readProperties(publish, bb);
-        var subscriptions = (HashSet<String>)context.getValue("TOPICS");
-        if(subscriptions==null){
+        var subscriptions = (HashSet<String>) context.getValue("TOPICS");
+        if (subscriptions == null) {
             subscriptions = new HashSet<>();
             context.setValue("TOPICS", subscriptions);
         }
@@ -67,7 +67,7 @@ public class Subscribe extends BasePropertiesMqttState {
         while (bb.getPosition() < bb.size()) {
             var topic = bb.readUtf8String();
             var options = bb.get();
-            subscriptions.add(options+"|"+topic);
+            subscriptions.add(options + "|" + topic);
             publish.getTopics().add(new Topic(topic, options));
         }
 

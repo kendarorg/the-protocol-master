@@ -113,7 +113,7 @@ public class Main {
     }
 
     public static void stop() {
-        if(protocolServersCache==null)return;
+        if (protocolServersCache == null) return;
         for (var server : protocolServersCache.values()) {
             server.stop();
         }
@@ -225,7 +225,7 @@ public class Main {
 
 
     public static boolean isRunning() {
-        if(protocolServersCache==null)return false;
+        if (protocolServersCache == null) return false;
         return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning);
     }
 
@@ -309,7 +309,7 @@ public class Main {
             var pluginSettings = (PluginSettings) ini.getPlugin(plugin.getId(), plugin.getSettingClass());
             if (pluginSettings != null) {
                 plugin.initialize(ini, pluginSettings);
-            }else{
+            } else {
                 globalPlugins.remove(i);
             }
         }

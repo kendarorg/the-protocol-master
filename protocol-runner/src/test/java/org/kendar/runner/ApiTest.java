@@ -136,7 +136,7 @@ public class ApiTest extends BasicTest {
         assertTrue(actual.contains("/api/global/terminate"));
         var exp = new FileResourcesUtils().getFileFromResourceAsByteArray("resource://web/swagger/favicon-32x32.png");
         var bin = downloadRequest("http://localhost:5005/swagger/favicon-32x32.png", httpclient);
-        assertArrayEquals(exp,bin);
+        assertArrayEquals(exp, bin);
     }
 
     @Test

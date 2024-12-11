@@ -39,6 +39,7 @@ public class FileStorageRepository implements StorageRepository {
     private final Object initializeContentLock = new Object();
     private final AtomicInteger executorItems = new AtomicInteger(0);
     private String targetDir;
+    private Object lock = new Object();
 
     public FileStorageRepository(String targetDir) {
 
@@ -160,7 +161,7 @@ public class FileStorageRepository implements StorageRepository {
     @Override
     public List<CompactLine> getIndexes(String instanceId) {
         if (protocolRepo.get(instanceId) == null) {
-           return null;
+            return null;
         }
         var repo = protocolRepo.get(instanceId);
         return new ArrayList<>(repo.index);
@@ -171,15 +172,13 @@ public class FileStorageRepository implements StorageRepository {
         protocolRepo.clear();
         var dir = Path.of(targetDir).toFile();
         File[] files = dir.listFiles();
-        if(files != null) {
+        if (files != null) {
             for (File file : files) {
-                if (file.isDirectory())continue;
+                if (file.isDirectory()) continue;
                 file.delete();
             }
         }
     }
-
-    private Object lock = new Object();
 
     public long generateIndex() {
         synchronized (lock) {
@@ -329,9 +328,9 @@ public class FileStorageRepository implements StorageRepository {
         log.debug("[CL<FF] loading responses");
         for (var item : ctx.index.stream()
                 .sorted(Comparator.comparingInt(value -> (int) value.getIndex())).
-                filter(value->value.getIndex()> query.getStartAt()).
+                filter(value -> value.getIndex() > query.getStartAt()).
                 collect(Collectors.toList())) {
-            if(query.getUsed().contains(item.getIndex()))continue;
+            if (query.getUsed().contains((int) item.getIndex())) continue;
             if (item.getType().equalsIgnoreCase("RESPONSE")) {
                 var outItem = ctx.outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
                 if (outItem.isPresent()) {
@@ -380,12 +379,12 @@ public class FileStorageRepository implements StorageRepository {
             fis = new ByteArrayInputStream(byteArray);
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry ze = zis.getNextEntry();
-            if(ze==null){
+            if (ze == null) {
                 throw new RuntimeException("Not a zip file!");
             }
             while (ze != null) {
                 String fileName = ze.getName();
-                if(fileName.length()==0)continue;
+                if (fileName.length() == 0) continue;
                 File newFile = Path.of(destDir, fileName).toFile();
                 //System.out.println("Unzipping to "+newFile.getAbsolutePath());
                 //create directories for sub directories in zip

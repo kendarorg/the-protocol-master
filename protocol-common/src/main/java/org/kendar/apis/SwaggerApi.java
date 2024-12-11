@@ -43,11 +43,12 @@ import java.util.stream.Collectors;
         blocking = true)
 public class SwaggerApi implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(SwaggerApi.class);
     private final String localAddress;
     private final List<SwaggerEnricher> enrichers;
     private final FiltersConfiguration filtersConfiguration;
     private final int port;
-    private static final Logger log = LoggerFactory.getLogger(SwaggerApi.class);
+
     public SwaggerApi(FiltersConfiguration filtersConfiguration,
                       List<SwaggerEnricher> enrichers, int port) {
 
@@ -94,8 +95,8 @@ public class SwaggerApi implements FilteringClass {
         var mf = filter.getMethodFilter();
         if (!expectedPaths.containsKey(filter.getMethodFilter().pathAddress())) {
             expectedPaths.put(filter.getMethodFilter().pathAddress(), new PathItem());
-        }else{
-            log.warn("Duplicate path "+mf.method()+" "+filter.getMethodFilter().pathAddress());
+        } else {
+            log.warn("Duplicate path " + mf.method() + " " + filter.getMethodFilter().pathAddress());
         }
         var expectedPath = expectedPaths.get(filter.getMethodFilter().pathAddress());
 

@@ -75,8 +75,8 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettin
 
 
     protected Map<String, String> getContextTags(ProtoContext context) {
-        if(context.getValue("QUEUE")!=null){
-            return Map.of("queue",(String)context.getValue("QUEUE"));
+        if (context.getValue("QUEUE") != null) {
+            return Map.of("queue", (String) context.getValue("QUEUE"));
         }
         return Map.of();
     }

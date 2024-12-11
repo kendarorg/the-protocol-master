@@ -39,7 +39,7 @@ public class LineToWrite {
         return storageItem;
     }
 
-    public long retrieveTimestamp(){
+    public long retrieveTimestamp() {
         return storageItem.getTimestamp();
     }
 }

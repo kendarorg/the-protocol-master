@@ -89,7 +89,8 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             if (fr != null) {
                 log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
 
-                var ctx = context.getDescriptor().getContextsCache().get(consumeId);;
+                var ctx = context.getDescriptor().getContextsCache().get(consumeId);
+                ;
                 ctx.write(fr);
             } else {
                 throw new RuntimeException("MISSING CLASS " + clazz);
@@ -150,28 +151,28 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         switch (index.getType()) {
             case "Connect":
                 result = handleFakeConnect((Connect) in, pluginContext);
-                if(result==null && !getSettings().isBlockExternal()){
+                if (result == null && !getSettings().isBlockExternal()) {
                     index.setIndex(-1);
                     return null;
                 }
                 break;
             case "Subscribe":
                 result = handleFakeSubscribe((Subscribe) in, pluginContext);
-                if(result==null && !getSettings().isBlockExternal()){
+                if (result == null && !getSettings().isBlockExternal()) {
                     index.setIndex(-1);
                     return null;
                 }
                 break;
             case "Publish":
                 result = handleFakePublish((Publish) in, pluginContext);
-                if(result==null && !getSettings().isBlockExternal()){
+                if (result == null && !getSettings().isBlockExternal()) {
                     index.setIndex(-1);
                     return null;
                 }
                 break;
             case "PublishRel":
                 result = handleFakePublishRel((PublishRel) in, pluginContext);
-                if(result==null && !getSettings().isBlockExternal()){
+                if (result == null && !getSettings().isBlockExternal()) {
                     index.setIndex(-1);
                     return null;
                 }
@@ -209,11 +210,11 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
 
 
     protected Map<String, String> getContextTags(ProtoContext context) {
-        if(context.getValue("TOPICS")!=null){
-            var hashTopic = (HashSet<String>)context.getValue("TOPICS");
+        if (context.getValue("TOPICS") != null) {
+            var hashTopic = (HashSet<String>) context.getValue("TOPICS");
             var result = new HashMap<String, String>();
-            for(var topic : hashTopic) {
-                var spl = topic.split("|",2);
+            for (var topic : hashTopic) {
+                var spl = topic.split("|", 2);
                 result.put(spl[1].substring(1), spl[0]);
             }
             return result;
@@ -225,13 +226,13 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
     protected Map<String, String> buildTag(Object cll) {
         var data = new HashMap<String, String>();
         var in = mapper.toJsonNode(cll);
-        if(in.has("packetIdentifier")){
+        if (in.has("packetIdentifier")) {
             //data.put("packetIdentifier", in.get("packetIdentifier").asText());
         }
-        if(in.has("topicName")){
+        if (in.has("topicName")) {
             data.put(in.get("topicName").asText(), in.get("qos").asText());
-        }else if(in.has("topics")){
-            for(var topic : in.get("topics")){
+        } else if (in.has("topics")) {
+            for (var topic : in.get("topics")) {
                 data.put(topic.get("topic").asText(), topic.get("type").asText());
             }
         }

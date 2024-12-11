@@ -112,11 +112,11 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
     }
 
     protected Map<String, String> getContextTags(ProtoContext context) {
-        if(context.getValue("QUEUE")!=null){
-            var hashTopic = (HashSet<String>)context.getValue("QUEUE");
+        if (context.getValue("QUEUE") != null) {
+            var hashTopic = (HashSet<String>) context.getValue("QUEUE");
             var result = new HashMap<String, String>();
-            for(var topic : hashTopic) {
-               // var spl = topic.split("|",3);
+            for (var topic : hashTopic) {
+                // var spl = topic.split("|",3);
                 //TODO RABBITCONTEXT
                 result.put("queue", topic);
             }
@@ -128,14 +128,14 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
     @Override
     protected Map<String, String> buildTag(Object cll) {
         var data = new HashMap<String, String>();
-        if(cll instanceof BasicConsume){
-            data.put("queue",((BasicConsume)cll).getConsumeOrigin());
-        }else if(cll instanceof BodyFrame){
-            data.put("queue",((BodyFrame)cll).getConsumeOrigin());
-        }else if(cll instanceof BasicDeliver){
-            data.put("queue",((BasicDeliver)cll).getConsumeOrigin());
-        }else if(cll instanceof HeaderFrame){
-            data.put("queue",((HeaderFrame)cll).getConsumeOrigin());
+        if (cll instanceof BasicConsume) {
+            data.put("queue", ((BasicConsume) cll).getConsumeOrigin());
+        } else if (cll instanceof BodyFrame) {
+            data.put("queue", ((BodyFrame) cll).getConsumeOrigin());
+        } else if (cll instanceof BasicDeliver) {
+            data.put("queue", ((BasicDeliver) cll).getConsumeOrigin());
+        } else if (cll instanceof HeaderFrame) {
+            data.put("queue", ((HeaderFrame) cll).getConsumeOrigin());
         }
         //var in = mapper.toJsonNode(cll);
 //        if(in.has("packetIdentifier")){

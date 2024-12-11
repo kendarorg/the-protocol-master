@@ -1,25 +1,27 @@
 {
-  "timestamp" : 1733762109616,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 2,
-  "input" : {
-    "fullFlag" : -126,
-    "fixedHeader" : "SUBSCRIBE",
-    "topics" : [ {
-      "topic" : "/subscribe/",
-      "type" : 0
-    } ],
-    "packetIdentifier" : 1
+  "timestamp": 1733762109616,
+  "constant": false,
+  "connectionId": 1,
+  "index": 2,
+  "input": {
+    "fullFlag": -126,
+    "fixedHeader": "SUBSCRIBE",
+    "topics": [
+      {
+        "topic": "/subscribe/",
+        "type": 0
+      }
+    ],
+    "packetIdentifier": 1
   },
-  "output" : {
-    "fullFlag" : -112,
-    "fixedHeader" : "SUBACK",
-    "packetIdentifier" : 1
+  "output": {
+    "fullFlag": -112,
+    "fixedHeader": "SUBACK",
+    "packetIdentifier": 1
   },
-  "durationMs" : 6,
-  "type" : "Subscribe",
-  "caller" : "MQTT",
-  "inputType" : "Subscribe",
-  "outputType" : "SubscribeAck"
+  "durationMs": 6,
+  "type": "Subscribe",
+  "caller": "MQTT",
+  "inputType": "Subscribe",
+  "outputType": "SubscribeAck"
 }

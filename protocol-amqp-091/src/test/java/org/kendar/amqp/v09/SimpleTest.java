@@ -219,7 +219,6 @@ public class SimpleTest extends BasicTest {
         System.out.println("------------------------------------------------------------");
 
 
-
         Sleeper.sleep(1000, () -> messages.size() == 3);
         channel1.queueDelete(MAIN_QUEUE);
         channel.queueDelete(MAIN_QUEUE);

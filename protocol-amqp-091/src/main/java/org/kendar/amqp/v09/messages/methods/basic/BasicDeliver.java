@@ -106,7 +106,7 @@ public class BasicDeliver extends Basic {
         bd.exchange = ShortStringHelper.read(rb);
         bd.routingKey = ShortStringHelper.read(rb);
 
-        var consumeOrigin = basicConsume.getQueue()+"|"+basicConsume.getChannel()+"|"+mapper.serialize(basicConsume.getArguments());
+        var consumeOrigin = basicConsume.getQueue() + "|" + basicConsume.getChannel() + "|" + mapper.serialize(basicConsume.getArguments());
         bd.setConsumeOrigin(consumeOrigin);
 
 
@@ -122,11 +122,11 @@ public class BasicDeliver extends Basic {
         this.consumeId = consumeId;
     }
 
-    public void setConsumeOrigin(String consumeOrigin) {
-        this.consumeOrigin = consumeOrigin;
-    }
-
     public String getConsumeOrigin() {
         return consumeOrigin;
+    }
+
+    public void setConsumeOrigin(String consumeOrigin) {
+        this.consumeOrigin = consumeOrigin;
     }
 }

@@ -37,8 +37,8 @@ public class BasicTest {
     protected static List<InterceptPublishMessage> moquetteMessages = new ArrayList<>();
     //protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
-    private static Server mqttBroker;
     protected static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static Server mqttBroker;
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -86,7 +86,7 @@ public class BasicTest {
         }));
     }
 
-    public static void beforeEachNotStarting(TestInfo testInfo){
+    public static void beforeEachNotStarting(TestInfo testInfo) {
         events.clear();
         moquetteMessages.clear();
         EventsQueue.register("recorder", (r) -> {
