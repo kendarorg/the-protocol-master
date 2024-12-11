@@ -25,4 +25,6 @@ public interface StorageRepository extends Service {
 
 
     List<CompactLine> getIndexes(String instanceId);
+
+    void clean();
 }

@@ -315,8 +315,13 @@ public abstract class ProtoContext {
                 //Write somwhere the result
                 log.debug("[CL<TP][TX]: Responding {} Tags: {}", stepResult.getClass().getSimpleName(), event.getTagKeyValues());
                 write(stepResult);
+                postWrite(stepResult);
             }
         }
+    }
+
+    protected void postWrite(ReturnMessage stepResult) {
+
     }
 
     /**

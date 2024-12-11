@@ -57,6 +57,11 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public void clean() {
+
+    }
+
+    @Override
     public String getType() {
         return "storage";
     }

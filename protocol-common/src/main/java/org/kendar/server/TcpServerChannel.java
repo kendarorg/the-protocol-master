@@ -27,9 +27,13 @@ public class TcpServerChannel implements ClientServerChannel {
         this.client.close();
     }
 
+    private Object lock = new Object();
+
     @Override
     public Future<Integer> write(ByteBuffer response) {
-        return this.client.write(response);
+        synchronized (lock) {
+            return this.client.write(response);
+        }
     }
 
     @Override

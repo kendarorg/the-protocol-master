@@ -35,6 +35,14 @@ import java.util.concurrent.ExecutionException;
 public abstract class NetworkProtoContext extends ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(NetworkProtoContext.class);
 
+    public List<Runnable> getRunnables() {
+        try {
+            return new ArrayList<>(runnables);
+        }finally {
+            runnables.clear();
+        }
+    }
+
     /**
      * If had sent the greeting message (to send data immediatly after connection without further ado)
      */
@@ -121,6 +129,17 @@ public abstract class NetworkProtoContext extends ProtoContext {
                 log.error("[CL<TP][TX] Cannot write message: {} {}", returnMessage.getClass().getSimpleName(), e.getMessage());
                 throw new ConnectionExeception("Cannot write on channel");
             }
+        }
+
+
+    }
+
+
+    @Override
+    protected void postWrite(ReturnMessage stepResult) {
+        var toRun = getRunnables();
+        for(var runnable : toRun) {
+            runnable.run();
         }
     }
 
@@ -323,5 +342,12 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     public void setActive() {
         updateLastAccess();
+    }
+
+    private List<Runnable> runnables = new ArrayList<>();
+
+
+    public void addResponse(Runnable toRun) {
+        runnables.add(toRun);
     }
 }

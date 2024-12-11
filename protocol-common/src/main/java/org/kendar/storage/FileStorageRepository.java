@@ -165,6 +165,20 @@ public class FileStorageRepository implements StorageRepository {
         var repo = protocolRepo.get(instanceId);
         return new ArrayList<>(repo.index);
     }
+
+    @Override
+    public void clean() {
+        protocolRepo.clear();
+        var dir = Path.of(targetDir).toFile();
+        File[] files = dir.listFiles();
+        if(files != null) {
+            for (File file : files) {
+                if (file.isDirectory())continue;
+                file.delete();
+            }
+        }
+    }
+
     private Object lock = new Object();
 
     public long generateIndex() {
@@ -312,13 +326,13 @@ public class FileStorageRepository implements StorageRepository {
         var ctx = protocolRepo.get(protocolInstanceId);
         var result = new ArrayList<StorageItem>();
 
+        log.debug("[CL<FF] loading responses");
         for (var item : ctx.index.stream()
                 .sorted(Comparator.comparingInt(value -> (int) value.getIndex())).
                 filter(value->value.getIndex()> query.getStartAt()).
                 collect(Collectors.toList())) {
             if(query.getUsed().contains(item.getIndex()))continue;
             if (item.getType().equalsIgnoreCase("RESPONSE")) {
-                log.debug("[CL<FF] loading response");
                 var outItem = ctx.outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
                 if (outItem.isPresent()) {
                     result.add(outItem.get());

@@ -9,6 +9,7 @@ import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
@@ -183,8 +184,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
             }
             if (!result.isEmpty()) {
-                executor.submit(() -> {
-                    Sleeper.sleep(10);
+                ((NetworkProtoContext)pluginContext.getContext()).addResponse(()->{
                     sendBackResponses(pluginContext.getContext(), result);
                 });
             }
@@ -263,10 +263,11 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 }
 
             }
-            executor.submit(() -> {
-                Sleeper.sleep(10);
+            if (!result.isEmpty()) {
+            ((NetworkProtoContext)pluginContext.getContext()).addResponse(()->{
                 sendBackResponses(pluginContext.getContext(), result);
             });
+            }
 
         }
         return true;

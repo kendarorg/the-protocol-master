@@ -151,6 +151,31 @@ public class ApiHandler implements FilteringClass {
 
     @HttpMethodFilter(
             pathAddress = "/api/global/storage",
+            method = "DELETE", id = "DELETE /api/global/storage")
+    @TpmDoc(
+            description = "Delete recorded data",
+            responses = { @TpmResponse(
+                    body = Ok.class
+
+            ), @TpmResponse(
+                    code = 500,
+                    body = Ko.class
+            )},
+            tags = {"base/storage"})
+    public boolean cleanUp(Request reqp, Response resp) {
+        StorageRepository storage = settings.getService("storage");
+
+        try {
+            storage.clean();
+            respondOk(resp);
+        } catch (Exception ex) {
+            respondKo(resp, ex);
+        }
+        return true;
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/api/global/storage",
             method = "POST", id = "POST /api/global/storage")
     @TpmDoc(
             description = "Upload existing recording can call with " +
