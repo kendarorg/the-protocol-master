@@ -32,7 +32,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.apache.http.entity.ContentType.IMAGE_JPEG;
@@ -257,7 +256,8 @@ public class SimpleTest extends BasicTest {
 
         var method = httpPost.getMethod().toUpperCase();
 
-        var events = getEvents().stream().collect(Collectors.toList());
+        Sleeper.sleepNoException(1000,()->getEvents()!=null && !getEvents().isEmpty());
+        var events = getEvents();
         assertEquals(1, events.size());
         var evt = events.get(0);
         assertEquals("http", evt.getProtocol());
