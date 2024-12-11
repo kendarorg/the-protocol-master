@@ -183,6 +183,9 @@ public abstract class NetworkProxySocket {
     public void write(BBuffer buffer) {
         context.setActive();
         buffer.setPosition(0);
+        if(!channel.isOpen()){
+            Sleeper.sleepNoException(200,()->channel.isOpen());
+        }
         channel.write(ByteBuffer.wrap(buffer.getAll()));
     }
 

@@ -68,9 +68,11 @@ public class ExchangeTest extends BasicTest {
         numbers.add("4");
         numbers.add("5");
         System.out.println("-----------------------------");
-        numbers.forEach((n) -> queue.sendMessage(EXCHANGE_NAME, KEY_NAME, n));
+
         Square sq = new Square();
         sq.listenToMessage(connectionFactory);
+        Sleeper.sleep(100);
+        numbers.forEach((n) -> queue.sendMessage(EXCHANGE_NAME, KEY_NAME, n));
 
         Sleeper.sleep(5000, () -> Square.results.size() == 5);
         assertTrue(Square.results.containsKey("Square of 1 is: 1"));
