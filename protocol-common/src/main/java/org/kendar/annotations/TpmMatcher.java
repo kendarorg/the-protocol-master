@@ -2,6 +2,9 @@ package org.kendar.annotations;
 
 import java.lang.annotation.*;
 
+/**
+ * Matcher function for method
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 @Inherited

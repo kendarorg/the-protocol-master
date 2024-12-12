@@ -7,6 +7,9 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+/**
+ * Concrete HttpMethodFilter to ease the handling
+ */
 @SuppressWarnings("ClassExplicitlyAnnotation")
 public class HttpMethodFilterConcrete implements HttpMethodFilter {
     private final boolean methodBlocking;

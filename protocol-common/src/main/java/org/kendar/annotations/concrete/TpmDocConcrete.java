@@ -5,6 +5,9 @@ import org.kendar.annotations.multi.*;
 
 import java.lang.annotation.Annotation;
 
+/**
+ * Concrete documentation annotation
+ */
 @SuppressWarnings("ClassExplicitlyAnnotation")
 public class TpmDocConcrete implements TpmDoc {
     private final TpmDoc doc;

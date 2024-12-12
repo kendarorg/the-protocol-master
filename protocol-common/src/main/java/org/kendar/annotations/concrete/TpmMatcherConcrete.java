@@ -6,6 +6,9 @@ import org.kendar.annotations.TpmMatcher;
 
 import java.lang.annotation.Annotation;
 
+/**
+ * Concrete path matcher descriptor
+ */
 @SuppressWarnings("ClassExplicitlyAnnotation")
 public class TpmMatcherConcrete implements TpmMatcher {
     private final TpmMatcher matcher;

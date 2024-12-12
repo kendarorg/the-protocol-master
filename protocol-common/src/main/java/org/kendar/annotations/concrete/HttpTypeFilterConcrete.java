@@ -5,6 +5,9 @@ import org.kendar.annotations.HttpTypeFilter;
 import java.lang.annotation.Annotation;
 import java.util.regex.Pattern;
 
+/**
+ * Concrete HttpTypeFilter
+ */
 @SuppressWarnings("ClassExplicitlyAnnotation")
 public class HttpTypeFilterConcrete implements HttpTypeFilter {
 

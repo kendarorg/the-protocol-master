@@ -1,5 +1,8 @@
 package org.kendar.annotations;
 
+/**
+ * The matcher function to use to match the address
+ */
 public enum MatcherFunction {
     EXACT("EXACT"),
     REGEXP("REGEXP"),

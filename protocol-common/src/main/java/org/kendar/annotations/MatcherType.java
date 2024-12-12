@@ -1,5 +1,8 @@
 package org.kendar.annotations;
 
+/**
+ * The field to use as matcher
+ */
 public enum MatcherType {
     ADDRESS("ADDRESS"),
     PATH("PATH"),
