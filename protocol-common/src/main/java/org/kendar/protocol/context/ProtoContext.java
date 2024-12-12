@@ -311,7 +311,10 @@ public abstract class ProtoContext {
             } else {
                 //Run the step
                 var stepResult = steps.run();
-                if (stepResult == null) continue;
+                if (stepResult == null) {
+                    postWrite(null);
+                    continue;
+                }
                 //Write somwhere the result
                 log.debug("[CL<TP][TX]: Responding {} Tags: {}", stepResult.getClass().getSimpleName(), event.getTagKeyValues());
                 write(stepResult);

@@ -7,6 +7,7 @@ import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.protocol.states.Stop;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.settings.GlobalSettings;
@@ -161,6 +162,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
             if (settings.isResetConnectionsOnStart() && active) {
                 for (var context : pi.getContextsCache().entrySet()) {
                     var contextConnection = context.getValue().getValue("CONNECTION");
+                    context.getValue().write(new Stop());
                     context.getValue().disconnect(((ProxyConnection) contextConnection).getConnection());
                     pi.getContextsCache().remove(context.getKey());
                 }

@@ -74,15 +74,15 @@ public class ReplayerTest {
             MqttConnectOptions options = new MqttConnectOptions();
             client.connect(options);
 
-            if (client.isConnected()) {
+            Sleeper.sleep(1000, () ->client.isConnected());
                 setupCallBack(client);
 
                 client.subscribe(TOPIC_NAME, 0);
-
+                Sleeper.sleep(1000);
                 MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
                 message.setQos(0);
                 client.publish(TOPIC_NAME, message);
-            }
+
             Sleeper.sleep(1000, () -> !messages.isEmpty());
             client.disconnect();
             client.close();
