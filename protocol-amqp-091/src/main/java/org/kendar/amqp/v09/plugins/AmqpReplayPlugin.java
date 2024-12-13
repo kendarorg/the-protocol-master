@@ -1,6 +1,5 @@
 package org.kendar.amqp.v09.plugins;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
@@ -14,6 +13,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.utils.ExtraBeanUtils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -53,8 +53,10 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
 
         var result = mapper.deserialize(out, toread.getClass());
         try {
-            BeanUtils.copyProperties(toread, result);
+            ExtraBeanUtils.copyProperties(toread, result,"Reserved1");
         } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }

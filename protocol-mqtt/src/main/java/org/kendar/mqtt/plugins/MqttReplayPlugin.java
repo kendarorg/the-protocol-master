@@ -12,6 +12,7 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.utils.ExtraBeanUtils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -51,9 +52,9 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
 
         var result = mapper.deserialize(out.toString(), toread.getClass());
         try {
-
+            ExtraBeanUtils.copyProperties(toread, result,"PacketIdentifier");
             BeanUtils.copyProperties(toread, result);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }

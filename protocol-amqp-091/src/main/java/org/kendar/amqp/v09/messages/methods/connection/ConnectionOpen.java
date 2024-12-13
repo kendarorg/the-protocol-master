@@ -81,16 +81,11 @@ public class ConnectionOpen extends Connection {
         var result = new ConnectionOpenOk();
         result.setReserved1(reserved1);
 
-        return iteratorOfRunnable(() -> {
-                    var message = proxy.sendAndExpect(context,
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                             connection,
                             conOpen,
                             result
-                    );
-
-                    message.setReserved1(reserved1);
-                    return message;
-                }
+                    )
         );
     }
 

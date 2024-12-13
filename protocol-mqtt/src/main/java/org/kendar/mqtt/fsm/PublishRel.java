@@ -54,15 +54,14 @@ public class PublishRel extends BasePropertiesMqttState implements ReturnMessage
         if (isProxyed()) {
             return iteratorOfList(publishRel);
         } else {
-            return iteratorOfRunnable(() -> {
-                var result = proxy.sendAndExpect(context,
+            var pubComp = new PublishComp();
+            pubComp.setPacketIdentifier(publishRel.getPacketIdentifier());
+            return iteratorOfRunnable(() ->
+                proxy.sendAndExpect(context,
                         connection,
                         publishRel,
-                        new PublishComp()
-                );
-                result.setPacketIdentifier(publishRel.getPacketIdentifier());
-                return result;
-            });
+                        pubComp
+                ));
         }
     }
 
