@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 /**
  * Base class for the plugin
+ *
  * @param <W> BasicReplayPluginSettings this should match the getSettingClass method
  */
 public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptorBase<W> {
@@ -60,6 +61,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Retrieve the settings class, must match the <W> parameter
+     *
      * @return
      */
     @Override
@@ -69,8 +71,9 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Initialize the plugin
-     * @param global The global settings (with storage service)
-     * @param protocol The protocol specific settings
+     *
+     * @param global        The global settings (with storage service)
+     * @param protocol      The protocol specific settings
      * @param pluginSetting The plugin settings (must match the getSettingsClass)
      * @return
      */
@@ -83,6 +86,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Set the storage on the plugin
+     *
      * @param storage
      * @return
      */
@@ -96,6 +100,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     /**
      * To override if the protocol has callbacks/subscriptions
      * Default false
+     *
      * @return
      */
     protected boolean hasCallbacks() {
@@ -105,6 +110,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     /**
      * To do special operations on the data received
      * Usually does nothing
+     *
      * @param of
      * @return
      */
@@ -136,6 +142,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Operation to initialize the plugin according to activation status
+     *
      * @param active
      */
     @Override
@@ -188,8 +195,8 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                         var contextConnection = context.getValue("CONNECTION");
                         context.disconnect(((ProxyConnection) contextConnection).getConnection());
                         context.setValue("CONNECTION", null);
-                    }catch (Exception e){
-                        log.debug("Error disconnecting connection {}",contextKvp.getKey(), e);
+                    } catch (Exception e) {
+                        log.debug("Error disconnecting connection {}", contextKvp.getKey(), e);
                     }
                     pi.getContextsCache().remove(contextKvp.getKey());
                 }
@@ -199,6 +206,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * What to do when the proxy requests a response
+     *
      * @param pluginContext
      * @param in
      * @param out
@@ -251,6 +259,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Load from index the async responses following the ones returned
+     *
      * @param pluginContext
      * @param item
      */
@@ -292,6 +301,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     /**
      * Overridable, retrieve the tags from the context (e.g. in case of a queue
      * it adds to the message the queue to which the message is associated)
+     *
      * @param context
      * @return
      */
@@ -301,6 +311,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Read a storage item to reproduce
+     *
      * @param index
      * @param in
      * @param pluginContext
@@ -312,6 +323,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Build the tags from an input object
+     *
      * @param in
      * @return
      */
@@ -321,6 +333,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Operation to modify the message before sending it back to clien
+     *
      * @param lineToRead
      * @return
      */
@@ -330,6 +343,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Final operations on the
+     *
      * @param pluginContext
      * @param context
      * @param in
@@ -343,6 +357,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * HAndle the send without responses
+     *
      * @param pluginContext
      * @param in
      * @return
@@ -375,6 +390,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Send back the responses, only for callback enabled protocols
+     *
      * @param context
      * @param result
      */
@@ -386,6 +402,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      * The phases for which the plugin is enabled.
      * In this case only on PRE_CALL, intercepting all "real" call from
      * the client
+     *
      * @return
      */
     @Override
@@ -395,6 +412,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * The plugin id
+     *
      * @return
      */
     @Override
@@ -405,6 +423,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     /**
      * Find the correct index given the input object (from which the tags are loaded)
      * and following the query object
+     *
      * @param query
      * @param in
      * @return
@@ -437,6 +456,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Match the possible type with the real type
+     *
      * @param type
      * @param possibleType
      * @return
@@ -449,6 +469,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Check for matching tags and return a confidence value
+     *
      * @param tags
      * @param query
      * @return

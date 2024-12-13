@@ -52,6 +52,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     private BytesEvent remainingBytes;
     private List<Runnable> runnables = new ArrayList<>();
+    private boolean disconnected = false;
 
     public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
         super(descriptor, contextId);
@@ -89,14 +90,12 @@ public abstract class NetworkProtoContext extends ProtoContext {
         }
     }
 
-    private boolean disconnected = false;
-
     @Override
     public void disconnect(Object connection) {
         try {
             disconnected = true;
-            if(connection!=null && NetworkProxySocket.class.isAssignableFrom(connection.getClass())){
-                ((NetworkProxySocket)connection).close();
+            if (connection != null && NetworkProxySocket.class.isAssignableFrom(connection.getClass())) {
+                ((NetworkProxySocket) connection).close();
             }
             if (client != null) client.close();
         } catch (IOException e) {
@@ -112,11 +111,11 @@ public abstract class NetworkProtoContext extends ProtoContext {
     @Override
     public void write(ReturnMessage rm) {
         if (rm instanceof Stop) return;
-        if(disconnected){
-            if(client!=null && client.isOpen()){
+        if (disconnected) {
+            if (client != null && client.isOpen()) {
                 try {
                     client.close();
-                    client=null;
+                    client = null;
                 } catch (IOException e) {
 
                 }
@@ -150,7 +149,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     @Override
     protected void postWrite(ReturnMessage stepResult) {
-        if(disconnected)return;
+        if (disconnected) return;
         var toRun = getRunnables();
         for (var runnable : toRun) {
             runnable.run();

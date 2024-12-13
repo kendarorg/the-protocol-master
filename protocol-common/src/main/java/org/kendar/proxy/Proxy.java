@@ -55,9 +55,9 @@ public abstract class Proxy {
     public void setProtocol(NetworkProtoDescriptor protocol) {
 
         this.protocol = protocol;
-        for(var item:allowedPlugins.values()) {
-            for(var subitem:item.values()) {
-                for(var subSubItem:subitem){
+        for (var item : allowedPlugins.values()) {
+            for (var subitem : item.values()) {
+                for (var subSubItem : subitem) {
                     subSubItem.setProtocol(protocol);
                 }
             }

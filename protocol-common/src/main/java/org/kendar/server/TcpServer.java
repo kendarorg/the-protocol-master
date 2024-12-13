@@ -14,7 +14,10 @@ import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Multithreaded asynchronous server
@@ -27,23 +30,21 @@ public class TcpServer {
     private static final String HOST = "*";
     private static final Logger log = LoggerFactory.getLogger(TcpServer.class);
     private final NetworkProtoDescriptor protoDescriptor;
-
-    private int getWaitTimeoutMs(){
-        return WAIT_TIMEOUT_MS;
-    }
     /**
      * Listener thread
      */
     private Thread thread;
-
     /**
      * Listener socket
      */
     private AsynchronousServerSocketChannel server;
     private boolean callDurationTimes;
-
     public TcpServer(NetworkProtoDescriptor protoDescriptor) {
         this.protoDescriptor = protoDescriptor;
+    }
+
+    private int getWaitTimeoutMs() {
+        return WAIT_TIMEOUT_MS;
     }
 
     /**
@@ -149,7 +150,7 @@ public class TcpServer {
                             context.sendGreetings();
                         }
                         //Start reading
-                        client.read(buffer, getWaitTimeoutMs(),  buffer, new CompletionHandler<>() {
+                        client.read(buffer, getWaitTimeoutMs(), buffer, new CompletionHandler<>() {
                             @Override
                             public void completed(Integer result, ByteBuffer attachment) {
                                 try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
@@ -192,7 +193,7 @@ public class TcpServer {
                 } catch (ExecutionException e) {
                     log.trace("ExecutionException", e);
                     break;
-                }catch (Exception e) {
+                } catch (Exception e) {
                     log.trace("Execution exception", e);
                 }
             }

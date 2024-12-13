@@ -10,24 +10,28 @@ import java.lang.annotation.RetentionPolicy;
 public @interface QueryString {
     /**
      * Name
+     *
      * @return
      */
     String key();
 
     /**
      * Description
+     *
      * @return
      */
     String description() default "";
 
     /**
      * Type of field
+     *
      * @return
      */
     String type() default "string";
 
     /**
      * Example value
+     *
      * @return
      */
     String example() default "string";

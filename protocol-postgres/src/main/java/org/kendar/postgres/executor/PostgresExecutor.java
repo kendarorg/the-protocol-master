@@ -285,7 +285,7 @@ public class PostgresExecutor {
         for (var parsed : parseds) {
             var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
             lastOne = handleSingleQuery(sqlParseResult, protoContext, parse,
-                    new Binding("","",new ArrayList<>(),new ArrayList<>()), 1,false);
+                    new Binding("", "", new ArrayList<>(), new ArrayList<>()), 1, false);
         }
         ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
         return lastOne;

@@ -34,24 +34,28 @@ public @interface HttpMethodFilter {
 
     /**
      * The HTTP method (GET/PUT/POST/DELETE/PATCH/OPTIONS)
+     *
      * @return
      */
     String method() default "";
 
     /**
      * The description on swagger
+     *
      * @return
      */
     String description() default "";
 
     /**
      * The unique (to application) id of the method
+     *
      * @return
      */
     String id() default "";
 
     /**
      * The matcher (not in use)
+     *
      * @return
      */
     TpmMatcher[] matcher() default {};

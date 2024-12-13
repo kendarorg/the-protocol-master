@@ -22,7 +22,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     }
 
     public void setProtocolInstance(ProtoDescriptor procotolInstance) {
-        if(procotolInstance==null) {
+        if (procotolInstance == null) {
             return;
         }
         this.protocolInstance = procotolInstance;

@@ -13,6 +13,7 @@ import java.lang.annotation.*;
 public @interface TpmDoc {
     /**
      * Tags on swagger rendering
+     *
      * @return
      */
     String[] tags() default {};
@@ -23,42 +24,49 @@ public @interface TpmDoc {
 
     /**
      * Http return type
+     *
      * @return
      */
     String produce() default "";
 
     /**
      * Query string parameters
+     *
      * @return
      */
     QueryString[] query() default {};
 
     /**
      * Path parameters
+     *
      * @return
      */
     PathParameter[] path() default {};
 
     /**
      * Headers associated with method
+     *
      * @return
      */
     Header[] header() default {};
 
     /**
      * Kinds of requests
+     *
      * @return
      */
     TpmRequest[] requests() default {};
 
     /**
      * Kinds of responses
+     *
      * @return
      */
     TpmResponse[] responses() default {};
 
     /**
      * Security descriptors
+     *
      * @return
      */
     TpmSecurity[] security() default {};

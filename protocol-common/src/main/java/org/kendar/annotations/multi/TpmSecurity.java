@@ -6,12 +6,14 @@ package org.kendar.annotations.multi;
 public @interface TpmSecurity {
     /**
      * Scopes
+     *
      * @return
      */
     String[] scopes() default {};
 
     /**
      * Name
+     *
      * @return
      */
     String name();

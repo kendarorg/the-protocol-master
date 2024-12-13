@@ -73,6 +73,7 @@ public abstract class ProtoContext {
      */
     private ProtoState currentState;
     private boolean useCallDurationTimes;
+    private ConcurrentLinkedQueue<ProtoState> states = new ConcurrentLinkedQueue<>();
 
     public ProtoContext(ProtoDescriptor descriptor, int contextId) {
         this.contextId = contextId;
@@ -215,8 +216,6 @@ public abstract class ProtoContext {
         }
     }
 
-    private ConcurrentLinkedQueue<ProtoState> states = new ConcurrentLinkedQueue<>();
-
     /**
      * Find the correct handler for the event and execute it
      *
@@ -243,7 +242,7 @@ public abstract class ProtoContext {
             }
             currentState = foundedState;
             states.add(foundedState);
-            while (states.size()>5){
+            while (states.size() > 5) {
                 states.poll();
             }
 

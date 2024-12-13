@@ -144,11 +144,11 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     @Override
     protected void handleActivation(boolean active) {
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
-        if(isActive()!=active){
-            if(active){
+        if (isActive() != active) {
+            if (active) {
                 EventsQueue.send(new StartWriteEvent(getInstanceId()));
                 Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
-            }else{
+            } else {
                 terminate();
             }
         }
@@ -170,8 +170,8 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
                         var contextConnection = context.getValue("CONNECTION");
                         context.disconnect(((ProxyConnection) contextConnection).getConnection());
                         context.setValue("CONNECTION", null);
-                    }catch (Exception e){
-                        log.debug("Error disconnecting connection {}",contextKvp.getKey(), e);
+                    } catch (Exception e) {
+                        log.debug("Error disconnecting connection {}", contextKvp.getKey(), e);
                     }
                     pi.getContextsCache().remove(contextKvp.getKey());
                 }

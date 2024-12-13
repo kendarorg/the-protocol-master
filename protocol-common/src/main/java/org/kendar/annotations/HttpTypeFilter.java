@@ -15,6 +15,7 @@ public @interface HttpTypeFilter {
     /**
      * Can be set using simple ${property:default} or ${property}
      * Usually it is * (or anything)
+     *
      * @return host
      */
     String hostAddress() default "*";
@@ -28,12 +29,14 @@ public @interface HttpTypeFilter {
 
     /**
      * The name of
+     *
      * @return
      */
     String name() default "";
 
     /**
      * The priority of the filter (not used)
+     *
      * @return
      */
     int priority() default 100;
@@ -41,6 +44,7 @@ public @interface HttpTypeFilter {
     /**
      * If blocking the execution is ALWAYS blocked regardless of
      * the methods returning false
+     *
      * @return if is blocking
      */
     boolean blocking() default false;

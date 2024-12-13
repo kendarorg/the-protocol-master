@@ -69,7 +69,7 @@ public class MqttProtocol extends NetworkProtoDescriptor {
                                                         )
                                                 )
                                         )
-                                        ,new PingReq(MqttPacket.class)
+                                        , new PingReq(MqttPacket.class)
                                 )
 
                         )

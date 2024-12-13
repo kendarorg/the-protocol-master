@@ -28,19 +28,25 @@ public class TcpServerChannel implements ClientServerChannel {
 
     @Override
     public void close() throws IOException {
-        if(closed)return;
-        closed=true;
-        try{
-            this.client.shutdownInput();}catch (Exception e){}
-        try{
-            this.client.shutdownOutput();}catch (Exception e){}
-        try{
-            this.client.close();}catch (Exception e){}
+        if (closed) return;
+        closed = true;
+        try {
+            this.client.shutdownInput();
+        } catch (Exception e) {
+        }
+        try {
+            this.client.shutdownOutput();
+        } catch (Exception e) {
+        }
+        try {
+            this.client.close();
+        } catch (Exception e) {
+        }
     }
 
     @Override
     public Future<Integer> write(ByteBuffer response) {
-        if(closed)return new Future<Integer>() {
+        if (closed) return new Future<Integer>() {
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
                 return false;
@@ -73,7 +79,7 @@ public class TcpServerChannel implements ClientServerChannel {
 
     @Override
     public void read(ByteBuffer buffer, int timeoutInMs, ByteBuffer buffer1, CompletionHandler<Integer, ByteBuffer> completionHandler) {
-        if(closed)return;
+        if (closed) return;
         this.client.read(buffer, timeoutInMs, TimeUnit.MILLISECONDS, buffer1, completionHandler);
     }
 

@@ -73,7 +73,7 @@ public class Publish extends BasePropertiesMqttState {
         }
         if (qos == 1) {
             return iteratorOfRunnable(() -> {
-                var result =proxy.sendAndExpect(context,
+                var result = proxy.sendAndExpect(context,
                         connection,
                         publish,
                         new PublishAck()

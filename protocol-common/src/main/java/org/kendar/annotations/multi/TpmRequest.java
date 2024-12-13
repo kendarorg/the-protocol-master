@@ -13,24 +13,28 @@ import java.lang.annotation.RetentionPolicy;
 public @interface TpmRequest {
     /**
      * List of examples
+     *
      * @return
      */
     Example[] examples() default {};
 
     /**
      * Accepted mime type
+     *
      * @return
      */
     String accept() default ConstantsMime.JSON;
 
     /**
      * Body type
+     *
      * @return
      */
     Class<?> body() default Object.class;
 
     /**
      * If optional
+     *
      * @return
      */
     boolean optional() default false;

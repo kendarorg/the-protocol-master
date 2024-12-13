@@ -20,7 +20,7 @@ public class MqttPacket extends ProtocolEvent implements NetworkReturnMessage {
                       String packetIdentifier) {
         super(context, prevState);
         if (packetIdentifier != null) {
-            System.out.println("PACKET "+packetIdentifier+" "+this.getClass().getSimpleName());
+            System.out.println("PACKET " + packetIdentifier + " " + this.getClass().getSimpleName());
             getTag().add(Tag.of("PACKET", packetIdentifier).get(0));
         }
         this.fixedHeader = fixedHeader;

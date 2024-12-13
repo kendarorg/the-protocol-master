@@ -10,24 +10,28 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Header {
     /**
      * Description
+     *
      * @return
      */
     String description() default "";
 
     /**
      * Header key
+     *
      * @return
      */
     String key();
 
     /**
      * Header value
+     *
      * @return
      */
     String value() default "";
 
     /**
      * Header content type
+     *
      * @return
      */
     Class<?> type() default String.class;
