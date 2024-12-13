@@ -43,7 +43,7 @@ public class Execute extends PostgresState {
 
         log.debug("[SERVER][STMTEXEC]: Max:{} Query:{}", maxRecords, parseMessage.getQuery());
         var res = executor.executePortal(
-                protoContext, parseMessage, bindMessage, maxRecords,
+                postgresContext, parseMessage, bindMessage, maxRecords,
                 bindMessage.isDescribable() || parseMessage.isDescribable(),
                 false);
         if (res.isRunNow()) {
