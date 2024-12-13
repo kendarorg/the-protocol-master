@@ -142,6 +142,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     protected void handleActivation(boolean active) {
         try {
             if (this.isActive() != active) {
+
                 completedOutIndexes.clear();
                 completedIndexes.clear();
                 if (active) {
@@ -170,20 +171,27 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
 
-    /**
-     * Post activation initializations
-     * @param active
-     */
+
     @Override
     protected void handlePostActivation(boolean active) {
+        disconnectAll();
+    }
+
+    private void disconnectAll() {
         var pi = getProtocolInstance();
         if (pi != null && BasicAysncReplayPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
             var settings = (BasicAysncReplayPluginSettings) getSettings();
-            if (settings.isResetConnectionsOnStart() && active) {
-                for (var context : pi.getContextsCache().entrySet()) {
-                    var contextConnection = context.getValue().getValue("CONNECTION");
-                    context.getValue().disconnect(((ProxyConnection) contextConnection).getConnection());
-                    pi.getContextsCache().remove(context.getKey());
+            if (settings.isResetConnectionsOnStart()) {
+                for (var contextKvp : pi.getContextsCache().entrySet()) {
+                    try {
+                        var context = contextKvp.getValue();
+                        var contextConnection = context.getValue("CONNECTION");
+                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                        context.setValue("CONNECTION", null);
+                    }catch (Exception e){
+                        log.debug("Error disconnecting connection {}",contextKvp.getKey(), e);
+                    }
+                    pi.getContextsCache().remove(contextKvp.getKey());
                 }
             }
         }

@@ -77,7 +77,11 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
 
     @Override
     public BasePluginDescriptor duplicate() {
-        return null;
+        try {
+            return this.getClass().getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Should implement clone for " + this.getClass(), e);
+        }
     }
 
     @Override

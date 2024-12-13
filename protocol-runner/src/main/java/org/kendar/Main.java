@@ -49,6 +49,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static java.lang.System.exit;
+
 @SuppressWarnings("ThrowablePrintedToSystemOut")
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
@@ -62,6 +64,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         execute(args, Main::stopWhenQuitCommand);
+        exit(0);
     }
 
 

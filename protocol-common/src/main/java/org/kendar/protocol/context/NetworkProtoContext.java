@@ -15,6 +15,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.NullState;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.Stop;
+import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.Proxy;
 import org.kendar.server.ClientServerChannel;
 import org.kendar.utils.Sleeper;
@@ -88,9 +89,15 @@ public abstract class NetworkProtoContext extends ProtoContext {
         }
     }
 
+    private boolean disconnected = false;
+
     @Override
     public void disconnect(Object connection) {
         try {
+            disconnected = true;
+            if(connection!=null && NetworkProxySocket.class.isAssignableFrom(connection.getClass())){
+                ((NetworkProxySocket)connection).close();
+            }
             if (client != null) client.close();
         } catch (IOException e) {
 
@@ -105,6 +112,16 @@ public abstract class NetworkProtoContext extends ProtoContext {
     @Override
     public void write(ReturnMessage rm) {
         if (rm instanceof Stop) return;
+        if(disconnected){
+            if(client!=null && client.isOpen()){
+                try {
+                    client.close();
+                    client=null;
+                } catch (IOException e) {
+
+                }
+            }
+        }
         updateLastAccess();
         var returnMessage = (NetworkReturnMessage) rm;
         //Create a new buffer fit for the destination
@@ -133,6 +150,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     @Override
     protected void postWrite(ReturnMessage stepResult) {
+        if(disconnected)return;
         var toRun = getRunnables();
         for (var runnable : toRun) {
             runnable.run();

@@ -215,6 +215,8 @@ public abstract class ProtoContext {
         }
     }
 
+    private ConcurrentLinkedQueue<ProtoState> states = new ConcurrentLinkedQueue<>();
+
     /**
      * Find the correct handler for the event and execute it
      *
@@ -240,6 +242,10 @@ public abstract class ProtoContext {
                 log.debug("[CL>TP][RX]: Executing {}", foundedState.getClass().getSimpleName());
             }
             currentState = foundedState;
+            states.add(foundedState);
+            while (states.size()>5){
+                states.poll();
+            }
 
             //Invoke the execution
             var stepsToInvoke = currentState.executeEvent(currentEvent);

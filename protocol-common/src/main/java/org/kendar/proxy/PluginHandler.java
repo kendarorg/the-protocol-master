@@ -90,5 +90,9 @@ public class PluginHandler {
     public List<ProtocolPhase> getPhases() {
         return target.getPhases();
     }
+
+    public void setProtocol(ProtoDescriptor protocol) {
+        target.setProtocolInstance(protocol);
+    }
 }
 

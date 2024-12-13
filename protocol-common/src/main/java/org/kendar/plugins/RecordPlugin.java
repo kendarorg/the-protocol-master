@@ -7,7 +7,6 @@ import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
-import org.kendar.protocol.states.Stop;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.settings.GlobalSettings;
@@ -145,26 +144,36 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     @Override
     protected void handleActivation(boolean active) {
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
-        if (isActive() != active && !active) {
-            terminate();
-        } else if (isActive() != active && active) {
-
-            EventsQueue.send(new StartWriteEvent(getInstanceId()));
-            Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
+        if(isActive()!=active){
+            if(active){
+                EventsQueue.send(new StartWriteEvent(getInstanceId()));
+                Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
+            }else{
+                terminate();
+            }
         }
     }
 
     @Override
     protected void handlePostActivation(boolean active) {
+        disconnectAll();
+    }
+
+    private void disconnectAll() {
         var pi = getProtocolInstance();
         if (pi != null && BasicAysncRecordPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
             var settings = (BasicAysncRecordPluginSettings) getSettings();
-            if (settings.isResetConnectionsOnStart() && active) {
-                for (var context : pi.getContextsCache().entrySet()) {
-                    var contextConnection = context.getValue().getValue("CONNECTION");
-                    context.getValue().write(new Stop());
-                    context.getValue().disconnect(((ProxyConnection) contextConnection).getConnection());
-                    pi.getContextsCache().remove(context.getKey());
+            if (settings.isResetConnectionsOnStart()) {
+                for (var contextKvp : pi.getContextsCache().entrySet()) {
+                    try {
+                        var context = contextKvp.getValue();
+                        var contextConnection = context.getValue("CONNECTION");
+                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                        context.setValue("CONNECTION", null);
+                    }catch (Exception e){
+                        log.debug("Error disconnecting connection {}",contextKvp.getKey(), e);
+                    }
+                    pi.getContextsCache().remove(contextKvp.getKey());
                 }
             }
         }

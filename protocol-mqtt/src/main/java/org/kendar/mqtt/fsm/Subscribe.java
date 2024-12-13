@@ -74,11 +74,14 @@ public class Subscribe extends BasePropertiesMqttState {
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
+        return iteratorOfRunnable(() -> {
+            var result = proxy.sendAndExpect(context,
                 connection,
                 publish,
-                new SubscribeAck()
-        ));
+                new SubscribeAck());
+            result.setPacketIdentifier(publish.getPacketIdentifier());
+            return result;
+        });
     }
 
 

@@ -57,6 +57,13 @@ All callback are replayed automatically
 
 ## Interesting informations
 
+```
+Remember that with automatic recconection with Eclipse Paho
+YOU MUST re-connect and re-subscribe!!!
+
+No idea for other clients 
+```
+
 At the moment the test is based on the moquette MQTT server, since it can be
 embedded directly into any java application and does not require testcontainers
 

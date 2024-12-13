@@ -20,7 +20,7 @@ import java.util.concurrent.*;
  * Multithreaded asynchronous server
  */
 public class TcpServer {
-
+    private static final int WAIT_TIMEOUT_MS = 30000;
     /**
      * Default host
      */
@@ -28,6 +28,9 @@ public class TcpServer {
     private static final Logger log = LoggerFactory.getLogger(TcpServer.class);
     private final NetworkProtoDescriptor protoDescriptor;
 
+    private int getWaitTimeoutMs(){
+        return WAIT_TIMEOUT_MS;
+    }
     /**
      * Listener thread
      */
@@ -146,7 +149,7 @@ public class TcpServer {
                             context.sendGreetings();
                         }
                         //Start reading
-                        client.read(buffer, 30000, TimeUnit.MILLISECONDS, buffer, new CompletionHandler<>() {
+                        client.read(buffer, getWaitTimeoutMs(),  buffer, new CompletionHandler<>() {
                             @Override
                             public void completed(Integer result, ByteBuffer attachment) {
                                 try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
@@ -168,7 +171,7 @@ public class TcpServer {
                                         return;
                                     }
                                     //Restart reading again
-                                    client.read(attachment, 30000, TimeUnit.MILLISECONDS, attachment, this);
+                                    client.read(attachment, getWaitTimeoutMs(), attachment, this);
                                 } catch (Exception ex) {
                                     context.handleExceptionInternal(ex);
                                     throw ex;
@@ -183,10 +186,13 @@ public class TcpServer {
                             }
                         });
                     } catch (ClosedChannelException ex) {
-
+                        log.trace("ClosedChannelException", ex);
                     }
 
-                } catch (Exception e) {
+                } catch (ExecutionException e) {
+                    log.trace("ExecutionException", e);
+                    break;
+                }catch (Exception e) {
                     log.trace("Execution exception", e);
                 }
             }

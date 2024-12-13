@@ -44,11 +44,14 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
     }
 
     @Override
-    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread, LineToRead lineToRead) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context,
+                              Object in, Object outObj, Object toread,
+                              LineToRead lineToRead) {
         var out = mapper.toJsonNode(outObj);
 
         var result = mapper.deserialize(out.toString(), toread.getClass());
         try {
+
             BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
