@@ -1,11 +1,9 @@
 package org.kendar.apis;
 
-import com.fasterxml.jackson.databind.node.BinaryNode;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.PathParameter;
-import org.kendar.annotations.multi.TpmRequest;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
@@ -17,7 +15,6 @@ import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 
 import java.util.ArrayList;
@@ -26,7 +23,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import static java.lang.System.exit;
-import static org.kendar.apis.ApiUtils.*;
+import static org.kendar.apis.ApiUtils.respondJson;
+import static org.kendar.apis.ApiUtils.respondOk;
 
 @HttpTypeFilter(hostAddress = "*")
 public class ApiHandler implements FilteringClass {
@@ -121,93 +119,6 @@ public class ApiHandler implements FilteringClass {
         respondJson(resp, result);
     }
 
-    @HttpMethodFilter(
-            pathAddress = "/api/global/storage",
-            method = "GET", id = "GET /api/global/storage")
-    @TpmDoc(
-            description = "Download recorded data",
-            responses = {@TpmResponse(
-                    content = ConstantsMime.ZIP,
-                    body = byte[].class
-            ), @TpmResponse(
-                    body = Ok.class
-
-            ), @TpmResponse(
-                    code = 500,
-                    body = Ko.class
-            )},
-            tags = {"base/storage"})
-    public boolean handleDownload(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
-
-        try {
-            var data = storage.readAsZip();
-            respondFile(resp, data, ConstantsMime.ZIP, "storage.zip");
-        } catch (Exception ex) {
-            respondKo(resp, ex);
-        }
-        return true;
-    }
-
-    @HttpMethodFilter(
-            pathAddress = "/api/global/storage",
-            method = "DELETE", id = "DELETE /api/global/storage")
-    @TpmDoc(
-            description = "Delete recorded data",
-            responses = {@TpmResponse(
-                    body = Ok.class
-
-            ), @TpmResponse(
-                    code = 500,
-                    body = Ko.class
-            )},
-            tags = {"base/storage"})
-    public boolean cleanUp(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
-
-        try {
-            storage.clean();
-            respondOk(resp);
-        } catch (Exception ex) {
-            respondKo(resp, ex);
-        }
-        return true;
-    }
-
-    @HttpMethodFilter(
-            pathAddress = "/api/global/storage",
-            method = "POST", id = "POST /api/global/storage")
-    @TpmDoc(
-            description = "Upload existing recording can call with " +
-                    "<a href='upload.html?path=/api/global/storage&contentType=application/octet-stream&binary=true'>Upload</a>",
-            requests = @TpmRequest(
-                    accept = ConstantsMime.ZIP
-            ),
-            responses = {@TpmResponse(
-                    body = Ok.class
-            ), @TpmResponse(
-                    code = 500,
-                    body = Ko.class
-            )},
-            tags = {"base/storage"})
-    public boolean handleUpload(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
-        try {
-
-            byte[] inputData;
-            if (reqp.getRequestText() instanceof BinaryNode) {
-                inputData = ((BinaryNode) reqp.getRequestText()).binaryValue();
-            } else {
-                inputData = reqp.getRequestText().textValue().getBytes();
-            }
-            storage.writeZip(inputData);
-            storage.initialize();
-            respondOk(resp);
-        } catch (Exception ex) {
-            respondKo(resp, ex);
-        }
-        return true;
-    }
 
     @SuppressWarnings("finally")
     @HttpMethodFilter(
