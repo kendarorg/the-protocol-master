@@ -45,12 +45,8 @@ public class ExtraBeanUtils {
         for (var item : avoid) {
             mapToAvoid.add(item.toLowerCase(Locale.ROOT));
         }
-        var origProperties = cache.computeIfAbsent(orig.getClass().getName(), k -> {
-            return describe(orig);
-        });
-        var destProperties = cache.computeIfAbsent(dest.getClass().getName(), k -> {
-            return describe(dest);
-        });
+        var origProperties = cache.computeIfAbsent(orig.getClass().getName(), k -> describe(orig));
+        var destProperties = cache.computeIfAbsent(dest.getClass().getName(), k -> describe(dest));
         var pu = BeanUtilsBean.getInstance().getPropertyUtils();
         var bbu = BeanUtilsBean.getInstance();
         for (var origEntry : origProperties.entrySet()) {

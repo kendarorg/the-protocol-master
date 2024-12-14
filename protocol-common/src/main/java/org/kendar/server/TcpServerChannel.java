@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class TcpServerChannel implements ClientServerChannel {
     private final AsynchronousSocketChannel client;
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private boolean closed = false;
 
     public TcpServerChannel(AsynchronousSocketChannel client) {
@@ -46,7 +46,7 @@ public class TcpServerChannel implements ClientServerChannel {
 
     @Override
     public Future<Integer> write(ByteBuffer response) {
-        if (closed) return new Future<Integer>() {
+        if (closed) return new Future<>() {
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
                 return false;

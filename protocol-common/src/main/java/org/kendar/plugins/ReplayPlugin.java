@@ -118,8 +118,6 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         return of;
     }
 
-    @SuppressWarnings("IfStatementWithIdenticalBranches")
-
     /**
      * Handle all the messages recorded previously
      * @param pluginContext The execution context
@@ -291,9 +289,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
             }
             if (!result.isEmpty()) {
-                ((NetworkProtoContext) pluginContext.getContext()).addResponse(() -> {
-                    sendBackResponses(pluginContext.getContext(), result);
-                });
+                ((NetworkProtoContext) pluginContext.getContext()).addResponse(() -> sendBackResponses(pluginContext.getContext(), result));
             }
         }
     }

@@ -129,7 +129,6 @@ public class TcpServer {
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
             log.info("[CL>TP][IN] Listening on " + HOST + ":{} {}", protoDescriptor.getPort(), protoDescriptor.getClass().getSimpleName());
 
-            //noinspection InfiniteLoopStatement
             while (true) {
                 try {
                     //Accept request

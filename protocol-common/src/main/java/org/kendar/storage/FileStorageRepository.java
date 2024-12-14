@@ -38,7 +38,7 @@ public class FileStorageRepository implements StorageRepository {
     private final Object initializeContentLock = new Object();
     private final AtomicInteger executorItems = new AtomicInteger(0);
     private String targetDir;
-    private Object lock = new Object();
+    private final Object lock = new Object();
 
     public FileStorageRepository(String targetDir) {
 

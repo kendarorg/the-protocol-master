@@ -96,7 +96,7 @@ public class SwaggerApi implements FilteringClass {
         if (!expectedPaths.containsKey(filter.getMethodFilter().pathAddress())) {
             expectedPaths.put(filter.getMethodFilter().pathAddress(), new PathItem());
         } else {
-            log.warn("Duplicate path " + mf.method() + " " + filter.getMethodFilter().pathAddress());
+            log.warn("Duplicate path {} {}", mf.method(), filter.getMethodFilter().pathAddress());
         }
         var expectedPath = expectedPaths.get(filter.getMethodFilter().pathAddress());
 
@@ -114,9 +114,7 @@ public class SwaggerApi implements FilteringClass {
                 components = new Components();
             }
             var scc = components;
-            schemas.entrySet().forEach(es ->
-                    scc.addSchemas(es.getKey(), es.getValue())
-            );
+            schemas.forEach((key, value) -> scc.addSchemas(key, value));
             swagger.components(components);
             String swaggerJson = Json.mapper().writeValueAsString(swagger);
             OpenAPI rebuilt = Json.mapper().readValue(swaggerJson, OpenAPI.class);

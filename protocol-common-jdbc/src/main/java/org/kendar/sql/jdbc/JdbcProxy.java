@@ -401,7 +401,7 @@ public class JdbcProxy extends Proxy {
             }
             return new ProxyConnection(connection);
         } catch (SQLException e) {
-            log.warn("Error connection " + getConnectionString(), e);
+            log.warn("Error connection {}", getConnectionString(), e);
             return new ProxyConnection(null);
         }
     }

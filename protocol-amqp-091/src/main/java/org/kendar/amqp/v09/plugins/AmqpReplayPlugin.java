@@ -54,9 +54,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         var result = mapper.deserialize(out, toread.getClass());
         try {
             ExtraBeanUtils.copyProperties(toread, result, "Reserved1");
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
