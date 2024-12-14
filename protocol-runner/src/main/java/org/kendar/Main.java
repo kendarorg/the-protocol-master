@@ -8,7 +8,7 @@ import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
 import org.kendar.apis.ApiFiltersLoader;
 import org.kendar.apis.ApiHandler;
-import org.kendar.apis.ApiStorageHandler;
+import org.kendar.apis.ApiStorageOnlyHandler;
 import org.kendar.cli.CommandParser;
 import org.kendar.command.*;
 import org.kendar.http.plugins.*;
@@ -269,7 +269,7 @@ public class Main {
         var apisFiltersLoader = new ApiFiltersLoader(new ArrayList<>(), ini.getApiPort());
         var apiHandler = new ApiHandler(ini);
         apisFiltersLoader.getFilters().add(apiHandler);
-        var apiStorageHandler = new ApiStorageHandler(ini);
+        var apiStorageHandler = new ApiStorageOnlyHandler(ini);
         apisFiltersLoader.getFilters().add(apiStorageHandler);
         apiHandler.addGLobalPlugins(globalPlugins);
 

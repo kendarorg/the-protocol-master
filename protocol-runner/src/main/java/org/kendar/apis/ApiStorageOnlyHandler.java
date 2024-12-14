@@ -30,13 +30,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.kendar.apis.ApiUtils.*;
 
 @HttpTypeFilter(hostAddress = "*")
-public class ApiStorageHandler implements FilteringClass {
+public class ApiStorageOnlyHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalSettings settings;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
-    public ApiStorageHandler(GlobalSettings settings) {
+    public ApiStorageOnlyHandler(GlobalSettings settings) {
         this.settings = settings;
     }
 
