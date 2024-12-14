@@ -122,7 +122,9 @@ public class Main {
         for (var server : protocolServersCache.values()) {
             server.stop();
         }
-        apiServer.stop(0);
+        if(apiServer!=null) {
+            apiServer.stop(0);
+        }
     }
 
     private static Boolean stopWhenQuitCommand() {
