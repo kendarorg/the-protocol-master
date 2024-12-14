@@ -82,13 +82,13 @@ public class ApiTest extends ApiTestBase {
 
         Sleeper.sleep(1000);
         var httpclient = HttpClients.createDefault();
-        var actual = new String(downloadRequest("http://localhost:5005/swagger/index.html", httpclient));
+        var actual = new String(downloadRequest("http://localhost:5005/swagger-ui/index.html", httpclient));
         assertTrue(actual.contains("swagger-ui"));
 
         actual = new String(downloadRequest("http://localhost:5005/api/swagger/map.json", httpclient));
         assertTrue(actual.contains("/api/global/terminate"));
-        var exp = new FileResourcesUtils().getFileFromResourceAsByteArray("resource://web/swagger/favicon-32x32.png");
-        var bin = downloadRequest("http://localhost:5005/swagger/favicon-32x32.png", httpclient);
+        var exp = new FileResourcesUtils().getFileFromResourceAsByteArray("resource://web/swagger-ui/favicon-32x32.png");
+        var bin = downloadRequest("http://localhost:5005/swagger-ui/favicon-32x32.png", httpclient);
         assertArrayEquals(exp, bin);
     }
 
