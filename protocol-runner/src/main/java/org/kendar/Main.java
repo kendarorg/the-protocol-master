@@ -61,6 +61,7 @@ public class Main {
     private static List<GlobalPluginDescriptor> allGlobalPlugins;
     private static List<GlobalPluginDescriptor> globalPlugins;
     private static JarPluginManager pluginManager;
+    private static HttpServer apiServer;
 
 
     public static void main(String[] args) throws Exception {
@@ -121,6 +122,7 @@ public class Main {
         for (var server : protocolServersCache.values()) {
             server.stop();
         }
+        apiServer.stop(0);
     }
 
     private static Boolean stopWhenQuitCommand() {
@@ -327,7 +329,7 @@ public class Main {
                 apisFiltersLoader.loadFilters();
                 if (ini.getApiPort() > 0) {
                     var address = new InetSocketAddress(ini.getApiPort());
-                    var apiServer = HttpServer.create(address, 10);
+                    apiServer = HttpServer.create(address, 10);
                     apiServer.createContext("/", apisFiltersLoader);
                     apiServer.start();
                     log.info("[SERVER][IN] Listening on *.:{} TPM Apis", ini.getApiPort());

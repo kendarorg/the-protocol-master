@@ -316,6 +316,18 @@ public class Request {
         }
     }
 
+    public String buildUrlNoQuery() {
+
+        if (getPort() > 0) {
+            return getProtocol() + "://" + getHost() + ":" + getPort() +
+                    getPath();
+        } else {
+
+            return getProtocol() + "://" + getHost() +
+                    getPath();
+        }
+    }
+
     public void removeHeader(String s) {
         for (var kvp : headers.keySet()) {
             if (s.equalsIgnoreCase(kvp)) {

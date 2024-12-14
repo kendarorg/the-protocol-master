@@ -52,6 +52,11 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public List<CompactLineComplete> getAllIndexes(int maxLen) {
+        return List.of();
+    }
+
+    @Override
     public List<CompactLine> getIndexes(String instanceId) {
         return List.of();
     }

@@ -1,10 +1,6 @@
 package org.kendar.runner;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,16 +13,13 @@ import org.kendar.plugins.apis.Status;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.Sleeper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ApiTest extends BasicTest {
+public class ApiTest extends ApiTestBase {
     private static BasicTest bs;
 
     @AfterAll
@@ -34,6 +27,7 @@ public class ApiTest extends BasicTest {
         bs.runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(1000);
+
     }
 
     @BeforeAll
@@ -52,46 +46,6 @@ public class ApiTest extends BasicTest {
         Sleeper.sleep(2000);
     }
 
-    private static <T> T getRequest(String target, CloseableHttpClient httpclient, TypeReference<T> typeReference) throws IOException {
-        var httpget = new HttpGet(target);
-        var httpresponse = httpclient.execute(httpget);
-
-        var sc = new Scanner(httpresponse.getEntity().getContent());
-        var result = "";
-        while (sc.hasNext()) {
-            result += (sc.nextLine());
-        }
-        System.out.println(result);
-        return mapper.deserialize(result, typeReference);
-    }
-
-    private static byte[] downloadRequest(String target, CloseableHttpClient httpclient) throws IOException {
-        var httpget = new HttpGet(target);
-        var httpresponse = httpclient.execute(httpget);
-
-        var baos = new ByteArrayOutputStream();
-        httpresponse.getEntity().writeTo(baos);
-        return baos.toByteArray();
-    }
-
-    private static String downloadRequestString(String target, CloseableHttpClient httpclient) throws IOException {
-        var bytes = downloadRequest(target, httpclient);
-        return new String(bytes);
-    }
-
-    private static <T> T postRequest(String target, CloseableHttpClient httpclient, byte[] data, TypeReference<T> typeReference) throws IOException {
-        var httpget = new HttpPost(target);
-        var be = new ByteArrayEntity(data);
-        httpget.setEntity(be);
-        var httpresponse = httpclient.execute(httpget);
-
-        var sc = new Scanner(httpresponse.getEntity().getContent());
-        var result = "";
-        while (sc.hasNext()) {
-            result += (sc.nextLine());
-        }
-        return mapper.deserialize(result, typeReference);
-    }
 
     @Test
     void globalApiTest() throws Exception {
@@ -104,7 +58,6 @@ public class ApiTest extends BasicTest {
         var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
         assertTrue(zip.length > 100);
         Files.write(Path.of("target", "downloaded.zip"), zip);
-
     }
 
     @Test

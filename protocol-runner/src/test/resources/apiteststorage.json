@@ -1,7 +1,7 @@
 {
   "pluginsDir": "target/plugins",
   "logLevel": "DEBUG",
-  "dataDir": "target/tests/apitest",
+  "dataDir": "data/postgres",
   "apiPort": 5005,
   "protocols": {
     "http-01": {

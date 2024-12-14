@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -133,6 +132,7 @@ public class FileStorageRepository implements StorageRepository {
 
         //}
     }
+
 
     private void initializeContentWrite(String instanceId) {
 
@@ -293,32 +293,21 @@ public class FileStorageRepository implements StorageRepository {
     @Override
     public StorageItem readById(String protocolInstanceId, long id) {
         var ctx = protocolRepo.get(protocolInstanceId);
+        if(ctx==null){
+            String fileContent;
+            try {
+                var filePath= Path.of(targetDir, padLeftZeros(String.valueOf(id),10)+"." + protocolInstanceId + ".json");
+
+                    fileContent = Files.readString(filePath);
+            } catch (IOException e) {
+                fileContent = "{}";
+            }
+            return mapper.deserialize(fileContent, new TypeReference<>() {
+            });
+        }
         return ctx.inMemoryDb.get(id);
     }
 
-    private boolean typeMatching(String type, String type1) {
-        if ("RESPONSE".equalsIgnoreCase(type1)) return false;
-        if (type == null || type.isEmpty()) return true;
-        return type.equalsIgnoreCase(type1);
-    }
-
-    private boolean tagsMatching(Map<String, String> tags, Map<String, String> query) {
-        for (var tag : query.entrySet()) {
-            if (tags.containsKey(tag.getKey())) {
-                var l = tags.get(tag.getKey());
-                var r = query.get(tag.getKey());
-                //noinspection StringEquality
-                if ((l == null || r == null) && l == r) {
-                    continue;
-                }
-                if (l != null && l.equalsIgnoreCase(r)) {
-                    continue;
-                }
-                return false;
-            }
-        }
-        return true;
-    }
 
     @Override
     public List<StorageItem> readResponses(String protocolInstanceId, ResponseItemQuery query) {
@@ -421,5 +410,49 @@ public class FileStorageRepository implements StorageRepository {
         public List<CompactLine> index = new ArrayList<>();
         public boolean initialized = false;
         public volatile boolean somethingWritten = false;
+    }
+
+    @Override
+    public List<CompactLineComplete> getAllIndexes(int maxLen) {
+        var result = new ArrayList<CompactLineComplete>();
+        for (var file : listFilesUsingJavaIO(Path.of(targetDir).toAbsolutePath().toString())) {
+            if(file.getName().contains("index") && file.getName().endsWith(".json")) {
+                String fileContent;
+                var fileNameOnly = file.toPath().getFileName().toString();
+                fileNameOnly = fileNameOnly.replace("index.","");
+                var protocolInstanceId = fileNameOnly.replace(".json","");
+                try {
+                    fileContent = Files.readString(file.toPath());
+                } catch (IOException e) {
+                    fileContent = "{}";
+                }
+                var deserialized = mapper.deserialize(fileContent, new TypeReference<List<CompactLineComplete>>() {
+                });
+                deserialized.forEach(item->{
+                    item.setProtocolInstanceId(protocolInstanceId);
+                    var id = protocolInstanceId+"/"+padLeftZeros(String.valueOf(item.getIndex()), 10);
+
+
+                    var filePath= Path.of(targetDir, padLeftZeros(String.valueOf(item.getIndex()),10)+"." + protocolInstanceId + ".json");
+                    if(filePath.toFile().exists()) {
+                        item.setFullItemId(id);
+                    }
+                    if(maxLen>=0) {
+                        for (var tag : item.getTags().entrySet()) {
+                            var val = tag.getValue();
+                            var isTooMuch = val.length() > maxLen;
+                            val = val.substring(0, Math.min(val.length(), maxLen));
+                            if (isTooMuch) {
+                                val += "...";
+                            }
+                            item.getTags().put(tag.getKey(), val);
+                        }
+                    }
+                });
+                result.addAll(deserialized);
+            }
+        }
+        return result;
+
     }
 }
