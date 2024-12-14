@@ -38,7 +38,7 @@ public class ApiTestStorage extends ApiTestBase {
         };
         bs = new BasicTest();
         bs.startAndHandleUnexpectedErrors(args);
-        Sleeper.sleep(2000);
+        Sleeper.sleep(3000);
     }
 
     @Test
