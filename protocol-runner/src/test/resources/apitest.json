@@ -18,7 +18,10 @@
       },
       "plugins": {
         "record-plugin": {
-          "recordSites": ["unknown"]},
+          "recordSites": [
+            "unknown"
+          ]
+        },
         "replay-plugin": {}
       }
     },

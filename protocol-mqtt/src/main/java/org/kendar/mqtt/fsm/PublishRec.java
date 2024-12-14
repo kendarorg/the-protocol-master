@@ -52,10 +52,10 @@ public class PublishRec extends BasePropertiesMqttState implements ReturnMessage
             var pubRelProxyed = (PublishRel) new PublishRel().asProxy();
             pubRelProxyed.setPacketIdentifier(publishRec.getPacketIdentifier());
             return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
-                        connection,
-                        publishRec,
-                        pubRelProxyed
-                ));
+                    connection,
+                    publishRec,
+                    pubRelProxyed
+            ));
         }
         return iteratorOfList(publishRec);
     }

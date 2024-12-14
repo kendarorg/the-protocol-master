@@ -48,7 +48,7 @@ public class ApiTestStorage extends ApiTestBase {
 
         var items = getRequest("http://localhost:5005/api/global/storage/items",
                 httpclient, new TypeReference<List<CompactLineApi>>() {
-        });
+                });
         assertEquals(12, items.size());
 
         var item = getRequest("http://localhost:5005/api/global/storage/items/default/3",

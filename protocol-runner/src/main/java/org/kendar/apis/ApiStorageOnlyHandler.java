@@ -163,9 +163,9 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             var data = storage.getAllIndexes(Integer.parseInt(maxLengthStr));
             var result = new ArrayList<CompactLineApi>();
             data.sort(Comparator.comparingLong(CompactLine::getIndex));
-            for(var item:data){
+            for (var item : data) {
                 var api = mapper.deserialize(mapper.serialize(item), CompactLineApi.class);
-                if(api.getFullItemId()!=null && !api.getFullItemId().isEmpty()) {
+                if (api.getFullItemId() != null && !api.getFullItemId().isEmpty()) {
                     var itemId = reqp.buildUrlNoQuery() + "/" + api.getFullItemId();
                     api.setFullItemAddress(itemId);
                 }
@@ -201,7 +201,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
         try {
             var instanceId = reqp.getPathParameter("protocol");
             var itemId = Long.parseLong(reqp.getPathParameter("index"));
-            var result = storage.readById(instanceId,itemId);
+            var result = storage.readById(instanceId, itemId);
             respondJson(resp, result);
         } catch (Exception ex) {
             respondKo(resp, ex);

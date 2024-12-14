@@ -39,6 +39,7 @@ public class TcpServer {
      */
     private AsynchronousServerSocketChannel server;
     private boolean callDurationTimes;
+
     public TcpServer(NetworkProtoDescriptor protoDescriptor) {
         this.protoDescriptor = protoDescriptor;
     }

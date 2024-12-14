@@ -75,22 +75,22 @@ public class Publish extends BasePropertiesMqttState {
             var puback = new PublishAck();
             puback.setPacketIdentifier(publish.getPacketIdentifier());
             return iteratorOfRunnable(() ->
-                proxy.sendAndExpect(context,
-                        connection,
-                        publish,
-                        puback
-                )
+                    proxy.sendAndExpect(context,
+                            connection,
+                            publish,
+                            puback
+                    )
             );
         } else if (qos == 2) {
 
             var pubrec = new PublishRec();
             pubrec.setPacketIdentifier(publish.getPacketIdentifier());
             return iteratorOfRunnable(() ->
-                proxy.sendAndExpect(context,
-                        connection,
-                        publish,
-                        pubrec
-                )
+                    proxy.sendAndExpect(context,
+                            connection,
+                            publish,
+                            pubrec
+                    )
             );
         }
         return iteratorOfRunnable(() -> proxy.sendAndForget(context,

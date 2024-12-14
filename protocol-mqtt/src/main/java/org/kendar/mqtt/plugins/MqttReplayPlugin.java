@@ -52,7 +52,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
 
         var result = mapper.deserialize(out.toString(), toread.getClass());
         try {
-            ExtraBeanUtils.copyProperties(toread, result,"PacketIdentifier");
+            ExtraBeanUtils.copyProperties(toread, result, "PacketIdentifier");
             BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);

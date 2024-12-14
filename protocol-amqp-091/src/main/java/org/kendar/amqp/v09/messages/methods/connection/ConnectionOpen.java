@@ -82,10 +82,10 @@ public class ConnectionOpen extends Connection {
         result.setReserved1(reserved1);
 
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
-                            connection,
-                            conOpen,
-                            result
-                    )
+                        connection,
+                        conOpen,
+                        result
+                )
         );
     }
 

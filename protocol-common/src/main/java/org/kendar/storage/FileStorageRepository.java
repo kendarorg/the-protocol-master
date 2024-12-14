@@ -293,12 +293,12 @@ public class FileStorageRepository implements StorageRepository {
     @Override
     public StorageItem readById(String protocolInstanceId, long id) {
         var ctx = protocolRepo.get(protocolInstanceId);
-        if(ctx==null){
+        if (ctx == null) {
             String fileContent;
             try {
-                var filePath= Path.of(targetDir, padLeftZeros(String.valueOf(id),10)+"." + protocolInstanceId + ".json");
+                var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(id), 10) + "." + protocolInstanceId + ".json");
 
-                    fileContent = Files.readString(filePath);
+                fileContent = Files.readString(filePath);
             } catch (IOException e) {
                 fileContent = "{}";
             }
@@ -403,24 +403,15 @@ public class FileStorageRepository implements StorageRepository {
         return "storage";
     }
 
-    private static class ProtocolRepo {
-        public final Object lockObject = new Object();
-        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
-        public final List<StorageItem> outItems = new ArrayList<>();
-        public List<CompactLine> index = new ArrayList<>();
-        public boolean initialized = false;
-        public volatile boolean somethingWritten = false;
-    }
-
     @Override
     public List<CompactLineComplete> getAllIndexes(int maxLen) {
         var result = new ArrayList<CompactLineComplete>();
         for (var file : listFilesUsingJavaIO(Path.of(targetDir).toAbsolutePath().toString())) {
-            if(file.getName().contains("index") && file.getName().endsWith(".json")) {
+            if (file.getName().contains("index") && file.getName().endsWith(".json")) {
                 String fileContent;
                 var fileNameOnly = file.toPath().getFileName().toString();
-                fileNameOnly = fileNameOnly.replace("index.","");
-                var protocolInstanceId = fileNameOnly.replace(".json","");
+                fileNameOnly = fileNameOnly.replace("index.", "");
+                var protocolInstanceId = fileNameOnly.replace(".json", "");
                 try {
                     fileContent = Files.readString(file.toPath());
                 } catch (IOException e) {
@@ -428,16 +419,16 @@ public class FileStorageRepository implements StorageRepository {
                 }
                 var deserialized = mapper.deserialize(fileContent, new TypeReference<List<CompactLineComplete>>() {
                 });
-                deserialized.forEach(item->{
+                deserialized.forEach(item -> {
                     item.setProtocolInstanceId(protocolInstanceId);
-                    var id = protocolInstanceId+"/"+padLeftZeros(String.valueOf(item.getIndex()), 10);
+                    var id = protocolInstanceId + "/" + padLeftZeros(String.valueOf(item.getIndex()), 10);
 
 
-                    var filePath= Path.of(targetDir, padLeftZeros(String.valueOf(item.getIndex()),10)+"." + protocolInstanceId + ".json");
-                    if(filePath.toFile().exists()) {
+                    var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(item.getIndex()), 10) + "." + protocolInstanceId + ".json");
+                    if (filePath.toFile().exists()) {
                         item.setFullItemId(id);
                     }
-                    if(maxLen>=0) {
+                    if (maxLen >= 0) {
                         for (var tag : item.getTags().entrySet()) {
                             var val = tag.getValue();
                             var isTooMuch = val.length() > maxLen;
@@ -454,5 +445,14 @@ public class FileStorageRepository implements StorageRepository {
         }
         return result;
 
+    }
+
+    private static class ProtocolRepo {
+        public final Object lockObject = new Object();
+        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
+        public final List<StorageItem> outItems = new ArrayList<>();
+        public List<CompactLine> index = new ArrayList<>();
+        public boolean initialized = false;
+        public volatile boolean somethingWritten = false;
     }
 }

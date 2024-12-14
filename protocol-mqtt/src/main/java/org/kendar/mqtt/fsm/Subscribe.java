@@ -76,10 +76,10 @@ public class Subscribe extends BasePropertiesMqttState {
 
         var suback = new SubscribeAck();
         suback.setPacketIdentifier(publish.getPacketIdentifier());
-        return iteratorOfRunnable(() ->  proxy.sendAndExpect(context,
-                    connection,
-                    publish,
-                    suback));
+        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
+                connection,
+                publish,
+                suback));
     }
 
 

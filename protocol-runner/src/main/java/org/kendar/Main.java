@@ -122,7 +122,7 @@ public class Main {
         for (var server : protocolServersCache.values()) {
             server.stop();
         }
-        if(apiServer!=null) {
+        if (apiServer != null) {
             apiServer.stop(0);
         }
     }

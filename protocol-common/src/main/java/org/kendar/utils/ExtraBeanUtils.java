@@ -14,9 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ExtraBeanUtils {
     private static final Logger LOG = LoggerFactory.getLogger(ExtraBeanUtils.class);
-    private static ConcurrentHashMap<String, Map<String,TypeOfProp>> cache = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, Map<String, TypeOfProp>> cache = new ConcurrentHashMap<>();
 
-    private static Map<String,TypeOfProp> describe(Object orig){
+    private static Map<String, TypeOfProp> describe(Object orig) {
         var pu = BeanUtilsBean.getInstance().getPropertyUtils();
         var origDescriptors = pu.getPropertyDescriptors(orig);
         var result = new HashMap<String, TypeOfProp>();
@@ -25,41 +25,41 @@ public class ExtraBeanUtils {
             if ("class".equals(name)) {
                 continue; // No point in trying to set an object's class
             }
-            if(pu.isReadable(orig, name)){
-                if(pu.isWriteable(orig, name)){
-                    result.put(name,TypeOfProp.BOTH);
-                }else{
-                    result.put(name,TypeOfProp.READ);
+            if (pu.isReadable(orig, name)) {
+                if (pu.isWriteable(orig, name)) {
+                    result.put(name, TypeOfProp.BOTH);
+                } else {
+                    result.put(name, TypeOfProp.READ);
                 }
-            }else if(pu.isWriteable(orig, name)){
+            } else if (pu.isWriteable(orig, name)) {
 
-                result.put(name,TypeOfProp.WRITE);
+                result.put(name, TypeOfProp.WRITE);
             }
         }
         return result;
     }
 
-    public static void copyProperties(final Object dest, final Object orig, String ... avoid) throws IllegalAccessException, InvocationTargetException,
-    NoSuchMethodException {
+    public static void copyProperties(final Object dest, final Object orig, String... avoid) throws IllegalAccessException, InvocationTargetException,
+            NoSuchMethodException {
         var mapToAvoid = new HashSet<String>();
-        for(var item:avoid){
+        for (var item : avoid) {
             mapToAvoid.add(item.toLowerCase(Locale.ROOT));
         }
-        var origProperties = cache.computeIfAbsent(orig.getClass().getName(), k ->{
+        var origProperties = cache.computeIfAbsent(orig.getClass().getName(), k -> {
             return describe(orig);
         });
-        var destProperties = cache.computeIfAbsent(dest.getClass().getName(), k ->{
+        var destProperties = cache.computeIfAbsent(dest.getClass().getName(), k -> {
             return describe(dest);
         });
         var pu = BeanUtilsBean.getInstance().getPropertyUtils();
-        var bbu= BeanUtilsBean.getInstance();
-        for(var origEntry : origProperties.entrySet()) {
-            if(mapToAvoid.contains(origEntry.getKey().toLowerCase())) continue;
+        var bbu = BeanUtilsBean.getInstance();
+        for (var origEntry : origProperties.entrySet()) {
+            if (mapToAvoid.contains(origEntry.getKey().toLowerCase())) continue;
             var destEntry = destProperties.get(origEntry.getKey());
-            if(destEntry==null)continue;
-            if(
-                    (origEntry.getValue()==TypeOfProp.READ||origEntry.getValue()==TypeOfProp.BOTH) &&
-                            (destEntry==TypeOfProp.WRITE||destEntry==TypeOfProp.BOTH)){
+            if (destEntry == null) continue;
+            if (
+                    (origEntry.getValue() == TypeOfProp.READ || origEntry.getValue() == TypeOfProp.BOTH) &&
+                            (destEntry == TypeOfProp.WRITE || destEntry == TypeOfProp.BOTH)) {
                 var origValue = pu.getSimpleProperty(orig, origEntry.getKey());
                 bbu.copyProperty(dest, origEntry.getKey(), origValue);
             }
