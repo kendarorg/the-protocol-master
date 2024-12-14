@@ -1,4 +1,5 @@
 {
+  "timestamp": 1733870616970,
   "constant": false,
   "connectionId": 1,
   "index": 7,
@@ -24,9 +25,9 @@
     "proxyed": false,
     "classId": 60,
     "methodId": 21,
-    "tag": "amq.ctag-qZcPnE1q2m9Vg3ICbroWHg"
+    "tag": "amq.ctag-sQzqNeFgzmseb97B8DI2PQ"
   },
-  "durationMs": 4,
+  "durationMs": 1,
   "type": "BasicConsume",
   "caller": "AMQP",
   "inputType": "BasicConsume",

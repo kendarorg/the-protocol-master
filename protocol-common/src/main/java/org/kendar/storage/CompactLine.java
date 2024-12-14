@@ -65,4 +65,14 @@ public class CompactLine {
     public void setTags(Map<String, String> tags) {
         this.tags = tags;
     }
+
+    @Override
+    public String toString() {
+        return "CompactLine{" +
+                "index=" + index +
+                ", type='" + type + '\'' +
+                ", caller='" + caller + '\'' +
+                ", tags=" + tags +
+                '}';
+    }
 }

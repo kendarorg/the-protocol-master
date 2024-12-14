@@ -15,8 +15,7 @@ public class ProxyServerHandler {
 
     private static final Logger log = LoggerFactory.getLogger("org.kendar.http.Proxy");
     private final ExecutorService executor;
-    //    public static final Pattern CONNECT_PATTERN = Pattern.compile("CONNECT (.+):(.+) HTTP/(1\\.[01])",
-//            Pattern.CASE_INSENSITIVE);
+
     private final Socket clientSocket;
     private final int httpRedirect;
     private final int httpsRedirect;

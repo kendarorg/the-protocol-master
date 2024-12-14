@@ -1,16 +1,41 @@
 {
-  "pluginsDir": "plugins",
+  "pluginsDir": "target/plugins",
   "logLevel": "INFO",
-  "dataDir": "data",
+  "dataDir": "target/data",
   "apiPort": 8095,
+  "plugins": {
+    "report-plugin": {
+      "active": true
+    }
+  },
   "protocols": {
+    "mysql-01": {
+      "protocol": "mysql",
+      "port": 3306,
+      "login": "root",
+      "password": "password",
+      "timeout": 30,
+      "connectionString": "jdbc:mysql://192.168.56.2:23306/db",
+      "plugins": {
+        "mock-plugin": {
+          "active": false,
+          "dataDir": "target/mocks"
+        }
+      }
+    },
     "postgres-01": {
       "protocol": "postgres",
       "port": 5432,
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
-      "connectionString": "jdbc:mysql://localhost:3306"
+      "connectionString": "jdbc:mysql://localhost:3306",
+      "plugins": {
+        "mock-plugin": {
+          "active": false,
+          "dataDir": "target/mocks"
+        }
+      }
     },
     "mqtt-01": {
       "protocol": "mqtt",
@@ -41,11 +66,13 @@
           "errorMessage": "ERROR",
           "percentage": 0
         },
+        "report-plugin": {
+          "active": true
+        },
         "replay-plugin": {
           "active": false,
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
-          "blockExternal": true,
           "matchSites": [
             "net_core_http",
             "net_core_rest"
@@ -54,6 +81,10 @@
         "record-plugin": {
           "active": false,
           "recordSites": []
+        },
+        "mock-plugin": {
+          "active": false,
+          "dataDir": "target/mocks"
         }
       }
     }

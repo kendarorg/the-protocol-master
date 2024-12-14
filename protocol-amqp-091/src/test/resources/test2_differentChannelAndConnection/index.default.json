@@ -3,7 +3,7 @@
     "index": 1,
     "type": "byte[]",
     "caller": "AMQP",
-    "durationMs": 6,
+    "durationMs": 2,
     "tags": {
       "output": "ConnectionStart",
       "input": "byte[]"
@@ -13,7 +13,7 @@
     "index": 2,
     "type": "ConnectionStartOk",
     "caller": "AMQP",
-    "durationMs": 4,
+    "durationMs": 1,
     "tags": {
       "output": "ConnectionTune",
       "input": "ConnectionStartOk"
@@ -32,7 +32,7 @@
     "index": 4,
     "type": "ConnectionOpen",
     "caller": "AMQP",
-    "durationMs": 2,
+    "durationMs": 1,
     "tags": {
       "output": "ConnectionOpenOk",
       "input": "ConnectionOpen"
@@ -42,7 +42,7 @@
     "index": 5,
     "type": "ChannelOpen",
     "caller": "AMQP",
-    "durationMs": 3,
+    "durationMs": 1,
     "tags": {
       "output": "ChannelOpenOk",
       "input": "ChannelOpen"
@@ -52,7 +52,7 @@
     "index": 6,
     "type": "QueueDeclare",
     "caller": "AMQP",
-    "durationMs": 8,
+    "durationMs": 2,
     "tags": {
       "output": "QueueDeclareOk",
       "input": "QueueDeclare"
@@ -62,17 +62,18 @@
     "index": 7,
     "type": "BasicConsume",
     "caller": "AMQP",
-    "durationMs": 4,
+    "durationMs": 1,
     "tags": {
       "output": "BasicConsumeOk",
-      "input": "BasicConsume"
+      "input": "BasicConsume",
+      "queue": "fuffa_queue|1|{}"
     }
   },
   {
     "index": 8,
     "type": "byte[]",
     "caller": "AMQP",
-    "durationMs": 3,
+    "durationMs": 2,
     "tags": {
       "output": "ConnectionStart",
       "input": "byte[]"
@@ -82,7 +83,7 @@
     "index": 9,
     "type": "ConnectionStartOk",
     "caller": "AMQP",
-    "durationMs": 5,
+    "durationMs": 1,
     "tags": {
       "output": "ConnectionTune",
       "input": "ConnectionStartOk"
@@ -92,7 +93,7 @@
     "index": 10,
     "type": "ConnectionTuneOk",
     "caller": "AMQP",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "input": "ConnectionTuneOk"
     }
@@ -101,7 +102,7 @@
     "index": 11,
     "type": "ConnectionOpen",
     "caller": "AMQP",
-    "durationMs": 6,
+    "durationMs": 1,
     "tags": {
       "output": "ConnectionOpenOk",
       "input": "ConnectionOpen"
@@ -111,7 +112,7 @@
     "index": 12,
     "type": "ChannelOpen",
     "caller": "AMQP",
-    "durationMs": 2,
+    "durationMs": 11,
     "tags": {
       "output": "ChannelOpenOk",
       "input": "ChannelOpen"
@@ -121,7 +122,7 @@
     "index": 13,
     "type": "QueueDeclare",
     "caller": "AMQP",
-    "durationMs": 2,
+    "durationMs": 0,
     "tags": {
       "output": "QueueDeclareOk",
       "input": "QueueDeclare"
@@ -131,7 +132,7 @@
     "index": 14,
     "type": "BasicPublish",
     "caller": "AMQP",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "input": "BasicPublish"
     }
@@ -161,7 +162,8 @@
     "durationMs": 0,
     "tags": {
       "output": "BasicDeliver",
-      "consumeId": "1"
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
     }
   },
   {
@@ -171,7 +173,8 @@
     "durationMs": 0,
     "tags": {
       "output": "HeaderFrame",
-      "consumeId": "1"
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
     }
   },
   {
@@ -181,14 +184,15 @@
     "durationMs": 0,
     "tags": {
       "output": "BodyFrame",
-      "consumeId": "1"
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
     }
   },
   {
     "index": 20,
     "type": "BasicAck",
     "caller": "AMQP",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "input": "BasicAck"
     }
@@ -197,7 +201,7 @@
     "index": 21,
     "type": "BasicPublish",
     "caller": "AMQP",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "input": "BasicPublish"
     }
@@ -222,6 +226,17 @@
   },
   {
     "index": 24,
+    "type": "RESPONSE",
+    "caller": "AMQP",
+    "durationMs": 0,
+    "tags": {
+      "output": "BasicDeliver",
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
+    }
+  },
+  {
+    "index": 25,
     "type": "BasicPublish",
     "caller": "AMQP",
     "durationMs": 0,
@@ -230,30 +245,10 @@
     }
   },
   {
-    "index": 25,
-    "type": "RESPONSE",
-    "caller": "AMQP",
-    "durationMs": 0,
-    "tags": {
-      "output": "BasicDeliver",
-      "consumeId": "1"
-    }
-  },
-  {
-    "index": 26,
-    "type": "RESPONSE",
-    "caller": "AMQP",
-    "durationMs": 0,
-    "tags": {
-      "output": "HeaderFrame",
-      "consumeId": "1"
-    }
-  },
-  {
     "index": 27,
     "type": "HeaderFrame",
     "caller": "AMQP",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "input": "HeaderFrame"
     }
@@ -268,13 +263,25 @@
     }
   },
   {
+    "index": 26,
+    "type": "RESPONSE",
+    "caller": "AMQP",
+    "durationMs": 0,
+    "tags": {
+      "output": "HeaderFrame",
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
+    }
+  },
+  {
     "index": 29,
     "type": "RESPONSE",
     "caller": "AMQP",
     "durationMs": 0,
     "tags": {
       "output": "BodyFrame",
-      "consumeId": "1"
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
     }
   },
   {
@@ -284,7 +291,8 @@
     "durationMs": 0,
     "tags": {
       "output": "BasicDeliver",
-      "consumeId": "1"
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
     }
   },
   {
@@ -294,7 +302,8 @@
     "durationMs": 0,
     "tags": {
       "output": "HeaderFrame",
-      "consumeId": "1"
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
     }
   },
   {
@@ -304,14 +313,15 @@
     "durationMs": 0,
     "tags": {
       "output": "BodyFrame",
-      "consumeId": "1"
+      "consumeId": "1",
+      "queue": "fuffa_queue|1|{}"
     }
   },
   {
     "index": 33,
     "type": "BasicAck",
     "caller": "AMQP",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {
       "input": "BasicAck"
     }
@@ -326,7 +336,7 @@
     }
   },
   {
-    "index": 35,
+    "index": 36,
     "type": "RESPONSE",
     "caller": "AMQP",
     "durationMs": 0,
@@ -336,10 +346,10 @@
     }
   },
   {
-    "index": 36,
+    "index": 35,
     "type": "QueueDelete",
     "caller": "AMQP",
-    "durationMs": 13,
+    "durationMs": 8,
     "tags": {
       "output": "QueueDeleteOk",
       "input": "QueueDelete"

@@ -69,6 +69,4 @@ public class ProtocolEvent implements TaggedObject {
         if (tags == null) return "";
         return tags.stream().map(Tag::getKey).collect(Collectors.joining(","));
     }
-
-
 }

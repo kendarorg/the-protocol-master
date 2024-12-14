@@ -68,8 +68,8 @@ public class MqttProtocol extends NetworkProtoDescriptor {
                                                                 new PublishComp(MqttPacket.class).asProxy()
                                                         )
                                                 )
-                                        ),
-                                        new PingReq(MqttPacket.class)
+                                        )
+                                        , new PingReq(MqttPacket.class)
                                 )
 
                         )

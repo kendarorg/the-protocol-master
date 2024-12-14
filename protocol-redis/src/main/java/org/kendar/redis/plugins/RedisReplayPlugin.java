@@ -1,7 +1,7 @@
 package org.kendar.redis.plugins;
 
 import org.kendar.plugins.ReplayPlugin;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
@@ -14,9 +14,16 @@ import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.util.List;
+import java.util.Map;
 
-public class RedisReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
+public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
+
+
+    @Override
+    public Class<?> getSettingClass() {
+        return BasicAysncReplayPluginSettings.class;
+    }
 
     @Override
     public String getProtocol() {
@@ -36,6 +43,7 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
 
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
+        Sleeper.sleep(10);
         if (storageItems.isEmpty()) return;
         long lastTimestamp = 0;
         for (var item : storageItems) {
@@ -63,5 +71,13 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
             }
 
         }
+    }
+
+
+    protected Map<String, String> getContextTags(ProtoContext context) {
+        if (context.getValue("QUEUE") != null) {
+            return Map.of("queue", (String) context.getValue("QUEUE"));
+        }
+        return Map.of();
     }
 }

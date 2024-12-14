@@ -1,4 +1,5 @@
 {
+  "timestamp": 1733870617200,
   "constant": false,
   "connectionId": 1,
   "index": 17,
@@ -8,12 +9,13 @@
     "proxyed": false,
     "classId": 60,
     "methodId": 60,
-    "consumerTag": "amq.ctag-qZcPnE1q2m9Vg3ICbroWHg",
+    "consumerTag": "amq.ctag-sQzqNeFgzmseb97B8DI2PQ",
     "deliveryTag": 1,
     "redelivered": false,
     "exchange": "",
     "routingKey": "fuffa_queue",
-    "consumeId": 1
+    "consumeId": 1,
+    "consumeOrigin": "fuffa_queue|1|{}"
   },
   "durationMs": 0,
   "type": "RESPONSE",

@@ -12,6 +12,8 @@ public class Resp3Context extends NetworkProtoContext {
 
     @Override
     public void disconnect(Object connection) {
+
+        super.disconnect(connection);
         ProxyConnection conn = ((ProxyConnection) getValue("CONNECTION"));
         var sock = (Resp3ProxySocket) conn.getConnection();
         if (sock != null) {

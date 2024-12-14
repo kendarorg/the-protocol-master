@@ -1,22 +1,21 @@
 {
+  "timestamp": 1733870617303,
   "constant": false,
   "connectionId": 1,
   "index": 30,
-  "input": null,
   "output": {
-    "uuid": "183",
-    "optional": false,
     "channel": 1,
     "type": 1,
     "proxyed": false,
     "classId": 60,
     "methodId": 60,
-    "consumerTag": "amq.ctag-FmXqPJK3K5YPwwaUXLwuEw",
+    "consumerTag": "amq.ctag-sQzqNeFgzmseb97B8DI2PQ",
     "deliveryTag": 3,
     "redelivered": false,
     "exchange": "",
     "routingKey": "fuffa_queue",
-    "consumeId": 1
+    "consumeId": 1,
+    "consumeOrigin": "fuffa_queue|1|{}"
   },
   "durationMs": 0,
   "type": "RESPONSE",

@@ -8,12 +8,24 @@ import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.ExtraStringReplacer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> {
+
+
+    @Override
+    protected Class<?> getIn() {
+        return JdbcCall.class;
+    }
+
+    @Override
+    protected Class<?> getOut() {
+        return SelectResult.class;
+    }
 
     @Override
     protected void checkMatching(MockStorage data, JdbcCall callToSimulate, ChangeableReference<Integer> matchingQuery, ChangeableReference<Long> foundedIndex) {
@@ -93,7 +105,7 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
 
     @Override
     protected List<MockStorage> firstCheckOnMainPart(JdbcCall request) {
-        return mocks;
+        return new ArrayList<>(mocks.values());
     }
 
 

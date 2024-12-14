@@ -1,4 +1,5 @@
 {
+  "timestamp": 1733870617303,
   "constant": false,
   "connectionId": 1,
   "index": 31,
@@ -13,7 +14,8 @@
     "bodySize": 13,
     "appId": "TESTAPP",
     "propertyFlags": -28664,
-    "consumeId": 1
+    "consumeId": 1,
+    "consumeOrigin": "fuffa_queue|1|{}"
   },
   "durationMs": 0,
   "type": "RESPONSE",

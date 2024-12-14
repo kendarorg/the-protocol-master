@@ -33,6 +33,7 @@ without the need to mock a single request
 
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
+* blockExternal: Block calls to real service when not matching (default true)
 
 ### mock-plugin
 
@@ -106,7 +107,7 @@ For example calling the following
 
 ```
 java -cp "ojdbc11.jar;protocol-runner.jar" \
-  org.springframework.boot.loader.JarLauncher \
+  org.kendar.Main \
   -cfg oracleSettings.json
 ```
 

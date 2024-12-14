@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Interface for the communication between server and client
@@ -29,12 +28,11 @@ public interface ClientServerChannel {
      * Read asynchronously from the channel
      *
      * @param buffer
-     * @param i
-     * @param timeUnit
+     * @param timeoutInMs
      * @param buffer1
      * @param completionHandler
      */
-    void read(ByteBuffer buffer, int i, TimeUnit timeUnit, ByteBuffer buffer1, CompletionHandler<Integer, ByteBuffer> completionHandler);
+    void read(ByteBuffer buffer, int timeoutInMs, ByteBuffer buffer1, CompletionHandler<Integer, ByteBuffer> completionHandler);
 
     /**
      * Check if it's open

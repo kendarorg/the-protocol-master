@@ -7,11 +7,15 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
+import org.kendar.mongo.plugins.MongoReportPlugin;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -22,6 +26,8 @@ import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -30,6 +36,7 @@ public class BasicTest {
     protected static final int FAKE_PORT = 27077;
     protected static MongoDbImage mongoContainer;
     protected static TcpServer protocolServer;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -63,7 +70,6 @@ public class BasicTest {
         });
     }
 
-
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new MongoProtocol(FAKE_PORT);
         var proxy = new MongoProxy(mongoContainer.getConnectionString());
@@ -83,9 +89,14 @@ public class BasicTest {
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
         var pl = new MongoRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        var rep = new MongoReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        rep.setActive(true);
+        proxy.setPlugins(List.of(pl, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
+        EventsQueue.register("recorder", (r) -> {
+            events.add(r);
+        }, ReportDataEvent.class);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 
@@ -94,6 +105,8 @@ public class BasicTest {
     }
 
     public static void afterEachBase() {
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
     }
 
@@ -148,5 +161,9 @@ public class BasicTest {
                 //.serverApi(serverApi)
                 .build();
         return MongoClients.create(settings);
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 }

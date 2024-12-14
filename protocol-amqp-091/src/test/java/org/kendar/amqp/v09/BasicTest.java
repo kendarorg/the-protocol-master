@@ -4,10 +4,14 @@ package org.kendar.amqp.v09;
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -18,6 +22,8 @@ import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -26,6 +32,7 @@ public class BasicTest {
     protected static final int FAKE_PORT = 5682;
     protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -54,7 +61,6 @@ public class BasicTest {
 
     }
 
-
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new AmqpProtocol(FAKE_PORT);
         var proxy = new AmqpProxy(rabbitContainer.getConnectionString(),
@@ -75,13 +81,18 @@ public class BasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new AmqpRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        ;
+        var pl = new AmqpRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        var rep = new AmqpReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        rep.setActive(true);
         proxy.setPlugins(List.of(
-                pl));
+                pl, rep));
         pl.setActive(true);
+        rep.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
+        EventsQueue.register("recorder", (r) -> {
+            events.add(r);
+        }, ReportDataEvent.class);
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
@@ -89,11 +100,16 @@ public class BasicTest {
     }
 
     public static void afterEachBase() {
-
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
     }
 
     public static void afterClassBase() throws Exception {
         rabbitContainer.close();
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 }

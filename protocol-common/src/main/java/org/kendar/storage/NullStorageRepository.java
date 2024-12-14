@@ -52,18 +52,18 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
-    public void isRecording(String instanceId, boolean b) {
-
-    }
-
-    @Override
-    public void isReplaying(String instanceId, boolean b) {
-
+    public List<CompactLineComplete> getAllIndexes(int maxLen) {
+        return List.of();
     }
 
     @Override
     public List<CompactLine> getIndexes(String instanceId) {
         return List.of();
+    }
+
+    @Override
+    public void clean() {
+
     }
 
     @Override

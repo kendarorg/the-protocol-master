@@ -1,8 +1,8 @@
 {
+  "timestamp": 1733847873713,
   "constant": false,
   "connectionId": 1,
   "index": 11,
-  "input": null,
   "output": [
     "message",
     "commonChannel",

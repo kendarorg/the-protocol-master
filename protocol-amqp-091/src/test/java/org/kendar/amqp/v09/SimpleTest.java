@@ -217,14 +217,13 @@ public class SimpleTest extends BasicTest {
         channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
         chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
         System.out.println("------------------------------------------------------------");
-        Sleeper.sleep(100);
+
+
+        Sleeper.sleep(1000, () -> messages.size() == 3);
         channel1.queueDelete(MAIN_QUEUE);
         channel.queueDelete(MAIN_QUEUE);
         channel.close();
         connection.close();
-
-
-        Sleeper.sleep(1000, () -> messages.size() == 3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.kendar.Main;
 import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
+import org.postgresql.util.PSQLException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -11,8 +12,7 @@ import java.sql.Connection;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StandardProtocolsTest extends BasicTest {
 
@@ -237,13 +237,8 @@ public class StandardProtocolsTest extends BasicTest {
         }
 
         Sleeper.sleep(15 * 1000);
-        stmt = c.createStatement();
-        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_GG;");
-        while (resultset.next()) {
-
-        }
-
-        c.close();
+        var exstmt = c.createStatement();
+        assertThrows(PSQLException.class, () -> exstmt.executeQuery("SELECT DENOMINATION FROM COMPANY_GG;"));
 
         runTheServer.set(false);
         Main.stop();

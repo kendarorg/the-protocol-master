@@ -1,7 +1,7 @@
 package org.kendar.sql.jdbc;
 
 import org.kendar.iterators.QueryResultIterator;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
@@ -9,6 +9,8 @@ import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.parser.SqlStringParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class JdbcProxy extends Proxy {
+    private static final Logger log = LoggerFactory.getLogger(JdbcProxy.class);
     private final String driver;
     private final String connectionString;
     private final String forcedSchema;
@@ -398,6 +401,7 @@ public class JdbcProxy extends Proxy {
             }
             return new ProxyConnection(connection);
         } catch (SQLException e) {
+            log.warn("Error connection {}", getConnectionString(), e);
             return new ProxyConnection(null);
         }
     }

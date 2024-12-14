@@ -73,6 +73,7 @@ public abstract class ProtoContext {
      */
     private ProtoState currentState;
     private boolean useCallDurationTimes;
+    private ConcurrentLinkedQueue<ProtoState> states = new ConcurrentLinkedQueue<>();
 
     public ProtoContext(ProtoDescriptor descriptor, int contextId) {
         this.contextId = contextId;
@@ -240,6 +241,10 @@ public abstract class ProtoContext {
                 log.debug("[CL>TP][RX]: Executing {}", foundedState.getClass().getSimpleName());
             }
             currentState = foundedState;
+            states.add(foundedState);
+            while (states.size() > 5) {
+                states.poll();
+            }
 
             //Invoke the execution
             var stepsToInvoke = currentState.executeEvent(currentEvent);
@@ -311,12 +316,20 @@ public abstract class ProtoContext {
             } else {
                 //Run the step
                 var stepResult = steps.run();
-                if (stepResult == null) continue;
+                if (stepResult == null) {
+                    postWrite(null);
+                    continue;
+                }
                 //Write somwhere the result
                 log.debug("[CL<TP][TX]: Responding {} Tags: {}", stepResult.getClass().getSimpleName(), event.getTagKeyValues());
                 write(stepResult);
+                postWrite(stepResult);
             }
         }
+    }
+
+    protected void postWrite(ReturnMessage stepResult) {
+
     }
 
     /**

@@ -1,11 +1,11 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -15,12 +15,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response, HttpErrorPluginSettings> {
+public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPluginSettings> {
 
     private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
     private int errorCode;
     private String errorMessage;
     private double percentage;
+
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpErrorPluginSettings.class;
+    }
 
     @Override
     public List<ProtocolPhase> getPhases() {
@@ -38,7 +43,6 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response,
     }
 
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
         if (!isActive()) return false;
         if (Math.random() < percentage) {
@@ -52,7 +56,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptor<Request, Response,
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         var settings = (HttpErrorPluginSettings) pluginSetting;
         this.errorCode = settings.getShowError();

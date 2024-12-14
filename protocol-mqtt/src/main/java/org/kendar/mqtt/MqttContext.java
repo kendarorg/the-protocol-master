@@ -3,6 +3,7 @@ package org.kendar.mqtt;
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
 import org.kendar.mqtt.utils.MqttBBuffer;
+import org.kendar.mqtt.utils.MqttProxySocket;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -35,10 +36,12 @@ public class MqttContext extends NetworkProtoContext {
 
     @Override
     public void disconnect(Object connection) {
+        super.disconnect(connection);
         ProxyConnection conn = ((ProxyConnection) getValue("CONNECTION"));
-//        var sock = (MqttProxySocket) conn.getConnection();
-//        if (sock != null) {
-//            sock.close();
-//        }
+        var sock = (MqttProxySocket) conn.getConnection();
+        if (sock != null) {
+            sock.close();
+        }
+
     }
 }

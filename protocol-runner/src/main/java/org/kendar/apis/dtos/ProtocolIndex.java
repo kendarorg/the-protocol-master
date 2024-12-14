@@ -14,6 +14,14 @@ public class ProtocolIndex {
         this.protocol = protocol;
     }
 
+    @Override
+    public String toString() {
+        return "ProtocolIndex{" +
+                "id='" + id + '\'' +
+                ", protocol='" + protocol + '\'' +
+                '}';
+    }
+
     public String getId() {
         return id;
     }

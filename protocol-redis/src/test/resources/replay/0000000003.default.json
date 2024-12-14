@@ -1,4 +1,5 @@
 {
+  "timestamp": 1733847873496,
   "constant": false,
   "connectionId": 1,
   "index": 3,
@@ -11,7 +12,7 @@
     "commonChannel",
     1
   ],
-  "durationMs": 2,
+  "durationMs": 1,
   "type": "Resp3Message",
   "caller": "RESP3",
   "inputType": "Resp3Message",

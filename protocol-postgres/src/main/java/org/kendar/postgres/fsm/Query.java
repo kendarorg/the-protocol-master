@@ -39,7 +39,7 @@ public class Query extends PostgresState {
 
         log.info("[SERVER][QUERY][1]: {}", parseMessage.getQuery());
         var res = executor.executePortal(
-                protoContext, parseMessage, bindMessage, Integer.MAX_VALUE,
+                postgresContext, parseMessage, bindMessage, Integer.MAX_VALUE,
                 true, true);
         var itol = new IteratorOfLists<ProtoStep>();
         itol.addIterator(res.getReturnMessages());

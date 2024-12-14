@@ -1,21 +1,25 @@
 {
+  "timestamp": 1733762111846,
   "constant": false,
   "connectionId": 1,
   "index": 2,
   "input": {
-    "uuid": "10",
     "fullFlag": -126,
     "fixedHeader": "SUBSCRIBE",
-    "payload": "AAsvc3Vic2NyaWJlLwI=",
+    "topics": [
+      {
+        "topic": "/subscribe/",
+        "type": 2
+      }
+    ],
     "packetIdentifier": 1
   },
   "output": {
-    "uuid": "13",
     "fullFlag": -112,
     "fixedHeader": "SUBACK",
     "packetIdentifier": 1
   },
-  "durationMs": 4,
+  "durationMs": 1,
   "type": "Subscribe",
   "caller": "MQTT",
   "inputType": "Subscribe",

@@ -1,0 +1,72 @@
+{
+  "pluginsDir": "target/plugins",
+  "logLevel": "DEBUG",
+  "dataDir": "target/data",
+  "apiPort": 8095,
+  "plugins": {
+    "report-plugin": {
+      "active": true
+    }
+  },
+  "protocols": {
+    "mqtt-01": {
+      "protocol": "mqtt",
+      "port": 1883,
+      "login": "",
+      "password": "",
+      "timeout": 60,
+      "connectionString": "tcp://java-mosquitto:1883",
+      "plugins": {
+        "record-plugin": {
+          "resetConnectionsOnStart": false
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": false
+        }
+      }
+    },
+    "http-01": {
+      "protocol": "http",
+      "http": 8085,
+      "https": 8485,
+      "proxy": 9999,
+      "ssl": {
+        "der": "resource://certificates/ca.der",
+        "key": "resource://certificates/ca.key",
+        "cname": "C=US,O=Local Development,CN=local.org",
+        "hosts": [
+          "*.google.com",
+          "www.google.com"
+        ]
+      },
+      "plugins": {
+        "error-plugin": {
+          "active": false,
+          "errorCode": 0,
+          "errorMessage": "ERROR",
+          "percentage": 0
+        },
+        "report-plugin": {
+          "active": true
+        },
+        "replay-plugin": {
+          "active": false,
+          "replayId": "replay{timestamp}",
+          "respectCallDuration": true,
+          "matchSites": [
+            "net_core_http",
+            "net_core_rest"
+          ]
+        },
+        "record-plugin": {
+          "active": false,
+          "recordSites": []
+        },
+        "mock-plugin": {
+          "active": false,
+          "dataDir": "target/mocks"
+        }
+      }
+    }
+  }
+}

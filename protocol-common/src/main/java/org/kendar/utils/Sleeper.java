@@ -17,7 +17,7 @@ public class Sleeper {
 
         try {
             if (timeoutMillis == 0) {
-                Thread.yield();
+                Thread.onSpinWait();
                 return;
             }
             Object obj = new Object();
@@ -78,6 +78,6 @@ public class Sleeper {
      * Give control to other threads
      */
     public static void yield() {
-        Thread.yield();
+        Thread.onSpinWait();
     }
 }

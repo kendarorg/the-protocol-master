@@ -14,6 +14,8 @@ import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.NullState;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.protocol.states.Stop;
+import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.Proxy;
 import org.kendar.server.ClientServerChannel;
 import org.kendar.utils.Sleeper;
@@ -33,26 +35,24 @@ import java.util.concurrent.ExecutionException;
  */
 public abstract class NetworkProtoContext extends ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(NetworkProtoContext.class);
-
     /**
      * If had sent the greeting message (to send data immediatly after connection without further ado)
      */
     private boolean greetingsSent = false;
-
     /**
      * Wrapper for the connection with the client
      */
     private ClientServerChannel client;
-
     /**
      * Proxy to call the real server
      */
     private Proxy proxy;
-
     /**
      * Storage for the bytes not consumed
      */
     private BytesEvent remainingBytes;
+    private List<Runnable> runnables = new ArrayList<>();
+    private boolean disconnected = false;
 
     public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
         super(descriptor, contextId);
@@ -82,6 +82,27 @@ public abstract class NetworkProtoContext extends ProtoContext {
         throw new UnknownCommandException("Unknown command issued: " + message);
     }
 
+    public List<Runnable> getRunnables() {
+        try {
+            return new ArrayList<>(runnables);
+        } finally {
+            runnables.clear();
+        }
+    }
+
+    @Override
+    public void disconnect(Object connection) {
+        try {
+            disconnected = true;
+            if (connection != null && NetworkProxySocket.class.isAssignableFrom(connection.getClass())) {
+                ((NetworkProxySocket) connection).close();
+            }
+            if (client != null) client.close();
+        } catch (IOException e) {
+
+        }
+    }
+
     /**
      * Write to the client socket, calls the method to serialize the message
      *
@@ -89,6 +110,17 @@ public abstract class NetworkProtoContext extends ProtoContext {
      */
     @Override
     public void write(ReturnMessage rm) {
+        if (rm instanceof Stop) return;
+        if (disconnected) {
+            if (client != null && client.isOpen()) {
+                try {
+                    client.close();
+                    client = null;
+                } catch (IOException e) {
+
+                }
+            }
+        }
         updateLastAccess();
         var returnMessage = (NetworkReturnMessage) rm;
         //Create a new buffer fit for the destination
@@ -101,7 +133,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
         response.put(resultBuffer.toArray());
         //To send
         response.flip();
-        log.trace("[CL<TP][TX]: Sending back: {}", returnMessage.getClass().getSimpleName());
+        log.debug("[CL<TP][TX]: Sending back: {}", returnMessage.getClass().getSimpleName());
         var res = client.write(response);
         if (res != null) {
             try {
@@ -110,6 +142,17 @@ public abstract class NetworkProtoContext extends ProtoContext {
                 log.error("[CL<TP][TX] Cannot write message: {} {}", returnMessage.getClass().getSimpleName(), e.getMessage());
                 throw new ConnectionExeception("Cannot write on channel");
             }
+        }
+
+
+    }
+
+    @Override
+    protected void postWrite(ReturnMessage stepResult) {
+        if (disconnected) return;
+        var toRun = getRunnables();
+        for (var runnable : toRun) {
+            runnable.run();
         }
     }
 
@@ -312,5 +355,9 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     public void setActive() {
         updateLastAccess();
+    }
+
+    public void addResponse(Runnable toRun) {
+        runnables.add(toRun);
     }
 }

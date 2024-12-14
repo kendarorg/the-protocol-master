@@ -2,6 +2,12 @@
 
 You can directly use the "proxy" as a normal mysql backend
 
+```
+VERY IMPORTANT!! IF YOU USE THE DB NAME INTO YOUR APPLICATION
+CONNECTION STRING, YOU SHOULD USE THE DB NAME EVEN ON THE 
+PROXYED CONNETION STRING!!!
+```
+
 ## Configuration
 
 * protocol: redis (this is mandatory)
@@ -28,6 +34,7 @@ without the need to mock a single request
 
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
+* blockExternal: Block calls to real service when not matching (default true)
 
 ### mock-plugin
 

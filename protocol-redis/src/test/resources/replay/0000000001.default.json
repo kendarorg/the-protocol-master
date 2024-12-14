@@ -1,4 +1,5 @@
 {
+  "timestamp": 1733847873482,
   "constant": false,
   "connectionId": 1,
   "index": 1,
@@ -9,7 +10,7 @@
     "jedis"
   ],
   "output": "OK",
-  "durationMs": 1,
+  "durationMs": 2,
   "type": "Resp3Message",
   "caller": "RESP3",
   "inputType": "Resp3Message",

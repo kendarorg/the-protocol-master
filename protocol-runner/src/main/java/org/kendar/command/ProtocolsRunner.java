@@ -3,7 +3,7 @@ package org.kendar.command;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.cli.CommandParser;
-import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -82,7 +82,7 @@ public class ProtocolsRunner {
         return (T) value;
     }
 
-    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<PluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
+    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<ProtocolPluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
 
         try {
             var protocolMotherOption = options.getCommandOption("p");
@@ -112,29 +112,12 @@ public class ProtocolsRunner {
                 protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
                 parser.parse(args);
                 return true;
-
-                /*var datadir = cmd.getOptionValue("datadir", "data");
-                var pluginsDir = cmd.getOptionValue("pluginsDir", "plugins");
-                var protocol = cmd.getOptionValue("protocol");
-                var loglevel = cmd.getOptionValue("loglevel", "ERROR");
-                var logType = cmd.getOptionValue("logType", "file");
-                var tpmApi = Integer.parseInt(cmd.getOptionValue("apis", "0"));
-                checkOptions(settings.getDataDir(), settings.getPluginsDir(), protocol);*/
-                /*var ini = new GlobalSettings();
-                ini.setDataDir(datadir);
-                ini.setPluginsDir(pluginsDir);
-                ini.setLogLevel(loglevel);
-                ini.setLogType(logType);
-                ini.setApiPort(tpmApi);*/
-                /*runWithParams(args, protocol, isExecute, ini, options, filters);
-                return ini;*/
             }
         } catch (Exception ex) {
             if (ex.getMessage() != null) {
                 System.err.println("ERROR: " + ex.getMessage());
             }
             parser.printHelp();
-            //exit(0);
         }
         return false;
     }
@@ -149,7 +132,8 @@ public class ProtocolsRunner {
 
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
-                      GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage, List<PluginDescriptor> filters,
+                      GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage,
+                      List<ProtocolPluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var pr = protocols.get(protocol.getProtocol());
         var datadir = Path.of(ini.getDataDir()).toAbsolutePath().toFile();
@@ -157,7 +141,7 @@ public class ProtocolsRunner {
             datadir.mkdir();
         }
         protocol.setProtocolInstanceId(key);
-        pr.start(protocolServer, key, ini, protocol, storage, filters, stopWhenFalse);
+        pr.start(protocolServer, key, ini, protocol, storage, plugins, stopWhenFalse);
     }
 
     public CommonRunner getManagerFor(ProtocolSettings protocol) {

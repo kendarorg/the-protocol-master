@@ -1,10 +1,10 @@
 package org.kendar.http.plugins;
 
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
 import org.kendar.plugins.RewritePlugin;
-import org.kendar.plugins.RewritePluginSettings;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.utils.ReplacerItemInstance;
 
 import java.net.URL;
@@ -14,6 +14,17 @@ public class HttpRewritePlugin extends RewritePlugin<Request, Response, RewriteP
 
     private static final String HTTP = "http";
     private static final String HTTPS = "https";
+
+
+    @Override
+    protected Class<?> getIn() {
+        return Request.class;
+    }
+
+    @Override
+    protected Class<?> getOut() {
+        return Response.class;
+    }
 
     @Override
     public List<ProtocolPhase> getPhases() {

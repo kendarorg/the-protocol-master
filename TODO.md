@@ -7,11 +7,16 @@
 
 ### Code
 
+* findIndex,readStorageItem
+    * AMQP
+    * Redis
+    * Mongo
+    * Jdbc (set)
+    * Mysql (show warnings)
+    * Http (favicon)
 * Mocked specific responses for mongo, redis
 * Expose the connections for protocol on apis
 * Send mock messages amqp,mqtt,redis
-* Remove spring boot
-* Remove withstorage
 * Http
     * test brotli compression
     * Use anonymous Object for serialization for HTTP Multipart

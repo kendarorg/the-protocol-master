@@ -1,15 +1,14 @@
 package org.kendar.http.plugins;
 
-import org.kendar.http.utils.Request;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.apis.base.Request;
 import org.kendar.plugins.RecordPlugin;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
-import org.kendar.storage.generic.StorageRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,10 +16,14 @@ import java.util.stream.Collectors;
 public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     private List<MatchingRecRep> recordSites = new ArrayList<>();
 
-
     @Override
     public List<ProtocolPhase> getPhases() {
         return List.of(ProtocolPhase.PRE_CALL, ProtocolPhase.POST_CALL);
+    }
+
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpRecordPluginSettings.class;
     }
 
     @Override
@@ -79,9 +82,9 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        withStorage((StorageRepository) global.getService("storage"));
+        withStorage(global.getService("storage"));
         setupSitesToRecord(getSettings().getRecordSites());
         return this;
     }

@@ -1,18 +1,13 @@
 package org.kendar.events;
 
-import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class EventsQueue {
     private static final Logger logger = LoggerFactory.getLogger(EventsQueue.class);
@@ -58,6 +53,15 @@ public class EventsQueue {
         instance.eventHandlers.get(eventName).put(id, realConsumer);
     }
 
+
+    public static <T extends TpmEvent> void unregister(String id, Class<T> clazz) {
+        var eventName = clazz.getSimpleName().toLowerCase(Locale.ROOT);
+        if (instance.eventHandlers.containsKey(eventName)) {
+            instance.eventHandlers.get(eventName).remove(id);
+        }
+        instance.commandHandlers.remove(eventName);
+    }
+
     public static <T extends TpmEvent> void registerCommand(String id, Function<T, Object> function, Class<T> clazz) {
         var eventName = clazz.getSimpleName().toLowerCase(Locale.ROOT);
         //instance.conversions.put(eventName, clazz);
@@ -83,7 +87,7 @@ public class EventsQueue {
         new Thread(() -> {
             while (true) {
                 if (items.isEmpty()) {
-                    Sleeper.sleep(5);
+                    Thread.onSpinWait();
                     continue;
                 }
                 var item = items.poll();
@@ -126,7 +130,7 @@ public class EventsQueue {
     }
 
     public List<TpmEvent> clean() {
-        var result = items.stream().sequential().collect(Collectors.toList());
+        var result = new ArrayList<>(items);
         items.clear();
         return result;
     }
@@ -140,22 +144,4 @@ public class EventsQueue {
             this.consumer = consumer;
         }
     }
-/*
-    @SuppressWarnings("unchecked")
-    public void handle(String eventType, String jsonEvent) {
-        eventType = eventType.toLowerCase(Locale.ROOT);
-        if (!conversions.containsKey(eventType)) return;
-        var clazz = conversions.get(eventType);
-        var event = (TpmEvent) mapper.deserialize(jsonEvent, clazz);
-        handle(event);
-    }
-
-
-    public <T> T execute(TpmEvent event, Class<T> clazz) throws Exception {
-        var eventName = event.getClass().getSimpleName().toLowerCase(Locale.ROOT);
-        if (!commandHandlers.containsKey(eventName)) return null;
-        var handler = commandHandlers.get(eventName);
-
-        return (T) handler.apply(event);
-    }*/
 }

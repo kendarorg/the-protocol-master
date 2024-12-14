@@ -2,13 +2,13 @@ package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.beanutils.BeanUtils;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
-import org.kendar.http.utils.constants.ConstantsHeader;
-import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
+import org.kendar.apis.utils.ConstantsHeader;
+import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.plugins.ReplayPlugin;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -25,9 +25,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
+    private static final Logger log = LoggerFactory.getLogger(HttpReplayPlugin.class);
     private boolean blockExternal = true;
     private List<MatchingRecRep> matchSites = new ArrayList<>();
-    private static final Logger log = LoggerFactory.getLogger(HttpReplayPlugin.class);
+
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpReplayPluginSettings.class;
+    }
+
     private Map<String, String> buildTag(Request in) {
         var result = new HashMap<String, String>();
         result.put("path", in.getPath());
@@ -73,6 +79,16 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
         return false;
     }
 
+    @Override
+    protected int tagsMatching(Map<String, String> tags, Map<String, String> query) {
+        if (!tags.get("path").equalsIgnoreCase(query.get("path"))) {
+            return -1;
+        }
+        if (!tags.get("host").equalsIgnoreCase(query.get("host"))) {
+            return -1;
+        }
+        return super.tagsMatching(tags, query);
+    }
 
     protected boolean doSend(PluginContext pluginContext, Request in, Response out) {
         var query = new CallItemsQuery();
@@ -86,9 +102,16 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
         query.setUsed(completedIndexes);
 
-        var index = findIndex(query);
+        var index = findIndex(query, in);
         if (index == null) {
+            if (getSettings().isBlockExternal()) {
+                out.setStatusCode(500);
+                out.setResponseText(new TextNode("Not Found replaying: " + in.getMethod() + " on " + in.buildUrl()));
+                out.addHeader("Content-Type", ConstantsMime.TEXT);
+                return true;
+            }
             return false;
+
         }
         var storageItem = storage.readById(getInstanceId(), index.getIndex());
         if (storageItem == null) {
@@ -98,7 +121,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
         var lineToRead = new LineToRead(storageItem, index);
         var item = lineToRead.getStorageItem();
-        log.debug("READING " + item.getIndex());
+        log.debug("READING {}", item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
         if (getSettings().isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());
@@ -124,7 +147,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
 
         blockExternal = getSettings().isBlockExternal();

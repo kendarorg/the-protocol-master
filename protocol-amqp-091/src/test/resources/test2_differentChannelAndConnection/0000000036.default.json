@@ -1,0 +1,20 @@
+{
+  "timestamp": 1733870617407,
+  "constant": false,
+  "connectionId": 1,
+  "index": 36,
+  "output": {
+    "channel": 1,
+    "type": 1,
+    "proxyed": false,
+    "classId": 60,
+    "methodId": 30,
+    "consumerTag": "amq.ctag-sQzqNeFgzmseb97B8DI2PQ",
+    "noWait": true,
+    "consumeId": 1
+  },
+  "durationMs": 0,
+  "type": "RESPONSE",
+  "caller": "AMQP",
+  "outputType": "BasicCancel"
+}

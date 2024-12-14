@@ -10,9 +10,24 @@
     <artifactId>jacoco</artifactId>
     <dependencies>
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mongo</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-common-jdbc</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-runner</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
@@ -39,7 +54,7 @@
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-http</artifactId>
             <version>${revision}</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
 
@@ -51,14 +66,33 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${assembly.plugin.version}</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/resources/zip.xml</descriptor>
+                    </descriptors>
+                    <finalName>jacoco-report</finalName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>install</phase> <!-- append to the packaging phase. -->
+                        <goals>
+                            <goal>single</goal> <!-- goals == mojos -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
+                <version>${antrun.plugin.version}</version>
                 <executions>
                     <execution>
-                        <phase>test</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
@@ -79,6 +113,9 @@
                                         <fileset dir="${basedir}/../protocol-common/target">
                                             <include name="*.exec"/>
                                         </fileset>
+                                        <fileset dir="${basedir}/../protocol-common-jdbc/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
                                         <fileset dir="${basedir}/../protocol-mongo/target">
                                             <include name="*.exec"/>
                                         </fileset>
@@ -92,6 +129,12 @@
                                             <include name="*.exec"/>
                                         </fileset>
                                         <fileset dir="${basedir}/../protocol-redis/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-runner/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
+                                        <fileset dir="${basedir}/../protocol-http/target">
                                             <include name="*.exec"/>
                                         </fileset>
                                     </executiondata>
@@ -112,12 +155,24 @@
                                             <dirset dir="${basedir}/../protocol-postgres">
                                                 <include name="**/src/main/java"/>
                                             </dirset>
+                                            <dirset dir="${basedir}/../protocol-runner">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-http">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-common-jdbc">
+                                                <include name="**/src/main/java"/>
+                                            </dirset>
                                         </sourcefiles>
                                         <classfiles>
                                             <fileset dir="${basedir}/../protocol-amqp-091/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-common/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-common-jdbc/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-mongo/target/classes">
@@ -127,6 +182,12 @@
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-postgres/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-mongo/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-runner/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                         </classfiles>

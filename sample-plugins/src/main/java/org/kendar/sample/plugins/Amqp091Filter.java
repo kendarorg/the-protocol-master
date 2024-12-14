@@ -2,21 +2,21 @@ package org.kendar.sample.plugins;
 
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpen;
 import org.kendar.amqp.v09.messages.methods.channel.ChannelOpenOk;
-import org.kendar.plugins.AlwaysActivePlugin;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.AlwaysActivePlugin;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
-import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.PluginSettings;
-import org.kendar.settings.ProtocolSettings;
 import org.pf4j.Extension;
 
 import java.util.List;
 
 @Extension
-public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, ChannelOpenOk, Amqp091FilterSettings> implements AlwaysActivePlugin {
+public class Amqp091Filter extends ProtocolPluginDescriptorBase<Amqp091FilterSettings> implements AlwaysActivePlugin {
 
+    @Override
+    public Class<?> getSettingClass() {
+        return Amqp091FilterSettings.class;
+    }
 
     /**
      * Only PRE_CALL and POST_CALL for things different from http
@@ -38,14 +38,7 @@ public class Amqp091Filter extends ProtocolPluginDescriptor<ChannelOpen, Channel
         return "amqp091";
     }
 
-    @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global, protocol, pluginSetting);
-        return this;
-    }
 
-
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, ChannelOpen in, ChannelOpenOk out) {
         return false;
     }

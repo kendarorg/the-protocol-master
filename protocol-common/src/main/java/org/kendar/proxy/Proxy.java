@@ -2,9 +2,8 @@ package org.kendar.proxy;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReplayStatusEvent;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 
@@ -19,7 +18,7 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("rawtypes")
 public abstract class Proxy {
-    private final Map<String, Map<ProtocolPhase, List<ProtocolPluginDescriptor>>> allowedPlugins = new ConcurrentHashMap<>();
+    private final Map<String, Map<ProtocolPhase, List<PluginHandler>>> allowedPlugins = new ConcurrentHashMap<>();
     private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
     protected boolean replayer;
     /**
@@ -56,6 +55,13 @@ public abstract class Proxy {
     public void setProtocol(NetworkProtoDescriptor protocol) {
 
         this.protocol = protocol;
+        for (var item : allowedPlugins.values()) {
+            for (var subitem : item.values()) {
+                for (var subSubItem : subitem) {
+                    subSubItem.setProtocol(protocol);
+                }
+            }
+        }
     }
 
     /**
@@ -71,8 +77,8 @@ public abstract class Proxy {
      */
     public abstract void initialize();
 
-    public List<PluginDescriptor> getPlugins() {
-        var result = new HashMap<String, PluginDescriptor>();
+    public List<PluginHandler> getPlugins() {
+        var result = new HashMap<String, PluginHandler>();
         for (var item : allowedPlugins.entrySet()) {
             for (var phase : item.getValue().entrySet()) {
                 for (var plugin : phase.getValue()) {
@@ -84,41 +90,32 @@ public abstract class Proxy {
         return new ArrayList<>(result.values());
     }
 
-    public void setPlugins(List<PluginDescriptor> filters) {
+    public void setPlugins(List<ProtocolPluginDescriptor> filters) {
         for (var plugin : filters) {
-            var clazz = plugin.getClass();
-            var handle = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase("handle")).findFirst();
-
-            if (handle.isPresent()) {
-                var matcher = pattern.matcher(handle.get().toString());
-                if (matcher.find()) {
-                    var pars = matcher.group(2);
-                    if (!allowedPlugins.containsKey(pars)) {
-                        allowedPlugins.put(pars, new HashMap<>());
+            var handlers = PluginHandler.of(plugin, this.protocol);
+            for (var handler : handlers) {
+                var pars = handler.getKey();
+                if (!allowedPlugins.containsKey(pars)) {
+                    allowedPlugins.put(pars, new HashMap<>());
+                }
+                var map = allowedPlugins.get(pars);
+                for (var phase : plugin.getPhases()) {
+                    if (!map.containsKey(phase)) {
+                        map.put((ProtocolPhase) phase, new ArrayList<>());
                     }
-                    var map = allowedPlugins.get(pars);
-                    for (var phase : plugin.getPhases()) {
-                        if (!map.containsKey(phase)) {
-                            map.put((ProtocolPhase) phase, new ArrayList<>());
-                        }
-                        map.get(phase).add((ProtocolPluginDescriptor) plugin);
-                    }
+                    map.get(phase).add(handler);
                 }
             }
         }
     }
 
-    public <I, J> List<ProtocolPluginDescriptor> getPlugins(ProtocolPhase phase, I in, J out) {
+    public <I, J> List<PluginHandler> getPlugins(ProtocolPhase phase, I in, J out) {
         var data = String.join(",",
-                PluginContext.class.getName(),
-                ProtocolPhase.class.getName(),
                 in.getClass().getName(), out.getClass().getName());
         var anonymousData = String.join(",",
-                PluginContext.class.getName(),
-                ProtocolPhase.class.getName(),
                 Object.class.getName(), Object.class.getName());
         var forData = allowedPlugins.get(anonymousData);
-        var result = new ArrayList<ProtocolPluginDescriptor>();
+        var result = new ArrayList<PluginHandler>();
         //Handle Object,Object data
         if (forData != null) {
             var forPhase = forData.get(phase);
@@ -141,8 +138,8 @@ public abstract class Proxy {
         for (var item : allowedPlugins.entrySet()) {
             for (var phase : item.getValue().entrySet()) {
                 for (var plugin : phase.getValue()) {
-                    if (plugin.isActive() && !terminatedPlugins.contains(plugin)) {
-                        plugin.terminate();
+                    if (plugin.getTarget().isActive() && !terminatedPlugins.contains(plugin)) {
+                        plugin.getTarget().terminate();
                         terminatedPlugins.add(plugin);
                     }
                 }

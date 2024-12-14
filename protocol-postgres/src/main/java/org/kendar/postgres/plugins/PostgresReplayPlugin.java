@@ -7,6 +7,7 @@ public class PostgresReplayPlugin extends JdbcReplayPlugin {
 
 
     private static final SqlStringParser parser = new SqlStringParser("$");
+
     @Override
     protected SqlStringParser getParser() {
         return parser;

@@ -6,6 +6,8 @@ public class BasicReplayPluginSettings extends PluginSettings {
     private boolean respectCallDuration;
     private String replayId;
 
+    private boolean blockExternal = true;
+
     public String getReplayId() {
         return replayId;
     }
@@ -22,4 +24,11 @@ public class BasicReplayPluginSettings extends PluginSettings {
         this.respectCallDuration = respectCallDuration;
     }
 
+    public boolean isBlockExternal() {
+        return blockExternal;
+    }
+
+    public void setBlockExternal(boolean blockExternal) {
+        this.blockExternal = blockExternal;
+    }
 }

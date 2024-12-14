@@ -1,8 +1,10 @@
 package org.kendar.storage.generic;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class ResponseItemQuery {
+    private final HashMap<String, String> tags = new HashMap<>();
     private HashSet<Integer> used = new HashSet<>();
     private String caller;
     private long startAt;
@@ -30,4 +32,18 @@ public class ResponseItemQuery {
     public void setStartAt(long startAt) {
         this.startAt = startAt;
     }
+
+    public HashMap<String, String> getTags() {
+        return tags;
+    }
+
+    public String getTag(String tag) {
+        return tags.get(tag);
+    }
+
+    public void addTag(String tag, Object value) {
+        tags.put(tag, value != null ? value.toString() : null);
+    }
+
+
 }

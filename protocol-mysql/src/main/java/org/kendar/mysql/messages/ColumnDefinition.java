@@ -44,39 +44,6 @@ public class ColumnDefinition extends MySQLReturnMessage {
         resultBuffer.write((byte) 0x00);
         resultBuffer.write((byte) 0x00);
 
-/*
-        if (field.getCatalogName() == null || field.getCatalogName().isEmpty()) {
-            resultBuffer.writeWithLength("def".getBytes());
-        } else {
-            resultBuffer.writeWithLength(field.getCatalogName().getBytes());
-        }
-        resultBuffer.writeWithLength(field.getSchemaName().getBytes());
-        resultBuffer.writeWithLength(field.getTableName().getBytes());
-        resultBuffer.writeWithLength(field.getTableName().getBytes());
-        if (field.getColumnLabel() != null && !field.getColumnLabel().isEmpty()) {
-            resultBuffer.writeWithLength(field.getColumnLabel().getBytes());
-        } else {
-            resultBuffer.writeWithLength(field.getColumnName().getBytes());
-        }
-        resultBuffer.writeWithLength(field.getColumnLabel().getBytes());
-        resultBuffer.writeLength(0x0c);
-        resultBuffer.writeUB2(language.getValue());
-        resultBuffer.writeUB4(field.getColumnDisplaySize());
-
-        if (binary) {
-            resultBuffer.write((byte) toMysql(field.getColumnType()));
-        } else {
-            resultBuffer.write((byte) MySQLType.MYSQL_TYPE_VAR_STRING.getValue());
-        }
-        resultBuffer.writeUB2(0x00);
-        //TODO VERIFIY PRECISION https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_com_query_response_text_resultset_column_definition.html
-        if (field.getPrecision() > 0) {
-            resultBuffer.write((byte) field.getPrecision());
-        } else {
-            resultBuffer.write((byte) 0x00);
-        }
-        resultBuffer.write((byte) 0x00);
-        resultBuffer.write((byte) 0x00);*/
     }
 
     private long getMaxColumnDisplaySize(JDBCType columnType) {

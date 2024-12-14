@@ -5,7 +5,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.kendar.mqtt.plugins.MqttReplayPlugin;
-import org.kendar.plugins.settings.BasicReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
@@ -56,7 +56,7 @@ public class ReplayerTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         ;
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
@@ -74,15 +74,15 @@ public class ReplayerTest {
             MqttConnectOptions options = new MqttConnectOptions();
             client.connect(options);
 
-            if (client.isConnected()) {
-                setupCallBack(client);
+            Sleeper.sleep(1000, () -> client.isConnected());
+            setupCallBack(client);
 
-                client.subscribe(TOPIC_NAME, 0);
+            client.subscribe(TOPIC_NAME, 0);
+            Sleeper.sleep(1000);
+            MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
+            message.setQos(0);
+            client.publish(TOPIC_NAME, message);
 
-                MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
-                message.setQos(0);
-                client.publish(TOPIC_NAME, message);
-            }
             Sleeper.sleep(1000, () -> !messages.isEmpty());
             client.disconnect();
             client.close();
@@ -108,7 +108,7 @@ public class ReplayerTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         ;
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
@@ -154,17 +154,14 @@ public class ReplayerTest {
         messages.clear();
         var baseProtocol = new MqttProtocol(1885);
         var proxy = new MqttProxy();
-
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "qos2Test"));
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
-        ;
+        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
-
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         var protocolServer = new TcpServer(baseProtocol);

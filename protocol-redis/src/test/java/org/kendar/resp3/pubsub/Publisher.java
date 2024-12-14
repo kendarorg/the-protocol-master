@@ -25,6 +25,7 @@ public class Publisher {
         for (var line : data) {
             System.out.println("Sending " + line);
             publisherJedis.publish(channel, line);
+            System.out.println("Published " + line);
             Sleeper.sleep(100);
         }
 

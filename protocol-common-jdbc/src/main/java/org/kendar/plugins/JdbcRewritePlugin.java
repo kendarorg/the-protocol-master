@@ -1,5 +1,7 @@
 package org.kendar.plugins;
 
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.utils.ReplacerItemInstance;
@@ -14,6 +16,16 @@ public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectRe
         if (replaced != toReplace) {
             request.setQuery(replaced);
         }
+    }
+
+    @Override
+    protected Class<?> getIn() {
+        return JdbcCall.class;
+    }
+
+    @Override
+    protected Class<?> getOut() {
+        return SelectResult.class;
     }
 
     @Override

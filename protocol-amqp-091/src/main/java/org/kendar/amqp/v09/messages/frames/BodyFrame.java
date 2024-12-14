@@ -22,6 +22,7 @@ public class BodyFrame extends Frame {
     private byte[] contentBytes;
     private String contentString;
     private int consumeId;
+    private String consumeOrigin;
 
     public BodyFrame() {
         setType(FrameType.BODY.asByte());
@@ -67,6 +68,9 @@ public class BodyFrame extends Frame {
         }
 
 
+        var routingKey = context.getValue("BASIC_PUBLISH_RK_" + channel);
+        var exchange = context.getValue("BASIC_PUBLISH_XC_" + channel);
+
         var bf = new BodyFrame();
         bf.setChannel(channel);
         bf.setContentBytes(contentBytes);
@@ -74,12 +78,13 @@ public class BodyFrame extends Frame {
         if (isProxyed()) {
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             bf.setConsumeId(basicConsume.getConsumeId());
-
+            var consumeOrigin = basicConsume.getQueue() + "|" + basicConsume.getChannel() + "|" + mapper.serialize(basicConsume.getArguments());
+            bf.setConsumeOrigin(consumeOrigin);
 
             //If it is a recorder
             if (!proxy.isReplayer()) {
 
-                proxy.respond(bf, new PluginContext("AMQP", "RESPONSE", -1, context));
+                proxy.respond(bf, new PluginContext("AMQP", "RESPONSE", System.currentTimeMillis(), context));
             }
             //Return itself
             return iteratorOfList(bf);
@@ -113,5 +118,13 @@ public class BodyFrame extends Frame {
 
     public void setConsumeId(int consumeId) {
         this.consumeId = consumeId;
+    }
+
+    public String getConsumeOrigin() {
+        return consumeOrigin;
+    }
+
+    public void setConsumeOrigin(String consumeOrigin) {
+        this.consumeOrigin = consumeOrigin;
     }
 }

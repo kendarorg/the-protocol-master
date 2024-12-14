@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.fileupload.FileUploadException;
-import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
+import org.kendar.apis.converters.RequestResponseBuilderImpl;
 import org.kendar.utils.JsonMapper;
 
 import java.io.IOException;

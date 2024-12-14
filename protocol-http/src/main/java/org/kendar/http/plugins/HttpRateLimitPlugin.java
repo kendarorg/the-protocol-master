@@ -1,10 +1,10 @@
 package org.kendar.http.plugins;
 
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -22,13 +22,18 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Response, HttpRateLimitPluginSettings> {
+public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
     private List<Pattern> recordSites = new ArrayList<>();
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
+
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpRateLimitPluginSettings.class;
+    }
 
     @Override
     protected void handleActivation(boolean active) {
@@ -40,7 +45,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
 
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         var settings = getSettings();
         setupSitesToRecord(settings.getLimitSites());
@@ -51,13 +56,12 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptor<Request, Respo
         return this;
     }
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
             if (!recordSites.isEmpty()) {
                 var matchFound = false;
                 for (var pat : recordSites) {
-                    if (pat.matcher(((Request) in).getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+                    if (pat.matcher(in.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                         matchFound = true;
                         break;
                     }

@@ -1,19 +1,22 @@
 package org.kendar.http.plugins;
 
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
-import org.kendar.plugins.ProtocolPhase;
-import org.kendar.plugins.ProtocolPluginDescriptor;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.utils.Sleeper;
 
 import java.util.List;
 import java.util.Random;
 
-public class HttpLatencyPlugin extends ProtocolPluginDescriptor<Request, Response, HttpLatencyPluginSettings> {
-
+public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyPluginSettings> {
 
     @Override
+    public Class<?> getSettingClass() {
+        return HttpLatencyPluginSettings.class;
+    }
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
             HttpLatencyPluginSettings s = getSettings();

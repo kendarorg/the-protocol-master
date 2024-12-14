@@ -10,6 +10,7 @@ import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -59,6 +60,14 @@ public class SimpleMongoTest extends BasicTest {
         assertEquals("Ski Bloopers", doc.get("title").toString());
         assertNotNull(doc);
         assertNotNull(c);
+
+        var events = getEvents().stream().collect(Collectors.toList());
+        assertEquals(3, events.size());
+        var evt = events.get(0);
+        assertEquals("mongodb", evt.getProtocol());
+        assertEquals(1, events.stream().filter(e -> e.getQuery().contains(":dbStats")).count());
+        assertEquals(1, events.stream().filter(e -> e.getQuery().contains(":insert")).count());
+        assertEquals(1, events.stream().filter(e -> e.getQuery().contains(":find")).count());
     }
 
     @Test

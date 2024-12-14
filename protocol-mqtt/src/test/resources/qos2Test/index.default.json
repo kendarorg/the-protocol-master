@@ -3,30 +3,16 @@
     "index": 1,
     "type": "Connect",
     "caller": "MQTT",
-    "durationMs": 10,
-    "tags": {
-      "output": "ConnectAck",
-      "input": "Connect"
-    }
+    "durationMs": 5,
+    "tags": {}
   },
   {
     "index": 2,
     "type": "Subscribe",
     "caller": "MQTT",
-    "durationMs": 4,
+    "durationMs": 1,
     "tags": {
-      "output": "SubscribeAck",
-      "input": "Subscribe"
-    }
-  },
-  {
-    "index": 3,
-    "type": "Publish",
-    "caller": "MQTT",
-    "durationMs": 152,
-    "tags": {
-      "output": "PublishRec",
-      "input": "Publish"
+      "/subscribe/": "2"
     }
   },
   {
@@ -35,36 +21,44 @@
     "caller": "MQTT",
     "durationMs": 0,
     "tags": {
-      "output": "Publish"
+      "/subscribe/": "2"
+    }
+  },
+  {
+    "index": 3,
+    "type": "Publish",
+    "caller": "MQTT",
+    "durationMs": 188,
+    "tags": {
+      "/subscribe/": "2"
     }
   },
   {
     "index": 5,
     "type": "PublishRel",
     "caller": "MQTT",
-    "durationMs": 970,
-    "tags": {
-      "output": "PublishComp",
-      "input": "PublishRel"
-    }
+    "durationMs": 992,
+    "tags": {}
   },
   {
     "index": 6,
     "type": "PublishRec",
     "caller": "MQTT",
-    "durationMs": 1000,
-    "tags": {
-      "output": "PublishRel",
-      "input": "PublishRec"
-    }
+    "durationMs": 996,
+    "tags": {}
   },
   {
     "index": 7,
     "type": "PublishComp",
     "caller": "MQTT",
     "durationMs": 0,
-    "tags": {
-      "input": "PublishComp"
-    }
+    "tags": {}
+  },
+  {
+    "index": 8,
+    "type": "Disconnect",
+    "caller": "MQTT",
+    "durationMs": 0,
+    "tags": {}
   }
 ]

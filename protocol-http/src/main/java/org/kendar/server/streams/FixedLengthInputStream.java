@@ -1,7 +1,7 @@
 package org.kendar.server.streams;
 
 
-import org.kendar.http.utils.constants.ConstantsHeader;
+import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.server.exchange.ExchangeImpl;
 
 import java.io.IOException;

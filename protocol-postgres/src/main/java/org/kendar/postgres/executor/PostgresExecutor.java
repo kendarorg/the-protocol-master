@@ -7,7 +7,6 @@ import org.kendar.postgres.executor.converters.PostgresCallConverter;
 import org.kendar.postgres.fsm.PostgresProtoContext;
 import org.kendar.postgres.messages.*;
 import org.kendar.protocol.context.NetworkProtoContext;
-import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.sql.jdbc.JdbcProxy;
@@ -103,7 +102,7 @@ public class PostgresExecutor {
         return fields;
     }
 
-    public ExecutorResult executePortal(NetworkProtoContext protoContext, Parse parse, Binding binding,
+    public ExecutorResult executePortal(PostgresProtoContext protoContext, Parse parse, Binding binding,
                                         int maxRecords, boolean describable, boolean possiblyMultiple) {
 
         try {
@@ -132,7 +131,7 @@ public class PostgresExecutor {
         return parser.isUnknown(parsed) || parser.isMixed(parsed) || parsed.size() == 1;
     }
 
-    private ExecutorResult executeRealQuery(NetworkProtoContext protoContext, Parse parse,
+    private ExecutorResult executeRealQuery(PostgresProtoContext protoContext, Parse parse,
                                             Binding binding, int maxRecords, boolean describable,
                                             boolean possiblyMultiple) {
         var parsed = parser.getTypes(parse.getQuery());
@@ -279,9 +278,17 @@ public class PostgresExecutor {
         return new ExecutorResult(ProtoState.iteratorOfList(result.toArray(new ReturnMessage[0])));
     }
 
-    private ExecutorResult handleWithinTransaction(List<SqlParseResult> parsed, ProtoContext protoContext, Parse parse,
+    private ExecutorResult handleWithinTransaction(List<SqlParseResult> parseds, PostgresProtoContext protoContext, Parse parse,
                                                    Binding binding, int maxRecords, boolean describable) throws SQLException {
-        throw new SQLException("UNSUPPORTED TRANSACTIONS");
+        ((JdbcProxy) protoContext.getProxy()).executeBegin(protoContext);
+        ExecutorResult lastOne = null;
+        for (var parsed : parseds) {
+            var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
+            lastOne = handleSingleQuery(sqlParseResult, protoContext, parse,
+                    new Binding("", "", new ArrayList<>(), new ArrayList<>()), 1, false);
+        }
+        ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
+        return lastOne;
     }
 
 }

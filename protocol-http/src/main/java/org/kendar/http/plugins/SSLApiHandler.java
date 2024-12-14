@@ -1,37 +1,88 @@
 package org.kendar.http.plugins;
 
-import com.sun.net.httpserver.HttpExchange;
+import org.kendar.annotations.HttpMethodFilter;
+import org.kendar.annotations.HttpTypeFilter;
+import org.kendar.annotations.TpmDoc;
+import org.kendar.annotations.multi.PathParameter;
+import org.kendar.annotations.multi.TpmResponse;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.plugins.BaseApiServerHandler;
-import org.kendar.plugins.DefaultPluginApiHandler;
-import org.kendar.plugins.apis.FileDownload;
+import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.utils.FileResourcesUtils;
 
-public class SSLApiHandler extends DefaultPluginApiHandler<SSLDummyPlugin> {
+import static org.kendar.apis.ApiUtils.respondFile;
+import static org.kendar.apis.ApiUtils.respondKo;
+
+@HttpTypeFilter(hostAddress = "*")
+public class SSLApiHandler implements ProtocolPluginApiHandler {
     private final HttpProtocolSettings protocolSettings;
+    private final SSLDummyPlugin descriptor;
+    private final String id;
+    private final String instanceId;
 
     public SSLApiHandler(SSLDummyPlugin descriptor, String id, String instanceId, HttpProtocolSettings protocolSettings) {
-        super(descriptor, id, instanceId);
+        this.descriptor = descriptor;
+        this.id = id;
+        this.instanceId = instanceId;
         this.protocolSettings = protocolSettings;
     }
 
-    @Override
-    public boolean handle(BaseApiServerHandler apiServerHandler, HttpExchange exchange, String pathPart) {
+    @HttpMethodFilter(
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/{action}",
+            method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/{action}")
+    @TpmDoc(
+            description = "Retrieve the root certificates",
+            path = {@PathParameter(key = "action",
+                    allowedValues = {"der", "key"})},
+            responses = @TpmResponse(
+                    body = byte[].class,
+                    content = "application/pkix-crl",
+                    description = "Retrieve the root certificates"
+            ),
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+    public boolean retrieveDerKey(Request reqp, Response resp) {
+        var action = reqp.getPathParameter("action");
+
         try {
             var frf = new FileResourcesUtils();
-            switch (pathPart) {
-                case "/der":
+            switch (action) {
+                case "der":
                     var data = frf.getFileFromResourceAsByteArray(protocolSettings.getSSL().getDer());
-                    apiServerHandler.respond(exchange, new FileDownload(data, "certificate.der", "application/pkix-crl"), 200);
+                    respondFile(resp, data, "application/pkix-crl", "certificate.der");
                     return true;
-                case "/key":
+                case "key":
                     var key = frf.getFileFromResourceAsByteArray(protocolSettings.getSSL().getKey());
-                    apiServerHandler.respond(exchange, new FileDownload(key, "certificate.key", "application/pkix-crl"), 200);
+                    respondFile(resp, key, "application/pkix-crl", "certificate.key");
                     return true;
             }
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            respondKo(resp, ex);
+            return true;
+
         }
         return false;
+    }
+
+    public SSLDummyPlugin getDescriptor() {
+        return descriptor;
+    }
+
+    public String getId() {
+        return id + "." + instanceId;
+    }
+
+    public String getProtocolInstanceId() {
+        return instanceId;
+    }
+
+    @Override
+    public String getProtocol() {
+        return descriptor.getProtocol();
+    }
+
+    @Override
+    public String getPluginId() {
+        return descriptor.getId();
     }
 }

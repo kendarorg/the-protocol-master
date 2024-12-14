@@ -1,9 +1,9 @@
 {
+  "timestamp": 1733762110722,
   "constant": false,
   "connectionId": 1,
   "index": 3,
   "input": {
-    "uuid": "14",
     "fullFlag": 50,
     "fixedHeader": "PUBLISH",
     "topicName": "/subscribe/",
@@ -14,13 +14,12 @@
     "qos": 1
   },
   "output": {
-    "uuid": "18",
     "fullFlag": 64,
     "fixedHeader": "PUBACK",
     "packetIdentifier": 2,
     "reasonCode": 0
   },
-  "durationMs": 668,
+  "durationMs": 678,
   "type": "Publish",
   "caller": "MQTT",
   "inputType": "Publish",

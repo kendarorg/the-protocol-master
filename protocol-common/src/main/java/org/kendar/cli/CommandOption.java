@@ -14,6 +14,7 @@ public class CommandOption implements CommandItem {
     private final Map<String, CommandOption> subOptionsValues = new HashMap<>();
     private final HashSet<String> duplicateGuardSubChoices = new HashSet<>();
     private final HashSet<String> duplicateGuardSubOptions = new HashSet<>();
+    private final List<CommandOption> subOptions = new ArrayList<>();
     private boolean hasParameter;
     private boolean mandatoryParameter;
     private String longCommand;
@@ -22,7 +23,6 @@ public class CommandOption implements CommandItem {
     private Consumer<String> callback;
     private boolean present;
     private String subChoicesDescription;
-    private final List<CommandOption> subOptions = new ArrayList<>();
     private CommandItem parent;
 
     private CommandOption(String shortCommand, String description) {

@@ -1,10 +1,9 @@
 {
+  "timestamp": 1733870616970,
   "constant": false,
   "connectionId": 1,
   "index": 7,
   "input": {
-    "uuid": "70",
-    "optional": false,
     "channel": 1,
     "type": 1,
     "proxyed": false,
@@ -21,14 +20,12 @@
     "consumeId": 1
   },
   "output": {
-    "uuid": "71",
-    "optional": false,
     "channel": 1,
     "type": 1,
     "proxyed": false,
     "classId": 60,
     "methodId": 21,
-    "tag": "amq.ctag-FmXqPJK3K5YPwwaUXLwuEw"
+    "tag": "amq.ctag-sQzqNeFgzmseb97B8DI2PQ"
   },
   "durationMs": 1,
   "type": "BasicConsume",

@@ -32,6 +32,9 @@ All callback are replayed automatically
 
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
+* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server
+* blockExternal: Block calls to real service when not matching (default true)
+* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server
 
 ## Missing features
 
@@ -54,6 +57,13 @@ All callback are replayed automatically
 
 ## Interesting informations
 
+```
+Remember that with automatic recconection with Eclipse Paho
+YOU MUST re-connect and re-subscribe!!!
+
+No idea for other clients 
+```
+
 At the moment the test is based on the moquette MQTT server, since it can be
 embedded directly into any java application and does not require testcontainers
 
@@ -65,3 +75,5 @@ test section)
 When the Paho client does not know what packet identifier it should generate,
 simply create a new one. This happened for example when during development. I
 had not set the packet Identifier when returning a PUBREL packet
+
+The packets can arrive even in out of order kind...

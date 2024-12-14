@@ -3,22 +3,24 @@
     "index": 1,
     "type": "Resp3Message",
     "caller": "RESP3",
-    "durationMs": 1,
+    "durationMs": 2,
     "tags": {}
   },
   {
     "index": 2,
     "type": "Resp3Message",
     "caller": "RESP3",
-    "durationMs": 0,
+    "durationMs": 1,
     "tags": {}
   },
   {
     "index": 3,
     "type": "Resp3Message",
     "caller": "RESP3",
-    "durationMs": 2,
-    "tags": {}
+    "durationMs": 1,
+    "tags": {
+      "queue": "commonChannel"
+    }
   },
   {
     "index": 4,
@@ -31,14 +33,14 @@
     "index": 5,
     "type": "Resp3Message",
     "caller": "RESP3",
-    "durationMs": 2,
+    "durationMs": 1,
     "tags": {}
   },
   {
     "index": 6,
     "type": "Resp3Message",
     "caller": "RESP3",
-    "durationMs": 0,
+    "durationMs": 1,
     "tags": {}
   },
   {
@@ -46,24 +48,21 @@
     "type": "RESPONSE",
     "caller": "RESP3",
     "durationMs": 0,
-    "tags": {}
-  },
-  {
-    "index": 8,
-    "type": "Resp3Message",
-    "caller": "RESP3",
-    "durationMs": 2,
-    "tags": {}
+    "tags": {
+      "queue": "commonChannel"
+    }
   },
   {
     "index": 9,
     "type": "RESPONSE",
     "caller": "RESP3",
     "durationMs": 0,
-    "tags": {}
+    "tags": {
+      "queue": "commonChannel"
+    }
   },
   {
-    "index": 10,
+    "index": 8,
     "type": "Resp3Message",
     "caller": "RESP3",
     "durationMs": 1,
@@ -74,13 +73,22 @@
     "type": "RESPONSE",
     "caller": "RESP3",
     "durationMs": 0,
+    "tags": {
+      "queue": "commonChannel"
+    }
+  },
+  {
+    "index": 10,
+    "type": "Resp3Message",
+    "caller": "RESP3",
+    "durationMs": 1,
     "tags": {}
   },
   {
     "index": 12,
     "type": "Resp3Message",
     "caller": "RESP3",
-    "durationMs": 1,
+    "durationMs": 0,
     "tags": {}
   }
 ]

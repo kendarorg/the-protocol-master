@@ -4,14 +4,11 @@ import com.sun.net.httpserver.HttpsServer;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.http.HttpProtocol;
-import org.kendar.http.plugins.HttpErrorPluginSettings;
-import org.kendar.http.plugins.HttpLatencyPluginSettings;
-import org.kendar.http.plugins.HttpRecordPluginSettings;
-import org.kendar.http.plugins.HttpReplayPluginSettings;
+import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.ssl.CertificatesManager;
-import org.kendar.plugins.PluginDescriptor;
-import org.kendar.plugins.RewritePluginSettings;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -159,14 +156,18 @@ public class HttpRunner extends CommonRunner {
 
     public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
                       String sectionKey, GlobalSettings ini, ProtocolSettings pset, StorageRepository storage,
-                      List<PluginDescriptor> plugins,
+                      List<ProtocolPluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalseAction) throws Exception {
         var settings = (HttpProtocolSettings) pset;
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = pset.getPlugin(plugin.getId(), plugin.getSettingClass());
-            plugin.initialize(ini, pset, specificPluginSetting);
-            plugin.refreshStatus();
+            if (specificPluginSetting != null || plugin instanceof SSLDummyPlugin) {
+                plugin.initialize(ini, settings, specificPluginSetting);
+                plugin.refreshStatus();
+            } else {
+                plugins.remove(i);
+            }
         }
         var baseProtocol = new HttpProtocol(ini, settings, plugins);
         baseProtocol.initialize();

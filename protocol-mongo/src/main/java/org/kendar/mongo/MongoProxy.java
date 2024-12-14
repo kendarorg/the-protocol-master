@@ -18,7 +18,7 @@ import org.kendar.mongo.dtos.OpMsgSection;
 import org.kendar.mongo.dtos.OpQueryContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
@@ -178,9 +178,7 @@ public class MongoProxy extends Proxy {
                 return out;
             }
         }
-//        if (replayer) {
-//            var item = storage.read((JsonNode) lsatOp.serialize(), "HELLO_OP_QUERY");
-//            var res = new OpReplyContent();
+
 //            res.doDeserialize(item.getOutput(), mapper);
 //            res.setRequestId(protoContext.getReqResId());
 //            res.setResponseId(lsatOp.getRequestId());

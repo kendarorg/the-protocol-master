@@ -6,6 +6,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.junit.jupiter.api.*;
 import org.kendar.Main;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
+import org.kendar.plugins.GlobalReport;
 import org.kendar.runner.utils.SimpleHttpServer;
 import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.FileResourcesUtils;
@@ -14,10 +17,13 @@ import org.kendar.utils.Sleeper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,6 +36,7 @@ public class MultiRecordReplay extends BasicTest {
     private static String HTTPS_PORT = "12443";
     private static String PROXY_PORT = "1281";
     private static int SIMPLE_SERVER_HTTP_PORT = 18080;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     @BeforeAll
@@ -46,16 +53,26 @@ public class MultiRecordReplay extends BasicTest {
         simpleServer.stop();
     }
 
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
+    }
+
     @BeforeEach
     public void beforeEach() throws IOException {
         runTheServer.set(true);
+        EventsQueue.register("recorder", (r) -> {
+            events.add(r);
+        }, ReportDataEvent.class);
     }
 
     @AfterEach
     public void afterEach() {
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+
         runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(100);
+        events.clear();
     }
 
 
@@ -125,9 +142,29 @@ public class MultiRecordReplay extends BasicTest {
                 verifyTestRun.set(true);
             }
         });
+
+
+        var getReport = new HttpGet("http://localhost:9127/api/global/plugins/report-plugin/download");
+        httpresponse = httpclient.execute(getReport);
+        sc = new Scanner(httpresponse.getEntity().getContent());
+
+        //Printing the status line
+        assertEquals("HTTP/1.1 200 OK", httpresponse.getStatusLine().toString());
+        content = new StringBuilder();
+        while (sc.hasNext()) {
+            content.append(sc.nextLine());
+        }
+        var data = mapper.deserialize(content.toString(), GlobalReport.class);
+
+        assertEquals(14, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("postgres")).count());
+        assertEquals(1, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("http")).count());
+
+
         runTheServer.set(false);
         Main.stop();
         assertTrue(verifyTestRun.get());
+
+
         System.out.println("RECORDING COMPLETED ==============================================");
 
         var replaySettings = fr.getFileFromResourceAsString(Path.of("src", "test", "resources", "multiRecording.json.template").toAbsolutePath().toString());
@@ -143,6 +180,7 @@ public class MultiRecordReplay extends BasicTest {
         replaySettings = replaySettings.replaceAll(Pattern.quote("{replayActive}"), "true");
         var replayConfig = Path.of("target", "multiRecording", "replaying.json").toAbsolutePath();
         Files.writeString(replayConfig, replaySettings);
+
 
         System.out.println("STARTING ==============================================");
         startAndHandleUnexpectedErrors("-cfg", replayConfig.toString());
@@ -163,6 +201,14 @@ public class MultiRecordReplay extends BasicTest {
             lt.setSalary(500.22);
             em.persist(lt);
         });
+
+
+        var httpFail = new HttpGet("http://localhost:" + SIMPLE_SERVER_HTTP_PORT + "/notRecorded");
+        httpresponse = httpclient.execute(httpFail);
+        sc = new Scanner(httpresponse.getEntity().getContent());
+
+        //Printing the status line
+        assertEquals("HTTP/1.1 500 Internal Server Error", httpresponse.getStatusLine().toString());
 
 
         httpresponse = httpclient.execute(httpget);

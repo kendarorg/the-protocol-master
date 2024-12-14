@@ -1,6 +1,10 @@
 package org.kendar.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -15,24 +19,38 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptor<T, K, W> {
+public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptorBase<W> {
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();
+
+    protected abstract Class<?> getIn();
+
+    protected abstract Class<?> getOut();
 
     @Override
     public String getId() {
         return "rewrite-plugin";
     }
 
-
     @Override
-    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, T request, K response) {
+    public Class<?> getSettingClass() {
+        return RewritePluginSettings.class;
+    }
+
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object request, Object response) {
+
         if (!isActive()) return false;
         if (replacers.isEmpty()) return false;
-        J toReplace = prepare(request, response);
+        if (request != null && !request.getClass().equals(getIn())) {
+            return false;
+        }
+        if (response != null && !response.getClass().equals(getOut())) {
+            return false;
+        }
+        J toReplace = prepare((T) request, (K) response);
         for (var item : replacers) {
-            replaceData(item, toReplace, request, response);
+            replaceData(item, toReplace, (T) request, (K) response);
         }
         return false;
     }
@@ -43,7 +61,7 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
 
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         var settings = getSettings();
         if (settings.getRewritesFile() == null) return null;

@@ -2,6 +2,7 @@ package org.kendar.storage.generic;
 
 import org.kendar.Service;
 import org.kendar.storage.CompactLine;
+import org.kendar.storage.CompactLineComplete;
 import org.kendar.storage.StorageItem;
 
 import java.util.List;
@@ -23,8 +24,10 @@ public interface StorageRepository extends Service {
 
     long generateIndex();
 
-    void isRecording(String instanceId, boolean b);
-    void isReplaying(String instanceId, boolean b);
+
+    List<CompactLineComplete> getAllIndexes(int maxLen);
 
     List<CompactLine> getIndexes(String instanceId);
+
+    void clean();
 }

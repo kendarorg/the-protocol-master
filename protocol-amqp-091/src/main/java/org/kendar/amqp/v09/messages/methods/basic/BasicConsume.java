@@ -12,15 +12,18 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferUtils;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
 public class BasicConsume extends Basic {
 
     private static final Logger log = LoggerFactory.getLogger(BasicConsume.class);
+    private static JsonMapper mapper = new JsonMapper();
     private short reserved1;
     private String queue;
     private String consumerTag;
@@ -30,6 +33,7 @@ public class BasicConsume extends Basic {
     private boolean noWait;
     private Map<String, Object> arguments;
     private int consumeId;
+    private String consumeOrigin;
 
     public BasicConsume() {
         super();
@@ -160,6 +164,16 @@ public class BasicConsume extends Basic {
 
         context.setValue("BASIC_CONSUME_CI_" + basicConsume.getConsumeId(), basicConsume);
 
+        context.setValue("BASIC_CONSUME_CI_" + basicConsume.getConsumeId(), basicConsume);
+
+
+        if (context.getValue("QUEUE") == null) {
+            context.setValue("QUEUE", new HashSet<String>());
+        }
+
+        var list = (HashSet<String>) context.getValue("QUEUE");
+        list.add(queue + "|" + channel + "|" + mapper.serialize(arguments));
+        basicConsume.setConsumeOrigin(queue + "|" + channel + "|" + mapper.serialize(arguments));
         //Send back the consume ok
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
@@ -174,5 +188,13 @@ public class BasicConsume extends Basic {
 
     public void setConsumeId(int consumeId) {
         this.consumeId = consumeId;
+    }
+
+    public String getConsumeOrigin() {
+        return consumeOrigin;
+    }
+
+    public void setConsumeOrigin(String consumeOrigin) {
+        this.consumeOrigin = consumeOrigin;
     }
 }

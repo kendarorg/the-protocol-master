@@ -1,9 +1,9 @@
 {
+  "timestamp": 1733762110697,
   "constant": false,
   "connectionId": 1,
   "index": 1,
   "input": {
-    "uuid": "3",
     "protocolVersion": 4,
     "fullFlag": 16,
     "fixedHeader": "CONNECT",
@@ -12,16 +12,15 @@
     "keepAlive": 60,
     "willQos": 0,
     "willRetain": false,
-    "clientId": "7d39c267-1dee-4972-b0d9-2fd39d2b9b45"
+    "clientId": "b07bbffc-04c5-490e-8a9e-a31d68101559"
   },
   "output": {
-    "uuid": "6",
     "fullFlag": 32,
     "fixedHeader": "CONNACK",
     "sessionSet": false,
     "connectReasonCode": 0
   },
-  "durationMs": 8,
+  "durationMs": 5,
   "type": "Connect",
   "caller": "MQTT",
   "inputType": "Connect",

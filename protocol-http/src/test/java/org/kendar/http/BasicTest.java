@@ -17,12 +17,15 @@ import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.plugins.RewritePluginSettings;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
+import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -32,7 +35,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -44,6 +49,7 @@ public class BasicTest {
     static int FAKE_PORT_HTTPS = 8487;
     static int FAKE_PORT_PROXY = 9999;
     private static SimpleHttpServer simpleServer;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected GlobalSettings globalSettings;
     protected HttpProtocolSettings httpProtocolSettings;
 
@@ -155,14 +161,21 @@ public class BasicTest {
         httpProtocolSettings.getPlugins().put("mock-plugin", mockSettings);
         globalSettings.getProtocols().put("http", httpProtocolSettings);
         globalSettings.putService("storage", storage);
+        var settings = new PluginSettings();
+        settings.setActive(true);
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
                 new HttpRecordPlugin().initialize(globalSettings, httpProtocolSettings, recordingSettings),
                 new HttpReplayPlugin().initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(),
+                new HttpReportPlugin().initialize(globalSettings, httpProtocolSettings, settings),
                 new HttpLatencyPlugin(),
                 new HttpRateLimitPlugin(),
                 new HttpMockPlugin().initialize(globalSettings, httpProtocolSettings, mockSettings),
                 new HttpRewritePlugin().initialize(globalSettings, httpProtocolSettings, rewriteSettings)));
+        baseProtocol.initialize();
+        EventsQueue.register("recorder", (r) -> {
+            events.add(r);
+        }, ReportDataEvent.class);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
 
@@ -171,8 +184,13 @@ public class BasicTest {
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
-    public void afterEachBase() {
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
+    }
 
+    public void afterEachBase() {
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
         Sleeper.sleep(5000, () -> !protocolServer.isRunning());
     }

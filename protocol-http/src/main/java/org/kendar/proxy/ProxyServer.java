@@ -15,13 +15,7 @@ import java.util.function.Function;
 public class ProxyServer {
     public final HashSet<String> ignore = new HashSet<>();
     private final int port;
-    //    public static void main(String[] args) {
-//        (new ProxyServer()).run();
-//    }
-//
-//    public ProxyServer() {
-//        super("Server Thread");
-//    }
+
     private final ExecutorService executor = Executors.newCachedThreadPool();
     ServerSocket serverSocket = null;
     private int httpRedirect = -1;

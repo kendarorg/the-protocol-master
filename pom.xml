@@ -24,7 +24,7 @@
     </modules>
 
     <properties>
-        <revision>2.1.5</revision>
+        <revision>2.2.0</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
@@ -40,7 +40,6 @@
         <snappy.version>1.1.8.4</snappy.version>
         <zstd.version>1.5.2-2</zstd.version>
         <hibernate.version>5.4.0.Final</hibernate.version>
-        <jaxb.api.version>2.3.0</jaxb.api.version>
         <amqp.client.version>5.20.0</amqp.client.version>
         <jedis.version>5.1.2</jedis.version>
         <commons.io.version>2.7</commons.io.version>
@@ -52,6 +51,14 @@
         <json.schema.validator.version>1.0.66</json.schema.validator.version>
         <pl4j.version>3.12.1</pl4j.version>
         <bouncycastle.version>1.68</bouncycastle.version>
+        <commons.fileupload.version>1.3.3</commons.fileupload.version>
+        <guava.version>31.1-jre</guava.version>
+        <swagger.version>2.2.1</swagger.version>
+        <assembly.plugin.version>3.7.1</assembly.plugin.version>
+        <deploy.plugin.version>3.1.3</deploy.plugin.version>
+        <surfire.plugin.version>3.5.2</surfire.plugin.version>
+        <compiler.plugin.version>3.13.0</compiler.plugin.version>
+        <antrun.plugin.version>3.1.0</antrun.plugin.version>
     </properties>
     <dependencies>
         <!--        <dependency>-->
@@ -163,7 +170,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M3</version>
+                <version>${surfire.plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

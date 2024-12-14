@@ -14,25 +14,26 @@ import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Multithreaded asynchronous server
  */
 public class TcpServer {
-
+    private static final int WAIT_TIMEOUT_MS = 30000;
     /**
      * Default host
      */
     private static final String HOST = "*";
     private static final Logger log = LoggerFactory.getLogger(TcpServer.class);
     private final NetworkProtoDescriptor protoDescriptor;
-
     /**
      * Listener thread
      */
     private Thread thread;
-
     /**
      * Listener socket
      */
@@ -41,6 +42,10 @@ public class TcpServer {
 
     public TcpServer(NetworkProtoDescriptor protoDescriptor) {
         this.protoDescriptor = protoDescriptor;
+    }
+
+    private int getWaitTimeoutMs() {
+        return WAIT_TIMEOUT_MS;
     }
 
     /**
@@ -55,8 +60,10 @@ public class TcpServer {
             }
         } else {
             try {
-                server.close();
-                Sleeper.sleepNoException(2000, () -> !server.isOpen());
+                if (server != null) {
+                    server.close();
+                    Sleeper.sleepNoException(2000, () -> !server.isOpen());
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {
@@ -122,7 +129,6 @@ public class TcpServer {
             server.bind(new InetSocketAddress(protoDescriptor.getPort()));
             log.info("[CL>TP][IN] Listening on " + HOST + ":{} {}", protoDescriptor.getPort(), protoDescriptor.getClass().getSimpleName());
 
-            //noinspection InfiniteLoopStatement
             while (true) {
                 try {
                     //Accept request
@@ -144,7 +150,7 @@ public class TcpServer {
                             context.sendGreetings();
                         }
                         //Start reading
-                        client.read(buffer, 30000, TimeUnit.MILLISECONDS, buffer, new CompletionHandler<>() {
+                        client.read(buffer, getWaitTimeoutMs(), buffer, new CompletionHandler<>() {
                             @Override
                             public void completed(Integer result, ByteBuffer attachment) {
                                 try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
@@ -166,7 +172,7 @@ public class TcpServer {
                                         return;
                                     }
                                     //Restart reading again
-                                    client.read(attachment, 30000, TimeUnit.MILLISECONDS, attachment, this);
+                                    client.read(attachment, getWaitTimeoutMs(), attachment, this);
                                 } catch (Exception ex) {
                                     context.handleExceptionInternal(ex);
                                     throw ex;
@@ -181,9 +187,12 @@ public class TcpServer {
                             }
                         });
                     } catch (ClosedChannelException ex) {
-
+                        log.trace("ClosedChannelException", ex);
                     }
 
+                } catch (ExecutionException e) {
+                    log.trace("ExecutionException", e);
+                    break;
                 } catch (Exception e) {
                     log.trace("Execution exception", e);
                 }

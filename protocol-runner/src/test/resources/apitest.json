@@ -1,5 +1,5 @@
 {
-  "pluginsDir": "plugins",
+  "pluginsDir": "target/plugins",
   "logLevel": "DEBUG",
   "dataDir": "target/tests/apitest",
   "apiPort": 5005,
@@ -17,7 +17,11 @@
         ]
       },
       "plugins": {
-        "record-plugin": {},
+        "record-plugin": {
+          "recordSites": [
+            "unknown"
+          ]
+        },
         "replay-plugin": {}
       }
     },

@@ -2,13 +2,17 @@ package org.kendar.resp3;
 
 
 import org.junit.jupiter.api.TestInfo;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
 import org.kendar.redis.plugins.RedisRecordPlugin;
+import org.kendar.redis.plugins.RedisReportPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -19,6 +23,8 @@ import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -27,6 +33,7 @@ public class BasicTest {
     protected static final int FAKE_PORT = 6389;
     protected static RedisImage redisImage;
     protected static TcpServer protocolServer;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -42,7 +49,6 @@ public class BasicTest {
 
 
     }
-
 
     public static void beforeEachBase(TestInfo testInfo) {
         var baseProtocol = new Resp3Protocol(FAKE_PORT);
@@ -63,11 +69,17 @@ public class BasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new RedisRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        var pl = new RedisRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+
+        var rep = new RedisReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        rep.setActive(true);
+        proxy.setPlugins(List.of(pl, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
+        EventsQueue.register("recorder", (r) -> {
+            events.add(r);
+        }, ReportDataEvent.class);
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
@@ -75,11 +87,16 @@ public class BasicTest {
     }
 
     public static void afterEachBase() {
-
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
     }
 
     public static void afterClassBase() throws Exception {
         redisImage.close();
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 }

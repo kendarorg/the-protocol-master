@@ -3,20 +3,16 @@
     "index": 1,
     "type": "Connect",
     "caller": "MQTT",
-    "durationMs": 64,
-    "tags": {
-      "output": "ConnectAck",
-      "input": "Connect"
-    }
+    "durationMs": 37,
+    "tags": {}
   },
   {
     "index": 2,
     "type": "Subscribe",
     "caller": "MQTT",
-    "durationMs": 11,
+    "durationMs": 6,
     "tags": {
-      "output": "SubscribeAck",
-      "input": "Subscribe"
+      "/subscribe/": "0"
     }
   },
   {
@@ -25,7 +21,7 @@
     "caller": "MQTT",
     "durationMs": 0,
     "tags": {
-      "input": "Publish"
+      "/subscribe/": "0"
     }
   },
   {
@@ -34,7 +30,14 @@
     "caller": "MQTT",
     "durationMs": 0,
     "tags": {
-      "output": "Publish"
+      "/subscribe/": "0"
     }
+  },
+  {
+    "index": 5,
+    "type": "Disconnect",
+    "caller": "MQTT",
+    "durationMs": 0,
+    "tags": {}
   }
 ]

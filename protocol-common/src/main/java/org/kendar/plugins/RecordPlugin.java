@@ -2,8 +2,13 @@ package org.kendar.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.events.*;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
+import org.kendar.proxy.ProxyConnection;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -12,23 +17,29 @@ import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptor<Object, Object, W> {
+public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase<W> {
     protected static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(RecordPlugin.class);
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
+
+    @Override
+    public Class<?> getSettingClass() {
+        return BasicRecordPluginSettings.class;
+    }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldIgnoreTrivialCalls() {
         return ignoreTrivialCalls;
     }
 
-    @Override
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
             switch (phase) {
@@ -59,6 +70,8 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
                 pluginContext.getCaller(),
                 null,
                 out.getClass().getSimpleName());
+
+        storageItem.setTimestamp(pluginContext.getStart());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
 
@@ -85,6 +98,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
                 pluginContext.getCaller(),
                 in.getClass().getSimpleName(),
                 resType);
+        storageItem.setTimestamp(pluginContext.getStart());
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         if (!shouldNotSave(in, out, compactLine) || !shouldIgnoreTrivialCalls()) {
@@ -108,8 +122,8 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     }
 
     @Override
-    public PluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        withStorage((StorageRepository) global.getService("storage"));
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        withStorage(global.getService("storage"));
         ignoreTrivialCalls = ((BasicRecordPluginSettings) pluginSetting).isIgnoreTrivialCalls();
         super.initialize(global, protocol, pluginSetting);
         return this;
@@ -126,15 +140,42 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     public void terminate() {
         EventsQueue.send(new FinalizeWriteEvent(getInstanceId()));
     }
-    private static final Logger log = LoggerFactory.getLogger(RecordPlugin.class);
 
     @Override
     protected void handleActivation(boolean active) {
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
-        if (isActive()!=active && !active) {
-            terminate();
-        }else if (isActive()!=active && active) {
-            EventsQueue.send(new StartWriteEvent(getInstanceId()));
+        if (isActive() != active) {
+            if (active) {
+                EventsQueue.send(new StartWriteEvent(getInstanceId()));
+                Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
+            } else {
+                terminate();
+            }
+        }
+    }
+
+    @Override
+    protected void handlePostActivation(boolean active) {
+        disconnectAll();
+    }
+
+    private void disconnectAll() {
+        var pi = getProtocolInstance();
+        if (pi != null && BasicAysncRecordPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
+            var settings = (BasicAysncRecordPluginSettings) getSettings();
+            if (settings.isResetConnectionsOnStart()) {
+                for (var contextKvp : pi.getContextsCache().entrySet()) {
+                    try {
+                        var context = contextKvp.getValue();
+                        var contextConnection = context.getValue("CONNECTION");
+                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                        context.setValue("CONNECTION", null);
+                    } catch (Exception e) {
+                        log.debug("Error disconnecting connection {}", contextKvp.getKey(), e);
+                    }
+                    pi.getContextsCache().remove(contextKvp.getKey());
+                }
+            }
         }
     }
 

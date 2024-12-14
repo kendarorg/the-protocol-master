@@ -1,13 +1,17 @@
 package org.kendar.postgres;
 
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.postgres.plugins.PostgresMockPlugin;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
+import org.kendar.postgres.plugins.PostgresReportPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
@@ -23,6 +27,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -32,6 +38,7 @@ public class BasicTest {
     protected static PostgresSqlImage postgresContainer;
     protected static TcpServer protocolServer;
     protected static PostgresProtocol baseProtocol;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -83,10 +90,16 @@ public class BasicTest {
         global.putService("storage", storage);
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
-        proxy.setPlugins(List.of(pl, pl1));
+        var rep = new PostgresReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        rep.setActive(true);
+        proxy.setPlugins(List.of(pl, pl1, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
+
+        EventsQueue.register("recorder", (r) -> {
+            events.add(r);
+        }, ReportDataEvent.class);
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
@@ -94,6 +107,9 @@ public class BasicTest {
     }
 
     public static void afterEachBase() {
+
+        EventsQueue.unregister("recorder", ReportDataEvent.class);
+        events.clear();
         protocolServer.stop();
     }
 
@@ -119,5 +135,9 @@ public class BasicTest {
                         postgresContainer.getUserId(), postgresContainer.getPassword());
         assertNotNull(c);
         return c;
+    }
+
+    public List<ReportDataEvent> getEvents() {
+        return events.stream().collect(Collectors.toList());
     }
 }

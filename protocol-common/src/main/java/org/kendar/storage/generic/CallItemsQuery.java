@@ -13,6 +13,14 @@ public class CallItemsQuery {
         return tags;
     }
 
+    public String getTag(String tag) {
+        return tags.get(tag);
+    }
+
+    public void addTag(String tag, Object value) {
+        tags.put(tag, value != null ? value.toString() : null);
+    }
+
     public String getType() {
         return type;
     }
@@ -32,10 +40,6 @@ public class CallItemsQuery {
         this.used = used;
     }
 
-    public void addTag(String tag, Object value) {
-        tags.put(tag, value != null ? value.toString() : null);
-    }
-
     public String getCaller() {
         return caller;
     }
@@ -44,9 +48,6 @@ public class CallItemsQuery {
         this.caller = caller;
     }
 
-    public String getTag(String tag) {
-        return tags.get(tag);
-    }
 
     @Override
     public String toString() {

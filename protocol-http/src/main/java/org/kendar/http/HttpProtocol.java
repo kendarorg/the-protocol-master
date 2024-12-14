@@ -2,15 +2,14 @@ package org.kendar.http;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
+import org.kendar.apis.converters.RequestResponseBuilderImpl;
 import org.kendar.http.plugins.SSLDummyPlugin;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
-import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
-import org.kendar.http.utils.plugins.PluginClassesHandlerImpl;
-import org.kendar.plugins.PluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -31,7 +30,7 @@ import java.util.logging.Level;
 public class HttpProtocol extends NetworkProtoDescriptor {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
     private final GlobalSettings globalSettings;
-    private final List<PluginDescriptor> plugins;
+    private final List<ProtocolPluginDescriptor> plugins;
     private final HttpProtocolSettings settings;
     private ProxyServer proxy;
     private HttpsServer httpsServer;
@@ -39,13 +38,14 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private boolean httpRunning;
     private boolean httpsRunning;
 
-    public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<PluginDescriptor> plugins) {
+    public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<ProtocolPluginDescriptor> plugins) {
 
         this.globalSettings = globalSettings;
         this.settings = settings;
         this.plugins = new ArrayList<>(plugins);
         var sslPlugin = new SSLDummyPlugin();
         sslPlugin.setActive(true);
+        sslPlugin.initialize(globalSettings, settings, null);
         this.plugins.add(sslPlugin);
         //Disable logging for apache http client
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
@@ -68,7 +68,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         return httpsServer;
     }
 
-    public List<PluginDescriptor> getPlugins() {
+    public List<ProtocolPluginDescriptor> getPlugins() {
         return plugins;
     }
 
@@ -125,9 +125,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             int port = getOrDefault(settings.getHttp(), 4080);
             int httpsPort = getOrDefault(settings.getHttps(), 4443);
             var proxyPort = getOrDefault(settings.getProxy(), 9999);
-//        log.info("LISTEN HTTP: " + port);
-//        log.info("LISTEN HTTPS: " + httpsPort);
-//        log.info("LISTEN PROXY: " + proxyPort);
+
             var backlog = 60;
             var useCachedExecutor = true;
             var address = new InetSocketAddress(port);
@@ -183,8 +181,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             }
 
             var handler = new MasterHandler(
-                    new PluginClassesHandlerImpl(plugins),
-                    //new SimpleRewriterHandlerImpl(proxyConfig, dnsHandler),
+                    new PluginClassesHandlerImpl(plugins, this),
                     new RequestResponseBuilderImpl(),
                     new ExternalRequesterImpl(requestResponseBuilder, dnsHandler, connectionBuilder),
                     connectionBuilder);

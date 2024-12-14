@@ -5,6 +5,7 @@ import org.kendar.postgres.jpa.CompanyJpa;
 import org.kendar.tests.jpa.HibernateSessionFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,6 +61,10 @@ public class JpaTest extends BasicTest {
 
         assertTrue(atomicBoolean.get());
 
-
+        var events = getEvents().stream().collect(Collectors.toList());
+        assertEquals(14, events.size());
+        var evt = events.get(12);
+        assertEquals("postgres", evt.getProtocol());
+        assertTrue(evt.getQuery().contains("$1"));
     }
 }

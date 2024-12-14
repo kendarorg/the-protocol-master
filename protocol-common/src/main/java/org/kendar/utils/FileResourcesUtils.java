@@ -1,6 +1,7 @@
 package org.kendar.utils;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URI;
@@ -19,7 +20,7 @@ import java.util.jar.JarFile;
 
 public class FileResourcesUtils {
     private static final String JAR_PATH_DELIMITER = "/";
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(FileResourcesUtils.class);
 
 
     // get a file from the resources folder

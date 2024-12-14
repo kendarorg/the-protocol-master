@@ -3,7 +3,7 @@ package org.kendar.http;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.fileupload.FileUploadException;
-import org.kendar.http.utils.converters.RequestResponseBuilderImpl;
+import org.kendar.apis.converters.RequestResponseBuilderImpl;
 import org.kendar.server.KendarHttpServer;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;

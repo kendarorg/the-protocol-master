@@ -1,22 +1,21 @@
 {
+  "timestamp": 1733762112551,
   "constant": false,
   "connectionId": 1,
   "index": 5,
   "input": {
-    "uuid": "19",
     "fullFlag": 98,
     "fixedHeader": "PUBREL",
     "packetIdentifier": 2,
     "reasonCode": 0
   },
   "output": {
-    "uuid": "22",
     "fullFlag": 112,
     "fixedHeader": "PUBCOMP",
     "packetIdentifier": 2,
     "reasonCode": 0
   },
-  "durationMs": 970,
+  "durationMs": 992,
   "type": "PublishRel",
   "caller": "MQTT",
   "inputType": "PublishRel",

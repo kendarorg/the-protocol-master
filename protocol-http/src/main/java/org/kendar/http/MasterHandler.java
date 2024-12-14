@@ -6,13 +6,17 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpsExchange;
 import org.apache.http.conn.HttpClientConnectionManager;
-import org.kendar.http.utils.*;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
+import org.kendar.apis.converters.RequestResponseBuilder;
+import org.kendar.apis.utils.ConstantsHeader;
+import org.kendar.apis.utils.ConstantsMime;
+import org.kendar.apis.utils.JsonSmile;
+import org.kendar.apis.utils.MimeChecker;
+import org.kendar.http.utils.ConnectionBuilder;
 import org.kendar.http.utils.callexternal.ExternalRequester;
-import org.kendar.http.utils.constants.ConstantsHeader;
-import org.kendar.http.utils.constants.ConstantsMime;
-import org.kendar.http.utils.converters.RequestResponseBuilder;
 import org.kendar.http.utils.plugins.PluginClassesHandler;
-import org.kendar.plugins.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +53,6 @@ public class MasterHandler implements HttpHandler {
         this.externalRequester = externalRequester;
         this.connectionBuilder = connectionBuilder;
 
-//
-//
-//        eventQueue.registerCommand(this::remoteRequest, ExecuteRemoteRequest.class);
-//        eventQueue.registerCommand(this::localRequest, ExecuteLocalRequest.class);
     }
 
     private void sendResponse(Response response, HttpExchange httpExchange) throws IOException {

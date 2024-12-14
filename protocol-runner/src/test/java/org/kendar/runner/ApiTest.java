@@ -1,10 +1,6 @@
 package org.kendar.runner;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,16 +13,13 @@ import org.kendar.plugins.apis.Status;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.Sleeper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ApiTest extends BasicTest {
+public class ApiTest extends ApiTestBase {
     private static BasicTest bs;
 
     @AfterAll
@@ -34,6 +27,7 @@ public class ApiTest extends BasicTest {
         bs.runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(1000);
+
     }
 
     @BeforeAll
@@ -49,56 +43,21 @@ public class ApiTest extends BasicTest {
         };
         bs = new BasicTest();
         bs.startAndHandleUnexpectedErrors(args);
-        Sleeper.sleep(2000);
+        Sleeper.sleep(3000);
     }
 
-    private static <T> T getRequest(String target, CloseableHttpClient httpclient, TypeReference<T> typeReference) throws IOException {
-        var httpget = new HttpGet(target);
-        var httpresponse = httpclient.execute(httpget);
-
-        var sc = new Scanner(httpresponse.getEntity().getContent());
-        var result = "";
-        while (sc.hasNext()) {
-            result += (sc.nextLine());
-        }
-        return mapper.deserialize(result, typeReference);
-    }
-
-    private static byte[] downloadRequest(String target, CloseableHttpClient httpclient) throws IOException {
-        var httpget = new HttpGet(target);
-        var httpresponse = httpclient.execute(httpget);
-
-        var baos = new ByteArrayOutputStream();
-        httpresponse.getEntity().writeTo(baos);
-        return baos.toByteArray();
-    }
-
-    private static <T> T postRequest(String target, CloseableHttpClient httpclient, byte[] data, TypeReference<T> typeReference) throws IOException {
-        var httpget = new HttpPost(target);
-        var be = new ByteArrayEntity(data);
-        httpget.setEntity(be);
-        var httpresponse = httpclient.execute(httpget);
-
-        var sc = new Scanner(httpresponse.getEntity().getContent());
-        var result = "";
-        while (sc.hasNext()) {
-            result += (sc.nextLine());
-        }
-        return mapper.deserialize(result, typeReference);
-    }
 
     @Test
     void globalApiTest() throws Exception {
 
         var httpclient = HttpClients.createDefault();
         var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent.zip"));
-        var okResult = postRequest("http://localhost:5005/api/storage/upload", httpclient, data, new TypeReference<Ok>() {
+        var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
         });
         assertEquals("OK", okResult.getResult());
-        var zip = downloadRequest("http://localhost:5005/api/storage/download", httpclient);
+        var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
         assertTrue(zip.length > 100);
         Files.write(Path.of("target", "downloaded.zip"), zip);
-
     }
 
     @Test
@@ -118,6 +77,22 @@ public class ApiTest extends BasicTest {
     }
 
     @Test
+    void testingStatic() throws Exception {
+        var frsu = new FileResourcesUtils();
+
+        Sleeper.sleep(1000);
+        var httpclient = HttpClients.createDefault();
+        var actual = new String(downloadRequest("http://localhost:5005/swagger/index.html", httpclient));
+        assertTrue(actual.contains("swagger-ui"));
+
+        actual = new String(downloadRequest("http://localhost:5005/api/swagger/map.json", httpclient));
+        assertTrue(actual.contains("/api/global/terminate"));
+        var exp = new FileResourcesUtils().getFileFromResourceAsByteArray("resource://web/swagger/favicon-32x32.png");
+        var bin = downloadRequest("http://localhost:5005/swagger/favicon-32x32.png", httpclient);
+        assertArrayEquals(exp, bin);
+    }
+
+    @Test
     void protocolApiTest() throws Exception {
 
         var httpclient = HttpClients.createDefault();
@@ -126,15 +101,20 @@ public class ApiTest extends BasicTest {
         });
         assertEquals(7, protocols.size());
 
+        var settings = downloadRequestString("http://localhost:5005/api/global/settings", httpclient);
+        assertTrue(settings.contains("target/tests/apitest"));
+        assertTrue(settings.contains("5005"));
+
         var plugins = getRequest("http://localhost:5005/api/protocols/redis-01/plugins", httpclient, new TypeReference<List<PluginIndex>>() {
         });
         assertEquals(2, plugins.size());
         assertTrue(plugins.stream().allMatch(p -> !p.isActive()));
 
 
-        var okResult = getRequest("http://localhost:5005/api/protocols/*/plugins/record-plugin/start", httpclient, new TypeReference<Ok>() {
+        var okResult = getRequest("http://localhost:5005/api/protocols/all/plugins/record-plugin/start", httpclient, new TypeReference<Ok>() {
         });
         assertEquals("OK", okResult.getResult());
+
         for (var protocol : protocols) {
             var status = getRequest("http://localhost:5005/api/protocols/" + protocol.getId() + "/plugins/record-plugin/status", httpclient, new TypeReference<Status>() {
             });

@@ -1,9 +1,9 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.kendar.http.utils.MimeChecker;
-import org.kendar.http.utils.Request;
-import org.kendar.http.utils.Response;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
+import org.kendar.apis.utils.MimeChecker;
 import org.kendar.plugins.MockPlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.utils.ChangeableReference;
@@ -52,7 +52,7 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
 
     @Override
     protected List<MockStorage> firstCheckOnMainPart(Request request) {
-        return mocks.stream().filter(a -> a.retrieveInAs(Request.class).getHost().
+        return mocks.values().stream().filter(a -> a.retrieveInAs(Request.class).getHost().
                 equalsIgnoreCase(request.getHost())).collect(Collectors.toList());
     }
 
@@ -64,6 +64,16 @@ public class HttpMockPlugin extends MockPlugin<Request, Response> {
         response.setHeaders(foundedCloneResponse.getHeaders());
         response.setStatusCode(foundedCloneResponse.getStatusCode());
         response.setMessages(foundedCloneResponse.getMessages());
+    }
+
+    @Override
+    protected Class<?> getIn() {
+        return Request.class;
+    }
+
+    @Override
+    protected Class<?> getOut() {
+        return Response.class;
     }
 
     @Override

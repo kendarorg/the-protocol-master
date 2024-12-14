@@ -1,11 +1,11 @@
 package org.kendar.cli;
 
 public class HelpLine {
+    private final boolean block;
     private String shortCommand;
     private String longCommand;
     private String description;
     private String availableOptions;
-    private final boolean block;
 
     public HelpLine(String shortCommand, String longCommand, String description, String availableOptions) {
         this.shortCommand = shortCommand;
