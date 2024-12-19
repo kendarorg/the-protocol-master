@@ -174,11 +174,15 @@ public class BasicConsume extends Basic {
         var list = (HashSet<String>) context.getValue("QUEUE");
         list.add(queue + "|" + channel + "|" + mapper.serialize(arguments));
         basicConsume.setConsumeOrigin(queue + "|" + channel + "|" + mapper.serialize(arguments));
+
+        context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), basicConsume.getConsumerTag());
         //Send back the consume ok
+        var bscOk = new BasicConsumeOk();
+        bscOk.setTag(basicConsume.getConsumerTag());
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 basicConsume,
-                new BasicConsumeOk()
+                bscOk
         ));
     }
 

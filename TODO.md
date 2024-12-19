@@ -36,3 +36,6 @@ Dev proxy like
 * https://learn.microsoft.com/en-us/microsoft-cloud/dev/dev-proxy/technical-reference/executionsummaryplugin
 * https://learn.microsoft.com/en-us/microsoft-cloud/dev/dev-proxy/technical-reference/openapispecgeneratorplugin
 * https://learn.microsoft.com/en-us/microsoft-cloud/dev/dev-proxy/technical-reference/markdownreporter
+
+AMQP: contentBytes
+MONGO: documents not in json

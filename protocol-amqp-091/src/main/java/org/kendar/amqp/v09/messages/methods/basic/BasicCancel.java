@@ -74,8 +74,10 @@ public class BasicCancel extends Basic {
 
             return iteratorOfList(toSend);
         }
+        var bsc = new BasicCancelOk();
+        bsc.setConsumerTag(toSend.consumerTag);
         return iteratorOfRunnable(() -> {
-            proxy.sendAndExpect(context, connection, basicConsume, new BasicCancelOk());
+            proxy.sendAndExpect(context, connection, basicConsume, bsc);
         });
     }
 

@@ -92,9 +92,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             }
             if (fr != null) {
                 log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
-
                 var ctx = context.getDescriptor().getContextsCache().get(consumeId);
-                ;
                 ctx.write(fr);
             } else {
                 throw new RuntimeException("MISSING CLASS " + clazz);

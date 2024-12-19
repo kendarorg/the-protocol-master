@@ -53,7 +53,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
 
         var result = mapper.deserialize(out, toread.getClass());
         try {
-            ExtraBeanUtils.copyProperties(toread, result, "Reserved1");
+            ExtraBeanUtils.copyProperties(toread, result, "Reserved1","consumerTag");
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -78,26 +78,28 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             var out = mapper.toJsonNode(item.getOutput());
             var clazz = item.getOutputType();
             ReturnMessage fr = null;
-            int consumeId = -1;
+            int consumeId = item.getConnectionId();
             switch (clazz) {
                 case "BasicDeliver":
                     var bd = mapper.deserialize(out, BasicDeliver.class);
-                    consumeId = bd.getConsumeId();
+                    var tag = (String)context.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
+                    bd.setConsumerTag(tag);
+                    //consumeId = bd.getConsumeId();
                     fr = bd;
                     break;
                 case "HeaderFrame":
                     var hf = mapper.deserialize(out, HeaderFrame.class);
-                    consumeId = hf.getConsumeId();
+                    //consumeId = hf.getConsumeId();
                     fr = hf;
                     break;
                 case "BodyFrame":
                     var bf = mapper.deserialize(out, BodyFrame.class);
-                    consumeId = bf.getConsumeId();
+                    //consumeId = bf.getConsumeId();
                     fr = bf;
                     break;
                 case "BasicCancel":
                     var bc = mapper.deserialize(out, BasicCancel.class);
-                    consumeId = bc.getConsumeId();
+                    //consumeId = bc.getConsumeId();
                     fr = bc;
                     break;
             }
