@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
  * @param <W> BasicReplayPluginSettings this should match the getSettingClass method
  */
 public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptorBase<W> {
-
     private static final Logger log = LoggerFactory.getLogger(ReplayPlugin.class);
 
     /**
@@ -120,10 +119,11 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
     /**
      * Handle all the messages recorded previously
+     *
      * @param pluginContext The execution context
      * @param protocolPhase The current exection phase
-     * @param in The input item. When Object means anything
-     * @param out The output item. When Object means anything
+     * @param in            The input item. When Object means anything
+     * @param out           The output item. When Object means anything
      * @return True when should block further executions
      */
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase,

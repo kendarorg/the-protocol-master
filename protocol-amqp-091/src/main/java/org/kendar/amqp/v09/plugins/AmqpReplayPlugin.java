@@ -53,7 +53,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
 
         var result = mapper.deserialize(out, toread.getClass());
         try {
-            ExtraBeanUtils.copyProperties(toread, result, "Reserved1","consumerTag");
+            ExtraBeanUtils.copyProperties(toread, result, "Reserved1", "consumerTag");
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -82,7 +82,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             switch (clazz) {
                 case "BasicDeliver":
                     var bd = mapper.deserialize(out, BasicDeliver.class);
-                    var tag = (String)context.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
+                    var tag = (String) context.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
                     bd.setConsumerTag(tag);
                     //consumeId = bd.getConsumeId();
                     fr = bd;

@@ -151,9 +151,12 @@ public abstract class NetworkProtoContext extends ProtoContext {
     protected void postWrite(ReturnMessage stepResult) {
         if (disconnected) return;
         var toRun = getRunnables();
-        for (var runnable : toRun) {
-            runnable.run();
-        }
+        if (toRun.isEmpty()) return;
+        executorService.submit(() -> {
+            for (var runnable : toRun) {
+                runnable.run();
+            }
+        });
     }
 
     /**
