@@ -182,7 +182,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         disconnectAll();
     }
 
-    private void disconnectAll() {
+    protected void disconnectAll() {
         var pi = getProtocolInstance();
         if (pi != null && BasicAysncReplayPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
             var settings = (BasicAysncReplayPluginSettings) getSettings();

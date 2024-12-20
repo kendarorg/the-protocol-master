@@ -22,15 +22,10 @@ public class MqttProtocol extends NetworkProtoDescriptor {
     public static final int VERSION_5 = 5;
     private static final int PORT = 1883;
     public static int VERSION_3 = 3;
-    public static ConcurrentHashMap<Integer, NetworkProtoContext> consumeContext;
     private int port = PORT;
 
-    private MqttProtocol() {
-        consumeContext = new ConcurrentHashMap<>();
-    }
 
     public MqttProtocol(int port) {
-        this();
         this.port = port;
     }
 
@@ -81,7 +76,6 @@ public class MqttProtocol extends NetworkProtoDescriptor {
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor,
                                          int contextId) {
         var result = new MqttContext(protoDescriptor, contextId);
-        consumeContext.put(result.getContextId(), result);
         return result;
     }
 

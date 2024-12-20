@@ -157,7 +157,7 @@ public class BasicConsume extends Basic {
         basicConsume.queue = queue;
         basicConsume.setConsumeId(context.getDescriptor().getCounter("CONSUME_ID"));
         context.setConsumeId(basicConsume.getConsumeId());
-        protocol.getConsumeContext().put(basicConsume.getConsumeId(), context);
+        protocol.getContextsCache().put(basicConsume.getConsumeId(), context);
 
         context.setValue("BASIC_CONSUME_CH_" + channel, basicConsume);
         log.debug("CTX:{} CHAN:{} CNS_ID:{}", context.getContextId(), channel, basicConsume.getConsumeId());

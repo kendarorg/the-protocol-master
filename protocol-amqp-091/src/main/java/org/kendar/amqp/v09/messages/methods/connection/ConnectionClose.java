@@ -96,7 +96,7 @@ public class ConnectionClose extends Connection {
 
         if (context != null) {
             var protocol = (AmqpProtocol) context.getDescriptor();
-            protocol.getConsumeContext().remove(context.getConsumeId());
+            protocol.getContextsCache().remove(context.getConsumeId());
             var result = new ConnectionCloseOk();
             result.setChannel(channel);
             var fproxy = proxy;

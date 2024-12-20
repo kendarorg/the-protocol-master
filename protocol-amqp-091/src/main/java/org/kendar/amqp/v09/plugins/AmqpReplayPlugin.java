@@ -1,6 +1,5 @@
 package org.kendar.amqp.v09.plugins;
 
-import org.kendar.amqp.v09.AmqpProtocol;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
@@ -78,7 +77,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                         }
                     }
                 }
-                var ctx = ((AmqpProtocol) context.getDescriptor()).getConsumeContext().get(consumeId);
+                var ctx = context.getDescriptor().getContextsCache().get(consumeId);
                 var out = mapper.toJsonNode(item.getOutput());
                 var clazz = item.getOutputType();
                 ReturnMessage fr = null;

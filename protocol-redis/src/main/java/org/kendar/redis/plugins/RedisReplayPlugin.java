@@ -63,7 +63,7 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettin
 
             int connectionId = item.getConnectionId();
             if (type.equalsIgnoreCase("RESPONSE")) {
-                var ctx = ((Resp3Protocol) context.getDescriptor()).consumeContext.get(connectionId);
+                var ctx = context.getDescriptor().getContextsCache().get(connectionId);
                 ReturnMessage fr = new Resp3Message(ctx, null, out);
                 ctx.write(fr);
             } else {

@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AmqpProtocol extends NetworkProtoDescriptor {
@@ -41,18 +40,15 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     private static final boolean IS_BIG_ENDIAN = true;
     private static final int PORT = 5672;
     final AtomicBoolean running = new AtomicBoolean(true);
-    private final ConcurrentHashMap<Integer, AmqpProtoContext> consumeContext;
     private final Logger log = LoggerFactory.getLogger(AmqpProtocol.class);
     private int port = PORT;
     private TimerTask timer;
 
     private AmqpProtocol() {
-        consumeContext = new ConcurrentHashMap<>();
 
     }
 
     public AmqpProtocol(int port) {
-        this();
         this.port = port;
     }
 
@@ -113,8 +109,8 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     }
 
     private void sendHeartbeat() {
-        for (var ctx : consumeContext.values()) {
-            for (var ch : ctx.getChannels()) {
+        for (var ctx : getContextsCache().values()) {
+            for (var ch : ((AmqpProtoContext)ctx).getChannels()) {
                 var hb = new HearthBeatFrame();
                 hb.setChannel(ch);
                 hb.setProtoDescriptor(this);
@@ -144,9 +140,5 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     @Override
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId) {
         return new AmqpProtoContext(this, contextId);
-    }
-
-    public ConcurrentHashMap<Integer, AmqpProtoContext> getConsumeContext() {
-        return consumeContext;
     }
 }
