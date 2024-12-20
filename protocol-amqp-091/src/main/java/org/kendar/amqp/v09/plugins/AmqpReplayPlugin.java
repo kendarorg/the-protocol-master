@@ -18,6 +18,7 @@ import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -64,51 +65,55 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         if (storageItems.isEmpty()) return;
         long lastTimestamp = 0;
         for (var item : storageItems) {
-            if (getSettings().isRespectCallDuration()) {
-                if (lastTimestamp == 0) {
-                    lastTimestamp = item.getTimestamp();
-                } else if (item.getTimestamp() > 0) {
-                    var wait = item.getTimestamp() - lastTimestamp;
-                    lastTimestamp = item.getTimestamp();
-                    if (wait > 0) {
-                        Sleeper.sleep(wait);
+            int consumeId = item.getConnectionId();
+            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", consumeId + "")) {
+                if (getSettings().isRespectCallDuration()) {
+                    if (lastTimestamp == 0) {
+                        lastTimestamp = item.getTimestamp();
+                    } else if (item.getTimestamp() > 0) {
+                        var wait = item.getTimestamp() - lastTimestamp;
+                        lastTimestamp = item.getTimestamp();
+                        if (wait > 0) {
+                            Sleeper.sleep(wait);
+                        }
                     }
                 }
-            }
-            var out = mapper.toJsonNode(item.getOutput());
-            var clazz = item.getOutputType();
-            ReturnMessage fr = null;
-            int consumeId = item.getConnectionId();
-            switch (clazz) {
-                case "BasicDeliver":
-                    var bd = mapper.deserialize(out, BasicDeliver.class);
-                    var tag = (String) context.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
-                    bd.setConsumerTag(tag);
-                    //consumeId = bd.getConsumeId();
-                    fr = bd;
-                    break;
-                case "HeaderFrame":
-                    var hf = mapper.deserialize(out, HeaderFrame.class);
-                    //consumeId = hf.getConsumeId();
-                    fr = hf;
-                    break;
-                case "BodyFrame":
-                    var bf = mapper.deserialize(out, BodyFrame.class);
-                    //consumeId = bf.getConsumeId();
-                    fr = bf;
-                    break;
-                case "BasicCancel":
-                    var bc = mapper.deserialize(out, BasicCancel.class);
-                    //consumeId = bc.getConsumeId();
-                    fr = bc;
-                    break;
-            }
-            if (fr != null) {
-                log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
                 var ctx = ((AmqpProtocol) context.getDescriptor()).getConsumeContext().get(consumeId);
-                ctx.write(fr);
-            } else {
-                throw new RuntimeException("MISSING CLASS " + clazz);
+                var out = mapper.toJsonNode(item.getOutput());
+                var clazz = item.getOutputType();
+                ReturnMessage fr = null;
+                switch (clazz) {
+                    case "BasicDeliver":
+                        var bd = mapper.deserialize(out, BasicDeliver.class);
+                        var tag = (String) ctx.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
+                        if(tag!=null && !tag.isEmpty()) {
+                            bd.setConsumerTag(tag);
+                        }
+                        //consumeId = bd.getConsumeId();
+                        fr = bd;
+                        break;
+                    case "HeaderFrame":
+                        var hf = mapper.deserialize(out, HeaderFrame.class);
+                        //consumeId = hf.getConsumeId();
+                        fr = hf;
+                        break;
+                    case "BodyFrame":
+                        var bf = mapper.deserialize(out, BodyFrame.class);
+                        //consumeId = bf.getConsumeId();
+                        fr = bf;
+                        break;
+                    case "BasicCancel":
+                        var bc = mapper.deserialize(out, BasicCancel.class);
+                        //consumeId = bc.getConsumeId();
+                        fr = bc;
+                        break;
+                }
+                if (fr != null) {
+                    log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
+                    ctx.write(fr);
+                } else {
+                    throw new RuntimeException("MISSING CLASS " + clazz);
+                }
             }
         }
     }

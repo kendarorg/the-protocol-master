@@ -17,6 +17,7 @@ import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -64,40 +65,41 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         if (storageItems.isEmpty()) return;
         long lastTimestamp = 0;
         for (var item : storageItems) {
-            if (getSettings().isRespectCallDuration()) {
-                if (lastTimestamp == 0) {
-                    lastTimestamp = item.getTimestamp();
-                } else if (item.getTimestamp() > 0) {
-                    var wait = item.getTimestamp() - lastTimestamp;
-                    lastTimestamp = item.getTimestamp();
-                    if (wait > 0) {
-                        Sleeper.sleep(wait);
+            int consumeId = item.getConnectionId();
+            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", consumeId + "")) {
+                if (getSettings().isRespectCallDuration()) {
+                    if (lastTimestamp == 0) {
+                        lastTimestamp = item.getTimestamp();
+                    } else if (item.getTimestamp() > 0) {
+                        var wait = item.getTimestamp() - lastTimestamp;
+                        lastTimestamp = item.getTimestamp();
+                        if (wait > 0) {
+                            Sleeper.sleep(wait);
+                        }
                     }
                 }
-            }
-            var out = mapper.toJsonNode(item.getOutput());
-            var clazz = item.getOutputType();
-            ReturnMessage fr;
-            int consumeId = item.getConnectionId();
-            switch (clazz) {
-                case "ConnectAck":
-                    fr = mapper.deserialize(out.toString(), ConnectAck.class);
-                    break;
-                case "Publish":
-                    fr = mapper.deserialize(out.toString(), Publish.class);
-                    break;
-                default:
-                    throw new RuntimeException("MISSING " + clazz);
-
-            }
-            if (fr != null) {
-                log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
                 var ctx = context.getDescriptor().getContextsCache().get(consumeId);
-                ctx.write(fr);
-            } else {
-                throw new RuntimeException("MISSING CLASS " + clazz);
-            }
+                var out = mapper.toJsonNode(item.getOutput());
+                var clazz = item.getOutputType();
+                ReturnMessage fr;
+                switch (clazz) {
+                    case "ConnectAck":
+                        fr = mapper.deserialize(out.toString(), ConnectAck.class);
+                        break;
+                    case "Publish":
+                        fr = mapper.deserialize(out.toString(), Publish.class);
+                        break;
+                    default:
+                        throw new RuntimeException("MISSING " + clazz);
 
+                }
+                if (fr != null) {
+                    log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
+                    ctx.write(fr);
+                } else {
+                    throw new RuntimeException("MISSING CLASS " + clazz);
+                }
+            }
         }
     }
 
