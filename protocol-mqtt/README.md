@@ -32,9 +32,9 @@ All callback are replayed automatically
 
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
-* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server
+* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server  (default true)
 * blockExternal: Block calls to real service when not matching (default true)
-* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server
+* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server (default true)
 
 ## Missing features
 
@@ -59,10 +59,13 @@ All callback are replayed automatically
 
 ```
 Remember that with automatic recconection with Eclipse Paho
-YOU MUST re-connect and re-subscribe!!!
+YOU MUST re-connect and re-subscribe!!! 
 
-No idea for other clients 
+EVEN if yout set the reconnect to "true"
 ```
+
+* [Ref.1](https://github.com/eclipse-paho/paho.mqtt.java/issues/686)
+* [Ref.2](https://stackoverflow.com/a/33735501/1632288)
 
 At the moment the test is based on the moquette MQTT server, since it can be
 embedded directly into any java application and does not require testcontainers

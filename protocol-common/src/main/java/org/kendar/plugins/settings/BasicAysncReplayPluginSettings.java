@@ -1,7 +1,7 @@
 package org.kendar.plugins.settings;
 
 public class BasicAysncReplayPluginSettings extends BasicReplayPluginSettings {
-    private boolean resetConnectionsOnStart = false;
+    private boolean resetConnectionsOnStart = true;
 
     public boolean isResetConnectionsOnStart() {
         return resetConnectionsOnStart;
