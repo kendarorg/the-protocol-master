@@ -56,7 +56,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      * Indexes locally loaded from the storage. They do not contain the first
      * responses
      */
-    private List<CompactLine> indexes = new ArrayList<>();
+    private final List<CompactLine> indexes = new ArrayList<>();
 
     /**
      * Retrieve the settings class, must match the <W> parameter
@@ -264,6 +264,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
     private void loadAndPrepareTheAsyncResponses(PluginContext pluginContext, StorageItem item) {
         if (hasCallbacks() && item != null) {
             var afterIndex = item.getIndex();
+            var timeStamp = item.getTimestamp();
             var respQuery = new ResponseItemQuery();
             respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
@@ -289,7 +290,14 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
 
             }
             if (!result.isEmpty()) {
-                ((NetworkProtoContext) pluginContext.getContext()).addResponse(() -> sendBackResponses(pluginContext.getContext(), result));
+                ((NetworkProtoContext) pluginContext.getContext()).addResponse(() ->
+                {
+                    var sleepint = result.get(0).getTimestamp()-timeStamp;
+                    if(sleepint>0){
+                        Sleeper.sleep(sleepint);
+                    }
+                    sendBackResponses(pluginContext.getContext(), result);
+                });
             }
         }
     }
