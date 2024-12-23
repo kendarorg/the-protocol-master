@@ -27,7 +27,6 @@ public class AmqpRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSetting
         return Math.max(cid.asInt(), consumeId);
     }
 
-
     @Override
     public Class<?> getSettingClass() {
         return BasicAysncRecordPluginSettings.class;

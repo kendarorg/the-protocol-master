@@ -3,10 +3,12 @@ package org.kendar.amqp.v09;
 
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.amqp.v09.plugins.AmqpPublishPlugin;
 import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
@@ -17,6 +19,7 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tests.testcontainer.images.RabbitMqImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
@@ -28,11 +31,12 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BasicTest {
-
+    protected JsonMapper mapper = new JsonMapper();
     protected static final int FAKE_PORT = 5682;
     protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static ProtocolPluginDescriptor publishPlugin;
 
     public static void beforeClassBase() {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -83,9 +87,10 @@ public class BasicTest {
         gs.putService("storage", storage);
         var pl = new AmqpRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new AmqpReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        publishPlugin = new AmqpPublishPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(
-                pl, rep));
+                pl, rep,publishPlugin));
         pl.setActive(true);
         rep.setActive(true);
         baseProtocol.setProxy(proxy);

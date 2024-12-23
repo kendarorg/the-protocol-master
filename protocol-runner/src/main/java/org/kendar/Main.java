@@ -3,6 +3,7 @@ package org.kendar;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.sun.net.httpserver.HttpServer;
+import org.kendar.amqp.v09.plugins.AmqpPublishPlugin;
 import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
@@ -204,7 +205,8 @@ public class Main {
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "amqp091", List.of(
                 new AmqpRecordPlugin(),
                 new AmqpReplayPlugin(),
-                new AmqpReportPlugin()));
+                new AmqpReportPlugin(),
+                new AmqpPublishPlugin()));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mqtt", List.of(
                 new MqttRecordPlugin(),
                 new MqttReplayPlugin(),

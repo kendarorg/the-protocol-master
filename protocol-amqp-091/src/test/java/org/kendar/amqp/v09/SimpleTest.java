@@ -1,7 +1,13 @@
 package org.kendar.amqp.v09;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.rabbitmq.client.*;
 import org.junit.jupiter.api.*;
+import org.kendar.amqp.v09.apis.AmqpPublishPluginApis;
+import org.kendar.amqp.v09.apis.dtos.AmqpConnection;
+import org.kendar.amqp.v09.apis.dtos.PublishMessage;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
@@ -10,6 +16,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -319,5 +326,84 @@ public class SimpleTest extends BasicTest {
                 .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
         channel.close();
         connection.close();
+    }
+
+    @Test
+    void withPublishPlugin() throws Exception {
+        var messages = new ConcurrentHashMap<Integer, String>();
+        String exectedMessage = DEFAULT_MESSAGE_CONTENT;
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        var cs = "amqp://localhost:" + FAKE_PORT;
+        //cs = rabbitContainer.getConnectionString();
+        Sleeper.sleep(100);
+
+        connectionFactory.setUri(cs);
+        connectionFactory.setPassword(rabbitContainer.getAdminPassword());
+
+        Connection connection = connectionFactory.newConnection();
+        Channel channel = connection
+                .openChannel()
+                .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
+
+
+        channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
+
+        var chanConsume = consume(connectionFactory, messages, channel);
+
+
+        Sleeper.sleep(100);
+
+
+        var publish = (AmqpPublishPluginApis)publishPlugin.getApiHandler();
+        var res = new Response();
+        publish.getConnections(new Request(),res);
+        var responses = mapper.deserialize(res.getResponseText(),new TypeReference<List<AmqpConnection>>(){});
+        assertEquals(1, responses.size());
+        var response = responses.get(0);
+        var pm = new PublishMessage();
+        pm.setAppId("test");
+        pm.setContentType("text/plain");
+        pm.setBody("TestData");
+        publish.doPublish(pm,response.getId(),response.getChannel());
+
+        System.out.println("a");
+        /*var props = new AMQP.BasicProperties.Builder()
+                .contentType("text/plain")
+//                .contentEncoding("UTF-8")
+                .deliveryMode(1)
+//                .priority(2)
+//                .correlationId("3") //?
+//                //.replyTo("4")
+//                //.expiration("5")
+//                .messageId("6")
+//                .timestamp(new Date())
+//                //.type("7")
+//                //.userId("8")
+                .appId("TESTAPP")
+                //.clusterId("9")
+                .build();
+        //SimpleProxyServer.write=true;
+        Sleeper.sleep(100);
+        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
+        Sleeper.sleep(100);
+        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
+        chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
+        Sleeper.sleep(100);*/
+//        Sleeper.sleep(100);
+//        System.out.println("QEUEUE DELETE------------------------------------------------------");
+//        channel.queueDelete(MAIN_QUEUE);
+
+        Sleeper.sleep(100);
+        System.out.println("CLOSE CHANNEL ------------------------------------------------");
+        channel.close();
+        Sleeper.sleep(100);
+        System.out.println("CLOSE CONNNECTION ------------------------------------------------");
+        connection.close();
+
+
+        Sleeper.sleep(1000, () -> messages.size() == 1);
+
+        assertEquals(1, messages.size());
+        assertTrue(messages.containsValue("TestData"));
     }
 }
