@@ -43,7 +43,16 @@
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
-      "connectionString": "tcp://localhost:1885"
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {
+        "record-plugin": {
+          "resetConnectionsOnStart": true
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": true,
+          "respectCallDuration": true
+        }
+      }
     },
     "http-01": {
       "protocol": "http",
@@ -103,6 +112,23 @@
         },
         "replay-plugin": {
           "resetConnectionsOnStart": true,
+          "respectCallDuration": true
+        }
+      }
+    },
+    "mongo-01": {
+      "protocol": "mongodb",
+      "port": 6672,
+      "login": "root",
+      "password": "password",
+      "timeout": 30,
+      "connectionString": "tcp://192.168.56.2:26672",
+      "plugins": {
+        "amqp-publish-plugin": {
+        },
+        "record-plugin": {
+        },
+        "replay-plugin": {
           "respectCallDuration": true
         }
       }
