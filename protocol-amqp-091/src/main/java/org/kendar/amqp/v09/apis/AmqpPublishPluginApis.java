@@ -130,7 +130,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         bd.setChannel((short) channelId);
         bd.setConsumeId(basicConsume.getConsumeId());
         bd.setConsumerTag(consumerTag);
-        bd.setDeliveryTag(1);
+        bd.setDeliveryTag(messageData.getDeliveryTag());
         bd.setRedelivered(false);
         bd.setExchange(exchange);
         bd.setRoutingKey(routingKeys);
@@ -147,8 +147,8 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         hf.setContentType(messageData.getContentType());
         hf.setConsumeOrigin(consumeOrigin);
         hf.setAppId(messageData.getAppId());
-        hf.setDeliveryMode(1);
-        hf.setPropertyFlags(-28664);
+        hf.setDeliveryMode(messageData.getDeliveryMode());
+        hf.setPropertyFlags(messageData.getPropertyFlag());
 
         hf.setBodySize(dataToSend.length);
         context.write(hf);

@@ -4,6 +4,17 @@ public class PublishMessage {
     private String contentType;
     private String appId;
     private String body;
+    private int propertyFlag = -28664;
+    private int deliveryMode = 1;
+    private long deliveryTag = 1;
+
+    public int getPropertyFlag() {
+        return propertyFlag;
+    }
+
+    public void setPropertyFlag(int propertyFlag) {
+        this.propertyFlag = propertyFlag;
+    }
 
     public String getContentType() {
         return contentType;
@@ -27,5 +38,21 @@ public class PublishMessage {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public Integer getDeliveryMode() {
+        return deliveryMode;
+    }
+
+    public void setDeliveryMode(Integer deliveryMode) {
+        this.deliveryMode = deliveryMode;
+    }
+
+    public long getDeliveryTag() {
+        return deliveryTag;
+    }
+
+    public void setDeliveryTag(long deliveryTag) {
+        this.deliveryTag = deliveryTag;
     }
 }

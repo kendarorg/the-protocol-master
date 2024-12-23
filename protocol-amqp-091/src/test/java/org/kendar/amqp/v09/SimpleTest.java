@@ -363,8 +363,13 @@ public class SimpleTest extends BasicTest {
         var pm = new PublishMessage();
         pm.setAppId("test");
         pm.setContentType("text/plain");
-        pm.setBody("TestData");
+        pm.setBody("TestData1");
         publish.doPublish(pm,response.getId(),response.getChannel());
+        pm.setBody("TestData2");
+        publish.doPublish(pm,response.getId(),response.getChannel());
+        pm.setBody("TestData3");
+        publish.doPublish(pm,response.getId(),response.getChannel());
+
 
         System.out.println("a");
         /*var props = new AMQP.BasicProperties.Builder()
@@ -401,9 +406,11 @@ public class SimpleTest extends BasicTest {
         connection.close();
 
 
-        Sleeper.sleep(1000, () -> messages.size() == 1);
+        Sleeper.sleep(1000, () -> messages.size() ==3);
 
-        assertEquals(1, messages.size());
-        assertTrue(messages.containsValue("TestData"));
+        assertEquals(3, messages.size());
+        assertTrue(messages.containsValue("TestData1"));
+        assertTrue(messages.containsValue("TestData2"));
+        assertTrue(messages.containsValue("TestData3"));
     }
 }
