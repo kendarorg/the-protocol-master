@@ -1,6 +1,5 @@
 package org.kendar.mqtt.plugins;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.fsm.*;
@@ -10,7 +9,6 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -76,22 +74,7 @@ public class MqttReportPlugin extends ReportPlugin<PluginSettings> {
         if (!isActive()) return;
         var context = pluginContext.getContext();
         var connectionId = context.getContextId();
-        var data = "";
-        var payload = "";
-        try {
-            payload = new String(in.getPayload());
-            var converted = payload.getBytes(StandardCharsets.UTF_8);
-            if (in.getPayload().length == converted.length) {
-                for (var i = 0; i < converted.length; i++) {
-                    if (converted[i] != in.getPayload()[i]) {
-                        payload = Base64.toBase64String(in.getPayload());
-                        break;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            payload = Base64.toBase64String(in.getPayload());
-        }
+        var payload = mapper.toHumanReadable(in.getPayload());
 
         var duration = System.currentTimeMillis() - pluginContext.getStart();
         EventsQueue.send(new ReportDataEvent(
@@ -102,7 +85,7 @@ public class MqttReportPlugin extends ReportPlugin<PluginSettings> {
                 pluginContext.getStart(),
                 duration,
                 Map.of("qos", qos + "",
-                        "payloadLength", in.getPayload().length + "")
+                        "payloadLength", payload.length()+ "")
         ));
     }
 }

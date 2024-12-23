@@ -12,7 +12,6 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferUtils;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +22,6 @@ import java.util.Map;
 public class BasicConsume extends Basic {
 
     private static final Logger log = LoggerFactory.getLogger(BasicConsume.class);
-    private static JsonMapper mapper = new JsonMapper();
     private short reserved1;
     private String queue;
     private String consumerTag;

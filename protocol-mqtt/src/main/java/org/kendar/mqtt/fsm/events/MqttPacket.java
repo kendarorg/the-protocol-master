@@ -7,11 +7,14 @@ import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MqttPacket extends ProtocolEvent implements NetworkReturnMessage {
     private final MqttFixedHeader fixedHeader;
     private final MqttBBuffer buffer;
     private final byte fullFlag;
+    private static final Logger log = LoggerFactory.getLogger(MqttPacket.class);
 
     public MqttPacket(ProtoContext context, Class<?> prevState,
                       MqttFixedHeader fixedHeader,
@@ -20,7 +23,7 @@ public class MqttPacket extends ProtocolEvent implements NetworkReturnMessage {
                       String packetIdentifier) {
         super(context, prevState);
         if (packetIdentifier != null) {
-            System.out.println("PACKET " + packetIdentifier + " " + this.getClass().getSimpleName());
+            log.debug("PACKET " + packetIdentifier + " " + this.getClass().getSimpleName());
             getTag().add(Tag.of("PACKET", packetIdentifier).get(0));
         }
         this.fixedHeader = fixedHeader;

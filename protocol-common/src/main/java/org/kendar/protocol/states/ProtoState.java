@@ -7,6 +7,7 @@ import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.messages.RunnableStep;
+import org.kendar.utils.JsonMapper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
  * Basic state
  */
 public abstract class ProtoState {
+    protected static final JsonMapper mapper = new JsonMapper();
     /**
      * List of handled messages types
      */

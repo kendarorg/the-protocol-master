@@ -190,6 +190,7 @@ public class FileStorageRepository implements StorageRepository {
     public void write(LineToWrite item) {
         executorItems.incrementAndGet();
         executor.submit(() -> {
+
             if (item == null) {
                 log.error("Blank item");
                 return;

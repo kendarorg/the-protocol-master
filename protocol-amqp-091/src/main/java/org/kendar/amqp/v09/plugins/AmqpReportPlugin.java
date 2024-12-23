@@ -1,6 +1,5 @@
 package org.kendar.amqp.v09.plugins;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionOpen;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionOpenOk;
@@ -11,7 +10,6 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class AmqpReportPlugin extends ReportPlugin<PluginSettings> {
@@ -45,25 +43,7 @@ public class AmqpReportPlugin extends ReportPlugin<PluginSettings> {
         var channel = in.getChannel();
         var routingKey = context.getValue("BASIC_PUBLISH_RK_" + in.getChannel());
         var exchange = context.getValue("BASIC_PUBLISH_XC_" + in.getChannel());
-        var payload = "";
-        if (in.getContentString() != null && !in.getContentString().isEmpty()) {
-            payload = in.getContentString();
-        } else if (in.getContentBytes() != null && in.getContentBytes().length > 0) {
-            try {
-                payload = new String(in.getContentBytes());
-                var converted = payload.getBytes(StandardCharsets.UTF_8);
-                if (in.getContentBytes().length == converted.length) {
-                    for (var i = 0; i < converted.length; i++) {
-                        if (converted[i] != in.getContentBytes()[i]) {
-                            payload = Base64.toBase64String(in.getContentBytes());
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                payload = Base64.toBase64String(in.getContentBytes());
-            }
-        }
+        var payload = mapper.toHumanReadable(in.getContent());
 
         var duration = System.currentTimeMillis() - pluginContext.getStart();
         EventsQueue.send(new ReportDataEvent(
@@ -73,7 +53,7 @@ public class AmqpReportPlugin extends ReportPlugin<PluginSettings> {
                 connectionId,
                 pluginContext.getStart(),
                 duration,
-                Map.of("body", payload)
+                Map.of("body", payload,"channel",channel+"")
         ));
         return false;
     }

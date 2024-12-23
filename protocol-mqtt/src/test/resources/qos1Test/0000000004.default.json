@@ -1,20 +1,23 @@
 {
-  "timestamp": 1733762111399,
-  "constant": false,
-  "connectionId": 1,
-  "index": 4,
-  "output": {
-    "fullFlag": 50,
-    "fixedHeader": "PUBLISH",
-    "topicName": "/subscribe/",
-    "payload": "SGVsbG8gV29ybGQhIQ==",
-    "packetIdentifier": 1,
-    "dupFlag": false,
-    "retainFlag": false,
-    "qos": 1
+  "timestamp" : 1734945806457,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 4,
+  "output" : {
+    "fullFlag" : 50,
+    "fixedHeader" : "PUBLISH",
+    "topicName" : "/subscribe/",
+    "payload" : {
+      "bytes" : "SGVsbG8gV29ybGQhIQ==",
+      "chars" : "Hello World!!"
+    },
+    "packetIdentifier" : 1,
+    "dupFlag" : false,
+    "retainFlag" : false,
+    "qos" : 1
   },
-  "durationMs": 0,
-  "type": "RESPONSE",
-  "caller": "MQTT",
-  "outputType": "Publish"
+  "durationMs" : 0,
+  "type" : "RESPONSE",
+  "caller" : "MQTT",
+  "outputType" : "Publish"
 }

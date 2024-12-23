@@ -8,23 +8,28 @@ import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
+import org.kendar.utils.ContentData;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 /**
  * https://www.emqx.com/en/blog/mqtt-5-0-control-packets-02-publish-puback
  */
 public class Publish extends BasePropertiesMqttState {
-    protected static final JsonMapper mapper = new JsonMapper();
     private String topicName;
-    private byte[] payload;
+    private ContentData payload;
     private short packetIdentifier;
     private boolean dupFlag;
     private boolean retainFlag;
     private int qos;
 
+    public ContentData getPayload() {
+        return payload;
+    }
+
+    public void setPayload(ContentData payload) {
+        this.payload = payload;
+    }
 
     public Publish() {
         super();
@@ -42,7 +47,7 @@ public class Publish extends BasePropertiesMqttState {
         rb.writeUtf8String(getTopicName());
         rb.writeShort(getPacketIdentifier());
         writeProperties(rb);
-        rb.write(getPayload());
+        rb.write(mapper.fromGenericContent(getPayload()));
     }
 
     @Override
@@ -62,7 +67,7 @@ public class Publish extends BasePropertiesMqttState {
         publish.setProtocolVersion(context.getProtocolVersion());
         //Variable header for MQTT >=5
         readProperties(publish, bb);
-        publish.setPayload(bb.getRemaining());
+        publish.setPayload(mapper.toGenericContent(bb.getRemaining(),null));
 
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
@@ -107,13 +112,6 @@ public class Publish extends BasePropertiesMqttState {
         this.topicName = topicName;
     }
 
-    public byte[] getPayload() {
-        return payload;
-    }
-
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
-    }
 
     public short getPacketIdentifier() {
         return packetIdentifier;
@@ -151,7 +149,7 @@ public class Publish extends BasePropertiesMqttState {
     public String toString() {
         return "Publish{" +
                 "topicName='" + topicName + '\'' +
-                ", payload=" + Arrays.toString(payload) +
+                ", payload=" + payload +
                 ", packetIdentifier=" + packetIdentifier +
                 ", dupFlag=" + dupFlag +
                 ", retainFlag=" + retainFlag +
