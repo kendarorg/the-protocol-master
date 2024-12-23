@@ -67,6 +67,16 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public void update(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
+
+    }
+
+    @Override
+    public void delete(String instanceId, long itemId) {
+
+    }
+
+    @Override
     public String getType() {
         return "storage";
     }

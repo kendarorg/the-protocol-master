@@ -180,6 +180,8 @@ public class FileStorageRepository implements StorageRepository {
         }
     }
 
+
+
     public long generateIndex() {
         synchronized (lock) {
             return storageCounter.incrementAndGet();
@@ -455,5 +457,55 @@ public class FileStorageRepository implements StorageRepository {
         public List<CompactLine> index = new ArrayList<>();
         public boolean initialized = false;
         public volatile boolean somethingWritten = false;
+    }
+
+    @Override
+    public void update(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
+        var indexFile = retrieveIndexFile(protocolInstanceId);
+        var indexPath = Path.of(targetDir, "index." + protocolInstanceId + ".json");
+        for (int i = 0; i < indexFile.size(); i++) {
+            var toCheck = indexFile.get(i);
+            if (toCheck.getIndex() == itemId) {
+                index.setIndex(itemId);
+                indexFile.set(i,index);
+                var old = this.readById(protocolInstanceId,itemId);
+
+                var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+                try {
+                    item.setIndex(itemId);
+                    item.setTimestamp(old.getTimestamp());
+                    item.setCaller(old.getCaller());
+                    Files.writeString(indexPath,mapper.serialize(indexFile));
+                    Files.writeString(filePath,mapper.serialize(item));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return;
+            }
+        }
+        throw new RuntimeException("ITem id "+itemId+" not found");
+
+    }
+
+    @Override
+    public void delete(String protocolInstanceId, long itemId) {
+        try {
+            var indexFile = retrieveIndexFile(protocolInstanceId);
+            var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+            var indexPath = Path.of(targetDir, "index." + protocolInstanceId + ".json");
+            if (filePath.toFile().exists()) {
+                Files.delete(filePath);
+            }
+            for (int i = 0; i < indexFile.size(); i++) {
+                var toCheck = indexFile.get(i);
+                if (toCheck.getIndex() == itemId) {
+                    indexFile.remove(i);
+                    Files.writeString(indexPath, mapper.serialize(indexFile));
+                    break;
+                }
+            }
+        }catch (Exception ex){
+            throw new RuntimeException("Unable to delete item "+itemId,ex);
+        }
     }
 }

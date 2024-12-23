@@ -11,6 +11,7 @@ import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.dtos.CompactLineApi;
+import org.kendar.apis.dtos.StorageAndIndex;
 import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
@@ -18,7 +19,6 @@ import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.CompactLine;
-import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 
@@ -182,14 +182,14 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             pathAddress = "/api/global/storage/items/{protocol}/{index}",
             method = "GET", id = "GET /api/global/storage/items/{protocol}/{index}")
     @TpmDoc(
-            description = "List all data",
+            description = "List single item",
             path = {
                     @PathParameter(key = "protocol", description = "The protocol instance id"),
                     @PathParameter(key = "index", description = "The index of the recording")
             },
             responses = {
                     @TpmResponse(
-                            body = StorageItem.class
+                            body = StorageAndIndex.class
                     ), @TpmResponse(
                     code = 500,
                     body = Ko.class
@@ -197,12 +197,96 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             tags = {"base/storage"})
     public boolean getSingleItem(Request reqp, Response resp) {
         StorageRepository storage = settings.getService("storage");
+        var result = new StorageAndIndex();
 
         try {
             var instanceId = reqp.getPathParameter("protocol");
             var itemId = Long.parseLong(reqp.getPathParameter("index"));
-            var result = storage.readById(instanceId, itemId);
-            respondJson(resp, result);
+            result.setItem(storage.readById(instanceId, itemId));
+            var optIndex = storage.getAllIndexes(-1).stream().filter(a->a.getIndex()==itemId).findFirst();
+            if(optIndex.isPresent()) {
+                var api = mapper.deserialize(mapper.serialize(optIndex.get()), CompactLineApi.class);
+                if (api.getFullItemId() != null && !api.getFullItemId().isEmpty()) {
+                    var theItemId = reqp.buildUrlNoQuery() + "/" + api.getFullItemId();
+                    api.setFullItemAddress(theItemId);
+                }
+                result.setIndex(api);
+                respondJson(resp, result);
+            }
+        } catch (Exception ex) {
+            respondKo(resp, ex);
+        }
+        return true;
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/api/global/storage/items/{protocol}/{index}",
+            method = "PUT", id = "PUT /api/global/storage/items/{protocol}/{index}")
+    @TpmDoc(
+            description = "Change single item",
+            path = {
+                    @PathParameter(key = "protocol", description = "The protocol instance id"),
+                    @PathParameter(key = "index", description = "The index of the recording")
+            },
+            requests = @TpmRequest(
+                    body = StorageAndIndex.class
+            ),
+            responses = {
+                    @TpmResponse(
+                            body = Ok.class
+                    ), @TpmResponse(
+                    code = 500,
+                    body = Ko.class
+            )},
+            tags = {"base/storage"})
+    public boolean changeSingleItem(Request reqp, Response resp) {
+        StorageRepository storage = settings.getService("storage");
+        var request = mapper.deserialize(reqp.getRequestText().toString(), StorageAndIndex.class);
+
+        try {
+            var instanceId = reqp.getPathParameter("protocol");
+            var itemId = Long.parseLong(reqp.getPathParameter("index"));
+            var optIndex = storage.getAllIndexes(-1).stream().filter(a->a.getIndex()==itemId).findFirst();
+            if(optIndex.isPresent()) {
+                var indexItem = optIndex.get();
+                if(request.getItem()!=null) {
+                    request.getItem().setIndex(itemId);
+                }
+                request.getIndex().setIndex(itemId);
+                storage.update(itemId,indexItem.getProtocolInstanceId(),request.getIndex(),request.getItem());
+                respondJson(resp, new Ok());
+            }
+        } catch (Exception ex) {
+            respondKo(resp, ex);
+        }
+        return true;
+    }
+
+
+    @HttpMethodFilter(
+            pathAddress = "/api/global/storage/items/{protocol}/{index}",
+            method = "DELETE", id = "DELETE /api/global/storage/items/{protocol}/{index}")
+    @TpmDoc(
+            description = "Delete single item",
+            path = {
+                    @PathParameter(key = "protocol", description = "The protocol instance id"),
+                    @PathParameter(key = "index", description = "The index of the recording")
+            },
+            responses = {
+                    @TpmResponse(
+                            body = Ok.class
+                    ), @TpmResponse(
+                    code = 500,
+                    body = Ko.class
+            )},
+            tags = {"base/storage"})
+    public boolean deleteSingleItem(Request reqp, Response resp) {
+        StorageRepository storage = settings.getService("storage");
+
+        try {
+            var instanceId = reqp.getPathParameter("protocol");
+            var itemId = Long.parseLong(reqp.getPathParameter("index"));
+            storage.delete(instanceId,itemId);
         } catch (Exception ex) {
             respondKo(resp, ex);
         }
