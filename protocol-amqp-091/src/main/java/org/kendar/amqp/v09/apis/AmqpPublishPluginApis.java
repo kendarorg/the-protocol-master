@@ -81,7 +81,8 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
             id = "POST /api/protocols/{#protocolInstanceId}/plugins/amqp-publish-plugin/connections/" +
                     "{connectionId}/{channel}")
     @TpmDoc(
-            description = "Retrieve all amqp connections",
+            description = "Send a message. Mandatory are only: contentType,appId,body,binary. If " +
+                    "content type is binary, the body must be a base-64 encoded byte array. ",
             path = {
                     @PathParameter(key="connectionId",description = "Connection Id"),
                     @PathParameter(key="channel",description = "Channel Id")

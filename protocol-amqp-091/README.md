@@ -35,6 +35,12 @@ All callback are replayed automatically
 * resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server (default true)
 * blockExternal: Block calls to real service when not matching (default true)
 
+### Publish plugin
+
+* Always active
+* Exposes the API to retrieve the current connections and if they are subscribed to something
+* Exposes the API to send a message to a currently active connection
+
 ## Documentation used
 
 * https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf (page 31)

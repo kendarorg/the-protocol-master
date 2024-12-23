@@ -4,6 +4,12 @@ public class PublishMessage {
     private String contentType;
     private String appId;
     private String body;
+
+
+    public void setDeliveryMode(int deliveryMode) {
+        this.deliveryMode = deliveryMode;
+    }
+
     private int propertyFlag = -28664;
     private int deliveryMode = 1;
     private long deliveryTag = 1;
