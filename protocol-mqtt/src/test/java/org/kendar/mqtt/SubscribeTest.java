@@ -1,7 +1,14 @@
 package org.kendar.mqtt;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.eclipse.paho.client.mqttv3.*;
 import org.junit.jupiter.api.*;
+import org.kendar.apis.base.Request;
+import org.kendar.apis.base.Response;
+import org.kendar.mqtt.apis.MqttPublishPluginApis;
+import org.kendar.mqtt.apis.dtos.MqttConnection;
+import org.kendar.mqtt.apis.dtos.PublishMessage;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
@@ -21,17 +28,13 @@ public class SubscribeTest extends BasicTest {
 
     @BeforeAll
     public static void beforeClass() throws IOException {
-        beforeClassBase();
+
 
     }
 
     @AfterAll
     public static void afterClass() throws Exception {
-        try {
-            afterClassBase();
-        } catch (Exception ex) {
 
-        }
     }
 
     private static void setupCallBack(MqttClient client) {
@@ -56,11 +59,22 @@ public class SubscribeTest extends BasicTest {
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
+        try {
+            beforeClassBase();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         beforeEachBase(testInfo);
     }
 
     @AfterEach
     public void afterEach() {
+
+        try {
+            afterClassBase();
+        } catch (Exception ex) {
+
+        }
         afterEachBase();
     }
 
@@ -157,5 +171,163 @@ public class SubscribeTest extends BasicTest {
         var mesg = messages.get(0);
         assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
         assertEquals(0, mesg.getQos());
+    }
+
+    private static JsonMapper mapper = new JsonMapper();
+    @Test
+    void qos2TestPublish() throws MqttException {
+        publishPlugin.setActive(true);
+        String publisherId = UUID.randomUUID().toString();
+        var client = new MqttClient("tcp://localhost:1884", publisherId);
+
+        MqttConnectOptions options = new MqttConnectOptions();
+        client.connect(options);
+
+        if (client.isConnected()) {
+            setupCallBack(client);
+
+            client.subscribe(TOPIC_NAME, 2);
+            Sleeper.sleep(500);
+            System.out.println("========================");
+
+            /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
+            message.setQos(2);
+            client.publish(TOPIC_NAME, message);*/
+            var publish = (MqttPublishPluginApis)publishPlugin.getApiHandler();
+            var res = new Response();
+            publish.getConnections(new Request(),res);
+            var responses = mapper.deserialize(res.getResponseText(),new TypeReference<List<MqttConnection>>(){});
+            Assertions.assertEquals(1, responses.size());
+            var response = responses.get(0);
+            var pm = new PublishMessage();
+            pm.setContentType("text/plain");
+            pm.setBody(MESSAGE_CONTENT);
+            pm.setTopic(TOPIC_NAME);
+            publish.doPublish(pm,response.getId(),TOPIC_NAME);
+            Sleeper.sleep(500);
+
+            System.out.println("========================");
+        } else {
+            throw new RuntimeException("NOT CONNETED");
+        }
+        Sleeper.sleep(7000, () -> messages.size() > 0);
+        client.disconnect();
+        client.close();
+        assertEquals(1, messages.size());
+        var mesg = messages.get(0);
+        assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
+        assertEquals(2, mesg.getQos());
+
+
+        var events = getEvents().stream().collect(Collectors.toList());
+        Assertions.assertEquals(2, events.size());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("CONNECT")).count());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("SUBSCRIBE")).count());
+        publishPlugin.setActive(false);
+    }
+
+    @Test
+    void qos1TestPublish() throws MqttException {
+        publishPlugin.setActive(true);
+        String publisherId = UUID.randomUUID().toString();
+        var client = new MqttClient("tcp://localhost:1884", publisherId);
+
+        MqttConnectOptions options = new MqttConnectOptions();
+        client.connect(options);
+
+        if (client.isConnected()) {
+            setupCallBack(client);
+
+            client.subscribe(TOPIC_NAME, 1);
+            Sleeper.sleep(500);
+            System.out.println("========================");
+
+            /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
+            message.setQos(2);
+            client.publish(TOPIC_NAME, message);*/
+            var publish = (MqttPublishPluginApis)publishPlugin.getApiHandler();
+            var res = new Response();
+            publish.getConnections(new Request(),res);
+            var responses = mapper.deserialize(res.getResponseText(),new TypeReference<List<MqttConnection>>(){});
+            Assertions.assertEquals(1, responses.size());
+            var response = responses.get(0);
+            var pm = new PublishMessage();
+            pm.setContentType("text/plain");
+            pm.setBody(MESSAGE_CONTENT);
+            pm.setTopic(TOPIC_NAME);
+            publish.doPublish(pm,response.getId(),TOPIC_NAME);
+            Sleeper.sleep(500);
+
+            System.out.println("========================");
+        } else {
+            throw new RuntimeException("NOT CONNETED");
+        }
+        Sleeper.sleep(7000, () -> messages.size() > 0);
+        client.disconnect();
+        client.close();
+        assertEquals(1, messages.size());
+        var mesg = messages.get(0);
+        assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
+        assertEquals(1, mesg.getQos());
+
+
+        var events = getEvents().stream().collect(Collectors.toList());
+        Assertions.assertEquals(2, events.size());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("CONNECT")).count());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("SUBSCRIBE")).count());
+        publishPlugin.setActive(false);
+    }
+
+
+    @Test
+    void qos0TestPublish() throws MqttException {
+        publishPlugin.setActive(true);
+        String publisherId = UUID.randomUUID().toString();
+        var client = new MqttClient("tcp://localhost:1884", publisherId);
+
+        MqttConnectOptions options = new MqttConnectOptions();
+        client.connect(options);
+
+        if (client.isConnected()) {
+            setupCallBack(client);
+
+            client.subscribe(TOPIC_NAME, 0);
+            Sleeper.sleep(500);
+            System.out.println("========================");
+
+            /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
+            message.setQos(2);
+            client.publish(TOPIC_NAME, message);*/
+            var publish = (MqttPublishPluginApis)publishPlugin.getApiHandler();
+            var res = new Response();
+            publish.getConnections(new Request(),res);
+            var responses = mapper.deserialize(res.getResponseText(),new TypeReference<List<MqttConnection>>(){});
+            Assertions.assertEquals(1, responses.size());
+            var response = responses.get(0);
+            var pm = new PublishMessage();
+            pm.setContentType("text/plain");
+            pm.setBody(MESSAGE_CONTENT);
+            pm.setTopic(TOPIC_NAME);
+            publish.doPublish(pm,response.getId(),TOPIC_NAME);
+            Sleeper.sleep(500);
+
+            System.out.println("========================");
+        } else {
+            throw new RuntimeException("NOT CONNETED");
+        }
+        Sleeper.sleep(7000, () -> messages.size() > 0);
+        client.disconnect();
+        client.close();
+        assertEquals(1, messages.size());
+        var mesg = messages.get(0);
+        assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
+        assertEquals(0, mesg.getQos());
+
+
+        var events = getEvents().stream().collect(Collectors.toList());
+        Assertions.assertEquals(2, events.size());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("CONNECT")).count());
+        Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("SUBSCRIBE")).count());
+        publishPlugin.setActive(false);
     }
 }

@@ -105,7 +105,7 @@
       "timeout": 30,
       "connectionString": "tcp://192.168.56.2:25672",
       "plugins": {
-        "amqp-publish-plugin": {
+        "publish-plugin": {
         },
         "record-plugin": {
           "resetConnectionsOnStart": true
@@ -124,7 +124,7 @@
       "timeout": 30,
       "connectionString": "tcp://192.168.56.2:26672",
       "plugins": {
-        "amqp-publish-plugin": {
+        "publish-plugin": {
         },
         "record-plugin": {
         },

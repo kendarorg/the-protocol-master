@@ -9,6 +9,7 @@ import io.moquette.interception.messages.InterceptPublishMessage;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
+import org.kendar.mqtt.plugins.MqttPublishPlugin;
 import org.kendar.mqtt.plugins.MqttRecordPlugin;
 import org.kendar.mqtt.plugins.MqttReportPlugin;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
@@ -39,6 +40,7 @@ public class BasicTest {
     protected static TcpServer protocolServer;
     protected static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static Server mqttBroker;
+    protected static MqttPublishPlugin publishPlugin;
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -115,9 +117,13 @@ public class BasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         gs.putService("storage", storage);
-        var pl = new MqttRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        var pls = new BasicAysncRecordPluginSettings();
+        pls.setResetConnectionsOnStart(false);
+        var pl = new MqttRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(),
+                pls);
         var rep = new MqttReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        proxy.setPlugins(List.of(pl, rep));
+        publishPlugin = (MqttPublishPlugin)new MqttPublishPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        proxy.setPlugins(List.of(pl, rep,publishPlugin));
         rep.setActive(true);
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

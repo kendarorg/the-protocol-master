@@ -16,6 +16,7 @@ import org.kendar.http.plugins.*;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.mongo.plugins.MongoReplayPlugin;
 import org.kendar.mongo.plugins.MongoReportPlugin;
+import org.kendar.mqtt.plugins.MqttPublishPlugin;
 import org.kendar.mqtt.plugins.MqttRecordPlugin;
 import org.kendar.mqtt.plugins.MqttReplayPlugin;
 import org.kendar.mqtt.plugins.MqttReportPlugin;
@@ -210,7 +211,8 @@ public class Main {
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "mqtt", List.of(
                 new MqttRecordPlugin(),
                 new MqttReplayPlugin(),
-                new MqttReportPlugin()));
+                new MqttReportPlugin(),
+                new MqttPublishPlugin()));
         addEmbeddedProtocolPlugin(allProtocolSpecificPlugins, "postgres", List.of(
                 new PostgresRecordPlugin(),
                 new PostgresReplayPlugin(),

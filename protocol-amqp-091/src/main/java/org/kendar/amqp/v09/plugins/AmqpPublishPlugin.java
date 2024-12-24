@@ -26,7 +26,7 @@ public class AmqpPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettin
 
     @Override
     public String getId() {
-        return "amqp-publish-plugin";
+        return "publish-plugin";
     }
 
     @Override

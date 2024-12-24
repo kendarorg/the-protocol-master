@@ -45,7 +45,9 @@ public class Publish extends BasePropertiesMqttState {
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.writeUtf8String(getTopicName());
-        rb.writeShort(getPacketIdentifier());
+        if(qos != 0) {
+            rb.writeShort(getPacketIdentifier());
+        }
         writeProperties(rb);
         rb.write(mapper.fromGenericContent(getPayload()));
     }
@@ -63,7 +65,9 @@ public class Publish extends BasePropertiesMqttState {
         publish.setQos(qos);
         var context = (MqttContext) event.getContext();
         publish.setTopicName(bb.readUtf8String());
-        publish.setPacketIdentifier(bb.getShort());
+        if(qos != 0) {
+            publish.setPacketIdentifier(bb.getShort());
+        }
         publish.setProtocolVersion(context.getProtocolVersion());
         //Variable header for MQTT >=5
         readProperties(publish, bb);

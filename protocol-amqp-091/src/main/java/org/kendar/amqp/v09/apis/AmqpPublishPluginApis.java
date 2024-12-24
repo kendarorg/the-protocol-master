@@ -36,8 +36,8 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
     }
 
     @HttpMethodFilter(
-            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/amqp-publish-plugin/connections",
-            method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/amqp-publish-plugin/connections")
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/publish-plugin/connections",
+            method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/publish-plugin/connections")
     @TpmDoc(
             description = "Retrieve all amqp connections",
             responses = {@TpmResponse(
@@ -75,10 +75,10 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
     }
 
     @HttpMethodFilter(
-            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/amqp-publish-plugin/connections/" +
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/publish-plugin/connections/" +
                     "{connectionId}/{channel}",
             method = "POST",
-            id = "POST /api/protocols/{#protocolInstanceId}/plugins/amqp-publish-plugin/connections/" +
+            id = "POST /api/protocols/{#protocolInstanceId}/plugins/publish-plugin/connections/" +
                     "{connectionId}/{channel}")
     @TpmDoc(
             description = "Send a message. Mandatory are only: contentType,appId,body,binary. If " +
@@ -110,7 +110,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         var pInstance = getDescriptor().getProtocolInstance();
         byte[] dataToSend;
         if(MimeChecker.isBinary(messageData.getContentType(),null)){
-            dataToSend = Base64.decode((String) messageData.getBody());
+            dataToSend = Base64.decode( messageData.getBody());
         }else{
             dataToSend = messageData.getBody().getBytes();
         }

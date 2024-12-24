@@ -22,26 +22,32 @@ public class SimpleTest extends BasicTest {
 
     @BeforeAll
     public static void beforeClass() throws IOException {
-        beforeClassBaseInternalIntercept();
+
 
     }
 
     @AfterAll
     public static void afterClass() throws Exception {
-        try {
-            afterClassBase();
-        } catch (Exception ex) {
 
-        }
     }
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
+        try {
+            beforeClassBaseInternalIntercept();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         beforeEachBase(testInfo);
     }
 
     @AfterEach
     public void afterEach() {
+        try {
+            afterClassBase();
+        } catch (Exception ex) {
+
+        }
         afterEachBase();
     }
 

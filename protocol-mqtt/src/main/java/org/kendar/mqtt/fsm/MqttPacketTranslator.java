@@ -2,6 +2,7 @@ package org.kendar.mqtt.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
@@ -55,7 +56,7 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
     }
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
-
+        var context = (MqttContext) event.getContext();
         var rb = (MqttBBuffer) event.getBuffer();
         var fullFlag = rb.get();
         var flag = MqttFixedHeader.of(fullFlag);
@@ -92,6 +93,9 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
                 break;
         }
 
+        if(packetIdentifier!=null && context!=null){
+            context.usePacket(Integer.parseInt(packetIdentifier.substring(1)));
+        }
 
         if (!proxy) {
             log.trace("[CL>TP][  ]: Founded flag: {} with var length: {} packet:{}", flag, varBValue.getValue(), packetIdentifier);
