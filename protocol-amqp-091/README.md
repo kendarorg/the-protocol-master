@@ -35,7 +35,7 @@ All callback are replayed automatically
 * resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server (default true)
 * blockExternal: Block calls to real service when not matching (default true)
 
-### Publish plugin
+### publish-plugin
 
 * Always active
 * Exposes the API to retrieve the current connections and if they are subscribed to something
