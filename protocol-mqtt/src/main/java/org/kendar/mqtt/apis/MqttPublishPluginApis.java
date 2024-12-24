@@ -80,8 +80,8 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             id = "POST /api/protocols/{#protocolInstanceId}/plugins/publish-plugin/connections/" +
                     "{connectionId}/{channel}")
     @TpmDoc(
-            description = "Send a message. Mandatory are only: contentType,appId,body,binary. If " +
-                    "content type is binary, the body must be a base-64 encoded byte array. ",
+            description = "Send a message. Mandatory are only: contentType,body. If " +
+                    "content type is binary, the body must be a base-64 encoded byte array.",
             path = {
                     @PathParameter(key="connectionId",description = "Connection Id"),
                     @PathParameter(key="topic",description = "Topic Id")
@@ -119,7 +119,6 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
         var packetIdentifier = (short)context.packetToUse();
         var message = new Publish();
         message.setPacketIdentifier(packetIdentifier);
-        message.setFullFlag(messageData.getFullFlag());
         message.setFixedHeader(MqttFixedHeader.PUBLISH);
         message.setTopicName(messageData.getTopic());
         var topics = (HashSet<String>)context.getValue("TOPICS");
