@@ -14,7 +14,6 @@ import org.kendar.apis.filters.FiltersConfiguration;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.MimeChecker;
-import org.kendar.utils.FileResourcesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +36,6 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
     public ApiFiltersLoader(List<FilteringClass> filteringClassList, int port) {
         this.filteringClassList = filteringClassList;
         filtersConfiguration = new FiltersConfiguration();
-        this.filteringClassList.add(new SwaggerApi(filtersConfiguration, new ArrayList<>(), port));
-        this.filteringClassList.add(new MainWebSite(new FileResourcesUtils()));
     }
 
     public static Method[] getAllMethodsInHierarchy(Class<?> objectClass) {
@@ -207,5 +204,9 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
         return ((rCode >= 100 && rCode < 200) /* informational */
                 || (rCode == 204)           /* no content */
                 || (rCode == 304));
+    }
+
+    public FiltersConfiguration getConfig() {
+        return filtersConfiguration;
     }
 }

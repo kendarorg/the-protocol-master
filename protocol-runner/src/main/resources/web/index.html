@@ -4,8 +4,18 @@
     <script defer charset="UTF-8" src="./lib/alpine.js"></script>
 </head>
 <body>
+<!--https://ntorga.com/full-stack-go-app-with-htmx-and-alpinejs/
+https://github.com/badlogic/basis-template
+-->
 
 
-
+<table
+        id="protocols-table"
+        hx-get="/tpl/protocols"
+        hx-trigger="load delay:500ms"
+        hx-select="#protocols-table"
+        hx-target="#protocols-table"
+        hx-swap="outerHTML transition:true"
+></table>
 </body>
 </html>

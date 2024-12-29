@@ -30,7 +30,7 @@ public class FileResourcesUtils {
         if (fileName.startsWith("resource://")) {
             fileName = fileName.substring("resource://".length());
             // The class loader that loaded the class
-            ClassLoader classLoader = getClass().getClassLoader();
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
             InputStream inputStream = classLoader.getResourceAsStream(fileName);
 
             // the stream holding the file content
@@ -90,7 +90,7 @@ public class FileResourcesUtils {
     */
     public File getFileFromResource(String fileName) throws URISyntaxException {
 
-        ClassLoader classLoader = getClass().getClassLoader();
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         URL resource = classLoader.getResource(fileName);
         if (resource == null) {
             throw new IllegalArgumentException("file not found! " + fileName);
@@ -158,7 +158,7 @@ public class FileResourcesUtils {
         }
         var result = new HashMap<String, Object>();
 
-        var classLoader = clazz.getClass().getClassLoader();
+        var classLoader = ClassLoader.getSystemClassLoader();
 
         final File jarFile =
                 new File(clazz.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());

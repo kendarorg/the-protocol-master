@@ -1,6 +1,7 @@
 package org.kendar.command;
 
 import com.sun.net.httpserver.HttpsServer;
+import org.kendar.annotations.TpmService;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.http.HttpProtocol;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+@TpmService
 public class HttpRunner extends CommonRunner {
     private static final Logger log = LoggerFactory.getLogger(HttpRunner.class);
     private TcpServer ps;

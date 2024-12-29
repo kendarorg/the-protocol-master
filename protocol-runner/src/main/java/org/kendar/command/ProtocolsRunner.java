@@ -1,5 +1,6 @@
 package org.kendar.command;
 
+import org.kendar.annotations.TpmService;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.cli.CommandParser;
@@ -21,11 +22,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
+@TpmService
 public class ProtocolsRunner {
     private static final JsonMapper mapper = new JsonMapper();
     private final Map<String, CommonRunner> protocols = new HashMap<>();
 
-    public ProtocolsRunner(CommonRunner... input) {
+    public ProtocolsRunner(List<CommonRunner> input) {
         for (CommonRunner protocol : input) {
             protocols.put(protocol.getId(), protocol);
         }

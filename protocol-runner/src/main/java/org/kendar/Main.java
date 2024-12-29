@@ -7,11 +7,10 @@ import org.kendar.amqp.v09.plugins.AmqpPublishPlugin;
 import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
-import org.kendar.apis.ApiFiltersLoader;
-import org.kendar.apis.ApiHandler;
-import org.kendar.apis.ApiStorageOnlyHandler;
+import org.kendar.apis.*;
 import org.kendar.cli.CommandParser;
-import org.kendar.command.*;
+import org.kendar.command.ProtocolsRunner;
+import org.kendar.di.DiService;
 import org.kendar.http.plugins.*;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.mongo.plugins.MongoReplayPlugin;
@@ -38,6 +37,7 @@ import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ChangeableReference;
+import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.Sleeper;
 import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
@@ -67,25 +67,31 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
+
+        //var data =injector.getBindings();
         execute(args, Main::stopWhenQuitCommand);
         exit(0);
     }
 
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
+        var diService = new DiService();
+        diService.loadPackage("org.kendar");
+
         protocolServersCache = new ConcurrentHashMap<>();
         allProtocolSpecificPlugins = new HashMap<>();
         allGlobalPlugins = new ArrayList<>();
         globalPlugins = new ArrayList<>();
-        protocolsRunner = new ProtocolsRunner(
+        protocolsRunner = diService.getInstance(ProtocolsRunner.class);
+        /*        new ProtocolsRunner(
                 new Amqp091Runner(),
                 new MongoRunner(),
                 new HttpRunner(),
-                new JdbcRunner("mysql"),
-                new JdbcRunner("postgres"),
+                new MySQLRunner(),
+                new PostgresRunner(),
                 new MqttRunner(),
                 new RedisRunner()
-        );
+        );*/
         var settings = new ChangeableReference<>(new GlobalSettings());
 
         var options = ProtocolsRunner.getMainOptions(settings);
@@ -105,8 +111,13 @@ public class Main {
         }
 
         pluginManager = new JarPluginManager(pathOfPluginsDir);
+
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
+        var extensionClasses = pluginManager.getExtensionClasses(ProtocolPluginDescriptor.class);
+        for(var ec:extensionClasses) {
+            diService.bindTransient(ec);
+        }
 
         var protocolPlugins = loadProtocolPlugins(pluginsDir);
         globalPlugins = loadGlobalPlugins(pluginsDir);
@@ -274,6 +285,8 @@ public class Main {
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
         var apisFiltersLoader = new ApiFiltersLoader(new ArrayList<>(), ini.getApiPort());
         var apiHandler = new ApiHandler(ini);
+        apisFiltersLoader.getFilters().add(new SwaggerApi(apisFiltersLoader.getConfig(), new ArrayList<>(), ini.getApiPort()));
+        apisFiltersLoader.getFilters().add(new MainWebSite(new FileResourcesUtils()));
         apisFiltersLoader.getFilters().add(apiHandler);
         var apiStorageHandler = new ApiStorageOnlyHandler(ini);
         apisFiltersLoader.getFilters().add(apiStorageHandler);
