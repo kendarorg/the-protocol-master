@@ -1,17 +1,24 @@
 package org.kendar.sample.plugins;
 
+import org.kendar.annotations.di.TpmService;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.plugins.base.AlwaysActivePlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
+import org.kendar.utils.JsonMapper;
 import org.pf4j.Extension;
 
 import java.util.List;
 
 @Extension
+@TpmService(tags = "http")
 public class HttpFilter extends ProtocolPluginDescriptorBase<HttpFilterSettings> implements AlwaysActivePlugin {
+    public HttpFilter(JsonMapper mapper) {
+        super(mapper);
+    }
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         return false;
     }

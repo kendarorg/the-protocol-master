@@ -84,10 +84,11 @@ public class BasicTest {
         }
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new AmqpRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
-        var rep = new AmqpReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        publishPlugin = new AmqpPublishPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        //gs.putService("storage", storage);
+        var mapper = new JsonMapper();
+        var pl = new AmqpRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(
                 pl, rep,publishPlugin));

@@ -11,6 +11,7 @@ import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
@@ -70,8 +71,8 @@ public class ReplayerTest {
                 "test", "resources", "test2_differentChannelAndConnection"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new AmqpReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
+        //gs.putService("storage", storage);
+        var pl = new AmqpReplayPlugin(new JsonMapper(),storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
@@ -156,8 +157,8 @@ public class ReplayerTest {
                 "test", "resources", "test5_noPublish"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new AmqpReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
+        //gs.putService("storage", storage);
+        var pl = new AmqpReplayPlugin(new JsonMapper(),storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 
@@ -232,8 +233,8 @@ public class ReplayerTest {
                 "test", "resources", "test3_openConnection"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new AmqpReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
+        //gs.putService("storage", storage);
+        var pl = new AmqpReplayPlugin(new JsonMapper(),storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 

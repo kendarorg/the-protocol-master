@@ -7,10 +7,15 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Map;
 
 public abstract class JdbcReportPlugin extends ReportPlugin<PluginSettings> {
+
+    public JdbcReportPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, JdbcCall in, SelectResult out) {
         if (!isActive()) return false;

@@ -16,6 +16,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.utils.ChangeableReference;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -31,8 +32,9 @@ public class ReplayRecordFilters {
     void testRecordSites() {
         try {
             events.clear();
+            var mapper = new JsonMapper();
             EventsQueue.register("testRecordSites", (e) -> events.add(e), WriteItemEvent.class);
-            var rwPlugin = new HttpRecordPlugin() {
+            var rwPlugin = new HttpRecordPlugin(mapper,new NullStorageRepository()) {
                 @Override
                 public boolean isActive() {
                     return true;
@@ -44,7 +46,7 @@ public class ReplayRecordFilters {
             settings.getRecordSites().add("www.sara.com");
             settings.getRecordSites().add("@.*microsoft.*");
             var global = new GlobalSettings();
-            global.putService("storage", new NullStorageRepository());
+            //global.putService("storage", new NullStorageRepository());
             rwPlugin.initialize(global, new HttpProtocolSettings(), settings);
 
             var pc = new PluginContext("http", null, 0L, null);
@@ -88,7 +90,7 @@ public class ReplayRecordFilters {
     @Test
     void testReplaySites() {
         var matched = new ChangeableReference<Boolean>(false);
-        var rwPlugin = new HttpReplayPlugin() {
+        var rwPlugin = new HttpReplayPlugin(new JsonMapper(),new NullStorageRepository()) {
             @Override
             public boolean isActive() {
                 return true;
@@ -106,7 +108,7 @@ public class ReplayRecordFilters {
         settings.getMatchSites().add("www.sara.com");
         settings.getMatchSites().add("@.*microsoft.*");
         var global = new GlobalSettings();
-        global.putService("storage", new NullStorageRepository());
+        //global.putService("storage", new NullStorageRepository());
 
         rwPlugin.initialize(global, new HttpProtocolSettings(), settings);
 

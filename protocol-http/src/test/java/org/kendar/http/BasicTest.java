@@ -29,6 +29,7 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
@@ -160,18 +161,19 @@ public class BasicTest {
         mockSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         httpProtocolSettings.getPlugins().put("mock-plugin", mockSettings);
         globalSettings.getProtocols().put("http", httpProtocolSettings);
-        globalSettings.putService("storage", storage);
+        //globalSettin//gs.putService("storage", storage);
         var settings = new PluginSettings();
         settings.setActive(true);
+        var mapper = new JsonMapper();
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
-                new HttpRecordPlugin().initialize(globalSettings, httpProtocolSettings, recordingSettings),
-                new HttpReplayPlugin().initialize(globalSettings, httpProtocolSettings, replaySettings),
-                new HttpErrorPlugin(),
-                new HttpReportPlugin().initialize(globalSettings, httpProtocolSettings, settings),
-                new HttpLatencyPlugin(),
-                new HttpRateLimitPlugin(),
-                new HttpMockPlugin().initialize(globalSettings, httpProtocolSettings, mockSettings),
-                new HttpRewritePlugin().initialize(globalSettings, httpProtocolSettings, rewriteSettings)));
+                new HttpRecordPlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, recordingSettings),
+                new HttpReplayPlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, replaySettings),
+                new HttpErrorPlugin(mapper),
+                new HttpReportPlugin(mapper).initialize(globalSettings, httpProtocolSettings, settings),
+                new HttpLatencyPlugin(mapper),
+                new HttpRateLimitPlugin(mapper),
+                new HttpMockPlugin(mapper).initialize(globalSettings, httpProtocolSettings, mockSettings),
+                new HttpRewritePlugin(mapper).initialize(globalSettings, httpProtocolSettings, rewriteSettings)));
         baseProtocol.initialize();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

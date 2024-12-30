@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import org.kendar.annotations.di.TpmService;
 import org.kendar.buffers.BBuffer;
 
 import java.util.Base64;
@@ -16,6 +17,7 @@ import java.util.Base64;
 /**
  * Wrapper to have a single json serializer
  */
+@TpmService
 public class JsonMapper {
     private static final ObjectMapper mapper = new ObjectMapper().
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

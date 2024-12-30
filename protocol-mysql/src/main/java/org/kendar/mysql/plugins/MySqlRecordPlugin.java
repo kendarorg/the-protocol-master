@@ -1,5 +1,6 @@
 package org.kendar.mysql.plugins;
 
+import org.kendar.annotations.di.TpmService;
 import org.kendar.plugins.JdbcRecordPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
@@ -8,14 +9,21 @@ import org.kendar.sql.parser.dtos.SimpleToken;
 import org.kendar.sql.parser.dtos.TokenType;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@TpmService(tags = "mysql")
 public class MySqlRecordPlugin extends JdbcRecordPlugin {
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
     private static final SqlStringParser parser = new SqlStringParser("?");
+
+    public MySqlRecordPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
     @Override
     public String getProtocol() {

@@ -19,6 +19,7 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tests.testcontainer.images.PostgresSqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
@@ -80,17 +81,18 @@ public class BasicTest {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
             }
         }
+        var mapper = new JsonMapper();
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new PostgresRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        var pl1 = new PostgresMockPlugin();
+        //gs.putService("storage", storage);
+        var pl = new PostgresRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl1 = new PostgresMockPlugin(mapper);
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
-        global.putService("storage", storage);
+        //global.putService("storage", storage);
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
-        var rep = new PostgresReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        var rep = new PostgresReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(pl, pl1, rep));
         pl.setActive(true);

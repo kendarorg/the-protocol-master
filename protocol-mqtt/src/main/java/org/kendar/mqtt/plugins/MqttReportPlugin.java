@@ -1,5 +1,6 @@
 package org.kendar.mqtt.plugins;
 
+import org.kendar.annotations.di.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.fsm.*;
@@ -8,11 +9,17 @@ import org.kendar.plugins.ReportPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@TpmService(tags = "mqtt")
 public class MqttReportPlugin extends ReportPlugin<PluginSettings> {
+    public MqttReportPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Connect in, ConnectAck out) {
         if (isActive()) {
             var context = pluginContext.getContext();

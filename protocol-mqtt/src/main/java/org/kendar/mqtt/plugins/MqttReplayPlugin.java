@@ -1,6 +1,7 @@
 package org.kendar.mqtt.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.kendar.annotations.di.TpmService;
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.fsm.*;
 import org.kendar.plugins.ReplayPlugin;
@@ -12,6 +13,7 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ExtraBeanUtils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -25,9 +27,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+@TpmService(tags = "mqtt")
 public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(MqttReplayPlugin.class);
+
+    public MqttReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
 
     @Override

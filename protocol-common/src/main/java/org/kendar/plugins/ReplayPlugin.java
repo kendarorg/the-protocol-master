@@ -22,6 +22,7 @@ import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,11 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      */
     private final List<CompactLine> indexes = new ArrayList<>();
 
+    public ReplayPlugin(JsonMapper mapper,StorageRepository storage) {
+        super(mapper);
+        this.storage = storage;
+    }
+
     /**
      * Retrieve the settings class, must match the <W> parameter
      *
@@ -78,7 +84,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      */
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        withStorage(global.getService("storage"));
+        //withStorage(global.getService("storage"));
         super.initialize(global, protocol, pluginSetting);
         return this;
     }
@@ -89,12 +95,12 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      * @param storage
      * @return
      */
-    protected ReplayPlugin withStorage(StorageRepository storage) {
+    /*protected ReplayPlugin withStorage(StorageRepository storage) {
         if (storage != null) {
             this.storage = storage;
         }
         return this;
-    }
+    }*/
 
     /**
      * To override if the protocol has callbacks/subscriptions

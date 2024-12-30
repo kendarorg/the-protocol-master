@@ -1,5 +1,6 @@
 package org.kendar.http.plugins;
 
+import org.kendar.annotations.di.TpmService;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.plugins.base.ProtocolPhase;
@@ -10,6 +11,7 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.FileResourcesUtils;
+import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
+@TpmService(tags = "http")
 public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
@@ -29,6 +31,10 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
+
+    public HttpRateLimitPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     @Override
     public Class<?> getSettingClass() {

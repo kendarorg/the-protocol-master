@@ -11,6 +11,7 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.ChangeableReference;
+import org.kendar.utils.JsonMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +27,10 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     protected Map<String, MockStorage> mocks = new HashMap<>();
     private String mocksDir;
+
+    public MockPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     protected static boolean isTemplateParameter(String tplSeg) {
         return tplSeg.startsWith("${") && tplSeg.endsWith("}") || tplSeg.startsWith("@{") && tplSeg.endsWith("}");

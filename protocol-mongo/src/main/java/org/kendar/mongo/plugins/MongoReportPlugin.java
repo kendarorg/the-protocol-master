@@ -1,5 +1,6 @@
 package org.kendar.mongo.plugins;
 
+import org.kendar.annotations.di.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mongo.dtos.MongoCommandsConstants;
@@ -8,10 +9,16 @@ import org.kendar.plugins.ReportPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Map;
 
+@TpmService(tags = "mongodb")
 public class MongoReportPlugin extends ReportPlugin<PluginSettings> {
+
+    public MongoReportPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, OpMsgContent in, OpMsgContent out) {
         if (!isActive()) return false;

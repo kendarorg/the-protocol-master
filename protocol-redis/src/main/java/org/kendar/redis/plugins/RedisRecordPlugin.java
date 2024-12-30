@@ -1,6 +1,7 @@
 package org.kendar.redis.plugins;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.kendar.annotations.di.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.RecordPlugin;
@@ -11,10 +12,17 @@ import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
+import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Map;
 
+@TpmService(tags = "redis")
 public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettings> {
+    public RedisRecordPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
+
     @Override
     protected Object getData(Object of) {
         if (of instanceof Resp3Message) {

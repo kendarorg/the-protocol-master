@@ -19,6 +19,7 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tests.testcontainer.images.MysqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
@@ -71,16 +72,17 @@ public class BasicTest {
         }
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new MySqlRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        //gs.putService("storage", storage);
+        var mapper = new JsonMapper();
+        var pl = new MySqlRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
-        var pl1 = new MySqlMockPlugin();
+        var pl1 = new MySqlMockPlugin(mapper);
         var global = new GlobalSettings();
-        global.putService("storage", storage);
+        //global.putService("storage", storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
-        var rep = new MySqlReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        var rep = new MySqlReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(pl, pl1, rep));
 
@@ -119,14 +121,15 @@ public class BasicTest {
             }
         }
         var global = new GlobalSettings();
-        global.putService("storage", storage);
+        //global.putService("storage", storage);
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new MySqlRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        //gs.putService("storage", storage);
+        var mapper = new JsonMapper();
+        var pl = new MySqlRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
-        var pl1 = new MySqlMockPlugin();
+        var pl1 = new MySqlMockPlugin(mapper);
         var mockPluginSettings = new BasicMockPluginSettings();
         mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);

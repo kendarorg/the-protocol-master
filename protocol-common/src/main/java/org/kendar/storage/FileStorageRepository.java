@@ -1,7 +1,11 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.annotations.TpmConstructor;
+import org.kendar.annotations.di.TpmPostConstruct;
+import org.kendar.annotations.di.TpmService;
 import org.kendar.events.*;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.storage.generic.StorageRepository;
@@ -15,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +32,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+@TpmService
 public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
     static final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -50,6 +56,16 @@ public class FileStorageRepository implements StorageRepository {
         this.targetDir = targetDir.toAbsolutePath().toString();
     }
 
+    @TpmConstructor
+    public FileStorageRepository(GlobalSettings settings) {
+        var logsDir = settings.getDataDir();
+        if(logsDir==null || logsDir.isEmpty()){
+            logsDir=  Path.of("data",
+                        Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
+        }
+        this.targetDir = Path.of(logsDir).toAbsolutePath().toString();
+    }
+
     public static String padLeftZeros(String inputString, int length) {
         if (inputString.length() >= length) {
             return inputString;
@@ -63,6 +79,7 @@ public class FileStorageRepository implements StorageRepository {
         return sb.toString();
     }
 
+    @TpmPostConstruct
     @Override
     public void initialize() {
 

@@ -3,17 +3,24 @@ package org.kendar.amqp.v09.plugins;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionOpen;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionOpenOk;
+import org.kendar.annotations.di.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.ReportPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Map;
 
+@TpmService(tags = "amqp091")
 public class AmqpReportPlugin extends ReportPlugin<PluginSettings> {
 
+
+    public AmqpReportPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     @Override
     public String getProtocol() {

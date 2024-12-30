@@ -20,6 +20,7 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.io.File;
@@ -116,13 +117,14 @@ public class BasicTest {
         }
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
+        //gs.putService("storage", storage);
         var pls = new BasicAysncRecordPluginSettings();
         pls.setResetConnectionsOnStart(false);
-        var pl = new MqttRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(),
+        var mapper = new JsonMapper();
+        var pl = new MqttRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(),
                 pls);
-        var rep = new MqttReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        publishPlugin = (MqttPublishPlugin)new MqttPublishPlugin().initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        var rep = new MqttReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        publishPlugin = (MqttPublishPlugin)new MqttPublishPlugin(mapper).initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
         proxy.setPlugins(List.of(pl, rep,publishPlugin));
         rep.setActive(true);
         pl.setActive(true);

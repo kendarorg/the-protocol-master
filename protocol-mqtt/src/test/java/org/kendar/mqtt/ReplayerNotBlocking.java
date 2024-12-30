@@ -10,6 +10,7 @@ import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
@@ -88,10 +89,10 @@ public class ReplayerNotBlocking extends BasicTest {
                 "test", "resources", "qos2Test"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
+        //gs.putService("storage", storage);
         var settings = new BasicAysncReplayPluginSettings();
         settings.setBlockExternal(false);
-        var pl = new MqttReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
+        var pl = new MqttReplayPlugin(new JsonMapper(),storage).initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
         proxy.setPlugins(List.of(pl));
 
         baseProtocol.setProxy(proxy);

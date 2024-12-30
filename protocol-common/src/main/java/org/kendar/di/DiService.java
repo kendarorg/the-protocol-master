@@ -1,11 +1,14 @@
 package org.kendar.di;
 
 import org.kendar.annotations.TpmConstructor;
-import org.kendar.annotations.TpmService;
-import org.kendar.annotations.TpmTransient;
+import org.kendar.annotations.di.TpmNamed;
+import org.kendar.annotations.di.TpmPostConstruct;
+import org.kendar.annotations.di.TpmService;
+import org.kendar.annotations.di.TpmTransient;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -18,7 +21,7 @@ public class DiService {
 
     public void register(Class<?> clazz, Object instance) {
         singletons.put(clazz, instance);
-        bind(clazz, mappings);
+        bind(instance.getClass(), mappings);
     }
 
     public void loadPackage(String packageName) {
@@ -60,7 +63,9 @@ public class DiService {
             if (!mappings.containsKey(i)) {
                 mappings.put(i, new ArrayList<>());
             }
-            mappings.get(i).add(t);
+            if(!mappings.get(i).contains(t)){
+                mappings.get(i).add(t);
+            }
         }
 
     }
@@ -104,19 +109,19 @@ public class DiService {
         }
     }
 
-    public <T> T getInstance(Class<T> clazz) {
-        var result = getInstances(clazz);
+    public <T> T getInstance(Class<T> clazz,String ...tags) {
+        var result = getInstances(clazz,tags);
         if (result == null || result.isEmpty()) return null;
         return result.get(0);
     }
 
-    private Object getInstance(Type type) {
-        var result = getInstances(type);
+    private Object getInstance(Type type,String ...tags) {
+        var result = getInstances(type,tags);
         if (result == null || result.isEmpty()) return null;
         return result.get(0);
     }
 
-    private List<Object> getInstances(Type type) {
+    private List<Object> getInstances(Type type,String...tags) {
         var data = mappings.get(type);
         var transi=false;
         if (data == null) {
@@ -128,12 +133,24 @@ public class DiService {
         }
         var result = new ArrayList<Object>();
         for (var i : data) {
+            if(tags.length>0) {
+                if(((Class<?>)i).getAnnotation(TpmService.class)==null){
+                    continue;
+                }
+                var iTags = ((Class<?>)i).getAnnotation(TpmService.class).tags();
+                if(iTags.length!=tags.length) {
+                    continue;
+                }
+                if(!Arrays.asList(iTags).containsAll(Arrays.asList(tags))){
+                    continue;
+                }
+            }
             result.add(this.createInstance((Class<?>) i,transi));
         }
         return result;
     }
 
-    public <T> List<T> getInstances(Class<T> clazz) {
+    public <T> List<T> getInstances(Class<T> clazz,String ... tags) {
         var data = mappings.get(clazz);
         var transi=false;
         if (data == null) {
@@ -145,6 +162,15 @@ public class DiService {
         }
         var result = new ArrayList<T>();
         for (var i : data) {
+            if(tags.length>0) {
+                var iTags = ((Class<?>)i).getAnnotation(TpmService.class).tags();
+                if(iTags.length!=tags.length) {
+                    continue;
+                }
+                if(!Arrays.asList(iTags).containsAll(Arrays.asList(tags))){
+                    continue;
+                }
+            }
             result.add((T) this.createInstance((Class<?>) i,transi));
         }
         return result;
@@ -153,6 +179,7 @@ public class DiService {
     private Object createInstance(Class<?> clazz, boolean transi) {
         try {
             var constructors = clazz.getConstructors();
+            var clazzNamed = clazz.getAnnotation(TpmNamed.class);
             Constructor constructor = null;
             if (constructors.length == 1) {
                 constructor = constructors[0];
@@ -172,10 +199,10 @@ public class DiService {
             }
             if (constructor.getParameterCount() == 0) {
                 if(transi){
-                    return constructor.newInstance();
+                    return postConstruct(constructor.newInstance());
                 }
                 if(!singletons.containsKey(clazz)){
-                    singletons.put(clazz, constructor.newInstance());
+                    singletons.put(clazz, postConstruct(constructor.newInstance()));
                 }
                 return singletons.get(clazz);
             }
@@ -183,32 +210,52 @@ public class DiService {
             var values = new Object[parameters.length];
             for (var i = 0; i < parameters.length; i++) {
                 var parameter = parameters[i];
+                var parameterAnnotation = parameter.getAnnotation(TpmNamed.class);
+                var tags = new String[]{};
+                if(parameterAnnotation!=null){
+                   tags=parameterAnnotation.tags();
+                }
                 if (List.class.isAssignableFrom(parameter.getType())) {
                     var args = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments();
                     if (args.length == 1) {
                         var arg = args[0];
-                        values[i] = getInstances(arg);
+                        values[i] = getInstances(arg,tags);
                     }
                 } else {
                     var parametrizedType = parameter.getParameterizedType();
                     if (parametrizedType instanceof ParameterizedType) {
-                        values[i] = getInstance(parametrizedType);
+                        values[i] = getInstance(parametrizedType,tags);
                     } else {
-                        values[i] = getInstance(parameter.getType());
+                        values[i] = getInstance(parameter.getType(),tags);
                     }
                 }
             }
             if(transi){
-                return constructor.newInstance(values);
+                return postConstruct(constructor.newInstance(values));
             }
             if(!singletons.containsKey(clazz)){
-                singletons.put(clazz, constructor.newInstance(values));
+                singletons.put(clazz, postConstruct(constructor.newInstance(values)));
             }
             return singletons.get(clazz);
 
         } catch (Exception e) {
             throw new RuntimeException("Unable to instantiate " + clazz, e);
         }
+    }
+
+    private Object postConstruct(Object o) {
+        var ms = o.getClass().getMethods();
+        for(var m:ms){
+            if(m.getAnnotation(TpmPostConstruct.class)!=null){
+                try {
+                    m.invoke(o);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
+            }
+        }
+        return o;
     }
 
 

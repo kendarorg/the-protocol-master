@@ -1,5 +1,6 @@
 package org.kendar.mysql.plugins;
 
+import org.kendar.annotations.di.TpmService;
 import org.kendar.plugins.JdbcReplayPlugin;
 import org.kendar.sql.jdbc.ProxyMetadata;
 import org.kendar.sql.jdbc.SelectResult;
@@ -7,10 +8,12 @@ import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 
 import java.sql.Types;
 
+@TpmService(tags = "mysql")
 public class MySqlReplayPlugin extends JdbcReplayPlugin {
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
     private static final String SELECT_TRANS_RESULT = "{\n" +
@@ -31,6 +34,10 @@ public class MySqlReplayPlugin extends JdbcReplayPlugin {
             "      \"lastInsertedId\" : 0\n" +
             "    }";
     private static final SqlStringParser parser = new SqlStringParser("?");
+
+    public MySqlReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
     @Override
     protected LineToRead beforeSendingReadResult(LineToRead lineToRead) {

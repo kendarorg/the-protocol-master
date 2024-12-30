@@ -5,6 +5,7 @@ import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
+import org.kendar.annotations.di.TpmService;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
@@ -12,6 +13,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ExtraBeanUtils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -25,9 +27,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+@TpmService(tags = "amqp091")
 public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(AmqpReplayPlugin.class);
+
+    public AmqpReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
 
     @Override

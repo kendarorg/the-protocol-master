@@ -10,6 +10,7 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.tests.jpa.HibernateSessionFactory;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
@@ -30,8 +31,9 @@ public class ReplayerTest {
                 "test", "resources", "replay"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new PostgresReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var mapper = new JsonMapper();
+        //gs.putService("storage", storage);
+        var pl = new PostgresReplayPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

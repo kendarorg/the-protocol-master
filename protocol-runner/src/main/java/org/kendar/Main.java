@@ -3,36 +3,18 @@ package org.kendar;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.sun.net.httpserver.HttpServer;
-import org.kendar.amqp.v09.plugins.AmqpPublishPlugin;
-import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
-import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
-import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
-import org.kendar.apis.*;
+import org.kendar.apis.ApiFiltersLoader;
+import org.kendar.apis.ApiHandler;
+import org.kendar.apis.filters.FiltersConfiguration;
 import org.kendar.cli.CommandParser;
 import org.kendar.command.ProtocolsRunner;
 import org.kendar.di.DiService;
-import org.kendar.http.plugins.*;
-import org.kendar.mongo.plugins.MongoRecordPlugin;
-import org.kendar.mongo.plugins.MongoReplayPlugin;
-import org.kendar.mongo.plugins.MongoReportPlugin;
-import org.kendar.mqtt.plugins.MqttPublishPlugin;
-import org.kendar.mqtt.plugins.MqttRecordPlugin;
-import org.kendar.mqtt.plugins.MqttReplayPlugin;
-import org.kendar.mqtt.plugins.MqttReportPlugin;
-import org.kendar.mysql.plugins.*;
-import org.kendar.plugins.GlobalReportPlugin;
-import org.kendar.plugins.base.AlwaysActivePlugin;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.postgres.plugins.*;
-import org.kendar.redis.plugins.RedisRecordPlugin;
-import org.kendar.redis.plugins.RedisReplayPlugin;
-import org.kendar.redis.plugins.RedisReportPlugin;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
-import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
@@ -46,11 +28,11 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Date;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static java.lang.System.exit;
 
@@ -59,11 +41,12 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static ConcurrentHashMap<String, TcpServer> protocolServersCache;
     private static ProtocolsRunner protocolsRunner;
-    private static HashMap<String, List<ProtocolPluginDescriptor>> allProtocolSpecificPlugins;
-    private static List<GlobalPluginDescriptor> allGlobalPlugins;
-    private static List<GlobalPluginDescriptor> globalPlugins;
+    //private static HashMap<String, List<ProtocolPluginDescriptor>> allProtocolSpecificPlugins;
+    //private static List<GlobalPluginDescriptor> allGlobalPlugins;
+    //private static List<GlobalPluginDescriptor> globalPlugins;
     private static JarPluginManager pluginManager;
     private static HttpServer apiServer;
+    private static DiService diService;
 
 
     public static void main(String[] args) throws Exception {
@@ -75,14 +58,14 @@ public class Main {
 
 
     public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
-        var diService = new DiService();
+        diService = new DiService();
         diService.loadPackage("org.kendar");
 
         protocolServersCache = new ConcurrentHashMap<>();
-        allProtocolSpecificPlugins = new HashMap<>();
+        /*allProtocolSpecificPlugins = new HashMap<>();
         allGlobalPlugins = new ArrayList<>();
-        globalPlugins = new ArrayList<>();
-        protocolsRunner = diService.getInstance(ProtocolsRunner.class);
+        globalPlugins = new ArrayList<>();*/
+
         /*        new ProtocolsRunner(
                 new Amqp091Runner(),
                 new MongoRunner(),
@@ -94,9 +77,11 @@ public class Main {
         );*/
         var settings = new ChangeableReference<>(new GlobalSettings());
 
+        //TODO This must be separated
         var options = ProtocolsRunner.getMainOptions(settings);
         var parser = new CommandParser(options);
         parser.parseIgnoreMissing(args);
+        diService.register(GlobalSettings.class, settings.get());
 
         if (parser.hasOption("unattended") || settings.get().isUnattended()) {
             stopWhenFalse = () -> {
@@ -114,20 +99,23 @@ public class Main {
 
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
-        var extensionClasses = pluginManager.getExtensionClasses(ProtocolPluginDescriptor.class);
-        for(var ec:extensionClasses) {
-            diService.bindTransient(ec);
+        for(var ec: pluginManager.getExtensionClasses(ProtocolPluginDescriptor.class)){
+            diService.bind(ec);
+        }
+        for(var ec: pluginManager.getExtensionClasses(GlobalPluginDescriptor.class)){
+            diService.bind(ec);
         }
 
-        var protocolPlugins = loadProtocolPlugins(pluginsDir);
-        globalPlugins = loadGlobalPlugins(pluginsDir);
+        protocolsRunner = diService.getInstance(ProtocolsRunner.class);
+        //var protocolPlugins = loadProtocolPlugins(pluginsDir);
+        //globalPlugins = loadGlobalPlugins(pluginsDir);
         if (!parser.hasOption("cfg")) {
-            if (!protocolsRunner.prepareSettingsFromCommandLine(options, args, protocolPlugins, settings.get(), parser)) {
+            if (!protocolsRunner.prepareSettingsFromCommandLine(options, args, settings.get(), parser)) {
                 return;
             }
         }
 
-        execute(settings.get(), stopWhenFalse, protocolPlugins, globalPlugins);
+        execute(settings.get(), stopWhenFalse);
     }
 
     public static void stop() {
@@ -177,7 +165,7 @@ public class Main {
     }
 
 
-    private static HashMap<String, List<ProtocolPluginDescriptor>> loadProtocolPlugins(String pluginsDir) {
+    /*private static HashMap<String, List<ProtocolPluginDescriptor>> loadProtocolPlugins(String pluginsDir) {
         if (!allProtocolSpecificPlugins.isEmpty()) {
             return allProtocolSpecificPlugins;
         }
@@ -237,14 +225,14 @@ public class Main {
                 new MySqlReportPlugin(),
                 new MySqlMockPlugin()));
         return allProtocolSpecificPlugins;
-    }
+    }*/
 
-    private static void addEmbeddedProtocolPlugin(HashMap<String, List<ProtocolPluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?>> embeddedPlugins) {
+    /*private static void addEmbeddedProtocolPlugin(HashMap<String, List<ProtocolPluginDescriptor>> plugins, String prt, List<ProtocolPluginDescriptor<?>> embeddedPlugins) {
         if (!plugins.containsKey(prt)) {
             plugins.put(prt, new ArrayList<>());
         }
         plugins.get(prt).addAll(embeddedPlugins);
-    }
+    }*/
 
 
     public static boolean isRunning() {
@@ -253,28 +241,21 @@ public class Main {
     }
 
 
-    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse,
-                               HashMap<String, List<ProtocolPluginDescriptor>> protocolPlugins,
-                               List<GlobalPluginDescriptor> globalPlugins) throws Exception {
+    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse
+                               ) throws Exception {
         if (ini == null) return;
-        var logsDir = ProtocolsRunner.getOrDefault(
+        /*var logsDir = ProtocolsRunner.getOrDefault(
                 ini.getDataDir(),
                 Path.of("data",
                         Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString());
         StorageRepository storage = setupStorage(logsDir);
-        storage.initialize();
-        ini.putService(storage.getType(), storage);
+        storage.initialize();*/
+        diService.register(FileResourcesUtils.class,new FileResourcesUtils());
+        //diService.register(StorageRepository.class,storage);
+        //ini.putService(storage.getType(), storage);
 
-        var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
+        //var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
 
-
-        if (protocolPlugins == null || protocolPlugins.isEmpty()) {
-            protocolPlugins = loadProtocolPlugins(pluginsDir);
-        }
-        if (globalPlugins == null || globalPlugins.isEmpty()) {
-            globalPlugins = loadGlobalPlugins(pluginsDir);
-        }
-        globalPlugins.add(new GlobalReportPlugin());
 
 
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
@@ -283,21 +264,25 @@ public class Main {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
-        var apisFiltersLoader = new ApiFiltersLoader(new ArrayList<>(), ini.getApiPort());
-        var apiHandler = new ApiHandler(ini);
-        apisFiltersLoader.getFilters().add(new SwaggerApi(apisFiltersLoader.getConfig(), new ArrayList<>(), ini.getApiPort()));
-        apisFiltersLoader.getFilters().add(new MainWebSite(new FileResourcesUtils()));
-        apisFiltersLoader.getFilters().add(apiHandler);
-        var apiStorageHandler = new ApiStorageOnlyHandler(ini);
-        apisFiltersLoader.getFilters().add(apiStorageHandler);
-        apiHandler.addGLobalPlugins(globalPlugins);
+        diService.register(FiltersConfiguration.class,new FiltersConfiguration());
+        var apisFiltersLoader = diService.getInstance(ApiFiltersLoader.class);
+        //var apisFiltersLoader = new ApiFiltersLoader(new ArrayList<>());
+//        var apiHandler = new ApiHandler(ini);
+//        apisFiltersLoader.getFilters().add(new SwaggerApi(apisFiltersLoader.getConfig(), new ArrayList<>(), ini.getApiPort()));
+//        apisFiltersLoader.getFilters().add(new MainWebSite(new FileResourcesUtils()));
+//        apisFiltersLoader.getFilters().add(apiHandler);
+        //var apiStorageHandler = new ApiStorageOnlyHandler(ini);
+        //apisFiltersLoader.getFilters().add(apiStorageHandler);
+        //var globalPlugins = diService.getInstances(GlobalPluginDescriptor.class);
+        //apiHandler.addGLobalPlugins(globalPlugins);
+        //var globalPlugins = diService.getInstances(GlobalPluginDescriptor.class);
 
-        for (var gp : globalPlugins) {
-            var ah = gp.getApiHandler();
-            apisFiltersLoader.getFilters().add(ah);
-        }
+//        for (var gp : globalPlugins) {
+//            var ah = diService.getApiHandler();
+//            apisFiltersLoader.getFilters().add(ah);
+//        }
 
-        var finalAllPlugins = protocolPlugins;
+
         var started = new AtomicInteger(0);
         for (var item : ini.getProtocols().entrySet()) {
             new Thread(() -> {
@@ -306,9 +291,11 @@ public class Main {
                     var protocol = ini.getProtocolForKey(item.getKey());
                     if (protocol == null) return;
                     var protocolManager = protocolsRunner.getManagerFor(protocol);
-                    var availableProtocolPlugins = loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
+                    var availableProtocolPlugins =diService.getInstances(ProtocolPluginDescriptor.class,protocol.getProtocol());
+                            //loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
                     var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
 
+                    var storage = diService.getInstance(StorageRepository.class);
                     try {
                         protocolsRunner.start(protocolServersCache, item.getKey(), ini, protocolFullSettings, storage, availableProtocolPlugins, stopWhenFalse);
                     } catch (Exception e) {
@@ -318,6 +305,7 @@ public class Main {
                     }
                     var pi = new ProtocolInstance(item.getKey(),
                             protocolServersCache.get(item.getKey()), availableProtocolPlugins, protocolFullSettings);
+                    var apiHandler = diService.getInstance(ApiHandler.class);
                     apiHandler.addProtocol(pi);
                     for (var pl : pi.getPlugins()) {
                         var apiHandlerPlugin = pl.getApiHandler();
@@ -331,6 +319,7 @@ public class Main {
                 }
             }).start();
         }
+        var globalPlugins = diService.getInstances(GlobalPluginDescriptor.class);
         for (int i = globalPlugins.size() - 1; i >= 0; i--) {
             var plugin = globalPlugins.get(i);
             var pluginSettings = (PluginSettings) ini.getPlugin(plugin.getId(), plugin.getSettingClass());
@@ -363,7 +352,7 @@ public class Main {
         }
     }
 
-    private static List<ProtocolPluginDescriptor> loadAvailablePluginsForProtocol(ProtocolSettings protocol, GlobalSettings global,
+    /*private static List<ProtocolPluginDescriptor> loadAvailablePluginsForProtocol(ProtocolSettings protocol, GlobalSettings global,
                                                                                   HashMap<String, List<ProtocolPluginDescriptor>> allPlugins) {
         var availablePlugins = allPlugins.get(protocol.getProtocol());
         if (availablePlugins == null) availablePlugins = new ArrayList<>();
@@ -383,10 +372,10 @@ public class Main {
             plugins.add((ProtocolPluginDescriptor) pluginInstance);
         }
         return plugins;
-    }
+    }*/
 
 
-    private static List<GlobalPluginDescriptor> loadGlobalPlugins(String pluginsDir) {
+    /*private static List<GlobalPluginDescriptor> loadGlobalPlugins(String pluginsDir) {
         if (!allGlobalPlugins.isEmpty()) {
             return allGlobalPlugins;
         }
@@ -394,5 +383,5 @@ public class Main {
         allGlobalPlugins.addAll(pluginManager.getExtensions(GlobalPluginDescriptor.class));
 
         return allGlobalPlugins;
-    }
+    }*/
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.BinaryNode;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
+import org.kendar.annotations.di.TpmService;
 import org.kendar.annotations.multi.PathParameter;
 import org.kendar.annotations.multi.QueryString;
 import org.kendar.annotations.multi.TpmRequest;
@@ -29,15 +30,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.kendar.apis.ApiUtils.*;
 
+@TpmService
 @HttpTypeFilter(hostAddress = "*")
 public class ApiStorageOnlyHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalSettings settings;
+    private final StorageRepository storage;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
-    public ApiStorageOnlyHandler(GlobalSettings settings) {
+    public ApiStorageOnlyHandler(GlobalSettings settings,StorageRepository storage) {
         this.settings = settings;
+        this.storage = storage;
     }
 
 
@@ -58,7 +62,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean handleDownload(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
+        //StorageRepository storage = settings.getService("storage");
 
         try {
             var data = storage.readAsZip();
@@ -83,7 +87,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean cleanUp(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
+        //StorageRepository storage = settings.getService("storage");
 
         try {
             storage.clean();
@@ -111,7 +115,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean handleUpload(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
+        //StorageRepository storage = settings.getService("storage");
         try {
 
             byte[] inputData;
@@ -153,7 +157,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean getItems(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
+        //StorageRepository storage = settings.getService("storage");
 
         try {
             var maxLengthStr = reqp.getQuery("maxLength");
@@ -196,7 +200,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean getSingleItem(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
+        //StorageRepository storage = settings.getService("storage");
         var result = new StorageAndIndex();
 
         try {
@@ -240,7 +244,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean changeSingleItem(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
+        //StorageRepository storage = settings.getService("storage");
         var request = mapper.deserialize(reqp.getRequestText().toString(), StorageAndIndex.class);
 
         try {
@@ -281,7 +285,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean deleteSingleItem(Request reqp, Response resp) {
-        StorageRepository storage = settings.getService("storage");
+        //StorageRepository storage = settings.getService("storage");
 
         try {
             var instanceId = reqp.getPathParameter("protocol");

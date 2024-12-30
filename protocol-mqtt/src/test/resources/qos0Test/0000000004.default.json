@@ -8,8 +8,8 @@
     "fixedHeader" : "PUBLISH",
     "topicName" : "/subscribe/",
     "payload" : {
-      "bytes" : "bGxvIFdvcmxkISE=",
-      "chars" : "llo World!!"
+      "bytes" : "SGVsbG8gV29ybGQhIQ==",
+      "chars" : "Hello World!!"
     },
     "packetIdentifier" : 18533,
     "dupFlag" : false,

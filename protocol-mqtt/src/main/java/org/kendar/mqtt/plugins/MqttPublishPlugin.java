@@ -1,5 +1,6 @@
 package org.kendar.mqtt.plugins;
 
+import org.kendar.annotations.di.TpmService;
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.apis.MqttPublishPluginApis;
 import org.kendar.mqtt.fsm.PublishAck;
@@ -10,11 +11,17 @@ import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
+import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+@TpmService(tags = "mqtt")
 public class MqttPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettings> {
+    public MqttPublishPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
+
     @Override
     public List<ProtocolPhase> getPhases() {
         return List.of(ProtocolPhase.PRE_CALL);

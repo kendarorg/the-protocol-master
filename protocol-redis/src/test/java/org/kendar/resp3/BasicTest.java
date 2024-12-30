@@ -18,6 +18,7 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tests.testcontainer.images.RedisImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
@@ -68,10 +69,11 @@ public class BasicTest {
         }
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new RedisRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        //gs.putService("storage", storage);
+        var  mapper = new JsonMapper();
+        var pl = new RedisRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
 
-        var rep = new RedisReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        var rep = new RedisReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(pl, rep));
         pl.setActive(true);

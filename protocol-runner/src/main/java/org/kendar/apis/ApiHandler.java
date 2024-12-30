@@ -2,7 +2,9 @@ package org.kendar.apis;
 
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
+import org.kendar.annotations.TpmConstructor;
 import org.kendar.annotations.TpmDoc;
+import org.kendar.annotations.di.TpmService;
 import org.kendar.annotations.multi.PathParameter;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
@@ -26,15 +28,18 @@ import static java.lang.System.exit;
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
+@TpmService
 @HttpTypeFilter(hostAddress = "*")
 public class ApiHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalSettings settings;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
-    private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
+    private List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
-    public ApiHandler(GlobalSettings settings) {
+    @TpmConstructor
+    public ApiHandler(GlobalSettings settings,List<GlobalPluginDescriptor> globalPlugins) {
         this.settings = settings;
+        this.globalPlugins = globalPlugins;
     }
 
     @HttpMethodFilter(
