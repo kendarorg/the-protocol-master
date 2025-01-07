@@ -21,9 +21,11 @@ public class BodyFrame extends Frame {
     private ContentData content;
     private int consumeId;
     private String consumeOrigin;
+
     public BodyFrame() {
         setType(FrameType.BODY.asByte());
     }
+
     public BodyFrame(Class<?>... events) {
         super(events);
         setType(FrameType.BODY.asByte());
