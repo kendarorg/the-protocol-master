@@ -48,9 +48,9 @@ public class PublishAck extends BasePropertiesMqttState implements ReturnMessage
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        if(!isProxyed()) {
+        if (!isProxyed()) {
             return iteratorOfList(publishAck);
-        }else{
+        } else {
             return iteratorOfRunnable(() ->
                     proxy.sendAndForget(context,
                             connection,

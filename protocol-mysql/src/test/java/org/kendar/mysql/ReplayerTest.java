@@ -37,7 +37,7 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new MySqlReplayPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var pl = new MySqlReplayPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
@@ -79,7 +79,7 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new MySqlReplayPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var pl = new MySqlReplayPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

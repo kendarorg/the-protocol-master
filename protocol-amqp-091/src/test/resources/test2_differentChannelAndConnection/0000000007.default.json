@@ -1,36 +1,36 @@
 {
-  "timestamp" : 1734945323961,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 7,
-  "input" : {
-    "channel" : 1,
-    "type" : 1,
-    "proxyed" : false,
-    "classId" : 60,
-    "methodId" : 20,
-    "reserved1" : 0,
-    "queue" : "fuffa_queue",
-    "consumerTag" : "",
-    "noLocal" : false,
-    "noAck" : false,
-    "exclusive" : false,
-    "noWait" : false,
-    "arguments" : { },
-    "consumeId" : 1,
-    "consumeOrigin" : "fuffa_queue|1|{}"
+  "timestamp": 1734945323961,
+  "constant": false,
+  "connectionId": 1,
+  "index": 7,
+  "input": {
+    "channel": 1,
+    "type": 1,
+    "proxyed": false,
+    "classId": 60,
+    "methodId": 20,
+    "reserved1": 0,
+    "queue": "fuffa_queue",
+    "consumerTag": "",
+    "noLocal": false,
+    "noAck": false,
+    "exclusive": false,
+    "noWait": false,
+    "arguments": {},
+    "consumeId": 1,
+    "consumeOrigin": "fuffa_queue|1|{}"
   },
-  "output" : {
-    "channel" : 1,
-    "type" : 1,
-    "proxyed" : false,
-    "classId" : 60,
-    "methodId" : 21,
-    "tag" : "amq.ctag-ABbC4Jyh7I96eIF9Ty6QqQ"
+  "output": {
+    "channel": 1,
+    "type": 1,
+    "proxyed": false,
+    "classId": 60,
+    "methodId": 21,
+    "tag": "amq.ctag-ABbC4Jyh7I96eIF9Ty6QqQ"
   },
-  "durationMs" : 11,
-  "type" : "BasicConsume",
-  "caller" : "AMQP",
-  "inputType" : "BasicConsume",
-  "outputType" : "BasicConsumeOk"
+  "durationMs": 11,
+  "type": "BasicConsume",
+  "caller": "AMQP",
+  "inputType": "BasicConsume",
+  "outputType": "BasicConsumeOk"
 }

@@ -34,7 +34,7 @@ public class ReplayRecordFilters {
             events.clear();
             var mapper = new JsonMapper();
             EventsQueue.register("testRecordSites", (e) -> events.add(e), WriteItemEvent.class);
-            var rwPlugin = new HttpRecordPlugin(mapper,new NullStorageRepository()) {
+            var rwPlugin = new HttpRecordPlugin(mapper, new NullStorageRepository()) {
                 @Override
                 public boolean isActive() {
                     return true;
@@ -90,7 +90,7 @@ public class ReplayRecordFilters {
     @Test
     void testReplaySites() {
         var matched = new ChangeableReference<Boolean>(false);
-        var rwPlugin = new HttpReplayPlugin(new JsonMapper(),new NullStorageRepository()) {
+        var rwPlugin = new HttpReplayPlugin(new JsonMapper(), new NullStorageRepository()) {
             @Override
             public boolean isActive() {
                 return true;

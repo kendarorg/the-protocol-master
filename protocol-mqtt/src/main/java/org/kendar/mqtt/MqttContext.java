@@ -56,18 +56,18 @@ public class MqttContext extends NetworkProtoContext {
     public int packetToUse() {
         var list = usedPackets.stream().sorted(Integer::compare).collect(Collectors.toList());
         var maxFoundedIndex = 28000;
-        for(var i = list.size() - 1; i >= 0; i--){
+        for (var i = list.size() - 1; i >= 0; i--) {
             var index = list.get(i);
-            if(index >14000){
+            if (index > 14000) {
                 maxFoundedIndex = index;
-            }else{
+            } else {
                 break;
             }
         }
-        if(maxFoundedIndex==28000){
+        if (maxFoundedIndex == 28000) {
             usedPackets.clear();
         }
-        usedPackets.add(maxFoundedIndex-1);
-        return maxFoundedIndex-1;
+        usedPackets.add(maxFoundedIndex - 1);
+        return maxFoundedIndex - 1;
     }
 }

@@ -4,7 +4,6 @@ import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmConstructor;
 import org.kendar.annotations.TpmDoc;
-import org.kendar.di.annotations.TpmService;
 import org.kendar.annotations.multi.PathParameter;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
@@ -12,6 +11,7 @@ import org.kendar.apis.base.Response;
 import org.kendar.apis.dtos.PluginIndex;
 import org.kendar.apis.dtos.ProtocolIndex;
 import org.kendar.apis.utils.ConstantsMime;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
@@ -37,7 +37,7 @@ public class ApiHandler implements FilteringClass {
     private List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
     @TpmConstructor
-    public ApiHandler(GlobalSettings settings,List<GlobalPluginDescriptor> globalPlugins) {
+    public ApiHandler(GlobalSettings settings, List<GlobalPluginDescriptor> globalPlugins) {
         this.settings = settings;
         this.globalPlugins = globalPlugins;
     }

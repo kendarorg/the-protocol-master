@@ -15,6 +15,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface TpmTransient {
     String name() default "";
+
     String[] tags() default {};
+
     TpmScopeType scope() default TpmScopeType.GLOBAL;
 }

@@ -1,8 +1,9 @@
 package org.kendar.mqtt.apis.dtos;
 
 public class MqttConnection {
-    private int qos =0;
+    private int qos = 0;
     private String topic;
+    private Integer id;
 
     public Integer getId() {
         return id;
@@ -12,21 +13,19 @@ public class MqttConnection {
         this.id = id;
     }
 
-    private Integer id;
+    public int getQos() {
+        return qos;
+    }
 
     public void setQos(int qos) {
         this.qos = qos;
     }
 
-    public int getQos() {
-        return qos;
+    public String getTopic() {
+        return topic;
     }
 
     public void setTopic(String topic) {
         this.topic = topic;
-    }
-
-    public String getTopic() {
-        return topic;
     }
 }

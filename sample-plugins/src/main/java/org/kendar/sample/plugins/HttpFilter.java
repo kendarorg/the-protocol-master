@@ -1,8 +1,8 @@
 package org.kendar.sample.plugins;
 
-import org.kendar.di.annotations.TpmService;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.AlwaysActivePlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;

@@ -1,10 +1,10 @@
 package org.kendar.http.plugins;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.kendar.di.annotations.TpmService;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.MimeChecker;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.MockPlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.utils.ChangeableReference;

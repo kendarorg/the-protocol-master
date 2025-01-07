@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.kendar.di.annotations.TpmService;
 import org.kendar.buffers.BBuffer;
+import org.kendar.di.annotations.TpmService;
 
 import java.util.Base64;
 
@@ -95,10 +95,10 @@ public class JsonMapper {
                     contentType.contains("xml")) {
                 result.setChars(new TextNode(new String(input)));
                 return result;
-            }else if(contentType.contains("json")){
+            } else if (contentType.contains("json")) {
                 try {
                     result.setChars(mapper.readTree(input));
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     result.setChars(new TextNode(new String(input)));
                 }
                 return result;
@@ -117,38 +117,38 @@ public class JsonMapper {
             }
         }
         result.setBytes(input);
-        try{
+        try {
             var pre = mapper.readTree(strData);
             result.setChars(pre);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             result.setChars(new TextNode(strData));
         }
         return result;
     }
 
     public byte[] fromGenericContent(ContentData content) {
-        if(content.getBytes()==null||content.getBytes().length==0){
-            if(content.getChars()==null){
+        if (content.getBytes() == null || content.getBytes().length == 0) {
+            if (content.getChars() == null) {
                 return new byte[]{};
-            }else{
+            } else {
                 return content.getChars().toString().getBytes();
             }
-        }else{
+        } else {
             return content.getBytes();
         }
     }
 
-    public String toHumanReadable(ContentData content){
-        if(content.getBytes()==null||content.getBytes().length==0){
-            if(content.getChars()==null){
+    public String toHumanReadable(ContentData content) {
+        if (content.getBytes() == null || content.getBytes().length == 0) {
+            if (content.getChars() == null) {
                 return "";
-            }else{
+            } else {
                 return content.getChars().toString();
             }
-        }else{
-            if(content.getChars()!=null){
-                return "STR:"+content.getChars().toString()+"\n" +
-                        "B64:"+Base64.getEncoder().encodeToString(content.getBytes());
+        } else {
+            if (content.getChars() != null) {
+                return "STR:" + content.getChars().toString() + "\n" +
+                        "B64:" + Base64.getEncoder().encodeToString(content.getBytes());
             }
             return Base64.getEncoder().encodeToString(content.getBytes());
         }

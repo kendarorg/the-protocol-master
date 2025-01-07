@@ -30,7 +30,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
 
-    public RecordPlugin(JsonMapper mapper,StorageRepository storage) {
+    public RecordPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
         this.storage = storage;
     }

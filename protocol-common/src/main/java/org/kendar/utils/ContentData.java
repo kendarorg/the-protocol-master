@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public class ContentData {
     private byte[] bytes;
+    private JsonNode chars;
 
     @Override
     public String toString() {
@@ -30,7 +31,5 @@ public class ContentData {
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
-
-    private JsonNode chars;
 
 }

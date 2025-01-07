@@ -93,7 +93,7 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
                 break;
         }
 
-        if(packetIdentifier!=null && context!=null){
+        if (packetIdentifier != null && context != null) {
             context.usePacket(Integer.parseInt(packetIdentifier.substring(1)));
         }
 

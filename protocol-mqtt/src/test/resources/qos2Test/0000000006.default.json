@@ -1,23 +1,23 @@
 {
-  "timestamp" : 1734945809582,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 6,
-  "input" : {
-    "fullFlag" : 80,
-    "fixedHeader" : "PUBREC",
-    "packetIdentifier" : 1,
-    "reasonCode" : 0
+  "timestamp": 1734945809582,
+  "constant": false,
+  "connectionId": 1,
+  "index": 6,
+  "input": {
+    "fullFlag": 80,
+    "fixedHeader": "PUBREC",
+    "packetIdentifier": 1,
+    "reasonCode": 0
   },
-  "output" : {
-    "fullFlag" : 98,
-    "fixedHeader" : "PUBREL",
-    "packetIdentifier" : 1,
-    "reasonCode" : 0
+  "output": {
+    "fullFlag": 98,
+    "fixedHeader": "PUBREL",
+    "packetIdentifier": 1,
+    "reasonCode": 0
   },
-  "durationMs" : 1000,
-  "type" : "PublishRec",
-  "caller" : "MQTT",
-  "inputType" : "PublishRec",
-  "outputType" : "PublishRel"
+  "durationMs": 1000,
+  "type": "PublishRec",
+  "caller": "MQTT",
+  "inputType": "PublishRec",
+  "outputType": "PublishRel"
 }

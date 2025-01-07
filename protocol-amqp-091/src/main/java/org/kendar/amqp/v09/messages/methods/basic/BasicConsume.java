@@ -152,7 +152,7 @@ public class BasicConsume extends Basic {
         basicConsume.setNoAck(noAck);
         basicConsume.setConsumerTag(consumerTag);
         basicConsume.setNoLocal(noLocal);
-        basicConsume.setQueue( queue);
+        basicConsume.setQueue(queue);
         basicConsume.setConsumeId(context.getDescriptor().getCounter("CONSUME_ID"));
         context.setConsumeId(basicConsume.getConsumeId());
         protocol.getContextsCache().put(basicConsume.getConsumeId(), context);
@@ -176,7 +176,7 @@ public class BasicConsume extends Basic {
         var bscOk = new BasicConsumeOk();
         bscOk.setTag(basicConsume.getConsumerTag());
         return iteratorOfRunnable(() -> {
-            var result = (BasicConsumeOk)proxy.sendAndExpect(context,
+            var result = (BasicConsumeOk) proxy.sendAndExpect(context,
                     connection,
                     basicConsume,
                     bscOk

@@ -12,6 +12,7 @@ public class PostgresReplayPlugin extends JdbcReplayPlugin {
 
 
     private static final SqlStringParser parser = new SqlStringParser("$");
+
     @TpmConstructor
     public PostgresReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);

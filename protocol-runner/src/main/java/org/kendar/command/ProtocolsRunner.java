@@ -1,9 +1,9 @@
 package org.kendar.command;
 
-import org.kendar.di.annotations.TpmService;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.cli.CommandParser;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -84,7 +84,7 @@ public class ProtocolsRunner {
         return (T) value;
     }
 
-    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args,  GlobalSettings settings, CommandParser parser) {
+    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, GlobalSettings settings, CommandParser parser) {
 
         try {
             var protocolMotherOption = options.getCommandOption("p");

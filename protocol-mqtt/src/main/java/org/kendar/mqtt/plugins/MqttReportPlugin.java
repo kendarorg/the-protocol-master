@@ -92,7 +92,7 @@ public class MqttReportPlugin extends ReportPlugin<PluginSettings> {
                 pluginContext.getStart(),
                 duration,
                 Map.of("qos", qos + "",
-                        "payloadLength", payload.length()+ "")
+                        "payloadLength", payload.length() + "")
         ));
     }
 }

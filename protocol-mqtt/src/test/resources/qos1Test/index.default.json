@@ -1,43 +1,50 @@
-[ {
-  "index" : 1,
-  "type" : "Connect",
-  "caller" : "MQTT",
-  "durationMs" : 47,
-  "tags" : { }
-}, {
-  "index" : 2,
-  "type" : "Subscribe",
-  "caller" : "MQTT",
-  "durationMs" : 16,
-  "tags" : {
-    "/subscribe/" : "1"
+[
+  {
+    "index": 1,
+    "type": "Connect",
+    "caller": "MQTT",
+    "durationMs": 47,
+    "tags": {}
+  },
+  {
+    "index": 2,
+    "type": "Subscribe",
+    "caller": "MQTT",
+    "durationMs": 16,
+    "tags": {
+      "/subscribe/": "1"
+    }
+  },
+  {
+    "index": 4,
+    "type": "RESPONSE",
+    "caller": "MQTT",
+    "durationMs": 0,
+    "tags": {
+      "/subscribe/": "1"
+    }
+  },
+  {
+    "index": 3,
+    "type": "Publish",
+    "caller": "MQTT",
+    "durationMs": 609,
+    "tags": {
+      "/subscribe/": "1"
+    }
+  },
+  {
+    "index": 5,
+    "type": "PublishAck",
+    "caller": "MQTT",
+    "durationMs": 16,
+    "tags": {}
+  },
+  {
+    "index": 6,
+    "type": "Disconnect",
+    "caller": "MQTT",
+    "durationMs": 16,
+    "tags": {}
   }
-}, {
-  "index" : 4,
-  "type" : "RESPONSE",
-  "caller" : "MQTT",
-  "durationMs" : 0,
-  "tags" : {
-    "/subscribe/" : "1"
-  }
-}, {
-  "index" : 3,
-  "type" : "Publish",
-  "caller" : "MQTT",
-  "durationMs" : 609,
-  "tags" : {
-    "/subscribe/" : "1"
-  }
-}, {
-  "index" : 5,
-  "type" : "PublishAck",
-  "caller" : "MQTT",
-  "durationMs" : 16,
-  "tags" : { }
-}, {
-  "index" : 6,
-  "type" : "Disconnect",
-  "caller" : "MQTT",
-  "durationMs" : 16,
-  "tags" : { }
-} ]
+]

@@ -92,7 +92,7 @@ public class ReplayerNotBlocking extends BasicTest {
         //gs.putService("storage", storage);
         var settings = new BasicAysncReplayPluginSettings();
         settings.setBlockExternal(false);
-        var pl = new MqttReplayPlugin(new JsonMapper(),storage).initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
+        var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
         proxy.setPlugins(List.of(pl));
 
         baseProtocol.setProxy(proxy);

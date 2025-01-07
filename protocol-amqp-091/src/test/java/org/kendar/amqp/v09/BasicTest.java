@@ -31,12 +31,12 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BasicTest {
-    protected JsonMapper mapper = new JsonMapper();
     protected static final int FAKE_PORT = 5682;
     protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static ProtocolPluginDescriptor publishPlugin;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected JsonMapper mapper = new JsonMapper();
 
     public static void beforeClassBase() {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -86,12 +86,12 @@ public class BasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new AmqpRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        var pl = new AmqpRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
+        publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(
-                pl, rep,publishPlugin));
+                pl, rep, publishPlugin));
         pl.setActive(true);
         rep.setActive(true);
         baseProtocol.setProxy(proxy);

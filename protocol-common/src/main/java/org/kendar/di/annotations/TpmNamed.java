@@ -10,8 +10,9 @@ import java.lang.annotation.Target;
  * Mandatory for @FilterClass
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE,ElementType.PARAMETER})
+@Target({ElementType.TYPE, ElementType.PARAMETER})
 public @interface TpmNamed {
     String name() default "";
+
     String[] tags() default {};
 }

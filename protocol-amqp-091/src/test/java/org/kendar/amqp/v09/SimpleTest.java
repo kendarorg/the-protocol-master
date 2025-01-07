@@ -227,7 +227,7 @@ public class SimpleTest extends BasicTest {
 
 
         Sleeper.sleep(1000, () -> {
-            System.err.println("SIZE: "+messages.size());
+            System.err.println("SIZE: " + messages.size());
             return messages.size() == 3;
         });
         channel1.queueDelete(MAIN_QUEUE);
@@ -354,21 +354,22 @@ public class SimpleTest extends BasicTest {
         Sleeper.sleep(100);
 
 
-        var publish = (AmqpPublishPluginApis)publishPlugin.getApiHandler();
+        var publish = (AmqpPublishPluginApis) publishPlugin.getApiHandler();
         var res = new Response();
-        publish.getConnections(new Request(),res);
-        var responses = mapper.deserialize(res.getResponseText(),new TypeReference<List<AmqpConnection>>(){});
+        publish.getConnections(new Request(), res);
+        var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<AmqpConnection>>() {
+        });
         assertEquals(1, responses.size());
         var response = responses.get(0);
         var pm = new PublishMessage();
         pm.setAppId("test");
         pm.setContentType("text/plain");
         pm.setBody("TestData1");
-        publish.doPublish(pm,response.getId(),response.getChannel());
+        publish.doPublish(pm, response.getId(), response.getChannel());
         pm.setBody("TestData2");
-        publish.doPublish(pm,response.getId(),response.getChannel());
+        publish.doPublish(pm, response.getId(), response.getChannel());
         pm.setBody("TestData3");
-        publish.doPublish(pm,response.getId(),response.getChannel());
+        publish.doPublish(pm, response.getId(), response.getChannel());
 
 
         System.out.println("a");
@@ -406,7 +407,7 @@ public class SimpleTest extends BasicTest {
         connection.close();
 
 
-        Sleeper.sleep(1000, () -> messages.size() ==3);
+        Sleeper.sleep(1000, () -> messages.size() == 3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue("TestData1"));

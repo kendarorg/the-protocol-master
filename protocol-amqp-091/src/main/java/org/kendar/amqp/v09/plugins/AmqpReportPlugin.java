@@ -60,7 +60,7 @@ public class AmqpReportPlugin extends ReportPlugin<PluginSettings> {
                 connectionId,
                 pluginContext.getStart(),
                 duration,
-                Map.of("body", payload,"channel",channel+"")
+                Map.of("body", payload, "channel", channel + "")
         ));
         return false;
     }

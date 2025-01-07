@@ -7,9 +7,9 @@
     "channel": 1,
     "type": 3,
     "proxyed": false,
-    "content" : {
-      "bytes" : "enp6eiBkZXRhaWxzMw==",
-      "chars" : "zzzz details3"
+    "content": {
+      "bytes": "enp6eiBkZXRhaWxzMw==",
+      "chars": "zzzz details3"
     },
     "consumeId": 1,
     "consumeOrigin": "fuffa_queue|1|{}"

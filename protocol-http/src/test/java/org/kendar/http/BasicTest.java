@@ -166,8 +166,8 @@ public class BasicTest {
         settings.setActive(true);
         var mapper = new JsonMapper();
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
-                new HttpRecordPlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, recordingSettings),
-                new HttpReplayPlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, replaySettings),
+                new HttpRecordPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, recordingSettings),
+                new HttpReplayPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(mapper),
                 new HttpReportPlugin(mapper).initialize(globalSettings, httpProtocolSettings, settings),
                 new HttpLatencyPlugin(mapper),

@@ -52,14 +52,14 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
     public void getConnections(Request request, Response response) {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<MqttConnection>();
-        for(var ccache:pInstance.getContextsCache().entrySet()){
+        for (var ccache : pInstance.getContextsCache().entrySet()) {
             var key = ccache.getKey();
-            var context = (MqttContext)ccache.getValue();
+            var context = (MqttContext) ccache.getValue();
             var subscriptions = (HashSet<String>) context.getValue("TOPICS");
-            if(subscriptions.isEmpty())continue;
+            if (subscriptions.isEmpty()) continue;
 
-            for(var subscription:subscriptions){
-                var subSplit = subscription.split("\\|",2);
+            for (var subscription : subscriptions) {
+                var subSplit = subscription.split("\\|", 2);
                 var qos = Integer.parseInt(subSplit[0]);
                 var topic = subSplit[1];
                 var connection = new MqttConnection();
@@ -70,7 +70,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             }
 
         }
-        respondJson(response,result);
+        respondJson(response, result);
     }
 
     @HttpMethodFilter(
@@ -83,8 +83,8 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             description = "Send a message. Mandatory are only: contentType,body. If " +
                     "content type is binary, the body must be a base-64 encoded byte array.",
             path = {
-                    @PathParameter(key="connectionId",description = "Connection Id"),
-                    @PathParameter(key="topic",description = "Topic Id")
+                    @PathParameter(key = "connectionId", description = "Connection Id"),
+                    @PathParameter(key = "topic", description = "Topic Id")
             },
             requests = @TpmRequest(
                     body = PublishMessage.class
@@ -108,59 +108,59 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
     public void doPublish(PublishMessage messageData, int connectionId, String topic) {
         var pInstance = getDescriptor().getProtocolInstance();
         byte[] dataToSend;
-        if(MimeChecker.isBinary(messageData.getContentType(),null)){
+        if (MimeChecker.isBinary(messageData.getContentType(), null)) {
             dataToSend = Base64.decode((String) messageData.getBody());
-        }else{
+        } else {
             dataToSend = messageData.getBody().getBytes();
         }
 
 
-        var context = (MqttContext)pInstance.getContextsCache().get(connectionId);
-        var packetIdentifier = (short)context.packetToUse();
+        var context = (MqttContext) pInstance.getContextsCache().get(connectionId);
+        var packetIdentifier = (short) context.packetToUse();
         var message = new Publish();
         message.setPacketIdentifier(packetIdentifier);
         message.setFixedHeader(MqttFixedHeader.PUBLISH);
         message.setTopicName(messageData.getTopic());
-        var topics = (HashSet<String>)context.getValue("TOPICS");
-        var topicAvailable = topics.stream().filter(t->t.endsWith("|"+messageData.getTopic())).findFirst();
-        if(topicAvailable.isEmpty()) {
-            throw new RuntimeException("MISSING TOPIC "+messageData.getTopic());
+        var topics = (HashSet<String>) context.getValue("TOPICS");
+        var topicAvailable = topics.stream().filter(t -> t.endsWith("|" + messageData.getTopic())).findFirst();
+        if (topicAvailable.isEmpty()) {
+            throw new RuntimeException("MISSING TOPIC " + messageData.getTopic());
         }
 
-        var splitTopic = topicAvailable.get().split("\\|",2);
+        var splitTopic = topicAvailable.get().split("\\|", 2);
         var qos = Integer.parseInt(splitTopic[0]);
         message.setQos(qos);
         ContentData content = new ContentData();
         content.setBytes(dataToSend);
         message.setPayload(content);
         var realFlag = 48;
-        if(qos==1)
+        if (qos == 1)
             realFlag = 50;
-        if(qos==2)
+        if (qos == 2)
             realFlag = 52;
-                //00110000
+        //00110000
         message.setFullFlag((byte) realFlag);
         message.setFixedHeader(MqttFixedHeader.PUBLISH);
         message.setProtocolVersion(context.getProtocolVersion());
         message.asProxy();
 
-        if(qos==2) {
+        if (qos == 2) {
             //should expect pubrec
             var pubRel = new PublishRel();
             pubRel.setPacketIdentifier(packetIdentifier);
             pubRel.setProtocolVersion(context.getProtocolVersion());
             pubRel.setFullFlag((byte) 98);
             pubRel.setFixedHeader(MqttFixedHeader.PUBREL);
-            pubRel.setReasonCode((byte)0);
-            getDescriptor().expectPubRec(context,pubRel);
-        }else if(qos==1){
+            pubRel.setReasonCode((byte) 0);
+            getDescriptor().expectPubRec(context, pubRel);
+        } else if (qos == 1) {
             //should expect pubrec
             var pubRel = new PublishAck();
             pubRel.setPacketIdentifier(packetIdentifier);
             pubRel.setProtocolVersion(context.getProtocolVersion());
             pubRel.setFixedHeader(MqttFixedHeader.PUBREL);
-            pubRel.setReasonCode((byte)0);
-            getDescriptor().expectPubAck(context,pubRel);
+            pubRel.setReasonCode((byte) 0);
+            getDescriptor().expectPubAck(context, pubRel);
         }
         context.write(message);
     }

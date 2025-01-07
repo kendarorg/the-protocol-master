@@ -12,7 +12,7 @@ public class TimerInstance {
         this.timerService = timerService;
     }
 
-    public void cancel(){
+    public void cancel() {
         timerTask.cancel();
     }
 

@@ -17,27 +17,24 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 
 public class BodyFrame extends Frame {
+    private static final Logger logPs = LoggerFactory.getLogger(AmqpProxySocket.class.getName());
+    private ContentData content;
+    private int consumeId;
+    private String consumeOrigin;
+    public BodyFrame() {
+        setType(FrameType.BODY.asByte());
+    }
+    public BodyFrame(Class<?>... events) {
+        super(events);
+        setType(FrameType.BODY.asByte());
+    }
+
     public ContentData getContent() {
         return content;
     }
 
     public void setContent(ContentData content) {
         this.content = content;
-    }
-
-    private static final Logger logPs = LoggerFactory.getLogger(AmqpProxySocket.class.getName());
-    private ContentData content;
-    private int consumeId;
-    private String consumeOrigin;
-
-    public BodyFrame() {
-        setType(FrameType.BODY.asByte());
-    }
-
-
-    public BodyFrame(Class<?>... events) {
-        super(events);
-        setType(FrameType.BODY.asByte());
     }
 
     @Override
@@ -62,7 +59,7 @@ public class BodyFrame extends Frame {
         String ext = "[SERVER]";
         if (isProxyed()) ext = "[PROXY ]";
         logPs.debug("{}[RX]: BodyFrame Content Length: {}", ext, contentBytes.length);
-        var contentItem = mapper.toGenericContent(contentBytes,contentType);
+        var contentItem = mapper.toGenericContent(contentBytes, contentType);
 
 
         var routingKey = context.getValue("BASIC_PUBLISH_RK_" + channel);

@@ -101,7 +101,7 @@ public class QueueBind extends Queue {
         queueDeclare.setRoutingKey(routingKey);
         queueDeclare.setNoWait(noWait);
         queueDeclare.setQueueName(destination);
-        context.setValue("ROUTING_KEYS_CH_" + channel,routingKey);
+        context.setValue("ROUTING_KEYS_CH_" + channel, routingKey);
 
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,

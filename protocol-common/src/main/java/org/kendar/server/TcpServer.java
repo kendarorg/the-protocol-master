@@ -30,6 +30,8 @@ public class TcpServer {
     private static final String HOST = "*";
     private static final Logger log = LoggerFactory.getLogger(TcpServer.class);
     private final NetworkProtoDescriptor protoDescriptor;
+    protected Runnable onStart;
+    protected Runnable onStop;
     /**
      * Listener thread
      */
@@ -79,6 +81,14 @@ public class TcpServer {
         }
     }
 
+    public void setOnStart(Runnable onStart) {
+        this.onStart = onStart;
+    }
+
+    public void setOnStop(Runnable onStop) {
+        this.onStop = onStop;
+    }
+
     /**
      * Start the server
      */
@@ -94,12 +104,18 @@ public class TcpServer {
         }
         this.thread = new Thread(() -> {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
+                if (onStart != null) {
+                    onStart.run();
+                }
                 try {
                     run();
                 } catch (IOException | ExecutionException | InterruptedException e) {
                     if (!(e.getCause() instanceof AsynchronousCloseException)) {
                         throw new RuntimeException(e);
                     }
+                }
+                if (onStop != null) {
+                    onStop.run();
                 }
             }
         });

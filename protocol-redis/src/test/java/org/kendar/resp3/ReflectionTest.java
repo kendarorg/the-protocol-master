@@ -13,7 +13,7 @@ public class ReflectionTest {
 
     @Test
     void testReflection() {
-        var example = new RedisRecordPlugin(new JsonMapper(),new NullStorageRepository());
+        var example = new RedisRecordPlugin(new JsonMapper(), new NullStorageRepository());
         var clazz = example.getClass();
         var handle = Arrays.stream(clazz.getMethods()).filter(m ->
                 m.getName().equalsIgnoreCase("handle")).findFirst();

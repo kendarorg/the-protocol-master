@@ -17,73 +17,73 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DiService {
     private static final Logger log = LoggerFactory.getLogger(DiService.class);
+    private static final ConcurrentHashMap<Thread, DiService> threads = new ConcurrentHashMap<>();
+    private static final TimerInstance timerService = new TimerService().schedule(DiService::threadsClean, 1000, 2000);
     protected final HashMap<Class<?>, Object> singletons = new HashMap<>();
     private final HashMap<Type, List<Type>> mappings = new HashMap<>();
     private final HashMap<Type, List<Type>> transientMappings = new HashMap<>();
     protected TpmScopeType scope = TpmScopeType.GLOBAL;
     protected DiService parent = null;
     protected List<DiService> children = new ArrayList<>();
-    private static final ConcurrentHashMap<Thread,DiService> threads = new ConcurrentHashMap<>();
 
-    private static void threadsClean(){
+    public DiService() {
+        singletons.put(DiService.class, this);
+        threads.clear();
+    }
+
+    protected DiService(TpmScopeType scope, DiService parent) {
+        this.scope = scope;
+        this.parent = parent;
+        this.parent.children.add(this);
+        singletons.put(DiService.class, this);
+    }
+
+    private static void threadsClean() {
         var threadsToClean = new ArrayList<Thread>();
-        for(var thread : threads.keySet()){
-            if(!thread.isAlive()){
+        for (var thread : threads.keySet()) {
+            if (!thread.isAlive()) {
                 threadsToClean.add(thread);
             }
         }
-        for(var thread : threadsToClean){
+        for (var thread : threadsToClean) {
             var context = threads.get(thread);
             context.destroy();
             threads.remove(thread);
         }
     }
 
+    public static DiService getThreadContext() {
+        return threads.get(Thread.currentThread());
+    }
+
+    public static void setThreadContext(DiService threadContext) {
+        threads.put(Thread.currentThread(), threadContext);
+    }
+
     private void destroy() {
-        for(var item:children){
+        for (var item : children) {
             item.destroy();
         }
         children.clear();
-        for(var item: singletons.values()){
+        for (var item : singletons.values()) {
             destroy(item);
         }
         singletons.clear();
-        if(parent != null){
+        if (parent != null) {
             parent.children.remove(this);
         }
     }
 
-    private static final TimerInstance timerService = new TimerService().schedule(DiService::threadsClean, 1000, 2000);
-
-    public DiService() {
-        singletons.put(DiService.class,this);
-        threads.clear();
-    }
-
-    public static DiService getThreadContext(){
-        return threads.get(Thread.currentThread());
-    }
-
-    public static void setThreadContext(DiService threadContext){
-        threads.put(Thread.currentThread(),threadContext);
-    }
-
     public DiService createChildScope(TpmScopeType scope) {
-        if(scope == TpmScopeType.CUSTOM) {
-            return new DiService(scope,this);
-        }else if(scope==TpmScopeType.GLOBAL) {
+        if (scope == TpmScopeType.CUSTOM) {
+            return new DiService(scope, this);
+        } else if (scope == TpmScopeType.GLOBAL) {
             return this;
-        }else{
-            var svc = new DiService(scope,this);
+        } else {
+            var svc = new DiService(scope, this);
             setThreadContext(svc);
             return svc;
-    }}
-
-    protected DiService(TpmScopeType scope,DiService parent) {
-        this.scope = scope;
-        this.parent = parent;
-        this.parent.children.add(this);
-        singletons.put(DiService.class,this);
+        }
     }
 
     public void register(Class<?> clazz, Object instance) {
@@ -177,7 +177,7 @@ public class DiService {
     }
 
     public <T> T getInstance(Class<T> clazz, String... tags) {
-        var result = getInstances(this,clazz, tags);
+        var result = getInstances(this, clazz, tags);
         if (result == null || result.isEmpty()) {
             return null;
         }
@@ -185,20 +185,20 @@ public class DiService {
     }
 
     private Object getInstance(Type type, String... tags) {
-        var result = getInstances(this,type, tags);
+        var result = getInstances(this, type, tags);
         if (result == null || result.isEmpty()) return null;
         return result.get(0);
     }
 
-    private List<Object> getInstances(DiService context,Type type, String... tags) {
+    private List<Object> getInstances(DiService context, Type type, String... tags) {
         var data = mappings.get(type);
         var transi = false;
         if (data == null) {
             data = transientMappings.get(type);
             transi = true;
             if (data == null) {
-                if(parent != null) {
-                    return parent.getInstances(context,type, tags);
+                if (parent != null) {
+                    return parent.getInstances(context, type, tags);
                 }
                 return new ArrayList<>();
             }
@@ -217,18 +217,19 @@ public class DiService {
                     continue;
                 }
             }
-            result.add(this.createInstance(context,(Class<?>) i, transi));
+            result.add(this.createInstance(context, (Class<?>) i, transi));
         }
-        if(parent!=null){
-            var parentResults = parent.getInstances(context,type,tags);
-            if(parentResults!=null){
+        if (parent != null) {
+            var parentResults = parent.getInstances(context, type, tags);
+            if (parentResults != null) {
                 result.addAll(parentResults);
             }
         }
         return result;
     }
+
     public <T> List<T> getInstances(Class<T> clazz, String... tags) {
-        return getInstances(this,clazz,tags);
+        return getInstances(this, clazz, tags);
     }
 
     private <T> List<T> getInstances(DiService context, Class<T> clazz, String... tags) {
@@ -238,8 +239,8 @@ public class DiService {
             data = transientMappings.get(clazz);
             transi = true;
             if (data == null) {
-                if(parent != null) {
-                    return parent.getInstances(context,clazz, tags);
+                if (parent != null) {
+                    return parent.getInstances(context, clazz, tags);
                 }
                 return new ArrayList<>();
             }
@@ -255,18 +256,18 @@ public class DiService {
                     continue;
                 }
             }
-            result.add((T) this.createInstance(context,(Class<?>) i, transi));
+            result.add((T) this.createInstance(context, (Class<?>) i, transi));
         }
-        if(parent!=null){
-            var parentResults = parent.getInstances(context,clazz,tags);
-            if(parentResults!=null){
+        if (parent != null) {
+            var parentResults = parent.getInstances(context, clazz, tags);
+            if (parentResults != null) {
                 result.addAll(parentResults);
             }
         }
         return result;
     }
 
-    private Object createInstance(DiService context,Class<?> clazz, boolean transi) {
+    private Object createInstance(DiService context, Class<?> clazz, boolean transi) {
         try {
             var constructors = clazz.getConstructors();
             var clazzNamed = clazz.getAnnotation(TpmNamed.class);
@@ -313,7 +314,7 @@ public class DiService {
                     var args = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments();
                     if (args.length == 1) {
                         var arg = args[0];
-                        values[i] = getInstances(context,arg, tags);
+                        values[i] = getInstances(context, arg, tags);
                     }
                 } else {
                     var parametrizedType = parameter.getParameterizedType();

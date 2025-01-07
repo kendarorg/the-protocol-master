@@ -59,9 +59,9 @@ public class FileStorageRepository implements StorageRepository {
     @TpmConstructor
     public FileStorageRepository(GlobalSettings settings) {
         var logsDir = settings.getDataDir();
-        if(logsDir==null || logsDir.isEmpty()){
-            logsDir=  Path.of("data",
-                        Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
+        if (logsDir == null || logsDir.isEmpty()) {
+            logsDir = Path.of("data",
+                    Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
         }
         this.targetDir = Path.of(logsDir).toAbsolutePath().toString();
     }
@@ -196,7 +196,6 @@ public class FileStorageRepository implements StorageRepository {
             }
         }
     }
-
 
 
     public long generateIndex() {
@@ -467,15 +466,6 @@ public class FileStorageRepository implements StorageRepository {
 
     }
 
-    private static class ProtocolRepo {
-        public final Object lockObject = new Object();
-        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
-        public final List<StorageItem> outItems = new ArrayList<>();
-        public List<CompactLine> index = new ArrayList<>();
-        public boolean initialized = false;
-        public volatile boolean somethingWritten = false;
-    }
-
     @Override
     public void update(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
         var indexFile = retrieveIndexFile(protocolInstanceId);
@@ -484,23 +474,23 @@ public class FileStorageRepository implements StorageRepository {
             var toCheck = indexFile.get(i);
             if (toCheck.getIndex() == itemId) {
                 index.setIndex(itemId);
-                indexFile.set(i,index);
-                var old = this.readById(protocolInstanceId,itemId);
+                indexFile.set(i, index);
+                var old = this.readById(protocolInstanceId, itemId);
 
                 var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
                 try {
                     item.setIndex(itemId);
                     item.setTimestamp(old.getTimestamp());
                     item.setCaller(old.getCaller());
-                    Files.writeString(indexPath,mapper.serialize(indexFile));
-                    Files.writeString(filePath,mapper.serialize(item));
+                    Files.writeString(indexPath, mapper.serialize(indexFile));
+                    Files.writeString(filePath, mapper.serialize(item));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 return;
             }
         }
-        throw new RuntimeException("ITem id "+itemId+" not found");
+        throw new RuntimeException("ITem id " + itemId + " not found");
 
     }
 
@@ -521,8 +511,17 @@ public class FileStorageRepository implements StorageRepository {
                     break;
                 }
             }
-        }catch (Exception ex){
-            throw new RuntimeException("Unable to delete item "+itemId,ex);
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to delete item " + itemId, ex);
         }
+    }
+
+    private static class ProtocolRepo {
+        public final Object lockObject = new Object();
+        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
+        public final List<StorageItem> outItems = new ArrayList<>();
+        public List<CompactLine> index = new ArrayList<>();
+        public boolean initialized = false;
+        public volatile boolean somethingWritten = false;
     }
 }

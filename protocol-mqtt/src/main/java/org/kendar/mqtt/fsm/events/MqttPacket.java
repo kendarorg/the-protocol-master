@@ -11,10 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MqttPacket extends ProtocolEvent implements NetworkReturnMessage {
+    private static final Logger log = LoggerFactory.getLogger(MqttPacket.class);
     private final MqttFixedHeader fixedHeader;
     private final MqttBBuffer buffer;
     private final byte fullFlag;
-    private static final Logger log = LoggerFactory.getLogger(MqttPacket.class);
 
     public MqttPacket(ProtoContext context, Class<?> prevState,
                       MqttFixedHeader fixedHeader,

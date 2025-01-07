@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.BinaryNode;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
-import org.kendar.di.annotations.TpmService;
 import org.kendar.annotations.multi.PathParameter;
 import org.kendar.annotations.multi.QueryString;
 import org.kendar.annotations.multi.TpmRequest;
@@ -14,6 +13,7 @@ import org.kendar.apis.base.Response;
 import org.kendar.apis.dtos.CompactLineApi;
 import org.kendar.apis.dtos.StorageAndIndex;
 import org.kendar.apis.utils.ConstantsMime;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
@@ -39,7 +39,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
-    public ApiStorageOnlyHandler(GlobalSettings settings,StorageRepository storage) {
+    public ApiStorageOnlyHandler(GlobalSettings settings, StorageRepository storage) {
         this.settings = settings;
         this.storage = storage;
     }
@@ -207,8 +207,8 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             var instanceId = reqp.getPathParameter("protocol");
             var itemId = Long.parseLong(reqp.getPathParameter("index"));
             result.setItem(storage.readById(instanceId, itemId));
-            var optIndex = storage.getAllIndexes(-1).stream().filter(a->a.getIndex()==itemId).findFirst();
-            if(optIndex.isPresent()) {
+            var optIndex = storage.getAllIndexes(-1).stream().filter(a -> a.getIndex() == itemId).findFirst();
+            if (optIndex.isPresent()) {
                 var api = mapper.deserialize(mapper.serialize(optIndex.get()), CompactLineApi.class);
                 if (api.getFullItemId() != null && !api.getFullItemId().isEmpty()) {
                     var theItemId = reqp.buildUrlNoQuery() + "/" + api.getFullItemId();
@@ -250,14 +250,14 @@ public class ApiStorageOnlyHandler implements FilteringClass {
         try {
             var instanceId = reqp.getPathParameter("protocol");
             var itemId = Long.parseLong(reqp.getPathParameter("index"));
-            var optIndex = storage.getAllIndexes(-1).stream().filter(a->a.getIndex()==itemId).findFirst();
-            if(optIndex.isPresent()) {
+            var optIndex = storage.getAllIndexes(-1).stream().filter(a -> a.getIndex() == itemId).findFirst();
+            if (optIndex.isPresent()) {
                 var indexItem = optIndex.get();
-                if(request.getItem()!=null) {
+                if (request.getItem() != null) {
                     request.getItem().setIndex(itemId);
                 }
                 request.getIndex().setIndex(itemId);
-                storage.update(itemId,indexItem.getProtocolInstanceId(),request.getIndex(),request.getItem());
+                storage.update(itemId, indexItem.getProtocolInstanceId(), request.getIndex(), request.getItem());
                 respondJson(resp, new Ok());
             }
         } catch (Exception ex) {
@@ -290,7 +290,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
         try {
             var instanceId = reqp.getPathParameter("protocol");
             var itemId = Long.parseLong(reqp.getPathParameter("index"));
-            storage.delete(instanceId,itemId);
+            storage.delete(instanceId, itemId);
         } catch (Exception ex) {
             respondKo(resp, ex);
         }

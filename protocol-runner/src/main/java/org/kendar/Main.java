@@ -100,10 +100,10 @@ public class Main {
 
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
-        for(var ec: pluginManager.getExtensionClasses(ProtocolPluginDescriptor.class)){
+        for (var ec : pluginManager.getExtensionClasses(ProtocolPluginDescriptor.class)) {
             diService.bind(ec);
         }
-        for(var ec: pluginManager.getExtensionClasses(GlobalPluginDescriptor.class)){
+        for (var ec : pluginManager.getExtensionClasses(GlobalPluginDescriptor.class)) {
             diService.bind(ec);
         }
 
@@ -243,7 +243,7 @@ public class Main {
 
 
     public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse
-                               ) throws Exception {
+    ) throws Exception {
         if (ini == null) return;
         /*var logsDir = ProtocolsRunner.getOrDefault(
                 ini.getDataDir(),
@@ -251,12 +251,11 @@ public class Main {
                         Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString());
         StorageRepository storage = setupStorage(logsDir);
         storage.initialize();*/
-        diService.register(FileResourcesUtils.class,new FileResourcesUtils());
+        diService.register(FileResourcesUtils.class, new FileResourcesUtils());
         //diService.register(StorageRepository.class,storage);
         //ini.putService(storage.getType(), storage);
 
         //var pluginsDir = ProtocolsRunner.getOrDefault(ini.getPluginsDir(), "plugins");
-
 
 
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
@@ -265,7 +264,7 @@ public class Main {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         var logger = loggerContext.getLogger("org.kendar");
         logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
-        diService.register(FiltersConfiguration.class,new FiltersConfiguration());
+        diService.register(FiltersConfiguration.class, new FiltersConfiguration());
         var apisFiltersLoader = diService.getInstance(ApiFiltersLoader.class);
         //var apisFiltersLoader = new ApiFiltersLoader(new ArrayList<>());
 //        var apiHandler = new ApiHandler(ini);
@@ -288,17 +287,19 @@ public class Main {
         for (var item : ini.getProtocols().entrySet()) {
             new Thread(() -> {
                 try {
-                    var localDiService = diService.createChildScope(TpmScopeType.CUSTOM);
+                    var localDiService = diService.createChildScope(TpmScopeType.THREAD);
                     var protocol = ini.getProtocolForKey(item.getKey());
                     if (protocol == null) return;
                     var protocolManager = protocolsRunner.getManagerFor(protocol);
-                    var availableProtocolPlugins =localDiService.getInstances(ProtocolPluginDescriptor.class,protocol.getProtocol());
-                            //loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
+                    var availableProtocolPlugins = localDiService.getInstances(ProtocolPluginDescriptor.class, protocol.getProtocol());
+                    //loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
                     var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
 
                     var storage = localDiService.getInstance(StorageRepository.class);
                     try {
-                        protocolsRunner.start(protocolServersCache, item.getKey(), ini, protocolFullSettings, storage, availableProtocolPlugins, stopWhenFalse);
+                        protocolsRunner.start(protocolServersCache,
+                                item.getKey(), ini, protocolFullSettings, storage, availableProtocolPlugins,
+                                stopWhenFalse);
                     } catch (Exception e) {
                         //noinspection SuspiciousMethodCalls
                         protocolServersCache.remove(item);

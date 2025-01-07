@@ -55,7 +55,6 @@ public class Disconnect extends BasePropertiesMqttState implements ReturnMessage
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
 
-
         return iteratorOfRunner(() -> {
             proxy.sendAndForget(context,
                     connection,

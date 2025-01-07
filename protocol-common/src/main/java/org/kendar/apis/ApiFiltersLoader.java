@@ -7,8 +7,6 @@ import com.sun.net.httpserver.HttpHandler;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
-import org.kendar.di.annotations.TpmPostConstruct;
-import org.kendar.di.annotations.TpmService;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.converters.RequestResponseBuilderImpl;
@@ -16,6 +14,8 @@ import org.kendar.apis.filters.FiltersConfiguration;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.MimeChecker;
+import org.kendar.di.annotations.TpmPostConstruct;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,13 +38,6 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
     private final RequestResponseBuilderImpl requestResponseBuilder = new RequestResponseBuilderImpl();
     private final Logger log = LoggerFactory.getLogger(ApiFiltersLoader.class);
 
-    @TpmPostConstruct
-    public void postConstruct() {
-        for(var gp: globalPluginDescriptors) {
-            getFilters().add(gp.getApiHandler());
-        }
-    }
-
     public ApiFiltersLoader(List<FilteringClass> filteringClassList,
                             FiltersConfiguration filtersConfiguration,
                             List<GlobalPluginDescriptor> globalPluginDescriptors) {
@@ -65,6 +58,13 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
         allMethods.addAll(Arrays.asList(declaredMethods));
         allMethods.addAll(Arrays.asList(methods));
         return allMethods.toArray(new Method[0]);
+    }
+
+    @TpmPostConstruct
+    public void postConstruct() {
+        for (var gp : globalPluginDescriptors) {
+            getFilters().add(gp.getApiHandler());
+        }
     }
 
     public List<FilteringClass> getFilters() {

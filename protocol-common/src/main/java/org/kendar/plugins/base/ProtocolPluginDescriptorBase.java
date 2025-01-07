@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> implements ProtocolPluginDescriptor<W> {
-    protected JsonMapper mapper;
     private static final Logger log = LoggerFactory.getLogger(ProtocolPluginDescriptorBase.class);
+    protected JsonMapper mapper;
     private boolean active;
     private String instanceId = "default";
     private ProtocolPluginApiHandler apiHandler;

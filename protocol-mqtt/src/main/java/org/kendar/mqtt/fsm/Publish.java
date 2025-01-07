@@ -23,14 +23,6 @@ public class Publish extends BasePropertiesMqttState {
     private boolean retainFlag;
     private int qos;
 
-    public ContentData getPayload() {
-        return payload;
-    }
-
-    public void setPayload(ContentData payload) {
-        this.payload = payload;
-    }
-
     public Publish() {
         super();
         setFixedHeader(MqttFixedHeader.PUBLISH);
@@ -41,11 +33,18 @@ public class Publish extends BasePropertiesMqttState {
         setFixedHeader(MqttFixedHeader.PUBLISH);
     }
 
+    public ContentData getPayload() {
+        return payload;
+    }
+
+    public void setPayload(ContentData payload) {
+        this.payload = payload;
+    }
 
     @Override
     protected void writeFrameContent(MqttBBuffer rb) {
         rb.writeUtf8String(getTopicName());
-        if(qos != 0) {
+        if (qos != 0) {
             rb.writeShort(getPacketIdentifier());
         }
         writeProperties(rb);
@@ -65,13 +64,13 @@ public class Publish extends BasePropertiesMqttState {
         publish.setQos(qos);
         var context = (MqttContext) event.getContext();
         publish.setTopicName(bb.readUtf8String());
-        if(qos != 0) {
+        if (qos != 0) {
             publish.setPacketIdentifier(bb.getShort());
         }
         publish.setProtocolVersion(context.getProtocolVersion());
         //Variable header for MQTT >=5
         readProperties(publish, bb);
-        publish.setPayload(mapper.toGenericContent(bb.getRemaining(),null));
+        publish.setPayload(mapper.toGenericContent(bb.getRemaining(), null));
 
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));

@@ -52,17 +52,17 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
     public void getConnections(Request request, Response response) {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<AmqpConnection>();
-        for(var ccache:pInstance.getContextsCache().entrySet()){
+        for (var ccache : pInstance.getContextsCache().entrySet()) {
             var key = ccache.getKey();
-            var context = (AmqpProtoContext)ccache.getValue();
-            for(var channel:context.getChannels()){
+            var context = (AmqpProtoContext) ccache.getValue();
+            for (var channel : context.getChannels()) {
 
                 var connection = new AmqpConnection();
                 connection.setId(key);
                 connection.setChannel(channel);
-                var basicConsume = (BasicConsume)context.getValue("BASIC_CONSUME_CH_" + channel);
-                if(basicConsume!=null){
-                    connection.setExchange((String)context.getValue("EXCHANGE_CH_"+channel));
+                var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
+                if (basicConsume != null) {
+                    connection.setExchange((String) context.getValue("EXCHANGE_CH_" + channel));
                     connection.setConsumeId(basicConsume.getConsumeId());
                     connection.setCanPublish(true);
                     connection.setConsumeOrigin(basicConsume.getConsumeOrigin());
@@ -71,7 +71,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                 result.add(connection);
             }
         }
-        respondJson(response,result);
+        respondJson(response, result);
     }
 
     @HttpMethodFilter(
@@ -84,8 +84,8 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
             description = "Send a message. Mandatory are only: contentType,appId,body,binary. If " +
                     "content type is binary, the body must be a base-64 encoded byte array. ",
             path = {
-                    @PathParameter(key="connectionId",description = "Connection Id"),
-                    @PathParameter(key="channel",description = "Channel Id")
+                    @PathParameter(key = "connectionId", description = "Connection Id"),
+                    @PathParameter(key = "channel", description = "Channel Id")
             },
             requests = @TpmRequest(
                     body = PublishMessage.class
@@ -109,24 +109,24 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
     public void doPublish(PublishMessage messageData, int connectionId, int channelId) {
         var pInstance = getDescriptor().getProtocolInstance();
         byte[] dataToSend;
-        if(MimeChecker.isBinary(messageData.getContentType(),null)){
-            dataToSend = Base64.decode( messageData.getBody());
-        }else{
+        if (MimeChecker.isBinary(messageData.getContentType(), null)) {
+            dataToSend = Base64.decode(messageData.getBody());
+        } else {
             dataToSend = messageData.getBody().getBytes();
         }
 
 
         var context = pInstance.getContextsCache().get(connectionId);
 
-        var basicConsume = (BasicConsume)context.getValue("BASIC_CONSUME_CH_" + channelId);
+        var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channelId);
         var consumeId = basicConsume.getConsumeId();
         var consumeOrigin = basicConsume.getConsumeOrigin();
-        var consumerTag = (String)context.getValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin());
-        if(consumerTag==null||consumerTag.isEmpty()){
+        var consumerTag = (String) context.getValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin());
+        if (consumerTag == null || consumerTag.isEmpty()) {
             consumerTag = UUID.randomUUID().toString();
         }
-        var exchange = (String)context.getValue("EXCHANGE_CH_"+ channelId);
-        var routingKeys = (String)context.getValue("ROUTING_KEYS_CH_" + channelId);
+        var exchange = (String) context.getValue("EXCHANGE_CH_" + channelId);
+        var routingKeys = (String) context.getValue("ROUTING_KEYS_CH_" + channelId);
         var bd = new BasicDeliver();
         bd.setChannel((short) channelId);
         bd.setConsumeId(basicConsume.getConsumeId());
@@ -140,8 +140,8 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
 
 
         var hf = new HeaderFrame();
-        hf.setType((byte)2);
-        hf.setClassId((short)60);
+        hf.setType((byte) 2);
+        hf.setClassId((short) 60);
         hf.setWeight((short) 0);
         hf.setChannel((short) channelId);
         hf.setConsumeId(basicConsume.getConsumeId());
@@ -156,7 +156,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
 
         var bf = new BodyFrame();
         bf.setChannel((short) channelId);
-        bf.setType((byte)3);
+        bf.setType((byte) 3);
         bf.setConsumeId(basicConsume.getConsumeId());
         bf.setConsumeOrigin(consumeOrigin);
         ContentData content = new ContentData();

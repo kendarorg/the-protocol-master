@@ -3,6 +3,7 @@ package org.kendar.command;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
+import org.kendar.di.DiService;
 import org.kendar.mysql.MySQLProtocol;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
@@ -134,7 +135,11 @@ public class JdbcRunner extends CommonRunner {
         baseProtocol.setProxy(proxy);
         baseProtocol.setTimeout(ProtocolsRunner.getOrDefault(realSttings.getTimeoutSeconds(), 30));
         baseProtocol.initialize();
+        var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
+        ps.setOnStart(() -> {
+            DiService.setThreadContext(diService);
+        });
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

@@ -1,30 +1,30 @@
 {
-  "timestamp" : 1734945808047,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 3,
-  "input" : {
-    "fullFlag" : 52,
-    "fixedHeader" : "PUBLISH",
-    "topicName" : "/subscribe/",
-    "payload" : {
-      "bytes" : "SGVsbG8gV29ybGQhIQ==",
-      "chars" : "Hello World!!"
+  "timestamp": 1734945808047,
+  "constant": false,
+  "connectionId": 1,
+  "index": 3,
+  "input": {
+    "fullFlag": 52,
+    "fixedHeader": "PUBLISH",
+    "topicName": "/subscribe/",
+    "payload": {
+      "bytes": "SGVsbG8gV29ybGQhIQ==",
+      "chars": "Hello World!!"
     },
-    "packetIdentifier" : 2,
-    "dupFlag" : false,
-    "retainFlag" : false,
-    "qos" : 2
+    "packetIdentifier": 2,
+    "dupFlag": false,
+    "retainFlag": false,
+    "qos": 2
   },
-  "output" : {
-    "fullFlag" : 80,
-    "fixedHeader" : "PUBREC",
-    "packetIdentifier" : 2,
-    "reasonCode" : 0
+  "output": {
+    "fullFlag": 80,
+    "fixedHeader": "PUBREC",
+    "packetIdentifier": 2,
+    "reasonCode": 0
   },
-  "durationMs" : 535,
-  "type" : "Publish",
-  "caller" : "MQTT",
-  "inputType" : "Publish",
-  "outputType" : "PublishRec"
+  "durationMs": 535,
+  "type": "Publish",
+  "caller": "MQTT",
+  "inputType": "Publish",
+  "outputType": "PublishRec"
 }

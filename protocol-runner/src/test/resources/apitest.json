@@ -33,8 +33,12 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
-        "record-plugin": {"active": false},
-        "replay-plugin": {"active": false}
+        "record-plugin": {
+          "active": false
+        },
+        "replay-plugin": {
+          "active": false
+        }
       }
     },
     "postgres-01": {
@@ -45,9 +49,15 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
-        "record-plugin": {"active": false},
-        "replay-plugin": {"active": false},
-        "mock-plugin": {"active": false}
+        "record-plugin": {
+          "active": false
+        },
+        "replay-plugin": {
+          "active": false
+        },
+        "mock-plugin": {
+          "active": false
+        }
       }
     },
     "mysql-01": {
@@ -58,9 +68,15 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
-        "record-plugin": {"active": false},
-        "replay-plugin": {"active": false},
-        "mock-plugin": {"active": false}
+        "record-plugin": {
+          "active": false
+        },
+        "replay-plugin": {
+          "active": false
+        },
+        "mock-plugin": {
+          "active": false
+        }
       }
     },
     "amqp091-01": {
@@ -83,8 +99,12 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
-        "record-plugin": {"active": false},
-        "replay-plugin": {"active": false}
+        "record-plugin": {
+          "active": false
+        },
+        "replay-plugin": {
+          "active": false
+        }
       }
     },
     "redis-01": {

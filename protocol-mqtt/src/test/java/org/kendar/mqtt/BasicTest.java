@@ -40,8 +40,8 @@ public class BasicTest {
     //protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     protected static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    private static Server mqttBroker;
     protected static MqttPublishPlugin publishPlugin;
+    private static Server mqttBroker;
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -121,11 +121,11 @@ public class BasicTest {
         var pls = new BasicAysncRecordPluginSettings();
         pls.setResetConnectionsOnStart(false);
         var mapper = new JsonMapper();
-        var pl = new MqttRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(),
+        var pl = new MqttRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(),
                 pls);
         var rep = new MqttReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        publishPlugin = (MqttPublishPlugin)new MqttPublishPlugin(mapper).initialize(gs,new ByteProtocolSettingsWithLogin(),new PluginSettings());
-        proxy.setPlugins(List.of(pl, rep,publishPlugin));
+        publishPlugin = (MqttPublishPlugin) new MqttPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        proxy.setPlugins(List.of(pl, rep, publishPlugin));
         rep.setActive(true);
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

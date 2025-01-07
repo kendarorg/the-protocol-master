@@ -1,8 +1,9 @@
 package org.kendar.command;
 
-import org.kendar.di.annotations.TpmService;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
+import org.kendar.di.DiService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.http.HttpProtocol;
 import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
@@ -25,7 +26,6 @@ import java.util.function.Supplier;
 public class HttpRunner extends CommonRunner {
     private static final Logger log = LoggerFactory.getLogger(HttpRunner.class);
     private TcpServer ps;
-
 
 
     @Override
@@ -161,7 +161,11 @@ public class HttpRunner extends CommonRunner {
         }
         var baseProtocol = new HttpProtocol(ini, settings, plugins);
         baseProtocol.initialize();
+        var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
+        ps.setOnStart(() -> {
+            DiService.setThreadContext(diService);
+        });
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(sectionKey, ps);

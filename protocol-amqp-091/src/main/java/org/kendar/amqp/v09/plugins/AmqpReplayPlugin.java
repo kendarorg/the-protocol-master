@@ -92,7 +92,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                     case "BasicDeliver":
                         var bd = mapper.deserialize(out, BasicDeliver.class);
                         var tag = (String) ctx.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
-                        if(tag!=null && !tag.isEmpty()) {
+                        if (tag != null && !tag.isEmpty()) {
                             bd.setConsumerTag(tag);
                         }
                         //consumeId = bd.getConsumeId();

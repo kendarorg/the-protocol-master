@@ -38,7 +38,7 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
 
-        var pl = new RedisReplayPlugin(new JsonMapper(),storage).initialize(gs, new ByteProtocolSettings(), new BasicAysncReplayPluginSettings());
+        var pl = new RedisReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettings(), new BasicAysncReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
 

@@ -110,7 +110,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
 
     private void sendHeartbeat() {
         for (var ctx : getContextsCache().values()) {
-            for (var ch : ((AmqpProtoContext)ctx).getChannels()) {
+            for (var ch : ((AmqpProtoContext) ctx).getChannels()) {
                 var hb = new HearthBeatFrame();
                 hb.setChannel(ch);
                 hb.setProtoDescriptor(this);

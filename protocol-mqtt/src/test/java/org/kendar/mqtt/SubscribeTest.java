@@ -25,6 +25,7 @@ public class SubscribeTest extends BasicTest {
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/subscribe/";
     private static final List<MqttMessage> messages = new ArrayList<>();
+    private static JsonMapper mapper = new JsonMapper();
 
     @BeforeAll
     public static void beforeClass() throws IOException {
@@ -77,7 +78,6 @@ public class SubscribeTest extends BasicTest {
         }
         afterEachBase();
     }
-
 
     @Test
     void qos2Test() throws MqttException {
@@ -173,7 +173,6 @@ public class SubscribeTest extends BasicTest {
         assertEquals(0, mesg.getQos());
     }
 
-    private static JsonMapper mapper = new JsonMapper();
     @Test
     void qos2TestPublish() throws MqttException {
         publishPlugin.setActive(true);
@@ -193,17 +192,18 @@ public class SubscribeTest extends BasicTest {
             /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
-            var publish = (MqttPublishPluginApis)publishPlugin.getApiHandler();
+            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler();
             var res = new Response();
-            publish.getConnections(new Request(),res);
-            var responses = mapper.deserialize(res.getResponseText(),new TypeReference<List<MqttConnection>>(){});
+            publish.getConnections(new Request(), res);
+            var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<MqttConnection>>() {
+            });
             Assertions.assertEquals(1, responses.size());
             var response = responses.get(0);
             var pm = new PublishMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
             pm.setTopic(TOPIC_NAME);
-            publish.doPublish(pm,response.getId(),TOPIC_NAME);
+            publish.doPublish(pm, response.getId(), TOPIC_NAME);
             Sleeper.sleep(500);
 
             System.out.println("========================");
@@ -245,17 +245,18 @@ public class SubscribeTest extends BasicTest {
             /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
-            var publish = (MqttPublishPluginApis)publishPlugin.getApiHandler();
+            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler();
             var res = new Response();
-            publish.getConnections(new Request(),res);
-            var responses = mapper.deserialize(res.getResponseText(),new TypeReference<List<MqttConnection>>(){});
+            publish.getConnections(new Request(), res);
+            var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<MqttConnection>>() {
+            });
             Assertions.assertEquals(1, responses.size());
             var response = responses.get(0);
             var pm = new PublishMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
             pm.setTopic(TOPIC_NAME);
-            publish.doPublish(pm,response.getId(),TOPIC_NAME);
+            publish.doPublish(pm, response.getId(), TOPIC_NAME);
             Sleeper.sleep(500);
 
             System.out.println("========================");
@@ -298,17 +299,18 @@ public class SubscribeTest extends BasicTest {
             /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
-            var publish = (MqttPublishPluginApis)publishPlugin.getApiHandler();
+            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler();
             var res = new Response();
-            publish.getConnections(new Request(),res);
-            var responses = mapper.deserialize(res.getResponseText(),new TypeReference<List<MqttConnection>>(){});
+            publish.getConnections(new Request(), res);
+            var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<MqttConnection>>() {
+            });
             Assertions.assertEquals(1, responses.size());
             var response = responses.get(0);
             var pm = new PublishMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
             pm.setTopic(TOPIC_NAME);
-            publish.doPublish(pm,response.getId(),TOPIC_NAME);
+            publish.doPublish(pm, response.getId(), TOPIC_NAME);
             Sleeper.sleep(500);
 
             System.out.println("========================");

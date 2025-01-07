@@ -19,7 +19,7 @@ public class TimerService {
             }
         };
         timer.schedule(timerTask, delay);
-        return new TimerInstance(timerTask,this);
+        return new TimerInstance(timerTask, this);
     }
 
     public TimerInstance schedule(Runnable task, long delay, long period) {
@@ -30,6 +30,6 @@ public class TimerService {
             }
         };
         timer.scheduleAtFixedRate(timerTask, delay, period);
-        return new TimerInstance(timerTask,this);
+        return new TimerInstance(timerTask, this);
     }
 }

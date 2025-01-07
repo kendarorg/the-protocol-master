@@ -8,12 +8,12 @@ import java.util.List;
 public class ListUser {
     private final List<ListOfInterface> items;
 
-    public List<ListOfInterface> getItems() {
-        return items;
-    }
-
-    public ListUser(List<ListOfInterface> items){
+    public ListUser(List<ListOfInterface> items) {
 
         this.items = items;
+    }
+
+    public List<ListOfInterface> getItems() {
+        return items;
     }
 }

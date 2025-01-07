@@ -33,7 +33,7 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         var mapper = new JsonMapper();
         //gs.putService("storage", storage);
-        var pl = new PostgresReplayPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        var pl = new PostgresReplayPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

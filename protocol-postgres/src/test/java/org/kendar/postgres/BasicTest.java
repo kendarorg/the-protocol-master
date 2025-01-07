@@ -85,7 +85,7 @@ public class BasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var pl = new PostgresRecordPlugin(mapper,storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new PostgresRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         var pl1 = new PostgresMockPlugin(mapper);
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();

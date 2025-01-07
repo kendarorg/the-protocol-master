@@ -1,15 +1,15 @@
 {
-  "timestamp" : 1735028858398,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 6,
-  "input" : {
-    "fullFlag" : -32,
-    "fixedHeader" : "DISCONNECT",
-    "reasonCode" : 0
+  "timestamp": 1735028858398,
+  "constant": false,
+  "connectionId": 1,
+  "index": 6,
+  "input": {
+    "fullFlag": -32,
+    "fixedHeader": "DISCONNECT",
+    "reasonCode": 0
   },
-  "durationMs" : 16,
-  "type" : "Disconnect",
-  "caller" : "MQTT",
-  "inputType" : "Disconnect"
+  "durationMs": 16,
+  "type": "Disconnect",
+  "caller": "MQTT",
+  "inputType": "Disconnect"
 }

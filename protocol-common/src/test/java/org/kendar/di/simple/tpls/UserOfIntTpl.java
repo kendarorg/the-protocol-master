@@ -9,11 +9,7 @@ import java.util.List;
 public class UserOfIntTpl implements GenericUserOf {
     private List<TemplateInterface<Integer>> template;
 
-    public List<TemplateInterface<Integer>> getTemplate() {
-        return template;
-    }
-
-    public UserOfIntTpl(){
+    public UserOfIntTpl() {
 
     }
 
@@ -21,5 +17,9 @@ public class UserOfIntTpl implements GenericUserOf {
     public UserOfIntTpl(List<TemplateInterface<Integer>> template) {
 
         this.template = template;
+    }
+
+    public List<TemplateInterface<Integer>> getTemplate() {
+        return template;
     }
 }

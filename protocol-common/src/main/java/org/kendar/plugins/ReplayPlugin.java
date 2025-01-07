@@ -47,19 +47,17 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      * Container for the completed responses
      */
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
-
-    /**
-     * The storage to be used to retrieve the data
-     */
-    protected StorageRepository storage;
-
     /**
      * Indexes locally loaded from the storage. They do not contain the first
      * responses
      */
     private final List<CompactLine> indexes = new ArrayList<>();
+    /**
+     * The storage to be used to retrieve the data
+     */
+    protected StorageRepository storage;
 
-    public ReplayPlugin(JsonMapper mapper,StorageRepository storage) {
+    public ReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
         this.storage = storage;
     }
@@ -298,8 +296,8 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             if (!result.isEmpty()) {
                 ((NetworkProtoContext) pluginContext.getContext()).addResponse(() ->
                 {
-                    var sleepint = result.get(0).getTimestamp()-timeStamp;
-                    if(sleepint>0){
+                    var sleepint = result.get(0).getTimestamp() - timeStamp;
+                    if (sleepint > 0) {
                         Sleeper.sleep(sleepint);
                     }
                     sendBackResponses(pluginContext.getContext(), result);
