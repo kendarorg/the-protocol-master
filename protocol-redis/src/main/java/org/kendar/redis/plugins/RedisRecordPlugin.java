@@ -54,6 +54,8 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
                     return Map.of("queue", input.get(1).asText());
                 } else if (input.get(0).asText().equalsIgnoreCase("MESSAGE")) {
                     return Map.of("queue", input.get(1).asText());
+                } else if (input.get(0).asText().equalsIgnoreCase("PING")) {
+                    return Map.of("type", "ping");
                 }
             }
         }
@@ -65,6 +67,8 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
                     return Map.of("queue", out.get(1).asText());
                 } else if (out.get(0).asText().equalsIgnoreCase("MESSAGE")) {
                     return Map.of("queue", out.get(1).asText());
+                } else if (out.get(0).asText().equalsIgnoreCase("PING")) {
+                    return Map.of("type", "ping");
                 }
             }
         }
@@ -84,5 +88,14 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
         var tags = buildTag(storageItem);
         var compactLine = new CompactLine(storageItem, () -> tags);
         EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
+    }
+
+    @Override
+    protected boolean shouldNotSave(Object in, Object out, CompactLine cl) {
+        if (cl == null) return false;
+        if (cl.getTags() == null || cl.getTags().get("type") == null) {
+            return false;
+        }
+        return cl.getTags().get("type").equals("ping");
     }
 }
