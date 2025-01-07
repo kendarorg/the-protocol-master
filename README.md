@@ -16,7 +16,13 @@ Effortlessy and with zero budget
 ### Get Started
 
 Look at "[The Protocol Master Samples](https://github.com/kendarorg/the-protocol-master-samples)" repository to create
-a complete docker environment to have a gimplse of the features
+a complete docker environment to have a gimplse of the features in
+various languages and environments
+
+* Python/MySQL/RabbitMQ
+* .Net Core/Entity Framework/MySQL
+* Go/Redis/Postgres
+* Java/Spring/MySQL/MQTT
 
 ### How it works
 
