@@ -139,7 +139,6 @@ public class PostgresExecutor {
         try {
             if (!shouldHandleAsSingleQuery(parsed) && possiblyMultiple) {
                 return handleWithinTransaction(parsed, protoContext, parse, binding, maxRecords, describable);
-                //TODO transaction
             } else {
                 var sqlParseResult = new SqlParseResult(parse.getQuery(), parsed.get(0).getType());
                 return handleSingleQuery(sqlParseResult, protoContext, parse, binding, maxRecords, describable);

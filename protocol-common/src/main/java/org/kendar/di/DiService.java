@@ -216,8 +216,11 @@ public class DiService {
                 if (!Arrays.asList(iTags).containsAll(Arrays.asList(tags))) {
                     continue;
                 }
+                result.add(this.createInstance(context, (Class<?>) i, transi));
+            } else {
+                result.add(this.createInstance(context, (Class<?>) i, transi));
             }
-            result.add(this.createInstance(context, (Class<?>) i, transi));
+
         }
         if (parent != null) {
             var parentResults = parent.getInstances(context, type, tags);
@@ -248,15 +251,21 @@ public class DiService {
         var result = new ArrayList<T>();
         for (var i : data) {
             if (tags.length > 0) {
-                var iTags = ((Class<?>) i).getAnnotation(TpmService.class).tags();
-                if (iTags.length != tags.length) {
-                    continue;
+                var annotation = ((Class<?>) i).getAnnotation(TpmService.class);
+                if (annotation != null) {
+                    var iTags = annotation.tags();
+                    if (iTags.length != tags.length) {
+                        continue;
+                    }
+                    if (!Arrays.asList(iTags).containsAll(Arrays.asList(tags))) {
+                        continue;
+                    }
+                    result.add((T) this.createInstance(context, (Class<?>) i, transi));
                 }
-                if (!Arrays.asList(iTags).containsAll(Arrays.asList(tags))) {
-                    continue;
-                }
+            } else {
+                result.add((T) this.createInstance(context, (Class<?>) i, transi));
             }
-            result.add((T) this.createInstance(context, (Class<?>) i, transi));
+
         }
         if (parent != null) {
             var parentResults = parent.getInstances(context, clazz, tags);

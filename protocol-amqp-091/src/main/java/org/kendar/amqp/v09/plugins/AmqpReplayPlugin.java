@@ -95,22 +95,18 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                         if (tag != null && !tag.isEmpty()) {
                             bd.setConsumerTag(tag);
                         }
-                        //consumeId = bd.getConsumeId();
                         fr = bd;
                         break;
                     case "HeaderFrame":
                         var hf = mapper.deserialize(out, HeaderFrame.class);
-                        //consumeId = hf.getConsumeId();
                         fr = hf;
                         break;
                     case "BodyFrame":
                         var bf = mapper.deserialize(out, BodyFrame.class);
-                        //consumeId = bf.getConsumeId();
                         fr = bf;
                         break;
                     case "BasicCancel":
                         var bc = mapper.deserialize(out, BasicCancel.class);
-                        //consumeId = bc.getConsumeId();
                         fr = bc;
                         break;
                 }
@@ -129,8 +125,6 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             var hashTopic = (HashSet<String>) context.getValue("QUEUE");
             var result = new HashMap<String, String>();
             for (var topic : hashTopic) {
-                // var spl = topic.split("|",3);
-                //TODO RABBITCONTEXT
                 result.put("queue", topic);
             }
             return result;

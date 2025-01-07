@@ -62,8 +62,6 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean handleDownload(Request reqp, Response resp) {
-        //StorageRepository storage = settings.getService("storage");
-
         try {
             var data = storage.readAsZip();
             respondFile(resp, data, ConstantsMime.ZIP, "storage.zip");
@@ -87,8 +85,6 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean cleanUp(Request reqp, Response resp) {
-        //StorageRepository storage = settings.getService("storage");
-
         try {
             storage.clean();
             respondOk(resp);
@@ -115,7 +111,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean handleUpload(Request reqp, Response resp) {
-        //StorageRepository storage = settings.getService("storage");
+
         try {
 
             byte[] inputData;
@@ -157,7 +153,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean getItems(Request reqp, Response resp) {
-        //StorageRepository storage = settings.getService("storage");
+
 
         try {
             var maxLengthStr = reqp.getQuery("maxLength");
@@ -200,7 +196,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean getSingleItem(Request reqp, Response resp) {
-        //StorageRepository storage = settings.getService("storage");
+
         var result = new StorageAndIndex();
 
         try {
@@ -244,7 +240,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean changeSingleItem(Request reqp, Response resp) {
-        //StorageRepository storage = settings.getService("storage");
+
         var request = mapper.deserialize(reqp.getRequestText().toString(), StorageAndIndex.class);
 
         try {
@@ -285,7 +281,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             )},
             tags = {"base/storage"})
     public boolean deleteSingleItem(Request reqp, Response resp) {
-        //StorageRepository storage = settings.getService("storage");
+
 
         try {
             var instanceId = reqp.getPathParameter("protocol");
