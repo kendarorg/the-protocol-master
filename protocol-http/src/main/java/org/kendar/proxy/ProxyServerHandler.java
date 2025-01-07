@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -123,8 +124,13 @@ public class ProxyServerHandler {
 
         final Socket forwardSocket;
         try {
-            forwardSocket = new Socket(dnsResolver.apply(proxyRequest.getHost()),
-                    changePort(httpsRedirect, proxyRequest.getPort()));
+            if(proxyRequest.getPort()==443) {
+                forwardSocket = new Socket(dnsResolver.apply(proxyRequest.getHost()),
+                        changePort(httpsRedirect, proxyRequest.getPort()));
+            }else{
+                forwardSocket = new Socket(InetAddress.getByName(proxyRequest.getHost()),
+                        proxyRequest.getPort());
+            }
 
         } catch (IOException | NumberFormatException e) {
             badGateway(proxyRequest, outputStreamWriter);
