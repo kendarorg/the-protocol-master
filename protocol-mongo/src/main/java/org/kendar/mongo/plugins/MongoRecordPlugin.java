@@ -1,6 +1,6 @@
 package org.kendar.mongo.plugins;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.mongo.dtos.BaseMessageData;
 import org.kendar.plugins.RecordPlugin;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;

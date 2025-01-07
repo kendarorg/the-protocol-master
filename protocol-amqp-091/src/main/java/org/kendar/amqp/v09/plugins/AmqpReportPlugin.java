@@ -3,7 +3,7 @@ package org.kendar.amqp.v09.plugins;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionOpen;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionOpenOk;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.ReportPlugin;

@@ -1,4 +1,4 @@
-package org.kendar.annotations.di;
+package org.kendar.di.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,9 +10,8 @@ import java.lang.annotation.Target;
  * Mandatory for @FilterClass
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface TpmTransient {
+@Target({ElementType.TYPE,ElementType.PARAMETER})
+public @interface TpmNamed {
     String name() default "";
     String[] tags() default {};
-    TpmScope scope() default TpmScope.GLOBAL;
 }

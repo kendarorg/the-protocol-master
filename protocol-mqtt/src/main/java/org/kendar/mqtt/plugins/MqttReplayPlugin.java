@@ -1,7 +1,7 @@
 package org.kendar.mqtt.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.fsm.*;
 import org.kendar.plugins.ReplayPlugin;

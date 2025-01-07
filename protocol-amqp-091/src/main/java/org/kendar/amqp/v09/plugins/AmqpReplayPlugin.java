@@ -5,7 +5,7 @@ import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;

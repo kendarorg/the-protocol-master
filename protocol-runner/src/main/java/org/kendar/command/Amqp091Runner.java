@@ -2,8 +2,8 @@ package org.kendar.command;
 
 import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.annotations.TpmConstructor;
-import org.kendar.annotations.di.TpmNamed;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmNamed;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;

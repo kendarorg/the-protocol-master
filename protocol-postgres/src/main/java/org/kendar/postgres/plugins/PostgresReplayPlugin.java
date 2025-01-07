@@ -1,7 +1,7 @@
 package org.kendar.postgres.plugins;
 
 import org.kendar.annotations.TpmConstructor;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.JdbcReplayPlugin;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.storage.generic.StorageRepository;

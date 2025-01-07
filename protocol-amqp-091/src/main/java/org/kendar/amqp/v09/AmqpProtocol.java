@@ -28,11 +28,11 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
+import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AmqpProtocol extends NetworkProtoDescriptor {
@@ -42,7 +42,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     final AtomicBoolean running = new AtomicBoolean(true);
     private final Logger log = LoggerFactory.getLogger(AmqpProtocol.class);
     private int port = PORT;
-    private TimerTask timer;
+    private TimerInstance timer;
 
     private AmqpProtocol() {
 

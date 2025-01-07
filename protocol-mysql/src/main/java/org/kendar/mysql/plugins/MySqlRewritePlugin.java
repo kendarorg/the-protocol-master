@@ -1,6 +1,6 @@
 package org.kendar.mysql.plugins;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.JdbcRewritePlugin;
 import org.kendar.utils.JsonMapper;
 

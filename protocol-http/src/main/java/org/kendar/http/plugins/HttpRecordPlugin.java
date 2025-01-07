@@ -1,6 +1,6 @@
 package org.kendar.http.plugins;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.apis.base.Request;
 import org.kendar.plugins.RecordPlugin;
 import org.kendar.plugins.base.ProtocolPhase;

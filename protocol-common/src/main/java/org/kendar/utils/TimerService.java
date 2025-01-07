@@ -11,7 +11,7 @@ public class TimerService {
     }
 
 
-    public TimerTask scheduleOnce(Runnable task, long delay) {
+    public TimerInstance scheduleOnce(Runnable task, long delay) {
         var timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -19,10 +19,10 @@ public class TimerService {
             }
         };
         timer.schedule(timerTask, delay);
-        return timerTask;
+        return new TimerInstance(timerTask,this);
     }
 
-    public TimerTask schedule(Runnable task, long delay, long period) {
+    public TimerInstance schedule(Runnable task, long delay, long period) {
         var timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -30,6 +30,6 @@ public class TimerService {
             }
         };
         timer.scheduleAtFixedRate(timerTask, delay, period);
-        return timerTask;
+        return new TimerInstance(timerTask,this);
     }
 }

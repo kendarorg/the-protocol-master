@@ -2,7 +2,7 @@ package org.kendar.apis;
 
 
 import org.kendar.annotations.HttpTypeFilter;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.apis.filters.StaticWebFilter;
 import org.kendar.utils.FileResourcesUtils;
 

@@ -1,6 +1,6 @@
 package org.kendar.command;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.mongo.MongoProxy;

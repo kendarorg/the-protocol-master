@@ -1,7 +1,7 @@
 package org.kendar.http.plugins;
 
-import org.kendar.annotations.di.TpmPostConstruct;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmPostConstruct;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.base.*;
 import org.kendar.proxy.PluginContext;

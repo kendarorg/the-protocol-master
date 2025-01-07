@@ -1,6 +1,6 @@
 package org.kendar.mongo.plugins;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;

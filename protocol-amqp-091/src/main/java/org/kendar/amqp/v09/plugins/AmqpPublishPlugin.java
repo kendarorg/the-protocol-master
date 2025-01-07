@@ -1,7 +1,7 @@
 package org.kendar.amqp.v09.plugins;
 
 import org.kendar.amqp.v09.apis.AmqpPublishPluginApis;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;

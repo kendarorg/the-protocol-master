@@ -1,6 +1,6 @@
 package org.kendar.mysql.plugins;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.JdbcRecordPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;

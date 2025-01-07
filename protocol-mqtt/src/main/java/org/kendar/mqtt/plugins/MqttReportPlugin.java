@@ -1,6 +1,6 @@
 package org.kendar.mqtt.plugins;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.fsm.*;

@@ -2,8 +2,8 @@ package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.kendar.annotations.TpmConstructor;
-import org.kendar.annotations.di.TpmPostConstruct;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmPostConstruct;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.events.*;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.generic.LineToWrite;

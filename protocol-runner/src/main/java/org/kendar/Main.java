@@ -9,6 +9,7 @@ import org.kendar.apis.filters.FiltersConfiguration;
 import org.kendar.cli.CommandParser;
 import org.kendar.command.ProtocolsRunner;
 import org.kendar.di.DiService;
+import org.kendar.di.TpmScopeType;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -287,15 +288,15 @@ public class Main {
         for (var item : ini.getProtocols().entrySet()) {
             new Thread(() -> {
                 try {
-
+                    var localDiService = diService.createChildScope(TpmScopeType.CUSTOM);
                     var protocol = ini.getProtocolForKey(item.getKey());
                     if (protocol == null) return;
                     var protocolManager = protocolsRunner.getManagerFor(protocol);
-                    var availableProtocolPlugins =diService.getInstances(ProtocolPluginDescriptor.class,protocol.getProtocol());
+                    var availableProtocolPlugins =localDiService.getInstances(ProtocolPluginDescriptor.class,protocol.getProtocol());
                             //loadAvailablePluginsForProtocol(protocol, ini, finalAllPlugins);
                     var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
 
-                    var storage = diService.getInstance(StorageRepository.class);
+                    var storage = localDiService.getInstance(StorageRepository.class);
                     try {
                         protocolsRunner.start(protocolServersCache, item.getKey(), ini, protocolFullSettings, storage, availableProtocolPlugins, stopWhenFalse);
                     } catch (Exception e) {
@@ -305,7 +306,7 @@ public class Main {
                     }
                     var pi = new ProtocolInstance(item.getKey(),
                             protocolServersCache.get(item.getKey()), availableProtocolPlugins, protocolFullSettings);
-                    var apiHandler = diService.getInstance(ApiHandler.class);
+                    var apiHandler = localDiService.getInstance(ApiHandler.class);
                     apiHandler.addProtocol(pi);
                     for (var pl : pi.getPlugins()) {
                         var apiHandlerPlugin = pl.getApiHandler();

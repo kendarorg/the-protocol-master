@@ -1,7 +1,7 @@
 package org.kendar.redis.plugins;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.RecordPlugin;

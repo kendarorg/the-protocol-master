@@ -1,6 +1,6 @@
 package org.kendar.di.simple.reg;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 
 @TpmService
 public class UsingRegistered {

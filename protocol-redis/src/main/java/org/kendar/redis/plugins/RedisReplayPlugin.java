@@ -1,6 +1,6 @@
 package org.kendar.redis.plugins;
 
-import org.kendar.annotations.di.TpmService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
