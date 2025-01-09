@@ -12,7 +12,7 @@ import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.MimeChecker;
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.apis.dtos.MqttConnection;
-import org.kendar.mqtt.apis.dtos.PublishMessage;
+import org.kendar.mqtt.apis.dtos.PublishMqttMessage;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.Publish;
 import org.kendar.mqtt.fsm.PublishAck;
@@ -78,7 +78,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                     "{connectionId}/{topic}",
             method = "POST",
             id = "POST /api/protocols/{#protocolInstanceId}/plugins/publish-plugin/connections/" +
-                    "{connectionId}/{channel}")
+                    "{connectionId}/{topic}")
     @TpmDoc(
             description = "Send a message. Mandatory are only: contentType,body. If " +
                     "content type is binary, the body must be a base-64 encoded byte array.",
@@ -87,7 +87,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                     @PathParameter(key = "topic", description = "Topic Id")
             },
             requests = @TpmRequest(
-                    body = PublishMessage.class
+                    body = PublishMqttMessage.class
             ),
             responses = {@TpmResponse(
                     body = Ok.class
@@ -98,14 +98,14 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
     public void publish(Request request, Response response) {
-        var messageData = mapper.deserialize(request.getRequestText().toString(), PublishMessage.class);
+        var messageData = mapper.deserialize(request.getRequestText().toString(), PublishMqttMessage.class);
         var connectionId = Integer.parseInt(request.getPathParameter("connectionId"));
         var topic = request.getPathParameter("topic");
 
         doPublish(messageData, connectionId, topic);
     }
 
-    public void doPublish(PublishMessage messageData, int connectionId, String topic) {
+    public void doPublish(PublishMqttMessage messageData, int connectionId, String topic) {
         var pInstance = getDescriptor().getProtocolInstance();
         byte[] dataToSend;
         if (MimeChecker.isBinary(messageData.getContentType(), null)) {

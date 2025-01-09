@@ -2,7 +2,7 @@ package org.kendar.amqp.v09.apis;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.kendar.amqp.v09.apis.dtos.AmqpConnection;
-import org.kendar.amqp.v09.apis.dtos.PublishMessage;
+import org.kendar.amqp.v09.apis.dtos.PublishAmqpMessage;
 import org.kendar.amqp.v09.context.AmqpProtoContext;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
@@ -88,7 +88,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                     @PathParameter(key = "channel", description = "Channel Id")
             },
             requests = @TpmRequest(
-                    body = PublishMessage.class
+                    body = PublishAmqpMessage.class
             ),
             responses = {@TpmResponse(
                     body = Ok.class
@@ -99,14 +99,14 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
     public void publish(Request request, Response response) {
-        var messageData = mapper.deserialize(request.getRequestText().toString(), PublishMessage.class);
+        var messageData = mapper.deserialize(request.getRequestText().toString(), PublishAmqpMessage.class);
         var connectionId = Integer.parseInt(request.getPathParameter("connectionId"));
         var channelId = Integer.parseInt(request.getPathParameter("channel"));
 
         doPublish(messageData, connectionId, channelId);
     }
 
-    public void doPublish(PublishMessage messageData, int connectionId, int channelId) {
+    public void doPublish(PublishAmqpMessage messageData, int connectionId, int channelId) {
         var pInstance = getDescriptor().getProtocolInstance();
         byte[] dataToSend;
         if (MimeChecker.isBinary(messageData.getContentType(), null)) {

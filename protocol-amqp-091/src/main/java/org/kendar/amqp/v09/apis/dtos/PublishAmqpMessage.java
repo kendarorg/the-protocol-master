@@ -1,6 +1,6 @@
 package org.kendar.amqp.v09.apis.dtos;
 
-public class PublishMessage {
+public class PublishAmqpMessage {
     private String contentType;
     private String appId;
     private String body;

@@ -1,6 +1,6 @@
 package org.kendar.mqtt.apis.dtos;
 
-public class PublishMessage {
+public class PublishMqttMessage {
     private String contentType;
     private String body;
     private String topic;

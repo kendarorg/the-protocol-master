@@ -9,6 +9,28 @@
     }
   },
   "protocols": {
+    "redis-01": {
+      "protocol": "redis",
+      "port": 6379,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connectionString": "tcp://192.168.56.2:26379",
+      "plugins": {
+        "record-plugin": {
+          "resetConnectionsOnStart": true
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": true,
+          "respectCallDuration": true
+        },
+        "report-plugin": {
+          "active": true
+        },
+        "publish-plugin": {
+        }
+      }
+    },
     "mysql-01": {
       "protocol": "mysql",
       "port": 3306,
@@ -45,6 +67,8 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "publish-plugin": {
+        },
         "record-plugin": {
           "resetConnectionsOnStart": true
         },

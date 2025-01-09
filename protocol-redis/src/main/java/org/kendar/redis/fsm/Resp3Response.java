@@ -14,7 +14,6 @@ import java.util.Iterator;
 public class Resp3Response extends ProtoState implements NetworkReturnMessage {
     private static final Logger log = LoggerFactory.getLogger(Resp3Response.class);
     private Resp3Message event;
-    private boolean proxy;
 
     public Resp3Response() {
         super();
@@ -26,15 +25,6 @@ public class Resp3Response extends ProtoState implements NetworkReturnMessage {
 
     public Resp3Message getEvent() {
         return event;
-    }
-
-    public Resp3Response asProxy() {
-        this.proxy = true;
-        return this;
-    }
-
-    public boolean isProxyed() {
-        return proxy;
     }
 
     @Override

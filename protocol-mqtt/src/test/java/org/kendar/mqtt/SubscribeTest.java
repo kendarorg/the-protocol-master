@@ -7,7 +7,7 @@ import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.mqtt.apis.MqttPublishPluginApis;
 import org.kendar.mqtt.apis.dtos.MqttConnection;
-import org.kendar.mqtt.apis.dtos.PublishMessage;
+import org.kendar.mqtt.apis.dtos.PublishMqttMessage;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
@@ -199,7 +199,7 @@ public class SubscribeTest extends BasicTest {
             });
             Assertions.assertEquals(1, responses.size());
             var response = responses.get(0);
-            var pm = new PublishMessage();
+            var pm = new PublishMqttMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
             pm.setTopic(TOPIC_NAME);
@@ -252,7 +252,7 @@ public class SubscribeTest extends BasicTest {
             });
             Assertions.assertEquals(1, responses.size());
             var response = responses.get(0);
-            var pm = new PublishMessage();
+            var pm = new PublishMqttMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
             pm.setTopic(TOPIC_NAME);
@@ -306,7 +306,7 @@ public class SubscribeTest extends BasicTest {
             });
             Assertions.assertEquals(1, responses.size());
             var response = responses.get(0);
-            var pm = new PublishMessage();
+            var pm = new PublishMqttMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
             pm.setTopic(TOPIC_NAME);

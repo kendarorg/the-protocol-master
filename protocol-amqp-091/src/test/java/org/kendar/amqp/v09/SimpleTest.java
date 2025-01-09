@@ -5,7 +5,7 @@ import com.rabbitmq.client.*;
 import org.junit.jupiter.api.*;
 import org.kendar.amqp.v09.apis.AmqpPublishPluginApis;
 import org.kendar.amqp.v09.apis.dtos.AmqpConnection;
-import org.kendar.amqp.v09.apis.dtos.PublishMessage;
+import org.kendar.amqp.v09.apis.dtos.PublishAmqpMessage;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.utils.Sleeper;
@@ -361,7 +361,7 @@ public class SimpleTest extends BasicTest {
         });
         assertEquals(1, responses.size());
         var response = responses.get(0);
-        var pm = new PublishMessage();
+        var pm = new PublishAmqpMessage();
         pm.setAppId("test");
         pm.setContentType("text/plain");
         pm.setBody("TestData1");
