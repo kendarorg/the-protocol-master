@@ -202,7 +202,6 @@ public class SubscribeTest extends BasicTest {
             var pm = new PublishMqttMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
-            pm.setTopic(TOPIC_NAME);
             publish.doPublish(pm, response.getId(), TOPIC_NAME);
             Sleeper.sleep(500);
 
@@ -255,7 +254,6 @@ public class SubscribeTest extends BasicTest {
             var pm = new PublishMqttMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
-            pm.setTopic(TOPIC_NAME);
             publish.doPublish(pm, response.getId(), TOPIC_NAME);
             Sleeper.sleep(500);
 
@@ -309,7 +307,6 @@ public class SubscribeTest extends BasicTest {
             var pm = new PublishMqttMessage();
             pm.setContentType("text/plain");
             pm.setBody(MESSAGE_CONTENT);
-            pm.setTopic(TOPIC_NAME);
             publish.doPublish(pm, response.getId(), TOPIC_NAME);
             Sleeper.sleep(500);
 
