@@ -5,7 +5,6 @@ import org.kendar.buffers.BBufferEndianness;
 import org.kendar.mqtt.fsm.*;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
-import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -15,8 +14,6 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MqttProtocol extends NetworkProtoDescriptor {
     public static final int VERSION_5 = 5;
@@ -57,7 +54,7 @@ public class MqttProtocol extends NetworkProtoDescriptor {
                                                                 new PublishRel(MqttPacket.class).asOptional()
                                                         ),
                                                         new Subscribe(MqttPacket.class),
-                                                        new PublishAck(MqttPacket.class),
+                                                        new PublishAck(MqttPacket.class).asProxy(),
                                                         new ProtoStateSequence(
                                                                 new PublishRec(MqttPacket.class).asProxy(),
                                                                 new PublishComp(MqttPacket.class).asProxy()

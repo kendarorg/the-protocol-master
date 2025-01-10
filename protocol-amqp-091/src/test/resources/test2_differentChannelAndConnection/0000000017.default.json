@@ -1,5 +1,5 @@
 {
-  "timestamp": 1733870617200,
+  "timestamp": 1734945324280,
   "constant": false,
   "connectionId": 1,
   "index": 17,
@@ -9,7 +9,7 @@
     "proxyed": false,
     "classId": 60,
     "methodId": 60,
-    "consumerTag": "amq.ctag-sQzqNeFgzmseb97B8DI2PQ",
+    "consumerTag": "amq.ctag-ABbC4Jyh7I96eIF9Ty6QqQ",
     "deliveryTag": 1,
     "redelivered": false,
     "exchange": "",

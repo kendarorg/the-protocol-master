@@ -1,5 +1,5 @@
 {
-  "timestamp": 1733762110266,
+  "timestamp": 1734945805337,
   "constant": false,
   "connectionId": 1,
   "index": 4,
@@ -7,7 +7,10 @@
     "fullFlag": 48,
     "fixedHeader": "PUBLISH",
     "topicName": "/subscribe/",
-    "payload": "bGxvIFdvcmxkISE=",
+    "payload": {
+      "bytes": "SGVsbG8gV29ybGQhIQ==",
+      "chars": "Hello World!!"
+    },
     "packetIdentifier": 18533,
     "dupFlag": false,
     "retainFlag": false,

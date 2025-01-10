@@ -6,12 +6,16 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.special.SpecialProtoState;
 import org.kendar.protocol.states.special.Tagged;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,7 +35,7 @@ public abstract class ProtoDescriptor {
      */
     private final List<ProtoState> interrupts = new ArrayList<>();
     private ConcurrentHashMap<Integer, ProtoContext> contextsCache;
-    private TimerTask contextCleaner;
+    private TimerInstance contextCleaner;
 
     public static long getNow() {
         return System.currentTimeMillis() / 1000;

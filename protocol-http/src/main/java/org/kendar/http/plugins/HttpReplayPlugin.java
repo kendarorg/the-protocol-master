@@ -6,6 +6,7 @@ import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.ConstantsMime;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -16,6 +17,8 @@ import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +27,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@TpmService(tags = "http")
 public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     private static final Logger log = LoggerFactory.getLogger(HttpReplayPlugin.class);
     private boolean blockExternal = true;
     private List<MatchingRecRep> matchSites = new ArrayList<>();
+
+    public HttpReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
     @Override
     public Class<?> getSettingClass() {

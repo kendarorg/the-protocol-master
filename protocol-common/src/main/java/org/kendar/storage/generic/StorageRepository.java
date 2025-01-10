@@ -30,4 +30,8 @@ public interface StorageRepository extends Service {
     List<CompactLine> getIndexes(String instanceId);
 
     void clean();
+
+    void update(long itemId, String protocolInstanceId, CompactLine index, StorageItem item);
+
+    void delete(String instanceId, long itemId);
 }

@@ -1,5 +1,5 @@
 {
-  "timestamp": 1733762110706,
+  "timestamp": 1735028857742,
   "constant": false,
   "connectionId": 1,
   "index": 2,
@@ -19,7 +19,7 @@
     "fixedHeader": "SUBACK",
     "packetIdentifier": 1
   },
-  "durationMs": 1,
+  "durationMs": 16,
   "type": "Subscribe",
   "caller": "MQTT",
   "inputType": "Subscribe",

@@ -1,16 +1,32 @@
 [
   {
+    "index": 5,
+    "type": "Disconnect",
+    "caller": "MQTT",
+    "durationMs": 1042,
+    "tags": {}
+  },
+  {
     "index": 1,
     "type": "Connect",
     "caller": "MQTT",
-    "durationMs": 5,
+    "durationMs": 14,
     "tags": {}
   },
   {
     "index": 2,
     "type": "Subscribe",
     "caller": "MQTT",
-    "durationMs": 1,
+    "durationMs": 11,
+    "tags": {
+      "/subscribe/": "2"
+    }
+  },
+  {
+    "index": 3,
+    "type": "Publish",
+    "caller": "MQTT",
+    "durationMs": 535,
     "tags": {
       "/subscribe/": "2"
     }
@@ -20,15 +36,6 @@
     "type": "RESPONSE",
     "caller": "MQTT",
     "durationMs": 0,
-    "tags": {
-      "/subscribe/": "2"
-    }
-  },
-  {
-    "index": 3,
-    "type": "Publish",
-    "caller": "MQTT",
-    "durationMs": 188,
     "tags": {
       "/subscribe/": "2"
     }
@@ -44,21 +51,14 @@
     "index": 6,
     "type": "PublishRec",
     "caller": "MQTT",
-    "durationMs": 996,
+    "durationMs": 1000,
     "tags": {}
   },
   {
     "index": 7,
     "type": "PublishComp",
     "caller": "MQTT",
-    "durationMs": 0,
-    "tags": {}
-  },
-  {
-    "index": 8,
-    "type": "Disconnect",
-    "caller": "MQTT",
-    "durationMs": 0,
+    "durationMs": 11,
     "tags": {}
   }
 ]

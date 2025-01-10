@@ -2,6 +2,8 @@ package org.kendar.command;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
+import org.kendar.di.DiService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.MqttProxy;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+@TpmService
 public class MqttRunner extends CommonRunner {
     private TcpServer ps;
 
@@ -74,7 +77,11 @@ public class MqttRunner extends CommonRunner {
         proxy.setPlugins(plugins);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
+        var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
+        ps.setOnStart(() -> {
+            DiService.setThreadContext(diService);
+        });
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServers.put(key, ps);

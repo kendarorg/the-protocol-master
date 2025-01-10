@@ -1,15 +1,14 @@
 package org.kendar.command;
 
-import com.sun.net.httpserver.HttpsServer;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
+import org.kendar.di.DiService;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.http.HttpProtocol;
 import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
-import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.RewritePluginSettings;
-import org.kendar.server.KendarHttpsServer;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -18,24 +17,15 @@ import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+@TpmService
 public class HttpRunner extends CommonRunner {
     private static final Logger log = LoggerFactory.getLogger(HttpRunner.class);
     private TcpServer ps;
-
-    private static HttpsServer createHttpsServer(CertificatesManager certificatesManager,
-                                                 InetSocketAddress sslAddress, int backlog, String cname, String der,
-                                                 String key, List<String> hosts) throws Exception {
-        var httpsServer = new KendarHttpsServer(sslAddress, backlog);
-
-        certificatesManager.setupSll(httpsServer, hosts, cname, der, key);
-        return httpsServer;
-    }
 
 
     @Override
@@ -171,7 +161,11 @@ public class HttpRunner extends CommonRunner {
         }
         var baseProtocol = new HttpProtocol(ini, settings, plugins);
         baseProtocol.initialize();
+        var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
+        ps.setOnStart(() -> {
+            DiService.setThreadContext(diService);
+        });
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(sectionKey, ps);

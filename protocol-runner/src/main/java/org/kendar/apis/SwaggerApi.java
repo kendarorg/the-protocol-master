@@ -31,6 +31,8 @@ import org.kendar.apis.filters.FiltersConfiguration;
 import org.kendar.apis.matchers.ApiMatcher;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.ConstantsMime;
+import org.kendar.di.annotations.TpmService;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("HttpUrlsUsage")
+@TpmService
 @HttpTypeFilter(hostAddress = "*",
         blocking = true)
 public class SwaggerApi implements FilteringClass {
@@ -50,10 +53,10 @@ public class SwaggerApi implements FilteringClass {
     private final int port;
 
     public SwaggerApi(FiltersConfiguration filtersConfiguration,
-                      List<SwaggerEnricher> enrichers, int port) {
+                      List<SwaggerEnricher> enrichers, GlobalSettings settings) {
 
         this.filtersConfiguration = filtersConfiguration;
-        this.port = port;
+        this.port = settings.getApiPort();
         this.localAddress = "localhost";
         this.enrichers = enrichers;
     }

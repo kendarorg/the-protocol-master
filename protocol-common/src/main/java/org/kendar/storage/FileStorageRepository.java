@@ -1,7 +1,11 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmPostConstruct;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.events.*;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.storage.generic.StorageRepository;
@@ -15,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +32,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+@TpmService
 public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
     static final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -50,6 +56,16 @@ public class FileStorageRepository implements StorageRepository {
         this.targetDir = targetDir.toAbsolutePath().toString();
     }
 
+    @TpmConstructor
+    public FileStorageRepository(GlobalSettings settings) {
+        var logsDir = settings.getDataDir();
+        if (logsDir == null || logsDir.isEmpty()) {
+            logsDir = Path.of("data",
+                    Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
+        }
+        this.targetDir = Path.of(logsDir).toAbsolutePath().toString();
+    }
+
     public static String padLeftZeros(String inputString, int length) {
         if (inputString.length() >= length) {
             return inputString;
@@ -63,6 +79,7 @@ public class FileStorageRepository implements StorageRepository {
         return sb.toString();
     }
 
+    @TpmPostConstruct
     @Override
     public void initialize() {
 
@@ -180,6 +197,7 @@ public class FileStorageRepository implements StorageRepository {
         }
     }
 
+
     public long generateIndex() {
         synchronized (lock) {
             return storageCounter.incrementAndGet();
@@ -190,6 +208,7 @@ public class FileStorageRepository implements StorageRepository {
     public void write(LineToWrite item) {
         executorItems.incrementAndGet();
         executor.submit(() -> {
+
             if (item == null) {
                 log.error("Blank item");
                 return;
@@ -445,6 +464,56 @@ public class FileStorageRepository implements StorageRepository {
         }
         return result;
 
+    }
+
+    @Override
+    public void update(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
+        var indexFile = retrieveIndexFile(protocolInstanceId);
+        var indexPath = Path.of(targetDir, "index." + protocolInstanceId + ".json");
+        for (int i = 0; i < indexFile.size(); i++) {
+            var toCheck = indexFile.get(i);
+            if (toCheck.getIndex() == itemId) {
+                index.setIndex(itemId);
+                indexFile.set(i, index);
+                var old = this.readById(protocolInstanceId, itemId);
+
+                var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+                try {
+                    item.setIndex(itemId);
+                    item.setTimestamp(old.getTimestamp());
+                    item.setCaller(old.getCaller());
+                    Files.writeString(indexPath, mapper.serialize(indexFile));
+                    Files.writeString(filePath, mapper.serialize(item));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return;
+            }
+        }
+        throw new RuntimeException("ITem id " + itemId + " not found");
+
+    }
+
+    @Override
+    public void delete(String protocolInstanceId, long itemId) {
+        try {
+            var indexFile = retrieveIndexFile(protocolInstanceId);
+            var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+            var indexPath = Path.of(targetDir, "index." + protocolInstanceId + ".json");
+            if (filePath.toFile().exists()) {
+                Files.delete(filePath);
+            }
+            for (int i = 0; i < indexFile.size(); i++) {
+                var toCheck = indexFile.get(i);
+                if (toCheck.getIndex() == itemId) {
+                    indexFile.remove(i);
+                    Files.writeString(indexPath, mapper.serialize(indexFile));
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to delete item " + itemId, ex);
+        }
     }
 
     private static class ProtocolRepo {

@@ -1,5 +1,6 @@
 package org.kendar.mongo.plugins;
 
+import org.kendar.di.annotations.TpmService;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
@@ -11,8 +12,15 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 
+@TpmService(tags = "mongodb")
 public class MongoReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
+    public MongoReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
+
     @Override
     public String getProtocol() {
         return "mongodb";

@@ -9,13 +9,11 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
 public class BasicDeliver extends Basic {
 
-    protected static final JsonMapper mapper = new JsonMapper();
     private String consumerTag;
     private long deliveryTag;
     private boolean redelivered;

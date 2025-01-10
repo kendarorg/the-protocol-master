@@ -1,23 +1,29 @@
 package org.kendar.redis.plugins;
 
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
-import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.util.List;
 import java.util.Map;
 
+@TpmService(tags = "redis")
 public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
+
+    public RedisReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
 
     @Override

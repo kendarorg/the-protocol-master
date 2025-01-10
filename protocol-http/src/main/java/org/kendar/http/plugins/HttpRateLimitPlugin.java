@@ -2,6 +2,7 @@ package org.kendar.http.plugins;
 
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
@@ -10,6 +11,7 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.FileResourcesUtils;
+import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,14 +23,18 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
+@TpmService(tags = "http")
 public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
-    private List<Pattern> recordSites = new ArrayList<>();
+    private List<Pattern> sitesToLimit = new ArrayList<>();
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
+
+    public HttpRateLimitPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     @Override
     public Class<?> getSettingClass() {
@@ -48,7 +54,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         var settings = getSettings();
-        setupSitesToRecord(settings.getLimitSites());
+        setupSitesToLimit(settings.getLimitSites());
         if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
             var frr = new FileResourcesUtils();
             customResponse = mapper.deserialize(frr.getFileFromResourceAsString(settings.getCustomResponseFile()), Response.class);
@@ -58,9 +64,9 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
-            if (!recordSites.isEmpty()) {
+            if (!sitesToLimit.isEmpty()) {
                 var matchFound = false;
-                for (var pat : recordSites) {
+                for (var pat : sitesToLimit) {
                     if (pat.matcher(in.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                         matchFound = true;
                         break;
@@ -75,8 +81,8 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
         return false;
     }
 
-    private void setupSitesToRecord(List<String> recordSites) {
-        this.recordSites = recordSites.stream()
+    private void setupSitesToLimit(List<String> recordSites) {
+        this.sitesToLimit = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
                 .map(regex -> regex.startsWith("@") ?
                         Pattern.compile(regex.substring(1)) :

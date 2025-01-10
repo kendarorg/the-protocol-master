@@ -102,6 +102,8 @@ public class ExchangeBind extends Exchange {
         queueDeclare.setNoWait(noWait);
         queueDeclare.setDestination(destination);
 
+        context.setValue("ROUTING_KEYS_CH_" + channel, routingKey);
+
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
                 connection,
                 queueDeclare,

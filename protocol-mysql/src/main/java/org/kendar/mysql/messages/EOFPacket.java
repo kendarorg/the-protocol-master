@@ -4,12 +4,6 @@ import org.kendar.mysql.buffers.MySQLBBuffer;
 
 public class EOFPacket extends MySQLReturnMessage {
 
-    //  if capabilities & CLIENT_PROTOCOL_41 {
-//     int<2>	status_flags	Status Flags
-//     int<2>	warnings	number of warnings
-//    } elseif capabilities & CLIENT_TRANSACTIONS {
-//     int<2>	status_flags	Status Flags
-//    }
     private int statusFlags;
     private int warnings;
 

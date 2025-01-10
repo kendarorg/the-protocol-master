@@ -9,6 +9,7 @@ import io.moquette.interception.messages.InterceptPublishMessage;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
+import org.kendar.mqtt.plugins.MqttPublishPlugin;
 import org.kendar.mqtt.plugins.MqttRecordPlugin;
 import org.kendar.mqtt.plugins.MqttReportPlugin;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
@@ -19,6 +20,7 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.io.File;
@@ -38,6 +40,7 @@ public class BasicTest {
     //protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     protected static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static MqttPublishPlugin publishPlugin;
     private static Server mqttBroker;
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
@@ -114,10 +117,15 @@ public class BasicTest {
         }
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new MqttRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
-        var rep = new MqttReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        proxy.setPlugins(List.of(pl, rep));
+        //gs.putService("storage", storage);
+        var pls = new BasicAysncRecordPluginSettings();
+        pls.setResetConnectionsOnStart(false);
+        var mapper = new JsonMapper();
+        var pl = new MqttRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(),
+                pls);
+        var rep = new MqttReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        publishPlugin = (MqttPublishPlugin) new MqttPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        proxy.setPlugins(List.of(pl, rep, publishPlugin));
         rep.setActive(true);
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

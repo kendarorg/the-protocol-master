@@ -1,5 +1,5 @@
 {
-  "timestamp": 1733762111837,
+  "timestamp": 1734945807512,
   "constant": false,
   "connectionId": 1,
   "index": 1,
@@ -12,7 +12,7 @@
     "keepAlive": 60,
     "willQos": 0,
     "willRetain": false,
-    "clientId": "cea12f5e-56ff-48e2-a709-cf705355844e"
+    "clientId": "36a923c6-c950-4f07-9ee2-408c695d29d3"
   },
   "output": {
     "fullFlag": 32,
@@ -20,7 +20,7 @@
     "sessionSet": false,
     "connectReasonCode": 0
   },
-  "durationMs": 5,
+  "durationMs": 14,
   "type": "Connect",
   "caller": "MQTT",
   "inputType": "Connect",

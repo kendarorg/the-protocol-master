@@ -147,6 +147,7 @@ public class ExchangeDeclare extends Exchange {
         exchangeDec.setAutoDelete(autoDelete);
         exchangeDec.setNoWait(noWait);
         exchangeDec.setName(name);
+        context.setValue("EXCHANGE_CH_" + channel, name);
 
         var exchangeDeclareOk = new ExchangeDeclareOk();
         exchangeDeclareOk.setChannel(channel);

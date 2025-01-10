@@ -1,16 +1,29 @@
 package org.kendar.http.plugins;
 
+import org.kendar.di.annotations.TpmPostConstruct;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.base.*;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 
+@TpmService(tags = "http")
 public class SSLDummyPlugin extends ProtocolPluginDescriptorBase<SSLDummyPluginSettings> implements AlwaysActivePlugin {
     private HttpProtocolSettings protocolSettings;
+
+    public SSLDummyPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
+
+    @TpmPostConstruct
+    public void postConstruct() {
+        setActive(true);
+    }
 
     @Override
     public Class<?> getSettingClass() {

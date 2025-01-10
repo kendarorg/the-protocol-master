@@ -1,5 +1,6 @@
 package org.kendar.plugins;
 
+import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.base.BasePluginApiHandler;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@TpmService
 public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final List<ReportDataEvent> events = new ArrayList<>();

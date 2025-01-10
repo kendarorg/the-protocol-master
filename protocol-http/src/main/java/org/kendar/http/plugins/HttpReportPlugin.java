@@ -2,16 +2,24 @@ package org.kendar.http.plugins;
 
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.ReportPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
+import org.kendar.utils.JsonMapper;
 
 import java.util.Map;
 
+@TpmService(tags = "http")
 public class HttpReportPlugin extends ReportPlugin<PluginSettings> {
+
+    public HttpReportPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (!isActive()) return false;
 

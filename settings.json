@@ -9,6 +9,28 @@
     }
   },
   "protocols": {
+    "redis-01": {
+      "protocol": "redis",
+      "port": 6379,
+      "login": "remotelogin",
+      "password": "remotepassword",
+      "timeout": 30,
+      "connectionString": "tcp://192.168.56.2:26379",
+      "plugins": {
+        "record-plugin": {
+          "resetConnectionsOnStart": true
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": true,
+          "respectCallDuration": true
+        },
+        "report-plugin": {
+          "active": true
+        },
+        "publish-plugin": {
+        }
+      }
+    },
     "mysql-01": {
       "protocol": "mysql",
       "port": 3306,
@@ -43,7 +65,18 @@
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
-      "connectionString": "tcp://localhost:1885"
+      "connectionString": "tcp://localhost:1885",
+      "plugins": {
+        "publish-plugin": {
+        },
+        "record-plugin": {
+          "resetConnectionsOnStart": true
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": true,
+          "respectCallDuration": true
+        }
+      }
     },
     "http-01": {
       "protocol": "http",
@@ -85,6 +118,42 @@
         "mock-plugin": {
           "active": false,
           "dataDir": "target/mocks"
+        }
+      }
+    },
+    "amqp-01": {
+      "protocol": "amqp091",
+      "port": 5672,
+      "login": "root",
+      "password": "password",
+      "timeout": 30,
+      "connectionString": "tcp://192.168.56.2:25672",
+      "plugins": {
+        "publish-plugin": {
+        },
+        "record-plugin": {
+          "resetConnectionsOnStart": true
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": true,
+          "respectCallDuration": true
+        }
+      }
+    },
+    "mongo-01": {
+      "protocol": "mongodb",
+      "port": 6672,
+      "login": "root",
+      "password": "password",
+      "timeout": 30,
+      "connectionString": "tcp://192.168.56.2:26672",
+      "plugins": {
+        "publish-plugin": {
+        },
+        "record-plugin": {
+        },
+        "replay-plugin": {
+          "respectCallDuration": true
         }
       }
     }

@@ -2,15 +2,22 @@ package org.kendar.http.plugins;
 
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.util.List;
 import java.util.Random;
 
+@TpmService(tags = "http")
 public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyPluginSettings> {
+
+    public HttpLatencyPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     @Override
     public Class<?> getSettingClass() {

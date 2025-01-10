@@ -10,10 +10,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.buffers.BBuffer;
+import org.kendar.di.annotations.TpmService;
+
+import java.util.Base64;
 
 /**
  * Wrapper to have a single json serializer
  */
+@TpmService
 public class JsonMapper {
     private static final ObjectMapper mapper = new ObjectMapper().
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -80,6 +84,73 @@ public class JsonMapper {
             return mapper.readTree(mapper.writeValueAsString(of));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public ContentData toGenericContent(byte[] input, String contentType) {
+        var result = new ContentData();
+        result.setBytes(input);
+        if (contentType != null && !contentType.isEmpty()) {
+            if (contentType.contains("text") ||
+                    contentType.contains("xml")) {
+                result.setChars(new TextNode(new String(input)));
+                return result;
+            } else if (contentType.contains("json")) {
+                try {
+                    result.setChars(mapper.readTree(input));
+                } catch (Exception ex) {
+                    result.setChars(new TextNode(new String(input)));
+                }
+                return result;
+            }
+        }
+        var strData = new String(input);
+        var doubleConversion = strData.getBytes();
+        if (doubleConversion.length != input.length) {
+            result.setBytes(input);
+            return result;
+        }
+        for (int i = 0; i < input.length; i++) {
+            if (doubleConversion[i] != input[i]) {
+                result.setBytes(input);
+                return result;
+            }
+        }
+        result.setBytes(input);
+        try {
+            var pre = mapper.readTree(strData);
+            result.setChars(pre);
+        } catch (Exception ex) {
+            result.setChars(new TextNode(strData));
+        }
+        return result;
+    }
+
+    public byte[] fromGenericContent(ContentData content) {
+        if (content.getBytes() == null || content.getBytes().length == 0) {
+            if (content.getChars() == null) {
+                return new byte[]{};
+            } else {
+                return content.getChars().toString().getBytes();
+            }
+        } else {
+            return content.getBytes();
+        }
+    }
+
+    public String toHumanReadable(ContentData content) {
+        if (content.getBytes() == null || content.getBytes().length == 0) {
+            if (content.getChars() == null) {
+                return "";
+            } else {
+                return content.getChars().toString();
+            }
+        } else {
+            if (content.getChars() != null) {
+                return "STR:" + content.getChars().toString() + "\n" +
+                        "B64:" + Base64.getEncoder().encodeToString(content.getBytes());
+            }
+            return Base64.getEncoder().encodeToString(content.getBytes());
         }
     }
 }

@@ -10,17 +10,15 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
+import org.kendar.utils.ContentData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
 public class BodyFrame extends Frame {
-    protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger logPs = LoggerFactory.getLogger(AmqpProxySocket.class.getName());
-    private byte[] contentBytes;
-    private String contentString;
+    private ContentData content;
     private int consumeId;
     private String consumeOrigin;
 
@@ -28,16 +26,23 @@ public class BodyFrame extends Frame {
         setType(FrameType.BODY.asByte());
     }
 
-
     public BodyFrame(Class<?>... events) {
         super(events);
         setType(FrameType.BODY.asByte());
     }
 
+    public ContentData getContent() {
+        return content;
+    }
+
+    public void setContent(ContentData content) {
+        this.content = content;
+    }
+
     @Override
     protected void writeFrameContent(BBuffer rb) {
 
-        rb.write(contentBytes);
+        rb.write(mapper.fromGenericContent(content));
     }
 
     @Override
@@ -53,19 +58,10 @@ public class BodyFrame extends Frame {
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
         var contentType = (String) event.getContext().getValue("CONTENT_TYPE_" + channel);
         var contentBytes = rb.getBytes(size);
-        String contentString = null;
         String ext = "[SERVER]";
         if (isProxyed()) ext = "[PROXY ]";
         logPs.debug("{}[RX]: BodyFrame Content Length: {}", ext, contentBytes.length);
-        if (contentType != null) {
-            logPs.debug("{}[RX]: BodyFrame Content type: {}", ext, contentType);
-            if (contentType.contains("text") ||
-                    contentType.contains("json") ||
-                    contentType.contains("xml")) {
-                contentString = new String(contentBytes);
-                logPs.debug("{}[RX]: BodyFrame Content: {}", ext, contentString);
-            }
-        }
+        var contentItem = mapper.toGenericContent(contentBytes, contentType);
 
 
         var routingKey = context.getValue("BASIC_PUBLISH_RK_" + channel);
@@ -73,8 +69,7 @@ public class BodyFrame extends Frame {
 
         var bf = new BodyFrame();
         bf.setChannel(channel);
-        bf.setContentBytes(contentBytes);
-        bf.setContentString(contentString);
+        bf.setContent(contentItem);
         if (isProxyed()) {
             var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel);
             bf.setConsumeId(basicConsume.getConsumeId());
@@ -96,21 +91,6 @@ public class BodyFrame extends Frame {
         return iteratorOfRunnable(() -> proxy.sendAndForget(context, connection, bf));
     }
 
-    public byte[] getContentBytes() {
-        return contentBytes;
-    }
-
-    public void setContentBytes(byte[] contentBytes) {
-        this.contentBytes = contentBytes;
-    }
-
-    public String getContentString() {
-        return contentString;
-    }
-
-    public void setContentString(String contentString) {
-        this.contentString = contentString;
-    }
 
     public int getConsumeId() {
         return consumeId;

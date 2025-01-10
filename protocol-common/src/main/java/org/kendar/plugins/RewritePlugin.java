@@ -9,6 +9,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItem;
 import org.kendar.utils.ReplacerItemInstance;
 import org.slf4j.Logger;
@@ -23,6 +24,10 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();
+
+    public RewritePlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     protected abstract Class<?> getIn();
 

@@ -156,6 +156,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
             for (var runnable : toRun) {
                 runnable.run();
             }
+            updateLastAccess();
         });
     }
 

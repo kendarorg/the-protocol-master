@@ -118,6 +118,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
             } else {
                 fullRequest.addHeader("Host", request.getHost());
             }
+            //TODO HANDLE SOAP REQUEST
             /*if (request.isSoapRequest()) {
                 HttpEntity entity = handleSoapRequest(request);
                 ((HttpEntityEnclosingRequestBase) fullRequest).setEntity(entity);
@@ -147,11 +148,6 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                             }
                         }
                         builder.addPart(fbd);
-                        /*builder.addBinaryBody(
-                                part.getFieldName(),
-                                part.getByteData(),
-                                ContentType.create(part.getContentType()),
-                                part.getFileName());*/
                     } else {
                         var cb = new StringBody(part.getStringData());
                         var fbd = new FormBodyPart(part.getFieldName(), cb);

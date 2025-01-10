@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.kendar.Main;
 import org.kendar.apis.dtos.CompactLineApi;
-import org.kendar.storage.StorageItem;
+import org.kendar.apis.dtos.StorageAndIndex;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
@@ -52,9 +52,9 @@ public class ApiTestStorage extends ApiTestBase {
         assertEquals(12, items.size());
 
         var item = getRequest("http://localhost:5005/api/global/storage/items/default/3",
-                httpclient, new TypeReference<StorageItem>() {
+                httpclient, new TypeReference<StorageAndIndex>() {
                 });
-        assertEquals("JDBC", item.getCaller());
+        assertEquals("JDBC", item.getItem().getCaller());
 
     }
 

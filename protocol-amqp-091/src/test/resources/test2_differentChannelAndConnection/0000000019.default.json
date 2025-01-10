@@ -1,5 +1,5 @@
 {
-  "timestamp": 1733870617201,
+  "timestamp": 1734945324281,
   "constant": false,
   "connectionId": 1,
   "index": 19,
@@ -7,8 +7,10 @@
     "channel": 1,
     "type": 3,
     "proxyed": false,
-    "contentBytes": "enp6eiBkZXRhaWxzMQ==",
-    "contentString": "zzzz details1",
+    "content": {
+      "bytes": "enp6eiBkZXRhaWxzMQ==",
+      "chars": "zzzz details1"
+    },
     "consumeId": 1,
     "consumeOrigin": "fuffa_queue|1|{}"
   },

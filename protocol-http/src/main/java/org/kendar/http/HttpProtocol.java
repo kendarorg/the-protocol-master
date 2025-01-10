@@ -3,7 +3,6 @@ package org.kendar.http;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
 import org.kendar.apis.converters.RequestResponseBuilderImpl;
-import org.kendar.http.plugins.SSLDummyPlugin;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
@@ -43,10 +42,11 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         this.globalSettings = globalSettings;
         this.settings = settings;
         this.plugins = new ArrayList<>(plugins);
-        var sslPlugin = new SSLDummyPlugin();
-        sslPlugin.setActive(true);
-        sslPlugin.initialize(globalSettings, settings, null);
-        this.plugins.add(sslPlugin);
+
+        //var sslPlugin = new SSLDummyPlugin();
+        //sslPlugin.setActive(true);
+        //sslPlugin.initialize(globalSettings, settings, null);
+        //this.plugins.add(sslPlugin);
         //Disable logging for apache http client
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
 

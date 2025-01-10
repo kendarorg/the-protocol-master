@@ -32,9 +32,19 @@ All callback are replayed automatically
 
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
-* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server  (default true)
+* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server  (
+  default true)
 * blockExternal: Block calls to real service when not matching (default true)
-* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server (default true)
+* resetConnectionsOnStart: reset connection on start replaying. When starting replay on an already active server (
+  default true)
+
+### publish-plugin
+
+* Should be activated
+* Exposes the API to retrieve the current connections and if they are subscribed to something
+* Exposes the API to send a message to a currently active connection
+
+The qos is retrieved from the subscribed topic
 
 ## Missing features
 

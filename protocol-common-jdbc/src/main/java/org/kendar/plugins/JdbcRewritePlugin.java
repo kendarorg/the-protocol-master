@@ -4,11 +4,16 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItemInstance;
 
 import java.util.List;
 
 public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectResult, RewritePluginSettings, String> {
+    public JdbcRewritePlugin(JsonMapper mapper) {
+        super(mapper);
+    }
+
     @Override
     protected void replaceData(ReplacerItemInstance item, String toReplace, JdbcCall request, SelectResult response) {
         var replaced = item.run(toReplace);

@@ -12,7 +12,6 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferUtils;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +22,6 @@ import java.util.Map;
 public class BasicConsume extends Basic {
 
     private static final Logger log = LoggerFactory.getLogger(BasicConsume.class);
-    private static JsonMapper mapper = new JsonMapper();
     private short reserved1;
     private String queue;
     private String consumerTag;
@@ -147,22 +145,20 @@ public class BasicConsume extends Basic {
 
         var basicConsume = new BasicConsume();
         basicConsume.setChannel(channel);
-        basicConsume.arguments = arguments;
-        basicConsume.reserved1 = reserved1;
-        basicConsume.noWait = noWait;
-        basicConsume.exclusive = exclusive;
-        basicConsume.noAck = noAck;
-        basicConsume.consumerTag = consumerTag;
-        basicConsume.noLocal = noLocal;
-        basicConsume.queue = queue;
+        basicConsume.setArguments(arguments);
+        basicConsume.setReserved1(reserved1);
+        basicConsume.setNoWait(noWait);
+        basicConsume.setExclusive(exclusive);
+        basicConsume.setNoAck(noAck);
+        basicConsume.setConsumerTag(consumerTag);
+        basicConsume.setNoLocal(noLocal);
+        basicConsume.setQueue(queue);
         basicConsume.setConsumeId(context.getDescriptor().getCounter("CONSUME_ID"));
         context.setConsumeId(basicConsume.getConsumeId());
         protocol.getContextsCache().put(basicConsume.getConsumeId(), context);
 
         context.setValue("BASIC_CONSUME_CH_" + channel, basicConsume);
         log.debug("CTX:{} CHAN:{} CNS_ID:{}", context.getContextId(), channel, basicConsume.getConsumeId());
-
-        context.setValue("BASIC_CONSUME_CI_" + basicConsume.getConsumeId(), basicConsume);
 
         context.setValue("BASIC_CONSUME_CI_" + basicConsume.getConsumeId(), basicConsume);
 
@@ -175,15 +171,20 @@ public class BasicConsume extends Basic {
         list.add(queue + "|" + channel + "|" + mapper.serialize(arguments));
         basicConsume.setConsumeOrigin(queue + "|" + channel + "|" + mapper.serialize(arguments));
 
-        context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), basicConsume.getConsumerTag());
+
         //Send back the consume ok
         var bscOk = new BasicConsumeOk();
         bscOk.setTag(basicConsume.getConsumerTag());
-        return iteratorOfRunnable(() -> proxy.sendAndExpect(context,
-                connection,
-                basicConsume,
-                bscOk
-        ));
+        return iteratorOfRunnable(() -> {
+            var result = (BasicConsumeOk) proxy.sendAndExpect(context,
+                    connection,
+                    basicConsume,
+                    bscOk
+            );
+
+            context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), result.getTag());
+            return result;
+        });
     }
 
     public int getConsumeId() {

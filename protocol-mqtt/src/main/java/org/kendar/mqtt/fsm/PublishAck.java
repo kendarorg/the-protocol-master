@@ -2,11 +2,13 @@ package org.kendar.mqtt.fsm;
 
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.MqttProtocol;
+import org.kendar.mqtt.MqttProxy;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
+import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
 
@@ -43,7 +45,19 @@ public class PublishAck extends BasePropertiesMqttState implements ReturnMessage
             publishAck.setReasonCode(bb.get());
             readProperties(publishAck, bb);
         }
-        return iteratorOfList(publishAck);
+        var proxy = (MqttProxy) context.getProxy();
+        var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
+
+        if (!isProxyed()) {
+            return iteratorOfList(publishAck);
+        } else {
+            return iteratorOfRunnable(() ->
+                    proxy.sendAndForget(context,
+                            connection,
+                            publishAck
+                    )
+            );
+        }
     }
 
     public short getPacketIdentifier() {

@@ -1,15 +1,16 @@
 {
-  "timestamp": 1733762111430,
+  "timestamp": 1735028858382,
   "constant": false,
   "connectionId": 1,
   "index": 5,
   "input": {
-    "fullFlag": -32,
-    "fixedHeader": "DISCONNECT",
+    "fullFlag": 64,
+    "fixedHeader": "PUBACK",
+    "packetIdentifier": 1,
     "reasonCode": 0
   },
-  "durationMs": 0,
-  "type": "Disconnect",
+  "durationMs": 16,
+  "type": "PublishAck",
   "caller": "MQTT",
-  "inputType": "Disconnect"
+  "inputType": "PublishAck"
 }

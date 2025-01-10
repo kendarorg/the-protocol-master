@@ -3,6 +3,7 @@ package org.kendar.command;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.cli.CommandParser;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.server.TcpServer;
 import org.kendar.settings.GlobalSettings;
@@ -21,11 +22,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
+@TpmService
 public class ProtocolsRunner {
     private static final JsonMapper mapper = new JsonMapper();
     private final Map<String, CommonRunner> protocols = new HashMap<>();
 
-    public ProtocolsRunner(CommonRunner... input) {
+    public ProtocolsRunner(List<CommonRunner> input) {
         for (CommonRunner protocol : input) {
             protocols.put(protocol.getId(), protocol);
         }
@@ -82,7 +84,7 @@ public class ProtocolsRunner {
         return (T) value;
     }
 
-    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, HashMap<String, List<ProtocolPluginDescriptor>> filters, GlobalSettings settings, CommandParser parser) {
+    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, GlobalSettings settings, CommandParser parser) {
 
         try {
             var protocolMotherOption = options.getCommandOption("p");
@@ -120,14 +122,6 @@ public class ProtocolsRunner {
             parser.printHelp();
         }
         return false;
-    }
-
-    private void checkOptions(String... args) throws Exception {
-        for (var arg : args) {
-            if (arg == null) {
-                throw new Exception();
-            }
-        }
     }
 
 

@@ -10,6 +10,7 @@ import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.apis.utils.MimeChecker;
+import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.utils.FileResourcesUtils;
 
 import java.io.IOException;
@@ -25,11 +26,11 @@ public abstract class StaticWebFilter implements FilteringClass {
 
     public StaticWebFilter(FileResourcesUtils fileResourcesUtils) {
         this.fileResourcesUtils = fileResourcesUtils;
-        try {
+        /*try {
             loadAllStuffs();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     protected abstract String getPath();
@@ -42,7 +43,7 @@ public abstract class StaticWebFilter implements FilteringClass {
         return null;
     }
 
-    //TODO @PostConstruct
+    @TpmPostConstruct
     public void loadAllStuffs() throws IOException {
         var realPath = getPath();
         if (isResource(getPath())) {

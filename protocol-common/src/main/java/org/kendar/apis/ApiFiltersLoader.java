@@ -14,7 +14,9 @@ import org.kendar.apis.filters.FiltersConfiguration;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.MimeChecker;
-import org.kendar.utils.FileResourcesUtils;
+import org.kendar.di.annotations.TpmPostConstruct;
+import org.kendar.di.annotations.TpmService;
+import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,17 +30,20 @@ import java.util.*;
 import static org.kendar.apis.ApiUtils.respondKo;
 import static org.kendar.apis.ApiUtils.respondText;
 
+@TpmService
 public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
     private final List<FilteringClass> filteringClassList;
     private final FiltersConfiguration filtersConfiguration;
+    private final List<GlobalPluginDescriptor> globalPluginDescriptors;
     private final RequestResponseBuilderImpl requestResponseBuilder = new RequestResponseBuilderImpl();
     private final Logger log = LoggerFactory.getLogger(ApiFiltersLoader.class);
 
-    public ApiFiltersLoader(List<FilteringClass> filteringClassList, int port) {
+    public ApiFiltersLoader(List<FilteringClass> filteringClassList,
+                            FiltersConfiguration filtersConfiguration,
+                            List<GlobalPluginDescriptor> globalPluginDescriptors) {
         this.filteringClassList = filteringClassList;
-        filtersConfiguration = new FiltersConfiguration();
-        this.filteringClassList.add(new SwaggerApi(filtersConfiguration, new ArrayList<>(), port));
-        this.filteringClassList.add(new MainWebSite(new FileResourcesUtils()));
+        this.filtersConfiguration = filtersConfiguration;
+        this.globalPluginDescriptors = globalPluginDescriptors;
     }
 
     public static Method[] getAllMethodsInHierarchy(Class<?> objectClass) {
@@ -53,6 +58,13 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
         allMethods.addAll(Arrays.asList(declaredMethods));
         allMethods.addAll(Arrays.asList(methods));
         return allMethods.toArray(new Method[0]);
+    }
+
+    @TpmPostConstruct
+    public void postConstruct() {
+        for (var gp : globalPluginDescriptors) {
+            getFilters().add(gp.getApiHandler());
+        }
     }
 
     public List<FilteringClass> getFilters() {
@@ -207,5 +219,9 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
         return ((rCode >= 100 && rCode < 200) /* informational */
                 || (rCode == 204)           /* no content */
                 || (rCode == 304));
+    }
+
+    public FiltersConfiguration getConfig() {
+        return filtersConfiguration;
     }
 }

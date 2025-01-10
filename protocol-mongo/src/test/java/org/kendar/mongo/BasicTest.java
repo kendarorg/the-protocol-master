@@ -21,6 +21,7 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tests.testcontainer.images.MongoDbImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
@@ -87,9 +88,10 @@ public class BasicTest {
         }
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new MongoRecordPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        var rep = new MongoReportPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        //gs.putService("storage", storage);
+        var mapper = new JsonMapper();
+        var pl = new MongoRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var rep = new MongoReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(pl, rep));
         pl.setActive(true);

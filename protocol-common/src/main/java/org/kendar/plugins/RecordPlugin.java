@@ -30,6 +30,11 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     protected StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
 
+    public RecordPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper);
+        this.storage = storage;
+    }
+
     @Override
     public Class<?> getSettingClass() {
         return BasicRecordPluginSettings.class;
@@ -123,18 +128,18 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        withStorage(global.getService("storage"));
+        //withStorage(global.getService("storage"));
         ignoreTrivialCalls = ((BasicRecordPluginSettings) pluginSetting).isIgnoreTrivialCalls();
         super.initialize(global, protocol, pluginSetting);
         return this;
     }
 
-    protected RecordPlugin withStorage(StorageRepository storage) {
+    /*protected RecordPlugin withStorage(StorageRepository storage) {
         if (storage != null) {
             this.storage = storage;
         }
         return this;
-    }
+    }*/
 
     @Override
     public void terminate() {

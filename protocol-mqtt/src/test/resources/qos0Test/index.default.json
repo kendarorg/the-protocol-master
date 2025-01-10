@@ -3,14 +3,14 @@
     "index": 1,
     "type": "Connect",
     "caller": "MQTT",
-    "durationMs": 37,
+    "durationMs": 12,
     "tags": {}
   },
   {
     "index": 2,
     "type": "Subscribe",
     "caller": "MQTT",
-    "durationMs": 6,
+    "durationMs": 10,
     "tags": {
       "/subscribe/": "0"
     }
@@ -19,7 +19,7 @@
     "index": 3,
     "type": "Publish",
     "caller": "MQTT",
-    "durationMs": 0,
+    "durationMs": 11,
     "tags": {
       "/subscribe/": "0"
     }
@@ -32,12 +32,5 @@
     "tags": {
       "/subscribe/": "0"
     }
-  },
-  {
-    "index": 5,
-    "type": "Disconnect",
-    "caller": "MQTT",
-    "durationMs": 0,
-    "tags": {}
   }
 ]

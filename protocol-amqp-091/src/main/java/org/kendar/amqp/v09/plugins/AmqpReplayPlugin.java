@@ -5,6 +5,7 @@ import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
@@ -12,6 +13,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ExtraBeanUtils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -25,9 +27,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+@TpmService(tags = "amqp091")
 public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(AmqpReplayPlugin.class);
+
+    public AmqpReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
 
     @Override
@@ -85,25 +92,21 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                     case "BasicDeliver":
                         var bd = mapper.deserialize(out, BasicDeliver.class);
                         var tag = (String) ctx.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
-                        if(tag!=null && !tag.isEmpty()) {
+                        if (tag != null && !tag.isEmpty()) {
                             bd.setConsumerTag(tag);
                         }
-                        //consumeId = bd.getConsumeId();
                         fr = bd;
                         break;
                     case "HeaderFrame":
                         var hf = mapper.deserialize(out, HeaderFrame.class);
-                        //consumeId = hf.getConsumeId();
                         fr = hf;
                         break;
                     case "BodyFrame":
                         var bf = mapper.deserialize(out, BodyFrame.class);
-                        //consumeId = bf.getConsumeId();
                         fr = bf;
                         break;
                     case "BasicCancel":
                         var bc = mapper.deserialize(out, BasicCancel.class);
-                        //consumeId = bc.getConsumeId();
                         fr = bc;
                         break;
                 }
@@ -122,8 +125,6 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             var hashTopic = (HashSet<String>) context.getValue("QUEUE");
             var result = new HashMap<String, String>();
             for (var topic : hashTopic) {
-                // var spl = topic.split("|",3);
-                //TODO RABBITCONTEXT
                 result.put("queue", topic);
             }
             return result;

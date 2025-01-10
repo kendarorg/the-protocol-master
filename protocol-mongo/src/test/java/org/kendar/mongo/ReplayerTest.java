@@ -19,6 +19,7 @@ import org.kendar.server.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
 import java.nio.file.Path;
@@ -53,8 +54,9 @@ public class ReplayerTest {
                 "test", "resources", "replay"));
         storage.initialize();
         var gs = new GlobalSettings();
-        gs.putService("storage", storage);
-        var pl = new MongoReplayPlugin().initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
+        //gs.putService("storage", storage);
+
+        var pl = new MongoReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
         proxy.setPlugins(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

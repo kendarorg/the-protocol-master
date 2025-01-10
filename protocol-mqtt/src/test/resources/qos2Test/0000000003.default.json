@@ -1,5 +1,5 @@
 {
-  "timestamp": 1733762112355,
+  "timestamp": 1734945808047,
   "constant": false,
   "connectionId": 1,
   "index": 3,
@@ -7,7 +7,10 @@
     "fullFlag": 52,
     "fixedHeader": "PUBLISH",
     "topicName": "/subscribe/",
-    "payload": "SGVsbG8gV29ybGQhIQ==",
+    "payload": {
+      "bytes": "SGVsbG8gV29ybGQhIQ==",
+      "chars": "Hello World!!"
+    },
     "packetIdentifier": 2,
     "dupFlag": false,
     "retainFlag": false,
@@ -19,7 +22,7 @@
     "packetIdentifier": 2,
     "reasonCode": 0
   },
-  "durationMs": 188,
+  "durationMs": 535,
   "type": "Publish",
   "caller": "MQTT",
   "inputType": "Publish",

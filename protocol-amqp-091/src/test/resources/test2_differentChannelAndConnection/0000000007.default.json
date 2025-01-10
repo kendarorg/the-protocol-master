@@ -1,5 +1,5 @@
 {
-  "timestamp": 1733870616970,
+  "timestamp": 1734945323961,
   "constant": false,
   "connectionId": 1,
   "index": 7,
@@ -17,7 +17,8 @@
     "exclusive": false,
     "noWait": false,
     "arguments": {},
-    "consumeId": 1
+    "consumeId": 1,
+    "consumeOrigin": "fuffa_queue|1|{}"
   },
   "output": {
     "channel": 1,
@@ -25,9 +26,9 @@
     "proxyed": false,
     "classId": 60,
     "methodId": 21,
-    "tag": "amq.ctag-sQzqNeFgzmseb97B8DI2PQ"
+    "tag": "amq.ctag-ABbC4Jyh7I96eIF9Ty6QqQ"
   },
-  "durationMs": 1,
+  "durationMs": 11,
   "type": "BasicConsume",
   "caller": "AMQP",
   "inputType": "BasicConsume",

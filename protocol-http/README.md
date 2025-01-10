@@ -51,9 +51,9 @@ without the need to mock a single request
 Generate random errors
 
 * active: If it is active
-* errorCode: The error code to expose
+* showError: The error code to expose
 * errorMessage: the error message to write to output
-* percentage: the percent of calls to generate errors
+* errorPercent: the percent of calls to generate errors
 
 ### latency-plugin
 

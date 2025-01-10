@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.MimeChecker;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.MockPlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.utils.ChangeableReference;
+import org.kendar.utils.JsonMapper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +17,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@TpmService(tags = "http")
 public class HttpMockPlugin extends MockPlugin<Request, Response> {
+
+    public HttpMockPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
 
     private static void writeHeaderParameter(Response clonedResponse, HashMap<String, String> parameters) {
         for (var kvp : clonedResponse.getHeaders().entrySet()) {

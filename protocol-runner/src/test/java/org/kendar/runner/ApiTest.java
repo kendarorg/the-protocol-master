@@ -114,6 +114,7 @@ public class ApiTest extends ApiTestBase {
         var okResult = getRequest("http://localhost:5005/api/protocols/all/plugins/record-plugin/start", httpclient, new TypeReference<Ok>() {
         });
         assertEquals("OK", okResult.getResult());
+        Sleeper.sleep(1000);
 
         for (var protocol : protocols) {
             var status = getRequest("http://localhost:5005/api/protocols/" + protocol.getId() + "/plugins/record-plugin/status", httpclient, new TypeReference<Status>() {
@@ -125,6 +126,7 @@ public class ApiTest extends ApiTestBase {
             });
             assertEquals("OK", okResult.getResult());
         }
+        Sleeper.sleep(1000);
         for (var protocol : protocols) {
             var status = getRequest("http://localhost:5005/api/protocols/" + protocol.getId() + "/plugins/record-plugin/start", httpclient, new TypeReference<Status>() {
             });

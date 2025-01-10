@@ -1,5 +1,5 @@
 {
-  "timestamp": 1733762114546,
+  "timestamp": 1734945810583,
   "constant": false,
   "connectionId": 1,
   "index": 7,
@@ -9,7 +9,7 @@
     "packetIdentifier": 1,
     "reasonCode": 0
   },
-  "durationMs": 0,
+  "durationMs": 11,
   "type": "PublishComp",
   "caller": "MQTT",
   "inputType": "PublishComp"

@@ -1,0 +1,21 @@
+<html>
+<head>
+    <script charset="UTF-8" src="./lib/utils.js"></script>
+    <script charset="UTF-8" defer src="./lib/alpine.js"></script>
+</head>
+<body>
+<!--https://ntorga.com/full-stack-go-app-with-htmx-and-alpinejs/
+https://github.com/badlogic/basis-template
+-->
+
+
+<table
+        hx-get="/tpl/protocols"
+        hx-select="#protocols-table"
+        hx-swap="outerHTML transition:true"
+        hx-target="#protocols-table"
+        hx-trigger="load delay:500ms"
+        id="protocols-table"
+></table>
+</body>
+</html>

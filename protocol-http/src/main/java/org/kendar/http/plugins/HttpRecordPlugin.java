@@ -1,6 +1,7 @@
 package org.kendar.http.plugins;
 
 import org.kendar.apis.base.Request;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.RecordPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -9,12 +10,19 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@TpmService(tags = "http")
 public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     private List<MatchingRecRep> recordSites = new ArrayList<>();
+
+    public HttpRecordPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
     @Override
     public List<ProtocolPhase> getPhases() {
@@ -84,7 +92,7 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        withStorage(global.getService("storage"));
+        //withStorage(global.getService("storage"));
         setupSitesToRecord(getSettings().getRecordSites());
         return this;
     }

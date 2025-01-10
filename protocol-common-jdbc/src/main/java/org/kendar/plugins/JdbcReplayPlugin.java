@@ -10,12 +10,18 @@ import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.dtos.SimpleToken;
 import org.kendar.sql.parser.dtos.TokenType;
 import org.kendar.storage.generic.LineToRead;
+import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class JdbcReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
+
+    public JdbcReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
     protected abstract SqlStringParser getParser();
 

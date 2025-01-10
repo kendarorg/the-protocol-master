@@ -22,6 +22,7 @@ import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,17 +47,20 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      * Container for the completed responses
      */
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
-
-    /**
-     * The storage to be used to retrieve the data
-     */
-    protected StorageRepository storage;
-
     /**
      * Indexes locally loaded from the storage. They do not contain the first
      * responses
      */
     private final List<CompactLine> indexes = new ArrayList<>();
+    /**
+     * The storage to be used to retrieve the data
+     */
+    protected StorageRepository storage;
+
+    public ReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper);
+        this.storage = storage;
+    }
 
     /**
      * Retrieve the settings class, must match the <W> parameter
@@ -78,7 +82,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      */
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        withStorage(global.getService("storage"));
+        //withStorage(global.getService("storage"));
         super.initialize(global, protocol, pluginSetting);
         return this;
     }
@@ -89,12 +93,12 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      * @param storage
      * @return
      */
-    protected ReplayPlugin withStorage(StorageRepository storage) {
+    /*protected ReplayPlugin withStorage(StorageRepository storage) {
         if (storage != null) {
             this.storage = storage;
         }
         return this;
-    }
+    }*/
 
     /**
      * To override if the protocol has callbacks/subscriptions
@@ -292,8 +296,8 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             if (!result.isEmpty()) {
                 ((NetworkProtoContext) pluginContext.getContext()).addResponse(() ->
                 {
-                    var sleepint = result.get(0).getTimestamp()-timeStamp;
-                    if(sleepint>0){
+                    var sleepint = result.get(0).getTimestamp() - timeStamp;
+                    if (sleepint > 0) {
                         Sleeper.sleep(sleepint);
                     }
                     sendBackResponses(pluginContext.getContext(), result);

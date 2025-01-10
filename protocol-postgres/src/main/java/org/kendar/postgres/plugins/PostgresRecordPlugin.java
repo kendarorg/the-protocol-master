@@ -1,5 +1,7 @@
 package org.kendar.postgres.plugins;
 
+import org.kendar.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.JdbcRecordPlugin;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
@@ -7,13 +9,21 @@ import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.dtos.SimpleToken;
 import org.kendar.sql.parser.dtos.TokenType;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@TpmService(tags = "postgres")
 public class PostgresRecordPlugin extends JdbcRecordPlugin {
     private static final SqlStringParser parser = new SqlStringParser("$");
+
+    @TpmConstructor
+    public PostgresRecordPlugin(JsonMapper mapper, StorageRepository storage) {
+        super(mapper, storage);
+    }
 
     @Override
     public String getProtocol() {
