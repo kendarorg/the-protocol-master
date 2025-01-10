@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
-    private List<Pattern> recordSites = new ArrayList<>();
+    private List<Pattern> sitesToLimit = new ArrayList<>();
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
@@ -54,7 +54,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         var settings = getSettings();
-        setupSitesToRecord(settings.getLimitSites());
+        setupSitesToLimit(settings.getLimitSites());
         if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
             var frr = new FileResourcesUtils();
             customResponse = mapper.deserialize(frr.getFileFromResourceAsString(settings.getCustomResponseFile()), Response.class);
@@ -64,9 +64,9 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
-            if (!recordSites.isEmpty()) {
+            if (!sitesToLimit.isEmpty()) {
                 var matchFound = false;
-                for (var pat : recordSites) {
+                for (var pat : sitesToLimit) {
                     if (pat.matcher(in.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                         matchFound = true;
                         break;
@@ -81,8 +81,8 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
         return false;
     }
 
-    private void setupSitesToRecord(List<String> recordSites) {
-        this.recordSites = recordSites.stream()
+    private void setupSitesToLimit(List<String> recordSites) {
+        this.sitesToLimit = recordSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
                 .map(regex -> regex.startsWith("@") ?
                         Pattern.compile(regex.substring(1)) :
