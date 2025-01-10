@@ -99,9 +99,16 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
         var pInstance = getDescriptor().getProtocolInstance();
         String dataToSend = messageData.getBody();
 
-        var context = (Resp3Context) pInstance.getContextsCache().get(connectionId);
-        var message = new Resp3Message(context,null,
-                mapper.toJsonNode(List.of("message",queue,dataToSend)));
-        context.write(message);
+        for(var contxtKvp: pInstance.getContextsCache().entrySet()) {
+            var context = (Resp3Context) contxtKvp.getValue();
+            if(connectionId!=-1 && connectionId!=contxtKvp.getKey()){
+                continue;
+            }
+            var message = new Resp3Message(context,null,
+                    mapper.toJsonNode(List.of("message",queue,dataToSend)));
+            context.write(message);
+        }
+
+
     }
 }
