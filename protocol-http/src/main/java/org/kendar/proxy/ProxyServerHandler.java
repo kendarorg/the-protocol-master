@@ -124,10 +124,10 @@ public class ProxyServerHandler {
 
         final Socket forwardSocket;
         try {
-            if(proxyRequest.getPort()==443) {
+            if (proxyRequest.getPort() == 443) {
                 forwardSocket = new Socket(dnsResolver.apply(proxyRequest.getHost()),
                         changePort(httpsRedirect, proxyRequest.getPort()));
-            }else{
+            } else {
                 forwardSocket = new Socket(InetAddress.getByName(proxyRequest.getHost()),
                         proxyRequest.getPort());
             }

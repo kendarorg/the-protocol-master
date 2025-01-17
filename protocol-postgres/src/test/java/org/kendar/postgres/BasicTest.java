@@ -8,7 +8,7 @@ import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.postgres.plugins.PostgresMockPlugin;
 import org.kendar.postgres.plugins.PostgresRecordPlugin;
 import org.kendar.postgres.plugins.PostgresReportPlugin;
-import org.kendar.server.TcpServer;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;

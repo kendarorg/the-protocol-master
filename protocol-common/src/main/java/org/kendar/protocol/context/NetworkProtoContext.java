@@ -17,7 +17,7 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.Stop;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.Proxy;
-import org.kendar.server.ClientServerChannel;
+import org.kendar.tcpserver.ClientServerChannel;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

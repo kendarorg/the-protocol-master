@@ -129,7 +129,7 @@ public class MySQLExecutor {
                 return handleWithinTransaction(parsed, protoContext, parse, parameterValues, text);
             } else {
                 var sqlParseResult = new SqlParseResult(parse, parsed.get(0).getType());
-                return handleSingleQuery(sqlParseResult, protoContext, parse, parameterValues, text);
+                return handleSingleQuery(parsed.get(0).getValue(), sqlParseResult, protoContext, parse, parameterValues, text);
             }
         } catch (SQLException e) {
             log.error("[SERVER] Error %s", e);
@@ -143,7 +143,7 @@ public class MySQLExecutor {
         }
     }
 
-    private Iterator<ProtoStep> handleSingleQuery(SqlParseResult parsed, MySQLProtoContext
+    private Iterator<ProtoStep> handleSingleQuery(String cleanedUpString, SqlParseResult parsed, MySQLProtoContext
             protoContext, String parse, List<BindingParameter> parameterValues, boolean text) throws SQLException {
         var pvup = parsed.getValue().toUpperCase();
         if (pvup.startsWith("SET AUTOCOMMIT=0")) {
@@ -163,13 +163,13 @@ public class MySQLExecutor {
             case CALL:
                 return executeQuery(999999, parsed, protoContext, parse, "CALL", parameterValues, text);
             default:
-                if (parsed.getValue().toUpperCase().startsWith("BEGIN")) {
+                if (cleanedUpString.toUpperCase().startsWith("BEGIN")) {
                     return executeBegin(parse, protoContext);
-                } else if (parsed.getValue().toUpperCase().startsWith("COMMIT")) {
+                } else if (cleanedUpString.toUpperCase().startsWith("COMMIT")) {
                     return executeCommit(parse, protoContext);
-                } else if (parsed.getValue().toUpperCase().startsWith("ROLLBACK")) {
+                } else if (cleanedUpString.toUpperCase().startsWith("ROLLBACK")) {
                     return executeRollback(parse, protoContext);
-                } else if (parsed.getValue().toUpperCase().startsWith("USE")) {
+                } else if (cleanedUpString.toUpperCase().startsWith("USE")) {
                     return executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
                 }
                 throw new SQLException("UNSUPPORTED QUERY " + parsed.getValue());
@@ -288,7 +288,7 @@ public class MySQLExecutor {
         Iterator<ProtoStep> lastOne = null;
         for (var parsed : parseds) {
             var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
-            lastOne = handleSingleQuery(sqlParseResult, protoContext, parse, parameterValues, text);
+            lastOne = handleSingleQuery(parsed.getValue(),sqlParseResult, protoContext, parse, parameterValues, text);
         }
         ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
         return lastOne;

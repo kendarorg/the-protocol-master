@@ -23,7 +23,7 @@ import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.RewritePluginSettings;
-import org.kendar.server.TcpServer;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;

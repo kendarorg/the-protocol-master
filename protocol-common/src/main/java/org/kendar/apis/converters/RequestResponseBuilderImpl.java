@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.sun.net.httpserver.HttpExchange;
+import io.airlift.compress.zstd.ZstdInputStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -23,7 +24,6 @@ import java.util.Base64;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-
 
 public class RequestResponseBuilderImpl implements RequestResponseBuilder {
 
@@ -197,6 +197,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
         HttpEntity responseEntity = httpResponse.getEntity();
 
         var brotli = false;
+        var zstd = false;
         String contentEncoding = "";
         if (responseEntity != null) {
             InputStream in = responseEntity.getContent();
@@ -206,12 +207,15 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
             }
             if (contentEncoding == null) contentEncoding = "";
 
-
+            zstd  =contentEncoding.equalsIgnoreCase("zstd");
             brotli = contentEncoding.equalsIgnoreCase("br");
             if (responseEntity.getContentType() != null &&
                     MimeChecker.isBinary(responseEntity.getContentType().getValue(), contentEncoding)) {
 
-                if (brotli) {
+                if (zstd) {
+                    response.setResponseText(new BinaryNode(IOUtils.toByteArray(new ZstdInputStream(in))));
+                    response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
+                } else if (brotli) {
                     response.setResponseText(new BinaryNode(IOUtils.toByteArray(new BrotliInputStream(in))));
                     response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
                 } else {
@@ -220,7 +224,10 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
             } else {
                 JsonNode responseText = null;
                 var bytes = new byte[]{};
-                if (brotli) {
+                if (zstd) {
+                    bytes = IOUtils.toByteArray(new ZstdInputStream(in));
+                    response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
+                } else if (brotli) {
                     bytes = IOUtils.toByteArray(new BrotliInputStream(in));
                     response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
                 } else {
@@ -247,7 +254,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
             if (header.getName().equalsIgnoreCase(ConstantsHeader.TRANSFER_ENCODING)) continue;
             response.addHeader(header.getName(), header.getValue());
         }
-        if (brotli) {
+        if (brotli||zstd) {
             response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
         }
     }

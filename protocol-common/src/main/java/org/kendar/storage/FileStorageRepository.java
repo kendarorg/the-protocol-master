@@ -324,7 +324,11 @@ public class FileStorageRepository implements StorageRepository {
             return mapper.deserialize(fileContent, new TypeReference<>() {
             });
         }
-        return ctx.inMemoryDb.get(id);
+        var result = ctx.inMemoryDb.get(id);
+        if(result == null) {
+            result = ctx.outItems.stream().filter(a->a.getIndex()==id).findFirst().orElse(null);
+        }
+        return result;
     }
 
 

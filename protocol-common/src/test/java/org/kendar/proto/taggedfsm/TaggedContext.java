@@ -3,7 +3,7 @@ package org.kendar.proto.taggedfsm;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.messages.ReturnMessage;
-import org.kendar.server.ClientServerChannel;
+import org.kendar.tcpserver.ClientServerChannel;
 
 import java.util.ArrayList;
 import java.util.List;

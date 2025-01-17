@@ -152,4 +152,13 @@ public class SqlSqlStringParserTest {
     }
 
 
+    @Test
+    void somethingWeird3() {
+        var target = new SqlStringParser("$");
+        var result = target.getTypes("/* ApplicationName=IntelliJ IDEA 2024.3.1.1 */ SELECT \"t1\".\"symbol\" FROM \"quotation\" AS \"t1\" GROUP BY \"t1\".\"symbol\";");
+        assertEquals(1, result.size());
+    }
+
+    //
+
 }

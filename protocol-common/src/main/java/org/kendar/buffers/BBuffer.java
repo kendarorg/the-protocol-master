@@ -133,6 +133,28 @@ public class BBuffer {
         this.position += second.length;
     }
 
+    public void writePartial(byte[] second,int length) {
+        if (this.position == -1) {
+            this.position = 0;
+        }
+        writePartial(second,length, this.position);
+        this.position += length;
+    }
+
+    public void writePartial(byte[] second,int length, int offset) {
+        if (offset < 0) offset = 0;
+        if ((offset + second.length) > bytes.length) {
+            var missingLength = (offset + length) - bytes.length;
+
+            var first = bytes;
+            bytes = new byte[missingLength + bytes.length];
+            System.arraycopy(first, 0, bytes, 0, first.length);
+            System.arraycopy(second, 0, bytes, first.length, length);
+        } else {
+            System.arraycopy(second, 0, bytes, offset, length);
+        }
+    }
+
     public void write(byte[] second, int offset) {
         if (offset < 0) offset = 0;
         if ((offset + second.length) > bytes.length) {

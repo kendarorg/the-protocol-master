@@ -1,4 +1,4 @@
-package org.kendar.server;
+package org.kendar.tcpserver;
 
 import java.io.IOException;
 import java.net.SocketAddress;

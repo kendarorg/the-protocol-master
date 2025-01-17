@@ -10,7 +10,7 @@
     <logger name="org.kendar" level="DEBUG"/>
     <logger name="com.github" level="ERROR"/>
     <logger name="org.testcontainers" level="ERROR"/>
-    <logger name="org.kendar.server.TcpServer" level="DEBUG"/>
+    <logger name="org.kendar.tcpserver.TcpServer" level="DEBUG"/>
     <logger name="org.kendar.proxy.NetworkProxySocket" level="DEBUG"/>
     <logger name="org.kendar.mqtt.fsm.MqttPacketTranslator" level="TRACE"/>
 

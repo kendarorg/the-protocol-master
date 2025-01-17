@@ -51,7 +51,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
             var key = ccache.getKey();
             var context = (Resp3Context) ccache.getValue();
             var subscription = (String) context.getValue("QUEUE");
-            if (subscription==null) continue;
+            if (subscription == null) continue;
 
 
             var connection = new RedisConnection();
@@ -99,13 +99,13 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
         var pInstance = getDescriptor().getProtocolInstance();
         String dataToSend = messageData.getBody();
 
-        for(var contxtKvp: pInstance.getContextsCache().entrySet()) {
+        for (var contxtKvp : pInstance.getContextsCache().entrySet()) {
             var context = (Resp3Context) contxtKvp.getValue();
-            if(connectionId!=-1 && connectionId!=contxtKvp.getKey()){
+            if (connectionId != -1 && connectionId != contxtKvp.getKey()) {
                 continue;
             }
-            var message = new Resp3Message(context,null,
-                    mapper.toJsonNode(List.of("message",queue,dataToSend)));
+            var message = new Resp3Message(context, null,
+                    mapper.toJsonNode(List.of("message", queue, dataToSend)));
             context.write(message);
         }
 

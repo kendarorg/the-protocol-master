@@ -11,7 +11,7 @@ import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
-import org.kendar.server.TcpServer;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.JdbcProxy;

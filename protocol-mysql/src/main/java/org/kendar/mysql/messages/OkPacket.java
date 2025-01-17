@@ -138,7 +138,7 @@ public class OkPacket extends MySQLReturnMessage {
                 resultBuffer.writeWithLength(info.getBytes());
                 //resultBuffer.write((byte)0);
             } else {
-                resultBuffer.writeWithLength(new byte[0]);
+                resultBuffer.writeWithLength(new byte[]{0,0,0});
             }
         }
     }
