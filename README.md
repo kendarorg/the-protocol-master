@@ -94,7 +94,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Translate postgres and MySQL to any Jdbc supported db like Oracle!
 * Plugin-based architecture
 * Custom maven repository on [https://maven.kendar.org](https://maven.kendar.org/maven2/releases/org/kendar/protocol/)
-* More than 70% Instructions coverage
+* More than 70% Test coverage
 
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
