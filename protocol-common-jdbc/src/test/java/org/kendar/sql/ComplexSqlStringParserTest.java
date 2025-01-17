@@ -55,7 +55,7 @@ public class ComplexSqlStringParserTest {
         var parsed = target.getTypes(query);
         var sqlParseResult = new SqlParseResult(query, parsed.get(0).getType());
         var result = target.parseString(query);
-        assertEquals(5, result.size());
+        assertEquals(6, result.size());
 
     }
 
