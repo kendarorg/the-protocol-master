@@ -1,6 +1,6 @@
 package org.kendar.di.simple.tpls;
 
-import org.kendar.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
 
 import java.util.List;

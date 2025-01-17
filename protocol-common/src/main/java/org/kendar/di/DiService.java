@@ -1,6 +1,6 @@
 package org.kendar.di;
 
-import org.kendar.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.*;
 import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;

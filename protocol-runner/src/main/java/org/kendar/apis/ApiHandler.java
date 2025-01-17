@@ -2,7 +2,7 @@ package org.kendar.apis;
 
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
-import org.kendar.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.PathParameter;
 import org.kendar.annotations.multi.TpmResponse;
