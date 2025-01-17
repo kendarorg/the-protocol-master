@@ -151,6 +151,10 @@ and its response)
 
 .NET uses the get last row id
 
+Testing in python with [PyMySQL](https://github.com/PyMySQL) I noticed that the 
+OkPacket is request to have -at least- 7 bytes as payload, then added an empty
+info array...
+
 ### Data types mess
 
 This happens only on binary protocol and -real- prepared statements (that are

@@ -84,12 +84,33 @@ public class SqlStringParser {
         return data.stream().anyMatch(a -> a.getType() == SqlStringType.UNKNOWN || a.getType() == SqlStringType.NONE);
     }
 
+    private SqlStringType inferType(String sql) {
+        var splitted = sql.trim().split("\\s+");
+        if (splitted.length != 0) {
+            var first = splitted[0].trim().toLowerCase(Locale.ROOT);
+            if (!first.isEmpty()) {
+                if (select.containsKey(first)) {
+                    return select.get(first);
+                }
+                return SqlStringType.UNKNOWN;
+            }
+        }
+        return null;
+    }
+
     public List<SqlParseResult> getTypes(String input) {
         var result = new ArrayList<SqlParseResult>();
         try {
             var sqls = parseSql(input);
             for (var sql : sqls) {
-                var splitted = sql.trim().split("\\s+");
+                var foundedType = inferType(sql);
+                if(foundedType==null || foundedType==SqlStringType.UNKNOWN) {
+                    foundedType = inferType(String.join(" ",parseString(sql)));
+                }
+                if(foundedType!=null) {
+                    result.add(new SqlParseResult(sql, foundedType));
+                }
+                /*var splitted = sql.trim().split("\\s+");
                 if (splitted.length == 0) {
                     continue;
                 }
@@ -102,7 +123,8 @@ public class SqlStringParser {
                     result.add(new SqlParseResult(sql, founded));
                 } else {
                     result.add(new SqlParseResult(sql, SqlStringType.UNKNOWN));
-                }
+                }*/
+
             }
         } catch (Exception ex) {
             log.error("Unable to split query: {}", input);

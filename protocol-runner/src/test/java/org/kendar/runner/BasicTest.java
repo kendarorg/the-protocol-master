@@ -1,7 +1,7 @@
 package org.kendar.runner;
 
 import org.kendar.Main;
-import org.kendar.server.TcpServer;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.PostgresSqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.utils.JsonMapper;

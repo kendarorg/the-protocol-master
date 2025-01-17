@@ -115,12 +115,12 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
         }
 
 
-        for(var contxtKvp: pInstance.getContextsCache().entrySet()) {
+        for (var contxtKvp : pInstance.getContextsCache().entrySet()) {
             var context = (MqttContext) contxtKvp.getValue();
             var topics = (HashSet<String>) context.getValue("TOPICS");
-            if(topics==null) continue;
+            if (topics == null) continue;
             var topicAvailable = topics.stream().filter(t -> t.endsWith("|" + topic)).findFirst();
-            if(connectionId!=-1 && connectionId!=contxtKvp.getKey()){
+            if (connectionId != -1 && connectionId != contxtKvp.getKey()) {
                 continue;
             }
             if (topicAvailable.isEmpty()) {

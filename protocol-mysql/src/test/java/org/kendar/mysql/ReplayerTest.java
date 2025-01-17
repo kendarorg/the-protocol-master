@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.kendar.mysql.jpa.CompanyJpa;
 import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
-import org.kendar.server.TcpServer;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.jdbc.JdbcProxy;

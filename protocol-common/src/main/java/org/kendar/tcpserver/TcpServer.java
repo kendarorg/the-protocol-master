@@ -1,4 +1,4 @@
-package org.kendar.server;
+package org.kendar.tcpserver;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.protocol.context.NetworkProtoContext;

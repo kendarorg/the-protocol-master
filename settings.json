@@ -93,6 +93,9 @@
         ]
       },
       "plugins": {
+        "sample-http": {
+          "active": true
+        },
         "error-plugin": {
           "active": false,
           "errorCode": 0,
