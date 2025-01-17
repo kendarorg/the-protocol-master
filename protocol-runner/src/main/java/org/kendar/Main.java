@@ -13,7 +13,7 @@ import org.kendar.di.TpmScopeType;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.server.TcpServer;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;

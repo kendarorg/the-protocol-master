@@ -5,7 +5,7 @@ import org.kendar.buffers.BBufferEndianness;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.Proxy;
-import org.kendar.server.ClientServerChannel;
+import org.kendar.tcpserver.ClientServerChannel;
 import org.slf4j.MDC;
 
 /**

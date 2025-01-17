@@ -12,7 +12,7 @@ import org.kendar.events.ReportDataEvent;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.mongo.plugins.MongoReportPlugin;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
-import org.kendar.server.TcpServer;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
