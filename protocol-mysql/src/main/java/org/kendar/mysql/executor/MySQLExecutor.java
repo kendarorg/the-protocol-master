@@ -153,6 +153,7 @@ public class MySQLExecutor {
         } else if (pvup.startsWith("ROLLBACK")) {
             return executeRollback(parse, protoContext);
         }
+        var parsedStringWithoutComments = String.join(" ",parser.parseString(parsed.getValue()));
         switch (parsed.getType()) {
             case UPDATE:
                 return executeQuery(999999, parsed, protoContext, parse, "UPDATE", parameterValues, text);
@@ -163,13 +164,13 @@ public class MySQLExecutor {
             case CALL:
                 return executeQuery(999999, parsed, protoContext, parse, "CALL", parameterValues, text);
             default:
-                if (parsed.getValue().toUpperCase().startsWith("BEGIN")) {
+                if (parsedStringWithoutComments.toUpperCase().startsWith("BEGIN")) {
                     return executeBegin(parse, protoContext);
-                } else if (parsed.getValue().toUpperCase().startsWith("COMMIT")) {
+                } else if (parsedStringWithoutComments.toUpperCase().startsWith("COMMIT")) {
                     return executeCommit(parse, protoContext);
-                } else if (parsed.getValue().toUpperCase().startsWith("ROLLBACK")) {
+                } else if (parsedStringWithoutComments.toUpperCase().startsWith("ROLLBACK")) {
                     return executeRollback(parse, protoContext);
-                } else if (parsed.getValue().toUpperCase().startsWith("USE")) {
+                } else if (parsedStringWithoutComments.toUpperCase().startsWith("USE")) {
                     return executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
                 }
                 throw new SQLException("UNSUPPORTED QUERY " + parsed.getValue());

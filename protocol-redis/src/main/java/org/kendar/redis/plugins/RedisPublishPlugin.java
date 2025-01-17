@@ -12,7 +12,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 
 @TpmService(tags = "redis")
-public class RedisPublishPlugin  extends ProtocolPluginDescriptorBase<PluginSettings> {
+public class RedisPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettings> {
     public RedisPublishPlugin(JsonMapper mapper) {
         super(mapper);
     }

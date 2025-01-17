@@ -158,6 +158,7 @@ public class PostgresExecutor {
     private ExecutorResult handleSingleQuery(SqlParseResult parsed,
                                              NetworkProtoContext protoContext, Parse parse, Binding binding,
                                              int maxRecords, boolean describable) throws SQLException {
+        var parsedStringWithoutComments = String.join(" ",parser.parseString(parsed.getValue()));
         switch (parsed.getType()) {
             case UPDATE:
                 if (parsed.getValue().replaceAll("\\s", " ").
@@ -177,11 +178,11 @@ public class PostgresExecutor {
                 return executeQuery(maxRecords, parsed, protoContext,
                         binding, parse.getConcreteTypes(), "CALL");
             default:
-                if (parsed.getValue().toUpperCase().startsWith("BEGIN")) {
+                if (parsedStringWithoutComments.toUpperCase().startsWith("BEGIN")) {
                     return executeBegin(parse, protoContext);
-                } else if (parsed.getValue().toUpperCase().startsWith("COMMIT")) {
+                } else if (parsedStringWithoutComments.toUpperCase().startsWith("COMMIT")) {
                     return executeCommit(parse, protoContext);
-                } else if (parsed.getValue().toUpperCase().startsWith("ROLLBACK")) {
+                } else if (parsedStringWithoutComments.toUpperCase().startsWith("ROLLBACK")) {
                     return executeRollback(parse, protoContext);
                 }
                 throw new SQLException("UNSUPPORTED QUERY " + parsed.getValue());

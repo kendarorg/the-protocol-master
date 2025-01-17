@@ -1,6 +1,7 @@
 package org.kendar.sql;
 
 import org.junit.jupiter.api.Test;
+import org.kendar.sql.parser.SqlParseResult;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
 
@@ -38,6 +39,21 @@ public class ComplexSqlStringParserTest {
                 "test4 /* eee\n" +
                 "ffff */ test5";
         var target = new SqlStringParser("$");
+        var result = target.parseString(query);
+        assertEquals(5, result.size());
+
+    }
+
+    @Test
+    void testCppComments() {
+        var query = "/* test */ test0 --aaaaaa\n" +
+                "test1 #bb bbbb\n" +
+                "test2 /* cccc ddd */ test3\n" +
+                "test4 'aaa' /* eee\n" +
+                "ffff */ test5";
+        var target = new SqlStringParser("$");
+        var parsed = target.getTypes(query);
+        var sqlParseResult = new SqlParseResult(query, parsed.get(0).getType());
         var result = target.parseString(query);
         assertEquals(5, result.size());
 
