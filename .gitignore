@@ -33,3 +33,5 @@ target
 /plugins/*.jar
 /data/*.*
 /protocol-runner/data/*.*
+jte-classes
+extensions.idx
