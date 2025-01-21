@@ -29,6 +29,7 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 

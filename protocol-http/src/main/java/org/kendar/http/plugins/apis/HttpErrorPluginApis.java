@@ -30,7 +30,21 @@ public class HttpErrorPluginApis extends ProtocolPluginApiHandlerDefault<HttpErr
             method = "GET", id = "GET /ui/protocols/{#protocolInstanceId}/plugins/{#plugin}")
     public boolean actionOnAllPlugins(Request reqp, Response resp) {
         var output = new StringOutput();
-        templateEngine.render("error/index.jte", "Hello world", output);
+
+        templateEngine.render("error-plugin/index.jte", getDescriptor().getSettings(), output);
+        resp.setStatusCode(200);
+        resp.addHeader("Content-Type", "text/html");
+        resp.setResponseText(TextNode.valueOf(output.toString()));
+        return true;
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/ui/protocols/{#protocolInstanceId}/plugins/{#plugin}",
+            method = "POST", id = "POST /ui/protocols/{#protocolInstanceId}/plugins/{#plugin}")
+    public boolean saveData(Request reqp, Response resp) {
+        var output = new StringOutput();
+
+        templateEngine.render("error-plugin/data.jte", getDescriptor().getSettings(), output);
         resp.setStatusCode(200);
         resp.addHeader("Content-Type", "text/html");
         resp.setResponseText(TextNode.valueOf(output.toString()));

@@ -8,6 +8,7 @@ import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
+import org.kendar.plugins.base.ProtocolApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -36,6 +37,10 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private HttpServer httpServer;
     private boolean httpRunning;
     private boolean httpsRunning;
+
+    public ProtocolApiHandler getApiHandler() {
+        return new HttpWebSite(new FileResourcesUtils(),settings.getProtocolInstanceId());
+    }
 
     public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<ProtocolPluginDescriptor> plugins) {
 

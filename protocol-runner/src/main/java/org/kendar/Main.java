@@ -216,6 +216,12 @@ public class Main {
                 while (started.get() < ini.getProtocols().size()) {
                     Sleeper.sleep(100);
                 }
+                for(var item: protocolServersCache.values()) {
+                    var protocolFilter = item.getProtoDescriptor().getApiHandler();
+                    if(protocolFilter!=null) {
+                        apisFiltersLoader.getFilters().add(protocolFilter);
+                    }
+                }
                 apisFiltersLoader.loadFilters();
                 if (ini.getApiPort() > 0) {
                     var address = new InetSocketAddress(ini.getApiPort());

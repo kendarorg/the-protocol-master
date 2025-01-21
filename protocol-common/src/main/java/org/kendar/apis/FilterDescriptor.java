@@ -16,6 +16,7 @@ import org.kendar.apis.matchers.FilterMatcher;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.GenericFilterExecutor;
 import org.kendar.apis.utils.IdBuilder;
+import org.kendar.plugins.base.ProtocolApiHandler;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 
 import java.lang.annotation.IncompleteAnnotationException;
@@ -264,6 +265,15 @@ public class FilterDescriptor {
             pathPattern = pathPattern.replaceAll(
                     Pattern.quote("{#plugin}"),
                     Matcher.quoteReplacement(ppah.getPluginId()));
+        }else if(ProtocolApiHandler.class.isAssignableFrom(filterClass.getClass())) {
+            var ppah = (ProtocolApiHandler) filterClass;
+            pathPattern = pathPattern.replaceAll(
+                    Pattern.quote("{#protocolInstanceId}"),
+                    Matcher.quoteReplacement(ppah.getProtocolInstanceId()));
+
+            pathPattern = pathPattern.replaceAll(
+                    Pattern.quote("{#protocol}"),
+                    Matcher.quoteReplacement(ppah.getProtocol()));
         }
         return pathPattern;
     }

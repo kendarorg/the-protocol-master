@@ -52,6 +52,10 @@ public abstract class StaticWebFilter implements FilteringClass {
         }
     }
 
+    public boolean isPathMatching(String path) {
+        return true;
+    }
+
     @SuppressWarnings("RedundantIfStatement")
     @HttpMethodFilter(
             pathAddress = "*", method = "GET")
@@ -64,14 +68,21 @@ public abstract class StaticWebFilter implements FilteringClass {
         if (requestedPath.endsWith("/")) {
             requestedPath = requestedPath.substring(0, requestedPath.length() - 1);
         }
+        if(isPathMatching(requestedPath)){
+            requestedPath = adaptRequestedPath(requestedPath);
+            if (verifyPathAndRender(response, realPath, requestedPath, false)) return true;
+            if (verifyPathAndRender(response, realPath, requestedPath + "/index.htm", true)) return true;
+            if (verifyPathAndRender(response, realPath, requestedPath + "/index.html", true)) return true;
+            if (verifyPathAndRender(response, realPath, request.getPath() + ".htm", true)) return true;
+            if (verifyPathAndRender(response, realPath, request.getPath() + ".html", true)) return true;
+        }
 
-        if (verifyPathAndRender(response, realPath, requestedPath, false)) return true;
-        if (verifyPathAndRender(response, realPath, requestedPath + "/index.htm", true)) return true;
-        if (verifyPathAndRender(response, realPath, requestedPath + "/index.html", true)) return true;
-        if (verifyPathAndRender(response, realPath, request.getPath() + ".htm", true)) return true;
-        if (verifyPathAndRender(response, realPath, request.getPath() + ".html", true)) return true;
 
         return false;
+    }
+
+    public String adaptRequestedPath(String requestedPath) {
+        return requestedPath;
     }
 
     private boolean verifyPathAndRender(Response response, String realPath, String possibleMatch, boolean redirect) {
