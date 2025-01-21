@@ -51,6 +51,6 @@ htmx.defineExtension('submitjson', {
             data: parameters,
             options: { submissionFormat: 'pretty'}
         }
-        return (JSON.stringify(body))
+        return (JSON.stringify(parameters))
     }
 })

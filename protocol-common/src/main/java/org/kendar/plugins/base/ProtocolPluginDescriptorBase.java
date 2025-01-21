@@ -8,12 +8,14 @@ import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> implements ProtocolPluginDescriptor<W> {
     private static final Logger log = LoggerFactory.getLogger(ProtocolPluginDescriptorBase.class);
     protected JsonMapper mapper;
     private boolean active;
     private String instanceId = "default";
-    private ProtocolPluginApiHandler apiHandler;
+    private List<ProtocolPluginApiHandler> apiHandler;
     private PluginSettings settings;
     private ProtoDescriptor protocolInstance;
 
@@ -46,15 +48,15 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         return instanceId;
     }
 
-    public ProtocolPluginApiHandler getApiHandler() {
+    public List<ProtocolPluginApiHandler> getApiHandler() {
         if (apiHandler == null) {
             apiHandler = buildApiHandler();
         }
         return apiHandler;
     }
 
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new ProtocolPluginApiHandlerDefault<>(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new ProtocolPluginApiHandlerDefault<>(this, getId(), getInstanceId()));
     }
 
 

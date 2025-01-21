@@ -2,7 +2,13 @@ package org.kendar.http;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
+import gg.jte.CodeResolver;
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.ResourceCodeResolver;
 import org.kendar.apis.converters.RequestResponseBuilderImpl;
+import org.kendar.http.api.HttpUi;
+import org.kendar.http.api.HttpWebSite;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
@@ -37,9 +43,13 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private HttpServer httpServer;
     private boolean httpRunning;
     private boolean httpsRunning;
+    private CodeResolver codeResolver;
+    private TemplateEngine templateEngine;
 
-    public ProtocolApiHandler getApiHandler() {
-        return new HttpWebSite(new FileResourcesUtils(),settings.getProtocolInstanceId());
+    public List<ProtocolApiHandler> getApiHandler() {
+        return List.of(
+                new HttpWebSite(new FileResourcesUtils(),settings.getProtocolInstanceId()),
+                new HttpUi(this,templateEngine,settings.getProtocolInstanceId()));
     }
 
     public HttpProtocol(GlobalSettings globalSettings, HttpProtocolSettings settings, List<ProtocolPluginDescriptor> plugins) {
@@ -53,7 +63,9 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         //sslPlugin.initialize(globalSettings, settings, null);
         //this.plugins.add(sslPlugin);
         //Disable logging for apache http client
-        java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
+        java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);;
+        codeResolver = new ResourceCodeResolver("jte");
+        templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
 
     }
 
@@ -209,5 +221,9 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public TemplateEngine getTemplateEngine() {
+        return templateEngine;
     }
 }

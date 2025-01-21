@@ -6,6 +6,9 @@ import org.kendar.utils.FileResourcesUtils;
 
 import java.io.IOException;
 
+/**
+ * The path on resources should be "webPROTOCOL"
+ */
 public abstract class ProtocolStaticWebFilter extends StaticWebFilter implements ProtocolApiHandler {
     private final String protocolInstanceId;
 

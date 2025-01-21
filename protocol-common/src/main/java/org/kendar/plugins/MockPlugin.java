@@ -166,7 +166,7 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
     }
 
     @Override
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new BaseMockPluginApis(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new BaseMockPluginApis(this, getId(), getInstanceId()));
     }
 }

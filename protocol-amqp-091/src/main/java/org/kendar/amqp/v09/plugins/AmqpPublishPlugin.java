@@ -37,7 +37,7 @@ public class AmqpPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettin
     }
 
     @Override
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new AmqpPublishPluginApis(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new AmqpPublishPluginApis(this, getId(), getInstanceId()));
     }
 }

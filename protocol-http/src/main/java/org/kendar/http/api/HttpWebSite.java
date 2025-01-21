@@ -1,4 +1,4 @@
-package org.kendar.http;
+package org.kendar.http.api;
 
 
 import org.kendar.annotations.HttpTypeFilter;

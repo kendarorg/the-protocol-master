@@ -35,9 +35,8 @@ public class RedisPublishPlugin extends ProtocolPluginDescriptorBase<PluginSetti
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         return false;
     }
-
     @Override
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new RedisPublishPluginApis(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new RedisPublishPluginApis(this, getId(), getInstanceId()));
     }
 }

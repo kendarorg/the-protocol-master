@@ -28,8 +28,8 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
     }
 
     @Override
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new HttpErrorPluginApis(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new HttpErrorPluginApis(this, getId(), getInstanceId()));
     }
 
     @Override

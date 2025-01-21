@@ -2,15 +2,8 @@
 
 @param HttpErrorPluginSettings settings
 
-<!--
-https://htmx.org/api/
-https://coderonfleek.medium.com/sending-data-in-htmx-requests-3-ways-4287ead56dbd
-https://htmx.org/attributes/hx-vals/
-https://htmx.org/api/
--->
 <head>
     <title>Error plugin settings</title>
-
 </head>
 <body>
 <h2>Error plugin settings</h2>
@@ -23,12 +16,11 @@ https://htmx.org/api/
         hx-target="#formData"
         hx-post="./error-plugin"
         hx-vals="js:{...formData()}"
-        hx-ext="submitjson"/>
+        hx-ext="submitjson">Submit</button>
 <script src="/lib/htmx.min.js"></script>
 <script src="/lib/utils.js"></script>
 <script type="application/javascript">
     formData= function(){
-        debugger;
         return {
             showError:document.getElementById("showError").value,
             errorPercent:document.getElementById("errorPercent").value,

@@ -236,7 +236,7 @@ public abstract class ProtoDescriptor {
 
     }
 
-    public ProtocolApiHandler getApiHandler() {
-        return null;
+    public List<ProtocolApiHandler> getApiHandler() {
+        return List.of();
     }
 }
