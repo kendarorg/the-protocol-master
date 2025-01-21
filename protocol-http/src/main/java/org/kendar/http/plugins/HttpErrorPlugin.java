@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
+import org.kendar.http.plugins.apis.HttpErrorPluginApis;
+import org.kendar.plugins.base.*;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -27,6 +26,11 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
 
     public HttpErrorPlugin(JsonMapper mapper) {
         super(mapper);
+    }
+
+    @Override
+    protected ProtocolPluginApiHandler buildApiHandler() {
+        return new HttpErrorPluginApis(this, getId(), getInstanceId());
     }
 
     @Override
