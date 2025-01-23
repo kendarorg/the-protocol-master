@@ -63,6 +63,7 @@
         <reflection.version>0.10.2</reflection.version>
         <logback.version>1.4.8</logback.version>
         <sl4j.version>2.0.7</sl4j.version>
+        <jte.version>3.1.16</jte.version>
     </properties>
     <dependencies>
         <dependency>

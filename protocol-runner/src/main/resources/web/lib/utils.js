@@ -47,10 +47,6 @@ htmx.defineExtension('submitjson', {
     },
     encodeParameters: function (xhr, parameters, elt) {
         xhr.overrideMimeType('text/json') // override default mime type
-        const body = { // set your request body
-            data: parameters,
-            options: {submissionFormat: 'pretty'}
-        }
         return (JSON.stringify(parameters))
     }
 })

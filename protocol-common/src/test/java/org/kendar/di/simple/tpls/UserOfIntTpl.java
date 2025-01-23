@@ -13,10 +13,18 @@ public class UserOfIntTpl implements GenericUserOf {
 
     }
 
+    @Override
+    public String toString() {
+        return "UserOfIntTpl{" +
+                "template=" + template +
+                '}';
+    }
+
     @TpmConstructor
     public UserOfIntTpl(List<TemplateInterface<Integer>> template) {
 
         this.template = template;
+        System.out.println(this.toString()+" "+Thread.currentThread().getId());
     }
 
     public List<TemplateInterface<Integer>> getTemplate() {

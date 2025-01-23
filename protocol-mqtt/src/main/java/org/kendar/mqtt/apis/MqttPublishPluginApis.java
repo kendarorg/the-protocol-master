@@ -32,7 +32,6 @@ import static org.kendar.apis.ApiUtils.respondJson;
 public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttPublishPlugin> {
     public MqttPublishPluginApis(MqttPublishPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);
-
     }
 
     @HttpMethodFilter(

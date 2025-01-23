@@ -22,12 +22,13 @@ public class DiService {
     protected final List<DiService> children = new ArrayList<>();
     private final HashMap<Type, List<Type>> mappings = new HashMap<>();
     private final HashMap<Type, List<Type>> transientMappings = new HashMap<>();
+    private final HashMap<String, Object> namedMappings = new HashMap<>();
     protected TpmScopeType scope = TpmScopeType.GLOBAL;
     protected DiService parent = null;
 
     public DiService() {
-        singletons.put(DiService.class, this);
         threads.clear();
+        singletons.put(DiService.class, this);
     }
 
     protected DiService(TpmScopeType scope, DiService parent) {
@@ -37,7 +38,7 @@ public class DiService {
         singletons.put(DiService.class, this);
     }
 
-    private static void threadsClean() {
+    public static void threadsClean() {
         var threadsToClean = new ArrayList<Thread>();
         for (var thread : threads.keySet()) {
             if (!thread.isAlive()) {
@@ -71,6 +72,11 @@ public class DiService {
         if (parent != null) {
             parent.children.remove(this);
         }
+        namedMappings.clear();
+        parent = null;
+        transientMappings.clear();
+        mappings.clear();
+        scope = TpmScopeType.NONE;
     }
 
     public DiService createChildScope(TpmScopeType scope) {
@@ -88,6 +94,10 @@ public class DiService {
     public void register(Class<?> clazz, Object instance) {
         singletons.put(clazz, instance);
         bind(instance.getClass(), mappings);
+    }
+
+    public void registerNamed(String name, Object instance) {
+        namedMappings.put(name, instance);
     }
 
     public void loadPackage(String packageName) {
@@ -154,8 +164,7 @@ public class DiService {
             }
             Type[] genericInterfaces = clazz.getGenericInterfaces();
             for (Type genericInterface : genericInterfaces) {
-                if (genericInterface instanceof ParameterizedType) {
-                    var parameterizedType = (ParameterizedType) genericInterface;
+                if (genericInterface instanceof ParameterizedType parameterizedType) {
                     interfacesFound.add(parameterizedType);
                     getAllInterfaces(parameterizedType, interfacesFound);
                 }
@@ -172,104 +181,23 @@ public class DiService {
     }
 
     public <T> T getInstance(Class<T> clazz, String... tags) {
-        var result = getInstances(this, clazz, tags);
-        if (result == null || result.isEmpty()) {
-            return null;
-        }
-        return result.get(0);
+        return (T) getInstanceInternal(this, null, clazz, tags);
     }
 
-    private Object getInstance(Type type, String... tags) {
-        var result = getInstances(this, type, tags);
+    public <T> T getNamedInstance(String name, Class<T> clazz, String... tags) {
+        return (T) getInstanceInternal(this, name, clazz, tags);
+    }
+
+    private Object getInstanceInternal(DiService context, String name, Type type, String... tags) {
+        var result = getInstancesInternal(name, Object.class, context, type, tags);
         if (result == null || result.isEmpty()) return null;
         return result.get(0);
     }
 
-    private List<Object> getInstances(DiService context, Type type, String... tags) {
-        var data = mappings.get(type);
-        var transi = false;
-        if (data == null) {
-            data = transientMappings.get(type);
-            transi = true;
-            if (data == null) {
-                if (parent != null) {
-                    return parent.getInstances(context, type, tags);
-                }
-                return new ArrayList<>();
-            }
-        }
-        var result = new ArrayList<>();
-        for (var i : data) {
-            if (tags.length > 0) {
-                if (((Class<?>) i).getAnnotation(TpmService.class) == null) {
-                    continue;
-                }
-                var iTags = ((Class<?>) i).getAnnotation(TpmService.class).tags();
-                if (iTags.length != tags.length) {
-                    continue;
-                }
-                if (!Arrays.asList(iTags).containsAll(Arrays.asList(tags))) {
-                    continue;
-                }
-                result.add(this.createInstance(context, (Class<?>) i, transi));
-            } else {
-                result.add(this.createInstance(context, (Class<?>) i, transi));
-            }
-
-        }
-        if (parent != null) {
-            var parentResults = parent.getInstances(context, type, tags);
-            if (parentResults != null) {
-                result.addAll(parentResults);
-            }
-        }
-        return result;
-    }
-
     public <T> List<T> getInstances(Class<T> clazz, String... tags) {
-        return getInstances(this, clazz, tags);
+        return getInstancesInternal(null, clazz, this, clazz, tags);
     }
 
-    private <T> List<T> getInstances(DiService context, Class<T> clazz, String... tags) {
-        var data = mappings.get(clazz);
-        var transi = false;
-        if (data == null) {
-            data = transientMappings.get(clazz);
-            transi = true;
-            if (data == null) {
-                if (parent != null) {
-                    return parent.getInstances(context, clazz, tags);
-                }
-                return new ArrayList<>();
-            }
-        }
-        var result = new ArrayList<T>();
-        for (var i : data) {
-            if (tags.length > 0) {
-                var annotation = ((Class<?>) i).getAnnotation(TpmService.class);
-                if (annotation != null) {
-                    var iTags = annotation.tags();
-                    if (iTags.length != tags.length) {
-                        continue;
-                    }
-                    if (!Arrays.asList(iTags).containsAll(Arrays.asList(tags))) {
-                        continue;
-                    }
-                    result.add((T) this.createInstance(context, (Class<?>) i, transi));
-                }
-            } else {
-                result.add((T) this.createInstance(context, (Class<?>) i, transi));
-            }
-
-        }
-        if (parent != null) {
-            var parentResults = parent.getInstances(context, clazz, tags);
-            if (parentResults != null) {
-                result.addAll(parentResults);
-            }
-        }
-        return result;
-    }
 
     private Object createInstance(DiService context, Class<?> clazz, boolean transi) {
         try {
@@ -292,56 +220,58 @@ public class DiService {
             if (constructor == null) {
                 throw new RuntimeException("No TpmConstructor found");
             }
+            Object result = null;
             if (constructor.getParameterCount() == 0) {
+                var singleton = getSingletonMapping(clazz);
                 if (transi) {
-                    return postConstruct(constructor.newInstance());
-                }
-                if (context.singletons.containsKey(clazz)) {
-                    return context.singletons.get(clazz);
-                }
-                if (singletons.containsKey(clazz)) {
-                    return singletons.get(clazz);
-                }
-                context.singletons.put(clazz, postConstruct(constructor.newInstance()));
-                return context.singletons.get(clazz);
-            }
-            var parameters = constructor.getParameters();
-            var values = new Object[parameters.length];
-            for (var i = 0; i < parameters.length; i++) {
-                var parameter = parameters[i];
-                var parameterAnnotation = parameter.getAnnotation(TpmNamed.class);
-                var tags = new String[]{};
-                if (parameterAnnotation != null) {
-                    tags = parameterAnnotation.tags();
-                }
-                if (List.class.isAssignableFrom(parameter.getType())) {
-                    var args = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments();
-                    if (args.length == 1) {
-                        var arg = args[0];
-                        values[i] = getInstances(context, arg, tags);
-                    }
+                    result = postConstruct(constructor.newInstance());
+                } else if (singleton.isPresent()) {
+                    result = singleton.get();
                 } else {
-                    var parametrizedType = parameter.getParameterizedType();
-                    if (parametrizedType instanceof ParameterizedType) {
-                        values[i] = getInstance(parametrizedType, tags);
+                    singletons.put(clazz, postConstruct(constructor.newInstance()));
+                    result = singletons.get(clazz);
+                }
+            } else {
+                var parameters = constructor.getParameters();
+                var values = new Object[parameters.length];
+                for (var i = 0; i < parameters.length; i++) {
+                    var parameter = parameters[i];
+                    var parameterAnnotation = parameter.getAnnotation(TpmNamed.class);
+                    var tags = new String[]{};
+                    String named = null;
+                    if (parameterAnnotation != null) {
+                        tags = parameterAnnotation.tags();
+                        named = parameterAnnotation.value();
+                    }
+                    if (List.class.isAssignableFrom(parameter.getType())) {
+                        var args = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments();
+                        if (args.length == 1) {
+                            var arg = args[0];
+                            values[i] = getInstancesInternal(named, clazz, context, arg, tags);
+                        }
                     } else {
-                        values[i] = getInstance(parameter.getType(), tags);
+                        var parametrizedType = parameter.getParameterizedType();
+                        if (parametrizedType instanceof ParameterizedType) {
+                            values[i] = getInstanceInternal(context, named, parametrizedType, tags);
+                        } else {
+                            values[i] = getInstanceInternal(context, named, parameter.getType(), tags);
+                        }
                     }
                 }
+                var singleton = getSingletonMapping(clazz);
+                if (transi) {
+                    result = postConstruct(constructor.newInstance(values));
+                } else if (singleton.isPresent()) {
+                    result = singleton.get();
+                } else {
+                    singletons.put(clazz, postConstruct(constructor.newInstance(values)));
+                    result = singletons.get(clazz);
+                }
             }
-            if (transi) {
-                return postConstruct(constructor.newInstance(values));
+            if (clazzNamed != null) {
+                namedMappings.put(clazzNamed.value(), result);
             }
-            if (context.singletons.containsKey(clazz)) {
-                return context.singletons.get(clazz);
-            }
-            if (singletons.containsKey(clazz)) {
-                return singletons.get(clazz);
-            }
-
-            context.singletons.put(clazz, postConstruct(constructor.newInstance(values)));
-            return context.singletons.get(clazz);
-
+            return result;
         } catch (Exception e) {
             throw new RuntimeException("Unable to instantiate " + clazz, e);
         }
@@ -375,6 +305,101 @@ public class DiService {
             }
         }
         return o;
+    }
+
+    private <T> Optional<T> getNamedMapping(Class<T> clazz, String name) {
+        if (name != null) {
+            var parentItem = this;
+            while (parentItem != null) {
+                if (parentItem.namedMappings.containsKey(name)) {
+                    Object instance = namedMappings.get(name);
+                    if (clazz.isAssignableFrom(instance.getClass())) {
+                        return Optional.of((T) instance);
+                    }
+                    return Optional.of(null);
+                }
+                parentItem = parentItem.parent;
+            }
+
+        }
+        return Optional.empty();
+    }
+
+    private <T> Optional<T> getSingletonMapping(Class<T> clazz) {
+        var parentItem = this;
+        while (parentItem != null) {
+            if (parentItem.singletons.containsKey(clazz)) {
+                Object instance = parentItem.singletons.get(clazz);
+                return Optional.of((T) instance);
+            }
+            parentItem = parentItem.parent;
+        }
+        return Optional.empty();
+    }
+
+
+    private <T> List<T> getInstancesInternal(String name, Class<T> clazz, DiService context, Type type, String... tags) {
+        if(scope==TpmScopeType.NONE){
+            throw new RuntimeException("Invalid Context");
+        }
+        var result = new ArrayList<T>();
+        if (name != null) {
+            var named = getNamedMapping(clazz, name);
+            if (named.isPresent()) {
+                result.add(named.get());
+                return result;
+            }
+        }
+        var parentItem = this;
+        while (parentItem != null) {
+            var data = parentItem.mappings.get(type);
+            var transi = false;
+            if (data == null) {
+                data = parentItem.transientMappings.get(type);
+                if (data != null) {
+                    transi = true;
+                } else {
+                    parentItem = parentItem.parent;
+                    continue;
+                }
+            }
+
+            for (var i : data) {
+                var annotation = ((Class<?>) i).getAnnotation(TpmService.class);
+                if (annotation != null) {
+                    if (name != null && !name.equalsIgnoreCase(annotation.value())) {
+                        continue;
+                    }
+                }
+                if (tags.length > 0) {
+                    if (annotation != null) {
+                        var iTags = annotation.tags();
+                        if (iTags.length != tags.length) {
+                            continue;
+                        }
+                        if (!Arrays.asList(iTags).containsAll(Arrays.asList(tags))) {
+                            continue;
+                        }
+                        result.add((T) createInstance(context, (Class<?>) i, transi));
+                    }
+                } else {
+                    result.add((T) createInstance(context, (Class<?>) i, transi));
+                }
+
+            }
+            parentItem = parentItem.parent;
+            /*if (parent != null) {
+                var parentResults = parent.getInstancesInternal(name, clazz, context, type, tags);
+                if (parentResults != null) {
+                    for (var parr : parentResults) {
+                        if (!result.contains(parr)) {
+                            result.add(parr);
+                        }
+                    }
+                }
+            }*/
+        }
+        return result;
     }
 
 
