@@ -192,7 +192,9 @@ public class SubscribeTest extends BasicTest {
             /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
-            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler();
+            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
+                    a->a instanceof MqttPublishPluginApis
+            ).findFirst().get();
             var res = new Response();
             publish.getConnections(new Request(), res);
             var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<MqttConnection>>() {
@@ -244,7 +246,9 @@ public class SubscribeTest extends BasicTest {
             /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
-            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler();
+            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
+                    a->a instanceof MqttPublishPluginApis
+            ).findFirst().get();
             var res = new Response();
             publish.getConnections(new Request(), res);
             var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<MqttConnection>>() {
@@ -297,7 +301,9 @@ public class SubscribeTest extends BasicTest {
             /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
-            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler();
+            var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
+                    a->a instanceof MqttPublishPluginApis
+            ).findFirst().get();
             var res = new Response();
             publish.getConnections(new Request(), res);
             var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<MqttConnection>>() {
