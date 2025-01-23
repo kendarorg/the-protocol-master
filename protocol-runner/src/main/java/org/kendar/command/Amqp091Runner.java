@@ -1,11 +1,9 @@
 package org.kendar.command;
 
 import org.kendar.amqp.v09.AmqpProxy;
-import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.di.DiService;
-import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
@@ -23,14 +21,7 @@ import java.util.function.Supplier;
 
 @TpmService
 public class Amqp091Runner extends CommonRunner {
-    private final List<ProtocolPluginDescriptor> plugins;
     private TcpServer ps;
-
-    @TpmConstructor
-    public Amqp091Runner(@TpmNamed(tags = "amqp091") List<ProtocolPluginDescriptor> plugins) {
-        this.plugins = plugins;
-    }
-
 
     @Override
     protected String getConnectionDescription() {

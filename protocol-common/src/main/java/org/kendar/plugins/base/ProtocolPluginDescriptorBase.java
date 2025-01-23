@@ -8,12 +8,18 @@ import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
+/**
+ * Base descriptor for a protocol plugin
+ * @param <W>
+ */
 public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> implements ProtocolPluginDescriptor<W> {
     private static final Logger log = LoggerFactory.getLogger(ProtocolPluginDescriptorBase.class);
     protected JsonMapper mapper;
     private boolean active;
     private String instanceId = "default";
-    private ProtocolPluginApiHandler apiHandler;
+    private List<ProtocolPluginApiHandler> apiHandler;
     private PluginSettings settings;
     private ProtoDescriptor protocolInstance;
 
@@ -33,28 +39,40 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         this.protocolInstance = procotolInstance;
     }
 
+    /**
+     * Retrieve the settings
+     * @return
+     */
     public W getSettings() {
         return (W) settings;
     }
 
+    /**
+     * Retrieve the settings class (For deserializaton purposes
+     * @return
+     */
     public Class<?> getSettingClass() {
         if (settings != null) return settings.getClass();
         return PluginSettings.class;
     }
 
+    /**
+     * The protocol instance ID
+     * @return
+     */
     public String getInstanceId() {
         return instanceId;
     }
 
-    public ProtocolPluginApiHandler getApiHandler() {
+    public List<ProtocolPluginApiHandler> getApiHandler() {
         if (apiHandler == null) {
             apiHandler = buildApiHandler();
         }
         return apiHandler;
     }
 
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new ProtocolPluginApiHandlerDefault<>(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new ProtocolPluginApiHandlerDefault<>(this, getId(), getInstanceId()));
     }
 
 
@@ -78,6 +96,10 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         }
     }
 
+    /**
+     * Actiavion callback
+     * @param active
+     */
     protected void handleActivation(boolean active) {
 
     }
@@ -86,6 +108,10 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         return active;
     }
 
+    /**
+     * Handle the activation of the plugin
+     * @param active
+     */
     public void setActive(boolean active) {
         var isChanged = active != this.isActive();
         if (isChanged) handleActivation(active);
@@ -93,6 +119,10 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         if (isChanged) handlePostActivation(active);
     }
 
+    /**
+     * Post activation callback
+     * @param active
+     */
     protected void handlePostActivation(boolean active) {
 
     }
@@ -104,6 +134,9 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         }
     }
 
+    /**
+     * Terminate the plugin
+     */
     public void terminate() {
 
     }

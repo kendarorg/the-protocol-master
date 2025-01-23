@@ -3,6 +3,7 @@ package org.kendar.tcpserver;
 import org.kendar.events.EventsQueue;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -89,6 +90,9 @@ public class TcpServer {
         this.onStop = onStop;
     }
 
+    public ProtoDescriptor getProtoDescriptor() {
+        return protoDescriptor;
+    }
     /**
      * Start the server
      */

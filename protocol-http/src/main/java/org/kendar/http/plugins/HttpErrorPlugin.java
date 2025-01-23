@@ -21,9 +21,8 @@ import java.util.List;
 public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPluginSettings> {
 
     private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
-    private int errorCode;
-    private String errorMessage;
-    private double percentage;
+
+    private HttpErrorPluginSettings settings;
 
     public HttpErrorPlugin(JsonMapper mapper) {
         super(mapper);
@@ -52,23 +51,26 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
         if (!isActive()) return false;
-        if (Math.random() < percentage) {
+        var pc =  ((double) settings.getErrorPercent()) / 100.0;
+        if (Math.random() < pc) {
 
             log.info("Faking ERROR {} {}", request.getMethod(), request.buildUrl());
-            response.setStatusCode(errorCode);
-            response.setResponseText(new TextNode(errorMessage));
+            response.setStatusCode(settings.getShowError());
+            response.setResponseText(new TextNode(settings.getErrorMessage()));
             return true;
         }
         return false;
     }
 
     @Override
+    public HttpErrorPluginSettings getSettings() {
+        return settings;
+    }
+
+    @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        var settings = (HttpErrorPluginSettings) pluginSetting;
-        this.errorCode = settings.getShowError();
-        this.errorMessage = settings.getErrorMessage();
-        this.percentage = ((double) settings.getErrorPercent()) / 100.0;
+        settings = (HttpErrorPluginSettings) pluginSetting;
         return this;
     }
 }

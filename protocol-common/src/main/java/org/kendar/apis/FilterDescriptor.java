@@ -16,6 +16,7 @@ import org.kendar.apis.matchers.FilterMatcher;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.GenericFilterExecutor;
 import org.kendar.apis.utils.IdBuilder;
+import org.kendar.plugins.base.ProtocolApiHandler;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 
 import java.lang.annotation.IncompleteAnnotationException;
@@ -28,6 +29,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * It's the "instance wrapper" of a method of a controller
+ */
 public class FilterDescriptor {
 
     private static final Pattern namedGroupsPattern =
@@ -202,6 +206,14 @@ public class FilterDescriptor {
         return true;
     }
 
+    /**
+     * Run the callback associate with the address
+     * @param request
+     * @param response
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
     public boolean execute(
             Request request, Response response)
             throws InvocationTargetException, IllegalAccessException {

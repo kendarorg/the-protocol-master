@@ -37,3 +37,20 @@ function deepClone(obj) {
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
+
+htmx.defineExtension('submitjson', {
+    onEvent: function (name, evt) {
+        if (name === "htmx:configRequest") {
+            evt.detail.headers['Content-Type'] = "application/json"
+            evt.detail.headers['X-API-Key'] = 'sjk_xxx'
+        }
+    },
+    encodeParameters: function(xhr, parameters, elt) {
+        xhr.overrideMimeType('text/json') // override default mime type
+        const body = { // set your request body
+            data: parameters,
+            options: { submissionFormat: 'pretty'}
+        }
+        return (JSON.stringify(parameters))
+    }
+})

@@ -191,7 +191,7 @@ public class Main {
                     apiHandler.addProtocol(pi);
                     for (var pl : pi.getPlugins()) {
                         var apiHandlerPlugin = pl.getApiHandler();
-                        apisFiltersLoader.getFilters().add(apiHandlerPlugin);
+                        apisFiltersLoader.getFilters().addAll(apiHandlerPlugin);
                     }
                     started.incrementAndGet();
                     ini.putService(item.getKey(), pi);
@@ -215,6 +215,12 @@ public class Main {
             try {
                 while (started.get() < ini.getProtocols().size()) {
                     Sleeper.sleep(100);
+                }
+                for(var item: protocolServersCache.values()) {
+                    var protocolFilter = item.getProtoDescriptor().getApiHandler();
+                    if(protocolFilter!=null) {
+                        apisFiltersLoader.getFilters().addAll(protocolFilter);
+                    }
                 }
                 apisFiltersLoader.loadFilters();
                 if (ini.getApiPort() > 0) {

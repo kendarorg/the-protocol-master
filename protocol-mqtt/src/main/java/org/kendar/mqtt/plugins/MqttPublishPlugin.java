@@ -70,8 +70,8 @@ public class MqttPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettin
     }
 
     @Override
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new MqttPublishPluginApis(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new MqttPublishPluginApis(this, getId(), getInstanceId()));
     }
 
     public void expectPubRec(MqttContext context, PublishRel pubRel) {
