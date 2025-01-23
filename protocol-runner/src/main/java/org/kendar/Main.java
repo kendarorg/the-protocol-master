@@ -159,8 +159,8 @@ public class Main {
 
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        var logger = loggerContext.getLogger("org.kendar");
-        logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
+        var log = loggerContext.getLogger("org.kendar");
+        log.setLevel(Level.toLevel(logLevel, Level.ERROR));
         diService.register(FiltersConfiguration.class, new FiltersConfiguration());
         var apisFiltersLoader = diService.getInstance(ApiFiltersLoader.class);
 

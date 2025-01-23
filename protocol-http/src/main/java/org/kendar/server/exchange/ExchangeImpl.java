@@ -197,7 +197,7 @@ public class ExchangeImpl {
     @SuppressWarnings("SimplifyOptionalCallChains")
     public void sendResponseHeaders(int rCode, long contentLen)
             throws IOException {
-        final System.Logger logger = server.getLogger();
+        final System.Logger log = server.getLogger();
         if (sentHeaders) {
             throw new IOException("headers already sent");
         }
@@ -218,7 +218,7 @@ public class ExchangeImpl {
             if (contentLen != -1) {
                 String msg = "sendResponseHeaders: rCode = " + rCode
                         + ": forcing contentLen = -1";
-                logger.log(System.Logger.Level.WARNING, msg);
+                log.log(System.Logger.Level.WARNING, msg);
             }
             contentLen = -1;
             noContentLengthHeader = (rCode != 304);
@@ -231,7 +231,7 @@ public class ExchangeImpl {
             if (contentLen >= 0) {
                 String msg =
                         "sendResponseHeaders: being invoked with a content length for a HEAD request";
-                logger.log(System.Logger.Level.WARNING, msg);
+                log.log(System.Logger.Level.WARNING, msg);
             }
             noContentToSend = true;
             contentLen = 0;
@@ -265,7 +265,7 @@ public class ExchangeImpl {
                     Optional.ofNullable(rspHdrs.get("Connection"))
                             .map(List::stream).orElse(Stream.empty());
             if (conheader.anyMatch("close"::equalsIgnoreCase)) {
-                logger.log(System.Logger.Level.DEBUG, "Connection: close requested by handler");
+                log.log(System.Logger.Level.DEBUG, "Connection: close requested by handler");
                 close = true;
             }
         }
@@ -275,7 +275,7 @@ public class ExchangeImpl {
         tmpout.flush();
         tmpout = null;
         sentHeaders = true;
-        logger.log(System.Logger.Level.TRACE, "Sent headers: noContentToSend=" + noContentToSend);
+        log.log(System.Logger.Level.TRACE, "Sent headers: noContentToSend=" + noContentToSend);
         if (noContentToSend) {
             WriteFinishedEvent e = new WriteFinishedEvent(this);
             server.addEvent(e);

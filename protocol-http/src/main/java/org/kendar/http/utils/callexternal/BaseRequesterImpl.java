@@ -45,7 +45,7 @@ import java.util.Locale;
 @SuppressWarnings("resource")
 public abstract class BaseRequesterImpl implements BaseRequester {
     public static final String BLOCK_RECURSION = "X-BLOCK-RECURSIVE";
-    private static final Logger logger = LoggerFactory.getLogger(BaseRequesterImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(BaseRequesterImpl.class);
     private static final HttpRequestRetryHandler requestRetryHandler =
             (exception, executionCount, context) -> executionCount != 1;
     protected final DnsMultiResolver multiResolver;
@@ -192,7 +192,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                                         request.getRequestText().toString(), ContentType.create(contentType));
                     }
                 } catch (Exception ex) {
-                    logger.debug("Error {}", request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
+                    log.debug("Error {}", request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
                     entity =
                             new StringEntity(
                                     request.getRequestText().toString(), ContentType.create(ConstantsMime.STREAM));
@@ -247,7 +247,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
         } else if (request.getMethod().equalsIgnoreCase("TRACE")) {
             return new HttpTrace(stringAdress);
         } else {
-            logger.error("MISSING METHOD {} on {}", request.getMethod(), stringAdress);
+            log.error("MISSING METHOD {} on {}", request.getMethod(), stringAdress);
             throw new Exception("MISSING METHOD " + request.getMethod() + " on " + stringAdress);
         }
     }

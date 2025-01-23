@@ -32,7 +32,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
     private static final String H_AUTHORIZATION = "Authorization";
     private static final String BASIC_AUTH_MARKER = "basic";
     private static final String BASIC_AUTH_SEPARATOR = ":";
-    private static Logger logger;
+    private static Logger log;
 
     public RequestResponseBuilderImpl() {
 

@@ -61,7 +61,7 @@ public class ServerImpl {
     private final Set<HttpConnection> reqConnections;
     private final Set<HttpConnection> rspConnections;
     private final Object lolock = new Object();
-    private final System.Logger logger;
+    private final System.Logger log;
     private final AtomicReference<InternalSSLConfig> internalSSLConfig = new AtomicReference<>();
     private final String protocol;
     private final boolean https;
@@ -89,8 +89,8 @@ public class ServerImpl {
 
         this.protocol = protocol;
         this.wrapper = wrapper;
-        this.logger = System.getLogger("com.sun.net.httpserver");
-        ServerConfig.checkLegacyProperties(logger);
+        this.log = System.getLogger("com.sun.net.httpserver");
+        ServerConfig.checkLegacyProperties(log);
         https = protocol.equalsIgnoreCase("https");
         this.address = addr;
         contexts = new ContextList();
@@ -114,13 +114,13 @@ public class ServerImpl {
         if (reqRspTimeoutEnabled) {
             timer1 = new Timer("req-rsp-timeout-task", true);
             timer1.schedule(new ServerImpl.ReqRspTimeoutTask(), REQ_RSP_TIMER_SCHEDULE, REQ_RSP_TIMER_SCHEDULE);
-            logger.log(System.Logger.Level.DEBUG, "HttpServer request/response timeout task schedule ms: ",
+            log.log(System.Logger.Level.DEBUG, "HttpServer request/response timeout task schedule ms: ",
                     REQ_RSP_TIMER_SCHEDULE);
-            logger.log(System.Logger.Level.DEBUG, "MAX_REQ_TIME:  " + MAX_REQ_TIME);
-            logger.log(System.Logger.Level.DEBUG, "MAX_RSP_TIME:  " + MAX_RSP_TIME);
+            log.log(System.Logger.Level.DEBUG, "MAX_REQ_TIME:  " + MAX_REQ_TIME);
+            log.log(System.Logger.Level.DEBUG, "MAX_RSP_TIME:  " + MAX_RSP_TIME);
         }
         events = new LinkedList<>();
-        logger.log(System.Logger.Level.DEBUG, "HttpServer created " + protocol + " " + addr);
+        log.log(System.Logger.Level.DEBUG, "HttpServer created " + protocol + " " + addr);
     }
 
     public static synchronized void dprint(String s) {
@@ -260,7 +260,7 @@ public class ServerImpl {
                 dispatcherThread.join();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                logger.log(System.Logger.Level.TRACE, "ServerImpl.stop: ", e);
+                log.log(System.Logger.Level.TRACE, "ServerImpl.stop: ", e);
             }
         }
     }
@@ -271,7 +271,7 @@ public class ServerImpl {
         }
         HttpContextImpl context = new HttpContextImpl(protocol, path, handler, this);
         contexts.add(context);
-        logger.log(System.Logger.Level.DEBUG, "context created: " + path);
+        log.log(System.Logger.Level.DEBUG, "context created: " + path);
         return context;
     }
 
@@ -281,7 +281,7 @@ public class ServerImpl {
         }
         HttpContextImpl context = new HttpContextImpl(protocol, path, null, this);
         contexts.add(context);
-        logger.log(System.Logger.Level.DEBUG, "context created: " + path);
+        log.log(System.Logger.Level.DEBUG, "context created: " + path);
         return context;
     }
 
@@ -292,7 +292,7 @@ public class ServerImpl {
             throw new NullPointerException("null path parameter");
         }
         contexts.remove(protocol, path);
-        logger.log(System.Logger.Level.DEBUG, "context removed: " + path);
+        log.log(System.Logger.Level.DEBUG, "context removed: " + path);
     }
 
     public synchronized void removeContext(HttpContext context) throws IllegalArgumentException {
@@ -300,7 +300,7 @@ public class ServerImpl {
             throw new IllegalArgumentException("wrong HttpContext type");
         }
         contexts.remove((HttpContextImpl) context);
-        logger.log(System.Logger.Level.DEBUG, "context removed: " + context.getPath());
+        log.log(System.Logger.Level.DEBUG, "context removed: " + context.getPath());
     }
 
     public InetSocketAddress getAddress() {
@@ -317,7 +317,7 @@ public class ServerImpl {
     }
 
     public System.Logger getLogger() {
-        return logger;
+        return log;
     }
 
     @SuppressWarnings("AssertWithSideEffects")
@@ -347,7 +347,7 @@ public class ServerImpl {
     /* per exchange task */
 
     public void logReply(int code, String requestStr, String text) {
-        if (!logger.isLoggable(System.Logger.Level.DEBUG)) {
+        if (!log.isLoggable(System.Logger.Level.DEBUG)) {
             return;
         }
         if (text == null) {
@@ -361,7 +361,7 @@ public class ServerImpl {
         }
         String message = r + " [" + code + " " +
                 Code.msg(code) + "] (" + text + ")";
-        logger.log(System.Logger.Level.DEBUG, message);
+        log.log(System.Logger.Level.DEBUG, message);
     }
 
     void delay() {
@@ -527,7 +527,7 @@ public class ServerImpl {
             try {
                 if (r instanceof WriteFinishedEvent) {
 
-                    logger.log(System.Logger.Level.TRACE, "Write Finished");
+                    log.log(System.Logger.Level.TRACE, "Write Finished");
                     int exchanges = endExchange();
                     if (terminating && exchanges == 0) {
                         finished = true;
@@ -554,7 +554,7 @@ public class ServerImpl {
                     }
                 }
             } catch (IOException e) {
-                logger.log(
+                log.log(
                         System.Logger.Level.TRACE, "Dispatcher (1)", e
                 );
                 c.close();
@@ -572,7 +572,7 @@ public class ServerImpl {
                 markIdle(c);
             } catch (IOException e) {
                 dprint(e);
-                logger.log(System.Logger.Level.TRACE, "Dispatcher(8)", e);
+                log.log(System.Logger.Level.TRACE, "Dispatcher(8)", e);
                 c.close();
             }
         }
@@ -668,9 +668,9 @@ public class ServerImpl {
                     // call the selector just to process the cancelled keys
                     selector.selectNow();
                 } catch (IOException e) {
-                    logger.log(System.Logger.Level.TRACE, "Dispatcher (4)", e);
+                    log.log(System.Logger.Level.TRACE, "Dispatcher (4)", e);
                 } catch (Exception e) {
-                    logger.log(System.Logger.Level.TRACE, "Dispatcher (7)", e);
+                    log.log(System.Logger.Level.TRACE, "Dispatcher (7)", e);
                 }
             }
             try {
@@ -682,7 +682,7 @@ public class ServerImpl {
         private void handleException(SelectionKey key, Exception e) {
             HttpConnection conn = (HttpConnection) key.attachment();
             if (e != null) {
-                logger.log(System.Logger.Level.TRACE, "Dispatcher (2)", e);
+                log.log(System.Logger.Level.TRACE, "Dispatcher (2)", e);
             }
             closeConnection(conn);
         }
@@ -692,13 +692,13 @@ public class ServerImpl {
                 ServerImpl.Exchange t = new ServerImpl.Exchange(chan, protocol, conn);
                 executor.execute(t);
             } catch (HttpError e1) {
-                logger.log(System.Logger.Level.TRACE, "Dispatcher (4)", e1);
+                log.log(System.Logger.Level.TRACE, "Dispatcher (4)", e1);
                 closeConnection(conn);
             } catch (IOException e) {
-                logger.log(System.Logger.Level.TRACE, "Dispatcher (5)", e);
+                log.log(System.Logger.Level.TRACE, "Dispatcher (5)", e);
                 closeConnection(conn);
             } catch (Throwable e) {
-                logger.log(System.Logger.Level.TRACE, "Dispatcher (6)", e);
+                log.log(System.Logger.Level.TRACE, "Dispatcher (6)", e);
                 closeConnection(conn);
             }
         }
@@ -723,7 +723,7 @@ public class ServerImpl {
 
         public void run() {
             /* context will be null for new connections */
-            logger.log(System.Logger.Level.TRACE, "exchange started");
+            log.log(System.Logger.Level.TRACE, "exchange started");
             context = connection.getHttpContext();
             boolean newconnection;
             SSLEngine engine = null;
@@ -739,7 +739,7 @@ public class ServerImpl {
                     newconnection = true;
                     if (https) {
                         if (internalSSLConfig.get().getSslContext() == null) {
-                            logger.log(System.Logger.Level.WARNING,
+                            log.log(System.Logger.Level.WARNING,
                                     "SSL connection received. No https context created");
                             throw new HttpError("No SSL context established");
                         }
@@ -764,11 +764,11 @@ public class ServerImpl {
                 requestLine = req.requestLine();
                 if (requestLine == null) {
                     /* connection closed */
-                    logger.log(System.Logger.Level.DEBUG, "no request line: closing");
+                    log.log(System.Logger.Level.DEBUG, "no request line: closing");
                     closeConnection(connection);
                     return;
                 }
-                logger.log(System.Logger.Level.DEBUG, "Exchange request line: {0}", requestLine);
+                log.log(System.Logger.Level.DEBUG, "Exchange request line: {0}", requestLine);
                 int space = requestLine.indexOf(' ');
                 if (space == -1) {
                     reject(Code.HTTP_BAD_REQUEST,
@@ -911,21 +911,21 @@ public class ServerImpl {
                 }
 
             } catch (IOException e1) {
-                logger.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (1)", e1);
+                log.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (1)", e1);
                 closeConnection(connection);
             } catch (NumberFormatException e2) {
-                logger.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (2)", e2);
+                log.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (2)", e2);
                 reject(Code.HTTP_BAD_REQUEST,
                         requestLine, "NumberFormatException thrown");
             } catch (URISyntaxException e3) {
-                logger.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (3)", e3);
+                log.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (3)", e3);
                 reject(Code.HTTP_BAD_REQUEST,
                         requestLine, "URISyntaxException thrown");
             } catch (Exception e4) {
-                logger.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (4)", e4);
+                log.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (4)", e4);
                 closeConnection(connection);
             } catch (Throwable t) {
-                logger.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (5)", t);
+                log.log(System.Logger.Level.TRACE, "ServerImpl.Exchange (5)", t);
                 throw t;
             }
         }
@@ -968,7 +968,7 @@ public class ServerImpl {
                     closeConnection(connection);
                 }
             } catch (IOException e) {
-                logger.log(System.Logger.Level.TRACE, "ServerImpl.sendReply", e);
+                log.log(System.Logger.Level.TRACE, "ServerImpl.sendReply", e);
                 closeConnection(connection);
             }
         }
@@ -1020,8 +1020,8 @@ public class ServerImpl {
             for (HttpConnection c : toClose) {
                 allConnections.remove(c);
                 c.close();
-                if (logger.isLoggable(System.Logger.Level.TRACE)) {
-                    logger.log(System.Logger.Level.TRACE, "Closed idle connection " + c);
+                if (log.isLoggable(System.Logger.Level.TRACE)) {
+                    log.log(System.Logger.Level.TRACE, "Closed idle connection " + c);
                 }
             }
         }
@@ -1044,7 +1044,7 @@ public class ServerImpl {
                         }
                     }
                     for (HttpConnection c : toClose) {
-                        logger.log(System.Logger.Level.DEBUG, "closing: no request: " + c);
+                        log.log(System.Logger.Level.DEBUG, "closing: no request: " + c);
                         reqConnections.remove(c);
                         allConnections.remove(c);
                         c.close();
@@ -1060,7 +1060,7 @@ public class ServerImpl {
                         }
                     }
                     for (HttpConnection c : toClose) {
-                        logger.log(System.Logger.Level.DEBUG, "closing: no response: " + c);
+                        log.log(System.Logger.Level.DEBUG, "closing: no response: " + c);
                         rspConnections.remove(c);
                         allConnections.remove(c);
                         c.close();

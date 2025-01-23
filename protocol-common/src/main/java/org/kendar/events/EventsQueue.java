@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class EventsQueue {
-    private static final Logger logger = LoggerFactory.getLogger(EventsQueue.class);
+    private static final Logger log = LoggerFactory.getLogger(EventsQueue.class);
     private static final EventsQueue instance = new EventsQueue();
     private static final AtomicLong size = new AtomicLong(0);
 
@@ -96,7 +96,7 @@ public class EventsQueue {
                     try {
                         handle(item);
                     } catch (Exception e) {
-                        logger.warn("Trouble handling {}", item.getClass().getSimpleName(), e);
+                        log.warn("Trouble handling {}", item.getClass().getSimpleName(), e);
                     }
                     size.decrementAndGet();
                     item = items.poll();
@@ -117,14 +117,14 @@ public class EventsQueue {
                 try {
                     subHandler.getValue().accept(event);
                 } catch (Exception ex) {
-                    logger.error("Error executing TpmEvent {}", eventName, ex);
+                    log.error("Error executing TpmEvent {}", eventName, ex);
                 }
             }
         } else if (handler != null) {
             try {
                 handler.consumer.apply(event);
             } catch (Exception ex) {
-                logger.error("Error executing TpmEvent {}", eventName, ex);
+                log.error("Error executing TpmEvent {}", eventName, ex);
             }
         }
     }

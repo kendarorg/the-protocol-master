@@ -35,7 +35,7 @@ public class ConnectionBuilderImpl implements ConnectionBuilder {
             (exception, executionCount, context) -> executionCount != 3;
     protected final ConcurrentHashMap<String, ResolvedDomain> domains = new ConcurrentHashMap<>();
     private final DnsMultiResolver multiResolver;
-    private Logger logger;
+    private Logger log;
     private SystemDefaultDnsResolver remoteDnsResolver;
     private SystemDefaultDnsResolver fullDnsResolver;
 
@@ -100,7 +100,7 @@ public class ConnectionBuilderImpl implements ConnectionBuilder {
                     .register("https", sslsf).build();
 
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return null;
         }
     }
@@ -137,7 +137,7 @@ public class ConnectionBuilderImpl implements ConnectionBuilder {
                     .loadTrustMaterial(null, (x509CertChain, authType) -> true)
                     .build();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return HttpClientBuilder.create()
                 .disableAutomaticRetries()

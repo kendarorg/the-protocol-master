@@ -206,11 +206,11 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
                     os.flush();
                     os.close();
                 } catch (Exception ex) {
-                    //logger.trace(ex.getMessage());
+                    //log.trace(ex.getMessage());
                 }
             }
         } catch (Exception ex) {
-            //logger.error(ex.getMessage(), ex);
+            //log.error(ex.getMessage(), ex);
         }
     }
 
