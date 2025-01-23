@@ -28,7 +28,7 @@ import java.util.HashSet;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttPublishPlugin> {
     public MqttPublishPluginApis(MqttPublishPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);

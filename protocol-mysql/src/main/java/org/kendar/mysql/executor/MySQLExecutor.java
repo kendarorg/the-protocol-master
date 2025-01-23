@@ -153,27 +153,24 @@ public class MySQLExecutor {
         } else if (pvup.startsWith("ROLLBACK")) {
             return executeRollback(parse, protoContext);
         }
-        switch (parsed.getType()) {
-            case UPDATE:
-                return executeQuery(999999, parsed, protoContext, parse, "UPDATE", parameterValues, text);
-            case INSERT:
-                return executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
-            case SELECT:
-                return executeQuery(999999, parsed, protoContext, parse, "SELECT", parameterValues, text);
-            case CALL:
-                return executeQuery(999999, parsed, protoContext, parse, "CALL", parameterValues, text);
-            default:
+        return switch (parsed.getType()) {
+            case UPDATE -> executeQuery(999999, parsed, protoContext, parse, "UPDATE", parameterValues, text);
+            case INSERT -> executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
+            case SELECT -> executeQuery(999999, parsed, protoContext, parse, "SELECT", parameterValues, text);
+            case CALL -> executeQuery(999999, parsed, protoContext, parse, "CALL", parameterValues, text);
+            default -> {
                 if (cleanedUpString.toUpperCase().startsWith("BEGIN")) {
-                    return executeBegin(parse, protoContext);
+                    yield executeBegin(parse, protoContext);
                 } else if (cleanedUpString.toUpperCase().startsWith("COMMIT")) {
-                    return executeCommit(parse, protoContext);
+                    yield executeCommit(parse, protoContext);
                 } else if (cleanedUpString.toUpperCase().startsWith("ROLLBACK")) {
-                    return executeRollback(parse, protoContext);
+                    yield executeRollback(parse, protoContext);
                 } else if (cleanedUpString.toUpperCase().startsWith("USE")) {
-                    return executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
+                    yield executeQuery(999999, parsed, protoContext, parse, "INSERT 0", parameterValues, text);
                 }
                 throw new SQLException("UNSUPPORTED QUERY " + parsed.getValue());
-        }
+            }
+        };
     }
 
     private Iterator<ProtoStep> changeTransactionIsolation(ProtoContext protoContext, String value) {
@@ -288,7 +285,7 @@ public class MySQLExecutor {
         Iterator<ProtoStep> lastOne = null;
         for (var parsed : parseds) {
             var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
-            lastOne = handleSingleQuery(parsed.getValue(),sqlParseResult, protoContext, parse, parameterValues, text);
+            lastOne = handleSingleQuery(parsed.getValue(), sqlParseResult, protoContext, parse, parameterValues, text);
         }
         ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);
         return lastOne;
@@ -362,23 +359,9 @@ public class MySQLExecutor {
             result.add(new EOFPacket().
                     withStatusFlags(0x022).
                     withPacketNumber(++packetNumber));
-            long end = System.currentTimeMillis();
 
-            //KENDARMYSQLPREPARESTATEMENT
-            //var storage = protoContext.getProxy().getStorage();
-
-
-            //var selRes = new SelectResult();
             protoContext.setValue("STATEMENT_" + currentStatementId, query);
             protoContext.setValue("STATEMENT_FIELDS_" + currentStatementId, fields);
-            //protoContext.setValue("STATEMENT_PS_"+currentStatementId,ps);
-//            selRes.setLastInsertedId(currentStatementId);
-//            selRes.getMetadata().addAll(fields);
-//            storage.write(protoContext.getContextId(),
-//                    new JdbcRequest(query, new ArrayList<>()),
-//                    new JdbcResponse(selRes),
-//                    end - start, "PREPARE", "JDBC");
-
             ps.close();
 
         } catch (Exception ex) {

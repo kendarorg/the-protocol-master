@@ -1,6 +1,5 @@
 package org.kendar.di;
 
-import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.*;
 import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;
@@ -20,11 +19,11 @@ public class DiService {
     private static final ConcurrentHashMap<Thread, DiService> threads = new ConcurrentHashMap<>();
     private static final TimerInstance timerService = new TimerService().schedule(DiService::threadsClean, 1000, 2000);
     protected final HashMap<Class<?>, Object> singletons = new HashMap<>();
+    protected final List<DiService> children = new ArrayList<>();
     private final HashMap<Type, List<Type>> mappings = new HashMap<>();
     private final HashMap<Type, List<Type>> transientMappings = new HashMap<>();
     protected TpmScopeType scope = TpmScopeType.GLOBAL;
     protected DiService parent = null;
-    protected List<DiService> children = new ArrayList<>();
 
     public DiService() {
         singletons.put(DiService.class, this);
@@ -97,16 +96,12 @@ public class DiService {
         serviceAnnotations.stream()
                 .map(packageReflections::getTypesAnnotatedWith)
                 .flatMap(Set::stream)
-                .forEach((t) -> {
-                    this.bind(t, mappings);
-                });
+                .forEach((t) -> this.bind(t, mappings));
         var transientAnnotations = new HashSet<>(List.of(TpmTransient.class));
         transientAnnotations.stream()
                 .map(packageReflections::getTypesAnnotatedWith)
                 .flatMap(Set::stream)
-                .forEach((t) -> {
-                    this.bind(t, transientMappings);
-                });
+                .forEach((t) -> this.bind(t, transientMappings));
 
     }
 
@@ -151,16 +146,16 @@ public class DiService {
 
             Class<?>[] interfaces = clazz.getInterfaces();
 
-            for (int i = 0; i < interfaces.length; i++) {
-                if (!interfacesFound.contains(interfaces[i])) {
-                    interfacesFound.add(interfaces[i]);
-                    getAllInterfaces(interfaces[i], interfacesFound);
+            for (Class<?> anInterface : interfaces) {
+                if (!interfacesFound.contains(anInterface)) {
+                    interfacesFound.add(anInterface);
+                    getAllInterfaces(anInterface, interfacesFound);
                 }
             }
             Type[] genericInterfaces = clazz.getGenericInterfaces();
-            for (int i = 0; i < genericInterfaces.length; i++) {
-                if (genericInterfaces[i] instanceof ParameterizedType) {
-                    var parameterizedType = (ParameterizedType) genericInterfaces[i];
+            for (Type genericInterface : genericInterfaces) {
+                if (genericInterface instanceof ParameterizedType) {
+                    var parameterizedType = (ParameterizedType) genericInterface;
                     interfacesFound.add(parameterizedType);
                     getAllInterfaces(parameterizedType, interfacesFound);
                 }
@@ -203,7 +198,7 @@ public class DiService {
                 return new ArrayList<>();
             }
         }
-        var result = new ArrayList<Object>();
+        var result = new ArrayList<>();
         for (var i : data) {
             if (tags.length > 0) {
                 if (((Class<?>) i).getAnnotation(TpmService.class) == null) {

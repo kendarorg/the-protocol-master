@@ -39,6 +39,7 @@ public interface ProtocolPluginDescriptor<W extends PluginSettings> extends
 
     /**
      * Return all the APIs connected with the plugin
+     *
      * @return
      */
     List<ProtocolPluginApiHandler> getApiHandler();
@@ -46,6 +47,7 @@ public interface ProtocolPluginDescriptor<W extends PluginSettings> extends
     /**
      * Retrieve the specific instance of the protocol connected
      * with the plugin
+     *
      * @return
      */
     ProtoDescriptor getProtocolInstance();

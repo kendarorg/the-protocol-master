@@ -9,11 +9,11 @@ import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.Sleeper;
 
 import java.util.ArrayList;
@@ -78,9 +78,7 @@ public class RedisRunner extends CommonRunner {
         baseProtocol.initialize();
         var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> {
-            DiService.setThreadContext(diService);
-        });
+        ps.setOnStart(() -> DiService.setThreadContext(diService));
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServers.put(key, ps);

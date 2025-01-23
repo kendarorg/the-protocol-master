@@ -28,7 +28,7 @@ import java.util.UUID;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpPublishPlugin> {
     public AmqpPublishPluginApis(AmqpPublishPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);

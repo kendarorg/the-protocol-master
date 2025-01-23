@@ -15,7 +15,7 @@ import org.kendar.utils.JsonMapper;
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalReportPlugin plugin;

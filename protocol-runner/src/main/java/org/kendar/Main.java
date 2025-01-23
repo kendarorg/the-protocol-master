@@ -13,12 +13,12 @@ import org.kendar.di.TpmScopeType;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.Sleeper;
@@ -216,9 +216,9 @@ public class Main {
                 while (started.get() < ini.getProtocols().size()) {
                     Sleeper.sleep(100);
                 }
-                for(var item: protocolServersCache.values()) {
+                for (var item : protocolServersCache.values()) {
                     var protocolFilter = item.getProtoDescriptor().getApiHandler();
-                    if(protocolFilter!=null) {
+                    if (protocolFilter != null) {
                         apisFiltersLoader.getFilters().addAll(protocolFilter);
                     }
                 }

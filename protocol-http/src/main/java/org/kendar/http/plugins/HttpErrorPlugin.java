@@ -51,7 +51,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
         if (!isActive()) return false;
-        var pc =  ((double) settings.getErrorPercent()) / 100.0;
+        var pc = ((double) settings.getErrorPercent()) / 100.0;
         if (Math.random() < pc) {
 
             log.info("Faking ERROR {} {}", request.getMethod(), request.buildUrl());

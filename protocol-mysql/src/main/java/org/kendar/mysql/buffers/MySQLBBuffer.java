@@ -71,18 +71,13 @@ public class MySQLBBuffer extends BBuffer {
 
     public long readLength() {
         int length = get() & 0xff;
-        switch (length) {
-            case 251:
-                return NULL_LENGTH;
-            case 252:
-                return readUB2();
-            case 253:
-                return readUB3();
-            case 254:
-                return getLong();
-            default:
-                return length;
-        }
+        return switch (length) {
+            case 251 -> NULL_LENGTH;
+            case 252 -> readUB2();
+            case 253 -> readUB3();
+            case 254 -> getLong();
+            default -> length;
+        };
     }
 
     public void writeWithLength(byte[] src) {

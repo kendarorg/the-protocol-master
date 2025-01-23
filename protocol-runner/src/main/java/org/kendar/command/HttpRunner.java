@@ -9,10 +9,10 @@ import org.kendar.http.plugins.*;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.RewritePluginSettings;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,9 +163,7 @@ public class HttpRunner extends CommonRunner {
         baseProtocol.initialize();
         var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> {
-            DiService.setThreadContext(diService);
-        });
+        ps.setOnStart(() -> DiService.setThreadContext(diService));
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(sectionKey, ps);

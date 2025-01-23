@@ -11,18 +11,6 @@
     <artifactId>protocol-common</artifactId>
     <dependencies>
         <dependency>
-            <groupId>io.airlift</groupId>
-            <artifactId>aircompressor</artifactId>
-            <version>2.0.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>${jackson.version}</version>
@@ -37,7 +25,6 @@
             <artifactId>reflections</artifactId>
             <version>${reflection.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.airlift/aircompressor -->
         <!-- https://mvnrepository.com/artifact/io.airlift/aircompressor -->
         <dependency>
             <groupId>io.airlift</groupId>

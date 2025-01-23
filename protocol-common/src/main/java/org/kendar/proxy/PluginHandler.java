@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PluginHandler {
     private final Class<?> typeIn;
@@ -38,7 +37,7 @@ public class PluginHandler {
         var result = new ArrayList<PluginHandler>();
         plugin.setProtocolInstance(protocol);
         var clazz = plugin.getClass();
-        var handles = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase(methodName)).collect(Collectors.toList());
+        var handles = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase(methodName)).toList();
         for (var handle : handles) {
             if (handle.getParameterCount() != 4) continue;
             if (handle.getParameters()[0].getType() != PluginContext.class ||

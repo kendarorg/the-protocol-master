@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Base class for the plugin
@@ -48,14 +47,14 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      */
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
     /**
+     * The storage to be used to retrieve the data
+     */
+    protected final StorageRepository storage;
+    /**
      * Indexes locally loaded from the storage. They do not contain the first
      * responses
      */
     private final List<CompactLine> indexes = new ArrayList<>();
-    /**
-     * The storage to be used to retrieve the data
-     */
-    protected StorageRepository storage;
 
     public ReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
@@ -82,23 +81,9 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      */
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        //withStorage(global.getService("storage"));
         super.initialize(global, protocol, pluginSetting);
         return this;
     }
-
-    /**
-     * Set the storage on the plugin
-     *
-     * @param storage
-     * @return
-     */
-    /*protected ReplayPlugin withStorage(StorageRepository storage) {
-        if (storage != null) {
-            this.storage = storage;
-        }
-        return this;
-    }*/
 
     /**
      * To override if the protocol has callbacks/subscriptions
@@ -443,7 +428,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                         typeMatching(query.getType(), a.getType()) &&
                                 a.getCaller().equalsIgnoreCase(query.getCaller()) &&
                                 query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
-                ).collect(Collectors.toList());
+                ).toList();
         CompactLine bestIndex = null;
         var maxMatch = -1;
         //Evaluate the most matching item

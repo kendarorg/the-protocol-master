@@ -98,16 +98,13 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                         fr = bd;
                         break;
                     case "HeaderFrame":
-                        var hf = mapper.deserialize(out, HeaderFrame.class);
-                        fr = hf;
+                        fr = mapper.deserialize(out, HeaderFrame.class);
                         break;
                     case "BodyFrame":
-                        var bf = mapper.deserialize(out, BodyFrame.class);
-                        fr = bf;
+                        fr = mapper.deserialize(out, BodyFrame.class);
                         break;
                     case "BasicCancel":
-                        var bc = mapper.deserialize(out, BasicCancel.class);
-                        fr = bc;
+                        fr = mapper.deserialize(out, BasicCancel.class);
                         break;
                 }
                 if (fr != null) {
@@ -144,17 +141,6 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         } else if (cll instanceof HeaderFrame) {
             data.put("queue", ((HeaderFrame) cll).getConsumeOrigin());
         }
-        //var in = mapper.toJsonNode(cll);
-//        if(in.has("packetIdentifier")){
-//            //data.put("packetIdentifier", in.get("packetIdentifier").asText());
-//        }
-//        if(in.has("topicName")){
-//            data.put(in.get("topicName").asText(), in.get("qos").asText());
-//        }else if(in.has("topics")){
-//            for(var topic : in.get("topics")){
-//                data.put(topic.get("topic").asText(), topic.get("type").asText());
-//            }
-//        }
         return data;
     }
 }

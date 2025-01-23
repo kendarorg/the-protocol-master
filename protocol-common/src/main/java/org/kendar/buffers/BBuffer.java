@@ -133,15 +133,15 @@ public class BBuffer {
         this.position += second.length;
     }
 
-    public void writePartial(byte[] second,int length) {
+    public void writePartial(byte[] second, int length) {
         if (this.position == -1) {
             this.position = 0;
         }
-        writePartial(second,length, this.position);
+        writePartial(second, length, this.position);
         this.position += length;
     }
 
-    public void writePartial(byte[] second,int length, int offset) {
+    public void writePartial(byte[] second, int length, int offset) {
         if (offset < 0) offset = 0;
         if ((offset + second.length) > bytes.length) {
             var missingLength = (offset + length) - bytes.length;

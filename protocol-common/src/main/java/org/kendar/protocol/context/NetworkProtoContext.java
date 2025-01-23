@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutionException;
  */
 public abstract class NetworkProtoContext extends ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(NetworkProtoContext.class);
+    private final List<Runnable> runnables = new ArrayList<>();
     /**
      * If had sent the greeting message (to send data immediatly after connection without further ado)
      */
@@ -51,7 +52,6 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * Storage for the bytes not consumed
      */
     private BytesEvent remainingBytes;
-    private List<Runnable> runnables = new ArrayList<>();
     private boolean disconnected = false;
 
     public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {

@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.kendar.apis.ApiUtils.*;
 
 @TpmService
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class ApiStorageOnlyHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalSettings settings;

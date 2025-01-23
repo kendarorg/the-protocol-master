@@ -6,7 +6,6 @@ import org.kendar.sql.parser.SqlStringParser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class PostgresCallConverter {
     public static final SqlStringParser parser = new SqlStringParser("$");
@@ -29,7 +28,7 @@ public class PostgresCallConverter {
         var resultingParams = parsedParams.stream().
                 map(String::trim).
                 filter(pp -> (!pp.isEmpty() && !pp.equalsIgnoreCase(","))).
-                collect(Collectors.toList());
+                toList();
         var paramIndex = 0;
         var finalParams = new ArrayList<String>();
         for (String parPar : resultingParams) {

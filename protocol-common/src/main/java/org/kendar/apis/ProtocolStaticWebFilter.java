@@ -13,29 +13,6 @@ import java.io.IOException;
 public abstract class ProtocolStaticWebFilter extends StaticWebFilter implements ProtocolApiHandler {
     private final String protocolInstanceId;
 
-    @Override
-    public String adaptRequestedPath(String requestedPath) {
-        return requestedPath
-                .replace("/"+protocolInstanceId, "/"+getProtocol());
-    }
-
-
-
-    @Override
-    public String getId() {
-        return getProtocol()+"."+getProtocolInstanceId()+".web";
-    }
-
-    @Override
-    protected String getPath() {
-        return "*web"+getProtocol();
-    }
-
-    @Override
-    public boolean isPathMatching(String path) {
-        return path.contains("/"+protocolInstanceId);
-    }
-
     public ProtocolStaticWebFilter(FileResourcesUtils fileResourcesUtils, String protocolInstanceId) {
 
         super(fileResourcesUtils);
@@ -46,6 +23,28 @@ public abstract class ProtocolStaticWebFilter extends StaticWebFilter implements
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public String adaptRequestedPath(String requestedPath) {
+        return requestedPath
+                .replace("/" + protocolInstanceId, "/" + getProtocol());
+    }
+
+    @Override
+    public String getId() {
+        return getProtocol() + "." + getProtocolInstanceId() + ".web";
+    }
+
+    @Override
+    protected String getPath() {
+        return "*web" + getProtocol();
+    }
+
+    @Override
+    public boolean isPathMatching(String path) {
+        return path.contains("/" + protocolInstanceId);
+    }
+
     @Override
     public String getProtocolInstanceId() {
         return protocolInstanceId;

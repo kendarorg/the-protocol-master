@@ -16,7 +16,6 @@ import org.kendar.apis.matchers.FilterMatcher;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.GenericFilterExecutor;
 import org.kendar.apis.utils.IdBuilder;
-import org.kendar.plugins.base.ProtocolApiHandler;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 
 import java.lang.annotation.IncompleteAnnotationException;
@@ -208,6 +207,7 @@ public class FilterDescriptor {
 
     /**
      * Run the callback associate with the address
+     *
      * @param request
      * @param response
      * @return

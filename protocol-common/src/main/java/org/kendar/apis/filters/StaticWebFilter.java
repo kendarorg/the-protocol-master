@@ -12,6 +12,8 @@ import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.apis.utils.MimeChecker;
 import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.utils.FileResourcesUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Handle requests for the static pages (usually in resource files)
  */
 public abstract class StaticWebFilter implements FilteringClass {
+    private static final Logger log = LoggerFactory.getLogger(StaticWebFilter.class);
     private final FileResourcesUtils fileResourcesUtils;
     private final ConcurrentHashMap<String, String> markdownCache = new ConcurrentHashMap<>();
     private HashMap<String, Object> resourceFiles = new HashMap<>();
@@ -33,6 +36,7 @@ public abstract class StaticWebFilter implements FilteringClass {
 
     /**
      * The root path (with * it's inside the resources)
+     *
      * @return
      */
     protected abstract String getPath();
@@ -51,6 +55,7 @@ public abstract class StaticWebFilter implements FilteringClass {
      * same api for all protocols the function verifies that in the called path
      * exists the protocolInstanceId, like /something/mqtt-01/somthingelse while
      * the file system path is [resources]/getPath()/something/[protocol]/somethingelse
+     *
      * @param path
      * @return
      */
@@ -70,7 +75,7 @@ public abstract class StaticWebFilter implements FilteringClass {
         if (requestedPath.endsWith("/")) {
             requestedPath = requestedPath.substring(0, requestedPath.length() - 1);
         }
-        if(isPathMatching(requestedPath)){
+        if (isPathMatching(requestedPath)) {
             requestedPath = adaptRequestedPath(requestedPath);
             if (verifyPathAndRender(response, realPath, requestedPath, false)) return true;
             if (verifyPathAndRender(response, realPath, requestedPath + "/index.htm", true)) return true;
@@ -86,6 +91,7 @@ public abstract class StaticWebFilter implements FilteringClass {
     /**
      * This is connected with isPathMatching(), when /something/mqtt-01/somthingelse
      * is called it transform it into /something/mqtt/somthingelse
+     *
      * @param requestedPath
      * @return
      */
@@ -96,6 +102,7 @@ public abstract class StaticWebFilter implements FilteringClass {
     /**
      * If it finds the path accept it, if needed handles the redirect http://xx
      * http://xx to http://xx/index.html
+     *
      * @param response
      * @param realPath
      * @param possibleMatch
@@ -141,6 +148,7 @@ public abstract class StaticWebFilter implements FilteringClass {
 
     /**
      * Render the files applying the mostly correct mime type
+     *
      * @param fullPath
      * @param response
      */
@@ -174,7 +182,7 @@ public abstract class StaticWebFilter implements FilteringClass {
             response.setStatusCode(200);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 

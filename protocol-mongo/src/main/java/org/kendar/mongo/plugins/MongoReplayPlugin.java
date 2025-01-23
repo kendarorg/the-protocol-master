@@ -8,9 +8,6 @@ import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
-import org.kendar.storage.CompactLine;
-import org.kendar.storage.StorageItem;
-import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
@@ -48,23 +45,5 @@ public class MongoReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
                 res1.setFlags(8);
                 break;
         }
-    }
-
-    @Override
-    protected CompactLine findIndex(CallItemsQuery query, Object in) {
-        var result = super.findIndex(query, in);
-        //OP_MSG with dbStats load from recorded
-        //HELLO_OP_MSG load from recorded
-        //HELLO_OP_QUERY doc
-        //OP_QUERY not deserialized correctly
-        return result;
-    }
-
-    @Override
-    protected StorageItem readStorageItem(CompactLine index, Object in, PluginContext pluginContext) {
-        var resultFinal = super.readStorageItem(index, in, pluginContext);
-        //HELLO_OP_MSG Always
-        //HELLO_OP_QUERY
-        return resultFinal;
     }
 }

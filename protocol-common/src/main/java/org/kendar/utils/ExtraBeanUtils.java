@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ExtraBeanUtils {
     private static final Logger LOG = LoggerFactory.getLogger(ExtraBeanUtils.class);
-    private static ConcurrentHashMap<String, Map<String, TypeOfProp>> cache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Map<String, TypeOfProp>> cache = new ConcurrentHashMap<>();
 
     private static Map<String, TypeOfProp> describe(Object orig) {
         var pu = BeanUtilsBean.getInstance().getPropertyUtils();

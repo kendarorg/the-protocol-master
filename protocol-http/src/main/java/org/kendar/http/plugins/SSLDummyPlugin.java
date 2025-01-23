@@ -45,6 +45,7 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptorBase<SSLDummyPluginS
     public boolean isActive() {
         return true;
     }
+
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
         return List.of(new SSLApiHandler(this, getId(), getInstanceId(), protocolSettings));

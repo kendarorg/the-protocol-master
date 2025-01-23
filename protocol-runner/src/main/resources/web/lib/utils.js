@@ -45,11 +45,11 @@ htmx.defineExtension('submitjson', {
             evt.detail.headers['X-API-Key'] = 'sjk_xxx'
         }
     },
-    encodeParameters: function(xhr, parameters, elt) {
+    encodeParameters: function (xhr, parameters, elt) {
         xhr.overrideMimeType('text/json') // override default mime type
         const body = { // set your request body
             data: parameters,
-            options: { submissionFormat: 'pretty'}
+            options: {submissionFormat: 'pretty'}
         }
         return (JSON.stringify(parameters))
     }

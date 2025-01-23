@@ -65,78 +65,28 @@ public class DataTypesBuilder {
     private String getClName(DataTypeDescriptor dt) {
         Class clazz;
         var type = dt.getDataType();
-        switch (type) {
-            case Types.STRUCT:
-                clazz = Struct.class;
-                break;
-            case Types.ARRAY:
-                clazz = Array.class;
-                break;
-            case Types.BIT:
-            case Types.BOOLEAN:
-                clazz = Boolean.class;
-                break;
-            case Types.SQLXML:
-                clazz = java.sql.SQLXML.class;
-                break;
-            case Types.BINARY:
-            case Types.VARBINARY:
-            case Types.LONGVARBINARY:
-                clazz = byte[].class;
-                break;
-            case Types.BLOB:
-                clazz = Blob.class;
-                break;
-            case Types.SMALLINT:
-                clazz = Short.class;
-                break;
-            case Types.TINYINT:
-                clazz = Byte.class;
-                break;
-            case Types.INTEGER:
-                clazz = Integer.class;
-                break;
-            case Types.BIGINT:
-                clazz = Long.class;
-                break;
-            case Types.REAL:
-                clazz = Float.class;
-                break;
-            case Types.DOUBLE:
-                clazz = Double.class;
-                break;
-            case Types.DATE:
-                clazz = java.sql.Date.class;
-                break;
-            case Types.TIME:
-            case Types.TIME_WITH_TIMEZONE:
-                clazz = java.sql.Time.class;
-                break;
-            case Types.TIMESTAMP:
-            case Types.TIMESTAMP_WITH_TIMEZONE:
-                clazz = java.sql.Timestamp.class;
-                break;
-            case Types.NUMERIC:
-            case Types.DECIMAL:
-                clazz = BigDecimal.class;
-                break;
-            case Types.CLOB:
-                clazz = Clob.class;
-                break;
-            case Types.NULL:
-            case Types.CHAR:
-            case Types.VARCHAR:
-            case Types.NVARCHAR:
-            case Types.NCLOB:
-            case Types.NCHAR:
-            case Types.LONGNVARCHAR:
-            case Types.LONGVARCHAR:
-                clazz = String.class;
-                break;
-            default:
-                clazz = Object.class;
-                break;
-        }
+        clazz = switch (type) {
+            case Types.STRUCT -> Struct.class;
+            case Types.ARRAY -> Array.class;
+            case Types.BIT, Types.BOOLEAN -> Boolean.class;
+            case Types.SQLXML -> SQLXML.class;
+            case Types.BINARY, Types.VARBINARY, Types.LONGVARBINARY -> byte[].class;
+            case Types.BLOB -> Blob.class;
+            case Types.SMALLINT -> Short.class;
+            case Types.TINYINT -> Byte.class;
+            case Types.INTEGER -> Integer.class;
+            case Types.BIGINT -> Long.class;
+            case Types.REAL -> Float.class;
+            case Types.DOUBLE -> Double.class;
+            case Types.DATE -> java.sql.Date.class;
+            case Types.TIME, Types.TIME_WITH_TIMEZONE -> Time.class;
+            case Types.TIMESTAMP, Types.TIMESTAMP_WITH_TIMEZONE -> Timestamp.class;
+            case Types.NUMERIC, Types.DECIMAL -> BigDecimal.class;
+            case Types.CLOB -> Clob.class;
+            case Types.NULL, Types.CHAR, Types.VARCHAR, Types.NVARCHAR, Types.NCLOB, Types.NCHAR, Types.LONGNVARCHAR,
+                 Types.LONGVARCHAR -> String.class;
+            default -> Object.class;
+        };
         return clazz.getName();
     }
 

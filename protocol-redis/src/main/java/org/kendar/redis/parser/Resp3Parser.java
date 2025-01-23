@@ -308,39 +308,26 @@ public class Resp3Parser {
     public Object parse(Resp3Input line) throws Resp3ParseException {
 
         char prefix = line.charAtAndIncrement();
-        switch (prefix) {
-            case '+':
-                return parseSimpleString(line);
-            case '-':
-                return parseSimpleError(line);
-            case ':':
-                return parseInteger(line);
-            case '$':
-                return parseBulkString(line);
-            case '*':
-                return parseArray(line);
-            case '_':
+        return switch (prefix) {
+            case '+' -> parseSimpleString(line);
+            case '-' -> parseSimpleError(line);
+            case ':' -> parseInteger(line);
+            case '$' -> parseBulkString(line);
+            case '*' -> parseArray(line);
+            case '_' -> {
                 parseNull(line);
-                return null;
-            case '#':
-                return parseBool(line);
-            case ',':
-                return parseDouble(line);
-            case '(':
-                return parseBigNumber(line);
-            case '!':
-                return parseBulkError(line);
-            case '=':
-                return parseVerbatimString(line);
-            case '%':
-                return parseMap(line);
-            case '~':
-                return parseSet(line);
-            case '>':
-                return parsePush(line);
-            default:
-                throw new Resp3ParseException("Unknown response type: " + prefix);
-        }
+                yield null;
+            }
+            case '#' -> parseBool(line);
+            case ',' -> parseDouble(line);
+            case '(' -> parseBigNumber(line);
+            case '!' -> parseBulkError(line);
+            case '=' -> parseVerbatimString(line);
+            case '%' -> parseMap(line);
+            case '~' -> parseSet(line);
+            case '>' -> parsePush(line);
+            default -> throw new Resp3ParseException("Unknown response type: " + prefix);
+        };
 
 
     }

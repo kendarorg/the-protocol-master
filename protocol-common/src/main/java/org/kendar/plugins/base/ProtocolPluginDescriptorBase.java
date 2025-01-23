@@ -12,11 +12,12 @@ import java.util.List;
 
 /**
  * Base descriptor for a protocol plugin
+ *
  * @param <W>
  */
 public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> implements ProtocolPluginDescriptor<W> {
     private static final Logger log = LoggerFactory.getLogger(ProtocolPluginDescriptorBase.class);
-    protected JsonMapper mapper;
+    protected final JsonMapper mapper;
     private boolean active;
     private String instanceId = "default";
     private List<ProtocolPluginApiHandler> apiHandler;
@@ -41,6 +42,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
 
     /**
      * Retrieve the settings
+     *
      * @return
      */
     public W getSettings() {
@@ -49,6 +51,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
 
     /**
      * Retrieve the settings class (For deserializaton purposes
+     *
      * @return
      */
     public Class<?> getSettingClass() {
@@ -58,6 +61,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
 
     /**
      * The protocol instance ID
+     *
      * @return
      */
     public String getInstanceId() {
@@ -98,6 +102,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
 
     /**
      * Actiavion callback
+     *
      * @param active
      */
     protected void handleActivation(boolean active) {
@@ -110,6 +115,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
 
     /**
      * Handle the activation of the plugin
+     *
      * @param active
      */
     public void setActive(boolean active) {
@@ -121,6 +127,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
 
     /**
      * Post activation callback
+     *
      * @param active
      */
     protected void handlePostActivation(boolean active) {

@@ -7,7 +7,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.utils.FileResourcesUtils;
 
 @TpmService
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class MainWebSite extends StaticWebFilter {
     public MainWebSite(FileResourcesUtils fileResourcesUtils) {
 

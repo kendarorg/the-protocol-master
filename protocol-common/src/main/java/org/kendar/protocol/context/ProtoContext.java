@@ -60,6 +60,7 @@ public abstract class ProtoContext {
      * Exclusively lock the send operation
      */
     private final Object sendLock = new Object();
+    private final ConcurrentLinkedQueue<ProtoState> states = new ConcurrentLinkedQueue<>();
     /**
      * Execution stack, this stores the current state
      */
@@ -73,7 +74,6 @@ public abstract class ProtoContext {
      */
     private ProtoState currentState;
     private boolean useCallDurationTimes;
-    private ConcurrentLinkedQueue<ProtoState> states = new ConcurrentLinkedQueue<>();
 
     public ProtoContext(ProtoDescriptor descriptor, int contextId) {
         this.contextId = contextId;

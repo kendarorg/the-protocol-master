@@ -129,6 +129,7 @@ public class ServerImpl {
         }
     }
 
+
     public static synchronized void dprint(Exception e) {
         if (debug) {
             //noinspection ThrowablePrintedToSystemOut

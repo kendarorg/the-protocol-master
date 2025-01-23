@@ -44,7 +44,6 @@ import java.util.Locale;
 
 @SuppressWarnings("resource")
 public abstract class BaseRequesterImpl implements BaseRequester {
-    @SuppressWarnings("UastIncorrectHttpHeaderInspection")
     public static final String BLOCK_RECURSION = "X-BLOCK-RECURSIVE";
     private static final Logger logger = LoggerFactory.getLogger(BaseRequesterImpl.class);
     private static final HttpRequestRetryHandler requestRetryHandler =

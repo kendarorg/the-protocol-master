@@ -14,7 +14,7 @@ import org.kendar.utils.FileResourcesUtils;
 import static org.kendar.apis.ApiUtils.respondFile;
 import static org.kendar.apis.ApiUtils.respondKo;
 
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class SSLApiHandler implements ProtocolPluginApiHandler {
     private final HttpProtocolSettings protocolSettings;
     private final SSLDummyPlugin descriptor;

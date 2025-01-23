@@ -16,7 +16,7 @@ import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
 
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor> implements ProtocolPluginApiHandler {
     protected static final JsonMapper mapper = new JsonMapper();
     private final T descriptor;

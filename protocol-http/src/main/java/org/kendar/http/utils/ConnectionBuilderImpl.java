@@ -92,8 +92,6 @@ public class ConnectionBuilderImpl implements ConnectionBuilder {
         SSLContextBuilder contextBuilder = new SSLContextBuilder();
         try {
             contextBuilder.loadTrustMaterial(null, (TrustStrategy) (chain, authType) -> true);
-//            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(contextBuilder.build(),
-//                    SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(contextBuilder.build(),
                     NoopHostnameVerifier.INSTANCE);
             RegistryBuilder<ConnectionSocketFactory> builder = RegistryBuilder.create();

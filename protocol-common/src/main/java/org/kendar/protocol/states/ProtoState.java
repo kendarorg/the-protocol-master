@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * Basic state
@@ -127,7 +126,7 @@ public abstract class ProtoState {
      * @return
      */
     public static Iterator<ProtoStep> iteratorOfList(ReturnMessage... msg) {
-        return Arrays.stream(msg).map(a -> (ProtoStep) () -> a).collect(Collectors.toList()).iterator();
+        return Arrays.stream(msg).map(a -> (ProtoStep) () -> a).toList().iterator();
     }
 
     public void setProtoDescriptor(ProtoDescriptor descriptor) {

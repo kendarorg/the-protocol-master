@@ -141,7 +141,7 @@ public class PostgresExecutor {
                 return handleWithinTransaction(parsed, protoContext, parse, binding, maxRecords, describable);
             } else {
                 var sqlParseResult = new SqlParseResult(parse.getQuery(), parsed.get(0).getType());
-                return handleSingleQuery(parsed.get(0).getValue(),sqlParseResult, protoContext, parse, binding, maxRecords, describable);
+                return handleSingleQuery(parsed.get(0).getValue(), sqlParseResult, protoContext, parse, binding, maxRecords, describable);
             }
         } catch (SQLException e) {
             log.error("[SERVER] Error {}", e.getMessage());
@@ -155,7 +155,7 @@ public class PostgresExecutor {
         }
     }
 
-    private ExecutorResult handleSingleQuery(String cleanedUpString,SqlParseResult parsed,
+    private ExecutorResult handleSingleQuery(String cleanedUpString, SqlParseResult parsed,
                                              NetworkProtoContext protoContext, Parse parse, Binding binding,
                                              int maxRecords, boolean describable) throws SQLException {
         switch (parsed.getType()) {
@@ -283,7 +283,7 @@ public class PostgresExecutor {
         ExecutorResult lastOne = null;
         for (var parsed : parseds) {
             var sqlParseResult = new SqlParseResult(parsed.getValue(), parsed.getType());
-            lastOne = handleSingleQuery(parsed.getValue(),sqlParseResult, protoContext, parse,
+            lastOne = handleSingleQuery(parsed.getValue(), sqlParseResult, protoContext, parse,
                     new Binding("", "", new ArrayList<>(), new ArrayList<>()), 1, false);
         }
         ((JdbcProxy) protoContext.getProxy()).executeCommit(protoContext);

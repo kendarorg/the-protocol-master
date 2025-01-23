@@ -1,7 +1,7 @@
 package org.kendar.plugins.base;
 
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.tcpserver.TcpServer;
 
 import java.util.List;
 

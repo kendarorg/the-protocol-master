@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class BaseMockPluginApis extends ProtocolPluginApiHandlerDefault<MockPlugin> {
 
     public BaseMockPluginApis(MockPlugin descriptor, String id, String instanceId) {

@@ -16,23 +16,24 @@ import java.sql.Types;
 @TpmService(tags = "mysql")
 public class MySqlReplayPlugin extends JdbcReplayPlugin {
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
-    private static final String SELECT_TRANS_RESULT = "{\n" +
-            "      \"records\" : [ [ \"0\" ] ],\n" +
-            "      \"metadata\" : [ {\n" +
-            "        \"columnName\" : \"@@session.transaction_read_only\",\n" +
-            "        \"columnLabel\" : \"@@session.transaction_read_only\",\n" +
-            "        \"byteData\" : false,\n" +
-            "        \"catalogName\" : \"\",\n" +
-            "        \"schemaName\" : \"\",\n" +
-            "        \"tableName\" : \"\",\n" +
-            "        \"columnDisplaySize\" : 19,\n" +
-            "        \"columnType\" : \"BIGINT\",\n" +
-            "        \"precision\" : 19\n" +
-            "      } ],\n" +
-            "      \"count\" : 1,\n" +
-            "      \"intResult\" : false,\n" +
-            "      \"lastInsertedId\" : 0\n" +
-            "    }";
+    private static final String SELECT_TRANS_RESULT = """
+            {
+                  "records" : [ [ "0" ] ],
+                  "metadata" : [ {
+                    "columnName" : "@@session.transaction_read_only",
+                    "columnLabel" : "@@session.transaction_read_only",
+                    "byteData" : false,
+                    "catalogName" : "",
+                    "schemaName" : "",
+                    "tableName" : "",
+                    "columnDisplaySize" : 19,
+                    "columnType" : "BIGINT",
+                    "precision" : 19
+                  } ],
+                  "count" : 1,
+                  "intResult" : false,
+                  "lastInsertedId" : 0
+                }""";
     private static final SqlStringParser parser = new SqlStringParser("?");
 
     public MySqlReplayPlugin(JsonMapper mapper, StorageRepository storage) {
