@@ -354,7 +354,9 @@ public class SimpleTest extends BasicTest {
         Sleeper.sleep(100);
 
 
-        var publish = (AmqpPublishPluginApis) publishPlugin.getApiHandler();
+        var publish = (AmqpPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
+                a->a instanceof AmqpPublishPluginApis
+        ).findFirst().get();
         var res = new Response();
         publish.getConnections(new Request(), res);
         var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<AmqpConnection>>() {
