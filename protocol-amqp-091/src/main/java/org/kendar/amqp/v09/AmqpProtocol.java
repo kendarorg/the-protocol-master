@@ -33,6 +33,7 @@ import org.kendar.utils.TimerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AmqpProtocol extends NetworkProtoDescriptor {
@@ -65,34 +66,35 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
                         new ConnectionOpen(AmqpFrame.class),
                         new Tagged(
                                 Tag.ofKeys("CHANNEL"),
-                                new ProtoStateSequence(
-                                        new ChannelOpen(AmqpFrame.class),
-                                        new ProtoStateWhile(
-                                                new ProtoStateSwitchCase(
-                                                        new QueueDeclare(AmqpFrame.class),
-                                                        new QueueBind(AmqpFrame.class),
-                                                        new QueueUnbind(AmqpFrame.class),
-                                                        new QueuePurge(AmqpFrame.class),
-                                                        new QueueDelete(AmqpFrame.class),
-                                                        new ExchangeDeclare(AmqpFrame.class),
-                                                        new ExchangeBind(AmqpFrame.class),
-                                                        new ExchangeUnbind(AmqpFrame.class),
-                                                        new ExchangeDelete(AmqpFrame.class),
-                                                        new BasicConsume(AmqpFrame.class),
-                                                        new BasicCancel(AmqpFrame.class),
-                                                        new BasicGet(AmqpFrame.class),
-                                                        new ProtoStateSequence(
-                                                                new BasicPublish(AmqpFrame.class),
-                                                                new HeaderFrame(AmqpFrame.class),
-                                                                new BodyFrame(AmqpFrame.class)
-                                                        ),
-                                                        new BasicAck(AmqpFrame.class),
-                                                        new BasicNack(AmqpFrame.class),
-                                                        new Reject(AmqpFrame.class)
-                                                )
-                                        ),
-                                        new ChannelClose(AmqpFrame.class)
-                                )
+                                new ProtoStateWhile(
+                                        new ProtoStateSequence(
+                                                new ChannelOpen(AmqpFrame.class),
+                                                new ProtoStateWhile(
+                                                        new ProtoStateSwitchCase(
+                                                                new QueueDeclare(AmqpFrame.class),
+                                                                new QueueBind(AmqpFrame.class),
+                                                                new QueueUnbind(AmqpFrame.class),
+                                                                new QueuePurge(AmqpFrame.class),
+                                                                new QueueDelete(AmqpFrame.class),
+                                                                new ExchangeDeclare(AmqpFrame.class),
+                                                                new ExchangeBind(AmqpFrame.class),
+                                                                new ExchangeUnbind(AmqpFrame.class),
+                                                                new ExchangeDelete(AmqpFrame.class),
+                                                                new BasicConsume(AmqpFrame.class),
+                                                                new BasicCancel(AmqpFrame.class),
+                                                                new BasicGet(AmqpFrame.class),
+                                                                new ProtoStateSequence(
+                                                                        new BasicPublish(AmqpFrame.class),
+                                                                        new HeaderFrame(AmqpFrame.class),
+                                                                        new BodyFrame(AmqpFrame.class)
+                                                                ),
+                                                                new BasicAck(AmqpFrame.class),
+                                                                new BasicNack(AmqpFrame.class),
+                                                                new Reject(AmqpFrame.class)
+                                                        )
+                                                ),
+                                                new ChannelClose(AmqpFrame.class)
+                                        ))
                         ),
                         new ConnectionClose(AmqpFrame.class)
                 )
@@ -105,18 +107,36 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
             timer.cancel();
         }
         var timerService = new TimerService();
-        timer = timerService.schedule(this::sendHeartbeat, 20 * 1000, 20 * 1000);
+        timer = timerService.schedule(this::sendHeartbeat, 5 * 1000, 5 * 1000);
     }
 
     private void sendHeartbeat() {
-        for (var ctx : getContextsCache().values()) {
-            for (var ch : ((AmqpProtoContext) ctx).getChannels()) {
-                var hb = new HearthBeatFrame();
-                hb.setChannel(ch);
-                hb.setProtoDescriptor(this);
-                //ctx.write(hb);
-                log.warn("Sending heartbeat");
-            }
+        var toRemove = new ArrayList<Integer>();
+        getContextsCache().forEach((key, value) -> {
+            var ctx = (AmqpProtoContext) value;
+            //for (var ch : (ctx).getChannels()) {
+                try {
+                    var hb = new HearthBeatFrame();
+                    hb.setChannel((short)0);
+                    hb.setProtoDescriptor(this);
+                    if (ctx.isConnected()) {
+                        //ctx.write(hb);
+                        //var prx = (AmqpProxy) ctx.getProxy();
+                        /*var connection = ((ProxyConnection) ctx.getValue("CONNECTION"));
+                        var sock = (NetworkProxySocket) connection.getConnection();
+                        sock.write(hb, this.buildBuffer());
+                        log.warn("Sending heartbeat");*/
+                    } else {
+                        toRemove.add(key);
+                    }
+
+                } catch (Exception e) {
+                    toRemove.add(key);
+                }
+            //}
+        });
+        for (var key : toRemove) {
+            getContextsCache().remove(key);
         }
     }
 

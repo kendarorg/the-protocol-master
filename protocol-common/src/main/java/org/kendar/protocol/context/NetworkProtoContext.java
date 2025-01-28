@@ -103,6 +103,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
         }
     }
 
+    private boolean connected = true;
+
     /**
      * Write to the client socket, calls the method to serialize the message
      *
@@ -140,7 +142,9 @@ public abstract class NetworkProtoContext extends ProtoContext {
                 res.get();
             } catch (InterruptedException | ExecutionException e) {
                 log.error("[CL<TP][TX] Cannot write message: {} {}", returnMessage.getClass().getSimpleName(), e.getMessage());
+                connected=false;
                 throw new ConnectionExeception("Cannot write on channel");
+
             }
         }
 
@@ -363,5 +367,9 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     public void addResponse(Runnable toRun) {
         runnables.add(toRun);
+    }
+
+    protected boolean isConnected() {
+        return client.isOpen() && connected;
     }
 }

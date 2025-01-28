@@ -42,4 +42,18 @@ public class AmqpProtoContext extends NetworkProtoContext {
     public void setConsumeId(int consumeId) {
         this.consumeId = consumeId;
     }
+
+    public boolean isConnected() {
+        ProxyConnection conn = ((ProxyConnection) getValue("CONNECTION"));
+        var sock = (AmqpProxySocket) conn.getConnection();
+        if (sock != null) {
+            if(!sock.isConnected()){
+                return false;
+            }
+        }
+        if(!super.isConnected()){
+            return false;
+        }
+        return true;
+    }
 }

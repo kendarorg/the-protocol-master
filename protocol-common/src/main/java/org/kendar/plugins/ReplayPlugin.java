@@ -180,8 +180,10 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                     try {
                         var context = contextKvp.getValue();
                         var contextConnection = context.getValue("CONNECTION");
-                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                        context.setValue("CONNECTION", null);
+                        if(contextConnection!=null) {
+                            context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                            context.setValue("CONNECTION", null);
+                        }
                     } catch (Exception e) {
                         log.debug("Error disconnecting connection {}", contextKvp.getKey(), e);
                     }

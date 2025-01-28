@@ -15,12 +15,12 @@ public class HearthBeatFrame extends Frame implements InterruptProtoState {
 
     public HearthBeatFrame() {
         super();
-        setType(FrameType.HEARTHBIT.asByte());
+        setType(FrameType.HEARTBEAT.asByte());
     }
 
     public HearthBeatFrame(Class<?>... events) {
         super(events);
-        setType(FrameType.HEARTHBIT.asByte());
+        setType(FrameType.HEARTBEAT.asByte());
     }
 
 
@@ -37,14 +37,14 @@ public class HearthBeatFrame extends Frame implements InterruptProtoState {
     @Override
     protected Iterator<ProtoStep> executeFrame(short channel, BBuffer rb, AmqpFrame event, int size) {
         var hbFrame = new HearthBeatFrame();
-        hbFrame.setChannel(channel);
+        hbFrame.setChannel((short) 0);
 
         var context = (AmqpProtoContext) event.getContext();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
         var sock = (AmqpProxySocket) connection.getConnection();
 
         var heartBeatFrame = new HearthBeatFrame();
-        heartBeatFrame.setChannel(channel);
+        heartBeatFrame.setChannel((short)0);
         sock.write(heartBeatFrame, context.buildBuffer());
         sock.read(heartBeatFrame, false);
 

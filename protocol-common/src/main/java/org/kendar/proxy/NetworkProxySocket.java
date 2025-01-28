@@ -243,6 +243,9 @@ public abstract class NetworkProxySocket {
 
         var returnMessage = new ArrayList<ReturnMessage>();
         if (founded == null) {
+            if(optional){
+                return returnMessage;
+            }
             throw new RuntimeException("UNABLE TO FIND Contains STILL (" + received.size() + ")");
         } else {
             //FLW16 RUN THE FOUNDED MESSAGE
@@ -263,5 +266,9 @@ public abstract class NetworkProxySocket {
         } catch (IOException e) {
             log.trace("Ignorable", e);
         }
+    }
+
+    public boolean isConnected() {
+        return channel.isOpen();
     }
 }

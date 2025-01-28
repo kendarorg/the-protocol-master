@@ -137,7 +137,11 @@ public abstract class NetworkProxy extends Proxy {
         }
 
         var sock = (NetworkProxySocket) connection.getConnection();
+        if(sock==null) {
+            return;
+        }
         sock.write(of, getProtocol().buildBuffer());
+
         for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, new Object())) {
             if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, null)) {
                 break;
@@ -194,7 +198,11 @@ public abstract class NetworkProxy extends Proxy {
             return null;
         }
         var bufferToWrite = getProtocol().buildBuffer();
+        if(sock==null) {
+            return toRead;
+        }
         sock.write(of, bufferToWrite);
+
         var returnMessages = sock.read(toRead, optional);
         for (var item : returnMessages) {
             if (toRead.getClass() == item.getClass()) {
@@ -237,6 +245,9 @@ public abstract class NetworkProxy extends Proxy {
         }
 
         var sock = (NetworkProxySocket) connection.getConnection();
+        if(sock==null) {
+            return toRead;
+        }
         sock.write(of);
         sock.read(toRead, optional);
 

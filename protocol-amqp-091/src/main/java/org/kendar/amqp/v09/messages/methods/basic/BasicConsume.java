@@ -175,6 +175,8 @@ public class BasicConsume extends Basic {
         //Send back the consume ok
         var bscOk = new BasicConsumeOk();
         bscOk.setTag(basicConsume.getConsumerTag());
+        context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), basicConsume.getConsumerTag());
+        log.debug("Consuming "+"BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin()+" "+ basicConsume.getConsumerTag());
         return iteratorOfRunnable(() -> {
             var result = (BasicConsumeOk) proxy.sendAndExpect(context,
                     connection,
@@ -182,7 +184,7 @@ public class BasicConsume extends Basic {
                     bscOk
             );
 
-            context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), result.getTag());
+            context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), basicConsume.getConsumerTag());
             return result;
         });
     }
