@@ -70,65 +70,6 @@
     }
   },
   {
-    "index": 8,
-    "type": "byte[]",
-    "caller": "AMQP",
-    "durationMs": 2,
-    "tags": {
-      "output": "ConnectionStart",
-      "input": "byte[]"
-    }
-  },
-  {
-    "index": 9,
-    "type": "ConnectionStartOk",
-    "caller": "AMQP",
-    "durationMs": 1,
-    "tags": {
-      "output": "ConnectionTune",
-      "input": "ConnectionStartOk"
-    }
-  },
-  {
-    "index": 10,
-    "type": "ConnectionTuneOk",
-    "caller": "AMQP",
-    "durationMs": 0,
-    "tags": {
-      "input": "ConnectionTuneOk"
-    }
-  },
-  {
-    "index": 11,
-    "type": "ConnectionOpen",
-    "caller": "AMQP",
-    "durationMs": 1,
-    "tags": {
-      "output": "ConnectionOpenOk",
-      "input": "ConnectionOpen"
-    }
-  },
-  {
-    "index": 12,
-    "type": "ChannelOpen",
-    "caller": "AMQP",
-    "durationMs": 11,
-    "tags": {
-      "output": "ChannelOpenOk",
-      "input": "ChannelOpen"
-    }
-  },
-  {
-    "index": 13,
-    "type": "QueueDeclare",
-    "caller": "AMQP",
-    "durationMs": 0,
-    "tags": {
-      "output": "QueueDeclareOk",
-      "input": "QueueDeclare"
-    }
-  },
-  {
     "index": 17,
     "type": "RESPONSE",
     "caller": "AMQP",
