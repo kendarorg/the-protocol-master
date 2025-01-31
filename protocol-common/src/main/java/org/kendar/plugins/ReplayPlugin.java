@@ -477,7 +477,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         for (var index : idx) {
             var used = query.getUsed().stream().anyMatch((n) -> n == index.getIndex());
             if(used) {
-                if(!repeatableItems().contains(index.getType())){
+                if(repeatableItems().contains(index.getType())){
                     var currentMatch = tagsMatching(index.getTags(), query.getTags());
                     if (currentMatch > maxMatchRepeated) {
                         maxMatchRepeated = currentMatch;
@@ -485,6 +485,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                     }
                     continue;
                 }
+                continue;
             }
             var currentMatch = tagsMatching(index.getTags(), query.getTags());
             if (currentMatch > maxMatch) {

@@ -2,8 +2,8 @@ package org.kendar.mqtt.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.mqtt.MqttContext;
-import org.kendar.mqtt.fsm.*;
+import org.kendar.mqtt.fsm.ConnectAck;
+import org.kendar.mqtt.fsm.Publish;
 import org.kendar.plugins.ReplayFindIndexResult;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
@@ -23,10 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @TpmService(tags = "mqtt")
 public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
@@ -148,7 +145,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         return result;
     }
 
-    @Override
+    /*@Override
     protected StorageItem readStorageItem(ReplayFindIndexResult index, Object in, PluginContext pluginContext) {
         var resultFinal = super.readStorageItem(index, in, pluginContext);
         StorageItem result = null;
@@ -187,8 +184,9 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             if (resultFinal == null) return result;
         }
         return resultFinal;
-    }
+    }*/
 
+    /*
     private StorageItem handleFakePublishRel(PublishRel publish, PluginContext pluginContext) {
         StorageItem result;
         //Connect for real
@@ -210,9 +208,11 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         result.setInput(publish);
         result.setOutput(subscribeAck);
         return result;
-    }
+    }*/
 
 
+
+    @Override
     protected Map<String, String> getContextTags(ProtoContext context) {
         if (context.getValue("TOPICS") != null) {
             var hashTopic = (HashSet<String>) context.getValue("TOPICS");
@@ -243,6 +243,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         return data;
     }
 
+    /*
     private StorageItem handleFakePublish(Publish publish, PluginContext pluginContext) {
         StorageItem result;
         //Connect for real
@@ -283,8 +284,20 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             return result;
         }
         return null;
+    }*/
+
+    private static List<String> repeatableItems = Arrays.asList(
+            "ExchangeDeclare","QueueDeclare","QueueBind","ExchangeBind",
+            "BasicConsume","byte[]","ConnectionStartOk","ConnectionOpen",
+            "ChannelOpen"
+    );
+
+    @Override
+    protected List<String> repeatableItems(){
+        return repeatableItems;
     }
 
+    /*
     private StorageItem handleFakeSubscribe(Subscribe subscribe, PluginContext pluginContext) {
         StorageItem result;
         //Connect for real
@@ -328,5 +341,5 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         result.setInput(connect);
         result.setOutput(connectAck);
         return result;
-    }
+    }*/
 }

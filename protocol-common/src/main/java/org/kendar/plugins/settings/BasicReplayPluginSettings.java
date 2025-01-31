@@ -12,6 +12,16 @@ public class BasicReplayPluginSettings extends PluginSettings {
         return replayId;
     }
 
+    private boolean ignoreTrivialCalls = true;
+
+    public boolean isIgnoreTrivialCalls() {
+        return ignoreTrivialCalls;
+    }
+
+    public void setIgnoreTrivialCalls(boolean ignoreTrivialCalls) {
+        this.ignoreTrivialCalls = ignoreTrivialCalls;
+    }
+
     public void setReplayId(String replayId) {
         this.replayId = replayId;
     }

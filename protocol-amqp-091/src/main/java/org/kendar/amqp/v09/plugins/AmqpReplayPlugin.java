@@ -65,11 +65,12 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         }
     }
 
-
+public static int counter=0;
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
         long lastTimestamp = 0;
+
         for (var item : storageItems) {
             int consumeId = item.getConnectionId();
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", consumeId + "")) {
@@ -90,6 +91,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                 ReturnMessage fr = null;
                 switch (clazz) {
                     case "BasicDeliver":
+                        counter++;
                         var bd = mapper.deserialize(out, BasicDeliver.class);
                         var tag = (String) ctx.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
 
