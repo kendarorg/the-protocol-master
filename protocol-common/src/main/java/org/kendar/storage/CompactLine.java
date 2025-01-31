@@ -7,10 +7,19 @@ import java.util.function.Supplier;
 public class CompactLine {
 
     private long index;
+    private long timestamp= System.currentTimeMillis();
     private String type;
     private String caller;
     private long durationMs;
     private Map<String, String> tags = new HashMap<>();
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public CompactLine() {
 

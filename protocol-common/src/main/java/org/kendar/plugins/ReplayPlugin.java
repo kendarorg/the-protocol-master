@@ -255,7 +255,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         buildState(pluginContext, context, in, outputItem, out, lineToRead);
         lineToRead.getStorageItem().setConnectionId(pluginContext.getContextId());
 
-        loadAndPrepareTheAsyncResponses(pluginContext, item);
+        loadAndPrepareTheAsyncResponses(pluginContext, item,index);
 
         return true;
     }
@@ -265,11 +265,17 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      *
      * @param pluginContext
      * @param item
+     * @param index
      */
-    private void loadAndPrepareTheAsyncResponses(PluginContext pluginContext, StorageItem item) {
+    private void loadAndPrepareTheAsyncResponses(PluginContext pluginContext, StorageItem item, ReplayFindIndexResult index) {
         if (hasCallbacks() && item != null) {
             var afterIndex = item.getIndex();
-            var timeStamp = item.getTimestamp();
+            var tmpTimestamp = item.getTimestamp();
+            if(index!=null && index.getLine()!=null &&
+                    index.getLine().getIndex()!=-1 && !index.isRepeated()) {
+                tmpTimestamp = index.getLine().getTimestamp();
+            }
+            var timeStamp = tmpTimestamp;
             var respQuery = new ResponseItemQuery();
             respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
@@ -412,7 +418,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         var lineToRead = new LineToRead(storageItem, index.getLine());
         var item = lineToRead.getStorageItem();
         completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
-        loadAndPrepareTheAsyncResponses(pluginContext, item);
+        loadAndPrepareTheAsyncResponses(pluginContext, item,index);
         return true;
     }
 
