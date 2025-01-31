@@ -53,6 +53,4 @@ public class AmqpProxySocket extends NetworkProxySocket {
     protected List<? extends ProtocolEvent> buildPossibleEvents(NetworkProtoContext context, BBuffer buffer) {
         return List.of(new AmqpFrame(context, null, buffer, (short) -1));
     }
-
-
 }
