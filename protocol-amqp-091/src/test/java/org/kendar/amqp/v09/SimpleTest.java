@@ -330,6 +330,7 @@ public class SimpleTest extends BasicTest {
 
     @Test
     void withPublishPlugin() throws Exception {
+        //recordPlugin.setActive(false);
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
         ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -375,31 +376,6 @@ public class SimpleTest extends BasicTest {
 
 
         System.out.println("a");
-        /*var props = new AMQP.BasicProperties.Builder()
-                .contentType("text/plain")
-//                .contentEncoding("UTF-8")
-                .deliveryMode(1)
-//                .priority(2)
-//                .correlationId("3") //?
-//                //.replyTo("4")
-//                //.expiration("5")
-//                .messageId("6")
-//                .timestamp(new Date())
-//                //.type("7")
-//                //.userId("8")
-                .appId("TESTAPP")
-                //.clusterId("9")
-                .build();
-        //SimpleProxyServer.write=true;
-        Sleeper.sleep(100);
-        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
-        Sleeper.sleep(100);
-        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
-        chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
-        Sleeper.sleep(100);*/
-//        Sleeper.sleep(100);
-//        System.out.println("QEUEUE DELETE------------------------------------------------------");
-//        channel.queueDelete(MAIN_QUEUE);
 
         Sleeper.sleep(100);
         System.out.println("CLOSE CHANNEL ------------------------------------------------");

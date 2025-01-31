@@ -7,8 +7,8 @@
     </appender>
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
-    <logger name="org.kendar" level="DEBUG"/>
-    <root level="DEBUG">
+
+    <root level="ERROR">
         <appender-ref ref="stdout"/>
     </root>
 </configuration>

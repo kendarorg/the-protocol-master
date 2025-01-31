@@ -36,6 +36,7 @@ public class BasicTest {
     protected static TcpServer protocolServer;
     protected static ProtocolPluginDescriptor publishPlugin;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static ProtocolPluginDescriptor recordPlugin;
     protected JsonMapper mapper = new JsonMapper();
 
     public static void beforeClassBase() {
@@ -86,13 +87,13 @@ public class BasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new AmqpRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        recordPlugin = new AmqpRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(
-                pl, rep, publishPlugin));
-        pl.setActive(true);
+                recordPlugin, rep, publishPlugin));
+        recordPlugin.setActive(true);
         rep.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

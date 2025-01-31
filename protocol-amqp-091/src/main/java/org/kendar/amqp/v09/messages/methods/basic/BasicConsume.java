@@ -183,8 +183,8 @@ public class BasicConsume extends Basic {
                     basicConsume,
                     bscOk
             );
-            bscOk.setTag(basicConsume.getConsumerTag());
-            context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), basicConsume.getConsumerTag());
+            bscOk.setTag(result.getTag());
+            context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), bscOk.getTag());
             return result;
         });
     }
