@@ -6,12 +6,14 @@ import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.plugins.ReplayFindIndexResult;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
+import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ExtraBeanUtils;
@@ -22,10 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @TpmService(tags = "amqp091")
 public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
@@ -65,6 +64,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
@@ -145,4 +145,24 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         }
         return data;
     }
+
+    private static List<String> repeatableItems = Arrays.asList(
+         "ExchangeDeclare","QueueDeclare","QueueBind","ExchangeBind",
+            "BasicConsume","byte[]","ConnectionStartOk","ConnectionOpen",
+            "ChannelOpen"
+    );
+
+    @Override
+    protected List<String> repeatableItems(){
+        return repeatableItems;
+    }
+
+    @Override
+    protected ReplayFindIndexResult findIndex(CallItemsQuery query, Object in) {
+        var result = super.findIndex(query, in);
+
+
+        return result;
+    }
+
 }

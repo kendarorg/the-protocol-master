@@ -86,9 +86,9 @@ public class AmqpFrameTranslator extends ProtoState implements NetworkReturnMess
         bb.writeInt(size);
         bb.write(content);
         bb.write(end);
-        if(type==8){
-            return iteratorOfEmpty();
-        }
+//        if(type==8){
+//            return iteratorOfEmpty();
+//        }
         bb.setPosition(0);
 
         log.debug("AmqpFrameTranslator: type = {}, channel = {}, size = {}, content = {}", type,channel, size, content);

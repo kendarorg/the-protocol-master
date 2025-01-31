@@ -121,13 +121,13 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
             return false;
 
         }
-        var storageItem = storage.readById(getInstanceId(), index.getIndex());
+        var storageItem = storage.readById(getInstanceId(), index.getLine().getIndex());
         if (storageItem == null) {
             storageItem = new StorageItem();
-            storageItem.setIndex(index.getIndex());
+            storageItem.setIndex(index.getLine().getIndex());
         }
 
-        var lineToRead = new LineToRead(storageItem, index);
+        var lineToRead = new LineToRead(storageItem, index.getLine());
         var item = lineToRead.getStorageItem();
         log.debug("READING {}", item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);

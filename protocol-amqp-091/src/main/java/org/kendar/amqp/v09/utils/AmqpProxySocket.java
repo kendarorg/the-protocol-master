@@ -4,6 +4,7 @@ import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.GenericFrame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
+import org.kendar.amqp.v09.messages.frames.HearthBeatFrame;
 import org.kendar.amqp.v09.messages.methods.basic.*;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionBlocked;
 import org.kendar.amqp.v09.messages.methods.connection.ConnectionUnblocked;
@@ -28,6 +29,7 @@ public class AmqpProxySocket extends NetworkProxySocket {
             new BodyFrame().asProxy(),
             new ConnectionBlocked().asProxy(),
             new ConnectionUnblocked().asProxy(),
+            new HearthBeatFrame().asProxy(),
             new BasicAck().asProxy(),
             new BasicNack().asProxy(),
             new BasicReturn().asProxy(),

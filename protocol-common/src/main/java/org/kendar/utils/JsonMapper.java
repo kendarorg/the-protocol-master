@@ -153,4 +153,9 @@ public class JsonMapper {
             return Base64.getEncoder().encodeToString(content.getBytes());
         }
     }
+
+    public <T> T clone(T toClone) {
+        if(toClone==null) return null;
+        return (T)deserialize(serialize(toClone),toClone.getClass());
+    }
 }

@@ -55,7 +55,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
 
     @Override
     protected void initializeProtocol() {
-        addInterruptState(new HearthBeatFrame());
+        addInterruptState(new HearthBeatFrame(AmqpFrame.class));
         addInterruptState(new AmqpFrameTranslator(BytesEvent.class));
 
         initialize(
@@ -71,6 +71,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
                                                 new ChannelOpen(AmqpFrame.class),
                                                 new ProtoStateWhile(
                                                         new ProtoStateSwitchCase(
+                                                                new HearthBeatFrame(AmqpFrame.class),
                                                                 new QueueDeclare(AmqpFrame.class),
                                                                 new QueueBind(AmqpFrame.class),
                                                                 new QueueUnbind(AmqpFrame.class),
@@ -107,33 +108,32 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
             timer.cancel();
         }
         var timerService = new TimerService();
-        timer = timerService.schedule(this::sendHeartbeat, 5 * 1000, 5 * 1000);
+        timer = timerService.schedule(this::sendHeartbeat, 1000, 5 * 1000);
     }
 
     private void sendHeartbeat() {
         var toRemove = new ArrayList<Integer>();
         getContextsCache().forEach((key, value) -> {
             var ctx = (AmqpProtoContext) value;
-            //for (var ch : (ctx).getChannels()) {
-                try {
-                    var hb = new HearthBeatFrame();
-                    hb.setChannel((short)0);
-                    hb.setProtoDescriptor(this);
-                    if (ctx.isConnected()) {
-                        //ctx.write(hb);
-                        //var prx = (AmqpProxy) ctx.getProxy();
-                        /*var connection = ((ProxyConnection) ctx.getValue("CONNECTION"));
-                        var sock = (NetworkProxySocket) connection.getConnection();
-                        sock.write(hb, this.buildBuffer());
-                        log.warn("Sending heartbeat");*/
-                    } else {
-                        toRemove.add(key);
-                    }
+            try {
+                if(ctx.getValue("HEARTBEAT")==null)return;
+                var hb = (short)ctx.getValue("HEARTBEAT");
+                if(hb<=0)return;
+                var lastHb = (long)ctx.getValue("HEARTBEAT_LAST");
+                if(ctx.isConnected() && lastHb<(hb+getNow())){
+                    var hbf = new HearthBeatFrame();
+                    hbf.setChannel((short) 0);
+                    hbf.setProtoDescriptor(this);
+                    ctx.write(hbf);
+                }
 
-                } catch (Exception e) {
+                if (!ctx.isConnected()) {
                     toRemove.add(key);
                 }
-            //}
+
+            } catch (Exception e) {
+                toRemove.add(key);
+            }
         });
         for (var key : toRemove) {
             getContextsCache().remove(key);

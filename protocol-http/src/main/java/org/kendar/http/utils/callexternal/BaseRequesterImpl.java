@@ -117,7 +117,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
             } else {
                 fullRequest.addHeader("Host", request.getHost());
             }
-            //TODO HANDLE SOAP REQUEST
+            //MAIN_TODO HANDLE SOAP REQUEST
             /*if (request.isSoapRequest()) {
                 HttpEntity entity = handleSoapRequest(request);
                 ((HttpEntityEnclosingRequestBase) fullRequest).setEntity(entity);

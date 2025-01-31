@@ -4,6 +4,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.fsm.*;
+import org.kendar.plugins.ReplayFindIndexResult;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
@@ -104,11 +105,11 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
     }
 
     @Override
-    protected CompactLine findIndex(CallItemsQuery query, Object in) {
+    protected ReplayFindIndexResult findIndex(CallItemsQuery query, Object in) {
         var result = super.findIndex(query, in);
         var index = -1L;
         if (result != null) {
-            index = result.getIndex();
+            index = result.getLine().getIndex();
         }
         switch (query.getType()) {
             case "Connect": {
@@ -118,7 +119,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                 cl.setIndex(index);
                 cl.getTags().put("input", "Connect");
                 cl.getTags().put("output", "ConnectAck");
-                return cl;
+                return new ReplayFindIndexResult(cl,false);
             }
             case "Subscribe": {
                 var cl = new CompactLine();
@@ -127,7 +128,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                 cl.setIndex(index);
                 cl.getTags().put("input", "Subscribe");
                 cl.getTags().put("output", "SubscribeAck");
-                return cl;
+                return new ReplayFindIndexResult(cl,false);
             }
             case "Publish": {
                 var cl = new CompactLine();
@@ -141,43 +142,43 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                 } else if (pub.getQos() == 2) {
                     cl.getTags().put("output", "PublishRec");
                 }
-                return cl;
+                return new ReplayFindIndexResult(cl,false);
             }
         }
         return result;
     }
 
     @Override
-    protected StorageItem readStorageItem(CompactLine index, Object in, PluginContext pluginContext) {
+    protected StorageItem readStorageItem(ReplayFindIndexResult index, Object in, PluginContext pluginContext) {
         var resultFinal = super.readStorageItem(index, in, pluginContext);
         StorageItem result = null;
         //if(result==null && index.getIndex()==-1){
-        switch (index.getType()) {
+        switch (index.getLine().getType()) {
             case "Connect":
                 result = handleFakeConnect((Connect) in, pluginContext);
                 if (result == null && !getSettings().isBlockExternal()) {
-                    index.setIndex(-1);
+                    index.getLine().setIndex(-1);
                     return null;
                 }
                 break;
             case "Subscribe":
                 result = handleFakeSubscribe((Subscribe) in, pluginContext);
                 if (result == null && !getSettings().isBlockExternal()) {
-                    index.setIndex(-1);
+                    index.getLine().setIndex(-1);
                     return null;
                 }
                 break;
             case "Publish":
                 result = handleFakePublish((Publish) in, pluginContext);
                 if (result == null && !getSettings().isBlockExternal()) {
-                    index.setIndex(-1);
+                    index.getLine().setIndex(-1);
                     return null;
                 }
                 break;
             case "PublishRel":
                 result = handleFakePublishRel((PublishRel) in, pluginContext);
                 if (result == null && !getSettings().isBlockExternal()) {
-                    index.setIndex(-1);
+                    index.getLine().setIndex(-1);
                     return null;
                 }
                 break;
