@@ -4,15 +4,12 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.fsm.ConnectAck;
 import org.kendar.mqtt.fsm.Publish;
-import org.kendar.plugins.ReplayFindIndexResult;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
-import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
-import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ExtraBeanUtils;
@@ -101,7 +98,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         }
     }
 
-    @Override
+    /*@Override
     protected ReplayFindIndexResult findIndex(CallItemsQuery query, Object in) {
         var result = super.findIndex(query, in);
         var index = -1L;
@@ -143,7 +140,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             }
         }
         return result;
-    }
+    }*/
 
     /*@Override
     protected StorageItem readStorageItem(ReplayFindIndexResult index, Object in, PluginContext pluginContext) {
@@ -287,9 +284,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
     }*/
 
     private static List<String> repeatableItems = Arrays.asList(
-            "ExchangeDeclare","QueueDeclare","QueueBind","ExchangeBind",
-            "BasicConsume","byte[]","ConnectionStartOk","ConnectionOpen",
-            "ChannelOpen"
+            "Connect","Subscribe","Publish"
     );
 
     @Override

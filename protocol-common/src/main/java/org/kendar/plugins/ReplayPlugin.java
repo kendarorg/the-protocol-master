@@ -476,8 +476,13 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         //Evaluate the most matching item
         for (var index : idx) {
             var used = query.getUsed().stream().anyMatch((n) -> n == index.getIndex());
+            var isRepeatableItem = repeatableItems().contains(index.getType()) && verifyContentRepeatable(index);
+            if(isRepeatableItem && !getSettings().isBlockExternal()){
+                return null;
+            }
             if(used) {
-                if(repeatableItems().contains(index.getType())){
+                if(!getSettings().isIgnoreTrivialCalls())continue;
+                if(isRepeatableItem){
                     var currentMatch = tagsMatching(index.getTags(), query.getTags());
                     if (currentMatch > maxMatchRepeated) {
                         maxMatchRepeated = currentMatch;
@@ -504,6 +509,10 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
             return null;
         }
 
+    }
+
+    protected boolean verifyContentRepeatable(CompactLine index) {
+        return true;
     }
 
     /**

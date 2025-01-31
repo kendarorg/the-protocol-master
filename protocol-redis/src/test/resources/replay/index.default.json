@@ -4,14 +4,14 @@
     "type": "Resp3Message",
     "caller": "RESP3",
     "durationMs": 2,
-    "tags": {}
+    "tags": {"repeatable":"true"}
   },
   {
     "index": 2,
     "type": "Resp3Message",
     "caller": "RESP3",
     "durationMs": 1,
-    "tags": {}
+    "tags": {"repeatable":"true"}
   },
   {
     "index": 3,
@@ -19,7 +19,7 @@
     "caller": "RESP3",
     "durationMs": 1,
     "tags": {
-      "queue": "commonChannel"
+      "queue": "commonChannel","repeatable":"true"
     }
   },
   {
@@ -27,14 +27,14 @@
     "type": "Resp3Message",
     "caller": "RESP3",
     "durationMs": 2,
-    "tags": {}
+    "tags": {"repeatable":"true"}
   },
   {
     "index": 5,
     "type": "Resp3Message",
     "caller": "RESP3",
     "durationMs": 1,
-    "tags": {}
+    "tags": {"repeatable":"true"}
   },
   {
     "index": 6,

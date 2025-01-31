@@ -10,6 +10,9 @@ You can directly use the proxy as a normal Redis server
 * password: the -real- password to use to connect to the real server
 * connectionString: the connection string for the real server (e.g. redis://localhost:1884 )
 * timeoutSeconds: the timeout to drop the connections
+* ignoreTrivialCalls: all calls must be present
+* blockExternal: if a call is not matched then try to use the real connection
+
 
 ## Plugins
 

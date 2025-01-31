@@ -6,14 +6,12 @@ import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.ReplayFindIndexResult;
 import org.kendar.plugins.ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
-import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ExtraBeanUtils;
@@ -65,7 +63,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         }
     }
 
-public static int counter=0;
+
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
@@ -91,7 +89,6 @@ public static int counter=0;
                 ReturnMessage fr = null;
                 switch (clazz) {
                     case "BasicDeliver":
-                        counter++;
                         var bd = mapper.deserialize(out, BasicDeliver.class);
                         var tag = (String) ctx.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
 
@@ -159,12 +156,5 @@ public static int counter=0;
         return repeatableItems;
     }
 
-    @Override
-    protected ReplayFindIndexResult findIndex(CallItemsQuery query, Object in) {
-        var result = super.findIndex(query, in);
-
-
-        return result;
-    }
 
 }
