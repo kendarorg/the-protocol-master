@@ -26,11 +26,14 @@ import java.util.*;
 public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(MqttReplayPlugin.class);
+    private static List<String> repeatableItems = Arrays.asList(
+            "Connect", "Subscribe", "Publish"
+    );
+
 
     public MqttReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
     }
-
 
     @Override
     public Class<?> getSettingClass() {
@@ -59,42 +62,6 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
-        if (storageItems.isEmpty()) return;
-        long lastTimestamp = 0;
-        for (var item : storageItems) {
-            int consumeId = item.getConnectionId();
-            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", consumeId + "")) {
-                if (getSettings().isRespectCallDuration()) {
-                    if (lastTimestamp == 0) {
-                        lastTimestamp = item.getTimestamp();
-                    } else if (item.getTimestamp() > 0) {
-                        var wait = item.getTimestamp() - lastTimestamp;
-                        lastTimestamp = item.getTimestamp();
-                        if (wait > 0) {
-                            Sleeper.sleep(wait);
-                        }
-                    }
-                }
-                var ctx = context.getDescriptor().getContextsCache().get(consumeId);
-                var out = mapper.toJsonNode(item.getOutput());
-                var clazz = item.getOutputType();
-                ReturnMessage fr = switch (clazz) {
-                    case "ConnectAck" -> mapper.deserialize(out.toString(), ConnectAck.class);
-                    case "Publish" -> mapper.deserialize(out.toString(), Publish.class);
-                    default -> throw new RuntimeException("MISSING " + clazz);
-                };
-                if (fr != null) {
-                    log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
-                    ctx.write(fr);
-                } else {
-                    throw new RuntimeException("MISSING CLASS " + clazz);
-                }
-            }
         }
     }
 
@@ -207,7 +174,41 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         return result;
     }*/
 
-
+    @Override
+    protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
+        if (storageItems.isEmpty()) return;
+        long lastTimestamp = 0;
+        for (var item : storageItems) {
+            int consumeId = item.getConnectionId();
+            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", consumeId + "")) {
+                if (getSettings().isRespectCallDuration()) {
+                    if (lastTimestamp == 0) {
+                        lastTimestamp = item.getTimestamp();
+                    } else if (item.getTimestamp() > 0) {
+                        var wait = item.getTimestamp() - lastTimestamp;
+                        lastTimestamp = item.getTimestamp();
+                        if (wait > 0) {
+                            Sleeper.sleep(wait);
+                        }
+                    }
+                }
+                var ctx = context.getDescriptor().getContextsCache().get(consumeId);
+                var out = mapper.toJsonNode(item.getOutput());
+                var clazz = item.getOutputType();
+                ReturnMessage fr = switch (clazz) {
+                    case "ConnectAck" -> mapper.deserialize(out.toString(), ConnectAck.class);
+                    case "Publish" -> mapper.deserialize(out.toString(), Publish.class);
+                    default -> throw new RuntimeException("MISSING " + clazz);
+                };
+                if (fr != null) {
+                    log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
+                    ctx.write(fr);
+                } else {
+                    throw new RuntimeException("MISSING CLASS " + clazz);
+                }
+            }
+        }
+    }
 
     @Override
     protected Map<String, String> getContextTags(ProtoContext context) {
@@ -221,23 +222,6 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
             return result;
         }
         return Map.of();
-    }
-
-    @Override
-    protected Map<String, String> buildTag(Object cll) {
-        var data = new HashMap<String, String>();
-        var in = mapper.toJsonNode(cll);
-        if (in.has("packetIdentifier")) {
-            //data.put("packetIdentifier", in.get("packetIdentifier").asText());
-        }
-        if (in.has("topicName")) {
-            data.put(in.get("topicName").asText(), in.get("qos").asText());
-        } else if (in.has("topics")) {
-            for (var topic : in.get("topics")) {
-                data.put(topic.get("topic").asText(), topic.get("type").asText());
-            }
-        }
-        return data;
     }
 
     /*
@@ -283,12 +267,25 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         return null;
     }*/
 
-    private static List<String> repeatableItems = Arrays.asList(
-            "Connect","Subscribe","Publish"
-    );
+    @Override
+    protected Map<String, String> buildTag(Object cll) {
+        var data = new HashMap<String, String>();
+        var in = mapper.toJsonNode(cll);
+        if (in.has("packetIdentifier")) {
+            //data.put("packetIdentifier", in.get("packetIdentifier").asText());
+        }
+        if (in.has("topicName")) {
+            data.put(in.get("topicName").asText(), in.get("qos").asText());
+        } else if (in.has("topics")) {
+            for (var topic : in.get("topics")) {
+                data.put(topic.get("topic").asText(), topic.get("type").asText());
+            }
+        }
+        return data;
+    }
 
     @Override
-    protected List<String> repeatableItems(){
+    protected List<String> repeatableItems() {
         return repeatableItems;
     }
 

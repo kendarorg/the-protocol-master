@@ -13,7 +13,6 @@ You can directly use the proxy as a normal Redis server
 * ignoreTrivialCalls: all calls must be present
 * blockExternal: if a call is not matched then try to use the real connection
 
-
 ## Plugins
 
 ### record-plugin

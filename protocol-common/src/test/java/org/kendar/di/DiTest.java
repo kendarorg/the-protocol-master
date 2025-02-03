@@ -38,7 +38,7 @@ public class DiTest {
         var result = diService.getInstance(ListUser.class);
         assertNotNull(result);
         assertEquals(2, result.getItems().size());
-        var listone = (ListOne)result.getItems().stream().filter(i->i instanceof ListOne).findFirst().get();
+        var listone = (ListOne) result.getItems().stream().filter(i -> i instanceof ListOne).findFirst().get();
         assertTrue(listone.isPostConstruct());
     }
 
@@ -98,7 +98,7 @@ public class DiTest {
         diService.registerNamed("test", "value");
         var storage = new AtomicReference<Object>();
         var childContext = new AtomicReference<DiService>();
-        new Thread(()->{
+        new Thread(() -> {
 
             childContext.set(diService.createChildScope(TpmScopeType.THREAD));
             DiService.getThreadContext().registerNamed("test", "other");
@@ -106,13 +106,13 @@ public class DiTest {
             storage.set(instance);
         }).start();
         Sleeper.sleep(100);
-        var threadThing = (NamedDependency)storage.get();
+        var threadThing = (NamedDependency) storage.get();
         var outerInstance = diService.getInstance(NamedDependency.class);
 
-        assertEquals(threadThing.named.getTest(),"other");
-        assertEquals(outerInstance.named.getTest(),"value");
+        assertEquals(threadThing.named.getTest(), "other");
+        assertEquals(outerInstance.named.getTest(), "value");
         DiService.threadsClean();
-        assertThrows(RuntimeException.class,()-> childContext.get().getInstance(NamedDependency.class));
+        assertThrows(RuntimeException.class, () -> childContext.get().getInstance(NamedDependency.class));
     }
 
 
@@ -121,17 +121,17 @@ public class DiTest {
         diService.registerNamed("test", "value");
         var bases = diService.getInstances(NamedBase.class);
         var storage = new AtomicReference<Object>();
-        new Thread(()->{
+        new Thread(() -> {
             diService.createChildScope(TpmScopeType.THREAD);
             DiService.getThreadContext().registerNamed("test", "other");
             var instance = DiService.getThreadContext().getInstance(NamedDependency.class);
             storage.set(instance);
         }).start();
         Sleeper.sleep(100);
-        var threadThing = (NamedDependency)storage.get();
+        var threadThing = (NamedDependency) storage.get();
         var outherInstance = diService.getInstance(NamedDependency.class);
 
-        assertEquals("value",threadThing.named.getTest());
-        assertEquals("value",outherInstance.named.getTest());
+        assertEquals("value", threadThing.named.getTest());
+        assertEquals("value", outherInstance.named.getTest());
     }
 }

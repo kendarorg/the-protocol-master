@@ -7,12 +7,15 @@ public class BasicReplayPluginSettings extends PluginSettings {
     private String replayId;
 
     private boolean blockExternal = true;
+    private boolean ignoreTrivialCalls = true;
 
     public String getReplayId() {
         return replayId;
     }
 
-    private boolean ignoreTrivialCalls = true;
+    public void setReplayId(String replayId) {
+        this.replayId = replayId;
+    }
 
     public boolean isIgnoreTrivialCalls() {
         return ignoreTrivialCalls;
@@ -20,10 +23,6 @@ public class BasicReplayPluginSettings extends PluginSettings {
 
     public void setIgnoreTrivialCalls(boolean ignoreTrivialCalls) {
         this.ignoreTrivialCalls = ignoreTrivialCalls;
-    }
-
-    public void setReplayId(String replayId) {
-        this.replayId = replayId;
     }
 
     public boolean isRespectCallDuration() {

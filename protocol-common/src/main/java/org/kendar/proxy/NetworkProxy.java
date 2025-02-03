@@ -137,7 +137,7 @@ public abstract class NetworkProxy extends Proxy {
         }
 
         var sock = (NetworkProxySocket) connection.getConnection();
-        if(sock==null) {
+        if (sock == null) {
             return;
         }
         sock.write(of, getProtocol().buildBuffer());
@@ -198,7 +198,7 @@ public abstract class NetworkProxy extends Proxy {
             return null;
         }
         var bufferToWrite = getProtocol().buildBuffer();
-        if(sock==null) {
+        if (sock == null) {
             return toRead;
         }
         sock.write(of, bufferToWrite);
@@ -245,7 +245,7 @@ public abstract class NetworkProxy extends Proxy {
         }
 
         var sock = (NetworkProxySocket) connection.getConnection();
-        if(sock==null) {
+        if (sock == null) {
             return toRead;
         }
         sock.write(of);

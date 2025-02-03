@@ -14,7 +14,6 @@ at the moment)
 * ignoreTrivialCalls: all calls must be present
 * blockExternal: if a call is not matched then try to use the real connection
 
-
 ## Plugins
 
 ### record-plugin

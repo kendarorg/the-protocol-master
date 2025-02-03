@@ -5,7 +5,11 @@ import org.kendar.di.annotations.TpmService;
 
 @TpmService
 public class ListOne implements ListOfInterface {
-    private boolean postConstruct=false;
+    private boolean postConstruct = false;
+
+    public ListOne() {
+        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+    }
 
     public boolean isPostConstruct() {
         return postConstruct;
@@ -16,13 +20,9 @@ public class ListOne implements ListOfInterface {
         return "ListOne{}";
     }
 
-    public ListOne() {
-        System.out.println(this.toString()+" "+Thread.currentThread().getId());
-    }
-
     @TpmPostConstruct
     public void postConstruct() {
         postConstruct = true;
-        System.out.println("Post construct "+this.toString()+" "+Thread.currentThread().getId());
+        System.out.println("Post construct " + this.toString() + " " + Thread.currentThread().getId());
     }
 }

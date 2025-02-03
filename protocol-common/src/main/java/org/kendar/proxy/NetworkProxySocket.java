@@ -243,7 +243,7 @@ public abstract class NetworkProxySocket {
 
         var returnMessage = new ArrayList<ReturnMessage>();
         if (founded == null) {
-            if(optional){
+            if (optional) {
                 return returnMessage;
             }
             throw new RuntimeException("UNABLE TO FIND Contains STILL (" + received.size() + ")");

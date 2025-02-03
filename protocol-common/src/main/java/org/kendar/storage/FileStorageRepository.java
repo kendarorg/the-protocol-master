@@ -337,7 +337,7 @@ public class FileStorageRepository implements StorageRepository {
         var ctx = protocolRepo.get(protocolInstanceId);
         var result = new ArrayList<StorageItem>();
 
-        log.debug("[CL<FF] loading responses {}",query.getStartAt());
+        log.debug("[CL<FF] loading responses {}", query.getStartAt());
         for (var item : ctx.index.stream()
                 .sorted(Comparator.comparingInt(value -> (int) value.getIndex())).
                 filter(value -> value.getIndex() > query.getStartAt()).

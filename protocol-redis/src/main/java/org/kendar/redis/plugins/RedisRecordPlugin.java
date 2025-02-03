@@ -23,6 +23,12 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
         super(mapper, storage);
     }
 
+    private static boolean isClientSetInfo(ArrayNode input) {
+        return input.get(0).asText().equalsIgnoreCase("CLIENT") &&
+                input.size() >= 1 &&
+                input.get(1).asText().equalsIgnoreCase("SETINFO");
+    }
+
     @Override
     protected Object getData(Object of) {
         if (of instanceof Resp3Message) {
@@ -51,13 +57,13 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
             if (input.size() >= 2) {
 
                 if (isClientSetInfo(input)) {
-                    return Map.of("repeatable","true");
-                }else if (input.get(0).asText().equalsIgnoreCase("SUBSCRIBE")) {
-                    return Map.of("queue", input.get(1).asText(),"repeatable","true");
+                    return Map.of("repeatable", "true");
+                } else if (input.get(0).asText().equalsIgnoreCase("SUBSCRIBE")) {
+                    return Map.of("queue", input.get(1).asText(), "repeatable", "true");
                 } else if (input.get(0).asText().equalsIgnoreCase("MESSAGE")) {
                     return Map.of("queue", input.get(1).asText());
                 } else if (input.get(0).asText().equalsIgnoreCase("PING")) {
-                    return Map.of("type", "ping","repeatable","true");
+                    return Map.of("type", "ping", "repeatable", "true");
                 }
             }
         }
@@ -75,12 +81,6 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
             }
         }
         return Map.of();
-    }
-
-    private static boolean isClientSetInfo(ArrayNode input) {
-        return input.get(0).asText().equalsIgnoreCase("CLIENT") &&
-                input.size() >= 1 &&
-                input.get(1).asText().equalsIgnoreCase("SETINFO");
     }
 
     protected void asyncCall(PluginContext pluginContext, Object out) {

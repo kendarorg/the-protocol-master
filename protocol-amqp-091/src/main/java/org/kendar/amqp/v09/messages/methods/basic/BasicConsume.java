@@ -176,16 +176,16 @@ public class BasicConsume extends Basic {
         var bscOk = new BasicConsumeOk();
         bscOk.setTag(basicConsume.getConsumerTag());
         context.setValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin(), basicConsume.getConsumerTag());
-        log.debug("Consuming "+"BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin()+" "+ basicConsume.getConsumerTag());
+        log.debug("Consuming " + "BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin() + " " + basicConsume.getConsumerTag());
         return iteratorOfRunnable(() -> {
             var result = (BasicConsumeOk) proxy.sendAndExpect(context,
                     connection,
                     basicConsume,
                     bscOk
             );
-            if(result.getTag() != null && !result.getTag().isEmpty()) {
+            if (result.getTag() != null && !result.getTag().isEmpty()) {
                 bscOk.setTag(result.getTag());
-            }else if(basicConsume.getConsumerTag() != null && !basicConsume.getConsumerTag().isEmpty()) {
+            } else if (basicConsume.getConsumerTag() != null && !basicConsume.getConsumerTag().isEmpty()) {
                 bscOk.setTag(basicConsume.getConsumerTag());
             }
 

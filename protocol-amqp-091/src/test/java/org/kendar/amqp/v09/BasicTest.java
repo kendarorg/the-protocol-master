@@ -35,8 +35,8 @@ public class BasicTest {
     protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     protected static ProtocolPluginDescriptor publishPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static ProtocolPluginDescriptor recordPlugin;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected JsonMapper mapper = new JsonMapper();
 
     public static void beforeClassBase() {

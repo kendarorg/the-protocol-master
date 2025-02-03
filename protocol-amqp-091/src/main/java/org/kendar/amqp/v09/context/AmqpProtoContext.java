@@ -47,11 +47,11 @@ public class AmqpProtoContext extends NetworkProtoContext {
         ProxyConnection conn = ((ProxyConnection) getValue("CONNECTION"));
         var sock = (AmqpProxySocket) conn.getConnection();
         if (sock != null) {
-            if(!sock.isConnected()){
+            if (!sock.isConnected()) {
                 return false;
             }
         }
-        if(!super.isConnected()){
+        if (!super.isConnected()) {
             return false;
         }
         return true;

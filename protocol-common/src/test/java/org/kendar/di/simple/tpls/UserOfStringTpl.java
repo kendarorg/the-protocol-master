@@ -9,7 +9,7 @@ public class UserOfStringTpl implements GenericUserOf {
     public UserOfStringTpl(TemplateInterface<String> template) {
 
         this.template = template;
-        System.out.println(this.toString()+" "+Thread.currentThread().getId());
+        System.out.println(this.toString() + " " + Thread.currentThread().getId());
     }
 
     @Override

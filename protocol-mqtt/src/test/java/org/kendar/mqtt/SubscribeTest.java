@@ -193,7 +193,7 @@ public class SubscribeTest extends BasicTest {
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
             var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
-                    a->a instanceof MqttPublishPluginApis
+                    a -> a instanceof MqttPublishPluginApis
             ).findFirst().get();
             var res = new Response();
             publish.getConnections(new Request(), res);
@@ -247,7 +247,7 @@ public class SubscribeTest extends BasicTest {
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
             var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
-                    a->a instanceof MqttPublishPluginApis
+                    a -> a instanceof MqttPublishPluginApis
             ).findFirst().get();
             var res = new Response();
             publish.getConnections(new Request(), res);
@@ -302,7 +302,7 @@ public class SubscribeTest extends BasicTest {
             message.setQos(2);
             client.publish(TOPIC_NAME, message);*/
             var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
-                    a->a instanceof MqttPublishPluginApis
+                    a -> a instanceof MqttPublishPluginApis
             ).findFirst().get();
             var res = new Response();
             publish.getConnections(new Request(), res);

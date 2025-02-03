@@ -28,11 +28,16 @@ import java.util.*;
 public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(AmqpReplayPlugin.class);
+    private static List<String> repeatableItems = Arrays.asList(
+            "ExchangeDeclare", "QueueDeclare", "QueueBind", "ExchangeBind",
+            "BasicConsume", "byte[]", "ConnectionStartOk", "ConnectionOpen",
+            "ChannelOpen"
+    );
+
 
     public AmqpReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
     }
-
 
     @Override
     public Class<?> getSettingClass() {
@@ -63,7 +68,6 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         }
     }
 
-
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
@@ -92,7 +96,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                         var bd = mapper.deserialize(out, BasicDeliver.class);
                         var tag = (String) ctx.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
 
-                        log.debug("Delivering "+"BASIC_CONSUME_CT_" + bd.getConsumeOrigin()+" "+tag);
+                        log.debug("Delivering " + "BASIC_CONSUME_CT_" + bd.getConsumeOrigin() + " " + tag);
                         if (tag != null && !tag.isEmpty()) {
                             bd.setConsumerTag(tag);
                         }
@@ -145,14 +149,8 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         return data;
     }
 
-    private static List<String> repeatableItems = Arrays.asList(
-         "ExchangeDeclare","QueueDeclare","QueueBind","ExchangeBind",
-            "BasicConsume","byte[]","ConnectionStartOk","ConnectionOpen",
-            "ChannelOpen"
-    );
-
     @Override
-    protected List<String> repeatableItems(){
+    protected List<String> repeatableItems() {
         return repeatableItems;
     }
 

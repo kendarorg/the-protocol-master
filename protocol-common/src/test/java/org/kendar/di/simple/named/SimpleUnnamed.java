@@ -6,6 +6,13 @@ import org.kendar.di.annotations.TpmService;
 
 @TpmService
 public class SimpleUnnamed implements NamedBase {
+    public String test;
+
+    public SimpleUnnamed(@TpmNamed("test") String test) {
+        this.test = test;
+        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+    }
+
     @Override
     public String getTest() {
         return test;
@@ -16,12 +23,5 @@ public class SimpleUnnamed implements NamedBase {
         return "SimpleUnnamed{" +
                 "test='" + test + '\'' +
                 '}';
-    }
-
-    public String test;
-
-    public SimpleUnnamed(@TpmNamed("test")String test) {
-        this.test = test;
-        System.out.println(this.toString()+" "+Thread.currentThread().getId());
     }
 }

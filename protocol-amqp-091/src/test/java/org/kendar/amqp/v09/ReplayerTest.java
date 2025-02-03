@@ -188,7 +188,6 @@ public class ReplayerTest {
             chanConsume.close();
 
 
-
             assertEquals(3, messages.size());
             assertTrue(messages.containsValue(exectedMessage + "1"));
             assertTrue(messages.containsValue(exectedMessage + "2"));

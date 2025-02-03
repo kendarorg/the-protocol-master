@@ -356,7 +356,7 @@ public class SimpleTest extends BasicTest {
 
 
         var publish = (AmqpPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
-                a->a instanceof AmqpPublishPluginApis
+                a -> a instanceof AmqpPublishPluginApis
         ).findFirst().get();
         var res = new Response();
         publish.getConnections(new Request(), res);

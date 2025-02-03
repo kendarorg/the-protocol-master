@@ -339,7 +339,7 @@ public class DiService {
 
 
     private <T> List<T> getInstancesInternal(String name, Class<T> clazz, DiService context, Type type, String... tags) {
-        if(scope==TpmScopeType.NONE){
+        if (scope == TpmScopeType.NONE) {
             throw new RuntimeException("Invalid Context");
         }
         var result = new ArrayList<T>();

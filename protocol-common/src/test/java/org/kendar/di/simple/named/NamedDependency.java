@@ -7,15 +7,15 @@ import org.kendar.di.annotations.TpmService;
 public class NamedDependency {
     public NamedBase named;
 
+    public NamedDependency(@TpmNamed("simpleNamed") NamedBase named) {
+        this.named = named;
+        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+    }
+
     @Override
     public String toString() {
         return "NamedDependency{" +
                 "named=" + named +
                 '}';
-    }
-
-    public NamedDependency(@TpmNamed("simpleNamed")NamedBase named) {
-        this.named = named;
-        System.out.println(this.toString()+" "+Thread.currentThread().getId());
     }
 }

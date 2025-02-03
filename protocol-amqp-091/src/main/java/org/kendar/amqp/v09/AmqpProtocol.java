@@ -116,11 +116,11 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
         getContextsCache().forEach((key, value) -> {
             var ctx = (AmqpProtoContext) value;
             try {
-                if(ctx.getValue("HEARTBEAT")==null)return;
-                var hb = (short)ctx.getValue("HEARTBEAT");
-                if(hb<=0)return;
-                var lastHb = (long)ctx.getValue("HEARTBEAT_LAST");
-                if(ctx.isConnected() && lastHb<(hb+getNow())){
+                if (ctx.getValue("HEARTBEAT") == null) return;
+                var hb = (short) ctx.getValue("HEARTBEAT");
+                if (hb <= 0) return;
+                var lastHb = (long) ctx.getValue("HEARTBEAT_LAST");
+                if (ctx.isConnected() && lastHb < (hb + getNow())) {
                     var hbf = new HearthBeatFrame();
                     hbf.setChannel((short) 0);
                     hbf.setProtoDescriptor(this);

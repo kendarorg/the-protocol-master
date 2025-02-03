@@ -155,7 +155,7 @@ public class JsonMapper {
     }
 
     public <T> T clone(T toClone) {
-        if(toClone==null) return null;
-        return (T)deserialize(serialize(toClone),toClone.getClass());
+        if (toClone == null) return null;
+        return (T) deserialize(serialize(toClone), toClone.getClass());
     }
 }

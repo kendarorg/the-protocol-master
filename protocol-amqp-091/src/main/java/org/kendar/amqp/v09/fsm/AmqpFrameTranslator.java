@@ -17,9 +17,9 @@ import java.util.Iterator;
  * The frame-end octet MUST always be the hexadecimal value %xCE.
  */
 public class AmqpFrameTranslator extends ProtoState implements NetworkReturnMessage, InterruptProtoState {
+    private final Logger log = LoggerFactory.getLogger(AmqpFrameTranslator.class);
     private short channel = 0;
     private byte type = 0;
-    private final Logger log = LoggerFactory.getLogger(AmqpFrameTranslator.class);
 
     public AmqpFrameTranslator() {
         super();
@@ -91,7 +91,7 @@ public class AmqpFrameTranslator extends ProtoState implements NetworkReturnMess
 //        }
         bb.setPosition(0);
 
-        log.debug("AmqpFrameTranslator: type = {}, channel = {}, size = {}, content = {}", type,channel, size, content);
+        log.debug("AmqpFrameTranslator: type = {}, channel = {}, size = {}, content = {}", type, channel, size, content);
         event.getContext().send(new AmqpFrame(event.getContext(), event.getPrevState(), bb, channel));
         return iteratorOfEmpty();
     }

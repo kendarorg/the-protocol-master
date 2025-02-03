@@ -48,13 +48,13 @@ public class HearthBeatFrame extends Frame implements InterruptProtoState {
         var sock = (AmqpProxySocket) connection.getConnection();
 
         var heartBeatFrame = new HearthBeatFrame();
-        heartBeatFrame.setChannel((short)0);
+        heartBeatFrame.setChannel((short) 0);
         if (isProxyed()) {
             heartBeatFrame.asProxy();
             //System.out.println("HEARTH BEAT PROXY");
             return iteratorOfList(heartBeatFrame);
         }
-        context.setValue("HEARTBEAT_LAST",getNow());
+        context.setValue("HEARTBEAT_LAST", getNow());
         System.out.println("HEARTH BEAT STD");
         return iteratorOfRunnable(() -> proxy.sendAndForget(context,
                 connection,
