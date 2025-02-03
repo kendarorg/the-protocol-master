@@ -73,6 +73,7 @@ public class RedisRunner extends CommonRunner {
                 plugins.remove(i);
             }
         }
+        baseProtocol.setSettings(protocolSettings);
         proxy.setPlugins(plugins);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

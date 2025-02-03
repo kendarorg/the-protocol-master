@@ -7,6 +7,7 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.special.SpecialProtoState;
 import org.kendar.protocol.states.special.Tagged;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public abstract class ProtoDescriptor {
     private final List<ProtoState> interrupts = new ArrayList<>();
     private ConcurrentHashMap<Integer, ProtoContext> contextsCache;
     private TimerInstance contextCleaner;
+    private ProtocolSettings settings;
 
     public static long getNow() {
         return System.currentTimeMillis() / 1000;
@@ -238,5 +240,13 @@ public abstract class ProtoDescriptor {
 
     public List<ProtocolApiHandler> getApiHandler() {
         return List.of();
+    }
+
+    public void setSettings(ProtocolSettings settings) {
+        this.settings = settings;
+    }
+
+    public ProtocolSettings getSettings() {
+        return settings;
     }
 }

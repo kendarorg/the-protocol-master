@@ -160,6 +160,7 @@ public class HttpRunner extends CommonRunner {
             }
         }
         var baseProtocol = new HttpProtocol(ini, settings, plugins);
+        baseProtocol.setSettings(settings);
         baseProtocol.initialize();
         var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);

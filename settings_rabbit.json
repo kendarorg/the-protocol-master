@@ -9,6 +9,19 @@
     }
   },
   "protocols": {
+    "mysql-01": {
+      "protocol": "mysql",
+      "port": 3306,
+      "login": "root",
+      "password": "password",
+      "timeout": 30,
+      "force3BytesOkPacketInfo": true,
+      "connectionString": "jdbc:mysql://192.168.56.2:23306/db",
+      "plugins": {
+        "record-plugin": {},
+        "replay-plugin": {}
+      }
+    },
     "amqp-01": {
       "protocol": "amqp091",
       "port": 5672,

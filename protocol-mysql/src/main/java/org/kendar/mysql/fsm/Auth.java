@@ -1,5 +1,6 @@
 package org.kendar.mysql.fsm;
 
+import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CapabilityFlag;
 import org.kendar.mysql.constants.Language;
@@ -45,6 +46,8 @@ public class Auth extends MySQLProtoState {
         }
         inputBuffer.setPosition(packetLength + 4);
         var toSend = new OkPacket();
+        var force3Bytes = ((MySqlProtocolSettings)event.getContext().getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
+        toSend.setForce3BytesOkPacketInfo(force3Bytes);
         toSend.setPacketNumber(packetIndex + 1);
         toSend.setCapabilities(CapabilityFlag.getFakeServerCapabilities());
         toSend.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());

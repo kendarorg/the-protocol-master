@@ -5,6 +5,7 @@ import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.di.DiService;
 import org.kendar.mysql.MySQLProtocol;
+import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
@@ -112,9 +113,12 @@ public class JdbcRunner extends CommonRunner {
             );
         } else if (protocolSettings.getProtocol().equalsIgnoreCase("mysql")) {
             driver = "com.mysql.cj.jdbc.Driver";
+            var mysqlProtocolSettings = (MySqlProtocolSettings)protocolSettings;
             baseProtocol = new MySQLProtocol(
                     ProtocolsRunner.getOrDefault(realSttings.getPort(), 3306));
+
         }
+        baseProtocol.setSettings(protocolSettings);
 
 
         var proxy = new JdbcProxy(driver,

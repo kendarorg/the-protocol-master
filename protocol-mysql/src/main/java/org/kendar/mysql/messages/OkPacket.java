@@ -33,6 +33,7 @@ public class OkPacket extends MySQLReturnMessage {
 
     private int capabilities;
     private int extendedCapabilities;
+    private boolean force3BytesOkPacketInfo;
 
     public int getExtendedCapabilities() {
         return extendedCapabilities;
@@ -138,17 +139,21 @@ public class OkPacket extends MySQLReturnMessage {
                 resultBuffer.writeWithLength(info.getBytes());
                 //resultBuffer.write((byte)0);
             } else {
-                if(resultBuffer.size()>=7) {
-                    resultBuffer.writeWithLength(new byte[0]);
+                if(force3BytesOkPacketInfo){
+                    resultBuffer.writeWithLength(new byte[]{0,0,0});
+
                 }else {
-                    var len = 7-resultBuffer.size();
-                    var filler = new byte[len];
-                    for(var i=0;i<len;i++) {
-                        filler[i] = 0;
-                    }
-                    resultBuffer.writeWithLength(filler);
+                    resultBuffer.writeWithLength(new byte[0]);
                 }
             }
         }
+    }
+
+    public void setForce3BytesOkPacketInfo(boolean force3BytesOkPacketInfo) {
+        this.force3BytesOkPacketInfo = force3BytesOkPacketInfo;
+    }
+
+    public boolean isForce3BytesOkPacketInfo() {
+        return force3BytesOkPacketInfo;
     }
 }

@@ -64,6 +64,7 @@ public class Amqp091Runner extends CommonRunner {
         proxy.setPlugins(plugins);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
+        baseProtocol.setSettings(protocolSettings);
         var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
         ps.setOnStart(() -> DiService.setThreadContext(diService));

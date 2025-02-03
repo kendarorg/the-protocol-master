@@ -17,6 +17,7 @@ PROXYED CONNETION STRING!!!
 * connectionString: the connection string for the real server (e.g. jdbc:mysql://localhost:5432/db?ssl=false )
 * timeoutSeconds: the timeout to drop the connections
 * forceSchema: the force is called in case the jdbc driver does not allow setting the schema from connection string
+* force3BytesOkPacketInfo: default to false. For some client (like python peewee) this should be set to true
 
 ## Plugins
 
