@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Special state in case of failure. May or may not carry to exception. Has its
- * own trace level logger
+ * own trace level log
  */
 public class FailedState extends ProtoState {
     private static final Logger log = LoggerFactory.getLogger(FailedState.class);

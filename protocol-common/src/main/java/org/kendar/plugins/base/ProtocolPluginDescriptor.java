@@ -37,8 +37,19 @@ public interface ProtocolPluginDescriptor<W extends PluginSettings> extends
      */
     ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting);
 
-    ProtocolPluginApiHandler getApiHandler();
+    /**
+     * Return all the APIs connected with the plugin
+     *
+     * @return
+     */
+    List<ProtocolPluginApiHandler> getApiHandler();
 
+    /**
+     * Retrieve the specific instance of the protocol connected
+     * with the plugin
+     *
+     * @return
+     */
     ProtoDescriptor getProtocolInstance();
 
     void setProtocolInstance(ProtoDescriptor protocol);

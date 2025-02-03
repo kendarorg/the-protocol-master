@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.kendar.amqp.v09.plugins.AmqpReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
@@ -182,36 +182,11 @@ public class ReplayerTest {
 
             Sleeper.sleep(100);
 
-            Connection connection = connectionFactory.newConnection();
-            Channel channel = connection
-                    .openChannel()
-                    .orElseThrow(() -> new RuntimeException("Failed to Open channel"));
-            channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
-
-            var props = new AMQP.BasicProperties.Builder()
-                    .contentType("text/plain")
-//                .contentEncoding("UTF-8")
-                    .deliveryMode(1)
-//                .priority(2)
-//                .correlationId("3") //?
-//                //.replyTo("4")
-//                //.expiration("5")
-//                .messageId("6")
-//                .timestamp(new Date())
-//                //.type("7")
-//                //.userId("8")
-                    .appId("TESTAPP")
-                    //.clusterId("9")
-                    .build();
-            //SimpleProxyServer.write=true;
-            Sleeper.sleep(100);
+            Sleeper.sleep(1000, () -> messages.size() == 3);
             System.out.println("------------------------------------------------------------");
             Sleeper.sleep(100);
-            channel.close();
-            connection.close();
+            chanConsume.close();
 
-
-            Sleeper.sleep(1000, () -> messages.size() == 3);
 
             assertEquals(3, messages.size());
             assertTrue(messages.containsValue(exectedMessage + "1"));

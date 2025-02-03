@@ -72,8 +72,7 @@ public class MqttProtocol extends NetworkProtoDescriptor {
     @Override
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor,
                                          int contextId) {
-        var result = new MqttContext(protoDescriptor, contextId);
-        return result;
+        return new MqttContext(protoDescriptor, contextId);
     }
 
     public BBuffer buildBuffer() {

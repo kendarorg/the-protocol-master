@@ -8,11 +8,11 @@ import org.kendar.mongo.MongoProxy;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.Sleeper;
 
 import java.util.List;
@@ -95,9 +95,7 @@ public class MongoRunner extends CommonRunner {
         baseProtocol.initialize();
         var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> {
-            DiService.setThreadContext(diService);
-        });
+        ps.setOnStart(() -> DiService.setThreadContext(diService));
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

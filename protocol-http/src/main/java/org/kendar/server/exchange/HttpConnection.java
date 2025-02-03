@@ -36,7 +36,7 @@ public class HttpConnection {
     String protocol;
     int remaining;
     boolean closed = false;
-    System.Logger logger;
+    System.Logger log;
     volatile HttpConnection.State state;
 
     public HttpConnection() {
@@ -76,7 +76,7 @@ public class HttpConnection {
         this.chan = chan;
         this.sslContext = sslContext;
         this.sslStreams = sslStreams;
-        this.logger = context.getLogger();
+        this.log = context.getLogger();
     }
 
     public SocketChannel getChannel() {
@@ -92,8 +92,8 @@ public class HttpConnection {
             return;
         }
         closed = true;
-        if (logger != null && chan != null) {
-            logger.log(System.Logger.Level.TRACE, "Closing connection: " + chan);
+        if (log != null && chan != null) {
+            log.log(System.Logger.Level.TRACE, "Closing connection: " + chan);
         }
 
         if (!chan.isOpen()) {

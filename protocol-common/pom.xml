@@ -11,6 +11,16 @@
     <artifactId>protocol-common</artifactId>
     <dependencies>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte</artifactId>
+            <version>${jte.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>aircompressor</artifactId>
             <version>2.0.2</version>
@@ -37,7 +47,6 @@
             <artifactId>reflections</artifactId>
             <version>${reflection.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.airlift/aircompressor -->
         <!-- https://mvnrepository.com/artifact/io.airlift/aircompressor -->
         <dependency>
             <groupId>io.airlift</groupId>

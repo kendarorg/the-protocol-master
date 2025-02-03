@@ -23,7 +23,7 @@ import java.util.List;
 import static org.kendar.apis.ApiUtils.respondJson;
 
 
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<RedisPublishPlugin> {
     public RedisPublishPluginApis(RedisPublishPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);

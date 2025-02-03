@@ -1,20 +1,18 @@
 package org.kendar.command;
 
 import org.kendar.amqp.v09.AmqpProxy;
-import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.di.DiService;
-import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.Sleeper;
 
 import java.util.List;
@@ -23,14 +21,7 @@ import java.util.function.Supplier;
 
 @TpmService
 public class Amqp091Runner extends CommonRunner {
-    private final List<ProtocolPluginDescriptor> plugins;
     private TcpServer ps;
-
-    @TpmConstructor
-    public Amqp091Runner(@TpmNamed(tags = "amqp091") List<ProtocolPluginDescriptor> plugins) {
-        this.plugins = plugins;
-    }
-
 
     @Override
     protected String getConnectionDescription() {
@@ -75,9 +66,7 @@ public class Amqp091Runner extends CommonRunner {
         baseProtocol.initialize();
         var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> {
-            DiService.setThreadContext(diService);
-        });
+        ps.setOnStart(() -> DiService.setThreadContext(diService));
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServers.put(key, ps);

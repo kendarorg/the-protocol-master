@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
 
 public class FileResourcesUtils {
     private static final String JAR_PATH_DELIMITER = "/";
-    private final Logger logger = LoggerFactory.getLogger(FileResourcesUtils.class);
+    private final Logger log = LoggerFactory.getLogger(FileResourcesUtils.class);
 
 
     // get a file from the resources folder
@@ -76,7 +76,7 @@ public class FileResourcesUtils {
                 result.add(line);
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return String.join("\n", result);
     }
@@ -119,7 +119,7 @@ public class FileResourcesUtils {
             }
             return returnValue;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -147,7 +147,7 @@ public class FileResourcesUtils {
 
             return result.toString();
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -175,7 +175,7 @@ public class FileResourcesUtils {
             jarType = "NESTED";
             loadNestedJar(path, result, classLoader, jarFile, ress);
         }
-        logger.info("Loading {} jar with path {}", jarType, jarFile);
+        log.info("Loading {} jar with path {}", jarType, jarFile);
 
         return result;
     }
@@ -189,7 +189,7 @@ public class FileResourcesUtils {
         var splitted = jarFile.getPath().split("!");
         var rootFilePath = splitted[0].substring(5);
         var rootFile = new File(rootFilePath);
-        logger.debug("Loading nested jar  with path {}", jarFile);
+        log.debug("Loading nested jar  with path {}", jarFile);
         loadFromJar(path, result, classLoader, rootFile, ress, "BOOT-INF/classes");
     }
 
@@ -238,7 +238,7 @@ public class FileResourcesUtils {
                 }
                 readToBytes(result, extra, filePath, inputStream);
             } catch (Exception e) {
-                logger.trace(e.getMessage());
+                log.trace(e.getMessage());
             }
         }
     }
@@ -300,7 +300,7 @@ public class FileResourcesUtils {
                 result.put(internalPath, bytes);
             }
         } catch (Exception ex) {
-            logger.trace(ex.getMessage());
+            log.trace(ex.getMessage());
         }
     }
 }

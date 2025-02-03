@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Iterator;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("MagicConstant")
 public class ComStmtExecute extends ProtoState {
@@ -35,24 +34,17 @@ public class ComStmtExecute extends ProtoState {
 
         switch (fieldType) {
             case BIGINT:
-                switch (mysqlFieldType) {
-                    case (1)://MYSQL_TYPE_TINY
-                        value = (int) inputBuffer.get();
-                        break;
-                    case (2)://MYSQL_TYPE_SHORT
-                    case (5)://MYSQL_TYPE_INT24
-                        value = inputBuffer.readUB2();
-                        break;
-                    case (3)://MYSQL_TYPE_LONG
-                    case (13)://MYSQL_TYPE_INT24
-                        value = inputBuffer.readUB4();
-                        break;
-                    case (8)://MYSQL_TYPE_LONGLONG
-                        value = inputBuffer.getLong();
-                        break;
-                    default:
-                        throw new RuntimeException("MISSING MYSQL TYPE (for sql int) " + mysqlFieldType);
-                }
+                value = switch (mysqlFieldType) {
+                    case (1) ->//MYSQL_TYPE_TINY
+                            (int) inputBuffer.get();//MYSQL_TYPE_SHORT
+                    case (2), (5) ->//MYSQL_TYPE_INT24
+                            inputBuffer.readUB2();//MYSQL_TYPE_LONG
+                    case (3), (13) ->//MYSQL_TYPE_INT24
+                            inputBuffer.readUB4();
+                    case (8) ->//MYSQL_TYPE_LONGLONG
+                            inputBuffer.getLong();
+                    default -> throw new RuntimeException("MISSING MYSQL TYPE (for sql int) " + mysqlFieldType);
+                };
                 break;
             case BOOLEAN:
                 value = inputBuffer.get() != 0;
@@ -198,7 +190,7 @@ public class ComStmtExecute extends ProtoState {
             return iteratorOfEmpty();
         }
         var fields = (ArrayList<ProxyMetadata>) context.getValue("STATEMENT_FIELDS_" + statementId);
-        var paramFields = fields.stream().filter(f -> f.getColumnName().equalsIgnoreCase("?")).collect(Collectors.toList());
+        var paramFields = fields.stream().filter(f -> f.getColumnName().equalsIgnoreCase("?")).toList();
         int nullBitmapSize = (paramFields.size() + 7) / 8;
         var nullBitmap = inputBuffer.getBytes(nullBitmapSize);
 

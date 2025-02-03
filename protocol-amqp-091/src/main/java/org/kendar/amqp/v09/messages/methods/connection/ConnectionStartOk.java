@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 
+import static org.kendar.protocol.descriptor.ProtoDescriptor.getNow;
+
 public class ConnectionStartOk extends Connection {
     private String[] auth;
     private Map<String, Object> clientProperties;
@@ -112,6 +114,8 @@ public class ConnectionStartOk extends Connection {
         conTuneOk.setChannelMax(conTune.getChannelMax());
         conTuneOk.setHearthBeat(conTune.getHearthBeat());
         conTuneOk.setFrameMax(conTune.getFrameMax());
+        context.setValue("HEARTBEAT", conTune.getHearthBeat());
+        context.setValue("HEARTBEAT_LAST", getNow());
 
 
         return iteratorOfRunnable(() -> {

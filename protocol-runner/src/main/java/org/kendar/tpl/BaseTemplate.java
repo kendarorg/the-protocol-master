@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class BaseTemplate implements FilteringClass {
     protected static final JsonMapper mapper = new JsonMapper();
-    protected static ConcurrentHashMap<String, Template> templates = new ConcurrentHashMap<>();
+    protected static final ConcurrentHashMap<String, Template> templates = new ConcurrentHashMap<>();
 
     protected Template loadTemplate(String filename) {
         filename = filename.toLowerCase();

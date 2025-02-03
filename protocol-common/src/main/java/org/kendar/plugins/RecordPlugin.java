@@ -27,7 +27,7 @@ import java.util.Map;
 public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase<W> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(RecordPlugin.class);
-    protected StorageRepository storage;
+    protected final StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
 
     public RecordPlugin(JsonMapper mapper, StorageRepository storage) {
@@ -128,18 +128,10 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        //withStorage(global.getService("storage"));
         ignoreTrivialCalls = ((BasicRecordPluginSettings) pluginSetting).isIgnoreTrivialCalls();
         super.initialize(global, protocol, pluginSetting);
         return this;
     }
-
-    /*protected RecordPlugin withStorage(StorageRepository storage) {
-        if (storage != null) {
-            this.storage = storage;
-        }
-        return this;
-    }*/
 
     @Override
     public void terminate() {

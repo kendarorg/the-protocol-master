@@ -7,7 +7,7 @@ import redis.clients.jedis.Jedis;
 
 public class Publisher {
 
-    private static final Logger logger = LoggerFactory.getLogger(Publisher.class);
+    private static final Logger log = LoggerFactory.getLogger(Publisher.class);
 
     private final Jedis publisherJedis;
 
@@ -19,7 +19,7 @@ public class Publisher {
     }
 
     public void start(String... data) {
-        //logger.info("Type your message (quit for terminate)");
+        //log.info("Type your message (quit for terminate)");
 
         //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         for (var line : data) {

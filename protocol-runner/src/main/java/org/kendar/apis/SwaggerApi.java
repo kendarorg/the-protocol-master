@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("HttpUrlsUsage")
 @TpmService
-@HttpTypeFilter(hostAddress = "*",
+@HttpTypeFilter(
         blocking = true)
 public class SwaggerApi implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
@@ -117,7 +117,7 @@ public class SwaggerApi implements FilteringClass {
                 components = new Components();
             }
             var scc = components;
-            schemas.forEach((key, value) -> scc.addSchemas(key, value));
+            schemas.forEach(scc::addSchemas);
             swagger.components(components);
             String swaggerJson = Json.mapper().writeValueAsString(swagger);
             OpenAPI rebuilt = Json.mapper().readValue(swaggerJson, OpenAPI.class);

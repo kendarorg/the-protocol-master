@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @TpmService(tags = "mqtt")
 public class MqttPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettings> {
-    private ConcurrentHashMap<Integer, PublishRel> expectPubRel = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, PublishAck> expectPubAck = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, PublishRel> expectPubRel = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, PublishAck> expectPubAck = new ConcurrentHashMap<>();
 
     public MqttPublishPlugin(JsonMapper mapper) {
         super(mapper);
@@ -70,8 +70,8 @@ public class MqttPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettin
     }
 
     @Override
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new MqttPublishPluginApis(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new MqttPublishPluginApis(this, getId(), getInstanceId()));
     }
 
     public void expectPubRec(MqttContext context, PublishRel pubRel) {

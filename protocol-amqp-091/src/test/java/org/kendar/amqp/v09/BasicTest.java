@@ -10,13 +10,13 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.RabbitMqImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.utils.JsonMapper;
@@ -35,6 +35,7 @@ public class BasicTest {
     protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     protected static ProtocolPluginDescriptor publishPlugin;
+    protected static ProtocolPluginDescriptor recordPlugin;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected JsonMapper mapper = new JsonMapper();
 
@@ -86,13 +87,13 @@ public class BasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new AmqpRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        recordPlugin = new AmqpRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         proxy.setPlugins(List.of(
-                pl, rep, publishPlugin));
-        pl.setActive(true);
+                recordPlugin, rep, publishPlugin));
+        recordPlugin.setActive(true);
         rep.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

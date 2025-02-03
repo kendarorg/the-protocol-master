@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutionException;
  */
 public abstract class NetworkProtoContext extends ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(NetworkProtoContext.class);
+    private final List<Runnable> runnables = new ArrayList<>();
     /**
      * If had sent the greeting message (to send data immediatly after connection without further ado)
      */
@@ -51,8 +52,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
      * Storage for the bytes not consumed
      */
     private BytesEvent remainingBytes;
-    private List<Runnable> runnables = new ArrayList<>();
     private boolean disconnected = false;
+    private boolean connected = true;
 
     public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
         super(descriptor, contextId);
@@ -140,7 +141,9 @@ public abstract class NetworkProtoContext extends ProtoContext {
                 res.get();
             } catch (InterruptedException | ExecutionException e) {
                 log.error("[CL<TP][TX] Cannot write message: {} {}", returnMessage.getClass().getSimpleName(), e.getMessage());
+                connected = false;
                 throw new ConnectionExeception("Cannot write on channel");
+
             }
         }
 
@@ -363,5 +366,9 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     public void addResponse(Runnable toRun) {
         runnables.add(toRun);
+    }
+
+    protected boolean isConnected() {
+        return client.isOpen() && connected;
     }
 }

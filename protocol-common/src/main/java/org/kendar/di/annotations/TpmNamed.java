@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.PARAMETER})
 public @interface TpmNamed {
-    String name() default "";
+    String value() default "";
 
     String[] tags() default {};
 }

@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 public class CompactLine {
 
     private long index;
+    private long timestamp = System.currentTimeMillis();
     private String type;
     private String caller;
     private long durationMs;
@@ -16,7 +17,6 @@ public class CompactLine {
 
     }
 
-
     public CompactLine(StorageItem item, Supplier<Map<String, String>> getTags) {
         index = item.getIndex();
         type = item.getType();
@@ -25,6 +25,13 @@ public class CompactLine {
         tags = getTags.get();
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public long getIndex() {
         return index;

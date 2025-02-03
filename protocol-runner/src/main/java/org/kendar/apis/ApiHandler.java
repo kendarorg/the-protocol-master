@@ -2,7 +2,6 @@ package org.kendar.apis;
 
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
-import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.PathParameter;
 import org.kendar.annotations.multi.TpmResponse;
@@ -10,7 +9,7 @@ import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.dtos.PluginIndex;
 import org.kendar.apis.dtos.ProtocolIndex;
-import org.kendar.apis.utils.ConstantsMime;
+import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
@@ -29,7 +28,7 @@ import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
 @TpmService
-@HttpTypeFilter(hostAddress = "*")
+@HttpTypeFilter()
 public class ApiHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalSettings settings;
@@ -79,8 +78,7 @@ public class ApiHandler implements FilteringClass {
     @TpmDoc(
             description = "Retrieve the settings of the application",
             responses = @TpmResponse(
-                    body = String.class,
-                    content = ConstantsMime.JSON
+                    body = String.class
             ),
             tags = {"base/utils"})
     public boolean getSettings(Request reqp, Response resp) {

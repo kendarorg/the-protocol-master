@@ -7,7 +7,7 @@ public enum FrameType {
 
     BODY(3),
     HEADER(2),
-    HEARTHBIT(4),
+    HEARTBEAT(8),
     METHOD(1);
     private static final Map<Integer, FrameType> BY_INT = new HashMap<>();
 

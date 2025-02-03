@@ -36,8 +36,6 @@ public class HttpContextImpl extends HttpContext {
         }
         this.handler = cb;
         this.server = server;
-        //authfilter = new AuthFilter(null);
-        //sfilters.add (authfilter);
     }
 
     /**

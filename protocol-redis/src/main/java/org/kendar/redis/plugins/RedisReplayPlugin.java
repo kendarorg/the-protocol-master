@@ -8,6 +8,7 @@ import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
 import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
+import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
@@ -85,5 +86,10 @@ public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettin
             return Map.of("queue", (String) context.getValue("QUEUE"));
         }
         return Map.of();
+    }
+
+    @Override
+    protected boolean verifyContentRepeatable(CompactLine index) {
+        return index.getTags().containsKey("repeatable");
     }
 }

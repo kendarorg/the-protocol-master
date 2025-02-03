@@ -20,7 +20,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 public class JdbcProxy extends Proxy {
     private static final Logger log = LoggerFactory.getLogger(JdbcProxy.class);
@@ -80,41 +79,23 @@ public class JdbcProxy extends Proxy {
     private static Object convertObject(BindingParameter value) {
         if (value == null) return null;
         var val = value.getValue();
-        switch (value.getType()) {
-            case INTEGER:
-            case BIGINT:
-            case TINYINT:
-            case SMALLINT:
-                return Long.parseLong(val);
-            case BIT:
-            case BOOLEAN:
-                return Boolean.parseBoolean(val);
-            case BINARY:
-            case BLOB:
-            case VARBINARY:
-            case LONGVARBINARY:
-                return Base64.getDecoder().decode(val);
-            case FLOAT:
-                return Float.parseFloat(val);
-            case DOUBLE:
-                return Double.parseDouble(val);
-            case REAL:
-            case NUMERIC:
-                return new BigDecimal(val);
-            case TIME:
-            case TIME_WITH_TIMEZONE:
-                return Time.valueOf(val);
-            case DATE:
+        return switch (value.getType()) {
+            case INTEGER, BIGINT, TINYINT, SMALLINT -> Long.parseLong(val);
+            case BIT, BOOLEAN -> Boolean.parseBoolean(val);
+            case BINARY, BLOB, VARBINARY, LONGVARBINARY -> Base64.getDecoder().decode(val);
+            case FLOAT -> Float.parseFloat(val);
+            case DOUBLE -> Double.parseDouble(val);
+            case REAL, NUMERIC -> new BigDecimal(val);
+            case TIME, TIME_WITH_TIMEZONE -> Time.valueOf(val);
+            case DATE -> {
                 if (val.length() > 10) {
                     val = val.substring(0, 10);
                 }
-                return Date.valueOf(val);
-            case TIMESTAMP:
-            case TIMESTAMP_WITH_TIMEZONE:
-                return Timestamp.valueOf(val);
-            default:
-                return val;
-        }
+                yield Date.valueOf(val);
+            }
+            case TIMESTAMP, TIMESTAMP_WITH_TIMEZONE -> Timestamp.valueOf(val);
+            default -> val;
+        };
     }
 
     public static String parseParameters(String query, SqlStringParser parser) {
@@ -149,14 +130,10 @@ public class JdbcProxy extends Proxy {
     public static boolean isByteOut(String clName) {
         var ns = clName.split("\\.");
         var name = ns[ns.length - 1].toLowerCase(Locale.ROOT);
-        switch (name) {
-            case ("[b"):
-            case ("[c"):
-            case ("byte"):
-                return true;
-            default:
-                return false;
-        }
+        return switch (name) {
+            case ("[b"), ("[c"), ("byte") -> true;
+            default -> false;
+        };
     }
 
     private static void fillOutputParametersOnRecordset(List<BindingParameter> parameterValues, PreparedStatement statement, SelectResult result, AtomicLong count) {
@@ -340,7 +317,7 @@ public class JdbcProxy extends Proxy {
             }
         }
 
-        var outputParams = parameterValues.stream().filter(BindingParameter::isOutput).collect(Collectors.toList());
+        var outputParams = parameterValues.stream().filter(BindingParameter::isOutput).toList();
         if (!outputParams.isEmpty()) {
             fillOutputParametersOnRecordset(parameterValues, statement, result, count);
         } else {

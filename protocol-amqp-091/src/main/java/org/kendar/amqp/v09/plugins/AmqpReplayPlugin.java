@@ -22,20 +22,22 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @TpmService(tags = "amqp091")
 public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(AmqpReplayPlugin.class);
+    private static List<String> repeatableItems = Arrays.asList(
+            "ExchangeDeclare", "QueueDeclare", "QueueBind", "ExchangeBind",
+            "BasicConsume", "byte[]", "ConnectionStartOk", "ConnectionOpen",
+            "ChannelOpen"
+    );
+
 
     public AmqpReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
     }
-
 
     @Override
     public Class<?> getSettingClass() {
@@ -70,6 +72,7 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
         long lastTimestamp = 0;
+
         for (var item : storageItems) {
             int consumeId = item.getConnectionId();
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", consumeId + "")) {
@@ -92,22 +95,21 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
                     case "BasicDeliver":
                         var bd = mapper.deserialize(out, BasicDeliver.class);
                         var tag = (String) ctx.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
+
+                        log.debug("Delivering " + "BASIC_CONSUME_CT_" + bd.getConsumeOrigin() + " " + tag);
                         if (tag != null && !tag.isEmpty()) {
                             bd.setConsumerTag(tag);
                         }
                         fr = bd;
                         break;
                     case "HeaderFrame":
-                        var hf = mapper.deserialize(out, HeaderFrame.class);
-                        fr = hf;
+                        fr = mapper.deserialize(out, HeaderFrame.class);
                         break;
                     case "BodyFrame":
-                        var bf = mapper.deserialize(out, BodyFrame.class);
-                        fr = bf;
+                        fr = mapper.deserialize(out, BodyFrame.class);
                         break;
                     case "BasicCancel":
-                        var bc = mapper.deserialize(out, BasicCancel.class);
-                        fr = bc;
+                        fr = mapper.deserialize(out, BasicCancel.class);
                         break;
                 }
                 if (fr != null) {
@@ -144,17 +146,13 @@ public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         } else if (cll instanceof HeaderFrame) {
             data.put("queue", ((HeaderFrame) cll).getConsumeOrigin());
         }
-        //var in = mapper.toJsonNode(cll);
-//        if(in.has("packetIdentifier")){
-//            //data.put("packetIdentifier", in.get("packetIdentifier").asText());
-//        }
-//        if(in.has("topicName")){
-//            data.put(in.get("topicName").asText(), in.get("qos").asText());
-//        }else if(in.has("topics")){
-//            for(var topic : in.get("topics")){
-//                data.put(topic.get("topic").asText(), topic.get("type").asText());
-//            }
-//        }
         return data;
     }
+
+    @Override
+    protected List<String> repeatableItems() {
+        return repeatableItems;
+    }
+
+
 }

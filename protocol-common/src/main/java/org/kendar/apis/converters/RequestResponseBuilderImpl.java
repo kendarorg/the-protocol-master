@@ -32,7 +32,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
     private static final String H_AUTHORIZATION = "Authorization";
     private static final String BASIC_AUTH_MARKER = "basic";
     private static final String BASIC_AUTH_SEPARATOR = ":";
-    private static Logger logger;
+    private static Logger log;
 
     public RequestResponseBuilderImpl() {
 
@@ -207,7 +207,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
             }
             if (contentEncoding == null) contentEncoding = "";
 
-            zstd  =contentEncoding.equalsIgnoreCase("zstd");
+            zstd = contentEncoding.equalsIgnoreCase("zstd");
             brotli = contentEncoding.equalsIgnoreCase("br");
             if (responseEntity.getContentType() != null &&
                     MimeChecker.isBinary(responseEntity.getContentType().getValue(), contentEncoding)) {
@@ -254,7 +254,7 @@ public class RequestResponseBuilderImpl implements RequestResponseBuilder {
             if (header.getName().equalsIgnoreCase(ConstantsHeader.TRANSFER_ENCODING)) continue;
             response.addHeader(header.getName(), header.getValue());
         }
-        if (brotli||zstd) {
+        if (brotli || zstd) {
             response.removeHeader(ConstantsHeader.CONTENT_ENCODING);
         }
     }

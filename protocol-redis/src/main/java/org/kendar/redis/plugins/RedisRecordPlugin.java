@@ -23,6 +23,12 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
         super(mapper, storage);
     }
 
+    private static boolean isClientSetInfo(ArrayNode input) {
+        return input.get(0).asText().equalsIgnoreCase("CLIENT") &&
+                input.size() >= 1 &&
+                input.get(1).asText().equalsIgnoreCase("SETINFO");
+    }
+
     @Override
     protected Object getData(Object of) {
         if (of instanceof Resp3Message) {
@@ -50,12 +56,14 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
             var input = (ArrayNode) item.getInput();
             if (input.size() >= 2) {
 
-                if (input.get(0).asText().equalsIgnoreCase("SUBSCRIBE")) {
-                    return Map.of("queue", input.get(1).asText());
+                if (isClientSetInfo(input)) {
+                    return Map.of("repeatable", "true");
+                } else if (input.get(0).asText().equalsIgnoreCase("SUBSCRIBE")) {
+                    return Map.of("queue", input.get(1).asText(), "repeatable", "true");
                 } else if (input.get(0).asText().equalsIgnoreCase("MESSAGE")) {
                     return Map.of("queue", input.get(1).asText());
                 } else if (input.get(0).asText().equalsIgnoreCase("PING")) {
-                    return Map.of("type", "ping");
+                    return Map.of("type", "ping", "repeatable", "true");
                 }
             }
         }

@@ -11,12 +11,12 @@ import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.postgres.PostgresProtocol;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItem;
 import org.kendar.utils.Sleeper;
@@ -137,9 +137,7 @@ public class JdbcRunner extends CommonRunner {
         baseProtocol.initialize();
         var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> {
-            DiService.setThreadContext(diService);
-        });
+        ps.setOnStart(() -> DiService.setThreadContext(diService));
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServer.put(key, ps);

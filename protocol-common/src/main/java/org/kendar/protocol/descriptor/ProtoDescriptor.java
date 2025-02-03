@@ -1,5 +1,6 @@
 package org.kendar.protocol.descriptor;
 
+import org.kendar.plugins.base.ProtocolApiHandler;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.states.InterruptProtoState;
 import org.kendar.protocol.states.ProtoState;
@@ -233,5 +234,9 @@ public abstract class ProtoDescriptor {
 
     public void start() {
 
+    }
+
+    public List<ProtocolApiHandler> getApiHandler() {
+        return List.of();
     }
 }

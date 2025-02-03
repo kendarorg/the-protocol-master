@@ -12,6 +12,8 @@ import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.apis.utils.MimeChecker;
 import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.utils.FileResourcesUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,29 +21,25 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Handle requests for the static pages (usually in resource files)
+ */
 public abstract class StaticWebFilter implements FilteringClass {
+    private static final Logger log = LoggerFactory.getLogger(StaticWebFilter.class);
     private final FileResourcesUtils fileResourcesUtils;
     private final ConcurrentHashMap<String, String> markdownCache = new ConcurrentHashMap<>();
     private HashMap<String, Object> resourceFiles = new HashMap<>();
 
     public StaticWebFilter(FileResourcesUtils fileResourcesUtils) {
         this.fileResourcesUtils = fileResourcesUtils;
-        /*try {
-            loadAllStuffs();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }*/
     }
 
+    /**
+     * The root path (with * it's inside the resources)
+     *
+     * @return
+     */
     protected abstract String getPath();
-
-    public String getDescription() {
-        return null;
-    }
-
-    public String getAddress() {
-        return null;
-    }
 
     @TpmPostConstruct
     public void loadAllStuffs() throws IOException {
@@ -50,6 +48,19 @@ public abstract class StaticWebFilter implements FilteringClass {
             realPath = realPath.substring(1);
             resourceFiles = fileResourcesUtils.loadResources(this, realPath);
         }
+    }
+
+    /**
+     * If the path contains replaceable parts. In the ProtocolStaticWebFilter to use the
+     * same api for all protocols the function verifies that in the called path
+     * exists the protocolInstanceId, like /something/mqtt-01/somthingelse while
+     * the file system path is [resources]/getPath()/something/[protocol]/somethingelse
+     *
+     * @param path
+     * @return
+     */
+    public boolean isPathMatching(String path) {
+        return true;
     }
 
     @SuppressWarnings("RedundantIfStatement")
@@ -64,16 +75,40 @@ public abstract class StaticWebFilter implements FilteringClass {
         if (requestedPath.endsWith("/")) {
             requestedPath = requestedPath.substring(0, requestedPath.length() - 1);
         }
+        if (isPathMatching(requestedPath)) {
+            requestedPath = adaptRequestedPath(requestedPath);
+            if (verifyPathAndRender(response, realPath, requestedPath, false)) return true;
+            if (verifyPathAndRender(response, realPath, requestedPath + "/index.htm", true)) return true;
+            if (verifyPathAndRender(response, realPath, requestedPath + "/index.html", true)) return true;
+            if (verifyPathAndRender(response, realPath, request.getPath() + ".htm", true)) return true;
+            if (verifyPathAndRender(response, realPath, request.getPath() + ".html", true)) return true;
+        }
 
-        if (verifyPathAndRender(response, realPath, requestedPath, false)) return true;
-        if (verifyPathAndRender(response, realPath, requestedPath + "/index.htm", true)) return true;
-        if (verifyPathAndRender(response, realPath, requestedPath + "/index.html", true)) return true;
-        if (verifyPathAndRender(response, realPath, request.getPath() + ".htm", true)) return true;
-        if (verifyPathAndRender(response, realPath, request.getPath() + ".html", true)) return true;
 
         return false;
     }
 
+    /**
+     * This is connected with isPathMatching(), when /something/mqtt-01/somthingelse
+     * is called it transform it into /something/mqtt/somthingelse
+     *
+     * @param requestedPath
+     * @return
+     */
+    public String adaptRequestedPath(String requestedPath) {
+        return requestedPath;
+    }
+
+    /**
+     * If it finds the path accept it, if needed handles the redirect http://xx
+     * http://xx to http://xx/index.html
+     *
+     * @param response
+     * @param realPath
+     * @param possibleMatch
+     * @param redirect
+     * @return
+     */
     private boolean verifyPathAndRender(Response response, String realPath, String possibleMatch, boolean redirect) {
         Path fullPath;
         if (resourceFiles == null || resourceFiles.isEmpty()) {
@@ -111,6 +146,12 @@ public abstract class StaticWebFilter implements FilteringClass {
         return path.startsWith("*");
     }
 
+    /**
+     * Render the files applying the mostly correct mime type
+     *
+     * @param fullPath
+     * @param response
+     */
     private void renderFile(Path fullPath, Response response) {
         try {
             var stringPath = fullPath.toString();
@@ -141,7 +182,7 @@ public abstract class StaticWebFilter implements FilteringClass {
             response.setStatusCode(200);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 

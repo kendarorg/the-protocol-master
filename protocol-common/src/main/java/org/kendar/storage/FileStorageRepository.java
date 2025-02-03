@@ -262,7 +262,7 @@ public class FileStorageRepository implements StorageRepository {
                 .map(File::getName)
                 .filter(name -> name.endsWith("." + protocolInstanceId + ".json"))
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
         var result = new ArrayList<StorageItem>();
         for (var fileName : fileNames) {
             var nameOnly = fileName.replace("." + protocolInstanceId + ".json", "");
@@ -325,8 +325,8 @@ public class FileStorageRepository implements StorageRepository {
             });
         }
         var result = ctx.inMemoryDb.get(id);
-        if(result == null) {
-            result = ctx.outItems.stream().filter(a->a.getIndex()==id).findFirst().orElse(null);
+        if (result == null) {
+            result = ctx.outItems.stream().filter(a -> a.getIndex() == id).findFirst().orElse(null);
         }
         return result;
     }
@@ -337,11 +337,11 @@ public class FileStorageRepository implements StorageRepository {
         var ctx = protocolRepo.get(protocolInstanceId);
         var result = new ArrayList<StorageItem>();
 
-        log.debug("[CL<FF] loading responses");
+        log.debug("[CL<FF] loading responses {}", query.getStartAt());
         for (var item : ctx.index.stream()
                 .sorted(Comparator.comparingInt(value -> (int) value.getIndex())).
                 filter(value -> value.getIndex() > query.getStartAt()).
-                collect(Collectors.toList())) {
+                toList()) {
             if (query.getUsed().contains((int) item.getIndex())) continue;
             if (item.getType().equalsIgnoreCase("RESPONSE")) {
                 var outItem = ctx.outItems.stream().filter(a -> a.getIndex() == item.getIndex()).findFirst();
@@ -396,7 +396,7 @@ public class FileStorageRepository implements StorageRepository {
             }
             while (ze != null) {
                 String fileName = ze.getName();
-                if (fileName.length() == 0) continue;
+                if (fileName.isEmpty()) continue;
                 File newFile = Path.of(destDir, fileName).toFile();
                 //System.out.println("Unzipping to "+newFile.getAbsolutePath());
                 //create directories for sub directories in zip

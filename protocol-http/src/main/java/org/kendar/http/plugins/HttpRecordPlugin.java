@@ -92,7 +92,6 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        //withStorage(global.getService("storage"));
         setupSitesToRecord(getSettings().getRecordSites());
         return this;
     }

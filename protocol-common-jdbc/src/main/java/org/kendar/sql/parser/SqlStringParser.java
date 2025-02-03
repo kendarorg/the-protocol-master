@@ -104,27 +104,12 @@ public class SqlStringParser {
             var sqls = parseSql(input);
             for (var sql : sqls) {
                 var foundedType = inferType(sql);
-                if(foundedType==null || foundedType==SqlStringType.UNKNOWN) {
-                    foundedType = inferType(String.join(" ",parseString(sql)));
+                if (foundedType == null || foundedType == SqlStringType.UNKNOWN) {
+                    foundedType = inferType(String.join(" ", parseString(sql)));
                 }
-                if(foundedType!=null) {
+                if (foundedType != null) {
                     result.add(new SqlParseResult(sql, foundedType));
                 }
-                /*var splitted = sql.trim().split("\\s+");
-                if (splitted.length == 0) {
-                    continue;
-                }
-                var first = splitted[0].trim().toLowerCase(Locale.ROOT);
-                if (first.isEmpty()) {
-                    continue;
-                }
-                if (select.containsKey(first)) {
-                    var founded = select.get(first);
-                    result.add(new SqlParseResult(sql, founded));
-                } else {
-                    result.add(new SqlParseResult(sql, SqlStringType.UNKNOWN));
-                }*/
-
             }
         } catch (Exception ex) {
             log.error("Unable to split query: {}", input);
@@ -338,7 +323,7 @@ public class SqlStringParser {
 
     public List<SimpleToken> tokenize(String input) {
         var partial = parseStringSimpleTokens(input).stream().
-                filter(a -> !a.getValue().isEmpty()).collect(Collectors.toList());
+                filter(a -> !a.getValue().isEmpty()).toList();
         var result = new ArrayList<SimpleToken>();
         for (var token : partial) {
             if (token.getType() == TokenType.BLOB) {

@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Base class for the plugin
@@ -37,29 +36,35 @@ import java.util.stream.Collectors;
  */
 public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptorBase<W> {
     private static final Logger log = LoggerFactory.getLogger(ReplayPlugin.class);
-
     /**
      * Container for the completed items
      */
     protected final HashSet<Integer> completedIndexes = new HashSet<>();
-
     /**
      * Container for the completed responses
      */
     protected final HashSet<Integer> completedOutIndexes = new HashSet<>();
+    /**
+     * The storage to be used to retrieve the data
+     */
+    protected final StorageRepository storage;
     /**
      * Indexes locally loaded from the storage. They do not contain the first
      * responses
      */
     private final List<CompactLine> indexes = new ArrayList<>();
     /**
-     * The storage to be used to retrieve the data
+     * Repeatable lines (connections etc)
      */
-    protected StorageRepository storage;
+    private final List<CompactLine> repeatable = new ArrayList<>();
 
     public ReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
         this.storage = storage;
+    }
+
+    protected List<String> repeatableItems() {
+        return new ArrayList<>();
     }
 
     /**
@@ -82,23 +87,9 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      */
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        //withStorage(global.getService("storage"));
         super.initialize(global, protocol, pluginSetting);
         return this;
     }
-
-    /**
-     * Set the storage on the plugin
-     *
-     * @param storage
-     * @return
-     */
-    /*protected ReplayPlugin withStorage(StorageRepository storage) {
-        if (storage != null) {
-            this.storage = storage;
-        }
-        return this;
-    }*/
 
     /**
      * To override if the protocol has callbacks/subscriptions
@@ -155,12 +146,17 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 completedOutIndexes.clear();
                 completedIndexes.clear();
                 if (active) {
+                    var repeatableMessageTypes = repeatableItems();
                     EventsQueue.send(new StartPlayEvent(getInstanceId()));
                     Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
                     var toCleanIndexes = new ArrayList<>(this.storage.getIndexes(getInstanceId()));
                     var fromHereTheyAreNotResponses = false;
                     indexes.clear();
+                    repeatable.clear();
                     for (var toClean : toCleanIndexes) {
+                        if (repeatableMessageTypes.contains(toClean.getType())) {
+                            repeatable.add(toClean);
+                        }
                         if (fromHereTheyAreNotResponses) {
                             indexes.add(toClean);
                         } else {
@@ -195,8 +191,10 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                     try {
                         var context = contextKvp.getValue();
                         var contextConnection = context.getValue("CONNECTION");
-                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                        context.setValue("CONNECTION", null);
+                        if (contextConnection != null) {
+                            context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                            context.setValue("CONNECTION", null);
+                        }
                     } catch (Exception e) {
                         log.debug("Error disconnecting connection {}", contextKvp.getKey(), e);
                     }
@@ -233,14 +231,14 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         }
         var storageItem = readStorageItem(index, in, pluginContext);
         if (storageItem == null) {
-            if (index.getIndex() == -1 && !getSettings().isBlockExternal()) {
+            if (index.getLine().getIndex() == -1 && !getSettings().isBlockExternal()) {
                 return false;
             }
             storageItem = new StorageItem();
-            storageItem.setIndex(index.getIndex());
+            storageItem.setIndex(index.getLine().getIndex());
         }
 
-        var lineToRead = new LineToRead(storageItem, index);
+        var lineToRead = new LineToRead(storageItem, index.getLine());
         completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
 
         var item = lineToRead.getStorageItem();
@@ -254,7 +252,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         buildState(pluginContext, context, in, outputItem, out, lineToRead);
         lineToRead.getStorageItem().setConnectionId(pluginContext.getContextId());
 
-        loadAndPrepareTheAsyncResponses(pluginContext, item);
+        loadAndPrepareTheAsyncResponses(pluginContext, item, index);
 
         return true;
     }
@@ -264,11 +262,17 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      *
      * @param pluginContext
      * @param item
+     * @param index
      */
-    private void loadAndPrepareTheAsyncResponses(PluginContext pluginContext, StorageItem item) {
+    private void loadAndPrepareTheAsyncResponses(PluginContext pluginContext, StorageItem item, ReplayFindIndexResult index) {
         if (hasCallbacks() && item != null) {
             var afterIndex = item.getIndex();
-            var timeStamp = item.getTimestamp();
+            var tmpTimestamp = item.getTimestamp();
+            if (index != null && index.getLine() != null &&
+                    index.getLine().getIndex() != -1 && !index.isRepeated()) {
+                tmpTimestamp = index.getLine().getTimestamp();
+            }
+            var timeStamp = tmpTimestamp;
             var respQuery = new ResponseItemQuery();
             respQuery.setCaller(pluginContext.getCaller());
             respQuery.setUsed(completedOutIndexes);
@@ -325,8 +329,25 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      * @param pluginContext
      * @return
      */
-    protected StorageItem readStorageItem(CompactLine index, Object in, PluginContext pluginContext) {
-        return storage.readById(getInstanceId(), index.getIndex());
+    protected StorageItem readStorageItem(ReplayFindIndexResult index, Object in, PluginContext pluginContext) {
+        var item = storage.readById(getInstanceId(), index.getLine().getIndex());
+        if (item != null && index.isRepeated()) {
+            if (!getSettings().isBlockExternal()) {
+                return null;
+            }
+            var result = new StorageItem();
+            result.setIndex(item.getIndex());
+            result.setTimestamp(item.getTimestamp());
+            result.setCaller(item.getCaller());
+            result.setConnectionId(pluginContext.getContextId());
+            result.setInputType(item.getInputType());
+            result.setOutputType(item.getOutputType());
+            result.setDurationMs(item.getDurationMs());
+            result.setInput(in);
+            result.setOutput(mapper.clone(item.getOutput()));
+            item = result;
+        }
+        return item;
     }
 
     /**
@@ -384,15 +405,17 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         }
         var storageItem = readStorageItem(index, in, pluginContext);
         if (storageItem == null) {
+            //MAIN_TODO Handle sending when connection exists and
+            //Can therefore send the message forward
             storageItem = new StorageItem();
-            storageItem.setIndex(index.getIndex());
+            storageItem.setIndex(index.getLine().getIndex());
         }
         storageItem.setConnectionId(pluginContext.getContextId());
 
-        var lineToRead = new LineToRead(storageItem, index);
+        var lineToRead = new LineToRead(storageItem, index.getLine());
         var item = lineToRead.getStorageItem();
         completedIndexes.add((int) lineToRead.getStorageItem().getIndex());
-        loadAndPrepareTheAsyncResponses(pluginContext, item);
+        loadAndPrepareTheAsyncResponses(pluginContext, item, index);
         return true;
     }
 
@@ -436,18 +459,36 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      * @param in
      * @return
      */
-    protected CompactLine findIndex(CallItemsQuery query, Object in) {
+    protected ReplayFindIndexResult findIndex(CallItemsQuery query, Object in) {
         var idx = indexes.stream()
                 .sorted(Comparator.comparingInt(value -> (int) value.getIndex()))
                 .filter(a ->
                         typeMatching(query.getType(), a.getType()) &&
-                                a.getCaller().equalsIgnoreCase(query.getCaller()) &&
-                                query.getUsed().stream().noneMatch((n) -> n == a.getIndex())
-                ).collect(Collectors.toList());
+                                a.getCaller().equalsIgnoreCase(query.getCaller())
+                ).toList();
         CompactLine bestIndex = null;
+        CompactLine bestIndexRepeated = null;
         var maxMatch = -1;
+        var maxMatchRepeated = -1;
         //Evaluate the most matching item
         for (var index : idx) {
+            var used = query.getUsed().stream().anyMatch((n) -> n == index.getIndex());
+            var isRepeatableItem = repeatableItems().contains(index.getType()) && verifyContentRepeatable(index);
+            if (isRepeatableItem && !getSettings().isBlockExternal()) {
+                return null;
+            }
+            if (used) {
+                if (!getSettings().isIgnoreTrivialCalls()) continue;
+                if (isRepeatableItem) {
+                    var currentMatch = tagsMatching(index.getTags(), query.getTags());
+                    if (currentMatch > maxMatchRepeated) {
+                        maxMatchRepeated = currentMatch;
+                        bestIndexRepeated = index;
+                    }
+                    continue;
+                }
+                continue;
+            }
             var currentMatch = tagsMatching(index.getTags(), query.getTags());
             if (currentMatch > maxMatch) {
                 maxMatch = currentMatch;
@@ -456,10 +497,19 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         }
         if (bestIndex != null) {
             log.debug("Matched for replay: {}.{}", bestIndex.getCaller(), bestIndex.getIndex());
+            return new ReplayFindIndexResult(bestIndex, false);
+        } else if (bestIndexRepeated != null) {
+            log.debug("Repeated match for reply: {}.{} {}", query.getCaller(), query.getType(), query.getTags());
+            return new ReplayFindIndexResult(mapper.clone(bestIndexRepeated), true);
         } else {
             log.debug("No match for reply: {}.{} {}", query.getCaller(), query.getType(), query.getTags());
+            return null;
         }
-        return bestIndex;
+
+    }
+
+    protected boolean verifyContentRepeatable(CompactLine index) {
+        return true;
     }
 
     /**

@@ -95,16 +95,16 @@ public class ServerConfig {
 
     }
 
-    public static void checkLegacyProperties(final System.Logger logger) {
+    public static void checkLegacyProperties(final System.Logger log) {
 
         // legacy properties that are no longer used
-        // print a warning to logger if they are set.
+        // print a warning to log if they are set.
 
         java.security.AccessController.doPrivileged(
                 (PrivilegedAction<Void>) () -> {
                     if (System.getProperty("sun.net.httpserver.readTimeout")
                             != null) {
-                        logger.log(System.Logger.Level.WARNING,
+                        log.log(System.Logger.Level.WARNING,
                                 "sun.net.httpserver.readTimeout " +
                                         "property is no longer used. " +
                                         "Use sun.net.httpserver.maxReqTime instead."
@@ -112,7 +112,7 @@ public class ServerConfig {
                     }
                     if (System.getProperty("sun.net.httpserver.writeTimeout")
                             != null) {
-                        logger.log(System.Logger.Level.WARNING,
+                        log.log(System.Logger.Level.WARNING,
                                 "sun.net.httpserver.writeTimeout " +
                                         "property is no longer used. Use " +
                                         "sun.net.httpserver.maxRspTime instead."
@@ -120,7 +120,7 @@ public class ServerConfig {
                     }
                     if (System.getProperty("sun.net.httpserver.selCacheTimeout")
                             != null) {
-                        logger.log(System.Logger.Level.WARNING,
+                        log.log(System.Logger.Level.WARNING,
                                 "sun.net.httpserver.selCacheTimeout " +
                                         "property is no longer used."
                         );

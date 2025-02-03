@@ -37,7 +37,7 @@ public class RedisPublishPlugin extends ProtocolPluginDescriptorBase<PluginSetti
     }
 
     @Override
-    protected ProtocolPluginApiHandler buildApiHandler() {
-        return new RedisPublishPluginApis(this, getId(), getInstanceId());
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new RedisPublishPluginApis(this, getId(), getInstanceId()));
     }
 }

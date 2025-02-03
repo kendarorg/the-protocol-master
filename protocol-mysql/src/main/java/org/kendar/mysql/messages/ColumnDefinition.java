@@ -47,72 +47,29 @@ public class ColumnDefinition extends MySQLReturnMessage {
     }
 
     private long getMaxColumnDisplaySize(JDBCType columnType) {
-        long value;
-        switch (columnType) {
-            case BOOLEAN:
-            case BIT:
-                value = 1;
-                break;
-            case BIGINT:
-            case INTEGER:
-            case SMALLINT:
-            case TINYINT:
-            case DOUBLE:
-            case FLOAT:
-            case DATE:
-            case TIME:
-            case TIME_WITH_TIMEZONE:
-            case TIMESTAMP:
-            case TIMESTAMP_WITH_TIMEZONE:
-                value = 32;
-                break;
-            default:
-                value = 999999999L;
-                break;
-        }
+        long value = switch (columnType) {
+            case BOOLEAN, BIT -> 1;
+            case BIGINT, INTEGER, SMALLINT, TINYINT, DOUBLE, FLOAT, DATE, TIME, TIME_WITH_TIMEZONE, TIMESTAMP,
+                 TIMESTAMP_WITH_TIMEZONE -> 32;
+            default -> 999999999L;
+        };
         return value;
     }
 
     private int toMysql(JDBCType columnType) {
-        MySQLType value;
-        switch (columnType) {
-            case BOOLEAN:
-            case BIT:
-                value = MySQLType.MYSQL_TYPE_BIT;
-                break;
-            case BIGINT:
-                value = MySQLType.MYSQL_TYPE_LONGLONG;
-                break;
-            case INTEGER:
-                value = MySQLType.MYSQL_TYPE_LONG;
-                break;
-            case SMALLINT:
-                value = MySQLType.MYSQL_TYPE_SHORT;
-                break;
-            case TINYINT:
-                value = MySQLType.MYSQL_TYPE_TINY;
-                break;
-            case DOUBLE:
-                value = MySQLType.MYSQL_TYPE_DOUBLE;
-                break;
-            case FLOAT:
-                value = MySQLType.MYSQL_TYPE_FLOAT;
-                break;
-            case DATE:
-                value = MySQLType.MYSQL_TYPE_DATE;
-                break;
-            case TIME:
-            case TIME_WITH_TIMEZONE:
-                value = MySQLType.MYSQL_TYPE_TIME;
-                break;
-            case TIMESTAMP:
-            case TIMESTAMP_WITH_TIMEZONE:
-                value = MySQLType.MYSQL_TYPE_TIMESTAMP;
-                break;
-            default:
-                value = MySQLType.MYSQL_TYPE_VAR_STRING;
-                break;
-        }
+        MySQLType value = switch (columnType) {
+            case BOOLEAN, BIT -> MySQLType.MYSQL_TYPE_BIT;
+            case BIGINT -> MySQLType.MYSQL_TYPE_LONGLONG;
+            case INTEGER -> MySQLType.MYSQL_TYPE_LONG;
+            case SMALLINT -> MySQLType.MYSQL_TYPE_SHORT;
+            case TINYINT -> MySQLType.MYSQL_TYPE_TINY;
+            case DOUBLE -> MySQLType.MYSQL_TYPE_DOUBLE;
+            case FLOAT -> MySQLType.MYSQL_TYPE_FLOAT;
+            case DATE -> MySQLType.MYSQL_TYPE_DATE;
+            case TIME, TIME_WITH_TIMEZONE -> MySQLType.MYSQL_TYPE_TIME;
+            case TIMESTAMP, TIMESTAMP_WITH_TIMEZONE -> MySQLType.MYSQL_TYPE_TIMESTAMP;
+            default -> MySQLType.MYSQL_TYPE_VAR_STRING;
+        };
         return value.getValue();
     }
 }

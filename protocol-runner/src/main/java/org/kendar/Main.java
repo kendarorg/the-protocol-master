@@ -13,12 +13,12 @@ import org.kendar.di.TpmScopeType;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.Sleeper;
@@ -159,8 +159,8 @@ public class Main {
 
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        var logger = loggerContext.getLogger("org.kendar");
-        logger.setLevel(Level.toLevel(logLevel, Level.ERROR));
+        var log = loggerContext.getLogger("org.kendar");
+        log.setLevel(Level.toLevel(logLevel, Level.ERROR));
         diService.register(FiltersConfiguration.class, new FiltersConfiguration());
         var apisFiltersLoader = diService.getInstance(ApiFiltersLoader.class);
 
@@ -191,7 +191,7 @@ public class Main {
                     apiHandler.addProtocol(pi);
                     for (var pl : pi.getPlugins()) {
                         var apiHandlerPlugin = pl.getApiHandler();
-                        apisFiltersLoader.getFilters().add(apiHandlerPlugin);
+                        apisFiltersLoader.getFilters().addAll(apiHandlerPlugin);
                     }
                     started.incrementAndGet();
                     ini.putService(item.getKey(), pi);
@@ -215,6 +215,12 @@ public class Main {
             try {
                 while (started.get() < ini.getProtocols().size()) {
                     Sleeper.sleep(100);
+                }
+                for (var item : protocolServersCache.values()) {
+                    var protocolFilter = item.getProtoDescriptor().getApiHandler();
+                    if (protocolFilter != null) {
+                        apisFiltersLoader.getFilters().addAll(protocolFilter);
+                    }
                 }
                 apisFiltersLoader.loadFilters();
                 if (ini.getApiPort() > 0) {
