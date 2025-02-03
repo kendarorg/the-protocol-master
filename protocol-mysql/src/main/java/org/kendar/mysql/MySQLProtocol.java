@@ -29,6 +29,7 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
 
     public MySQLProtocol(int port) {
         this.port = port;
+        setSettings(new MySqlProtocolSettings());
     }
 
     @Override
