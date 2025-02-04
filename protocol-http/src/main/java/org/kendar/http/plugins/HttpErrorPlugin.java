@@ -75,8 +75,8 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        var settings = getSettings();
-        errorSites = SiteMatcherUtils.setupSites(settings.getErrorSites());
+        super.initialize(global,protocol,pluginSetting);
+        errorSites = SiteMatcherUtils.setupSites(getSettings().getErrorSites());
         return this;
     }
 }

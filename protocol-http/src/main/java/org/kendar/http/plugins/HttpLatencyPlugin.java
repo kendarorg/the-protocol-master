@@ -28,8 +28,8 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyP
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        var settings = getSettings();
-        latencySites = SiteMatcherUtils.setupSites(settings.getLatencySites());
+        super.initialize(global, protocol, pluginSetting);
+        latencySites = SiteMatcherUtils.setupSites(getSettings().getLatencySites());
         return this;
     }
 

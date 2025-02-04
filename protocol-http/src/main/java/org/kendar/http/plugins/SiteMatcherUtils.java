@@ -7,6 +7,9 @@ import java.util.List;
 
 public class SiteMatcherUtils {
     public static List<MatchingRecRep> setupSites(List<String> errorSites) {
+        if(errorSites==null || errorSites.isEmpty()){
+            return new ArrayList<>();
+        }
         List<MatchingRecRep> destination = new ArrayList<>();
         destination.addAll(errorSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
