@@ -20,14 +20,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @TpmService(tags = "http")
 public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
-    private List<Pattern> sitesToLimit = new ArrayList<>();
+    private List<MatchingRecRep> sitesToLimit = new ArrayList<>();
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
@@ -54,7 +52,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
         var settings = getSettings();
-        setupSitesToLimit(settings.getLimitSites());
+        sitesToLimit = SiteMatcherUtils.setupSites(settings.getLimitSites());
         if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
             var frr = new FileResourcesUtils();
             customResponse = mapper.deserialize(frr.getFileFromResourceAsString(settings.getCustomResponseFile()), Response.class);
@@ -64,29 +62,11 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
-            if (!sitesToLimit.isEmpty()) {
-                var matchFound = false;
-                for (var pat : sitesToLimit) {
-                    if (pat.matcher(in.getHost()).matches()) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
-                        matchFound = true;
-                        break;
-                    }
-                }
-                if (!matchFound) {
-                    return false;
-                }
+            if(SiteMatcherUtils.matchSite(in, sitesToLimit)) {
+                return handleRateLimit(pluginContext, phase, in, out);
             }
-            return handleRateLimit(pluginContext, phase, in, out);
         }
         return false;
-    }
-
-    private void setupSitesToLimit(List<String> recordSites) {
-        this.sitesToLimit = recordSites.stream()
-                .map(String::trim).filter(s -> !s.isEmpty())
-                .map(regex -> regex.startsWith("@") ?
-                        Pattern.compile(regex.substring(1)) :
-                        Pattern.compile(Pattern.quote(regex))).collect(Collectors.toList());
     }
 
     @Override

@@ -39,6 +39,12 @@ All callback are replayed automatically
   default true)
 * blockExternal: Block calls to real service when not matching (default true)
 
+### publish-plugin
+
+* active: If it is active
+* Exposes the API to retrieve the current connections and if they are subscribed to something
+* Exposes the API to send a message to a currently active connection
+
 ## Missing features
 
 * [Inline commands](https://redis.io/docs/latest/develop/reference/protocol-spec/#inline-commands) issued via Telnet

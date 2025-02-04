@@ -60,28 +60,18 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
             if (phase == ProtocolPhase.PRE_CALL) {
                 var request = (Request) in;
                 var response = (Response) out;
-                if (!matchSites.isEmpty()) {
-                    var matchFound = false;
-                    for (var pat : matchSites) {
-                        if (pat.match(request.getHost() + request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
-                            matchFound = true;
-                            break;
+                if(SiteMatcherUtils.matchSite((Request)in, matchSites)) {
+                    var sent = doSend(pluginContext, request, response);
+                    if (!sent) {
+                        if (blockExternal) {
+                            response.setStatusCode(404);
+                            response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
+                            response.setResponseText(new TextNode("Page Not Found: " + request.getMethod() + " on " + request.buildUrl()));
+                            return true;
                         }
                     }
-                    if (!matchFound) {
-                        return false;
-                    }
+                    return sent;
                 }
-                var sent = doSend(pluginContext, request, response);
-                if (!sent) {
-                    if (blockExternal) {
-                        response.setStatusCode(404);
-                        response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
-                        response.setResponseText(new TextNode("Page Not Found: " + request.getMethod() + " on " + request.buildUrl()));
-                        return true;
-                    }
-                }
-                return sent;
             }
         }
         return false;
@@ -100,7 +90,6 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
     protected boolean doSend(PluginContext pluginContext, Request in, Response out) {
         var query = new CallItemsQuery();
-        var context = pluginContext.getContext();
 
         query.setCaller(pluginContext.getCaller());
         query.setType(in.getMethod());
@@ -148,18 +137,13 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
         return "http";
     }
 
-    private void setupMatchSites(List<String> recordSites) {
-        this.matchSites = recordSites.stream()
-                .map(String::trim).filter(s -> !s.isEmpty())
-                .map(MatchingRecRep::new).collect(Collectors.toList());
-    }
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
 
         blockExternal = getSettings().isBlockExternal();
-        setupMatchSites(getSettings().getMatchSites());
+        matchSites = SiteMatcherUtils.setupSites(getSettings().getMatchSites());
         return this;
     }
 

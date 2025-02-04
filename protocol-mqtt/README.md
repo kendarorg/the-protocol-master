@@ -42,7 +42,7 @@ All callback are replayed automatically
 
 ### publish-plugin
 
-* Should be activated
+* active: If it is active
 * Exposes the API to retrieve the current connections and if they are subscribed to something
 * Exposes the API to send a message to a currently active connection
 

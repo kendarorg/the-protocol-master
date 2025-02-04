@@ -43,6 +43,7 @@ without the need to mock a single request
 * active: If it is active
 * matchSites: list of matching ```hosts/path``` to replay. When empty everything is replayed. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
+  else exact match
 * respectCallDuration: respect the duration of the round trip
 * blockExternal: default to true, block any calls to not recorded website
 
@@ -51,6 +52,9 @@ without the need to mock a single request
 Generate random errors
 
 * active: If it is active
+* errorSites: list of matching ```hosts/path``` to generate errors on. When empty everything can generate errors. When prepending with @
+    uses regexp instead can use a simple string with * as wildcard
+    else exact match
 * showError: The error code to expose
 * errorMessage: the error message to write to output
 * errorPercent: the percent of calls to generate errors
@@ -59,6 +63,11 @@ Generate random errors
 
 Introduce random latency
 
+* active: If it is active
+* latencySites: list of matching ```hosts/path``` to apply latency on. When empty everything 
+  has latency. When prepending with @
+  uses regexp instead can use a simple string with * as wildcard
+  else exact match
 * minMs: Minimum latency added (default 0)
 * maxMs: Max latency added (default 0)
 
@@ -66,7 +75,10 @@ Introduce random latency
 
 Add the handling of throttling and rate limits
 
-* limitSites: list of matching hosts to throttle. When empty everything is replayed. When prepending with @ uses regexp
+* active: If it is active
+* limitSites: list of matching ```hosts/path``` to apply throttling on. When empty everything
+  has throttling. When prepending with @
+  uses regexp instead can use a simple string with * as wildcard
   else exact match
 * headerLimit: The header for the limit count (default RateLimit-Limit)
 * rateLimit: The limit count (default 120)
