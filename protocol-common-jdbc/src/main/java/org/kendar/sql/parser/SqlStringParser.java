@@ -85,9 +85,9 @@ public class SqlStringParser {
     }
 
     private SqlStringType inferType(String sql) {
-        var splitted = sql.trim().split("\\s+");
-        if (splitted.length != 0) {
-            var first = splitted[0].trim().toLowerCase(Locale.ROOT);
+        var split = sql.trim().split("\\s+");
+        if (split.length != 0) {
+            var first = split[0].trim().toLowerCase(Locale.ROOT);
             if (!first.isEmpty()) {
                 if (select.containsKey(first)) {
                     return select.get(first);
@@ -124,12 +124,12 @@ public class SqlStringParser {
 
     public List<String> parseSql(String input) {
         List<String> sqls = new ArrayList<>();
-        var splitted = parseString(input);
+        var split = parseString(input);
 
 
         String tempValue = "";
         var isProcedure = false;
-        for (var line : splitted) {
+        for (var line : split) {
             var trimmed = line.strip();
             if (trimmed.startsWith("'") || trimmed.startsWith("\"")) {
                 //Is a string

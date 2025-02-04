@@ -130,10 +130,10 @@ public class BasicTest {
 
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
-                var splittedDsp = dsp.split(",");
-                if (splittedDsp.length > 0) {
-                    if (splittedDsp[0].contains("DSC_")) {
-                        dsp = splittedDsp[0];
+                var splitDsp = dsp.split(",");
+                if (splitDsp.length > 0) {
+                    if (splitDsp[0].contains("DSC_")) {
+                        dsp = splitDsp[0];
                     }
                 }
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));

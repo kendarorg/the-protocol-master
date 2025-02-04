@@ -2,7 +2,8 @@
 
 ![](protocolmaster_s.gif)
 
-"The Protocol Master" is an infrastructure simulator to test effortlessy your app in minutes (with no coding) supporting
+"The Protocol Master" is an infrastructure simulator to test effortlessly your app in minutes (with no coding)
+supporting
 HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091 ... and all the compatible ones!
 
 * Simulate wrong scenarios
@@ -11,12 +12,12 @@ HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091 ... and all the co
 * Make untestable apps testable
 * Easy Chaos engineering
 
-Effortlessy and with zero budget
+Effortlessly and with zero budget
 
 ### Get Started
 
 Look at "[The Protocol Master Samples](https://github.com/kendarorg/the-protocol-master-samples)" repository to create
-a complete docker environment to have a gimplse of the features in
+a complete docker environment to have a glimpse of the features in
 various languages and environments
 
 * Python/MySQL/RabbitMQ
@@ -26,14 +27,14 @@ various languages and environments
 
 ### How it works
 
-It's simple it's a multiprotocol proxy on your box (or wetheaver you want)
-Independent from the stack you are using
+It's simple it's a `multiprotocol` proxy on your box (or whatever you want)
+Independent of the stack you are using
 
 ### Scenarios
 
 * Simulate what-if without hitting real servers
 * Testing resiliency, errors and wrong data
-* Security analisys (what goes on the wire)
+* Security analysis (what goes on the wire)
 * Test new APIs easily
 * Understand all consequences of changes
 
@@ -229,20 +230,20 @@ needed to simulate APIs, Database calls, and full scenarios, from UI to the DB.
 I started developing a series of docker container in PHP to intercept all incoming and outgoing HTTP/S call, with DNS
 server and certificates, you can find it [here](https://github.com/kendarorg/HttpAnsweringMachine.php).
 
-Becoming the thing too hard to cope with i started the development of a Java integrated version with fancy UI and all
+Becoming the thing too hard to cope with I started the development of a Java integrated version with fancy UI and all
 integrated service, the [HttpAnsweringMachine](https://github.com/kendarorg/HttpAnsweringMachine) based on Spring-Boot
 and leveraging a custom routing system, dns server and so on.
 
 But that was too really hard to interact with. I started developing a JDBC->HTTP->JDBC
 driver, [Janus-Jdbc](https://github.com/kendarorg/janus-jdbc) from scratch, then started creating a similar thing for
-.NET, thing went rogues in a short time with [Janus-Ado](https://github.com/kendarorg/janus-ado). But i started
+.NET, thing went rogues in a short time with [Janus-Ado](https://github.com/kendarorg/janus-ado). But I started
 understanding Postgres protocol.
 
 I started then with a command line utility to parse and translate binary protocols and that's how "The Protocol Master"
-was born. Always with a plugin-based architecture. Then i started adapting all the knowledge of HttpAnsweringMachine
+was born. Always with a plugin-based architecture. Then I started adapting all the knowledge of HttpAnsweringMachine
 inside it to handle HTTP/S.
 
-## If you like it Buy me a coffe :)
+## If you like it Buy me a coffee :)
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/paypalme/kendarorg/1)
 
@@ -267,6 +268,6 @@ correct type and then if the content is matching the signature.
 When a state is hit it can send events or response messages. When an execution runs
 without errors then the "executed incoming buffer" is purged from the received bytes
 
-The events are immediatly executed. If no bytes are present or there are not enough
+The events are immediately executed. If no bytes are present or there are not enough
 bytes to read, the events queue is seeked for "BytesEvent" and then the execution is
 retried.

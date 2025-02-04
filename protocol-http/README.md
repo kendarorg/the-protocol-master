@@ -33,7 +33,7 @@ The data will be stored in the global dataDir
 * recordSites: list of matching ```hosts/path``` to record. When empty everything is recorded. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
   else exact match
-* removeEtags: default to true, cleans all ETag-related fields to avoid caching
+* `removeEtags`: default to true, cleans all ETag-related fields to avoid caching
 
 ### replay-plugin
 
@@ -43,6 +43,7 @@ without the need to mock a single request
 * active: If it is active
 * matchSites: list of matching ```hosts/path``` to replay. When empty everything is replayed. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
+  else exact match
 * respectCallDuration: respect the duration of the round trip
 * blockExternal: default to true, block any calls to not recorded website
 
@@ -51,6 +52,10 @@ without the need to mock a single request
 Generate random errors
 
 * active: If it is active
+* errorSites: list of matching ```hosts/path``` to generate errors on. When empty everything can generate errors. When
+  prepending with @
+  uses regexp instead can use a simple string with * as wildcard
+  else exact match
 * showError: The error code to expose
 * errorMessage: the error message to write to output
 * errorPercent: the percent of calls to generate errors
@@ -59,6 +64,11 @@ Generate random errors
 
 Introduce random latency
 
+* active: If it is active
+* latencySites: list of matching ```hosts/path``` to apply latency on. When empty everything
+  has latency. When prepending with @
+  uses regexp instead can use a simple string with * as wildcard
+  else exact match
 * minMs: Minimum latency added (default 0)
 * maxMs: Max latency added (default 0)
 
@@ -66,7 +76,10 @@ Introduce random latency
 
 Add the handling of throttling and rate limits
 
-* limitSites: list of matching hosts to throttle. When empty everything is replayed. When prepending with @ uses regexp
+* active: If it is active
+* limitSites: list of matching ```hosts/path``` to apply throttling on. When empty everything
+  has throttling. When prepending with @
+  uses regexp instead can use a simple string with * as wildcard
   else exact match
 * headerLimit: The header for the limit count (default RateLimit-Limit)
 * rateLimit: The limit count (default 120)
@@ -77,7 +90,7 @@ Add the handling of throttling and rate limits
 * resetFormat: Format of the headerReset value (default secondsLeft, can be utcEpochSeconds)
 * headerRetryAfter: Header for seconds after which should retry (default Retry-After)
 * resetTimeWindowSeconds: When counters are reset
-* customResponseFile: Custom response file to use instead of reponse (see
+* customResponseFile: Custom response file to use instead of response (see
   an [example](src/test/resources/ratelimitresponse.json))
 
 ### mock-plugin
@@ -96,7 +109,7 @@ The mocks can be parametrized using ${variableName} format inside
 
 * Query: setting a value to ${myQueryVariable}
 * Header: setting a value to ${myHeaderVariable}
-* Path: e.g. /jsonized/${myPathVariable}/wetheaver
+* Path: e.g. `/jsonized/${myPathVariable}/wetheaver`
 
 These variable are assigned taking the value from the real request and are modified
 inside the headers and the content (when textual). For example the mocked response
@@ -111,7 +124,7 @@ This is useful to generate "dynamic" responses
 
 ### rewrite-plugin
 
-To change some call, for example to rewrite all call to localhost/microservice.1/* to remoteserice.com/*
+To change some call, for example to rewrite all call to `localhost/microservice.1/*` to `remoteservice.com/*`
 This can be used to avoid configuring the proxy on the application
 
 The recording will contain the target address!
@@ -119,7 +132,7 @@ The recording will contain the target address!
 * active: If it is active
 * rewritesFile: the json file containing the rewrites
 
-The format, is the following. When settings a regexp the replacements (like $1 etc)
+The format, is the following. When settings a regexp the replacements (like $1 etc.)
 can be used. Please remind that what follows the founded request is added at the end!
 
 ```
@@ -152,4 +165,4 @@ on a custom reimplementation of standard Java HttpServer and HttpsServer to
 allow changing the SSL certificates in runtime.
 
 A custom http/s proxy had been used to mask external servers and allow
-intercepting external resources like a MITM (Man In The Middle) attack.
+intercepting external resources like a `MITM` (Man In The Middle) attack.

@@ -1,6 +1,6 @@
 # AMQP 0.9.1 Protocol
 
-Create a two way transparent proxy to a remote amqp 0.9.1 compatible server.
+Create a two-way transparent proxy to a remote amqp 0.9.1 compatible server.
 
 ## Configuration
 

@@ -4,8 +4,12 @@ import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
@@ -15,8 +19,18 @@ import java.util.Random;
 @TpmService(tags = "http")
 public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyPluginSettings> {
 
+    private List<MatchingRecRep> latencySites;
+
     public HttpLatencyPlugin(JsonMapper mapper) {
         super(mapper);
+    }
+
+
+    @Override
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+        latencySites = SiteMatcherUtils.setupSites(getSettings().getLatencySites());
+        return this;
     }
 
     @Override
@@ -26,11 +40,13 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyP
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
-            HttpLatencyPluginSettings s = getSettings();
-            Random r = new Random();
-            int waitMs = r.nextInt(s.getMaxMs() - s.getMinMs()) + s.getMinMs();
-            if (waitMs > 0) {
-                Sleeper.sleep(waitMs);
+            if (SiteMatcherUtils.matchSite(in, latencySites)) {
+                HttpLatencyPluginSettings s = getSettings();
+                Random r = new Random();
+                int waitMs = r.nextInt(s.getMaxMs() - s.getMinMs()) + s.getMinMs();
+                if (waitMs > 0) {
+                    Sleeper.sleep(waitMs);
+                }
             }
         }
         return false;

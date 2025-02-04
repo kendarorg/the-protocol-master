@@ -242,11 +242,11 @@ public abstract class ProtoDescriptor {
         return List.of();
     }
 
-    public void setSettings(ProtocolSettings settings) {
-        this.settings = settings;
-    }
-
     public ProtocolSettings getSettings() {
         return settings;
+    }
+
+    public void setSettings(ProtocolSettings settings) {
+        this.settings = settings;
     }
 }

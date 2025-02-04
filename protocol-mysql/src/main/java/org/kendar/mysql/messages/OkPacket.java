@@ -139,21 +139,21 @@ public class OkPacket extends MySQLReturnMessage {
                 resultBuffer.writeWithLength(info.getBytes());
                 //resultBuffer.write((byte)0);
             } else {
-                if(force3BytesOkPacketInfo){
-                    resultBuffer.writeWithLength(new byte[]{0,0,0});
+                if (force3BytesOkPacketInfo) {
+                    resultBuffer.writeWithLength(new byte[]{0, 0, 0});
 
-                }else {
+                } else {
                     resultBuffer.writeWithLength(new byte[0]);
                 }
             }
         }
     }
 
-    public void setForce3BytesOkPacketInfo(boolean force3BytesOkPacketInfo) {
-        this.force3BytesOkPacketInfo = force3BytesOkPacketInfo;
-    }
-
     public boolean isForce3BytesOkPacketInfo() {
         return force3BytesOkPacketInfo;
+    }
+
+    public void setForce3BytesOkPacketInfo(boolean force3BytesOkPacketInfo) {
+        this.force3BytesOkPacketInfo = force3BytesOkPacketInfo;
     }
 }

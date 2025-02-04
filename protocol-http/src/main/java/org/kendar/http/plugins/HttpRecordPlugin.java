@@ -42,38 +42,22 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     protected void postCall(PluginContext pluginContext, Object in, Object out) {
         var request = (Request) in;
-        if (!recordSites.isEmpty()) {
-            var matchFound = false;
-            for (var pat : recordSites) {
-                if (pat.match(request.getHost() + request.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
-                    matchFound = true;
-                    break;
-                }
+        if (SiteMatcherUtils.matchSite((Request) in, recordSites)) {
+            var settings = (HttpRecordPluginSettings) getSettings();
+            if (settings.isRemoveEtags()) {
+                var all = request.getHeader("If-none-match");
+                if (all != null && !all.isEmpty()) all.clear();
+                all = request.getHeader("If-match");
+                if (all != null && !all.isEmpty()) all.clear();
+                all = request.getHeader("If-modified-since");
+                if (all != null && !all.isEmpty()) all.clear();
+                all = request.getHeader("ETag");
+                if (all != null && !all.isEmpty()) all.clear();
             }
-            if (!matchFound) {
-                return;
-            }
+            super.postCall(pluginContext, in, out);
         }
-        var settings = (HttpRecordPluginSettings) getSettings();
-        if (settings.isRemoveEtags()) {
-            var all = request.getHeader("If-none-match");
-            if (all != null && !all.isEmpty()) all.clear();
-            all = request.getHeader("If-match");
-            if (all != null && !all.isEmpty()) all.clear();
-            all = request.getHeader("If-modified-since");
-            if (all != null && !all.isEmpty()) all.clear();
-            all = request.getHeader("ETag");
-            if (all != null && !all.isEmpty()) all.clear();
-        }
-        super.postCall(pluginContext, in, out);
     }
 
-
-    private void setupSitesToRecord(List<String> recordSites) {
-        this.recordSites = recordSites.stream()
-                .map(String::trim).filter(s -> !s.isEmpty())
-                .map(MatchingRecRep::new).collect(Collectors.toList());
-    }
 
     @Override
     public Map<String, String> buildTag(StorageItem item) {
@@ -92,7 +76,7 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        setupSitesToRecord(getSettings().getRecordSites());
+        recordSites = SiteMatcherUtils.setupSites(getSettings().getRecordSites());
         return this;
     }
 }
