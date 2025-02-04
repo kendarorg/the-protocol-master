@@ -15,6 +15,8 @@ import org.kendar.redis.Resp3Context;
 import org.kendar.redis.api.dto.PublishRedisMessage;
 import org.kendar.redis.api.dto.RedisConnection;
 import org.kendar.redis.fsm.events.Resp3Message;
+import org.kendar.redis.parser.Resp3ParseException;
+import org.kendar.redis.parser.Resp3Parser;
 import org.kendar.redis.plugins.RedisPublishPlugin;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import static org.kendar.apis.ApiUtils.respondJson;
 
 @HttpTypeFilter()
 public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<RedisPublishPlugin> {
+    private final Resp3Parser parser = new Resp3Parser();
     public RedisPublishPluginApis(RedisPublishPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);
 
@@ -87,7 +90,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
                     description = "In case of errors"
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
-    public void publish(Request request, Response response) {
+    public void publish(Request request, Response response) throws Resp3ParseException {
         var messageData = mapper.deserialize(request.getRequestText().toString(), PublishRedisMessage.class);
         var connectionId = Integer.parseInt(request.getPathParameter("connectionId"));
         var queueu = request.getPathParameter("queue");
@@ -95,7 +98,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
         doPublish(messageData, connectionId, queueu);
     }
 
-    public void doPublish(PublishRedisMessage messageData, int connectionId, String queue) {
+    public void doPublish(PublishRedisMessage messageData, int connectionId, String queue) throws Resp3ParseException {
         var pInstance = getDescriptor().getProtocolInstance();
         String dataToSend = messageData.getBody();
 
@@ -104,8 +107,9 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
             if (connectionId != -1 && connectionId != contxtKvp.getKey()) {
                 continue;
             }
-            var message = new Resp3Message(context, null,
-                    mapper.toJsonNode(List.of("message", queue, dataToSend)));
+            var data = List.of("message", queue, dataToSend);
+            var string = parser.serialize(mapper.toJsonNode(data));
+            var message = new Resp3Message(context,null,data ,string);
             context.write(message);
         }
 

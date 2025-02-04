@@ -104,6 +104,9 @@ to check how they are handled:
 
 ### Notes on serialization
 
+The string seems always serialized as "complex string" prefixed with 
+$count\r\ncontent instead of using +content
+
 The serialization to json has some differences from the standard one, this because
 there is no direct matching for standard java collection. Therefore there are
 "magic keys" on the collections to identify them. E.G.

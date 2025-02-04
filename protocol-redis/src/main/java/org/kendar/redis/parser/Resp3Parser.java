@@ -414,11 +414,11 @@ public class Resp3Parser {
                 return "_" + "\r\n";
             } else if (valNode.isTextual()) {
                 var text = valNode.asText();
-                if (text.contains("\r") || text.indexOf("\n") > 0) {
+                //if (text.contains("\r") || text.indexOf("\n") > 0) {
                     return "$" + text.length() + "\r\n" + text + "\r\n";
-                } else {
-                    return "+" + text + "\r\n";
-                }
+                //} else {
+                //    return "+" + text + "\r\n";
+                //}
             }
         } else if (jsonNode.isObject()) {
             var objNode = (ObjectNode) jsonNode;
