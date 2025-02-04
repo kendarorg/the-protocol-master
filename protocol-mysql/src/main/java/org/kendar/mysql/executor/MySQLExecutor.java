@@ -56,7 +56,7 @@ public class MySQLExecutor {
         ((JdbcProxy) mysqlContext.getProxy()).executeCommit(protoContext);
         protoContext.setValue("TRANSACTION", false);
         var ok = new OkPacket();
-        var force3Bytes = ((MySqlProtocolSettings)protoContext.getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
+        var force3Bytes = ((MySqlProtocolSettings) protoContext.getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
         ok.setForce3BytesOkPacketInfo(force3Bytes);
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());
         return ProtoState.iteratorOfList(ok);
@@ -67,7 +67,7 @@ public class MySQLExecutor {
         ((JdbcProxy) mysqlContext.getProxy()).executeRollback(protoContext);
         protoContext.setValue("TRANSACTION", false);
         var ok = new OkPacket();
-        var force3Bytes = ((MySqlProtocolSettings)protoContext.getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
+        var force3Bytes = ((MySqlProtocolSettings) protoContext.getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
         ok.setForce3BytesOkPacketInfo(force3Bytes);
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());
         return ProtoState.iteratorOfList(ok);
@@ -78,7 +78,7 @@ public class MySQLExecutor {
         ((JdbcProxy) mysqlContext.getProxy()).executeBegin(protoContext);
         protoContext.setValue("TRANSACTION", true);
         var ok = new OkPacket();
-        var force3Bytes = ((MySqlProtocolSettings)protoContext.getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
+        var force3Bytes = ((MySqlProtocolSettings) protoContext.getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
         ok.setForce3BytesOkPacketInfo(force3Bytes);
         ok.setStatusFlags(StatusFlag.SERVER_STATUS_IN_TRANS.getCode());
         return ProtoState.iteratorOfList(ok);
@@ -275,7 +275,7 @@ public class MySQLExecutor {
                     withPacketNumber(++packetNumber));
         } else {
             var okPacket = new OkPacket();
-            var force3Bytes = ((MySqlProtocolSettings)protoContext.getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
+            var force3Bytes = ((MySqlProtocolSettings) protoContext.getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
             okPacket.setForce3BytesOkPacketInfo(force3Bytes);
             okPacket.setStatusFlags(0x022); //TODO
             okPacket.setWarnings(0);

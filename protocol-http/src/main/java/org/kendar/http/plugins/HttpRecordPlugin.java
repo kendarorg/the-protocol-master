@@ -42,7 +42,7 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     protected void postCall(PluginContext pluginContext, Object in, Object out) {
         var request = (Request) in;
-        if(SiteMatcherUtils.matchSite((Request)in, recordSites)) {
+        if (SiteMatcherUtils.matchSite((Request) in, recordSites)) {
             var settings = (HttpRecordPluginSettings) getSettings();
             if (settings.isRemoveEtags()) {
                 var all = request.getHeader("If-none-match");
@@ -57,7 +57,6 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
             super.postCall(pluginContext, in, out);
         }
     }
-
 
 
     @Override

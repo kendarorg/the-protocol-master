@@ -162,7 +162,7 @@ When is set to 1 (one) then the data inserted MUST NOT be returned
 
 ### Sp and function calls (jdbc)
 
-Calling sp or functions add around the call the following and set up the out param rebuilding everything 
+Calling sp or functions add around the call the following and set up the out param rebuilding everything
 MANUALLY in Parser::modifyJdbcCall. The out parameter is diabolically reintegrated!
 
 ```

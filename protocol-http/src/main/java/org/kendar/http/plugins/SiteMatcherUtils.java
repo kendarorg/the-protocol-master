@@ -7,7 +7,7 @@ import java.util.List;
 
 public class SiteMatcherUtils {
     public static List<MatchingRecRep> setupSites(List<String> errorSites) {
-        if(errorSites==null || errorSites.isEmpty()){
+        if (errorSites == null || errorSites.isEmpty()) {
             return new ArrayList<>();
         }
         List<MatchingRecRep> destination = new ArrayList<>();
@@ -24,7 +24,7 @@ public class SiteMatcherUtils {
 
         var matchFound = false;
         for (var pat : sites) {
-            if (pat.match(site.getHost()+site.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
+            if (pat.match(site.getHost() + site.getPath())) {// || pat.toString().equalsIgnoreCase(request.getHost())) {
                 matchFound = true;
                 break;
             }

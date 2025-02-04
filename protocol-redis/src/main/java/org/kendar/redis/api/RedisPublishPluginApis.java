@@ -28,6 +28,7 @@ import static org.kendar.apis.ApiUtils.respondJson;
 @HttpTypeFilter()
 public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<RedisPublishPlugin> {
     private final Resp3Parser parser = new Resp3Parser();
+
     public RedisPublishPluginApis(RedisPublishPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);
 
@@ -109,7 +110,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
             }
             var data = List.of("message", queue, dataToSend);
             var string = parser.serialize(mapper.toJsonNode(data));
-            var message = new Resp3Message(context,null,data ,string);
+            var message = new Resp3Message(context, null, data, string);
             context.write(message);
         }
 

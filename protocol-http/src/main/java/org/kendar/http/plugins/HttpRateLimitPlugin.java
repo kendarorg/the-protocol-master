@@ -61,7 +61,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
-            if(SiteMatcherUtils.matchSite(in, sitesToLimit)) {
+            if (SiteMatcherUtils.matchSite(in, sitesToLimit)) {
                 return handleRateLimit(pluginContext, phase, in, out);
             }
         }

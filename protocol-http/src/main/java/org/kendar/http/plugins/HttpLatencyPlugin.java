@@ -40,7 +40,7 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyP
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (isActive()) {
-            if(SiteMatcherUtils.matchSite(in, latencySites)) {
+            if (SiteMatcherUtils.matchSite(in, latencySites)) {
                 HttpLatencyPluginSettings s = getSettings();
                 Random r = new Random();
                 int waitMs = r.nextInt(s.getMaxMs() - s.getMinMs()) + s.getMinMs();

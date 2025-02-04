@@ -415,7 +415,7 @@ public class Resp3Parser {
             } else if (valNode.isTextual()) {
                 var text = valNode.asText();
                 //if (text.contains("\r") || text.indexOf("\n") > 0) {
-                    return "$" + text.length() + "\r\n" + text + "\r\n";
+                return "$" + text.length() + "\r\n" + text + "\r\n";
                 //} else {
                 //    return "+" + text + "\r\n";
                 //}

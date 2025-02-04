@@ -52,9 +52,10 @@ without the need to mock a single request
 Generate random errors
 
 * active: If it is active
-* errorSites: list of matching ```hosts/path``` to generate errors on. When empty everything can generate errors. When prepending with @
-    uses regexp instead can use a simple string with * as wildcard
-    else exact match
+* errorSites: list of matching ```hosts/path``` to generate errors on. When empty everything can generate errors. When
+  prepending with @
+  uses regexp instead can use a simple string with * as wildcard
+  else exact match
 * showError: The error code to expose
 * errorMessage: the error message to write to output
 * errorPercent: the percent of calls to generate errors
@@ -64,7 +65,7 @@ Generate random errors
 Introduce random latency
 
 * active: If it is active
-* latencySites: list of matching ```hosts/path``` to apply latency on. When empty everything 
+* latencySites: list of matching ```hosts/path``` to apply latency on. When empty everything
   has latency. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
   else exact match

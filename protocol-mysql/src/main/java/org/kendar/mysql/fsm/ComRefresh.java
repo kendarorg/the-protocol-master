@@ -21,7 +21,7 @@ public class ComRefresh extends ProtoState {
     }
 
     public Iterator<ProtoStep> execute(CommandEvent event) {
-        var force3Bytes = ((MySqlProtocolSettings)event.getContext().getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
+        var force3Bytes = ((MySqlProtocolSettings) event.getContext().getDescriptor().getSettings()).isForce3BytesOkPacketInfo();
         var toSend = new OkPacket();
         toSend.setForce3BytesOkPacketInfo(force3Bytes);
         toSend.setPacketNumber(1);

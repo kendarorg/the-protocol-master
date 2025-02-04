@@ -60,7 +60,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
             if (phase == ProtocolPhase.PRE_CALL) {
                 var request = (Request) in;
                 var response = (Response) out;
-                if(SiteMatcherUtils.matchSite((Request)in, matchSites)) {
+                if (SiteMatcherUtils.matchSite((Request) in, matchSites)) {
                     var sent = doSend(pluginContext, request, response);
                     if (!sent) {
                         if (blockExternal) {

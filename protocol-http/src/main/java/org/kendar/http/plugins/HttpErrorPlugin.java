@@ -22,9 +22,6 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
 
     private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
 
-
-
-    private HttpErrorPluginSettings settings;
     private List<MatchingRecRep> errorSites;
 
     public HttpErrorPlugin(JsonMapper mapper) {
@@ -54,13 +51,13 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
         if (!isActive()) return false;
-        if(SiteMatcherUtils.matchSite(request, errorSites)) {
-            var pc = ((double) settings.getErrorPercent()) / 100.0;
+        if (SiteMatcherUtils.matchSite(request, errorSites)) {
+            var pc = ((double) getSettings().getErrorPercent()) / 100.0;
             if (Math.random() < pc) {
 
                 log.info("Faking ERROR {} {}", request.getMethod(), request.buildUrl());
-                response.setStatusCode(settings.getShowError());
-                response.setResponseText(new TextNode(settings.getErrorMessage()));
+                response.setStatusCode(getSettings().getShowError());
+                response.setResponseText(new TextNode(getSettings().getErrorMessage()));
                 return true;
             }
         }
@@ -69,13 +66,8 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
     }
 
     @Override
-    public HttpErrorPluginSettings getSettings() {
-        return settings;
-    }
-
-    @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global,protocol,pluginSetting);
+        super.initialize(global, protocol, pluginSetting);
         errorSites = SiteMatcherUtils.setupSites(getSettings().getErrorSites());
         return this;
     }
