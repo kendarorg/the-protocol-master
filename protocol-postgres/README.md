@@ -2,7 +2,7 @@
 
 You can directly use the "proxy" as a normal postgres backend
 This protocol can be used as a "drop-in" replacement since the
-"special queries" like commit, savepoints etc are translate to JDBC and
+"special queries" like commit, save points etc. are translate to JDBC and
 not left as they are. So you can use this protocol to proxy and log a
 connection even with Oracle or SQLServer
 
@@ -49,7 +49,7 @@ The mock files are exactly like the recorded files with an addition of a few fie
 
 The mocks can be parametrized using ${variableName} format inside
 
-* Query: e.g. SELECT ADDRESS,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=${age}
+* Query: e.g. `SELECT ADDRESS,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=${age}`
 * Parameter: setting a value to ${myParameterVariable}
 
 These variable are assigned taking the value from the real request and are modified
@@ -71,7 +71,7 @@ This is useful to generate "dynamic" responses
 
 ### rewrite-plugin
 
-To change some call, for example to rewrite all call to localhost/microservice.1/* to remoteserice.com/*
+To change some call, for example to rewrite all call to `localhost/microservice.1/*` to `remoteservice.com/*`
 This can be used to avoid configuring the proxy on the application
 
 The recording will contain the target address!
@@ -79,7 +79,7 @@ The recording will contain the target address!
 * active: If it is active
 * rewritesFile: the json file containing the rewrites
 
-The format, is the following. When settings a regexp the replacements (like $1 etc)
+The format, is the following. When settings a regexp the replacements (like $1 etc.)
 can be used.
 
 ```
@@ -101,7 +101,7 @@ An example of complex regexp
 ### Connect to different servers
 
 Leveraging on rewrite and mock plugin it is possible to connect to any kind of db
-just replacing the queries (or adding them as mocks if tables are not available.
+just replacing the queries (or adding them as mocks if tables are not available).
 
 For example calling the following
 
@@ -124,7 +124,7 @@ If you are interested check the tutorial [Postgres to Oracle Bridge](../docs/pos
 ## Missing features
 
 * Real authentication (always allowed)
-* Savepoints (NOT TRANSLATED TO JDBC)
+* `Savepoints` (NOT TRANSLATED TO JDBC)
 * Replication protocol
 * Messages
     * CancelRequest
@@ -140,9 +140,9 @@ If you are interested check the tutorial [Postgres to Oracle Bridge](../docs/pos
 * https://www.instaclustr.com/blog/postgresql-data-types-mappings-to-sql-jdbc-and-java-data-types/
 * https://beta.pgcon.org/2014/schedule/attachments/330_postgres-for-the-wire.pdf
 
-## Interesting informations
+## Interesting information
 
-Several messages exists with the same code, but they have different directions
+Several messages exist with the same code, but they have different directions
 
 The indication on 0/1 or >1 on bind is fake. all work correctly
 
@@ -162,8 +162,8 @@ When is set to 1 (one) then the data inserted MUST NOT be returned
 
 ### Sp and function calls (jdbc)
 
-Calling sp or functions add around the call the following and setup the out param rebuilding everything -BY HAND-
-in Parser::modifyJdbcCall. The out parameter is diabolically reintegrated!
+Calling sp or functions add around the call the following and set up the out param rebuilding everything 
+MANUALLY in Parser::modifyJdbcCall. The out parameter is diabolically reintegrated!
 
 ```
       prefix = "select * from ";
@@ -172,29 +172,29 @@ in Parser::modifyJdbcCall. The out parameter is diabolically reintegrated!
 
 ### Numeric format
 
-varlen is not present in any of the 7.4 on-the-wire formats. According
-to numeric_recv,
+`varlen` is not present in any of the 7.4 on-the-wire formats. According
+to `numeric_recv`,
 
 * External format is a sequence of int16's:
-* ndigits, weight, sign, dscale, NumericDigits.
+* `ndigits`, `weight`, `sign`, `dscale`, `NumericDigits`.
 
 Some other relevant comments are
 
 * The value represented by a NumericVar is determined by the sign, weight,
-* ndigits, and digits[] array.
-* Note: the first digit of a NumericVar's value is assumed to be multiplied
-* by NBASE ** weight. Another way to say it is that there are weight+1
+* `ndigits`, and `digits[]` array.
+* Note: the first digit of a `NumericVar`'s value is assumed to be multiplied
+* by `NBASE` ** weight. Another way to say it is that there are weight+1
 * digits before the decimal point. It is possible to have weight < 0.
 
 
-* dscale, or display scale, is the nominal precision expressed as number
+* `dscale`, or display scale, is the nominal precision expressed as number
 * of digits after the decimal point (it must always be >= 0 at present).
-* dscale may be more than the number of physically stored fractional
+* `dscale` may be more than the number of physically stored fractional
   digits,
 * implying that we have suppressed storage of significant trailing zeroes.
 * It should never be less than the number of stored digits, since that
   would
-* imply hiding digits that are present. NOTE that dscale is always
+* imply hiding digits that are present. NOTE that `dscale` is always
   expressed
 * in *decimal* digits, and so it may correspond to a fractional number of
 

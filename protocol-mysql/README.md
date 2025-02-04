@@ -51,7 +51,7 @@ The mock files are exactly like the recorded files with an addition of a few fie
 
 The mocks can be parametrized using ${variableName} format inside
 
-* Query: e.g. SELECT ADDRESS,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=${age}
+* Query: e.g. `SELECT ADDRESS,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=${age}`
 * Parameter: setting a value to ${myParameterVariable}
 
 These variable are assigned taking the value from the real request and are modified
@@ -73,7 +73,7 @@ This is useful to generate "dynamic" responses
 
 ### rewrite-plugin
 
-To change some call, for example to rewrite all call to localhost/microservice.1/* to remoteserice.com/*
+To change some call, for example to rewrite all call to `localhost/microservice.1/*` to `remoteservice.com/*`
 This can be used to avoid configuring the proxy on the application
 
 The recording will contain the target address!
@@ -81,7 +81,7 @@ The recording will contain the target address!
 * active: If it is active
 * rewritesFile: the json file containing the rewrites
 
-The format, is the following. When settings a regexp the replacements (like $1 etc)
+The format, is the following. When settings a regexp the replacements (like $1 etc.)
 can be used.
 
 ```
@@ -103,7 +103,7 @@ An example of complex regexp
 ## Missing features
 
 * Real authentication (always allowed)
-* Multi-Resultset
+* `Multi-Resultset`
 * Replication Protocol
 * Commands
     * COM_QUIT
@@ -137,7 +137,7 @@ An example of complex regexp
 * https://learning.oreilly.com/library/view/understanding-mysql-internals/0596009577/ch04.html
 * https://clickhouse.com/codebrowser/ClickHouse/contrib/mariadb-connector-c/include/mariadb_com.h.html#319
 
-## Interesting informations
+## Interesting information
 
 MYSQL_TYPE_MEDIUMINT seems not existing (from docs)
 
@@ -147,7 +147,7 @@ not considered by the 8.x connector
 When using aliases the column name returned by the column descriptor MUST be
 the alias AND NOT THE COLUMN NAME
 
-The packet number is used to define the steps of the "subprotocols" (e.g. query
+The packet number is used to define the steps of the "sub protocols" (e.g. query
 and its response)
 
 .NET uses the get last row id
@@ -173,7 +173,7 @@ Double and floats follows the IEEE 754 floating-point value in Little-endian
 format on 8 or 4 bytes.
 
 When using the binary protocol (prepared statements)...everything is transmitted
-as string.. as with text protocol (cached statement) there is now no point in
+as string... as with text protocol (cached statement) there is now no point in
 using that approach. Only the parameters of the PS are sent in "compact mysql format"
 
 ### Generated keys and returning data

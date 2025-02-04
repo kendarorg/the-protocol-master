@@ -37,7 +37,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(NetworkProtoContext.class);
     private final List<Runnable> runnables = new ArrayList<>();
     /**
-     * If had sent the greeting message (to send data immediatly after connection without further ado)
+     * If had sent the greeting message (to send data immediately after connection without further ado)
      */
     private boolean greetingsSent = false;
     /**

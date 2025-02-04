@@ -186,8 +186,8 @@ public class FileResourcesUtils {
      * @param path /C:/Private/HttpAnsweringMachine/ham/libs/docker.builder-2.1.3.jar
      */
     private void loadNestedJar(String path, HashMap<String, Object> result, ClassLoader classLoader, File jarFile, ArrayList<String> ress) throws IOException {
-        var splitted = jarFile.getPath().split("!");
-        var rootFilePath = splitted[0].substring(5);
+        var split = jarFile.getPath().split("!");
+        var rootFilePath = split[0].substring(5);
         var rootFile = new File(rootFilePath);
         log.debug("Loading nested jar  with path {}", jarFile);
         loadFromJar(path, result, classLoader, rootFile, ress, "BOOT-INF/classes");

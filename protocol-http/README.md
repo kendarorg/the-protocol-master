@@ -33,7 +33,7 @@ The data will be stored in the global dataDir
 * recordSites: list of matching ```hosts/path``` to record. When empty everything is recorded. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
   else exact match
-* removeEtags: default to true, cleans all ETag-related fields to avoid caching
+* `removeEtags`: default to true, cleans all ETag-related fields to avoid caching
 
 ### replay-plugin
 
@@ -89,7 +89,7 @@ Add the handling of throttling and rate limits
 * resetFormat: Format of the headerReset value (default secondsLeft, can be utcEpochSeconds)
 * headerRetryAfter: Header for seconds after which should retry (default Retry-After)
 * resetTimeWindowSeconds: When counters are reset
-* customResponseFile: Custom response file to use instead of reponse (see
+* customResponseFile: Custom response file to use instead of response (see
   an [example](src/test/resources/ratelimitresponse.json))
 
 ### mock-plugin
@@ -108,7 +108,7 @@ The mocks can be parametrized using ${variableName} format inside
 
 * Query: setting a value to ${myQueryVariable}
 * Header: setting a value to ${myHeaderVariable}
-* Path: e.g. /jsonized/${myPathVariable}/wetheaver
+* Path: e.g. `/jsonized/${myPathVariable}/wetheaver`
 
 These variable are assigned taking the value from the real request and are modified
 inside the headers and the content (when textual). For example the mocked response
@@ -123,7 +123,7 @@ This is useful to generate "dynamic" responses
 
 ### rewrite-plugin
 
-To change some call, for example to rewrite all call to localhost/microservice.1/* to remoteserice.com/*
+To change some call, for example to rewrite all call to `localhost/microservice.1/*` to `remoteservice.com/*`
 This can be used to avoid configuring the proxy on the application
 
 The recording will contain the target address!
@@ -131,7 +131,7 @@ The recording will contain the target address!
 * active: If it is active
 * rewritesFile: the json file containing the rewrites
 
-The format, is the following. When settings a regexp the replacements (like $1 etc)
+The format, is the following. When settings a regexp the replacements (like $1 etc.)
 can be used. Please remind that what follows the founded request is added at the end!
 
 ```
@@ -164,4 +164,4 @@ on a custom reimplementation of standard Java HttpServer and HttpsServer to
 allow changing the SSL certificates in runtime.
 
 A custom http/s proxy had been used to mask external servers and allow
-intercepting external resources like a MITM (Man In The Middle) attack.
+intercepting external resources like a `MITM` (Man In The Middle) attack.

@@ -11,12 +11,12 @@ HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091 ... and all the co
 * Make untestable apps testable
 * Easy Chaos engineering
 
-Effortlessy and with zero budget
+Effortlessly and with zero budget
 
 ### Get Started
 
 Look at "[The Protocol Master Samples](https://github.com/kendarorg/the-protocol-master-samples)" repository to create
-a complete docker environment to have a gimplse of the features in
+a complete docker environment to have a glimpse of the features in
 various languages and environments
 
 * Python/MySQL/RabbitMQ
@@ -26,14 +26,14 @@ various languages and environments
 
 ### How it works
 
-It's simple it's a multiprotocol proxy on your box (or wetheaver you want)
-Independent from the stack you are using
+It's simple it's a multi protocol proxy on your box (or whatever you want)
+Independent of the stack you are using
 
 ### Scenarios
 
 * Simulate what-if without hitting real servers
 * Testing resiliency, errors and wrong data
-* Security analisys (what goes on the wire)
+* Security analysis (what goes on the wire)
 * Test new APIs easily
 * Understand all consequences of changes
 
@@ -267,6 +267,6 @@ correct type and then if the content is matching the signature.
 When a state is hit it can send events or response messages. When an execution runs
 without errors then the "executed incoming buffer" is purged from the received bytes
 
-The events are immediatly executed. If no bytes are present or there are not enough
+The events are immediately executed. If no bytes are present or there are not enough
 bytes to read, the events queue is seeked for "BytesEvent" and then the execution is
 retried.

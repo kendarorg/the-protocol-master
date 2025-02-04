@@ -58,11 +58,11 @@ All callback are replayed automatically
 
 ## Weirdness
 
-### Splitted commands
+### Split commands
 
-The command identifier, if composed by two strings, is splitted! A command like
+The command identifier, if composed by two strings, is split! A command like
 "ACL CAT" (see https://redis.io/docs/latest/commands/command-docs/ ) is in fact
-splitted, in the array sent by the protocol like this
+split, in the array sent by the protocol like this
 
 ```
     *3
@@ -86,7 +86,7 @@ value fitting in a long
 
 ### Bits and bytes
 
-Byte arrays are written and considered as unicode strings, see the specific test
+Byte arrays are written and considered as UNICODE strings, see the specific test
 to check how they are handled:
 
 ```
@@ -111,10 +111,10 @@ to check how they are handled:
 ### Notes on serialization
 
 The string seems always serialized as "complex string" prefixed with 
-$count\r\ncontent instead of using +content
+`$count\r\ncontent` instead of using `+content`
 
 The serialization to json has some differences from the standard one, this because
-there is no direct matching for standard java collection. Therefore there are
+there is no direct matching for standard java collection. Therefore, there are
 "magic keys" on the collections to identify them. E.G.
 
 ```
@@ -126,7 +126,7 @@ there is no direct matching for standard java collection. Therefore there are
         ...
 ```
 
-Maps are defined as arrays of arrays, because in REDIS keys can be any vakye
+Maps are defined as arrays of arrays, because in REDIS keys can be any value
 
 ```
     "myMap":[

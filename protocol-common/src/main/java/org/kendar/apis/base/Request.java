@@ -283,8 +283,8 @@ public class Request {
     public String findCookie(String value) {
         var cookies = this.getFirstHeader("Cookie");
         if (cookies == null) return null;
-        var splittedCookies = cookies.split(";");
-        for (var cookie : splittedCookies) {
+        var splitCookies = cookies.split(";");
+        for (var cookie : splitCookies) {
             var cookieData = cookie.trim().split("=");
             if (value.equalsIgnoreCase(cookieData[0].trim())) {
                 return cookieData[1].trim();
