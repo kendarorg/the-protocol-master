@@ -2,7 +2,6 @@ package org.kendar.apis.filters;
 
 
 import com.fasterxml.jackson.databind.node.BinaryNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.apis.FilteringClass;
 import org.kendar.apis.base.Request;
@@ -188,18 +187,10 @@ public abstract class StaticWebFilter implements FilteringClass {
 
     private void renderResourceFile(Response response, String stringPath, boolean isBinary) {
         var resourcePath = stringPath.replace('\\', '/');
-        if (isBinary) {
-            response.setResponseText(new BinaryNode((byte[]) resourceFiles.get(resourcePath)));
-        } else {
-            response.setResponseText(new TextNode(new String((byte[]) resourceFiles.get(resourcePath))));
-        }
+        response.setResponseText(new BinaryNode((byte[]) resourceFiles.get(resourcePath)));
     }
 
     private void renderRealFile(Path fullPath, Response response, String stringPath, boolean isBinary) throws IOException {
-        if (isBinary) {
-            response.setResponseText(new BinaryNode(Files.readAllBytes(fullPath)));
-        } else {
-            response.setResponseText(new TextNode(Files.readString(fullPath)));
-        }
+        response.setResponseText(new BinaryNode(Files.readAllBytes(fullPath)));
     }
 }
