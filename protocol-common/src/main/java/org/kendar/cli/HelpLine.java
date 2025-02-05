@@ -6,13 +6,15 @@ public class HelpLine {
     private String longCommand;
     private String description;
     private String availableOptions;
+    private boolean multiple;
 
-    public HelpLine(String shortCommand, String longCommand, String description, String availableOptions) {
+    public HelpLine(String shortCommand, String longCommand, String description, String availableOptions,boolean multiple) {
         this.shortCommand = shortCommand;
         this.longCommand = longCommand;
         this.description = description;
         this.availableOptions = availableOptions;
         this.block = false;
+        this.multiple = multiple;
     }
 
     public HelpLine(String description) {
@@ -63,5 +65,13 @@ public class HelpLine {
 
     public void setAvailableOptions(String availableOptions) {
         this.availableOptions = availableOptions;
+    }
+
+    public boolean isMultiple() {
+        return multiple;
+    }
+
+    public void setMultiple(boolean multiple) {
+        this.multiple = multiple;
     }
 }

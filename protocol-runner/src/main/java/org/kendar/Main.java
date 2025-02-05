@@ -151,8 +151,7 @@ public class Main {
     }
 
 
-    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse
-    ) throws Exception {
+    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse) throws Exception {
         if (ini == null) return;
         diService.register(FileResourcesUtils.class, new FileResourcesUtils());
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");

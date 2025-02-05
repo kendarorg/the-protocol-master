@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 @TpmService
@@ -33,10 +34,16 @@ public class ProtocolsRunner {
         }
     }
 
+    private static final String TPM_REPLACE="TPM_REPLACE";
+
     public static CommandOptions getMainOptions(ChangeableReference<GlobalSettings> settings) {
 
 
-        var coptions = CommandOptions.of("main", "The Protocol Master");
+        var coptions = CommandOptions.of("main",
+                "The Protocol Master\n" +
+                "If an environment variable exists "+TPM_REPLACE+"=a=b,c=d,e=f\n" +
+                "every occurrence of %a% in config file is replaced with \n" +
+                "b value and so on");
         coptions.withOptions(
                 CommandOption.of("un", "Unattended run (default false)")
                         .withLong("unattended")
@@ -45,8 +52,7 @@ public class ProtocolsRunner {
                         .withLong("config")
                         .withMandatoryParameter()
                         .withCallback((s) -> {
-                            var fr = new FileResourcesUtils().getFileFromResourceAsString(s);
-                            settings.set(mapper.deserialize(fr, GlobalSettings.class));
+                            loadConfigFile(settings, s);
                         }),
                 CommandOption.of("pld", "Plugins directory (default plugins)")
                         .withLong("pluginsDir")
@@ -75,6 +81,19 @@ public class ProtocolsRunner {
                         .withLong("help")
         );
         return coptions;
+    }
+
+    private static void loadConfigFile(ChangeableReference<GlobalSettings> settings, String s) {
+        var tpmReplace = System.getenv(TPM_REPLACE);
+        var fr = new FileResourcesUtils().getFileFromResourceAsString(s);
+        if(tpmReplace != null) {
+            var split = tpmReplace.split(",");
+            for(var spl:split){
+                var variable = spl.split("=",2);
+                fr = fr.replaceAll(Pattern.quote("%"+variable[0]+"%"),variable[1]);
+            }
+        }
+        settings.set(mapper.deserialize(fr, GlobalSettings.class));
     }
 
     public static <T> T getOrDefault(Object value, T defaultValue) {

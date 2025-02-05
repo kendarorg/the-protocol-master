@@ -24,6 +24,13 @@ public class CommandOption implements CommandItem {
     private boolean present;
     private String subChoicesDescription;
     private CommandItem parent;
+    private boolean multiple;
+    private Consumer<List<String>> multiCallback;
+
+    public CommandOption asMultiple() {
+        this.multiple = true;
+        return this;
+    }
 
     private CommandOption(String shortCommand, String description) {
 
@@ -144,8 +151,15 @@ public class CommandOption implements CommandItem {
     }
 
     public void setValues(List<String> values) {
-        this.values = values;
-        if (callback != null) {
+        if(this.values == null){
+            this.values = values;
+        }else{
+            this.values.addAll(values);
+        }
+
+        if (multiCallback != null) {
+            multiCallback.accept(this.values);
+        }else if (callback != null) {
             if (!this.isHasParameter()) {
                 callback.accept(null);
             } else {
@@ -209,6 +223,11 @@ public class CommandOption implements CommandItem {
         return this;
     }
 
+    public CommandOption withMultiCallback(Consumer<List<String>> callback) {
+        this.multiCallback = callback;
+        return this;
+    }
+
     public String getSubChoicesDescription() {
         return subChoicesDescription;
     }
@@ -264,7 +283,7 @@ public class CommandOption implements CommandItem {
     }
 
     public void parseInternal(List<MainArg> mainArgs) {
-        parseListOfCommands(mainArgs, subOptions, this);
+        parseListOfCommands(mainArgs, subOptions, this,false);
     }
 
     public List<CommandOption> getCommandOptions() {
@@ -281,5 +300,9 @@ public class CommandOption implements CommandItem {
 
     public void setParent(CommandItem parent) {
         this.parent = parent;
+    }
+
+    public boolean isMultiple() {
+        return multiple;
     }
 }
