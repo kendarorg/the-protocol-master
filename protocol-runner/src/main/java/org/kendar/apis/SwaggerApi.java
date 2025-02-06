@@ -99,7 +99,7 @@ public class SwaggerApi implements FilteringClass {
         if (!expectedPaths.containsKey(filter.getMethodFilter().pathAddress())) {
             expectedPaths.put(filter.getMethodFilter().pathAddress(), new PathItem());
         } else {
-            log.warn("Duplicate path {} {}", mf.method(), filter.getMethodFilter().pathAddress());
+            log.trace("Duplicate path {} {}", mf.method(), filter.getMethodFilter().pathAddress());
         }
         var expectedPath = expectedPaths.get(filter.getMethodFilter().pathAddress());
 
