@@ -40,6 +40,13 @@ public @interface TpmResponse {
     Class<?> body() default Object.class;
 
     /**
+     * Function to call for body type
+     *
+     * @return
+     */
+    String bodyMethod() default "";
+
+    /**
      * Returned headers
      *
      * @return

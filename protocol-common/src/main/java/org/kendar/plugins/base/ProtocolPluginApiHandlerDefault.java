@@ -4,16 +4,17 @@ import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.PathParameter;
+import org.kendar.annotations.multi.TpmRequest;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.apis.Status;
+import org.kendar.settings.PluginSettings;
 import org.kendar.utils.JsonMapper;
 
-import static org.kendar.apis.ApiUtils.respondJson;
-import static org.kendar.apis.ApiUtils.respondOk;
+import static org.kendar.apis.ApiUtils.*;
 
 
 @HttpTypeFilter()
@@ -73,7 +74,7 @@ public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor>
                     body = Status.class,
                     description = "In case of status request"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/{#plugin}"})
     public boolean actionOnAllPlugins(Request reqp, Response resp) {
         var action = reqp.getPathParameter("action");
         {
@@ -98,6 +99,62 @@ public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor>
             }
         }
         return false;
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/settings",
+            method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/settings")
+    @TpmDoc(
+            description = "Retrieve the settings for the specific plugin",
+            responses = {@TpmResponse(
+                    bodyMethod = "getSettingsClass",
+                    description = "The settings"
+            ), @TpmResponse(
+                    code = 500,
+                    body = Ko.class,
+                    description = "In case of errors"
+            )},
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/{#plugin}"})
+    public boolean getSettings(Request reqp, Response resp) {
+        var pluginInstance = getDescriptor();
+        if(ProtocolPluginDescriptorBase.class.isAssignableFrom(pluginInstance.getClass())){
+            var ppdb = (ProtocolPluginDescriptorBase)pluginInstance;
+            respondJson(resp,ppdb.getSettings());
+        }else{
+            respondKo(resp,"No plugin found with settings");
+        }
+        return true;
+    }
+
+    public Class<?> getSettingsClass() {
+        return descriptor.getSettingClass();
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/settings",
+            method = "PUT", id = "PUT /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/settings")
+    @TpmDoc(
+            description = "Set the settings for the specific plugin",
+            responses = {@TpmResponse(
+                    code = 500,
+                    body = Ko.class,
+                    description = "In case of errors"
+            )},
+            requests = @TpmRequest(
+                    bodyMethod = "getSettingsClass"
+            ),
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/{#plugin}"})
+    public boolean setSettings(Request reqp, Response resp) {
+        var pluginInstance = getDescriptor();
+        if(ProtocolPluginDescriptorBase.class.isAssignableFrom(pluginInstance.getClass())){
+            var settings = mapper.deserialize(reqp.getRequestText().toString(), pluginInstance.getSettingClass());
+            var ppdb = (ProtocolPluginDescriptorBase)pluginInstance;
+            ppdb.setSettings((PluginSettings) settings);
+            respondOk(resp);
+        }else{
+            respondKo(resp,"No plugin found with settings");
+        }
+        return true;
     }
 
 }

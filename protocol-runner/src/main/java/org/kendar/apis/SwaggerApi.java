@@ -173,7 +173,7 @@ public class SwaggerApi implements FilteringClass {
         } else {
             var responses = new HashMap<Integer, List<mt>>();
             for (var res : doc.responses()) {
-                prepareResponse(schemas, responses, res);
+                prepareResponse(schemas, responses, res,filter);
             }
             for (var singres : responses.entrySet()) {
                 buildResponse(apiResponses, singres);
@@ -211,17 +211,22 @@ public class SwaggerApi implements FilteringClass {
         apiResponses.addApiResponse(singres.getKey() + "", toAddResponse);
     }
 
-    private void prepareResponse(Map<String, Schema> schemas, HashMap<Integer, List<mt>> responses, TpmResponse res) {
-        var hasBody = extractSchemasForMethod(schemas, res.body());
+    private void prepareResponse(Map<String, Schema> schemas, HashMap<Integer, List<mt>> responses, TpmResponse res,
+                                 FilterDescriptor descriptor) {
+        var hasBody = extractSchemasForMethod(schemas, res.body(),res.bodyMethod(),descriptor);
 
         if (hasBody) {
+            var bodyClass = res.body();
+            if(bodyClass == Object.class && res.bodyMethod()!=null && !res.bodyMethod().isEmpty()){
+                bodyClass = (Class<?>) descriptor.invokeOnFilterClass(res.bodyMethod());
+            }
             var mmt = new mt();
             if (res.headers() != null) {
                 for (var hea : res.headers()) {
                     mmt.headers.put(hea.key(), hea);
                 }
             }
-            var schema = getSchemaTpm(res.body());
+            var schema = getSchemaTpm(bodyClass);
             var mediaType = new MediaType().schema(schema);
             if (res.examples() != null) {
                 for (var ex : res.examples()) {
@@ -238,11 +243,14 @@ public class SwaggerApi implements FilteringClass {
         }
     }
 
-    private void buildRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, TpmDoc doc, PathItem expectedPath, List<Parameter> parameters, ApiResponses apiResponses, TpmRequest res) {
-        var resBody = res.body();
-        var resExamples = res.examples();
-        var resAccept = res.accept();
-        var resOptional = res.optional();
+    private void buildRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, TpmDoc doc, PathItem expectedPath, List<Parameter> parameters, ApiResponses apiResponses, TpmRequest req) {
+        var resBody = req.body();
+        if(resBody== Object.class && req.bodyMethod()!=null && !req.bodyMethod().isEmpty()) {
+            resBody = (Class<?>) filter.invokeOnFilterClass(req.bodyMethod());
+        }
+        var resExamples = req.examples();
+        var resAccept = req.accept();
+        var resOptional = req.optional();
 
         setupRequest(swagger, schemas, filter, doc, expectedPath, parameters, apiResponses, resBody, resExamples, resAccept, resOptional);
     }
@@ -326,7 +334,7 @@ public class SwaggerApi implements FilteringClass {
         var matcher = descriptor.getMatchers().stream().filter(m -> m instanceof ApiMatcher).findFirst();
         if (matcher.isEmpty()) return;
         var filter = (ApiMatcher) matcher.get();
-        var hasBody = extractSchemasForMethod(schemas, resBody);
+        var hasBody = extractSchemasForMethod(schemas, resBody, null, descriptor);
 
         var operation = new Operation();
         if (hasBody) {
@@ -382,12 +390,15 @@ public class SwaggerApi implements FilteringClass {
         }
     }
 
-    private boolean extractSchemasForMethod(Map<String, Schema> schemas, Class<?> bodyRequest) {
+    private boolean extractSchemasForMethod(Map<String, Schema> schemas, Class<?> bodyRequest, String methodOnDescriptor, FilterDescriptor descriptor) {
         if (bodyRequest == Object.class) return false;
+        if(bodyRequest==null && methodOnDescriptor!=null && !methodOnDescriptor.isEmpty()){
+            bodyRequest = (Class<?>) descriptor.invokeOnFilterClass(methodOnDescriptor);
+        }
         if (Primitives.isWrapperType(bodyRequest)) return true;
         if (bodyRequest.isPrimitive()) return true;
         if (bodyRequest.isArray()) {
-            return extractSchemasForMethod(schemas, bodyRequest.getComponentType());
+            return extractSchemasForMethod(schemas, bodyRequest.getComponentType(), methodOnDescriptor, descriptor);
         }
         if (Collection.class.isAssignableFrom(bodyRequest)) return true;
         var request = ModelConverters.getInstance().readAll(bodyRequest);

@@ -47,15 +47,20 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
         }
     }
 
-
     @Override
-    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global, protocol, pluginSetting);
+    protected boolean handleSettingsChanged(){
         sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getLimitSites());
         if (getSettings().getCustomResponseFile() != null && Files.exists(Path.of(getSettings().getCustomResponseFile()))) {
             var frr = new FileResourcesUtils();
             customResponse = mapper.deserialize(frr.getFileFromResourceAsString(getSettings().getCustomResponseFile()), Response.class);
         }
+        return true;
+    }
+
+    @Override
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+        if(!handleSettingsChanged())return null;
         return this;
     }
 

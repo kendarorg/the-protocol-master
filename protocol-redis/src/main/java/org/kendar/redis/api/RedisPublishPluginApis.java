@@ -47,7 +47,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
                     body = Ko.class,
                     description = "In case of errors"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void getConnections(Request request, Response response) {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<RedisConnection>();
@@ -90,7 +90,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
                     body = Ko.class,
                     description = "In case of errors"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void publish(Request request, Response response) throws Resp3ParseException {
         var messageData = mapper.deserialize(request.getRequestText().toString(), PublishRedisMessage.class);
         var connectionId = Integer.parseInt(request.getPathParameter("connectionId"));

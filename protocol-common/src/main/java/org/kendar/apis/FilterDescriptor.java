@@ -17,6 +17,8 @@ import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.GenericFilterExecutor;
 import org.kendar.apis.utils.IdBuilder;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.IncompleteAnnotationException;
 import java.lang.reflect.InvocationTargetException;
@@ -203,6 +205,19 @@ public class FilterDescriptor {
             if (!match.matches(req)) return false;
         }
         return true;
+    }
+    private static final Logger log = LoggerFactory.getLogger(FilterDescriptor.class);
+
+    public Object invokeOnFilterClass(String name,Object...args){
+        if(name==null || name.isEmpty()) return null;
+        try {
+            var method = filterClass.getClass().getMethod(name);
+            method.setAccessible(true);
+            return method.invoke(filterClass, args);
+        }catch (Exception e) {
+            log.error("Error retrieving data from {}",filterClass.getClass().getName(),e);
+            return null;
+        }
     }
 
     /**

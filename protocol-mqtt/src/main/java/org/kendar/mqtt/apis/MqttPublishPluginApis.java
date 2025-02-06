@@ -47,7 +47,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                     body = Ko.class,
                     description = "In case of errors"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void getConnections(Request request, Response response) {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<MqttConnection>();
@@ -95,7 +95,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                     body = Ko.class,
                     description = "In case of errors"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void publish(Request request, Response response) {
         var messageData = mapper.deserialize(request.getRequestText().toString(), PublishMqttMessage.class);
         var connectionId = Integer.parseInt(request.getPathParameter("connectionId"));
