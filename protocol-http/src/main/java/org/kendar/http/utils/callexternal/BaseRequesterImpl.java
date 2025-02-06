@@ -192,7 +192,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                                         request.getRequestText().toString(), ContentType.create(contentType));
                     }
                 } catch (Exception ex) {
-                    log.debug("Error {}", request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
+                    log.debug("Error creating request {} {}",request.buildUrl(), request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
                     entity =
                             new StringEntity(
                                     request.getRequestText().toString(), ContentType.create(ConstantsMime.STREAM));
@@ -247,8 +247,8 @@ public abstract class BaseRequesterImpl implements BaseRequester {
         } else if (request.getMethod().equalsIgnoreCase("TRACE")) {
             return new HttpTrace(stringAdress);
         } else {
-            log.error("MISSING METHOD {} on {}", request.getMethod(), stringAdress);
-            throw new Exception("MISSING METHOD " + request.getMethod() + " on " + stringAdress);
+            log.error("Missing http method {} on {}", request.getMethod(), request.buildUrl());
+            throw new Exception("Missing http method " + request.getMethod() + " on " + request.buildUrl());
         }
     }
 }

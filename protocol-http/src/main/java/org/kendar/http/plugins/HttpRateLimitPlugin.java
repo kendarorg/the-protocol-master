@@ -109,7 +109,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
             resourcesRemaining -= settings.getCostPerRequest();
             if (resourcesRemaining < 0) {
                 resourcesRemaining = 0;
-                log.trace("Rate limit reached for {}", in.getHost());
+                log.info("Rate limit reached for {}", in.buildUrl());
                 var isnt = Calendar.getInstance();
                 isnt.setTimeInMillis(
                         resetTime.getTimeInMillis() - Calendar.getInstance().getTimeInMillis());
@@ -137,7 +137,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
                 }
             } else if (resourcesRemaining < (settings.getRateLimit() -
                     (settings.getRateLimit() * settings.getWarningThresholdPercent() / 100))) {
-                log.trace("Rate limit warn for {}", in.getHost());
+                log.trace("Rate limit warn for {}", in.buildUrl());
                 out.addHeader(settings.getHeaderLimit(), settings.getRateLimit() + "");
                 out.addHeader(settings.getHeaderRemaining(), resourcesRemaining + "");
             }

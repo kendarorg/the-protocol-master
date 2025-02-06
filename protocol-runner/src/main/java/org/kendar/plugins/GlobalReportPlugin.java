@@ -8,6 +8,8 @@ import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import java.util.concurrent.Executors;
 
 @TpmService
 public class GlobalReportPlugin implements GlobalPluginDescriptor {
+    private static final Logger log = LoggerFactory.getLogger(GlobalReportPlugin.class);
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final List<ReportDataEvent> events = new ArrayList<>();
     private final Map<String, Long> counters = new HashMap<>();
@@ -32,6 +35,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
 
     private void handleReport(ReportDataEvent m) {
         if (isActive()) {
+            log.info(m.toString());
             events.add(m);
             var tagId = m.getProtocol() + "." + m.getInstanceId();
             for (var tag : m.getTags().entrySet()) {

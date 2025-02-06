@@ -55,7 +55,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
             var pc = ((double) getSettings().getErrorPercent()) / 100.0;
             if (Math.random() < pc) {
 
-                log.info("Faking ERROR {} {}", request.getMethod(), request.buildUrl());
+                log.info("Faking ERROR {}", request.buildUrl());
                 response.setStatusCode(getSettings().getShowError());
                 response.setResponseText(new TextNode(getSettings().getErrorMessage()));
                 return true;

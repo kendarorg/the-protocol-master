@@ -133,7 +133,7 @@ public class MasterHandler implements HttpHandler {
 
     private void handleException(HttpExchange httpExchange, Response response, Exception ex) {
         try {
-            log.error("ERROR HANDLING HTTP REQUEST ", ex);
+            log.error("Error handling http request", ex);
             if (response.getHeader(ConstantsHeader.CONTENT_TYPE) == null) {
                 response.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.HTML);
             }
@@ -148,7 +148,7 @@ public class MasterHandler implements HttpHandler {
             }
             sendResponse(response, httpExchange);
         } catch (Exception xx) {
-            log.trace(xx.getMessage());
+            log.trace("Http handling exception",xx);
         }
     }
 
@@ -180,7 +180,7 @@ public class MasterHandler implements HttpHandler {
                 }
             }
 
-            log.info("[SERVER][REQ  ] {} {}", request.getMethod(), request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
+            log.debug("[SERVER][REQ  ] {} {}", request.getMethod(), request.buildUrl().substring(0, Math.min(request.buildUrl().length(), 60)));
 
             handleInternal(pluginContext, request, response, connManager);
             sendResponse(response, httpExchange);
@@ -197,7 +197,7 @@ public class MasterHandler implements HttpHandler {
                         pluginContext, ProtocolPhase.FINALIZE, request, response, connManager);
 
             } catch (Exception e) {
-                log.error("ERROR CALLING POST RENDER ", e);
+                log.error("Error calling post-render", e);
             }
         }
     }

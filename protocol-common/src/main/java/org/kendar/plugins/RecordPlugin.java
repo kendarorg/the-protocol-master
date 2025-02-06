@@ -168,7 +168,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
                         context.disconnect(((ProxyConnection) contextConnection).getConnection());
                         context.setValue("CONNECTION", null);
                     } catch (Exception e) {
-                        log.debug("Error disconnecting connection {}", contextKvp.getKey(), e);
+                        log.debug("Error disconnecting {}", contextKvp.getKey(), e);
                     }
                     pi.getContextsCache().remove(contextKvp.getKey());
                 }

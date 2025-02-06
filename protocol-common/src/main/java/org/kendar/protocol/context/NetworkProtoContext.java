@@ -79,7 +79,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
         if (!event.getTag().isEmpty()) {
             message += " tags:" + event.getTagKeyValues();
         }
-        log.error("[SERVER][??] Unknown: {}", message);
+        log.error("[SERVER][??] Unknown command: {}", message);
         throw new UnknownCommandException("Unknown command issued: " + message);
     }
 
@@ -231,7 +231,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
         try {
             client.close();
         } catch (IOException e) {
-            log.trace("Ignorable", e);
+            log.trace("Error closing client connection", e);
         }
     }
 
@@ -247,7 +247,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
     protected List<ReturnMessage> runException(Exception ex, ProtoState state, ProtocolEvent event) {
         if (event instanceof BytesEvent) {
             var rb = ((BytesEvent) event).getBuffer();
-            log.error("Exception buffer ({}):\n{}", rb.getAll().length, rb.toHexStringUpToLength(20));
+            log.trace("Exception buffer ({}):\n{}", rb.getAll().length, rb.toHexStringUpToLength(20));
         }
         return new ArrayList<>();
     }
@@ -282,7 +282,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
             if (currentEvent instanceof BytesEvent) {
                 var be = (BytesEvent) currentEvent;
                 if (remainingBytes != null && remainingBytes.getBuffer().size() > 0) {
-                    log.trace("[SERVER][RX] Adding to remaining bytes");
+                    log.trace("[SERVER][RX] Appending missing data");
                     remainingBytes.getBuffer().setPosition(remainingBytes.getBuffer().size());
                     remainingBytes.getBuffer().write(be.getBuffer().getAll());
                     remainingBytes.getBuffer().setPosition(0);

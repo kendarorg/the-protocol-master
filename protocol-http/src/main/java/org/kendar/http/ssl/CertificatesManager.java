@@ -199,7 +199,7 @@ public class CertificatesManager {
         if (hostsSize == registeredHosts.size() && port.getHttpsConfigurator() != null) {
             return;
         }
-        sslLog.debug("[SERVER] ADD HOST: {}", String.join(",", inserted));
+        sslLog.debug("[SERVER] Add ssl hosts: {}", String.join(",", inserted));
         var sslContextInt = getSslContext(new ArrayList<>(registeredHosts.values()), cname, der, key);
         port.setHttpsConfigurator(
                 new HttpsConfigurator(sslContextInt) {
@@ -218,7 +218,7 @@ public class CertificatesManager {
                             params.setSSLParameters(sslParameters);
 
                         } catch (Exception ex) {
-                            sslLog.error("ERROR CONFIGURING HTTPS");
+                            sslLog.error("Error configuring https",ex);
                         }
                     }
                 });

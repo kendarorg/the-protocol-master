@@ -264,7 +264,7 @@ public abstract class NetworkProxySocket {
         try {
             channel.close();
         } catch (IOException e) {
-            log.trace("Ignorable", e);
+            log.trace("Error closing connection", e);
         }
     }
 

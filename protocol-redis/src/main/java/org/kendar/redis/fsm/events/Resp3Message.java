@@ -47,7 +47,7 @@ public class Resp3Message extends ProtocolEvent implements NetworkReturnMessage 
             var data = message.getBytes(StandardCharsets.US_ASCII);
             resultBuffer.write(data);
         } catch (Exception ex) {
-            log.error(ex.getMessage());
+            log.error("Error writing message",ex);
         }
     }
 

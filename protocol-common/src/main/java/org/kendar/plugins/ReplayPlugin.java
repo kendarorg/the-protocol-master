@@ -171,7 +171,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Error handling activation", e);
         }
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
@@ -196,7 +196,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
                             context.setValue("CONNECTION", null);
                         }
                     } catch (Exception e) {
-                        log.debug("Error disconnecting connection {}", contextKvp.getKey(), e);
+                        log.trace("Error disconnecting {}", contextKvp.getKey(), e);
                     }
                     pi.getContextsCache().remove(contextKvp.getKey());
                 }
@@ -223,10 +223,10 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         query.getTags().putAll(buildTag(in));
         var index = findIndex(query, in);
         if (storage == null) {
-            log.error("LOGGER NULL");
+            log.error("Missing storage for context {}-{}",pluginContext.getContext().getContextId(),pluginContext.getCaller());
         }
         if (index == null) {
-            log.error("INDEX NULL {}", query);
+            log.error("Missing index for query {}", query);
             return false;
         }
         var storageItem = readStorageItem(index, in, pluginContext);

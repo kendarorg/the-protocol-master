@@ -118,7 +118,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
         var lineToRead = new LineToRead(storageItem, index.getLine());
         var item = lineToRead.getStorageItem();
-        log.debug("READING {}", item.getIndex());
+        log.debug("Reading index {}", item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
         if (getSettings().isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());

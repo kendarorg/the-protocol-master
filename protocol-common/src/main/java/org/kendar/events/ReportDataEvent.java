@@ -34,9 +34,13 @@ public class ReportDataEvent implements TpmEvent {
     @Override
     public String toString() {
         return "ReportDataEvent{" +
-                "protocol='" + protocol + '\'' +
-                ", instanceId='" + instanceId + '\'' +
+                "instanceId='" + instanceId + '\'' +
+                ", protocol='" + protocol + '\'' +
                 ", query='" + query + '\'' +
+                ", connectionId=" + connectionId +
+                ", timestamp=" + timestamp +
+                ", duration=" + duration +
+                ", tags=" + tags +
                 '}';
     }
 
