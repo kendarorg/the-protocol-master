@@ -1,8 +1,13 @@
 {
   "pluginsDir": "target/plugins",
-  "logLevel": "DEBUG",
+  "logLevel": "INFO",
   "dataDir": "target/tests/fromini",
   "apiPort": 8095,
+  "plugins": {
+    "report-plugin": {
+      "active": true
+    }
+  },
   "protocols": {
     "http-01": {
       "protocol": "http",
@@ -17,6 +22,9 @@
         ]
       },
       "plugins": {
+        "report-plugin": {
+          "active": true
+        },
         "error-plugin": {
           "errorCode": 0,
           "errorMessage": "ERROR",

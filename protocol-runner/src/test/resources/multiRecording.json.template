@@ -1,6 +1,6 @@
 {
   "pluginsDir": "plugins",
-  "logLevel": "DEBUG",
+  "logLevel": "INFO",
   "dataDir": "{dataDir}",
   "apiPort": 9127,
   "plugins": {

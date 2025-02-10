@@ -31,7 +31,7 @@ public class BaseMockPluginApis extends ProtocolPluginApiHandlerDefault<MockPlug
                     body = String[].class,
                     description = "Retrieve all the mock ids"
             ),
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
     public boolean listAllMocks(Request reqp, Response resp) {
 
         var result = new ArrayList<>(getDescriptor().getMocks().keySet());
@@ -49,7 +49,7 @@ public class BaseMockPluginApis extends ProtocolPluginApiHandlerDefault<MockPlug
                     body = MockStorage.class,
                     description = "Retrieve the mock file"
             ),
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
     public boolean getSingleMock(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("mockfile");
         var result = getDescriptor().getMocks().get(mockfile);

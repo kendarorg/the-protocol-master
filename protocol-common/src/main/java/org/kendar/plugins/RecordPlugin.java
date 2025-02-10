@@ -127,9 +127,15 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     }
 
     @Override
+    protected boolean handleSettingsChanged(){
+        ignoreTrivialCalls = ((BasicRecordPluginSettings) getSettings()).isIgnoreTrivialCalls();
+        return true;
+    }
+
+    @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        ignoreTrivialCalls = ((BasicRecordPluginSettings) pluginSetting).isIgnoreTrivialCalls();
         super.initialize(global, protocol, pluginSetting);
+        handleSettingsChanged();
         return this;
     }
 
@@ -168,7 +174,7 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
                         context.disconnect(((ProxyConnection) contextConnection).getConnection());
                         context.setValue("CONNECTION", null);
                     } catch (Exception e) {
-                        log.debug("Error disconnecting connection {}", contextKvp.getKey(), e);
+                        log.debug("Error disconnecting {}", contextKvp.getKey(), e);
                     }
                     pi.getContextsCache().remove(contextKvp.getKey());
                 }

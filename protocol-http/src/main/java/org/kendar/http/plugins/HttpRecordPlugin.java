@@ -74,9 +74,15 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     }
 
     @Override
+    protected boolean handleSettingsChanged(){
+        recordSites = SiteMatcherUtils.setupSites(getSettings().getRecordSites());
+        return true;
+    }
+
+    @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        recordSites = SiteMatcherUtils.setupSites(getSettings().getRecordSites());
+        handleSettingsChanged();
         return this;
     }
 }

@@ -100,7 +100,7 @@ public class ConnectionBuilderImpl implements ConnectionBuilder {
                     .register("https", sslsf).build();
 
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            log.error(e.getMessage(), e);
+            log.error("Error building SSL registry", e);
             return null;
         }
     }
@@ -137,7 +137,7 @@ public class ConnectionBuilderImpl implements ConnectionBuilder {
                     .loadTrustMaterial(null, (x509CertChain, authType) -> true)
                     .build();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Error building SSL context", e);
         }
         return HttpClientBuilder.create()
                 .disableAutomaticRetries()

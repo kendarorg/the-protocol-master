@@ -40,7 +40,7 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
                     content = "application/pkix-crl",
                     description = "Retrieve the root certificates"
             ),
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/ssl-plugin"})
     public boolean retrieveDerKey(Request reqp, Response resp) {
         var action = reqp.getPathParameter("action");
 

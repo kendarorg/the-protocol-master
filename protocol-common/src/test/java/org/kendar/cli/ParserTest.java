@@ -335,7 +335,7 @@ public class ParserTest {
 
     @Test
     void printHelp() {
-        var args = new String[]{"-xxx"};
+        var args = new String[]{"-m","a","-m","b","-protocol","http"};
         var options = CommandOptions.of("main", "The Protocol Master\ndo all!");
         var globalSettings = new GlobalSettings();
         options.withOptions(
@@ -346,6 +346,11 @@ public class ParserTest {
                         .withMandatoryParameter()
                         .withLong("storage")
                         .withCallback(globalSettings::setStorageDir),
+                CommandOption.of("m", "Multiple")
+                        .withMandatoryParameter()
+                        .asMultiple()
+                        .withLong("multiple")
+                        .withMultiCallback(globalSettings::setMultiple),
                 CommandOption.of("p", "The protocol")
                         .withParameter()
                         .withMandatoryParameter()
@@ -368,8 +373,16 @@ public class ParserTest {
                         )
                         .withMultipleSubChoices());
         var parser = new CommandParser(options);
-        //parser.parse(args);
+        var help = parser.buildHelp();
+        assertTrue(help.contains("Repeatable"));
         parser.printHelp();
+        parser.parse(args);
+        assertTrue(parser.hasOption("m"));
+        var values = parser.getOptionValues("m");
+        assertEquals(2, values.size());
+        assertEquals(2, globalSettings.getMultiple().size());
+        assertEquals("a", values.get(0));
+        assertEquals("b", values.get(1));
     }
 
     @Test
@@ -455,5 +468,21 @@ public class ParserTest {
                         ),
                 CommandOption.of("c", "bd")));
         assertEquals("Duplicate inherited command c on option CommandOption{shortCommand='a'}", res.getMessage());
+    }
+
+    @Test
+    void testMultiple() {
+        var args = new String[]{"-s", "a=b", "-s", "b=c"};
+        var options = CommandOptions.of("main");
+        options.withOptions(
+                CommandOption.of("s", "Storage Dir")
+                        .asMultiple()
+                        .withLong("storage"));
+        var parser = new CommandParser(options);
+        parser.parse(args);
+        var result = parser.getOptionValues("s");
+        assertEquals(2,result.size());
+        assertEquals("a=b", result.get(0));
+        assertEquals("b=c", result.get(1));
     }
 }

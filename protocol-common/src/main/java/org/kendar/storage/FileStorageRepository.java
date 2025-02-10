@@ -210,7 +210,7 @@ public class FileStorageRepository implements StorageRepository {
         executor.submit(() -> {
 
             if (item == null) {
-                log.error("Blank item");
+                log.error("No line to send founded");
                 return;
             }
             try {
@@ -234,7 +234,7 @@ public class FileStorageRepository implements StorageRepository {
                     Files.writeString(Path.of(targetDir, id), result);
                 }
             } catch (Exception e) {
-                log.warn("Trouble writing", e);
+                log.error("[TPM ][WR]: Error writing item", e);
             } finally {
                 executorItems.decrementAndGet();
             }
@@ -373,7 +373,7 @@ public class FileStorageRepository implements StorageRepository {
                 zos.closeEntry();
             }
         } catch (IOException ioe) {
-            log.error("ERROR Creating storage zip");
+            log.error("Error Creating storage zip",ioe);
         }
         return baos.toByteArray();
     }

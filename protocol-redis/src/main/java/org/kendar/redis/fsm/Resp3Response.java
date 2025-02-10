@@ -33,7 +33,7 @@ public class Resp3Response extends ProtoState implements NetworkReturnMessage {
             var bytes = event.getMessage().getBytes(StandardCharsets.US_ASCII);
             resultBuffer.write(bytes);
         } catch (Exception ex) {
-            log.error(ex.getMessage());
+            log.error("Error writing",ex);
         }
     }
 

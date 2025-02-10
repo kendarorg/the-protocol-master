@@ -94,11 +94,9 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
     protected abstract List<MockStorage> firstCheckOnMainPart(T request);
 
     @Override
-    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-
-        super.initialize(global, protocol, pluginSetting);
+    protected boolean handleSettingsChanged(){
         if (getSettings().getDataDir() == null) {
-            return null;
+            return false;
         }
         mocksDir = getSettings().getDataDir();
         if (!Files.exists(Path.of(mocksDir).toAbsolutePath())) {
@@ -109,6 +107,14 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
             }
         }
         loadMocks();
+        return true;
+    }
+    @Override
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+
+        super.initialize(global, protocol, pluginSetting);
+        if(!handleSettingsChanged())return null;
+
         return this;
 
     }

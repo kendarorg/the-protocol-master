@@ -1,8 +1,13 @@
 {
   "pluginsDir": "target/plugins",
-  "logLevel": "DEBUG",
+  "logLevel": "INFO",
   "dataDir": "target/tests/apitest",
   "apiPort": 5005,
+  "plugins": {
+    "report-plugin": {
+      "active": true
+    }
+  },
   "protocols": {
     "http-01": {
       "protocol": "http",
@@ -33,6 +38,9 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "report-plugin": {
+          "active": true
+        },
         "record-plugin": {
           "active": false
         },
@@ -49,6 +57,9 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "report-plugin": {
+          "active": true
+        },
         "record-plugin": {
           "active": false
         },
@@ -68,6 +79,9 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "report-plugin": {
+          "active": true
+        },
         "record-plugin": {
           "active": false
         },
@@ -87,6 +101,9 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "report-plugin": {
+          "active": true
+        },
         "record-plugin": {},
         "replay-plugin": {}
       }
@@ -99,6 +116,9 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "report-plugin": {
+          "active": true
+        },
         "record-plugin": {
           "active": false
         },
@@ -115,6 +135,9 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "report-plugin": {
+          "active": true
+        },
         "record-plugin": {},
         "replay-plugin": {}
       }

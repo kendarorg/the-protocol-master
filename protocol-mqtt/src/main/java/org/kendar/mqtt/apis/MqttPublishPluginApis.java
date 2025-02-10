@@ -47,7 +47,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                     body = Ko.class,
                     description = "In case of errors"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void getConnections(Request request, Response response) {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<MqttConnection>();
@@ -55,7 +55,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             var key = ccache.getKey();
             var context = (MqttContext) ccache.getValue();
             var subscriptions = (HashSet<String>) context.getValue("TOPICS");
-            if (subscriptions.isEmpty()) continue;
+            if (subscriptions == null || subscriptions.isEmpty()) continue;
 
             for (var subscription : subscriptions) {
                 var subSplit = subscription.split("\\|", 2);
@@ -95,7 +95,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                     body = Ko.class,
                     description = "In case of errors"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void publish(Request request, Response response) {
         var messageData = mapper.deserialize(request.getRequestText().toString(), PublishMqttMessage.class);
         var connectionId = Integer.parseInt(request.getPathParameter("connectionId"));

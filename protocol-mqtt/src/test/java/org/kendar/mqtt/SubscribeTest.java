@@ -113,7 +113,7 @@ public class SubscribeTest extends BasicTest {
 
 
         var events = getEvents().stream().collect(Collectors.toList());
-        Assertions.assertEquals(3, events.size());
+        Assertions.assertEquals(4, events.size());
         Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("SEND")).count());
         Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("CONNECT")).count());
         Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("SUBSCRIBE")).count());

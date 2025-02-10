@@ -23,7 +23,7 @@ public class MqttPacket extends ProtocolEvent implements NetworkReturnMessage {
                       String packetIdentifier) {
         super(context, prevState);
         if (packetIdentifier != null) {
-            log.debug("PACKET {} {}", packetIdentifier, this.getClass().getSimpleName());
+            log.trace("Founded packet {} {}", packetIdentifier, this.getClass().getSimpleName());
             getTag().add(Tag.of("PACKET", packetIdentifier).get(0));
         }
         this.fixedHeader = fixedHeader;

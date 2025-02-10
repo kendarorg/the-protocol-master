@@ -64,4 +64,27 @@ public class AmqpReportPlugin extends ReportPlugin<PluginSettings> {
         ));
         return false;
     }
+
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, BodyFrame out) {
+        if (!isActive() && phase!=ProtocolPhase.ASYNC_RESPONSE) return false;
+
+        var context = pluginContext.getContext();
+        var connectionId = context.getContextId();
+        var channel = out.getChannel();
+        var routingKey = context.getValue("BASIC_PUBLISH_RK_" + out.getChannel());
+        var exchange = context.getValue("BASIC_PUBLISH_XC_" + out.getChannel());
+        var payload = mapper.toHumanReadable(out.getContent());
+
+        var duration = System.currentTimeMillis() - pluginContext.getStart();
+        EventsQueue.send(new ReportDataEvent(
+                getInstanceId(),
+                getProtocol(),
+                String.format("RECEIVE:%s:%s", exchange, routingKey),
+                connectionId,
+                pluginContext.getStart(),
+                duration,
+                Map.of("body", payload, "channel", channel + "")
+        ));
+        return false;
+    }
 }

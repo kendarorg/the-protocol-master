@@ -25,11 +25,16 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyP
         super(mapper);
     }
 
+    @Override
+    protected boolean handleSettingsChanged(){
+        latencySites = SiteMatcherUtils.setupSites(getSettings().getLatencySites());
+        return true;
+    }
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        latencySites = SiteMatcherUtils.setupSites(getSettings().getLatencySites());
+        handleSettingsChanged();
         return this;
     }
 

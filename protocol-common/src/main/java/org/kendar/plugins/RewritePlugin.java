@@ -64,14 +64,12 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
 
     protected abstract void replaceData(ReplacerItemInstance item, J toReplace, T request, K response);
 
-
     @Override
-    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global, protocol, pluginSetting);
+    protected boolean handleSettingsChanged(){
         var settings = getSettings();
-        if (settings.getRewritesFile() == null) return null;
+        if (settings.getRewritesFile() == null) return false;
         var path = Path.of(settings.getRewritesFile()).toAbsolutePath();
-        if (!path.toFile().exists()) return null;
+        if (!path.toFile().exists()) return false;
 
         try {
             for (var replacer : mapper.deserialize(Files.readString(path), new TypeReference<List<ReplacerItem>>() {
@@ -82,6 +80,14 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
             log.error("Unable to read rewrite file {}", settings.getRewritesFile(), e);
             throw new RuntimeException(e);
         }
+        return true;
+    }
+
+    @Override
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+        if(!handleSettingsChanged())return null;
+
         return this;
     }
 

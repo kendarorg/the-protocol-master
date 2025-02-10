@@ -33,6 +33,13 @@ public @interface TpmRequest {
     Class<?> body() default Object.class;
 
     /**
+     * Function to call for body type
+     *
+     * @return
+     */
+    String bodyMethod() default "";
+
+    /**
      * If optional
      *
      * @return

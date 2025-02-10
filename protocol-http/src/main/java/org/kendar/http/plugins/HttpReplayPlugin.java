@@ -18,12 +18,15 @@ import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -118,7 +121,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
         var lineToRead = new LineToRead(storageItem, index.getLine());
         var item = lineToRead.getStorageItem();
-        log.debug("READING {}", item.getIndex());
+        log.debug("Reading index {}", item.getIndex());
         var outputItem = item.retrieveOutAs(Response.class);
         if (getSettings().isRespectCallDuration()) {
             Sleeper.sleep(item.getDurationMs());
@@ -137,13 +140,19 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
         return "http";
     }
 
+    @Override
+    protected boolean handleSettingsChanged(){
+        blockExternal = getSettings().isBlockExternal();
+        matchSites = SiteMatcherUtils.setupSites(getSettings().getMatchSites());
+        return true;
+    }
+
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
 
-        blockExternal = getSettings().isBlockExternal();
-        matchSites = SiteMatcherUtils.setupSites(getSettings().getMatchSites());
+        handleSettingsChanged();
         return this;
     }
 

@@ -410,7 +410,7 @@ public abstract class ProtoContext {
      */
     protected ProtoState findThePossibleNextStateOnStack(ProtocolEvent event, int depth) {
         if (depth > 10) {
-            log.error("MAX RECURSION HIT");
+            log.error("Max recursion hit searching for possible events");
             throw new RuntimeException("max recursion hit");
         }
 
@@ -667,7 +667,7 @@ public abstract class ProtoContext {
         }
         var exceptionResults = runException(ex, state, event);
         for (var exceptionResult : exceptionResults) {
-            log.error("Message: {}", exceptionResult.getClass().getSimpleName());
+            log.error("Exception handled: {}", exceptionResult.getClass().getSimpleName());
             write(exceptionResult);
         }
     }

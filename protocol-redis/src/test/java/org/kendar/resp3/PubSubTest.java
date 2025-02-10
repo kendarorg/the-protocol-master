@@ -74,6 +74,6 @@ public class PubSubTest extends BasicTest {
         var events = getEvents().stream().collect(Collectors.toList());
         assertEquals(4, events.size());
         Assertions.assertEquals(1, events.stream().filter(e -> e.getQuery().startsWith("SUBSCRIBE")).count());
-        Assertions.assertEquals(3, events.stream().filter(e -> e.getQuery().startsWith("PUBLISH")).count());
+        Assertions.assertEquals(3, events.stream().filter(e -> e.getQuery().startsWith("SEND PUBLISH")).count());
     }
 }

@@ -133,6 +133,9 @@ public class CommandParser {
                 if (item.getAvailableOptions() != null) {
                     description += "\nOptions: " + item.getAvailableOptions();
                 }
+                if (item.isMultiple()) {
+                    description += "\nRepeatable";
+                }
                 String[] split = description.split("[\r\n\f]+");
                 for (int i = 0; i < split.length; i++) {
                     var descline = split[i];

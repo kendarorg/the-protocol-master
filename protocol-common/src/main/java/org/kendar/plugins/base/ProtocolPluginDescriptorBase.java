@@ -50,6 +50,22 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     }
 
     /**
+     * Set the settings
+     * @param settings
+     */
+    public void setSettings(W settings) {
+        this.settings = settings;
+        handleSettingsChanged();
+    }
+
+    /**
+     * Handle changing settings
+     */
+    protected boolean handleSettingsChanged() {
+        return true;
+    }
+
+    /**
      * Retrieve the settings class (For deserializaton purposes
      *
      * @return
@@ -147,4 +163,6 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     public void terminate() {
 
     }
+
+
 }

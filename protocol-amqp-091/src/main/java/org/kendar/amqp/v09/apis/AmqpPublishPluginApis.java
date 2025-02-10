@@ -48,7 +48,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                     body = Ko.class,
                     description = "In case of errors"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void getConnections(Request request, Response response) {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<AmqpConnection>();

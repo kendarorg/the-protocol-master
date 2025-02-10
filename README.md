@@ -96,6 +96,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Plugin-based architecture
 * Custom maven repository on [https://maven.kendar.org](https://maven.kendar.org/maven2/releases/org/kendar/protocol/)
 * More than 70% Test coverage, more than 550 tests
+* Environment-based dynamic settings (see TPM_REPLACE)
 
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
@@ -132,6 +133,9 @@ If you want to go on the specific functions by protocol:
 
 ```
 The Protocol Master
+If an environment variable exists TPM_REPLACE=a=b,c=d,e=f
+every occurrence of %a% in config file is replaced with 
+b value and so on
 
 	un     	unattended	Unattended run (default false)
 	cfg    	config    	Load config file
