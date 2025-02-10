@@ -55,7 +55,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             var key = ccache.getKey();
             var context = (MqttContext) ccache.getValue();
             var subscriptions = (HashSet<String>) context.getValue("TOPICS");
-            if (subscriptions.isEmpty()) continue;
+            if (subscriptions == null || subscriptions.isEmpty()) continue;
 
             for (var subscription : subscriptions) {
                 var subSplit = subscription.split("\\|", 2);

@@ -22,6 +22,7 @@ import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.Sleeper;
+import org.pf4j.ExtensionPoint;
 import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,10 +83,7 @@ public class Main {
 
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
-        for (var ec : pluginManager.getExtensionClasses(ProtocolPluginDescriptor.class)) {
-            diService.bind(ec);
-        }
-        for (var ec : pluginManager.getExtensionClasses(GlobalPluginDescriptor.class)) {
+        for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class)) {
             diService.bind(ec);
         }
 
