@@ -87,6 +87,7 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
     public List<FilterDescriptor> loadFilters() {
         var result = new ArrayList<FilterDescriptor>();
         for (var filterClass : filteringClassList) {
+            if(filterClass==null)continue;
             result.addAll(getAnnotatedMethods(filterClass));
         }
         var duplicateIds = new HashSet<>();

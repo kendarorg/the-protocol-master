@@ -8,7 +8,8 @@ public class HelpLine {
     private String availableOptions;
     private boolean multiple;
 
-    public HelpLine(String shortCommand, String longCommand, String description, String availableOptions,boolean multiple) {
+    public HelpLine(String shortCommand, String longCommand, String description, String availableOptions,
+                    boolean multiple) {
         this.shortCommand = shortCommand;
         this.longCommand = longCommand;
         this.description = description;

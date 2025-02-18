@@ -180,6 +180,23 @@ public class DiService {
         }
     }
 
+    public static List<String> getTags(Object instance) {
+        var result = new ArrayList<String>();
+        var tpmNamed = instance.getClass().getAnnotation(TpmNamed.class);
+        if(tpmNamed != null) {
+            result.addAll(Arrays.asList(tpmNamed.tags()));
+        }
+        var tpmService = instance.getClass().getAnnotation(TpmService.class);
+        if(tpmService != null) {
+            result.addAll(Arrays.asList(tpmService.tags()));
+        }
+        var tpmTransient = instance.getClass().getAnnotation(TpmTransient.class);
+        if(tpmTransient != null) {
+            result.addAll(Arrays.asList(tpmTransient.tags()));
+        }
+        return result;
+    }
+
     public <T> T getInstance(Class<T> clazz, String... tags) {
         return (T) getInstanceInternal(this, null, clazz, tags);
     }
@@ -201,6 +218,15 @@ public class DiService {
 
     private Object createInstance(DiService context, Class<?> clazz, boolean transi) {
         try {
+            if(!transi) {
+                var sl = this;
+                while(sl != null) {
+                    if (sl.singletons.containsKey(clazz)) {
+                        return sl.singletons.get(clazz);
+                    }
+                    sl = sl.parent;
+                }
+            }
             var constructors = clazz.getConstructors();
             var clazzNamed = clazz.getAnnotation(TpmNamed.class);
             Constructor constructor = null;

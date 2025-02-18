@@ -291,6 +291,10 @@ public class CommandOption implements CommandItem {
     }
 
     public void printHelp(ArrayList<HelpLine> result) {
+        if(subOptions.isEmpty() && subChoices.isEmpty()) {
+            result.add(new HelpLine(getShortCommand(), getLongCommand(), getDescription(),
+                    null, isMultiple()));
+        }
         printHelpListOfCommands(result, subOptions);
     }
 

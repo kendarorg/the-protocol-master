@@ -66,6 +66,7 @@ public class Main {
         var parser = new CommandParser(options);
         parser.parseIgnoreMissing(args);
         diService.register(GlobalSettings.class, settings.get());
+        diService.register(DiService.class, diService);
 
         if (parser.hasOption("unattended") || settings.get().isUnattended()) {
             stopWhenFalse = () -> {
