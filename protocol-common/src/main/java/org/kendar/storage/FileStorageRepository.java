@@ -606,6 +606,15 @@ public class FileStorageRepository implements StorageRepository {
 
     }
 
+    @Override
+    public void delPluginFile(StorageFileIndex file) {
+        var pluginDir = ensureDirectory(Path.of(targetDir,file.getInstanceId(),file.getPluginId()).toAbsolutePath().toString());
+        var filePath = Path.of(pluginDir, file.getIndex() + ".json");
+        if(filePath.toFile().exists()) {
+            filePath.toFile().delete();
+        }
+    }
+
     private static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
 

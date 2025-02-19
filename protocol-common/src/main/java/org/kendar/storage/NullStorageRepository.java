@@ -92,6 +92,11 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public void delPluginFile(StorageFileIndex storageFileIndex) {
+
+    }
+
+    @Override
     public String getType() {
         return "storage";
     }

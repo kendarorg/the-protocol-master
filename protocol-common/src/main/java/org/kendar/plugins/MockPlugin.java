@@ -12,6 +12,8 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.storage.StorageFile;
+import org.kendar.storage.StorageFileIndex;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.JsonMapper;
@@ -159,6 +161,17 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new BaseMockPluginApis(this, getId(), getInstanceId()));
+        return List.of(new BaseMockPluginApis(this, getId(), getInstanceId(),repository));
+    }
+
+    public void putMock(String mockfile, MockStorage inputObject) {
+        getMocks().put(mockfile,inputObject);
+        var serialized = mapper.serialize(inputObject);
+        repository.writePluginFile(new StorageFile(new StorageFileIndex(getInstanceId(),getId(),mockfile),serialized));
+    }
+
+    public void delMock(String mockfile) {
+        getMocks().remove(mockfile);
+        repository.delPluginFile(new StorageFileIndex(getInstanceId(),getId(),mockfile));
     }
 }

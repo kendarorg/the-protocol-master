@@ -36,4 +36,6 @@ public interface StorageRepository extends Service {
     List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId);
     StorageFile readPluginFile(StorageFileIndex index);
     void writePluginFile(StorageFile file);
+
+    void delPluginFile(StorageFileIndex storageFileIndex);
 }
