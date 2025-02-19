@@ -32,7 +32,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-@TpmService
+@TpmService(tags = "storage_file")
 public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
     static final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -62,6 +62,8 @@ public class FileStorageRepository implements StorageRepository {
         if (logsDir == null || logsDir.isEmpty()) {
             logsDir = Path.of("data",
                     Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
+        }else{
+            logsDir = logsDir.replace("file:","");
         }
         this.targetDir = Path.of(logsDir).toAbsolutePath().toString();
         targetDir = ensureDirectory(targetDir);

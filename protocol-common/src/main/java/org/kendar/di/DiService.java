@@ -96,6 +96,13 @@ public class DiService {
         bind(instance.getClass(), mappings);
     }
 
+    public void overwrite(Class<?> clazz, Object instance) {
+        singletons.put(clazz, instance);
+        var implOfInt = new ArrayList<Type>();
+        implOfInt.add(instance.getClass());
+        mappings.put(clazz, implOfInt);
+    }
+
     public void registerNamed(String name, Object instance) {
         namedMappings.put(name, instance);
     }
@@ -427,6 +434,4 @@ public class DiService {
         }
         return result;
     }
-
-
 }

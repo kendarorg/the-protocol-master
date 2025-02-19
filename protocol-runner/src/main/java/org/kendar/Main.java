@@ -15,8 +15,6 @@ import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
-import org.kendar.storage.FileStorageRepository;
-import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.ChangeableReference;
@@ -30,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -132,18 +129,6 @@ public class Main {
         }
     }
 
-    private static StorageRepository setupStorage(String logsDir) {
-
-        if (logsDir != null && !logsDir.isEmpty()) {
-            logsDir = logsDir.replace("{timestamp}", "" + new Date().getTime());
-        }
-        StorageRepository storage = new NullStorageRepository();
-        if (logsDir != null && !logsDir.isEmpty()) {
-            storage = new FileStorageRepository(Path.of(logsDir));
-        }
-        return storage;
-    }
-
     public static boolean isRunning() {
         if (protocolServersCache == null) return false;
         return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning);
@@ -152,6 +137,16 @@ public class Main {
 
     public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse) throws Exception {
         if (ini == null) return;
+
+        if (!ini.getDataDir().contains(":")) {
+            ini.setDataDir("file:" + ini.getDataDir());
+        }
+        var dataDir = ini.getDataDir();
+        var splitted = dataDir.split(":", 2);
+        var storage_type = "storage_" + splitted[0];
+        var storageInstance = diService.getInstance(StorageRepository.class, storage_type);
+        diService.overwrite(StorageRepository.class, storageInstance);
+
         diService.register(FileResourcesUtils.class, new FileResourcesUtils());
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
 

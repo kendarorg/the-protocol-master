@@ -1,5 +1,6 @@
 package org.kendar.storage;
 
+import org.kendar.di.annotations.TpmService;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.storage.generic.StorageRepository;
@@ -7,8 +8,11 @@ import org.kendar.storage.generic.StorageRepository;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+@TpmService(tags = "storage_null")
 public class NullStorageRepository implements StorageRepository {
-
+    public NullStorageRepository() {
+        System.out.println("NullStorageRepository");
+    }
     private final AtomicLong counter = new AtomicLong(0);
 
     @Override

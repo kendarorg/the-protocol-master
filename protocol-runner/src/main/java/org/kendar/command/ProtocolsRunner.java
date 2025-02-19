@@ -70,10 +70,6 @@ public class ProtocolsRunner {
                         .withLong("apis")
                         .withMandatoryParameter()
                         .withCallback((s) -> settings.get().setApiPort(Integer.parseInt(s))),
-                CommandOption.of("lt", "The log type (default file)")
-                        .withLong("logType")
-                        .withMandatoryParameter()
-                        .withCallback((s) -> settings.get().setDataDir(s)),
                 CommandOption.of("p", "The protocols to start")
                         .withLong("protocol")
                         .withMandatoryParameter(),
@@ -149,10 +145,10 @@ public class ProtocolsRunner {
                       List<ProtocolPluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var pr = protocols.get(protocol.getProtocol());
-        var datadir = Path.of(ini.getDataDir()).toAbsolutePath().toFile();
+        /*var datadir = Path.of(ini.getDataDir()).toAbsolutePath().toFile();
         if (!datadir.exists()) {
             datadir.mkdir();
-        }
+        }*/
         protocol.setProtocolInstanceId(key);
         pr.start(protocolServer, key, ini, protocol, storage, plugins, stopWhenFalse);
     }
