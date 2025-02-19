@@ -1,4 +1,4 @@
-package org.kendar.testcontainer;
+package org.kendar.tests.testcontainer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
