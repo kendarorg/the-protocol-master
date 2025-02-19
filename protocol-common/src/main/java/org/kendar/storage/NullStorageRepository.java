@@ -77,6 +77,21 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId) {
+        return List.of();
+    }
+
+    @Override
+    public StorageFile readPluginFile(StorageFileIndex index) {
+        return null;
+    }
+
+    @Override
+    public void writePluginFile(StorageFile file) {
+
+    }
+
+    @Override
     public String getType() {
         return "storage";
     }

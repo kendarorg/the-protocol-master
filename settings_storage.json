@@ -18,8 +18,7 @@
       "connectionString": "jdbc:mysql://192.168.56.2:23306/db",
       "plugins": {
         "mock-plugin": {
-          "active": false,
-          "dataDir": "target/mocks"
+          "active": false
         }
       }
     },
@@ -32,8 +31,7 @@
       "connectionString": "jdbc:mysql://localhost:3306",
       "plugins": {
         "mock-plugin": {
-          "active": false,
-          "dataDir": "target/mocks"
+          "active": false
         }
       }
     },
@@ -83,8 +81,7 @@
           "recordSites": []
         },
         "mock-plugin": {
-          "active": false,
-          "dataDir": "target/mocks"
+          "active": false
         }
       }
     }

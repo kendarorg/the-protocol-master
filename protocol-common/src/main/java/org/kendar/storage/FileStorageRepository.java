@@ -64,6 +64,36 @@ public class FileStorageRepository implements StorageRepository {
                     Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
         }
         this.targetDir = Path.of(logsDir).toAbsolutePath().toString();
+        targetDir = ensureDirectory(targetDir);
+    }
+
+    private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+        if (fileToZip.isHidden()) {
+            return;
+        }
+        if (fileToZip.isDirectory()) {
+            if (fileName.endsWith("/")) {
+                zipOut.putNextEntry(new ZipEntry(fileName));
+                zipOut.closeEntry();
+            } else {
+                zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+                zipOut.closeEntry();
+            }
+            File[] children = fileToZip.listFiles();
+            for (File childFile : children) {
+                zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+            }
+            return;
+        }
+        FileInputStream fis = new FileInputStream(fileToZip);
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        byte[] bytes = new byte[1024];
+        int length;
+        while ((length = fis.read(bytes)) >= 0) {
+            zipOut.write(bytes, 0, length);
+        }
+        fis.close();
     }
 
     public static String padLeftZeros(String inputString, int length) {
@@ -84,15 +114,7 @@ public class FileStorageRepository implements StorageRepository {
     public void initialize() {
 
         try {
-            if (!Path.of(targetDir).isAbsolute()) {
-                Path currentRelativePath = Paths.get("").toAbsolutePath();
-                targetDir = Path.of(currentRelativePath.toString(), targetDir).toString();
-            }
-            if (!Files.exists(Path.of(targetDir))) {
-                if (!Path.of(targetDir).toFile().mkdirs()) {
-                    log.error("Error creating target dir {}", targetDir);
-                }
-            }
+            targetDir = ensureDirectory(targetDir);
             EventsQueue.register("FileStorageRepository", (e) -> write(e.getLineToWrite()), WriteItemEvent.class);
             EventsQueue.register("FileStorageRepository", (e) -> finalizeWrite(e.getInstanceId()), FinalizeWriteEvent.class);
             EventsQueue.register("FileStorageRepository", (e) -> initializeContentWrite(e.getInstanceId()), StartWriteEvent.class);
@@ -102,6 +124,19 @@ public class FileStorageRepository implements StorageRepository {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String ensureDirectory(String td) {
+        if (!Path.of(td).isAbsolute()) {
+            Path currentRelativePath = Paths.get("").toAbsolutePath();
+            td = Path.of(currentRelativePath.toString(), td).toString();
+        }
+        if (!Files.exists(Path.of(td))) {
+            if (!Path.of(td).toFile().mkdirs()) {
+                log.error("Error creating target dir {}", td);
+            }
+        }
+        return td;
     }
 
     private void finalizePlay(String instanceId) {
@@ -188,10 +223,17 @@ public class FileStorageRepository implements StorageRepository {
     public void clean() {
         protocolRepo.clear();
         var dir = Path.of(targetDir).toFile();
+        cleanRecursive(dir);
+        EventsQueue.send(new StorageReloadedEvent());
+    }
+
+    private static void cleanRecursive(File dir) {
         File[] files = dir.listFiles();
         if (files != null) {
             for (File file : files) {
-                if (file.isDirectory()) continue;
+                if (file.isDirectory()) {
+                    cleanRecursive(file);
+                }
                 file.delete();
             }
         }
@@ -362,15 +404,13 @@ public class FileStorageRepository implements StorageRepository {
                 .collect(Collectors.toList());
     }
 
+
     @Override
     public byte[] readAsZip() {
         var baos = new ByteArrayOutputStream();
         try (var zos = new ZipOutputStream(baos)) {
-            for (var file : listFilesUsingJavaIO(Path.of(targetDir).toAbsolutePath().toString())) {
-                var entry = new ZipEntry(file.getName());
-                zos.putNextEntry(entry);
-                zos.write(Files.readAllBytes(file.toPath()));
-                zos.closeEntry();
+            for (var file : new File(Path.of(targetDir).toAbsolutePath().toString()).listFiles()) {
+                zipFile(file,file.getName(),zos);
             }
         } catch (IOException ioe) {
             log.error("Error Creating storage zip",ioe);
@@ -380,41 +420,48 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void writeZip(byte[] byteArray) {
-        var destDir = Path.of(targetDir).toAbsolutePath().toString();
-        File dir = new File(destDir);
+        var destDirString = Path.of(targetDir).toAbsolutePath().toString();
+        File destDir = new File(destDirString);
         // create output directory if it doesn't exist
-        if (!dir.exists()) dir.mkdirs();
+        if (!destDir.exists()) destDir.mkdirs();
         ByteArrayInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
         try {
             fis = new ByteArrayInputStream(byteArray);
             ZipInputStream zis = new ZipInputStream(fis);
-            ZipEntry ze = zis.getNextEntry();
-            if (ze == null) {
+            ZipEntry zipEntry  = zis.getNextEntry();
+            if (zipEntry  == null) {
                 throw new RuntimeException("Not a zip file!");
             }
-            while (ze != null) {
-                String fileName = ze.getName();
-                if (fileName.isEmpty()) continue;
-                File newFile = Path.of(destDir, fileName).toFile();
-                //System.out.println("Unzipping to "+newFile.getAbsolutePath());
-                //create directories for sub directories in zip
-                new File(newFile.getParent()).mkdirs();
-                FileOutputStream fos = new FileOutputStream(newFile);
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
+            while (zipEntry != null) {
+                File newFile = newFile(destDir, zipEntry);
+                if (zipEntry.isDirectory()) {
+                    if (!newFile.isDirectory() && !newFile.mkdirs()) {
+                        throw new IOException("Failed to create directory " + newFile);
+                    }
+                } else {
+                    // fix for Windows-created archives
+                    File parent = newFile.getParentFile();
+                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                        throw new IOException("Failed to create directory " + parent);
+                    }
+
+                    // write file content
+                    FileOutputStream fos = new FileOutputStream(newFile);
+                    int len;
+                    while ((len = zis.read(buffer)) > 0) {
+                        fos.write(buffer, 0, len);
+                    }
+                    fos.close();
                 }
-                fos.close();
-                //close this ZipEntry
-                zis.closeEntry();
-                ze = zis.getNextEntry();
+                zipEntry = zis.getNextEntry();
             }
             //close last ZipEntry
             zis.closeEntry();
             zis.close();
             fis.close();
+            EventsQueue.send(new StorageReloadedEvent());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -518,6 +565,58 @@ public class FileStorageRepository implements StorageRepository {
         } catch (Exception ex) {
             throw new RuntimeException("Unable to delete item " + itemId, ex);
         }
+    }
+
+    @Override
+    public List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId) {
+        var result = new ArrayList<StorageFileIndex>();
+        var pluginDir = ensureDirectory(Path.of(targetDir,instanceId,pluginId).toAbsolutePath().toString());
+        for (var file : listFilesUsingJavaIO(Path.of(pluginDir).toAbsolutePath().toString())) {
+            if (file.getName().endsWith(".json")) {
+                result.add(new StorageFileIndex(instanceId,pluginId,file.getName().replace(".json","")));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public StorageFile readPluginFile(StorageFileIndex index) {
+        var pluginDir = ensureDirectory(Path.of(targetDir,index.getInstanceId(),index.getPluginId()).toAbsolutePath().toString());
+        var filePath = Path.of(pluginDir, index.getIndex() + ".json");
+        if(Files.exists(filePath)) {
+            try {
+                return new StorageFile(index,Files.readString(filePath));
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void writePluginFile(StorageFile file) {
+        var pluginDir = ensureDirectory(Path.of(targetDir,file.getIndex().getInstanceId(),file.getIndex().getPluginId()).toAbsolutePath().toString());
+        var filePath = Path.of(pluginDir, file.getIndex().getIndex() + ".json");
+        try {
+            Files.writeString(filePath,file.getContent());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        File destFile = new File(destinationDir, zipEntry.getName());
+
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = destFile.getCanonicalPath();
+
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        }
+
+        return destFile;
     }
 
     private static class ProtocolRepo {

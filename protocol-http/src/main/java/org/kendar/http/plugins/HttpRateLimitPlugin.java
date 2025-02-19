@@ -3,6 +3,8 @@ package org.kendar.http.plugins;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.StorageReloadedEvent;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
@@ -10,28 +12,31 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.utils.FileResourcesUtils;
+import org.kendar.storage.StorageFileIndex;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 @TpmService(tags = "http")
 public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
+    private final StorageRepository repository;
     private List<MatchingRecRep> sitesToLimit = new ArrayList<>();
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
 
-    public HttpRateLimitPlugin(JsonMapper mapper) {
+    public HttpRateLimitPlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
+        this.repository = repository;
+        EventsQueue.register(UUID.randomUUID().toString(), (e) -> handleSettingsChanged(), StorageReloadedEvent.class);
     }
 
     @Override
@@ -49,10 +54,12 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
 
     @Override
     protected boolean handleSettingsChanged(){
+        if(getSettings()==null) return false;
         sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getLimitSites());
-        if (getSettings().getCustomResponseFile() != null && Files.exists(Path.of(getSettings().getCustomResponseFile()))) {
-            var frr = new FileResourcesUtils();
-            customResponse = mapper.deserialize(frr.getFileFromResourceAsString(getSettings().getCustomResponseFile()), Response.class);
+        customResponse = null;
+        var responseFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(),getId(),"response"));
+        if (responseFile != null) {
+            customResponse = mapper.deserialize(responseFile.getContent(), Response.class);
         }
         return true;
     }
@@ -125,7 +132,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
                         resetTime.toInstant().getEpochSecond();
 
                 //Logger.LogRequest($"Exceeded resource limit when calling {request.Url}. Request will be throttled", MessageType.Failed, new LoggingContext(e.Session));
-                if (settings.getCustomResponseFile() != null && Files.exists(Path.of(settings.getCustomResponseFile()))) {
+                if (customResponse!=null && settings.isUseCustomResponse()) {
                     out.getHeaders().clear();
                     out.getHeaders().putAll(customResponse.getHeaders());
                     out.removeHeader(settings.getHeaderRetryAfter());

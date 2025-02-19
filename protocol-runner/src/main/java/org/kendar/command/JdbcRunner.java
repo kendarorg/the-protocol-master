@@ -67,11 +67,9 @@ public class JdbcRunner extends CommonRunner {
                         .withCallback(settings::setForceSchema),
                 CommandOption.of("rew", "Path of the rewrite queries file")
                         .withLong("rewrite")
-                        .withMandatoryParameter()
                         .withCallback((s) -> {
                             settings.getPlugins().put("rewrite-plugin", rewrite);
                             rewrite.setActive(true);
-                            rewrite.setRewritesFile(s);
                         })
         ));
         List<CommandOption> commandOptionList = getCommonOptions(globalSettings, settings, recording, replaying, extra);

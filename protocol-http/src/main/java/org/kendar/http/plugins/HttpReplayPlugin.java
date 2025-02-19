@@ -142,6 +142,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
 
     @Override
     protected boolean handleSettingsChanged(){
+        if(getSettings()==null) return false;
         blockExternal = getSettings().isBlockExternal();
         matchSites = SiteMatcherUtils.setupSites(getSettings().getMatchSites());
         return true;

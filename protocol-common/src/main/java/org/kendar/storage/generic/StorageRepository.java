@@ -1,9 +1,7 @@
 package org.kendar.storage.generic;
 
 import org.kendar.Service;
-import org.kendar.storage.CompactLine;
-import org.kendar.storage.CompactLineComplete;
-import org.kendar.storage.StorageItem;
+import org.kendar.storage.*;
 
 import java.util.List;
 
@@ -34,4 +32,8 @@ public interface StorageRepository extends Service {
     void update(long itemId, String protocolInstanceId, CompactLine index, StorageItem item);
 
     void delete(String instanceId, long itemId);
+
+    List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId);
+    StorageFile readPluginFile(StorageFileIndex index);
+    void writePluginFile(StorageFile file);
 }

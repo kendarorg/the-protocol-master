@@ -27,7 +27,6 @@ import org.kendar.utils.Sleeper;
 import org.testcontainers.shaded.com.trilead.ssh2.crypto.Base64;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -334,7 +333,8 @@ public class SimpleTest extends BasicTest {
         var latencyPlugin = (HttpRateLimitPlugin) baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("rate-limit-plugin")).findFirst().get();
         var lps = new HttpRateLimitPluginSettings();
         lps.setResetTimeWindowSeconds(3);
-        lps.setCustomResponseFile(Path.of("src", "test", "resources", "ratelimitresponse.json").toString());
+        lps.setUseCustomResponse(true);
+        //lps.setCustomResponseFile(Path.of("src", "test", "resources", "ratelimitresponse.json").toString());
         latencyPlugin.initialize(globalSettings, httpProtocolSettings, lps);
         latencyPlugin.setActive(true);
 

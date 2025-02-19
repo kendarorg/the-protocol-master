@@ -6,6 +6,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.RewritePlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.settings.RewritePluginSettings;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItemInstance;
 
@@ -18,8 +19,8 @@ public class HttpRewritePlugin extends RewritePlugin<Request, Response, RewriteP
     private static final String HTTP = "http";
     private static final String HTTPS = "https";
 
-    public HttpRewritePlugin(JsonMapper mapper) {
-        super(mapper);
+    public HttpRewritePlugin(JsonMapper mapper, StorageRepository repository) {
+        super(mapper,repository);
     }
 
 

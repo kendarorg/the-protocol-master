@@ -15,8 +15,16 @@ public class HttpRateLimitPluginSettings extends PluginSettings {
     private int warningThresholdPercent = 80;
     private int rateLimit = 120;//or custom?
     private String resetFormat = "secondsLeft";//UtcEpochSeconds
-    private String customResponseFile;
     private List<String> limitSites = new ArrayList<>();
+    private boolean useCustomResponse = false;
+
+    public boolean isUseCustomResponse() {
+        return useCustomResponse;
+    }
+
+    public void setUseCustomResponse(boolean useCustomResponse) {
+        this.useCustomResponse = useCustomResponse;
+    }
 
     public List<String> getLimitSites() {
         return limitSites;
@@ -97,13 +105,5 @@ public class HttpRateLimitPluginSettings extends PluginSettings {
 
     public void setResetFormat(String resetFormat) {
         this.resetFormat = resetFormat;
-    }
-
-    public String getCustomResponseFile() {
-        return customResponseFile;
-    }
-
-    public void setCustomResponseFile(String customResponseFile) {
-        this.customResponseFile = customResponseFile;
     }
 }

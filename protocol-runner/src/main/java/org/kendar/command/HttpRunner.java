@@ -62,11 +62,9 @@ public class HttpRunner extends CommonRunner {
                         .withCallback((s) -> settings.getSSL().setKey(s)),
                 CommandOption.of("rew", "Path of the rewrite queries file")
                         .withLong("rewrite")
-                        .withMandatoryParameter()
                         .withCallback((s) -> {
                             settings.getPlugins().put("rewrite-plugin", rewrite);
                             rewrite.setActive(true);
-                            rewrite.setRewritesFile(s);
                         }),
                 CommandOption.of("record", "Record Calls")
                         .withCallback(s -> {
