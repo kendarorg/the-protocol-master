@@ -58,7 +58,7 @@ public class ProtocolsRunner {
                         .withLong("pluginsDir")
                         .withMandatoryParameter()
                         .withCallback((s) -> settings.get().setPluginsDir(s)),
-                CommandOption.of("dd", "Data directory (default data)")
+                CommandOption.of("dd", "Data directory (default file:data)")
                         .withLong("datadir")
                         .withMandatoryParameter()
                         .withCallback((s) -> settings.get().setDataDir(s)),

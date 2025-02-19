@@ -140,10 +140,9 @@ b value and so on
 	un     	unattended	Unattended run (default false)
 	cfg    	config    	Load config file
 	pld    	pluginsDir	Plugins directory (default plugins)
-	dd     	datadir   	Data directory (default data)
+	dd     	datadir   	Data directory (default file:data)
 	ll     	loglevel  	Log4j loglevel (default ERROR)
 	ap     	apis      	The port TPM controllers (default 0, as not active)
-	lt     	logType   	The log type (default file)
 	h      	help      	Show help
 	p      	protocol  	The protocols to start
 	       	          	Options: amqp091|mqtt|http|mysql|mongodb|postgres|redis
