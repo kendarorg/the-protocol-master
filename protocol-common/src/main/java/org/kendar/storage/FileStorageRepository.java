@@ -35,16 +35,16 @@ import java.util.zip.ZipOutputStream;
 @TpmService(tags = "storage_file")
 public class FileStorageRepository implements StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
-    static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
-    private final ConcurrentHashMap<String, ProtocolRepo> protocolRepo = new ConcurrentHashMap<>();
-    private final AtomicInteger storageCounter = new AtomicInteger(0);
-    private final TypeReference<StorageItem> typeReference = new TypeReference<>() {
+    protected static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
+    protected final ConcurrentHashMap<String, ProtocolRepo> protocolRepo = new ConcurrentHashMap<>();
+    protected final AtomicInteger storageCounter = new AtomicInteger(0);
+    protected final TypeReference<StorageItem> typeReference = new TypeReference<>() {
     };
-    private final Object initializeContentLock = new Object();
-    private final AtomicInteger executorItems = new AtomicInteger(0);
-    private final Object lock = new Object();
-    private String targetDir;
+    protected final Object initializeContentLock = new Object();
+    protected final AtomicInteger executorItems = new AtomicInteger(0);
+    protected final Object lock = new Object();
+    protected String targetDir;
 
     public FileStorageRepository(String targetDir) {
 
@@ -69,7 +69,7 @@ public class FileStorageRepository implements StorageRepository {
         targetDir = ensureDirectory(targetDir);
     }
 
-    private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+    protected static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
         if (fileToZip.isHidden()) {
             return;
         }
@@ -128,7 +128,7 @@ public class FileStorageRepository implements StorageRepository {
         }
     }
 
-    private static String ensureDirectory(String td) {
+    protected static String ensureDirectory(String td) {
         if (!Path.of(td).isAbsolute()) {
             Path currentRelativePath = Paths.get("").toAbsolutePath();
             td = Path.of(currentRelativePath.toString(), td).toString();
@@ -141,14 +141,14 @@ public class FileStorageRepository implements StorageRepository {
         return td;
     }
 
-    private void finalizePlay(String instanceId) {
+    protected void finalizePlay(String instanceId) {
         synchronized (initializeContentLock) {
             log.info("Stop replaying {}", instanceId);
             protocolRepo.remove(instanceId);
         }
     }
 
-    private ProtocolRepo initializeContent(String instanceId) {
+    protected ProtocolRepo initializeContent(String instanceId) {
 
 //        if (protocolRepo.contains(instanceId)) {
 //            return protocolRepo.get(instanceId);
@@ -188,7 +188,7 @@ public class FileStorageRepository implements StorageRepository {
     }
 
 
-    private void initializeContentWrite(String instanceId) {
+    protected void initializeContentWrite(String instanceId) {
 
 //        if (protocolRepo.contains(instanceId)) {
 //            return;
@@ -229,7 +229,7 @@ public class FileStorageRepository implements StorageRepository {
         EventsQueue.send(new StorageReloadedEvent());
     }
 
-    private static void cleanRecursive(File dir) {
+    protected static void cleanRecursive(File dir) {
         File[] files = dir.listFiles();
         if (files != null) {
             for (File file : files) {
@@ -275,7 +275,7 @@ public class FileStorageRepository implements StorageRepository {
                     if (!Files.exists(Paths.get(targetDir))) {
                         Files.createDirectories(Paths.get(targetDir));
                     }
-                    Files.writeString(Path.of(targetDir, id), result);
+                    writeContent(id, result);
                 }
             } catch (Exception e) {
                 log.error("[TPM ][WR]: Error writing item", e);
@@ -285,11 +285,15 @@ public class FileStorageRepository implements StorageRepository {
         });
     }
 
+    private void writeContent(String id, String result) throws IOException {
+        setFileContent(Path.of(targetDir, id), result);
+    }
+
 
     protected List<CompactLine> retrieveIndexFile(String protocolInstanceId) {
         String fileContent;
         try {
-            fileContent = Files.readString(Path.of(targetDir, "index." + protocolInstanceId + ".json"));
+            fileContent = getFileContent(Path.of(targetDir, "index." + protocolInstanceId + ".json"));
         } catch (IOException e) {
             fileContent = "[]";
         }
@@ -317,7 +321,7 @@ public class FileStorageRepository implements StorageRepository {
                 continue;
             }
             try {
-                var fileContent = Files.readString(Path.of(targetDir, fileName));
+                var fileContent = getFileContent(Path.of(targetDir, fileName));
                 result.add(mapper.deserialize(fileContent, typeReference));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -341,7 +345,7 @@ public class FileStorageRepository implements StorageRepository {
             if (Files.exists(Path.of(targetDir, indexFile))) {
                 Files.delete(Path.of(targetDir, indexFile));
             }
-            Files.writeString(Path.of(targetDir, indexFile),
+            setFileContent(Path.of(targetDir, indexFile),
                     mapper.serializePretty(repo.index));
 
         } catch (IOException e) {
@@ -361,7 +365,7 @@ public class FileStorageRepository implements StorageRepository {
             try {
                 var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(id), 10) + "." + protocolInstanceId + ".json");
 
-                fileContent = Files.readString(filePath);
+                fileContent = getFileContent(filePath);
             } catch (IOException e) {
                 fileContent = "{}";
             }
@@ -400,7 +404,7 @@ public class FileStorageRepository implements StorageRepository {
         return result;
     }
 
-    private List<File> listFilesUsingJavaIO(String dir) {
+    protected List<File> listFilesUsingJavaIO(String dir) {
         return Stream.of(new File(dir).listFiles())
                 .filter(file -> !file.isDirectory())
                 .collect(Collectors.toList());
@@ -485,7 +489,7 @@ public class FileStorageRepository implements StorageRepository {
                 fileNameOnly = fileNameOnly.replace("index.", "");
                 var protocolInstanceId = fileNameOnly.replace(".json", "");
                 try {
-                    fileContent = Files.readString(file.toPath());
+                    fileContent = getFileContent(file.toPath());
                 } catch (IOException e) {
                     fileContent = "{}";
                 }
@@ -535,8 +539,8 @@ public class FileStorageRepository implements StorageRepository {
                     item.setIndex(itemId);
                     item.setTimestamp(old.getTimestamp());
                     item.setCaller(old.getCaller());
-                    Files.writeString(indexPath, mapper.serialize(indexFile));
-                    Files.writeString(filePath, mapper.serialize(item));
+                    setFileContent(indexPath, mapper.serialize(indexFile));
+                    setFileContent(filePath, mapper.serialize(item));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -560,7 +564,7 @@ public class FileStorageRepository implements StorageRepository {
                 var toCheck = indexFile.get(i);
                 if (toCheck.getIndex() == itemId) {
                     indexFile.remove(i);
-                    Files.writeString(indexPath, mapper.serialize(indexFile));
+                    setFileContent(indexPath, mapper.serialize(indexFile));
                     break;
                 }
             }
@@ -587,7 +591,7 @@ public class FileStorageRepository implements StorageRepository {
         var filePath = Path.of(pluginDir, index.getIndex() + ".json");
         if(Files.exists(filePath)) {
             try {
-                return new StorageFile(index,Files.readString(filePath));
+                return new StorageFile(index,getFileContent(filePath));
             } catch (IOException e) {
                 return null;
             }
@@ -601,7 +605,7 @@ public class FileStorageRepository implements StorageRepository {
         var pluginDir = ensureDirectory(Path.of(targetDir,file.getIndex().getInstanceId(),file.getIndex().getPluginId()).toAbsolutePath().toString());
         var filePath = Path.of(pluginDir, file.getIndex().getIndex() + ".json");
         try {
-            Files.writeString(filePath,file.getContent());
+            setFileContent(filePath,file.getContent());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -617,7 +621,7 @@ public class FileStorageRepository implements StorageRepository {
         }
     }
 
-    private static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+    protected static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
 
         String destDirPath = destinationDir.getCanonicalPath();
@@ -630,12 +634,22 @@ public class FileStorageRepository implements StorageRepository {
         return destFile;
     }
 
-    private static class ProtocolRepo {
+    protected static class ProtocolRepo {
         public final Object lockObject = new Object();
         public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
         public final List<StorageItem> outItems = new ArrayList<>();
         public List<CompactLine> index = new ArrayList<>();
         public boolean initialized = false;
         public volatile boolean somethingWritten = false;
+    }
+
+    protected String getFileContent(Path of) throws IOException {
+        return Files.readString(of);
+    }
+
+
+
+    protected void setFileContent(Path of, String s) throws IOException{
+        Files.writeString(of, s);
     }
 }

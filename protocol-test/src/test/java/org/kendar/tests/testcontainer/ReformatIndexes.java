@@ -35,7 +35,7 @@ public class ReformatIndexes {
             for (var file : result) {
                 try {
                     var changed = false;
-                    var content = Files.readString(file);
+                    var content = getFileContent(file);
                     var tree = mapper.readTree(content);
                     if (tree.get("input") != null
                             && tree.get("input").get("data") != null
@@ -69,5 +69,9 @@ public class ReformatIndexes {
                 }
             }
         }
+    }
+
+    private static String getFileContent(Path file) throws IOException {
+        return Files.readString(file);
     }
 }
