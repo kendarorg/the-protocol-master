@@ -226,6 +226,18 @@ Redis Protocol
 
 ```
 
+## Storage choices
+
+The global `dataDir` option is used to select the storage engine, setting the 
+value to `[storage engine]:[storage engine connection string]`.
+
+When not specified the storage engine is `file`
+
+* path (relative or absolute), as `file` option
+* file: followed by the path (relative or absolute)
+* null: without connection string
+* encrypted_file: followed by the path (relative or absolute), must set "ENCRYPTION_KEY" value as environment variable
+
 ## How it was Born
 
 I had an always missing QA environment and all changes should be checked by legal (it was in Electronic ID field). I
