@@ -335,7 +335,7 @@ public class ParserTest {
 
     @Test
     void printHelp() {
-        var args = new String[]{"-m","a","-m","b","-protocol","http"};
+        var args = new String[]{"-m", "a", "-m", "b", "-protocol", "http"};
         var options = CommandOptions.of("main", "The Protocol Master\ndo all!");
         var globalSettings = new GlobalSettings();
         options.withOptions(
@@ -481,14 +481,15 @@ public class ParserTest {
         var parser = new CommandParser(options);
         parser.parse(args);
         var result = parser.getOptionValues("s");
-        assertEquals(2,result.size());
+        assertEquals(2, result.size());
         assertEquals("a=b", result.get(0));
         assertEquals("b=c", result.get(1));
     }
 
     @Test
     void testMultilevel() {
-        var options = CommandOptions.of("main","Root item");
+        //var args = new String[]{"-j", "-p", "http", "-hp", "-plugin","-pluginChoice","-x","asdf","-bbb",|};
+        var options = CommandOptions.of("main", "Root item");
         options.withOptions(
                 CommandOption.of("j", "Stuff")
                         .withLong("jjjj"),
@@ -497,15 +498,17 @@ public class ParserTest {
                         .withMandatoryParameter()
                         .withLong("protocol")
                         .withSubChoices(
-                                CommandOptions.of("http","HTTP")
+                                CommandOptions.of("http", "HTTP")
                                         .withOptions(
                                                 CommandOption.of("hp", "Http Port").withLong("hpl"),
                                                 CommandOption.of("plugin", "Plugin")
                                                         .withCommandOptions(
-                                                                CommandOption.of("pluginChoice", "Plugin Choice")
+                                                                CommandOption.of("pluginChoice", "Plugin Choice"),
+                                                                CommandOption.of("otherChoice", "Plugin Choice")
                                                         )
                                         )
-                        ));
+                        )
+        );
         var parser = new CommandParser(options);
         var result = parser.buildHelp().trim();
         var expected = "Root item\n" +
@@ -518,7 +521,8 @@ public class ParserTest {
                 "\n" +
                 "  hp              hpl       Http Port\n" +
                 "  plugin                    Plugin\n" +
-                "    pluginChoice            Plugin Choice";
+                "    pluginChoice            Plugin Choice\n" +
+                "    otherChoice             Plugin Choice";
         assertEquals(expected,result);
         System.out.println(result);
     }

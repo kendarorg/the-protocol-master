@@ -124,31 +124,30 @@ public class CommandOptions implements CommandItem {
 
     protected static void printHelpListOfCommands(ArrayList<HelpLine> result, List<CommandOption> co,int level) {
         for (var item : co) {
-            if (item.hasSubChoices()) continue;
-            result.add(new
-                    HelpLine(item.getShortCommand(), item.getLongCommand(), item.getDescription(), null,
-                    item.isMultiple(),level+1));
+            if (item.hasSubChoices()) {
+                var choices = item.getSubChoices().stream().map(CommandOptions::getId).collect(Collectors.toCollection(HashSet::new));
+                var availableChoices = String.join("|", choices);
+                result.add(new HelpLine(item.getShortCommand(), item.getLongCommand(), item.getDescription(),
+                        availableChoices,item.isMultiple(),level+1));
+                if (item.getSubChoicesDescription() != null) {
+                    result.add(new HelpLine(item.getSubChoicesDescription(),level));
+                }
+                for (var choice : item.getSubChoices()) {
+                    if (choice.getDescription() != null) {
+                        result.add(new HelpLine(choice.getDescription()+" ("+choice.getId()+")",level));
+                        choice.printHelp(result,level);
+                    }
+                }
+            }else{
+                result.add(new
+                        HelpLine(item.getShortCommand(), item.getLongCommand(), item.getDescription(), null,
+                        item.isMultiple(),level+1));
+            }
             if (item.hasSubOptions()) {
                 for (var choice : item.getCommandOptions()) {
                     if (choice.getDescription() != null) {
                         choice.printHelp(result,level+2);
                     }
-                }
-            }
-        }
-        for (var item : co) {
-            if (!item.hasSubChoices()) continue;
-            var choices = item.getSubChoices().stream().map(CommandOptions::getId).collect(Collectors.toCollection(HashSet::new));
-            var availableChoices = String.join("|", choices);
-            result.add(new HelpLine(item.getShortCommand(), item.getLongCommand(), item.getDescription(),
-                    availableChoices,item.isMultiple(),level+1));
-            if (item.getSubChoicesDescription() != null) {
-                result.add(new HelpLine(item.getSubChoicesDescription(),level));
-            }
-            for (var choice : item.getSubChoices()) {
-                if (choice.getDescription() != null) {
-                    result.add(new HelpLine(choice.getDescription()+" ("+choice.getId()+")",level));
-                    choice.printHelp(result,level);
                 }
             }
         }
