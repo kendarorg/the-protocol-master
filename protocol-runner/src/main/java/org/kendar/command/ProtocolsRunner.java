@@ -145,10 +145,7 @@ public class ProtocolsRunner {
                       List<ProtocolPluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalse) throws Exception {
         var pr = protocols.get(protocol.getProtocol());
-        /*var datadir = Path.of(ini.getDataDir()).toAbsolutePath().toFile();
-        if (!datadir.exists()) {
-            datadir.mkdir();
-        }*/
+
         protocol.setProtocolInstanceId(key);
         pr.start(protocolServer, key, ini, protocol, storage, plugins, stopWhenFalse);
     }
