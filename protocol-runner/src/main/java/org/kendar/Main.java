@@ -138,11 +138,11 @@ public class Main {
     public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse) throws Exception {
         if (ini == null) return;
 
-        if (!ini.getDataDir().contains(":")) {
-            ini.setDataDir("file:" + ini.getDataDir());
+        if (!ini.getDataDir().contains("=")) {
+            ini.setDataDir("file=" + ini.getDataDir());
         }
         var dataDir = ini.getDataDir();
-        var splitted = dataDir.split(":", 2);
+        var splitted = dataDir.split("=", 2);
         var storage_type = "storage_" + splitted[0];
         var storageInstance = diService.getInstance(StorageRepository.class, storage_type);
         diService.overwrite(StorageRepository.class, storageInstance);

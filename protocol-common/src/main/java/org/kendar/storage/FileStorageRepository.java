@@ -63,7 +63,7 @@ public class FileStorageRepository implements StorageRepository {
             logsDir = Path.of("data",
                     Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
         }else{
-            logsDir = logsDir.replace("file:","");
+            logsDir = logsDir.replace("file=","");
         }
         this.targetDir = Path.of(logsDir).toAbsolutePath().toString();
         targetDir = ensureDirectory(targetDir);

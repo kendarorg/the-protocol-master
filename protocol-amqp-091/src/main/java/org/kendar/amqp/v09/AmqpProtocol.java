@@ -19,6 +19,10 @@ import org.kendar.amqp.v09.messages.methods.exchange.ExchangeDeclare;
 import org.kendar.amqp.v09.messages.methods.exchange.ExchangeDelete;
 import org.kendar.amqp.v09.messages.methods.exchange.ExchangeUnbind;
 import org.kendar.amqp.v09.messages.methods.queue.*;
+import org.kendar.di.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmNamed;
+import org.kendar.di.annotations.TpmService;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -28,14 +32,18 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@TpmService(tags = "amqp091")
 public class AmqpProtocol extends NetworkProtoDescriptor {
 
     private static final boolean IS_BIG_ENDIAN = true;
@@ -45,8 +53,23 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     private int port = PORT;
     private TimerInstance timer;
 
-    private AmqpProtocol() {
-
+    @TpmConstructor
+    public AmqpProtocol(GlobalSettings ini,ByteProtocolSettingsWithLogin settings, AmqpProxy proxy,
+                        @TpmNamed(tags = "amqp091") List<ProtocolPluginDescriptor> plugins) {
+        this.setTimeout(settings.getTimeoutSeconds());
+        this.setSettings(settings);
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
+            if (specificPluginSetting != null) {
+                plugin.initialize(ini, settings, specificPluginSetting);
+                plugin.refreshStatus();
+            } else {
+                plugins.remove(i);
+            }
+        }
+        proxy.setPlugins(plugins);
+        this.setProxy(proxy);
     }
 
     public AmqpProtocol(int port) {

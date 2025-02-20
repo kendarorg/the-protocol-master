@@ -96,6 +96,11 @@ public class DiService {
         bind(instance.getClass(), mappings);
     }
 
+    public void register(Object instance) {
+        singletons.put(instance.getClass(), instance);
+        bind(instance.getClass(), mappings);
+    }
+
     public void overwrite(Class<?> clazz, Object instance) {
         singletons.put(clazz, instance);
         var implOfInt = new ArrayList<Type>();

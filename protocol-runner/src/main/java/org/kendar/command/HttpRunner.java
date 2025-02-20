@@ -4,11 +4,14 @@ import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.http.HttpProtocol;
-import org.kendar.http.plugins.*;
+import org.kendar.http.plugins.HttpErrorPluginSettings;
+import org.kendar.http.plugins.HttpLatencyPluginSettings;
+import org.kendar.http.plugins.HttpRecordPluginSettings;
+import org.kendar.http.plugins.HttpReplayPluginSettings;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.RewritePluginSettings;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
@@ -142,11 +145,11 @@ public class HttpRunner extends CommonRunner {
         return "";
     }
 
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer,
-                      String sectionKey, GlobalSettings ini, ProtocolSettings pset, StorageRepository storage,
+    public void start(ConcurrentHashMap<String, TcpServer> protocolServers,
+                      String key, GlobalSettings ini, ProtocolSettings opaqueProtocolSettings, StorageRepository storage,
                       List<ProtocolPluginDescriptor> plugins,
                       Supplier<Boolean> stopWhenFalseAction) throws Exception {
-        var settings = (HttpProtocolSettings) pset;
+        /*var settings = (HttpProtocolSettings) pset;
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = pset.getPlugin(plugin.getId(), plugin.getSettingClass());
@@ -165,7 +168,17 @@ public class HttpRunner extends CommonRunner {
         ps.setOnStart(() -> DiService.setThreadContext(diService));
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(sectionKey, ps);
+        protocolServer.put(sectionKey, ps);*/
+
+        var diContext = DiService.getThreadContext();
+        diContext.register(opaqueProtocolSettings);
+        var baseProtocol = diContext.getInstance(NetworkProtoDescriptor.class,opaqueProtocolSettings.getProtocol());
+        baseProtocol.initialize();
+        ps = new TcpServer(baseProtocol);
+        ps.setOnStart(() -> DiService.setThreadContext(diContext));
+        ps.start();
+        Sleeper.sleep(5000, () -> ps.isRunning());
+        protocolServers.put(key, ps);
     }
 
 

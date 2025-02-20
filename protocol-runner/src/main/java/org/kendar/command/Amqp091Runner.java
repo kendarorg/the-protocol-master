@@ -1,6 +1,5 @@
 package org.kendar.command;
 
-import org.kendar.amqp.v09.AmqpProxy;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.di.DiService;
@@ -8,6 +7,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
@@ -40,7 +40,10 @@ public class Amqp091Runner extends CommonRunner {
                       ProtocolSettings opaqueProtocolSettings,
                       StorageRepository storage,
                       List<ProtocolPluginDescriptor> plugins, Supplier<Boolean> stopWhenFalse) throws Exception {
-        var protocolSettings = (ByteProtocolSettingsWithLogin) opaqueProtocolSettings;
+        var diContext = DiService.getThreadContext();
+        diContext.register(opaqueProtocolSettings);
+        var baseProtocol = diContext.getInstance(NetworkProtoDescriptor.class,opaqueProtocolSettings.getProtocol());
+        /*var protocolSettings = (ByteProtocolSettingsWithLogin) opaqueProtocolSettings;
 
         var port = ProtocolsRunner.getOrDefault(protocolSettings.getPort(), 5672);
         var timeoutSec = ProtocolsRunner.getOrDefault(protocolSettings.getTimeoutSeconds(), 30);
@@ -62,12 +65,12 @@ public class Amqp091Runner extends CommonRunner {
             }
         }
         proxy.setPlugins(plugins);
-        baseProtocol.setProxy(proxy);
+        baseProtocol.setProxy(proxy);*/
         baseProtocol.initialize();
-        baseProtocol.setSettings(protocolSettings);
-        var diService = DiService.getThreadContext();
+        //baseProtocol.setSettings(protocolSettings);
+        //var diService = DiService.getThreadContext();
         ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> DiService.setThreadContext(diService));
+        ps.setOnStart(() -> DiService.setThreadContext(diContext));
         ps.start();
         Sleeper.sleep(5000, () -> ps.isRunning());
         protocolServers.put(key, ps);
