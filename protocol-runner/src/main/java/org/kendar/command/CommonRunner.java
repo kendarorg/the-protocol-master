@@ -38,12 +38,12 @@ public abstract class CommonRunner {
                         .withCallback((s) -> settings.setTimeoutSeconds(Integer.parseInt(s)))));
         options.addAll(extraOptions);
 
-        options.add(CommandOption.of("record", "Record Calls")
+        options.add(CommandOption.of("record", "Start Recording Calls")
                 .withCallback(s -> {
                     recording.setActive(true);
                     settings.getPlugins().put("record-plugin", recording);
                 }));
-        options.add(CommandOption.of("replay", "Replay calls")
+        options.add(CommandOption.of("replay", "Start Replaying calls")
                 .withCommandOptions(
                         CommandOption.of("cdt", "Respect call duration timing\n" +
                                         "and distance between calls if applicable")

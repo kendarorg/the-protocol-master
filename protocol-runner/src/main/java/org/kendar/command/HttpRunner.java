@@ -66,12 +66,12 @@ public class HttpRunner extends CommonRunner {
                             settings.getPlugins().put("rewrite-plugin", rewrite);
                             rewrite.setActive(true);
                         }),
-                CommandOption.of("record", "Record Calls")
+                CommandOption.of("record", "Start recording calls")
                         .withCallback(s -> {
                             recording.setActive(true);
                             settings.getPlugins().put("record-plugin", recording);
                         }),
-                CommandOption.of("replay", "Replay calls")
+                CommandOption.of("replay", "Start replaying calls")
                         .withCommandOptions(
                                 CommandOption.of("cdt", "Respect call duration timing\n" +
                                                 "and distance between calls if applicable")
@@ -92,7 +92,7 @@ public class HttpRunner extends CommonRunner {
                             replaying.setActive(true);
                             settings.getPlugins().put("replay-plugin", replaying);
                         }),
-                CommandOption.of("errors", "Random errors")
+                CommandOption.of("errors", "Generate random errors")
                         .withCommandOptions(
                                 CommandOption.of("showError", "Http error code to show\n" +
                                                 "(default 0 aka none)")
@@ -108,7 +108,7 @@ public class HttpRunner extends CommonRunner {
                             recording.setActive(true);
                             settings.getPlugins().put("error-plugin", error);
                         }),
-                CommandOption.of("latency", "Random latency")
+                CommandOption.of("latency", "Apply random latency")
                         .withCommandOptions(
                                 CommandOption.of("latencyMin", "Minimum latency milliseconds\n" +
                                                 "(default 0)")
