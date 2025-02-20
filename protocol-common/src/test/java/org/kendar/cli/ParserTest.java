@@ -485,4 +485,41 @@ public class ParserTest {
         assertEquals("a=b", result.get(0));
         assertEquals("b=c", result.get(1));
     }
+
+    @Test
+    void testMultilevel() {
+        var options = CommandOptions.of("main","Root item");
+        options.withOptions(
+                CommandOption.of("j", "Stuff")
+                        .withLong("jjjj"),
+                CommandOption.of("p", "The protocol")
+                        .withParameter()
+                        .withMandatoryParameter()
+                        .withLong("protocol")
+                        .withSubChoices(
+                                CommandOptions.of("http","HTTP")
+                                        .withOptions(
+                                                CommandOption.of("hp", "Http Port").withLong("hpl"),
+                                                CommandOption.of("plugin", "Plugin")
+                                                        .withCommandOptions(
+                                                                CommandOption.of("pluginChoice", "Plugin Choice")
+                                                        )
+                                        )
+                        ));
+        var parser = new CommandParser(options);
+        var result = parser.buildHelp().trim();
+        var expected = "Root item\n" +
+                "\n" +
+                "  j               jjjj      Stuff\n" +
+                "  p               protocol  The protocol\n" +
+                "                            Options: http\n" +
+                "\n" +
+                "HTTP (http)\n" +
+                "\n" +
+                "  hp              hpl       Http Port\n" +
+                "  plugin                    Plugin\n" +
+                "    pluginChoice            Plugin Choice";
+        assertEquals(expected,result);
+        System.out.println(result);
+    }
 }

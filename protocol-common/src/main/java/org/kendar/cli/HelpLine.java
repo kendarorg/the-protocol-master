@@ -6,20 +6,32 @@ public class HelpLine {
     private String longCommand;
     private String description;
     private String availableOptions;
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    private int level;
     private boolean multiple;
 
     public HelpLine(String shortCommand, String longCommand, String description, String availableOptions,
-                    boolean multiple) {
+                    boolean multiple,int level) {
         this.shortCommand = shortCommand;
         this.longCommand = longCommand;
         this.description = description;
         this.availableOptions = availableOptions;
+        this.level = level;
         this.block = false;
         this.multiple = multiple;
     }
 
-    public HelpLine(String description) {
+    public HelpLine(String description,int level) {
         this.description = description;
+        this.level = level;
         this.block = true;
     }
 
@@ -30,9 +42,9 @@ public class HelpLine {
     @Override
     public String toString() {
         if (block) {
-            return description;
+            return description+" "+level;
         } else {
-            return shortCommand + "\t" + longCommand + "\t" + description;
+            return shortCommand + " " + longCommand + " " + description+" "+level;
         }
     }
 

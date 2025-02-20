@@ -100,13 +100,14 @@ public class CommandParser {
         var result = new ArrayList<HelpLine>();
         var toPrint = new StringBuilder();
 
-        if (options.getDescription() != null) result.add(new HelpLine(options.getDescription()));
-        options.printHelp(result);
+        if (options.getDescription() != null) result.add(new HelpLine(options.getDescription(),0));
+        var level =0;
+        options.printHelp(result,level);
         var maxShort = 0;
         var maxLong = 0;
         for (var item : result) {
             if (item.getShortCommand() != null) {
-                maxShort = Math.max(maxShort, item.getShortCommand().length());
+                maxShort = Math.max(maxShort,item.getLevel()*2 + item.getShortCommand().length());
             } else {
                 item.setShortCommand("");
             }
@@ -126,10 +127,15 @@ public class CommandParser {
         var max = 130 - maxLong - maxShort - 3;
         var firstLine = true;
         for (var item : result) {
+            var levelSpace = "";
+            for(var i =0;i<item.getLevel();i++){
+                levelSpace += "  ";
+            }
             if (!item.isBlock()) {
-                item.setShortCommand(item.getShortCommand() + sbShort.substring(item.getShortCommand().length()));
+                item.setShortCommand(item.getShortCommand() + sbShort.substring(levelSpace.length()+item.getShortCommand().length()));
                 item.setLongCommand(item.getLongCommand() + sbLong.substring(item.getLongCommand().length()));
-                var description = item.getDescription();
+                //+" "+item.getLevel();
+                var description = item.getDescription();;
                 if (item.getAvailableOptions() != null) {
                     description += "\nOptions: " + item.getAvailableOptions();
                 }
@@ -140,16 +146,17 @@ public class CommandParser {
                 for (int i = 0; i < split.length; i++) {
                     var descline = split[i];
                     if (i == 0) {
-                        toPrint.append("\t").append(item.getShortCommand()).append("\t").append(item.getLongCommand()).append("\t").append(descline).append("\n");
+                        toPrint.append(levelSpace+item.getShortCommand()).append("  ").append(item.getLongCommand()).append("  ").append(descline).append("\n");
                     } else {
-                        toPrint.append("\t").append(sbShort).append("\t").append(sbLong).append("\t").append(descline).append("\n");
+                        toPrint.append(sbShort).append("  ").append(sbLong).append("  ").append(descline).append("\n");
                     }
                 }
             } else {
                 if (!firstLine) {
                     toPrint.append("\n");
                 }
-                toPrint.append(item.getDescription()).append("\n");
+                //+" "+item.getLevel();
+                toPrint.append(levelSpace+item.getDescription()).append("\n");
                 toPrint.append("\n");
                 firstLine = false;
             }

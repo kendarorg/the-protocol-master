@@ -122,16 +122,16 @@ public class CommandOptions implements CommandItem {
         }
     }
 
-    protected static void printHelpListOfCommands(ArrayList<HelpLine> result, List<CommandOption> co) {
+    protected static void printHelpListOfCommands(ArrayList<HelpLine> result, List<CommandOption> co,int level) {
         for (var item : co) {
             if (item.hasSubChoices()) continue;
             result.add(new
                     HelpLine(item.getShortCommand(), item.getLongCommand(), item.getDescription(), null,
-                    item.isMultiple()));
+                    item.isMultiple(),level+1));
             if (item.hasSubOptions()) {
                 for (var choice : item.getCommandOptions()) {
                     if (choice.getDescription() != null) {
-                        choice.printHelp(result);
+                        choice.printHelp(result,level+2);
                     }
                 }
             }
@@ -141,14 +141,14 @@ public class CommandOptions implements CommandItem {
             var choices = item.getSubChoices().stream().map(CommandOptions::getId).collect(Collectors.toCollection(HashSet::new));
             var availableChoices = String.join("|", choices);
             result.add(new HelpLine(item.getShortCommand(), item.getLongCommand(), item.getDescription(),
-                    availableChoices,item.isMultiple()));
+                    availableChoices,item.isMultiple(),level+1));
             if (item.getSubChoicesDescription() != null) {
-                result.add(new HelpLine(item.getSubChoicesDescription()));
+                result.add(new HelpLine(item.getSubChoicesDescription(),level));
             }
             for (var choice : item.getSubChoices()) {
                 if (choice.getDescription() != null) {
-                    result.add(new HelpLine(choice.getDescription()));
-                    choice.printHelp(result);
+                    result.add(new HelpLine(choice.getDescription()+" ("+choice.getId()+")",level));
+                    choice.printHelp(result,level);
                 }
             }
         }
@@ -277,8 +277,8 @@ public class CommandOptions implements CommandItem {
         return this;
     }
 
-    public void printHelp(ArrayList<HelpLine> result) {
-        printHelpListOfCommands(result, commandOptions);
+    public void printHelp(ArrayList<HelpLine> result,int level) {
+        printHelpListOfCommands(result, commandOptions,level);
     }
 
     public String getDescription() {
