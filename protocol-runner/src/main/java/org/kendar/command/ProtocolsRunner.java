@@ -13,7 +13,6 @@ import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,11 +69,11 @@ public class ProtocolsRunner {
                         .withLong("apis")
                         .withMandatoryParameter()
                         .withCallback((s) -> settings.get().setApiPort(Integer.parseInt(s))),
+                CommandOption.of("h", "Show help")
+                        .withLong("help"),
                 CommandOption.of("p", "The protocols to start")
                         .withLong("protocol")
-                        .withMandatoryParameter(),
-                CommandOption.of("h", "Show help")
-                        .withLong("help")
+                        .withMandatoryParameter()
         );
         return coptions;
     }
