@@ -515,7 +515,7 @@ public class ParserTest {
                 "\n" +
                 "  j               jjjj      Stuff\n" +
                 "  p               protocol  The protocol\n" +
-                "                            Options: http\n" +
+                "                            *Options: http\n" +
                 "\n" +
                 "HTTP (http)\n" +
                 "\n" +
