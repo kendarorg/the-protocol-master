@@ -73,7 +73,7 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var pl = new AmqpReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
@@ -159,7 +159,7 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var pl = new AmqpReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
@@ -210,7 +210,7 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var pl = new AmqpReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
 
         baseProtocol.setProxy(proxy);

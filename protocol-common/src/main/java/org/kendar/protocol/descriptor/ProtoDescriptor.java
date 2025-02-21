@@ -1,5 +1,6 @@
 package org.kendar.protocol.descriptor;
 
+import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.ProtocolApiHandler;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.states.InterruptProtoState;
@@ -39,6 +40,7 @@ public abstract class ProtoDescriptor {
     private ConcurrentHashMap<Integer, ProtoContext> contextsCache;
     private TimerInstance contextCleaner;
     private ProtocolSettings settings;
+    private List<BasePluginDescriptor> plugins;
 
     public static long getNow() {
         return System.currentTimeMillis() / 1000;
@@ -248,5 +250,13 @@ public abstract class ProtoDescriptor {
 
     public void setSettings(ProtocolSettings settings) {
         this.settings = settings;
+    }
+
+    public void setPlugins(List<BasePluginDescriptor> plugins) {
+        this.plugins = plugins;
+    }
+
+    public List<BasePluginDescriptor> getPlugins() {
+        return plugins;
     }
 }

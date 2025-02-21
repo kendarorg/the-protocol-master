@@ -6,7 +6,6 @@ import org.kendar.mysql.plugins.MySqlReplayPlugin;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.jpa.HibernateSessionFactory;
@@ -28,7 +27,7 @@ public class ReplayerTest {
     void showWarnings() throws Exception {
 
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver");
+        var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver");
 
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "showWarnings"));
@@ -38,7 +37,7 @@ public class ReplayerTest {
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
         var pl = new MySqlReplayPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -70,7 +69,7 @@ public class ReplayerTest {
     @Test
     void simpleJpaTest() throws Exception {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver");
+        var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver");
 
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "replay"));
@@ -80,7 +79,7 @@ public class ReplayerTest {
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
         var pl = new MySqlReplayPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

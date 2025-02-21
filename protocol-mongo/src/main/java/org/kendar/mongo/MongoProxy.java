@@ -12,6 +12,8 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
+import org.kendar.di.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.iterators.ProcessId;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpMsgSection;
@@ -23,8 +25,10 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.utils.JsonMapper;
 
+@TpmService()
 public class MongoProxy extends Proxy {
     protected static final JsonMapper mapper = new JsonMapper();
     private String connectionString;
@@ -34,6 +38,11 @@ public class MongoProxy extends Proxy {
 
         this.connectionString = connectionString;
         this.serverApiVersion = serverApiVersion;
+    }
+
+    @TpmConstructor
+    public MongoProxy(ByteProtocolSettingsWithLogin settings){
+        this(settings.getConnectionString(),ServerApiVersion.V1);
     }
 
     public MongoProxy(String connectionString) {
@@ -96,7 +105,7 @@ public class MongoProxy extends Proxy {
         var pluginContext = new PluginContext("MONGODB", "OP_MSG", start, protoContext);
 
 
-        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, data, out)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.PRE_CALL, data, out)) {
             if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, data, out)) {
                 return out;
             }
@@ -112,7 +121,7 @@ public class MongoProxy extends Proxy {
                 commandResult.toJson(
                         JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build()));
         out.getSections().add(section);
-        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, data, out)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.POST_CALL, data, out)) {
             if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, data, out)) {
                 break;
             }
@@ -126,7 +135,7 @@ public class MongoProxy extends Proxy {
         var out = new OpMsgContent(0, protoContext.getReqResId(), lsatOp.getRequestId());
         var pluginContext = new PluginContext("MONGODB", "HELLO_OP_MSG", start, protoContext);
 
-        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, lsatOp, out)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.PRE_CALL, lsatOp, out)) {
             if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, lsatOp, out)) {
                 return out;
             }
@@ -160,7 +169,7 @@ public class MongoProxy extends Proxy {
         out.setFlags(0);
         out.setRequestId(protoContext.getReqResId());
         out.setResponseId(lsatOp.getRequestId());
-        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, lsatOp, out)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.POST_CALL, lsatOp, out)) {
             if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
                 break;
             }
@@ -173,7 +182,7 @@ public class MongoProxy extends Proxy {
         var out = new OpReplyContent();
         var pluginContext = new PluginContext("MONGODB", "HELLO_OP_QUERY", start, protoContext);
 
-        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, lsatOp, out)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.PRE_CALL, lsatOp, out)) {
             if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, lsatOp, out)) {
                 return out;
             }
@@ -215,7 +224,7 @@ public class MongoProxy extends Proxy {
         out.setCursorId(0);
         out.getDocuments().add(json);
 
-        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, lsatOp, out)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.POST_CALL, lsatOp, out)) {
             if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, lsatOp, out)) {
                 break;
             }

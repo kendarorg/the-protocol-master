@@ -13,6 +13,7 @@ import org.kendar.di.TpmScopeType;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.storage.generic.StorageRepository;
@@ -30,7 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 
 import static java.lang.System.exit;
@@ -157,7 +158,7 @@ public class Main {
         diService.register(FiltersConfiguration.class, new FiltersConfiguration());
         var apisFiltersLoader = diService.getInstance(ApiFiltersLoader.class);
 
-        var started = new AtomicInteger(0);
+        CountDownLatch latch = new CountDownLatch(ini.getProtocols().size());
         for (var item : ini.getProtocols().entrySet()) {
             new Thread(() -> {
                 try {
@@ -182,18 +183,26 @@ public class Main {
                             protocolServersCache.get(item.getKey()), availableProtocolPlugins, protocolFullSettings);
                     var apiHandler = localDiService.getInstance(ApiHandler.class);
                     apiHandler.addProtocol(pi);
-                    for (var pl : pi.getPlugins()) {
-                        var apiHandlerPlugin = pl.getApiHandler();
+                    for (var pl : ((NetworkProtoDescriptor)protocolServersCache.get(item.getKey()).getProtoDescriptor()).getPlugins()) {
+                        var apiHandlerPlugin = ((ProtocolPluginDescriptor)pl).getApiHandler();
                         apisFiltersLoader.getFilters().addAll(apiHandlerPlugin);
                     }
-                    started.incrementAndGet();
                     ini.putService(item.getKey(), pi);
 
                 } catch (Exception ex) {
                     log.error("Unable to start protocol {}", item.getKey(), ex);
                 }
+
+                latch.countDown();
             }).start();
         }
+
+        try {
+            latch.await();
+        } catch(InterruptedException ex) {
+            log.error("Error waiting for plugin to start");
+        }
+
         var globalPlugins = diService.getInstances(GlobalPluginDescriptor.class);
         for (int i = globalPlugins.size() - 1; i >= 0; i--) {
             var plugin = globalPlugins.get(i);
@@ -206,9 +215,6 @@ public class Main {
         }
         new Thread(() -> {
             try {
-                while (started.get() < ini.getProtocols().size()) {
-                    Sleeper.sleep(100);
-                }
                 for (var item : protocolServersCache.values()) {
                     var protocolFilter = item.getProtoDescriptor().getApiHandler();
                     if (protocolFilter != null) {

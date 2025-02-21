@@ -22,7 +22,7 @@ import org.kendar.amqp.v09.messages.methods.queue.*;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -55,21 +55,10 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
 
     @TpmConstructor
     public AmqpProtocol(GlobalSettings ini,ByteProtocolSettingsWithLogin settings, AmqpProxy proxy,
-                        @TpmNamed(tags = "amqp091") List<ProtocolPluginDescriptor> plugins) {
+                        @TpmNamed(tags = "amqp091") List<BasePluginDescriptor> plugins) {
+        super(ini, settings, proxy, plugins);
+        this.port = settings.getPort();
         this.setTimeout(settings.getTimeoutSeconds());
-        this.setSettings(settings);
-        for (var i = plugins.size() - 1; i >= 0; i--) {
-            var plugin = plugins.get(i);
-            var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
-            if (specificPluginSetting != null) {
-                plugin.initialize(ini, settings, specificPluginSetting);
-                plugin.refreshStatus();
-            } else {
-                plugins.remove(i);
-            }
-        }
-        proxy.setPlugins(plugins);
-        this.setProxy(proxy);
     }
 
     public AmqpProtocol(int port) {

@@ -91,7 +91,7 @@ public class BasicTest {
         var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(
+        proxy.setPluginHandlers(List.of(
                 recordPlugin, rep, publishPlugin));
         recordPlugin.setActive(true);
         rep.setActive(true);

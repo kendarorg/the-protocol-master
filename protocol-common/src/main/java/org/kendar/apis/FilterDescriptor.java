@@ -278,7 +278,8 @@ public class FilterDescriptor {
         return new TpmDocConcrete(doc);
     }
 
-    private String replaceFilterSpecific(String pathPattern, FilteringClass filterClass) {
+    private String replaceFilterSpecific(String pathPatternOri, FilteringClass filterClass) {
+        var pathPattern = pathPatternOri;
         if (ProtocolPluginApiHandler.class.isAssignableFrom(filterClass.getClass())) {
             var ppah = (ProtocolPluginApiHandler) filterClass;
             pathPattern = pathPattern.replaceAll(

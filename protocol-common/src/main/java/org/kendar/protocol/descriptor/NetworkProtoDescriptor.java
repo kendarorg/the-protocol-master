@@ -2,11 +2,18 @@ package org.kendar.protocol.descriptor;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
+import org.kendar.plugins.base.AlwaysActivePlugin;
+import org.kendar.plugins.base.BasePluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.Proxy;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.tcpserver.ClientServerChannel;
 import org.slf4j.MDC;
+
+import java.util.List;
 
 /**
  * Descriptor for network protocol
@@ -25,6 +32,29 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
         return false;
     }
 
+    public NetworkProtoDescriptor(){
+
+    }
+
+    public NetworkProtoDescriptor(GlobalSettings ini, ProtocolSettings settings, Proxy proxy,
+                                  List<BasePluginDescriptor> plugins) {
+        this.setSettings(settings);
+
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
+            if (specificPluginSetting != null|| AlwaysActivePlugin.class.isAssignableFrom(plugin.getClass())) {
+                ((ProtocolPluginDescriptor)plugin).initialize(ini, settings, specificPluginSetting);
+                plugin.refreshStatus();
+            } else {
+                plugins.remove(i);
+            }
+        }
+        this.setPlugins(plugins);
+        proxy.setPluginHandlers(plugins);
+        this.setProxy(proxy);
+    }
+
     /**
      * Initialize all (and the proxy)
      */
@@ -38,6 +68,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
             super.initialize();
         }
     }
+
 
     /**
      * Default for greetings

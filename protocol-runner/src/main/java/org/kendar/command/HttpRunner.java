@@ -28,7 +28,7 @@ import java.util.function.Supplier;
 @TpmService
 public class HttpRunner extends CommonRunner {
     private static final Logger log = LoggerFactory.getLogger(HttpRunner.class);
-    private TcpServer ps;
+
 
 
     @Override
@@ -145,41 +145,7 @@ public class HttpRunner extends CommonRunner {
         return "";
     }
 
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServers,
-                      String key, GlobalSettings ini, ProtocolSettings opaqueProtocolSettings, StorageRepository storage,
-                      List<ProtocolPluginDescriptor> plugins,
-                      Supplier<Boolean> stopWhenFalseAction) throws Exception {
-        /*var settings = (HttpProtocolSettings) pset;
-        for (var i = plugins.size() - 1; i >= 0; i--) {
-            var plugin = plugins.get(i);
-            var specificPluginSetting = pset.getPlugin(plugin.getId(), plugin.getSettingClass());
-            if (specificPluginSetting != null || plugin instanceof SSLDummyPlugin) {
-                plugin.initialize(ini, settings, specificPluginSetting);
-                plugin.refreshStatus();
-            } else {
-                plugins.remove(i);
-            }
-        }
-        var baseProtocol = new HttpProtocol(ini, settings, plugins);
-        baseProtocol.setSettings(settings);
-        baseProtocol.initialize();
-        var diService = DiService.getThreadContext();
-        ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> DiService.setThreadContext(diService));
-        ps.start();
-        Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServer.put(sectionKey, ps);*/
 
-        var diContext = DiService.getThreadContext();
-        diContext.register(opaqueProtocolSettings);
-        var baseProtocol = diContext.getInstance(NetworkProtoDescriptor.class,opaqueProtocolSettings.getProtocol());
-        baseProtocol.initialize();
-        ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> DiService.setThreadContext(diContext));
-        ps.start();
-        Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServers.put(key, ps);
-    }
 
 
     @Override
@@ -192,8 +158,5 @@ public class HttpRunner extends CommonRunner {
         return HttpProtocolSettings.class;
     }
 
-    @Override
-    public void stop() {
-        ps.stop();
-    }
+
 }

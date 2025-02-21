@@ -12,7 +12,6 @@ import org.kendar.postgres.plugins.PostgresReportPlugin;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
-import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -68,7 +67,7 @@ public class BasicTest {
     public static void beforeEachBase(TestInfo testInfo) {
 
         baseProtocol = new PostgresProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("org.postgresql.Driver",
+        var proxy = new PostgresProxy("org.postgresql.Driver",
                 postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
 
@@ -109,7 +108,7 @@ public class BasicTest {
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new PostgresReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl, pl1, rep));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

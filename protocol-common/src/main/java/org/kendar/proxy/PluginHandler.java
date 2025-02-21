@@ -1,6 +1,7 @@
 package org.kendar.proxy;
 
 
+import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -29,13 +30,13 @@ public class PluginHandler {
         }
     }
 
-    public static List<PluginHandler> of(ProtocolPluginDescriptor plugin, ProtoDescriptor protocol) {
+    public static List<PluginHandler> of(BasePluginDescriptor plugin, ProtoDescriptor protocol) {
         return of(plugin, "handle", protocol);
     }
 
-    public static List<PluginHandler> of(ProtocolPluginDescriptor plugin, String methodName, ProtoDescriptor protocol) {
+    public static List<PluginHandler> of(BasePluginDescriptor plugin, String methodName, ProtoDescriptor protocol) {
         var result = new ArrayList<PluginHandler>();
-        plugin.setProtocolInstance(protocol);
+        ((ProtocolPluginDescriptor)plugin).setProtocolInstance(protocol);
         var clazz = plugin.getClass();
         var handles = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase(methodName)).toList();
         for (var handle : handles) {
@@ -44,7 +45,7 @@ public class PluginHandler {
                     handle.getParameters()[1].getType() != ProtocolPhase.class) continue;
             var inParam = handle.getParameters()[2].getType();
             var outParam = handle.getParameters()[3].getType();
-            result.add(new PluginHandler(plugin, inParam, outParam, handle));
+            result.add(new PluginHandler((ProtocolPluginDescriptor) plugin, inParam, outParam, handle));
         }
         return result;
     }

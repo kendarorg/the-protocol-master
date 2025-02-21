@@ -2,9 +2,13 @@ package org.kendar.mqtt;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
+import org.kendar.di.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmNamed;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.fsm.*;
 import org.kendar.mqtt.fsm.events.MqttPacket;
 import org.kendar.mqtt.utils.MqttBBuffer;
+import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.context.Tag;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -14,12 +18,25 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.settings.GlobalSettings;
 
+import java.util.List;
+
+@TpmService(tags = "mqtt")
 public class MqttProtocol extends NetworkProtoDescriptor {
     public static final int VERSION_5 = 5;
     private static final int PORT = 1883;
     public static int VERSION_3 = 3;
     private int port = PORT;
+
+    @TpmConstructor
+    public MqttProtocol(GlobalSettings ini, ByteProtocolSettingsWithLogin settings, MqttProxy proxy,
+                        @TpmNamed(tags = "mqtt") List<BasePluginDescriptor> plugins) {
+        super(ini, settings, proxy, plugins);
+        this.port = settings.getPort();
+        this.setTimeout(settings.getTimeoutSeconds());
+    }
 
 
     public MqttProtocol(int port) {

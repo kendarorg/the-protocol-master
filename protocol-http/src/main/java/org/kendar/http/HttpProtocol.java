@@ -6,12 +6,13 @@ import org.kendar.apis.converters.RequestResponseBuilderImpl;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.http.plugins.SSLDummyPlugin;
 import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
 import org.kendar.http.utils.dns.DnsMultiResolverImpl;
+import org.kendar.plugins.base.AlwaysActivePlugin;
+import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
@@ -24,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -34,7 +34,7 @@ import java.util.logging.Level;
 public class HttpProtocol extends NetworkProtoDescriptor {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
     private final GlobalSettings globalSettings;
-    private final List<ProtocolPluginDescriptor> plugins;
+    private final List<BasePluginDescriptor> plugins;
     private final HttpProtocolSettings settings;
     private ProxyServer proxy;
     private HttpsServer httpsServer;
@@ -44,20 +44,20 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
     @TpmConstructor
     public HttpProtocol(GlobalSettings ini, HttpProtocolSettings settings,
-                        @TpmNamed(tags = "http") List<ProtocolPluginDescriptor> plugins) {
+                        @TpmNamed(tags = "http") List<BasePluginDescriptor> plugins) {
         this.globalSettings = ini;
         this.settings = settings;
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
-            if (specificPluginSetting != null || plugin instanceof SSLDummyPlugin) {
-                plugin.initialize(ini, settings, specificPluginSetting);
+            if (specificPluginSetting != null || AlwaysActivePlugin.class.isAssignableFrom(plugin.getClass())) {
+                ((ProtocolPluginDescriptor)plugin).initialize(ini, settings, specificPluginSetting);
                 plugin.refreshStatus();
             } else {
                 plugins.remove(i);
             }
         }
-        this.plugins = new ArrayList<>(plugins);
+        this.plugins = plugins;
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
     }
 
@@ -79,7 +79,8 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         return httpsServer;
     }
 
-    public List<ProtocolPluginDescriptor> getPlugins() {
+    @Override
+    public List<BasePluginDescriptor> getPlugins() {
         return plugins;
     }
 
@@ -187,7 +188,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                 var plugin = plugins.get(i);
                 var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
                 if (specificPluginSetting != null) {
-                    plugin.initialize(globalSettings, settings, specificPluginSetting);
+                    ((ProtocolPluginDescriptor)plugin).initialize(globalSettings, settings, specificPluginSetting);
                 }
             }
 

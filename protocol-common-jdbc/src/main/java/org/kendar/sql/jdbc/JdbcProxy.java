@@ -8,6 +8,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
+import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.sql.parser.SqlStringParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +22,28 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class JdbcProxy extends Proxy {
+public abstract class JdbcProxy extends Proxy {
     private static final Logger log = LoggerFactory.getLogger(JdbcProxy.class);
     private final String driver;
     private final String connectionString;
     private final String forcedSchema;
     private final String login;
     private final String password;
+
+    public JdbcProxy(JdbcProtocolSettings settings){
+        super();
+        var localDriver = settings.getDriver();
+        if(localDriver == null){
+            localDriver = getDefaultDriver();
+        }
+        this.driver = localDriver;
+        this.connectionString = settings.getConnectionString();
+        this.forcedSchema = settings.getForceSchema();
+        this.login = settings.getLogin();
+        this.password = settings.getPassword();
+    }
+
+    protected abstract String getDefaultDriver();
 
     public JdbcProxy(String driver) {
         this(driver, null, null, null, null);
@@ -255,7 +271,7 @@ public class JdbcProxy extends Proxy {
             long start = System.currentTimeMillis();
             var pluginContext = new PluginContext("JDBC", "QUERY", start, context);
             var jdbcCall = new JdbcCall(query, parameterValues);
-            for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
+            for (var plugin : getPluginHandlers(ProtocolPhase.PRE_CALL, jdbcCall, result)) {
                 if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, jdbcCall, result)) {
                     return result;
                 }
@@ -281,7 +297,7 @@ public class JdbcProxy extends Proxy {
             } else {
                 runThroughSingleResult(insert, parameterValues, statement, result, count);
             }
-            for (var plugin : getPlugins(ProtocolPhase.POST_CALL, jdbcCall, result)) {
+            for (var plugin : getPluginHandlers(ProtocolPhase.POST_CALL, jdbcCall, result)) {
                 if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, jdbcCall, result)) {
                     break;
                 }

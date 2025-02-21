@@ -107,8 +107,8 @@ public class ApiTest extends ApiTestBase {
 
         var plugins = getRequest("http://localhost:5005/api/protocols/redis-01/plugins", httpclient, new TypeReference<List<PluginIndex>>() {
         });
-        assertEquals(3, plugins.size());
-        assertEquals(plugins.stream().filter(p -> !p.isActive()).count(),2);
+        assertEquals(4, plugins.size());
+        assertEquals(3,plugins.stream().filter(p -> !p.isActive()).count());
 
 
         var okResult = getRequest("http://localhost:5005/api/protocols/all/plugins/record-plugin/start", httpclient, new TypeReference<Ok>() {

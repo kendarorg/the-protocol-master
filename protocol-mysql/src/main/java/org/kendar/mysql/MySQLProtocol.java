@@ -1,8 +1,12 @@
 package org.kendar.mysql;
 
+import org.kendar.di.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmNamed;
+import org.kendar.di.annotations.TpmService;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.fsm.*;
 import org.kendar.mysql.fsm.events.CommandEvent;
+import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -11,11 +15,21 @@ import org.kendar.protocol.states.NetworkWait;
 import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.parser.SqlStringParser;
 
+import java.util.List;
 
+@TpmService(tags = "mysql")
 public class MySQLProtocol extends NetworkProtoDescriptor {
 
+    @TpmConstructor
+    public MySQLProtocol(GlobalSettings ini, MySqlProtocolSettings settings, MySQLProxy proxy,
+                            @TpmNamed(tags = "mysql") List<BasePluginDescriptor> plugins) {
+        super(ini, settings, proxy, plugins);
+        this.port = settings.getPort();
+        this.setTimeout(settings.getTimeoutSeconds());
+    }
 
     private static final SqlStringParser parser = new SqlStringParser("?");
 

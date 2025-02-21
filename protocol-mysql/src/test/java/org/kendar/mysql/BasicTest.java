@@ -12,7 +12,6 @@ import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
-import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -57,7 +56,7 @@ public class BasicTest {
 
     public static void beforeEachBase(TestInfo testInfo) {
         baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
+        var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl(), null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
         StorageRepository storage = new NullStorageRepository();
@@ -97,7 +96,7 @@ public class BasicTest {
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new MySqlReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl, pl1, rep));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep));
 
 
         pl.setActive(true);
@@ -114,7 +113,7 @@ public class BasicTest {
 
     public static void beforeEachBasePrep(TestInfo testInfo) {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
+        var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl() +
                         "?generateSimpleParameterMetadata=true" +
                         "&useServerPrepStmts=true", null,
@@ -152,14 +151,14 @@ public class BasicTest {
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
         var pl = new MySqlRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
         var pl1 = new MySqlMockPlugin(mapper,storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
-        proxy.setPlugins(List.of(pl, pl1));
+        proxy.setPluginHandlers(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);
