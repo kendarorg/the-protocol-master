@@ -1,8 +1,8 @@
 package org.kendar.amqp.v09.cli;
 
+import org.kendar.amqp.v09.AmqpProtocolSettings;
 import org.kendar.command.NetworkProtocolCommandLineHandler;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.ProtocolSettings;
 
 @TpmService(tags = "amqp091")
@@ -30,6 +30,6 @@ public class AmqpCommandLineHandler extends NetworkProtocolCommandLineHandler {
 
     @Override
     protected ProtocolSettings buildProtocolSettings() {
-        return new ByteProtocolSettingsWithLogin();
+        return new AmqpProtocolSettings();
     }
 }

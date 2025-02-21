@@ -2,7 +2,7 @@ package org.kendar.redis.cli;
 
 import org.kendar.command.NetworkProtocolCommandLineHandler;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.redis.RedisProtocolSettings;
 import org.kendar.settings.ProtocolSettings;
 
 @TpmService(tags = "redis")
@@ -30,6 +30,6 @@ public class RedisCommandLineHandler extends NetworkProtocolCommandLineHandler {
 
     @Override
     protected ProtocolSettings buildProtocolSettings() {
-        return new ByteProtocolSettingsWithLogin();
+        return new RedisProtocolSettings();
     }
 }

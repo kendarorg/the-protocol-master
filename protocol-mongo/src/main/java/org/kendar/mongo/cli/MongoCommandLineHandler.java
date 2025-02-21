@@ -2,7 +2,7 @@ package org.kendar.mongo.cli;
 
 import org.kendar.command.NetworkProtocolCommandLineHandler;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.mongo.MongoProtocolSettings;
 import org.kendar.settings.ProtocolSettings;
 
 @TpmService(tags = "mongodb")
@@ -30,6 +30,6 @@ public class MongoCommandLineHandler extends NetworkProtocolCommandLineHandler {
 
     @Override
     protected ProtocolSettings buildProtocolSettings() {
-        return new ByteProtocolSettingsWithLogin();
+        return new MongoProtocolSettings();
     }
 }

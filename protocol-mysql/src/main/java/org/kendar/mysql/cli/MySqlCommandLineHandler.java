@@ -3,6 +3,7 @@ package org.kendar.mysql.cli;
 import org.kendar.cli.CommandOption;
 import org.kendar.command.NetworkProtocolCommandLineHandler;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
@@ -34,7 +35,7 @@ public class MySqlCommandLineHandler extends NetworkProtocolCommandLineHandler {
 
     @Override
     protected ProtocolSettings buildProtocolSettings() {
-        return new JdbcProtocolSettings();
+        return new MySqlProtocolSettings();
     }
 
     @Override

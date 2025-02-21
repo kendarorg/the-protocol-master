@@ -2,7 +2,7 @@ package org.kendar.mqtt.cli;
 
 import org.kendar.command.NetworkProtocolCommandLineHandler;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.settings.ByteProtocolSettingsWithLogin;
+import org.kendar.mqtt.MqttProtocolSettings;
 import org.kendar.settings.ProtocolSettings;
 
 @TpmService(tags = "mqtt")
@@ -30,6 +30,6 @@ public class MqttCommandLineHandler extends NetworkProtocolCommandLineHandler {
 
     @Override
     protected ProtocolSettings buildProtocolSettings() {
-        return new ByteProtocolSettingsWithLogin();
+        return new MqttProtocolSettings();
     }
 }
