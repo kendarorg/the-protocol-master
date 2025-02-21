@@ -168,6 +168,17 @@ public class BasicTest {
 
         var recordingSettings = new HttpRecordPluginSettings();
         httpProtocolSettings.getPlugins().put("record-plugin", recordingSettings);
+
+        var reportSettings = new PluginSettings();
+        reportSettings.setActive(true);
+        httpProtocolSettings.getPlugins().put("report-plugin", reportSettings);
+
+        var latencySettings = new HttpLatencyPluginSettings();
+        httpProtocolSettings.getPlugins().put("latency-plugin", latencySettings);
+
+        var ratelimit = new HttpRateLimitPluginSettings();
+        httpProtocolSettings.getPlugins().put("rate-limit-plugin", ratelimit);
+
         var replaySettings = new HttpReplayPluginSettings();
         httpProtocolSettings.getPlugins().put("replay-plugin", replaySettings);
         var mockSettings = new BasicMockPluginSettings();
@@ -204,9 +215,7 @@ public class BasicTest {
     public void afterEachBase() {
         EventsQueue.unregister("recorder", ReportDataEvent.class);
         events.clear();
-        //if(protocolServer!=null) {
-            protocolServer.stop();
-            Sleeper.sleep(5000, () -> !protocolServer.isRunning());
-        //}
+        protocolServer.stop();
+        Sleeper.sleep(5000, () -> !protocolServer.isRunning());
     }
 }
