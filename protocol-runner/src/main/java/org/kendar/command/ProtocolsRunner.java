@@ -2,17 +2,12 @@ package org.kendar.command;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
-import org.kendar.cli.CommandParser;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -20,13 +15,8 @@ import java.util.regex.Pattern;
 public class ProtocolsRunner {
     private static final JsonMapper mapper = new JsonMapper();
     private static final String TPM_REPLACE = "TPM_REPLACE";
-    private final Map<String, CommonRunner> protocols = new HashMap<>();
+    //private final Map<String, CommonRunner> protocols = new HashMap<>();
 
-    public ProtocolsRunner(List<CommonRunner> input) {
-        for (CommonRunner protocol : input) {
-            protocols.put(protocol.getId(), protocol);
-        }
-    }
 
     public static CommandOptions getMainOptions(ChangeableReference<GlobalSettings> settings) {
 
@@ -91,42 +81,5 @@ public class ProtocolsRunner {
             return defaultValue;
         }
         return (T) value;
-    }
-
-    public boolean prepareSettingsFromCommandLine(CommandOptions options, String[] args, GlobalSettings settings, CommandParser parser) {
-
-        try {
-            var protocolMotherOption = options.getCommandOption("p");
-            var protocolOptionsToAdd = new ArrayList<CommandOptions>();
-
-            if (parser.hasOption("help")) {
-                var helpValue = parser.getOptionValue("help");
-                if (helpValue == null) {
-                    for (var protocol : protocols.values()) {
-                        protocolOptionsToAdd.add(protocol.getOptions(settings));
-                    }
-                    protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
-                } else {
-                    var protocol = protocols.values().stream().filter(p -> p.getId().equalsIgnoreCase(helpValue)).findFirst().get();
-                    protocolOptionsToAdd.add(protocol.getOptions(settings));
-                    protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
-                }
-                throw new Exception();
-            } else {
-
-                for (var protocol : protocols.values()) {
-                    protocolOptionsToAdd.add(protocol.getOptions(settings));
-                }
-                protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
-                parser.parse(args);
-                return true;
-            }
-        } catch (Exception ex) {
-            if (ex.getMessage() != null) {
-                System.err.println("ERROR: " + ex.getMessage());
-            }
-            parser.printHelp();
-        }
-        return false;
     }
 }

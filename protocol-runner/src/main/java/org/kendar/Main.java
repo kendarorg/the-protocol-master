@@ -45,7 +45,7 @@ import static java.lang.System.exit;
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static ConcurrentHashMap<String, TcpServer> protocolServersCache;
-    private static ProtocolsRunner protocolsRunner;
+    //private static ProtocolsRunner protocolsRunner;
     private static JarPluginManager pluginManager;
     private static HttpServer apiServer;
     private static DiService diService;
@@ -91,7 +91,7 @@ public class Main {
             diService.bind(ec);
         }
 
-        protocolsRunner = diService.getInstance(ProtocolsRunner.class);
+        //protocolsRunner = diService.getInstance(ProtocolsRunner.class);
         /*if (!parser.hasOption("cfg")) {
             if (!protocolsRunner.prepareSettingsFromCommandLine(options, args, settings.get(), parser)) {
                 return;
