@@ -68,7 +68,7 @@ public class BasicTest {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
                 try {
-                    FileUtils.copyDirectory(Path.of("src","test","resources","data").toFile(),
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
                             Path.of("target", "tests", className, method, dsp).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -76,7 +76,7 @@ public class BasicTest {
             } else {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
                 try {
-                    FileUtils.copyDirectory(Path.of("src","test","resources","data").toFile(),
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
                             Path.of("target", "tests", className, method).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -89,7 +89,7 @@ public class BasicTest {
         var mapper = new JsonMapper();
         var pl = new MySqlRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
-        var pl1 = new MySqlMockPlugin(mapper,storage);
+        var pl1 = new MySqlMockPlugin(mapper, storage);
         var global = new GlobalSettings();
         //global.putService("storage", storage);
         var mockPluginSettings = new BasicMockPluginSettings();
@@ -129,7 +129,7 @@ public class BasicTest {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
                 try {
-                    FileUtils.copyDirectory(Path.of("src","test","resources","data").toFile(),
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
                             Path.of("target", "tests", className, method, dsp).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -137,7 +137,7 @@ public class BasicTest {
             } else {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
                 try {
-                    FileUtils.copyDirectory(Path.of("src","test","resources","data").toFile(),
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
                             Path.of("target", "tests", className, method).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -153,7 +153,7 @@ public class BasicTest {
         var pl = new MySqlRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
-        var pl1 = new MySqlMockPlugin(mapper,storage);
+        var pl1 = new MySqlMockPlugin(mapper, storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

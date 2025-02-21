@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="1">
+    <list size="4">
       <item index="0" class="java.lang.String" itemvalue="org.kendar.annotations.HttpMethodFilter" />
+      <item index="1" class="java.lang.String" itemvalue="org.kendar.di.annotations.TpmConstructor" />
+      <item index="2" class="java.lang.String" itemvalue="org.kendar.di.annotations.TpmPostConstruct" />
+      <item index="3" class="java.lang.String" itemvalue="org.kendar.di.annotations.TpmService" />
     </list>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />

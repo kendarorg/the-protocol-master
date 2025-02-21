@@ -7,8 +7,6 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -17,11 +15,10 @@ import java.nio.channels.AsynchronousChannelGroup;
 
 @TpmService
 public class AmqpProxy extends NetworkProxy {
-    private static final Logger log = LoggerFactory.getLogger(AmqpProxy.class);
 
     @TpmConstructor
-    public AmqpProxy(ByteProtocolSettingsWithLogin settings){
-        super(settings.getConnectionString(),settings.getLogin(),settings.getPassword());
+    public AmqpProxy(ByteProtocolSettingsWithLogin settings) {
+        super(settings.getConnectionString(), settings.getLogin(), settings.getPassword());
     }
 
     public AmqpProxy(String connectionString, String userId, String password) {

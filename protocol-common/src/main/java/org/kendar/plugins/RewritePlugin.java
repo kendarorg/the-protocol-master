@@ -71,9 +71,9 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
     protected abstract void replaceData(ReplacerItemInstance item, J toReplace, T request, K response);
 
     @Override
-    protected boolean handleSettingsChanged(){
-        if(getSettings()==null) return false;
-        var rewriteFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(),getId(),"rewrite"));
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
+        var rewriteFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(), getId(), "rewrite"));
         if (rewriteFile == null) return false;
 
         try {
@@ -91,7 +91,7 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        if(!handleSettingsChanged())return null;
+        if (!handleSettingsChanged()) return null;
 
         return this;
     }

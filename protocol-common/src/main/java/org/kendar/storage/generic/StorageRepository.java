@@ -34,7 +34,9 @@ public interface StorageRepository extends Service {
     void delete(String instanceId, long itemId);
 
     List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId);
+
     StorageFile readPluginFile(StorageFileIndex index);
+
     void writePluginFile(StorageFile file);
 
     void delPluginFile(StorageFileIndex storageFileIndex);

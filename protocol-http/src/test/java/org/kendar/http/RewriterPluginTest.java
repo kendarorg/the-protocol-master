@@ -18,9 +18,9 @@ public class RewriterPluginTest {
     @Test
     void doTest() {
         var settings = new RewritePluginSettings();
-        var storage = new FileStorageRepository(Path.of("src", "test", "resources","data"));
+        var storage = new FileStorageRepository(Path.of("src", "test", "resources", "data"));
         settings.setActive(true);
-        var target = new HttpRewritePlugin(new JsonMapper(),storage);
+        var target = new HttpRewritePlugin(new JsonMapper(), storage);
         var global = new GlobalSettings();
         //global.putService("storage", new NullStorageRepository());
 

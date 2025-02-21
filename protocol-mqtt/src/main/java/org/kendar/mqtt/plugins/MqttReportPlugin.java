@@ -57,22 +57,22 @@ public class MqttReportPlugin extends ReportPlugin<PluginSettings> {
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Publish out) {
-        handlePublish(pluginContext, out, -1,phase);
+        handlePublish(pluginContext, out, -1, phase);
         return false;
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Publish in, Object out) {
-        handlePublish(pluginContext, in, 0,phase);
+        handlePublish(pluginContext, in, 0, phase);
         return false;
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Publish in, PublishAck out) {
-        handlePublish(pluginContext, in, 1,phase);
+        handlePublish(pluginContext, in, 1, phase);
         return false;
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Publish in, PublishRec out) {
-        handlePublish(pluginContext, in, 2,phase);
+        handlePublish(pluginContext, in, 2, phase);
         return false;
     }
 
@@ -82,12 +82,12 @@ public class MqttReportPlugin extends ReportPlugin<PluginSettings> {
     }
 
 
-    private void handlePublish(PluginContext pluginContext, Publish in, int qos,ProtocolPhase phase) {
+    private void handlePublish(PluginContext pluginContext, Publish in, int qos, ProtocolPhase phase) {
         if (!isActive()) return;
         var context = pluginContext.getContext();
         var connectionId = context.getContextId();
         var payload = mapper.toHumanReadable(in.getPayload());
-        var message = String.format("%s:%s:%s",phase==ProtocolPhase.ASYNC_RESPONSE?"RECEIVE":"SEND", in.getTopicName(), payload);
+        var message = String.format("%s:%s:%s", phase == ProtocolPhase.ASYNC_RESPONSE ? "RECEIVE" : "SEND", in.getTopicName(), payload);
         var duration = System.currentTimeMillis() - pluginContext.getStart();
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),

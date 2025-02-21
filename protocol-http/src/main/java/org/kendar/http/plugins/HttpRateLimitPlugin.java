@@ -53,11 +53,11 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     }
 
     @Override
-    protected boolean handleSettingsChanged(){
-        if(getSettings()==null) return false;
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
         sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getLimitSites());
         customResponse = null;
-        var responseFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(),getId(),"response"));
+        var responseFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(), getId(), "response"));
         if (responseFile != null) {
             customResponse = mapper.deserialize(responseFile.getContent(), Response.class);
         }
@@ -67,7 +67,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        if(!handleSettingsChanged())return null;
+        if (!handleSettingsChanged()) return null;
         return this;
     }
 
@@ -132,7 +132,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
                         resetTime.toInstant().getEpochSecond();
 
                 //Logger.LogRequest($"Exceeded resource limit when calling {request.Url}. Request will be throttled", MessageType.Failed, new LoggingContext(e.Session));
-                if (customResponse!=null && settings.isUseCustomResponse()) {
+                if (customResponse != null && settings.isUseCustomResponse()) {
                     out.getHeaders().clear();
                     out.getHeaders().putAll(customResponse.getHeaders());
                     out.removeHeader(settings.getHeaderRetryAfter());

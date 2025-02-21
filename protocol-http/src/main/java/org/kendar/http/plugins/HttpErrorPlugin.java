@@ -66,8 +66,8 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
     }
 
     @Override
-    protected boolean handleSettingsChanged(){
-        if(getSettings()==null) return false;
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
         errorSites = SiteMatcherUtils.setupSites(getSettings().getErrorSites());
         return true;
     }

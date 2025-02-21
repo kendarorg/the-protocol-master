@@ -22,18 +22,6 @@ public abstract class Proxy {
     private final Map<String, Map<ProtocolPhase, List<PluginHandler>>> allowedPlugins = new ConcurrentHashMap<>();
     private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
     protected boolean replayer;
-
-    public List<PluginHandler> getAllPlugins() {
-        var result = new HashMap<Class<?>,PluginHandler>();
-        for(var entry : allowedPlugins.values()) {
-            for(var pliList:entry.values()){
-                for(var pli:pliList){
-                    result.put(pli.getClass(),pli);
-                }
-            }
-        }
-        return new ArrayList<>(result.values());
-    }
     /**
      * Descriptor (of course network like)
      */
@@ -41,6 +29,18 @@ public abstract class Proxy {
 
     protected Proxy() {
         EventsQueue.register(this.toString(), this::replayChange, ReplayStatusEvent.class);
+    }
+
+    public List<PluginHandler> getAllPlugins() {
+        var result = new HashMap<Class<?>, PluginHandler>();
+        for (var entry : allowedPlugins.values()) {
+            for (var pliList : entry.values()) {
+                for (var pli : pliList) {
+                    result.put(pli.getClass(), pli);
+                }
+            }
+        }
+        return new ArrayList<>(result.values());
     }
 
     private void replayChange(ReplayStatusEvent e) {
@@ -112,7 +112,7 @@ public abstract class Proxy {
                     allowedPlugins.put(pars, new HashMap<>());
                 }
                 var map = allowedPlugins.get(pars);
-                for (var phase : ((ProtocolPluginDescriptor)plugin).getPhases()) {
+                for (var phase : ((ProtocolPluginDescriptor) plugin).getPhases()) {
                     if (!map.containsKey(phase)) {
                         map.put((ProtocolPhase) phase, new ArrayList<>());
                     }

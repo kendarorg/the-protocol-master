@@ -6,13 +6,13 @@ import org.kendar.settings.ProtocolSettings;
 
 @TpmService(tags = "http")
 public class HttpProtocolSettings extends ProtocolSettings {
-    public HttpProtocolSettings() {
-        setProtocol("http");
-    }
     private int http = 80;
     private int https = 443;
     private int proxy = 9999;
     private HttpSSLSettings ssl = new HttpSSLSettings();
+    public HttpProtocolSettings() {
+        setProtocol("http");
+    }
 
     public int getHttp() {
         return http;

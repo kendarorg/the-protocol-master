@@ -8,7 +8,7 @@ public class StorageFileIndex {
     public StorageFileIndex() {
     }
 
-    public StorageFileIndex(String instanceId,String pluginId,String index) {
+    public StorageFileIndex(String instanceId, String pluginId, String index) {
         this.instanceId = instanceId;
         this.pluginId = pluginId;
         this.index = index;
@@ -16,6 +16,10 @@ public class StorageFileIndex {
 
     public String getIndex() {
         return index;
+    }
+
+    public void setIndex(String index) {
+        this.index = index;
     }
 
     public String getInstanceId() {
@@ -32,9 +36,5 @@ public class StorageFileIndex {
 
     public void setPluginId(String pluginId) {
         this.pluginId = pluginId;
-    }
-
-    public void setIndex(String index) {
-        this.index = index;
     }
 }

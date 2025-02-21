@@ -53,7 +53,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     private TimerInstance timer;
 
     @TpmConstructor
-    public AmqpProtocol(GlobalSettings ini,AmqpProtocolSettings settings, AmqpProxy proxy,
+    public AmqpProtocol(GlobalSettings ini, AmqpProtocolSettings settings, AmqpProxy proxy,
                         @TpmNamed(tags = "amqp091") List<BasePluginDescriptor> plugins) {
         super(ini, settings, proxy, plugins);
         this.port = settings.getPort();

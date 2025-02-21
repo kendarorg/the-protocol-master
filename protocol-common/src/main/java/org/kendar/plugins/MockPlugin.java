@@ -26,7 +26,7 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     private final StorageRepository repository;
     protected Map<String, MockStorage> mocks = new HashMap<>();
-    //private String mocksDir;
+
 
     public MockPlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
@@ -97,7 +97,7 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
 
     @Override
     protected boolean handleSettingsChanged() {
-        if(getSettings()==null) return false;
+        if (getSettings() == null) return false;
         loadMocks();
         return true;
     }
@@ -161,17 +161,17 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new BaseMockPluginApis(this, getId(), getInstanceId(),repository));
+        return List.of(new BaseMockPluginApis(this, getId(), getInstanceId()));
     }
 
     public void putMock(String mockfile, MockStorage inputObject) {
-        getMocks().put(mockfile,inputObject);
+        getMocks().put(mockfile, inputObject);
         var serialized = mapper.serialize(inputObject);
-        repository.writePluginFile(new StorageFile(new StorageFileIndex(getInstanceId(),getId(),mockfile),serialized));
+        repository.writePluginFile(new StorageFile(new StorageFileIndex(getInstanceId(), getId(), mockfile), serialized));
     }
 
     public void delMock(String mockfile) {
         getMocks().remove(mockfile);
-        repository.delPluginFile(new StorageFileIndex(getInstanceId(),getId(),mockfile));
+        repository.delPluginFile(new StorageFileIndex(getInstanceId(), getId(), mockfile));
     }
 }

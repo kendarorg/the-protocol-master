@@ -30,10 +30,10 @@ public abstract class JdbcProxy extends Proxy {
     private final String login;
     private final String password;
 
-    public JdbcProxy(JdbcProtocolSettings settings){
+    public JdbcProxy(JdbcProtocolSettings settings) {
         super();
         var localDriver = settings.getDriver();
-        if(localDriver == null){
+        if (localDriver == null) {
             localDriver = getDefaultDriver();
         }
         this.driver = localDriver;
@@ -42,8 +42,6 @@ public abstract class JdbcProxy extends Proxy {
         this.login = settings.getLogin();
         this.password = settings.getPassword();
     }
-
-    protected abstract String getDefaultDriver();
 
     public JdbcProxy(String driver) {
         this(driver, null, null, null, null);
@@ -196,6 +194,8 @@ public abstract class JdbcProxy extends Proxy {
         }
         result.setCount((int) count.get());
     }
+
+    protected abstract String getDefaultDriver();
 
     public String getDriver() {
         return driver;

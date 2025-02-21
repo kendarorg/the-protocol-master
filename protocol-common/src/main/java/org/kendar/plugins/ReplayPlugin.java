@@ -223,7 +223,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
         query.getTags().putAll(buildTag(in));
         var index = findIndex(query, in);
         if (storage == null) {
-            log.error("Missing storage for context {}-{}",pluginContext.getContext().getContextId(),pluginContext.getCaller());
+            log.error("Missing storage for context {}-{}", pluginContext.getContext().getContextId(), pluginContext.getCaller());
         }
         if (index == null) {
             log.error("Missing index for query {}", query);

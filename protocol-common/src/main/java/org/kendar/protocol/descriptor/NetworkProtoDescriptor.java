@@ -28,11 +28,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
      */
     private boolean proxy;
 
-    public boolean isWrapper() {
-        return false;
-    }
-
-    public NetworkProtoDescriptor(){
+    public NetworkProtoDescriptor() {
 
     }
 
@@ -43,8 +39,8 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
             var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
-            if (specificPluginSetting != null|| AlwaysActivePlugin.class.isAssignableFrom(plugin.getClass())) {
-                ((ProtocolPluginDescriptor)plugin).initialize(ini, settings, specificPluginSetting);
+            if (specificPluginSetting != null || AlwaysActivePlugin.class.isAssignableFrom(plugin.getClass())) {
+                ((ProtocolPluginDescriptor) plugin).initialize(ini, settings, specificPluginSetting);
                 plugin.refreshStatus();
             } else {
                 plugins.remove(i);
@@ -53,6 +49,10 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
         this.setPlugins(plugins);
         proxy.setPluginHandlers(plugins);
         this.setProxy(proxy);
+    }
+
+    public boolean isWrapper() {
+        return false;
     }
 
     /**

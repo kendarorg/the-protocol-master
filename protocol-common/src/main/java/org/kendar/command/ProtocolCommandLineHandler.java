@@ -16,6 +16,7 @@ public abstract class ProtocolCommandLineHandler {
     }
 
     public abstract String getId();
+
     public abstract String getDescription();
 
     protected abstract ProtocolSettings buildProtocolSettings();
@@ -23,9 +24,9 @@ public abstract class ProtocolCommandLineHandler {
     public CommandOptions loadCommandLine(GlobalSettings globalSettings) {
         var genericSettings = buildProtocolSettings();
         var options = new ArrayList<CommandOption>();
-        options.addAll(prepareCustomOptions(globalSettings,genericSettings));
-        for(var filter : filtersCommandLineHandlers) {
-            filter.setup(options,genericSettings);
+        options.addAll(prepareCustomOptions(globalSettings, genericSettings));
+        for (var filter : filtersCommandLineHandlers) {
+            filter.setup(options, genericSettings);
         }
         return CommandOptions.of(getId())
                 .withDescription(getDescription())

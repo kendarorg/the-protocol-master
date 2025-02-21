@@ -74,8 +74,8 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     }
 
     @Override
-    protected boolean handleSettingsChanged(){
-        if(getSettings()==null) return false;
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
         recordSites = SiteMatcherUtils.setupSites(getSettings().getRecordSites());
         return true;
     }

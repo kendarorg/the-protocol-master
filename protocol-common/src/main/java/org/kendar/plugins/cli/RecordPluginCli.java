@@ -7,15 +7,20 @@ import org.kendar.settings.PluginSettings;
 import java.util.ArrayList;
 
 public abstract class RecordPluginCli extends BasicPluginCli {
-    protected String getPluginName(){return "record-plugin";}
-    protected String getPluginDescription(){return "Record calls";}
+    protected String getPluginName() {
+        return "record-plugin";
+    }
+
+    protected String getPluginDescription() {
+        return "Activate recording calls";
+    }
 
     @Override
     protected CommandOption[] buildPluginOptions(PluginSettings settings) {
         var options = new ArrayList<CommandOption>();
         options.add(CommandOption.of("itc", "Ignore Trivial Calls, default true")
                 .withLong("ignoreTrivialCalls")
-                .withCallback((s) -> ((BasicRecordPluginSettings)settings).setIgnoreTrivialCalls(true)));
+                .withCallback((s) -> ((BasicRecordPluginSettings) settings).setIgnoreTrivialCalls(true)));
         return options.toArray(new CommandOption[0]);
     }
 

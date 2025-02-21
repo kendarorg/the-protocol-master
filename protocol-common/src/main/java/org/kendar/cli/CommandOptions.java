@@ -29,7 +29,7 @@ public class CommandOptions implements CommandItem {
         return new CommandOptions(id, description);
     }
 
-    protected static void parseListOfCommands(List<MainArg> mainArgs, List<CommandOption> co, CommandItem caller,boolean multiple) {
+    protected static void parseListOfCommands(List<MainArg> mainArgs, List<CommandOption> co, CommandItem caller, boolean multiple) {
         for (CommandOption item : co) {
             var matchingArgIndex = 0;
             var foundedMatchingArg = false;
@@ -74,10 +74,10 @@ public class CommandOptions implements CommandItem {
                 }
                 item.setValues(arg.get().getValues());
                 item.setPresent();
-                if(item.isMultiple()){
-                    parseListOfCommands(mainArgs,co,caller,true);
+                if (item.isMultiple()) {
+                    parseListOfCommands(mainArgs, co, caller, true);
                 }
-                if(multiple){
+                if (multiple) {
                     break;
                 }
                 if (item.hasSubOptions()) {
@@ -122,31 +122,31 @@ public class CommandOptions implements CommandItem {
         }
     }
 
-    protected static void printHelpListOfCommands(ArrayList<HelpLine> result, List<CommandOption> co,int level) {
+    protected static void printHelpListOfCommands(ArrayList<HelpLine> result, List<CommandOption> co, int level) {
         for (var item : co) {
             if (item.hasSubChoices()) {
                 var choices = item.getSubChoices().stream().map(CommandOptions::getId).collect(Collectors.toCollection(HashSet::new));
                 var availableChoices = String.join("|", choices);
                 result.add(new HelpLine(item.getShortCommand(), item.getLongCommand(), item.getDescription(),
-                        availableChoices,item.isMultiple(),level+1));
+                        availableChoices, item.isMultiple(), level + 1));
                 if (item.getSubChoicesDescription() != null) {
-                    result.add(new HelpLine(item.getSubChoicesDescription(),level));
+                    result.add(new HelpLine(item.getSubChoicesDescription(), level));
                 }
                 for (var choice : item.getSubChoices()) {
                     if (choice.getDescription() != null) {
-                        result.add(new HelpLine(choice.getDescription()+" ("+choice.getId()+")",level));
-                        choice.printHelp(result,level);
+                        result.add(new HelpLine(choice.getDescription() + " (" + choice.getId() + ")", level));
+                        choice.printHelp(result, level);
                     }
                 }
-            }else{
+            } else {
                 result.add(new
                         HelpLine(item.getShortCommand(), item.getLongCommand(), item.getDescription(), null,
-                        item.isMultiple(),level+1));
+                        item.isMultiple(), level + 1));
             }
             if (item.hasSubOptions()) {
                 for (var choice : item.getCommandOptions()) {
                     if (choice.getDescription() != null) {
-                        choice.printHelp(result,level+2);
+                        choice.printHelp(result, level + 2);
                     }
                 }
             }
@@ -225,7 +225,7 @@ public class CommandOptions implements CommandItem {
     }
 
     public void parseInternal(List<MainArg> mainArgs) {
-        parseListOfCommands(mainArgs, commandOptions, this,false);
+        parseListOfCommands(mainArgs, commandOptions, this, false);
     }
 
     public boolean hasOption(String id) {
@@ -276,8 +276,8 @@ public class CommandOptions implements CommandItem {
         return this;
     }
 
-    public void printHelp(ArrayList<HelpLine> result,int level) {
-        printHelpListOfCommands(result, commandOptions,level);
+    public void printHelp(ArrayList<HelpLine> result, int level) {
+        printHelpListOfCommands(result, commandOptions, level);
     }
 
     public String getDescription() {

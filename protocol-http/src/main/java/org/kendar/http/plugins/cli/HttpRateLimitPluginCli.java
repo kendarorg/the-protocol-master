@@ -35,9 +35,9 @@ public class HttpRateLimitPluginCli extends BasicPluginCli {
                 .withCallback((s) -> ((HttpRateLimitPluginSettings) settings).setResetTimeWindowSeconds(Integer.parseInt(s))));
         options.add(CommandOption.of("cpr", "Cost per request, default 2")
                 .withCallback((s) -> ((HttpRateLimitPluginSettings) settings).setCostPerRequest(Integer.parseInt(s))));
-        options.add(CommandOption.of("ewh", "Generate throttle on following websites @\r\n" +
+        options.add(CommandOption.of("twh", "Generate throttle on following websites @\r\n" +
                         "@REGEX or  STARTWITH. Default anything")
-                .withLong("errorWhere")
+                .withLong("throttleWhere")
                 .asMultiple()
                 .withMultiCallback((s) -> ((HttpRateLimitPluginSettings) settings).setLimitSites(s)));
         return options.toArray(new CommandOption[0]);

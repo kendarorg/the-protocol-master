@@ -8,7 +8,7 @@ import org.kendar.utils.JsonMapper;
 @TpmService(tags = "mysql")
 public class MySqlRewritePlugin extends JdbcRewritePlugin {
     public MySqlRewritePlugin(JsonMapper mapper, StorageRepository repository) {
-        super(mapper,repository);
+        super(mapper, repository);
     }
 
     @Override

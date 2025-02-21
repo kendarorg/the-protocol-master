@@ -152,7 +152,6 @@ An example of complex regexp
     "regex": true
 ```
 
-
 The file is located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]/rewrite.json
 
 ## Documentation used

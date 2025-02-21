@@ -1,6 +1,5 @@
 package org.kendar.plugins.apis;
 
-import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -12,7 +11,6 @@ import org.kendar.apis.base.Response;
 import org.kendar.plugins.MockPlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
-import org.kendar.storage.generic.StorageRepository;
 
 import java.util.ArrayList;
 
@@ -22,11 +20,9 @@ import static org.kendar.apis.ApiUtils.respondOk;
 @HttpTypeFilter()
 public class BaseMockPluginApis extends ProtocolPluginApiHandlerDefault<MockPlugin> {
 
-    private final StorageRepository repository;
 
-    public BaseMockPluginApis(MockPlugin descriptor, String id, String instanceId, StorageRepository repository) {
+    public BaseMockPluginApis(MockPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);
-        this.repository = repository;
     }
 
     @HttpMethodFilter(
@@ -71,7 +67,7 @@ public class BaseMockPluginApis extends ProtocolPluginApiHandlerDefault<MockPlug
             description = "Update/insert the mock file",
             path = {@PathParameter(key = "mockfile")},
             requests = @TpmRequest(body = MockStorage.class),
-            responses ={@TpmResponse(
+            responses = {@TpmResponse(
                     body = Ok.class
 
             ), @TpmResponse(
@@ -81,9 +77,9 @@ public class BaseMockPluginApis extends ProtocolPluginApiHandlerDefault<MockPlug
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
     public boolean putSingleMock(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("mockfile");
-        var inputData = ((TextNode) reqp.getRequestText()).textValue();
+        var inputData = reqp.getRequestText().textValue();
         var inputObject = mapper.deserialize(inputData, MockStorage.class);
-        getDescriptor().putMock(mockfile,inputObject);
+        getDescriptor().putMock(mockfile, inputObject);
         respondOk(resp);
         return true;
     }

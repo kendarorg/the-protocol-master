@@ -60,6 +60,23 @@ public class DiService {
         threads.put(Thread.currentThread(), threadContext);
     }
 
+    public static List<String> getTags(Object instance) {
+        var result = new ArrayList<String>();
+        var tpmNamed = instance.getClass().getAnnotation(TpmNamed.class);
+        if (tpmNamed != null) {
+            result.addAll(Arrays.asList(tpmNamed.tags()));
+        }
+        var tpmService = instance.getClass().getAnnotation(TpmService.class);
+        if (tpmService != null) {
+            result.addAll(Arrays.asList(tpmService.tags()));
+        }
+        var tpmTransient = instance.getClass().getAnnotation(TpmTransient.class);
+        if (tpmTransient != null) {
+            result.addAll(Arrays.asList(tpmTransient.tags()));
+        }
+        return result;
+    }
+
     private void destroy() {
         for (var item : children) {
             item.destroy();
@@ -131,7 +148,6 @@ public class DiService {
         this.bind(t, mappings);
     }
 
-
     public void bindTransient(Class<?> t) {
         this.bind(t, transientMappings);
     }
@@ -192,23 +208,6 @@ public class DiService {
         }
     }
 
-    public static List<String> getTags(Object instance) {
-        var result = new ArrayList<String>();
-        var tpmNamed = instance.getClass().getAnnotation(TpmNamed.class);
-        if(tpmNamed != null) {
-            result.addAll(Arrays.asList(tpmNamed.tags()));
-        }
-        var tpmService = instance.getClass().getAnnotation(TpmService.class);
-        if(tpmService != null) {
-            result.addAll(Arrays.asList(tpmService.tags()));
-        }
-        var tpmTransient = instance.getClass().getAnnotation(TpmTransient.class);
-        if(tpmTransient != null) {
-            result.addAll(Arrays.asList(tpmTransient.tags()));
-        }
-        return result;
-    }
-
     public <T> T getInstance(Class<T> clazz, String... tags) {
         return (T) getInstanceInternal(this, null, clazz, tags);
     }
@@ -230,9 +229,9 @@ public class DiService {
 
     private Object createInstance(DiService context, Class<?> clazz, boolean transi) {
         try {
-            if(!transi) {
+            if (!transi) {
                 var sl = this;
-                while(sl != null) {
+                while (sl != null) {
                     if (sl.singletons.containsKey(clazz)) {
                         return sl.singletons.get(clazz);
                     }
@@ -426,16 +425,58 @@ public class DiService {
 
             }
             parentItem = parentItem.parent;
-            /*if (parent != null) {
-                var parentResults = parent.getInstancesInternal(name, clazz, context, type, tags);
-                if (parentResults != null) {
-                    for (var parr : parentResults) {
-                        if (!result.contains(parr)) {
-                            result.add(parr);
-                        }
+        }
+        return result;
+    }
+
+    public List<Class<?>> getDefinitions(Class<?> type, String... tags) {
+        return getNamedDefinitions(type, null, tags);
+    }
+
+    public List<Class<?>> getNamedDefinitions(Class<?> type, String name, String... tags) {
+        if (scope == TpmScopeType.NONE) {
+            throw new RuntimeException("Invalid Context");
+        }
+        var result = new ArrayList<Class<?>>();
+
+        var parentItem = this;
+        while (parentItem != null) {
+            var data = parentItem.mappings.get(type);
+            var transi = false;
+            if (data == null) {
+                data = parentItem.transientMappings.get(type);
+                if (data != null) {
+                    transi = true;
+                } else {
+                    parentItem = parentItem.parent;
+                    continue;
+                }
+            }
+
+            for (var i : data) {
+                var annotation = ((Class<?>) i).getAnnotation(TpmService.class);
+                if (annotation != null) {
+                    if (name != null && !name.equalsIgnoreCase(annotation.value())) {
+                        continue;
                     }
                 }
-            }*/
+                if (tags.length > 0) {
+                    if (annotation != null) {
+                        var iTags = annotation.tags();
+                        if (iTags.length != tags.length) {
+                            continue;
+                        }
+                        if (!Arrays.asList(iTags).containsAll(Arrays.asList(tags))) {
+                            continue;
+                        }
+                        result.add((Class<?>) i);
+                    }
+                } else {
+                    result.add((Class<?>) i);
+                }
+
+            }
+            parentItem = parentItem.parent;
         }
         return result;
     }

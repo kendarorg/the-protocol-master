@@ -27,11 +27,6 @@ public class CommandOption implements CommandItem {
     private boolean multiple;
     private Consumer<List<String>> multiCallback;
 
-    public CommandOption asMultiple() {
-        this.multiple = true;
-        return this;
-    }
-
     private CommandOption(String shortCommand, String description) {
 
         this.shortCommand = shortCommand;
@@ -40,6 +35,11 @@ public class CommandOption implements CommandItem {
 
     public static CommandOption of(String shortCommand, String description) {
         return new CommandOption(shortCommand, description);
+    }
+
+    public CommandOption asMultiple() {
+        this.multiple = true;
+        return this;
     }
 
     public boolean isPresent() {
@@ -151,15 +151,15 @@ public class CommandOption implements CommandItem {
     }
 
     public void setValues(List<String> values) {
-        if(this.values == null){
+        if (this.values == null) {
             this.values = values;
-        }else{
+        } else {
             this.values.addAll(values);
         }
 
         if (multiCallback != null) {
             multiCallback.accept(this.values);
-        }else if (callback != null) {
+        } else if (callback != null) {
             if (!this.isHasParameter()) {
                 callback.accept(null);
             } else {
@@ -283,19 +283,19 @@ public class CommandOption implements CommandItem {
     }
 
     public void parseInternal(List<MainArg> mainArgs) {
-        parseListOfCommands(mainArgs, subOptions, this,false);
+        parseListOfCommands(mainArgs, subOptions, this, false);
     }
 
     public List<CommandOption> getCommandOptions() {
         return subOptions;
     }
 
-    public void printHelp(ArrayList<HelpLine> result,int level) {
-        if(subOptions.isEmpty() && subChoices.isEmpty()) {
+    public void printHelp(ArrayList<HelpLine> result, int level) {
+        if (subOptions.isEmpty() && subChoices.isEmpty()) {
             result.add(new HelpLine(getShortCommand(), getLongCommand(), getDescription(),
-                    null, isMultiple(),level));
+                    null, isMultiple(), level));
         }
-        printHelpListOfCommands(result, subOptions,level);
+        printHelpListOfCommands(result, subOptions, level);
     }
 
     public CommandItem getParent() {

@@ -9,12 +9,12 @@ import org.kendar.settings.ProtocolSettings;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class NetworkProtocolCommandLineHandler extends ProtocolCommandLineHandler{
+public abstract class NetworkProtocolCommandLineHandler extends ProtocolCommandLineHandler {
 
     @Override
     protected List<CommandOption> prepareCustomOptions(GlobalSettings globalSettings, ProtocolSettings genericSettings) {
         var options = new ArrayList<CommandOption>();
-        if(ByteProtocolSettings.class.isAssignableFrom(genericSettings.getClass())) {
+        if (ByteProtocolSettings.class.isAssignableFrom(genericSettings.getClass())) {
             var settings = (ByteProtocolSettings) genericSettings;
             settings.setPort(Integer.parseInt(getDefaultPort()));
             options.addAll(List.of(
@@ -31,7 +31,7 @@ public abstract class NetworkProtocolCommandLineHandler extends ProtocolCommandL
                             .withMandatoryParameter()
                             .withCallback((s) -> settings.setTimeoutSeconds(Integer.parseInt(s)))));
         }
-        if(ByteProtocolSettingsWithLogin.class.isAssignableFrom(genericSettings.getClass())) {
+        if (ByteProtocolSettingsWithLogin.class.isAssignableFrom(genericSettings.getClass())) {
             var settings = (ByteProtocolSettingsWithLogin) genericSettings;
             options.addAll(List.of(
                     CommandOption.of("pu", "Remote login")
@@ -44,7 +44,7 @@ public abstract class NetworkProtocolCommandLineHandler extends ProtocolCommandL
                             .withMandatoryParameter()
                             .withCallback(settings::setPassword)));
         }
-        options.addAll(super.prepareCustomOptions(globalSettings,genericSettings));
+        options.addAll(super.prepareCustomOptions(globalSettings, genericSettings));
         return options;
     }
 

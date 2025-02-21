@@ -10,10 +10,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @TpmService(tags = "storage_null")
 public class NullStorageRepository implements StorageRepository {
+    private final AtomicLong counter = new AtomicLong(0);
+
     public NullStorageRepository() {
         System.out.println("NullStorageRepository");
     }
-    private final AtomicLong counter = new AtomicLong(0);
 
     @Override
     public void initialize() {

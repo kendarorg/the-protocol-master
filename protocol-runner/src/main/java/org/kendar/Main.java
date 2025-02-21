@@ -45,7 +45,6 @@ import static java.lang.System.exit;
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static ConcurrentHashMap<String, TcpServer> protocolServersCache;
-    //private static ProtocolsRunner protocolsRunner;
     private static JarPluginManager pluginManager;
     private static HttpServer apiServer;
     private static DiService diService;
@@ -65,7 +64,7 @@ public class Main {
         protocolServersCache = new ConcurrentHashMap<>();
         var settings = new ChangeableReference<>(new GlobalSettings());
 
-        var options = ProtocolsRunner.getMainOptions(settings);
+        var options = ProtocolsRunner.getMainOptions(settings, diService);
         var parser = new CommandParser(options);
         parser.parseIgnoreMissing(args);
         diService.register(GlobalSettings.class, settings.get());
@@ -90,13 +89,6 @@ public class Main {
         for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class)) {
             diService.bind(ec);
         }
-
-        //protocolsRunner = diService.getInstance(ProtocolsRunner.class);
-        /*if (!parser.hasOption("cfg")) {
-            if (!protocolsRunner.prepareSettingsFromCommandLine(options, args, settings.get(), parser)) {
-                return;
-            }
-        }*/
         if (!parser.hasOption("cfg")) {
             var protocolMotherOption = options.getCommandOption("p");
             var protocolOptionsToAdd = new ArrayList<CommandOptions>();
@@ -105,16 +97,16 @@ public class Main {
                 helpForProtocol = parser.getOptionValue("help");
             }
 
-            for(var globalPluginOptions:diService.getInstances(GlobalPluginCommandLineHandler.class)){
-                globalPluginOptions.setup(options,settings.get());
+            for (var globalPluginOptions : diService.getInstances(GlobalPluginCommandLineHandler.class)) {
+                globalPluginOptions.setup(options, settings.get());
             }
             var commandLineOptions = diService.getInstances(ProtocolCommandLineHandler.class);
-            for(var commandLineOption:commandLineOptions){
+            for (var commandLineOption : commandLineOptions) {
                 var tags = DiService.getTags(commandLineOption);
-                if(helpForProtocol == null || tags.contains(helpForProtocol)){
+                if (helpForProtocol == null || tags.contains(helpForProtocol)) {
                     var protocolFilterCmdOptions = new ArrayList<PluginCommandLineHandler>();
-                    for(var tag:tags){
-                        protocolFilterCmdOptions.addAll(diService.getInstances(PluginCommandLineHandler.class,tag));
+                    for (var tag : tags) {
+                        protocolFilterCmdOptions.addAll(diService.getInstances(PluginCommandLineHandler.class, tag));
                     }
                     commandLineOption.initializeFiltersCommandLineHandlers(protocolFilterCmdOptions);
                     protocolOptionsToAdd.add(commandLineOption.loadCommandLine(settings.get()));
@@ -125,9 +117,9 @@ public class Main {
                 parser.printHelp();
                 return;
             }
-            try{
+            try {
                 parser.parse(args);
-            }catch(Exception e){
+            } catch (Exception e) {
                 parser.printHelp();
                 return;
             }

@@ -41,8 +41,8 @@ public class MongoProxy extends Proxy {
     }
 
     @TpmConstructor
-    public MongoProxy(ByteProtocolSettingsWithLogin settings){
-        this(settings.getConnectionString(),ServerApiVersion.V1);
+    public MongoProxy(ByteProtocolSettingsWithLogin settings) {
+        this(settings.getConnectionString(), ServerApiVersion.V1);
     }
 
     public MongoProxy(String connectionString) {

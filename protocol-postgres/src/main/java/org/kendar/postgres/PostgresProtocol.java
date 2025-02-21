@@ -31,14 +31,6 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     private static final SqlStringParser parser = new SqlStringParser("$");
     private static DataTypesConverter dataTypesConverter;
 
-    @TpmConstructor
-    public PostgresProtocol(GlobalSettings ini, PostgresProtocolSettings settings, PostgresProxy proxy,
-                            @TpmNamed(tags = "postgres") List<BasePluginDescriptor> plugins) {
-        super(ini, settings, proxy, plugins);
-        this.port = settings.getPort();
-        this.setTimeout(settings.getTimeoutSeconds());
-    }
-
     static {
         try {
             String text = new String(PostgresProtocol.class.getResourceAsStream("/postgresdtt.json")
@@ -51,6 +43,14 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     }
 
     private final int port;
+
+    @TpmConstructor
+    public PostgresProtocol(GlobalSettings ini, PostgresProtocolSettings settings, PostgresProxy proxy,
+                            @TpmNamed(tags = "postgres") List<BasePluginDescriptor> plugins) {
+        super(ini, settings, proxy, plugins);
+        this.port = settings.getPort();
+        this.setTimeout(settings.getTimeoutSeconds());
+    }
 
     public PostgresProtocol() {
         this(PORT);

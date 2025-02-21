@@ -12,7 +12,7 @@ import java.util.List;
 
 public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectResult, RewritePluginSettings, String> {
     public JdbcRewritePlugin(JsonMapper mapper, StorageRepository repository) {
-        super(mapper,repository);
+        super(mapper, repository);
     }
 
     @Override

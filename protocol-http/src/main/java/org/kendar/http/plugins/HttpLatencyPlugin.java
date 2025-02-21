@@ -26,8 +26,8 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyP
     }
 
     @Override
-    protected boolean handleSettingsChanged(){
-        if(getSettings()==null) return false;
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
         latencySites = SiteMatcherUtils.setupSites(getSettings().getLatencySites());
         return true;
     }

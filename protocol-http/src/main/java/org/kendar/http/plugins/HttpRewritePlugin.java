@@ -20,7 +20,7 @@ public class HttpRewritePlugin extends RewritePlugin<Request, Response, RewriteP
     private static final String HTTPS = "https";
 
     public HttpRewritePlugin(JsonMapper mapper, StorageRepository repository) {
-        super(mapper,repository);
+        super(mapper, repository);
     }
 
 

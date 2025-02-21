@@ -36,7 +36,7 @@ public class PluginHandler {
 
     public static List<PluginHandler> of(BasePluginDescriptor plugin, String methodName, ProtoDescriptor protocol) {
         var result = new ArrayList<PluginHandler>();
-        ((ProtocolPluginDescriptor)plugin).setProtocolInstance(protocol);
+        ((ProtocolPluginDescriptor) plugin).setProtocolInstance(protocol);
         var clazz = plugin.getClass();
         var handles = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equalsIgnoreCase(methodName)).toList();
         for (var handle : handles) {

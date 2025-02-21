@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class HttpMockPlugin extends MockPlugin<Request, Response> {
 
     public HttpMockPlugin(JsonMapper mapper, StorageRepository repository) {
-        super(mapper,repository);
+        super(mapper, repository);
     }
 
     private static void writeHeaderParameter(Response clonedResponse, HashMap<String, String> parameters) {

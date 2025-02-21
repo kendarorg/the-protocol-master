@@ -140,7 +140,7 @@ public class BasicTest {
                 }
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
                 try {
-                    FileUtils.copyDirectory(Path.of("src","test","resources","data").toFile(),
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
                             Path.of("target", "tests", className, method, dsp).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -148,7 +148,7 @@ public class BasicTest {
             } else {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
                 try {
-                    FileUtils.copyDirectory(Path.of("src","test","resources","data").toFile(),
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
                             Path.of("target", "tests", className, method).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -193,9 +193,9 @@ public class BasicTest {
                 new HttpErrorPlugin(mapper),
                 new HttpReportPlugin(mapper).initialize(globalSettings, httpProtocolSettings, settings),
                 new HttpLatencyPlugin(mapper),
-                new HttpRateLimitPlugin(mapper,storage),
-                new HttpMockPlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, mockSettings),
-                new HttpRewritePlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
+                new HttpRateLimitPlugin(mapper, storage),
+                new HttpMockPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, mockSettings),
+                new HttpRewritePlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
         baseProtocol.initialize();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

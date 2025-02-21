@@ -523,7 +523,7 @@ public class ParserTest {
                 "  plugin                    Plugin\n" +
                 "    pluginChoice            Plugin Choice\n" +
                 "    otherChoice             Plugin Choice";
-        assertEquals(expected,result);
+        assertEquals(expected, result);
         System.out.println(result);
     }
 }

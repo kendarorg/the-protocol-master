@@ -40,6 +40,7 @@ public class BasicTest {
     protected static PostgresSqlImage postgresContainer;
     protected static TcpServer protocolServer;
     protected static PostgresProtocol baseProtocol;
+    protected static StorageRepository storage;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
@@ -62,8 +63,6 @@ public class BasicTest {
         });
     }
 
-    protected static StorageRepository storage;
-
     public static void beforeEachBase(TestInfo testInfo) {
 
         baseProtocol = new PostgresProtocol(FAKE_PORT);
@@ -81,7 +80,7 @@ public class BasicTest {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
                 try {
-                    FileUtils.copyDirectory(Path.of("src","test","resources","data").toFile(),
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
                             Path.of("target", "tests", className, method, dsp).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -89,7 +88,7 @@ public class BasicTest {
             } else {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
                 try {
-                    FileUtils.copyDirectory(Path.of("src","test","resources","data").toFile(),
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
                             Path.of("target", "tests", className, method).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -101,7 +100,7 @@ public class BasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var pl = new PostgresRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        var pl1 = new PostgresMockPlugin(mapper,storage);
+        var pl1 = new PostgresMockPlugin(mapper, storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
         //global.putService("storage", storage);

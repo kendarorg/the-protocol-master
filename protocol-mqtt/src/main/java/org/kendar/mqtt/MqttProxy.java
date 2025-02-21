@@ -21,8 +21,8 @@ public class MqttProxy extends NetworkProxy {
     private static final Logger log = LoggerFactory.getLogger(MqttProxy.class);
 
     @TpmConstructor
-    public MqttProxy(ByteProtocolSettingsWithLogin settings){
-        super(settings.getConnectionString(),settings.getLogin(),settings.getPassword());
+    public MqttProxy(ByteProtocolSettingsWithLogin settings) {
+        super(settings.getConnectionString(), settings.getLogin(), settings.getPassword());
     }
 
     public MqttProxy() {

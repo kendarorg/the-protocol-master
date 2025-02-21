@@ -50,7 +50,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             var plugin = plugins.get(i);
             var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
             if (specificPluginSetting != null || AlwaysActivePlugin.class.isAssignableFrom(plugin.getClass())) {
-                ((ProtocolPluginDescriptor)plugin).initialize(ini, settings, specificPluginSetting);
+                ((ProtocolPluginDescriptor) plugin).initialize(ini, settings, specificPluginSetting);
                 plugin.refreshStatus();
             } else {
                 plugins.remove(i);
@@ -59,7 +59,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         this.plugins = plugins;
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
     }
-
 
 
     private static <T> T getOrDefault(Object value, T defaultValue) {
@@ -187,7 +186,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                 var plugin = plugins.get(i);
                 var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
                 if (specificPluginSetting != null) {
-                    ((ProtocolPluginDescriptor)plugin).initialize(globalSettings, settings, specificPluginSetting);
+                    ((ProtocolPluginDescriptor) plugin).initialize(globalSettings, settings, specificPluginSetting);
                 }
             }
 

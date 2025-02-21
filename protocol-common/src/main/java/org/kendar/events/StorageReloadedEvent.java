@@ -1,4 +1,4 @@
 package org.kendar.events;
 
-public class StorageReloadedEvent  implements TpmEvent{
+public class StorageReloadedEvent implements TpmEvent {
 }

@@ -20,8 +20,8 @@ public class Resp3Proxy extends NetworkProxy {
     }
 
     @TpmConstructor
-    public Resp3Proxy(ByteProtocolSettings settings){
-        super(settings.getConnectionString(),null,null);
+    public Resp3Proxy(ByteProtocolSettings settings) {
+        super(settings.getConnectionString(), null, null);
     }
 
     public Resp3Proxy(String connectionString, String userId, String password) {

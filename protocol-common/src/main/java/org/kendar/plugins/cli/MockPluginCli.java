@@ -7,8 +7,13 @@ import org.kendar.settings.PluginSettings;
 import java.util.ArrayList;
 
 public abstract class MockPluginCli extends BasicPluginCli {
-    protected String getPluginName(){return "mock-plugin";}
-    protected String getPluginDescription(){return "Mock certain service requests";}
+    protected String getPluginName() {
+        return "mock-plugin";
+    }
+
+    protected String getPluginDescription() {
+        return "Mock certain service requests";
+    }
 
     @Override
     protected CommandOption[] buildPluginOptions(PluginSettings settings) {

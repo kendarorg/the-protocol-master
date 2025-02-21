@@ -14,7 +14,7 @@ public class AsyncReplayPluginCli extends ReplayPluginCli {
         var options = new ArrayList<>(List.of(super.buildPluginOptions(settings)));
         options.add(CommandOption.of("rcs", "Reset all connections when starting, default false")
                 .withLong("resetConnectionsOnStartup")
-                .withCallback((s) -> ((BasicAysncReplayPluginSettings)settings).setResetConnectionsOnStart(true)));
+                .withCallback((s) -> ((BasicAysncReplayPluginSettings) settings).setResetConnectionsOnStart(true)));
         return options.toArray(new CommandOption[0]);
     }
 

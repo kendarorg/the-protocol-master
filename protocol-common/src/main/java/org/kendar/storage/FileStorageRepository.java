@@ -62,8 +62,8 @@ public class FileStorageRepository implements StorageRepository {
         if (logsDir == null || logsDir.isEmpty()) {
             logsDir = Path.of("data",
                     Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
-        }else{
-            logsDir = logsDir.replace("file=","");
+        } else {
+            logsDir = logsDir.replace("file=", "");
         }
         this.targetDir = Path.of(logsDir).toAbsolutePath().toString();
         targetDir = ensureDirectory(targetDir);
@@ -111,6 +111,44 @@ public class FileStorageRepository implements StorageRepository {
         return sb.toString();
     }
 
+    protected static String ensureDirectory(String td) {
+        if (!Path.of(td).isAbsolute()) {
+            Path currentRelativePath = Paths.get("").toAbsolutePath();
+            td = Path.of(currentRelativePath.toString(), td).toString();
+        }
+        if (!Files.exists(Path.of(td))) {
+            if (!Path.of(td).toFile().mkdirs()) {
+                log.error("Error creating target dir {}", td);
+            }
+        }
+        return td;
+    }
+
+    protected static void cleanRecursive(File dir) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    cleanRecursive(file);
+                }
+                file.delete();
+            }
+        }
+    }
+
+    protected static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        File destFile = new File(destinationDir, zipEntry.getName());
+
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = destFile.getCanonicalPath();
+
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        }
+
+        return destFile;
+    }
+
     @TpmPostConstruct
     @Override
     public void initialize() {
@@ -126,19 +164,6 @@ public class FileStorageRepository implements StorageRepository {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    protected static String ensureDirectory(String td) {
-        if (!Path.of(td).isAbsolute()) {
-            Path currentRelativePath = Paths.get("").toAbsolutePath();
-            td = Path.of(currentRelativePath.toString(), td).toString();
-        }
-        if (!Files.exists(Path.of(td))) {
-            if (!Path.of(td).toFile().mkdirs()) {
-                log.error("Error creating target dir {}", td);
-            }
-        }
-        return td;
     }
 
     protected void finalizePlay(String instanceId) {
@@ -187,7 +212,6 @@ public class FileStorageRepository implements StorageRepository {
         //}
     }
 
-
     protected void initializeContentWrite(String instanceId) {
 
 //        if (protocolRepo.contains(instanceId)) {
@@ -228,19 +252,6 @@ public class FileStorageRepository implements StorageRepository {
         cleanRecursive(dir);
         EventsQueue.send(new StorageReloadedEvent());
     }
-
-    protected static void cleanRecursive(File dir) {
-        File[] files = dir.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    cleanRecursive(file);
-                }
-                file.delete();
-            }
-        }
-    }
-
 
     public long generateIndex() {
         synchronized (lock) {
@@ -288,7 +299,6 @@ public class FileStorageRepository implements StorageRepository {
     private void writeContent(String id, String result) throws IOException {
         setFileContent(Path.of(targetDir, id), result);
     }
-
 
     protected List<CompactLine> retrieveIndexFile(String protocolInstanceId) {
         String fileContent;
@@ -356,7 +366,6 @@ public class FileStorageRepository implements StorageRepository {
         log.info("Stop recording {}", instanceId);
     }
 
-
     @Override
     public StorageItem readById(String protocolInstanceId, long id) {
         var ctx = protocolRepo.get(protocolInstanceId);
@@ -378,7 +387,6 @@ public class FileStorageRepository implements StorageRepository {
         }
         return result;
     }
-
 
     @Override
     public List<StorageItem> readResponses(String protocolInstanceId, ResponseItemQuery query) {
@@ -410,16 +418,15 @@ public class FileStorageRepository implements StorageRepository {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public byte[] readAsZip() {
         var baos = new ByteArrayOutputStream();
         try (var zos = new ZipOutputStream(baos)) {
             for (var file : new File(Path.of(targetDir).toAbsolutePath().toString()).listFiles()) {
-                zipFile(file,file.getName(),zos);
+                zipFile(file, file.getName(), zos);
             }
         } catch (IOException ioe) {
-            log.error("Error Creating storage zip",ioe);
+            log.error("Error Creating storage zip", ioe);
         }
         return baos.toByteArray();
     }
@@ -436,8 +443,8 @@ public class FileStorageRepository implements StorageRepository {
         try {
             fis = new ByteArrayInputStream(byteArray);
             ZipInputStream zis = new ZipInputStream(fis);
-            ZipEntry zipEntry  = zis.getNextEntry();
-            if (zipEntry  == null) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            if (zipEntry == null) {
                 throw new RuntimeException("Not a zip file!");
             }
             while (zipEntry != null) {
@@ -472,7 +479,6 @@ public class FileStorageRepository implements StorageRepository {
             throw new RuntimeException(e);
         }
     }
-
 
     @Override
     public String getType() {
@@ -576,10 +582,10 @@ public class FileStorageRepository implements StorageRepository {
     @Override
     public List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId) {
         var result = new ArrayList<StorageFileIndex>();
-        var pluginDir = ensureDirectory(Path.of(targetDir,instanceId,pluginId).toAbsolutePath().toString());
+        var pluginDir = ensureDirectory(Path.of(targetDir, instanceId, pluginId).toAbsolutePath().toString());
         for (var file : listFilesUsingJavaIO(Path.of(pluginDir).toAbsolutePath().toString())) {
             if (file.getName().endsWith(".json")) {
-                result.add(new StorageFileIndex(instanceId,pluginId,file.getName().replace(".json","")));
+                result.add(new StorageFileIndex(instanceId, pluginId, file.getName().replace(".json", "")));
             }
         }
         return result;
@@ -587,11 +593,11 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public StorageFile readPluginFile(StorageFileIndex index) {
-        var pluginDir = ensureDirectory(Path.of(targetDir,index.getInstanceId(),index.getPluginId()).toAbsolutePath().toString());
+        var pluginDir = ensureDirectory(Path.of(targetDir, index.getInstanceId(), index.getPluginId()).toAbsolutePath().toString());
         var filePath = Path.of(pluginDir, index.getIndex() + ".json");
-        if(Files.exists(filePath)) {
+        if (Files.exists(filePath)) {
             try {
-                return new StorageFile(index,getFileContent(filePath));
+                return new StorageFile(index, getFileContent(filePath));
             } catch (IOException e) {
                 return null;
             }
@@ -602,10 +608,10 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void writePluginFile(StorageFile file) {
-        var pluginDir = ensureDirectory(Path.of(targetDir,file.getIndex().getInstanceId(),file.getIndex().getPluginId()).toAbsolutePath().toString());
+        var pluginDir = ensureDirectory(Path.of(targetDir, file.getIndex().getInstanceId(), file.getIndex().getPluginId()).toAbsolutePath().toString());
         var filePath = Path.of(pluginDir, file.getIndex().getIndex() + ".json");
         try {
-            setFileContent(filePath,file.getContent());
+            setFileContent(filePath, file.getContent());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -614,24 +620,19 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void delPluginFile(StorageFileIndex file) {
-        var pluginDir = ensureDirectory(Path.of(targetDir,file.getInstanceId(),file.getPluginId()).toAbsolutePath().toString());
+        var pluginDir = ensureDirectory(Path.of(targetDir, file.getInstanceId(), file.getPluginId()).toAbsolutePath().toString());
         var filePath = Path.of(pluginDir, file.getIndex() + ".json");
-        if(filePath.toFile().exists()) {
+        if (filePath.toFile().exists()) {
             filePath.toFile().delete();
         }
     }
 
-    protected static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
+    protected String getFileContent(Path of) throws IOException {
+        return Files.readString(of);
+    }
 
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
+    protected void setFileContent(Path of, String s) throws IOException {
+        Files.writeString(of, s);
     }
 
     protected static class ProtocolRepo {
@@ -641,15 +642,5 @@ public class FileStorageRepository implements StorageRepository {
         public List<CompactLine> index = new ArrayList<>();
         public boolean initialized = false;
         public volatile boolean somethingWritten = false;
-    }
-
-    protected String getFileContent(Path of) throws IOException {
-        return Files.readString(of);
-    }
-
-
-
-    protected void setFileContent(Path of, String s) throws IOException{
-        Files.writeString(of, s);
     }
 }

@@ -173,7 +173,7 @@ public class SwaggerApi implements FilteringClass {
         } else {
             var responses = new HashMap<Integer, List<mt>>();
             for (var res : doc.responses()) {
-                prepareResponse(schemas, responses, res,filter);
+                prepareResponse(schemas, responses, res, filter);
             }
             for (var singres : responses.entrySet()) {
                 buildResponse(apiResponses, singres);
@@ -213,11 +213,11 @@ public class SwaggerApi implements FilteringClass {
 
     private void prepareResponse(Map<String, Schema> schemas, HashMap<Integer, List<mt>> responses, TpmResponse res,
                                  FilterDescriptor descriptor) {
-        var hasBody = extractSchemasForMethod(schemas, res.body(),res.bodyMethod(),descriptor);
+        var hasBody = extractSchemasForMethod(schemas, res.body(), res.bodyMethod(), descriptor);
 
         if (hasBody) {
             var bodyClass = res.body();
-            if(bodyClass == Object.class && res.bodyMethod()!=null && !res.bodyMethod().isEmpty()){
+            if (bodyClass == Object.class && res.bodyMethod() != null && !res.bodyMethod().isEmpty()) {
                 bodyClass = (Class<?>) descriptor.invokeOnFilterClass(res.bodyMethod());
             }
             var mmt = new mt();
@@ -245,7 +245,7 @@ public class SwaggerApi implements FilteringClass {
 
     private void buildRequest(OpenAPI swagger, Map<String, Schema> schemas, FilterDescriptor filter, TpmDoc doc, PathItem expectedPath, List<Parameter> parameters, ApiResponses apiResponses, TpmRequest req) {
         var resBody = req.body();
-        if(resBody== Object.class && req.bodyMethod()!=null && !req.bodyMethod().isEmpty()) {
+        if (resBody == Object.class && req.bodyMethod() != null && !req.bodyMethod().isEmpty()) {
             resBody = (Class<?>) filter.invokeOnFilterClass(req.bodyMethod());
         }
         var resExamples = req.examples();
@@ -392,7 +392,7 @@ public class SwaggerApi implements FilteringClass {
 
     private boolean extractSchemasForMethod(Map<String, Schema> schemas, Class<?> bodyRequest, String methodOnDescriptor, FilterDescriptor descriptor) {
         if (bodyRequest == Object.class) return false;
-        if(bodyRequest==null && methodOnDescriptor!=null && !methodOnDescriptor.isEmpty()){
+        if (bodyRequest == null && methodOnDescriptor != null && !methodOnDescriptor.isEmpty()) {
             bodyRequest = (Class<?>) descriptor.invokeOnFilterClass(methodOnDescriptor);
         }
         if (Primitives.isWrapperType(bodyRequest)) return true;

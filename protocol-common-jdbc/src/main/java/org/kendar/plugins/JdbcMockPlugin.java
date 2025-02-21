@@ -20,7 +20,7 @@ public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> 
 
 
     public JdbcMockPlugin(JsonMapper mapper, StorageRepository repository) {
-        super(mapper,repository);
+        super(mapper, repository);
     }
 
     @Override

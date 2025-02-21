@@ -16,7 +16,6 @@ public class HttpReplayPluginCli extends AsyncReplayPluginCli {
     }
 
 
-
     @Override
     protected CommandOption[] buildPluginOptions(PluginSettings settings) {
         var options = new ArrayList<CommandOption>();

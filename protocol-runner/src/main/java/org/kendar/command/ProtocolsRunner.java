@@ -2,8 +2,10 @@ package org.kendar.command;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
+import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.storage.cli.StorageCli;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
@@ -15,12 +17,14 @@ import java.util.regex.Pattern;
 public class ProtocolsRunner {
     private static final JsonMapper mapper = new JsonMapper();
     private static final String TPM_REPLACE = "TPM_REPLACE";
-    //private final Map<String, CommonRunner> protocols = new HashMap<>();
 
+    public static CommandOptions getMainOptions(ChangeableReference<GlobalSettings> settings, DiService diService) {
 
-    public static CommandOptions getMainOptions(ChangeableReference<GlobalSettings> settings) {
-
-
+        var availableStorages = diService.getInstances(StorageCli.class);
+        var storageOptions = "";
+        for (var storage : availableStorages) {
+            storageOptions += "\n- " + storage.getDescription();
+        }
         var coptions = CommandOptions.of("main",
                 "=======================\n" +
                         "= The Protocol Master =\n" +
@@ -42,7 +46,7 @@ public class ProtocolsRunner {
                         .withLong("pluginsDir")
                         .withMandatoryParameter()
                         .withCallback((s) -> settings.get().setPluginsDir(s)),
-                CommandOption.of("dd", "Data directory (default file:data)")
+                CommandOption.of("dd", "Data directory (default file=data)]\n*Options:" + storageOptions)
                         .withLong("datadir")
                         .withMandatoryParameter()
                         .withCallback((s) -> settings.get().setDataDir(s)),

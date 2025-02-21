@@ -33,9 +33,9 @@ public class HttpLatencyPluginCli extends BasicPluginCli {
                 .withCallback((s) -> ((HttpLatencyPluginSettings) settings).setMaxMs(Integer.parseInt(s))));
         options.add(CommandOption.of("min", "Min milliseconds latency, default 0")
                 .withCallback((s) -> ((HttpLatencyPluginSettings) settings).setMinMs(Integer.parseInt(s))));
-        options.add(CommandOption.of("ewh", "Modify latency on following websites @\r\n" +
+        options.add(CommandOption.of("lwh", "Modify latency on following websites @\r\n" +
                         "@REGEX or  STARTWITH. Default anything")
-                .withLong("errorWhere")
+                .withLong("latencyWhere")
                 .asMultiple()
                 .withMultiCallback((s) -> ((HttpLatencyPluginSettings) settings).setLatencySites(s)));
         return options.toArray(new CommandOption[0]);

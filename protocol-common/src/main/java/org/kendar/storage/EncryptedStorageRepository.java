@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@TpmService(tags = "encrypted_file")
+@TpmService(tags = "storage_encrypted")
 public class EncryptedStorageRepository extends FileStorageRepository {
 
     private final Encryptor encryptor;

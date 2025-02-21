@@ -37,6 +37,7 @@ public class FilterDescriptor {
 
     private static final Pattern namedGroupsPattern =
             Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z\\d]*)>");
+    private static final Logger log = LoggerFactory.getLogger(FilterDescriptor.class);
     private final int priority;
     private final boolean methodBlocking;
     private final boolean typeBlocking;
@@ -49,7 +50,6 @@ public class FilterDescriptor {
     private String description;
     private HttpTypeFilter typeFilter;
     private HttpMethodFilter methodFilter;
-
     private TpmDocConcrete doc;
     private Method callback;
     private String id;
@@ -199,23 +199,21 @@ public class FilterDescriptor {
         return priority;
     }
 
-
     public boolean matches(Request req) {
         for (var match : matchers) {
             if (!match.matches(req)) return false;
         }
         return true;
     }
-    private static final Logger log = LoggerFactory.getLogger(FilterDescriptor.class);
 
-    public Object invokeOnFilterClass(String name,Object...args){
-        if(name==null || name.isEmpty()) return null;
+    public Object invokeOnFilterClass(String name, Object... args) {
+        if (name == null || name.isEmpty()) return null;
         try {
             var method = filterClass.getClass().getMethod(name);
             method.setAccessible(true);
             return method.invoke(filterClass, args);
-        }catch (Exception e) {
-            log.error("Error retrieving data from {}",filterClass.getClass().getName(),e);
+        } catch (Exception e) {
+            log.error("Error retrieving data from {}", filterClass.getClass().getName(), e);
             return null;
         }
     }

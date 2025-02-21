@@ -12,6 +12,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ReformatIndexes {
+    private static String getFileContent(Path file) throws IOException {
+        return Files.readString(file);
+    }
+
     //@Test
     void reformat() throws IOException {
         var path = Path.of("").toAbsolutePath().getParent();
@@ -69,9 +73,5 @@ public class ReformatIndexes {
                 }
             }
         }
-    }
-
-    private static String getFileContent(Path file) throws IOException {
-        return Files.readString(file);
     }
 }

@@ -6,6 +6,24 @@ public class HelpLine {
     private String longCommand;
     private String description;
     private String availableOptions;
+    private int level;
+    private boolean multiple;
+
+    public HelpLine(String shortCommand, String longCommand, String description, String availableOptions,
+                    boolean multiple, int level) {
+        this.shortCommand = shortCommand;
+        this.longCommand = longCommand;
+        this.description = description;
+        this.availableOptions = availableOptions;
+        this.level = level;
+        this.block = false;
+        this.multiple = multiple;
+    }
+    public HelpLine(String description, int level) {
+        this.description = description;
+        this.level = level;
+        this.block = true;
+    }
 
     public int getLevel() {
         return level;
@@ -15,26 +33,6 @@ public class HelpLine {
         this.level = level;
     }
 
-    private int level;
-    private boolean multiple;
-
-    public HelpLine(String shortCommand, String longCommand, String description, String availableOptions,
-                    boolean multiple,int level) {
-        this.shortCommand = shortCommand;
-        this.longCommand = longCommand;
-        this.description = description;
-        this.availableOptions = availableOptions;
-        this.level = level;
-        this.block = false;
-        this.multiple = multiple;
-    }
-
-    public HelpLine(String description,int level) {
-        this.description = description;
-        this.level = level;
-        this.block = true;
-    }
-
     public boolean isBlock() {
         return block;
     }
@@ -42,9 +40,9 @@ public class HelpLine {
     @Override
     public String toString() {
         if (block) {
-            return description+" "+level;
+            return description + " " + level;
         } else {
-            return shortCommand + " " + longCommand + " " + description+" "+level;
+            return shortCommand + " " + longCommand + " " + description + " " + level;
         }
     }
 

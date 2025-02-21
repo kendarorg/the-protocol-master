@@ -252,11 +252,11 @@ public abstract class ProtoDescriptor {
         this.settings = settings;
     }
 
-    public void setPlugins(List<BasePluginDescriptor> plugins) {
-        this.plugins = plugins;
-    }
-
     public List<BasePluginDescriptor> getPlugins() {
         return plugins;
+    }
+
+    public void setPlugins(List<BasePluginDescriptor> plugins) {
+        this.plugins = plugins;
     }
 }
