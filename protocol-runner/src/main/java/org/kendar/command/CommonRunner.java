@@ -2,23 +2,14 @@ package org.kendar.command;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
-import org.kendar.di.DiService;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
-import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.ProtocolSettings;
-import org.kendar.storage.generic.StorageRepository;
-import org.kendar.tcpserver.TcpServer;
-import org.kendar.utils.Sleeper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 public abstract class CommonRunner {
 
@@ -66,8 +57,6 @@ public abstract class CommonRunner {
     }
 
     protected abstract String getConnectionDescription();
-    private TcpServer ps;
-
 
     protected List<CommandOption> optionLoginPassword(ByteProtocolSettingsWithLogin settings) {
         var options = List.of(
@@ -84,29 +73,9 @@ public abstract class CommonRunner {
         return new ArrayList<>(options);
     }
 
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServers, String key,
-                               GlobalSettings ini, ProtocolSettings opaqueProtocolSettings,
-                               StorageRepository storage, List<ProtocolPluginDescriptor> filters,
-                               Supplier<Boolean> stopWhenFalse) throws Exception{
-        var diContext = DiService.getThreadContext();
-        diContext.register(opaqueProtocolSettings);
-        var baseProtocol = diContext.getInstance(NetworkProtoDescriptor.class,opaqueProtocolSettings.getProtocol());
-        baseProtocol.initialize();
-        ps = new TcpServer(baseProtocol);
-        ps.setOnStart(() -> DiService.setThreadContext(diContext));
-        ps.start();
-        Sleeper.sleep(5000, () -> ps.isRunning());
-        protocolServers.put(key, ps);
-    }
 
     public abstract String getId();
 
-    public abstract Class<?> getSettingsClass();
-
-    public void stop(){
-
-            ps.stop();
-    }
 
     public abstract CommandOptions getOptions(GlobalSettings settings);
 }

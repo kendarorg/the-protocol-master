@@ -6,7 +6,11 @@ import com.sun.net.httpserver.HttpServer;
 import org.kendar.apis.ApiFiltersLoader;
 import org.kendar.apis.ApiHandler;
 import org.kendar.apis.filters.FiltersConfiguration;
+import org.kendar.cli.CommandOptions;
 import org.kendar.cli.CommandParser;
+import org.kendar.command.GlobalPluginCommandLineHandler;
+import org.kendar.command.PluginCommandLineHandler;
+import org.kendar.command.ProtocolCommandLineHandler;
 import org.kendar.command.ProtocolsRunner;
 import org.kendar.di.DiService;
 import org.kendar.di.TpmScopeType;
@@ -29,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -87,8 +92,43 @@ public class Main {
         }
 
         protocolsRunner = diService.getInstance(ProtocolsRunner.class);
-        if (!parser.hasOption("cfg")) {
+        /*if (!parser.hasOption("cfg")) {
             if (!protocolsRunner.prepareSettingsFromCommandLine(options, args, settings.get(), parser)) {
+                return;
+            }
+        }*/
+        if (!parser.hasOption("cfg")) {
+            var protocolMotherOption = options.getCommandOption("p");
+            var protocolOptionsToAdd = new ArrayList<CommandOptions>();
+            String helpForProtocol = null;
+            if (parser.hasOption("help")) {
+                helpForProtocol = parser.getOptionValue("help");
+            }
+
+            for(var globalPluginOptions:diService.getInstances(GlobalPluginCommandLineHandler.class)){
+                globalPluginOptions.setup(options,settings.get());
+            }
+            var commandLineOptions = diService.getInstances(ProtocolCommandLineHandler.class);
+            for(var commandLineOption:commandLineOptions){
+                var tags = DiService.getTags(commandLineOption);
+                if(helpForProtocol == null || tags.contains(helpForProtocol)){
+                    var protocolFilterCmdOptions = new ArrayList<PluginCommandLineHandler>();
+                    for(var tag:tags){
+                        protocolFilterCmdOptions.addAll(diService.getInstances(PluginCommandLineHandler.class,tag));
+                    }
+                    commandLineOption.initializeFiltersCommandLineHandlers(protocolFilterCmdOptions);
+                    protocolOptionsToAdd.add(commandLineOption.loadCommandLine(settings.get()));
+                }
+            }
+            protocolMotherOption.withSubChoices(protocolOptionsToAdd.toArray(new CommandOptions[0]));
+            if (parser.hasOption("help")) {
+                parser.printHelp();
+                return;
+            }
+            try{
+                parser.parse(args);
+            }catch(Exception e){
+                parser.printHelp();
                 return;
             }
         }
@@ -199,24 +239,6 @@ public class Main {
                         protocolServersCache.remove(item);
                         throw new RuntimeException(xx);
                     }
-
-
-                    /*var protocolManager = protocolsRunner.getManagerFor(protocol);
-                    var availableProtocolPlugins = localDiService.getInstances(ProtocolPluginDescriptor.class, protocol.getProtocol());
-                    var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
-
-                    var storage = localDiService.getInstance(StorageRepository.class);
-                    try {
-                        protocolsRunner.start(protocolServersCache,
-                                item.getKey(), ini, protocolFullSettings, storage, availableProtocolPlugins,
-                                stopWhenFalse);
-                    } catch (Exception e) {
-                        //noinspection SuspiciousMethodCalls
-                        protocolServersCache.remove(item);
-                        throw new RuntimeException(e);
-                    }*/
-
-
                 } catch (Exception ex) {
                     log.error("Unable to start protocol {}", item.getKey(), ex);
                 }

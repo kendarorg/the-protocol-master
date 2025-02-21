@@ -44,10 +44,4 @@ public class RedisRunner extends CommonRunner {
     public String getId() {
         return "redis";
     }
-
-    @Override
-    public Class<?> getSettingsClass() {
-        return ByteProtocolSettings.class;
-    }
-
 }

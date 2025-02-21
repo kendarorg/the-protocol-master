@@ -68,11 +68,6 @@ public class JdbcRunner extends CommonRunner {
         return protocol;
     }
 
-    @Override
-    public Class<?> getSettingsClass() {
-        return JdbcProtocolSettings.class;
-    }
-
 
 }
 

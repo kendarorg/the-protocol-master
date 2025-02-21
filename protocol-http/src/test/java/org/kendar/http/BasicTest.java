@@ -34,6 +34,7 @@ import org.kendar.utils.Sleeper;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -175,7 +176,7 @@ public class BasicTest {
         var settings = new PluginSettings();
         settings.setActive(true);
         var mapper = new JsonMapper();
-        baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
+        baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, new ArrayList<>(List.of(
                 new HttpRecordPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, recordingSettings),
                 new HttpReplayPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(mapper),
@@ -183,7 +184,7 @@ public class BasicTest {
                 new HttpLatencyPlugin(mapper),
                 new HttpRateLimitPlugin(mapper,storage),
                 new HttpMockPlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, mockSettings),
-                new HttpRewritePlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, rewriteSettings)));
+                new HttpRewritePlugin(mapper,storage).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
         baseProtocol.initialize();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
@@ -203,7 +204,9 @@ public class BasicTest {
     public void afterEachBase() {
         EventsQueue.unregister("recorder", ReportDataEvent.class);
         events.clear();
-        protocolServer.stop();
-        Sleeper.sleep(5000, () -> !protocolServer.isRunning());
+        //if(protocolServer!=null) {
+            protocolServer.stop();
+            Sleeper.sleep(5000, () -> !protocolServer.isRunning());
+        //}
     }
 }

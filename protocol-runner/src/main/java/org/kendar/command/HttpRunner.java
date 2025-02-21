@@ -144,10 +144,4 @@ public class HttpRunner extends CommonRunner {
         return "http";
     }
 
-    @Override
-    public Class<?> getSettingsClass() {
-        return HttpProtocolSettings.class;
-    }
-
-
 }

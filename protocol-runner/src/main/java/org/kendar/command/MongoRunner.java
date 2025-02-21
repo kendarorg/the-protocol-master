@@ -35,11 +35,6 @@ public class MongoRunner extends CommonRunner {
     }
 
     @Override
-    public Class<?> getSettingsClass() {
-        return ByteProtocolSettingsWithLogin.class;
-    }
-
-    @Override
     public String getDefaultPort() {
         return "27018";
     }

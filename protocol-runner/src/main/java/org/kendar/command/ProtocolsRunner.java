@@ -4,11 +4,7 @@ import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.cli.CommandParser;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.ProtocolSettings;
-import org.kendar.storage.generic.StorageRepository;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
@@ -17,8 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -134,20 +128,5 @@ public class ProtocolsRunner {
             parser.printHelp();
         }
         return false;
-    }
-
-
-    public void start(ConcurrentHashMap<String, TcpServer> protocolServer, String key,
-                      GlobalSettings ini, ProtocolSettings protocol, StorageRepository storage,
-                      List<ProtocolPluginDescriptor> plugins,
-                      Supplier<Boolean> stopWhenFalse) throws Exception {
-        var pr = protocols.get(protocol.getProtocol());
-
-        protocol.setProtocolInstanceId(key);
-        pr.start(protocolServer, key, ini, protocol, storage, plugins, stopWhenFalse);
-    }
-
-    public CommonRunner getManagerFor(ProtocolSettings protocol) {
-        return protocols.get(protocol.getProtocol());
     }
 }

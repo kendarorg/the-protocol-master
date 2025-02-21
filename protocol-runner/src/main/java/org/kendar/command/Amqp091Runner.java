@@ -29,11 +29,6 @@ public class Amqp091Runner extends CommonRunner {
         return "amqp091";
     }
 
-    @Override
-    public Class<?> getSettingsClass() {
-        return ByteProtocolSettingsWithLogin.class;
-    }
-
 
     @Override
     public CommandOptions getOptions(GlobalSettings globalSettings) {
