@@ -5,6 +5,9 @@ import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 
 @TpmService(tags = "mysql")
 public class MySqlProtocolSettings extends JdbcProtocolSettings {
+    public MySqlProtocolSettings() {
+        setProtocol("mysql");
+    }
     private boolean force3BytesOkPacketInfo = false;
 
     public boolean isForce3BytesOkPacketInfo() {

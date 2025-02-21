@@ -5,4 +5,7 @@ import org.kendar.settings.ByteProtocolSettingsWithLogin;
 
 @TpmService(tags = "mongodb")
 public class MongoProtocolSettings extends ByteProtocolSettingsWithLogin {
+    public MongoProtocolSettings() {
+        setProtocol("mongodb");
+    }
 }
