@@ -10,7 +10,6 @@ import org.kendar.http.plugins.HttpRecordPlugin;
 import org.kendar.http.plugins.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPlugin;
 import org.kendar.http.plugins.HttpReplayPluginSettings;
-import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;

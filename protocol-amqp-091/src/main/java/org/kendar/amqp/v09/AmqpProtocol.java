@@ -32,7 +32,6 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
-import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;
@@ -54,7 +53,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     private TimerInstance timer;
 
     @TpmConstructor
-    public AmqpProtocol(GlobalSettings ini,ByteProtocolSettingsWithLogin settings, AmqpProxy proxy,
+    public AmqpProtocol(GlobalSettings ini,AmqpProtocolSettings settings, AmqpProxy proxy,
                         @TpmNamed(tags = "amqp091") List<BasePluginDescriptor> plugins) {
         super(ini, settings, proxy, plugins);
         this.port = settings.getPort();

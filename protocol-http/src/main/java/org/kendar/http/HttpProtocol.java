@@ -6,7 +6,6 @@ import org.kendar.apis.converters.RequestResponseBuilderImpl;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;

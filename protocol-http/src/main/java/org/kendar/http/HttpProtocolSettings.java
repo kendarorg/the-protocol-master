@@ -1,7 +1,10 @@
-package org.kendar.http.settings;
+package org.kendar.http;
 
+import org.kendar.di.annotations.TpmService;
+import org.kendar.http.settings.HttpSSLSettings;
 import org.kendar.settings.ProtocolSettings;
 
+@TpmService(tags = "http")
 public class HttpProtocolSettings extends ProtocolSettings {
     private int http = 80;
     private int https = 443;

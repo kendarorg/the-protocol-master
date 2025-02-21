@@ -25,11 +25,11 @@ public class GlobalSettings {
         this.apiPort = apiPort;
     }
 
-    public void putService(String key, Object value) {
+    /*public void putService(String key, Object value) {
         services.put(key, value);
-    }
+    }*/
 
-    public <K> K getService(String key) {
+    /*public <K> K getService(String key) {
         return (K) services.get(key);
     }
 
@@ -41,15 +41,15 @@ public class GlobalSettings {
             }
         }
         return result;
-    }
+    }*/
 
-    public String getLogType() {
+    /*public String getLogType() {
         return logType;
     }
 
     public void setLogType(String logType) {
         this.logType = logType;
-    }
+    }*/
 
     public ProtocolSettings getProtocolForKey(String protocol) {
         if (!protocols.containsKey(protocol)) {

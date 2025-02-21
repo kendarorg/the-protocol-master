@@ -16,7 +16,6 @@ import org.kendar.redis.fsm.Resp3PullState;
 import org.kendar.redis.fsm.Resp3Subscribe;
 import org.kendar.redis.fsm.Resp3Unsubscribe;
 import org.kendar.redis.fsm.events.Resp3Message;
-import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.GlobalSettings;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class Resp3Protocol extends NetworkProtoDescriptor {
     private int port = PORT;
 
     @TpmConstructor
-    public Resp3Protocol(GlobalSettings ini, ByteProtocolSettings settings, Resp3Proxy proxy,
+    public Resp3Protocol(GlobalSettings ini, RedisProtocolSettings settings, Resp3Proxy proxy,
                          @TpmNamed(tags = "redis") List<BasePluginDescriptor> plugins) {
         super(ini, settings, proxy, plugins);
         this.port = settings.getPort();

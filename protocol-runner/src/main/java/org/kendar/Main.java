@@ -15,7 +15,7 @@ import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.ChangeableReference;
@@ -163,9 +163,45 @@ public class Main {
             new Thread(() -> {
                 try {
                     var localDiService = diService.createChildScope(TpmScopeType.THREAD);
-                    var protocol = ini.getProtocolForKey(item.getKey());
-                    if (protocol == null) return;
-                    var protocolManager = protocolsRunner.getManagerFor(protocol);
+                    try {
+                        var protocol = ini.getProtocolForKey(item.getKey());
+                        if (protocol == null) return;
+                        //Retrieve the type
+                        var tempSettings = localDiService.getInstance(ProtocolSettings.class, protocol.getProtocol());
+                        //Load the real data
+                        var protocolFullSettings = ini.getProtocol(item.getKey(), tempSettings.getClass());
+                        protocolFullSettings.setProtocolInstanceId(item.getKey());
+                        //Overwrite
+                        localDiService.overwrite(ProtocolSettings.class, protocolFullSettings);
+                        localDiService.overwrite(protocolFullSettings.getClass(), protocolFullSettings);
+
+                        var baseProtocol = localDiService.getInstance(NetworkProtoDescriptor.class, protocol.getProtocol());
+                        baseProtocol.initialize();
+                        var ps = new TcpServer(baseProtocol);
+                        ps.setOnStart(() -> DiService.setThreadContext(localDiService));
+                        ps.start();
+                        Sleeper.sleep(5000, () -> ps.isRunning());
+                        protocolServersCache.put(item.getKey(), ps);
+
+                        var pi = new ProtocolInstance(item.getKey(),
+                                protocolServersCache.get(item.getKey()),
+                                baseProtocol.getPlugins().stream().map(a -> (ProtocolPluginDescriptor) a).toList(),
+                                protocolFullSettings);
+                        var apiHandler = localDiService.getInstance(ApiHandler.class);
+                        apiHandler.addProtocol(pi);
+                        for (var pl : protocolServersCache.get(item.getKey()).getProtoDescriptor().getPlugins()) {
+                            var apiHandlerPlugin = ((ProtocolPluginDescriptor) pl).getApiHandler();
+                            apisFiltersLoader.getFilters().addAll(apiHandlerPlugin);
+                        }
+                        //ini.putService(item.getKey(), pi);
+                    } catch (Exception xx) {
+                        //noinspection SuspiciousMethodCalls
+                        protocolServersCache.remove(item);
+                        throw new RuntimeException(xx);
+                    }
+
+
+                    /*var protocolManager = protocolsRunner.getManagerFor(protocol);
                     var availableProtocolPlugins = localDiService.getInstances(ProtocolPluginDescriptor.class, protocol.getProtocol());
                     var protocolFullSettings = ini.getProtocol(item.getKey(), protocolManager.getSettingsClass());
 
@@ -178,16 +214,8 @@ public class Main {
                         //noinspection SuspiciousMethodCalls
                         protocolServersCache.remove(item);
                         throw new RuntimeException(e);
-                    }
-                    var pi = new ProtocolInstance(item.getKey(),
-                            protocolServersCache.get(item.getKey()), availableProtocolPlugins, protocolFullSettings);
-                    var apiHandler = localDiService.getInstance(ApiHandler.class);
-                    apiHandler.addProtocol(pi);
-                    for (var pl : ((NetworkProtoDescriptor)protocolServersCache.get(item.getKey()).getProtoDescriptor()).getPlugins()) {
-                        var apiHandlerPlugin = ((ProtocolPluginDescriptor)pl).getApiHandler();
-                        apisFiltersLoader.getFilters().addAll(apiHandlerPlugin);
-                    }
-                    ini.putService(item.getKey(), pi);
+                    }*/
+
 
                 } catch (Exception ex) {
                     log.error("Unable to start protocol {}", item.getKey(), ex);
@@ -199,14 +227,14 @@ public class Main {
 
         try {
             latch.await();
-        } catch(InterruptedException ex) {
+        } catch (InterruptedException ex) {
             log.error("Error waiting for plugin to start");
         }
 
         var globalPlugins = diService.getInstances(GlobalPluginDescriptor.class);
         for (int i = globalPlugins.size() - 1; i >= 0; i--) {
             var plugin = globalPlugins.get(i);
-            var pluginSettings = (PluginSettings) ini.getPlugin(plugin.getId(), plugin.getSettingClass());
+            var pluginSettings = ini.getPlugin(plugin.getId(), plugin.getSettingClass());
             if (pluginSettings != null) {
                 plugin.initialize(ini, pluginSettings);
             } else {

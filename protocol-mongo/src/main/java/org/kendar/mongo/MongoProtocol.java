@@ -22,7 +22,6 @@ import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
-import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 
 import java.util.List;
@@ -34,7 +33,7 @@ public class MongoProtocol extends NetworkProtoDescriptor {
     private final int port;
 
     @TpmConstructor
-    public MongoProtocol(GlobalSettings ini, ByteProtocolSettingsWithLogin settings, MongoProxy proxy,
+    public MongoProtocol(GlobalSettings ini, MongoProtocolSettings settings, MongoProxy proxy,
                          @TpmNamed(tags = "mongodb") List<BasePluginDescriptor> plugins) {
         super(ini, settings, proxy, plugins);
         this.port = settings.getPort();

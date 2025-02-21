@@ -21,7 +21,6 @@ import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.http.plugins.*;
-import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.settings.GlobalSettings;

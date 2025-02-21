@@ -105,8 +105,6 @@ public class ProtocolsRunner {
             var protocolMotherOption = options.getCommandOption("p");
             var protocolOptionsToAdd = new ArrayList<CommandOptions>();
 
-
-            var isExecute = false;
             if (parser.hasOption("help")) {
                 var helpValue = parser.getOptionValue("help");
                 if (helpValue == null) {
@@ -121,7 +119,6 @@ public class ProtocolsRunner {
                 }
                 throw new Exception();
             } else {
-                isExecute = true;
 
                 for (var protocol : protocols.values()) {
                     protocolOptionsToAdd.add(protocol.getOptions(settings));

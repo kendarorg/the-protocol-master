@@ -16,7 +16,6 @@ import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.sql.jdbc.DataTypesConverter;
-import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -33,7 +32,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     private static DataTypesConverter dataTypesConverter;
 
     @TpmConstructor
-    public PostgresProtocol(GlobalSettings ini, JdbcProtocolSettings settings, PostgresProxy proxy,
+    public PostgresProtocol(GlobalSettings ini, PostgresProtocolSettings settings, PostgresProxy proxy,
                             @TpmNamed(tags = "postgres") List<BasePluginDescriptor> plugins) {
         super(ini, settings, proxy, plugins);
         this.port = settings.getPort();

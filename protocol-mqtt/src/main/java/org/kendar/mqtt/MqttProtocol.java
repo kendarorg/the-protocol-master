@@ -18,7 +18,6 @@ import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
 import org.kendar.protocol.states.special.Tagged;
-import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class MqttProtocol extends NetworkProtoDescriptor {
     private int port = PORT;
 
     @TpmConstructor
-    public MqttProtocol(GlobalSettings ini, ByteProtocolSettingsWithLogin settings, MqttProxy proxy,
+    public MqttProtocol(GlobalSettings ini, MqttProtocolSettings settings, MqttProxy proxy,
                         @TpmNamed(tags = "mqtt") List<BasePluginDescriptor> plugins) {
         super(ini, settings, proxy, plugins);
         this.port = settings.getPort();
