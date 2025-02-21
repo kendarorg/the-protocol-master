@@ -10,6 +10,7 @@ public class HttpProtocolSettings extends ProtocolSettings {
     private int https = 443;
     private int proxy = 9999;
     private HttpSSLSettings ssl = new HttpSSLSettings();
+
     public HttpProtocolSettings() {
         setProtocol("http");
     }

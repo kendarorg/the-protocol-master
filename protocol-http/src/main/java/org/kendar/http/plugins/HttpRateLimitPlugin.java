@@ -100,7 +100,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
 
         synchronized (sync) {
 
-            var settings = (HttpRateLimitPluginSettings) getSettings();
+            var settings = getSettings();
             // set the initial values for the first request
             if (resetTime == null) {
                 resetTime = Calendar.getInstance();

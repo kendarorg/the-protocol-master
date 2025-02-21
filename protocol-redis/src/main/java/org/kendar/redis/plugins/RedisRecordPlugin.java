@@ -25,7 +25,7 @@ public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettin
 
     private static boolean isClientSetInfo(ArrayNode input) {
         return input.get(0).asText().equalsIgnoreCase("CLIENT") &&
-                input.size() >= 1 &&
+                !input.isEmpty() &&
                 input.get(1).asText().equalsIgnoreCase("SETINFO");
     }
 

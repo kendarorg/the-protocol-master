@@ -19,6 +19,7 @@ public class HelpLine {
         this.block = false;
         this.multiple = multiple;
     }
+
     public HelpLine(String description, int level) {
         this.description = description;
         this.level = level;

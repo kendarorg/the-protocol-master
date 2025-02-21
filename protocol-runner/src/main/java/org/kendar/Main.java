@@ -212,7 +212,7 @@ public class Main {
                         var ps = new TcpServer(baseProtocol);
                         ps.setOnStart(() -> DiService.setThreadContext(localDiService));
                         ps.start();
-                        Sleeper.sleep(5000, () -> ps.isRunning());
+                        Sleeper.sleep(5000, ps::isRunning);
                         protocolServersCache.put(item.getKey(), ps);
 
                         var pi = new ProtocolInstance(item.getKey(),

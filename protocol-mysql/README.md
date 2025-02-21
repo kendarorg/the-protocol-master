@@ -185,7 +185,7 @@ When doing an INSERT if the generated key is a LONG/INT then should be returned
 
 ### Prepared statement
 
-By default the JDBC driver emulates the prepared statements client side.
+By default, the JDBC driver emulates the prepared statements client side.
 If you want to use prepared statement, on the proxy connection string should set
 
 ```

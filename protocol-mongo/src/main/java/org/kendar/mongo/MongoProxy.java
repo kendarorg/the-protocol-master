@@ -78,7 +78,7 @@ public class MongoProxy extends Proxy {
         var out = new OpMsgContent(0, protoContext.getReqResId(), data.getRequestId());
 
         var docPayload = data.getSections().get(0).getDocuments().get(0);
-        var command = (BsonDocument) BsonDocument.parse(docPayload);
+        var command = BsonDocument.parse(docPayload);
         var finalMessage = command.containsKey("endSession");
         if (command.get("isMaster") != null) {
             return null;
@@ -90,7 +90,7 @@ public class MongoProxy extends Proxy {
 
                 var tl = new BsonArray();
                 for (var j = 0; j < pack.getDocuments().size(); j++) {
-                    var bdoc = (BsonDocument) BsonDocument.parse(pack.getDocuments().get(j));
+                    var bdoc = BsonDocument.parse(pack.getDocuments().get(j));
                     tl.add(bdoc);
                 }
                 command.put(pack.getIdentifier(), tl);

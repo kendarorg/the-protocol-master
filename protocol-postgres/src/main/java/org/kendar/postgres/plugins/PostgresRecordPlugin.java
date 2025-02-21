@@ -33,7 +33,7 @@ public class PostgresRecordPlugin extends JdbcRecordPlugin {
     @Override
     public Map<String, String> buildTag(StorageItem item) {
         var data = new HashMap<String, String>();
-        var input = (JdbcRequest) item.retrieveInAs(JdbcRequest.class);
+        var input = item.retrieveInAs(JdbcRequest.class);
         data.put("query", null);
         data.put("isIntResult", "true");
         data.put("parametersCount", "0");
@@ -52,7 +52,7 @@ public class PostgresRecordPlugin extends JdbcRecordPlugin {
             }
         }
         if (item.getOutput() != null) {
-            var output = (JdbcResponse) item.retrieveOutAs(JdbcResponse.class);
+            var output = item.retrieveOutAs(JdbcResponse.class);
             data.put("isIntResult", Boolean.toString(output.getSelectResult().isIntResult()));
             if (output.getSelectResult().isIntResult()) {
                 data.put("resultsCount", output.getIntResult() + "");

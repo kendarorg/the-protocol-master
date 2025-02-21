@@ -127,15 +127,14 @@ public class CommandParser {
         var max = 130 - maxLong - maxShort - 3;
         var firstLine = true;
         for (var item : result) {
-            var levelSpace = "";
+            StringBuilder levelSpace = new StringBuilder();
             for (var i = 0; i < item.getLevel(); i++) {
-                levelSpace += "  ";
+                levelSpace.append("  ");
             }
             if (!item.isBlock()) {
                 item.setShortCommand(item.getShortCommand() + sbShort.substring(levelSpace.length() + item.getShortCommand().length()));
                 item.setLongCommand(item.getLongCommand() + sbLong.substring(item.getLongCommand().length()));
                 var description = item.getDescription();
-                ;
                 if (item.getAvailableOptions() != null) {
                     description += "\n*Options: " + item.getAvailableOptions();
                 }
@@ -146,7 +145,7 @@ public class CommandParser {
                 for (int i = 0; i < split.length; i++) {
                     var descline = split[i];
                     if (i == 0) {
-                        toPrint.append(levelSpace + item.getShortCommand()).append("  ").append(item.getLongCommand()).append("  ").append(descline).append("\n");
+                        toPrint.append(levelSpace).append(item.getShortCommand()).append("  ").append(item.getLongCommand()).append("  ").append(descline).append("\n");
                     } else {
                         toPrint.append(sbShort).append("  ").append(sbLong).append("  ").append(descline).append("\n");
                     }
@@ -155,7 +154,7 @@ public class CommandParser {
                 if (!firstLine) {
                     toPrint.append("\n");
                 }
-                toPrint.append(levelSpace + item.getDescription()).append("\n");
+                toPrint.append(levelSpace).append(item.getDescription()).append("\n");
                 toPrint.append("\n");
                 firstLine = false;
             }

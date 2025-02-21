@@ -27,6 +27,7 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
     private static final int PORT = 3306;
     private static final boolean IS_BIG_ENDIAN = true;
     private final int port;
+
     @TpmConstructor
     public MySQLProtocol(GlobalSettings ini, MySqlProtocolSettings settings, MySQLProxy proxy,
                          @TpmNamed(tags = "mysql") List<BasePluginDescriptor> plugins) {

@@ -48,8 +48,7 @@ public abstract class JdbcReplayPlugin extends ReplayPlugin<BasicReplayPluginSet
                 && lineToRead.getStorageItem().getOutput() != null) {
             var source = lineToRead.getStorageItem().retrieveOutAs(JdbcResponse.class);
             outObj.fill(source.getSelectResult());
-        } else if (lineToRead != null && lineToRead.getCompactLine() != null) {// if(in.getQuery().trim().toLowerCase().startsWith("set")){
-            //completedIndexes.add((int) lineToRead.getCompactLine().getIndex());
+        } else if (lineToRead != null && lineToRead.getCompactLine() != null) {
             if (lineToRead.getCompactLine().getTags().get("isIntResult").equalsIgnoreCase("true")) {
                 SelectResult resultset = new SelectResult();
                 resultset.setIntResult(true);

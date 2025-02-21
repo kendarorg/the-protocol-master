@@ -23,8 +23,7 @@ public abstract class ProtocolCommandLineHandler {
 
     public CommandOptions loadCommandLine(GlobalSettings globalSettings) {
         var genericSettings = buildProtocolSettings();
-        var options = new ArrayList<CommandOption>();
-        options.addAll(prepareCustomOptions(globalSettings, genericSettings));
+        var options = new ArrayList<CommandOption>(prepareCustomOptions(globalSettings, genericSettings));
         for (var filter : filtersCommandLineHandlers) {
             filter.setup(options, genericSettings);
         }

@@ -5,7 +5,6 @@ import org.kendar.amqp.v09.context.AmqpProtoContext;
 import org.kendar.amqp.v09.dtos.FrameType;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
-import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.PluginContext;
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 
 public class BodyFrame extends Frame {
-    private static final Logger logPs = LoggerFactory.getLogger(AmqpProxySocket.class.getName());
+    private static final Logger logPs = LoggerFactory.getLogger(BodyFrame.class.getName());
     private ContentData content;
     private int consumeId;
     private String consumeOrigin;

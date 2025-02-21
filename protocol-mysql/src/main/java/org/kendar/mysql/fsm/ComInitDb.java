@@ -1,6 +1,5 @@
 package org.kendar.mysql.fsm;
 
-import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CommandType;
 import org.kendar.mysql.executor.MySQLExecutor;
 import org.kendar.mysql.executor.MySQLProtoContext;
@@ -25,7 +24,7 @@ public class ComInitDb extends ProtoState {
     }
 
     public Iterator<ProtoStep> execute(CommandEvent event) {
-        var inputBuffer = (MySQLBBuffer) event.getBuffer();
+        var inputBuffer = event.getBuffer();
         var context = (MySQLProtoContext) event.getContext();
         var database = inputBuffer.getString(5);
         var executor = new MySQLExecutor();

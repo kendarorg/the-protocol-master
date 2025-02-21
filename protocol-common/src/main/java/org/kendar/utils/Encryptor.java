@@ -73,7 +73,7 @@ public class Encryptor {
 
     public byte[] encryptString(String data)
             throws CryptoException {
-        if (data == null || data.length() == 0) {
+        if (data == null || data.isEmpty()) {
             return new byte[0];
         }
 

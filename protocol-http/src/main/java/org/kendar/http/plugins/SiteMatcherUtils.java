@@ -10,8 +10,7 @@ public class SiteMatcherUtils {
         if (errorSites == null || errorSites.isEmpty()) {
             return new ArrayList<>();
         }
-        List<MatchingRecRep> destination = new ArrayList<>();
-        destination.addAll(errorSites.stream()
+        List<MatchingRecRep> destination = new ArrayList<>(errorSites.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
                 .map(MatchingRecRep::new).toList());
         return destination;

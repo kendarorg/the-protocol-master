@@ -12,7 +12,6 @@ import org.kendar.utils.JsonMapper;
 
 import java.util.regex.Pattern;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
 @TpmService
 public class ProtocolsRunner {
     private static final JsonMapper mapper = new JsonMapper();
@@ -21,9 +20,9 @@ public class ProtocolsRunner {
     public static CommandOptions getMainOptions(ChangeableReference<GlobalSettings> settings, DiService diService) {
 
         var availableStorages = diService.getInstances(StorageCli.class);
-        var storageOptions = "";
+        StringBuilder storageOptions = new StringBuilder();
         for (var storage : availableStorages) {
-            storageOptions += "\n- " + storage.getDescription();
+            storageOptions.append("\n- ").append(storage.getDescription());
         }
         var coptions = CommandOptions.of("main",
                 "=======================\n" +
@@ -39,9 +38,7 @@ public class ProtocolsRunner {
                 CommandOption.of("cfg", "Load config file")
                         .withLong("config")
                         .withMandatoryParameter()
-                        .withCallback((s) -> {
-                            loadConfigFile(settings, s);
-                        }),
+                        .withCallback((s) -> loadConfigFile(settings, s)),
                 CommandOption.of("pld", "Plugins directory (default plugins)")
                         .withLong("pluginsDir")
                         .withMandatoryParameter()

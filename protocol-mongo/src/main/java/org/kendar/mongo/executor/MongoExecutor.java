@@ -1,7 +1,6 @@
 package org.kendar.mongo.executor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.client.MongoClient;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.mongo.dtos.OpMsgContent;
@@ -20,7 +19,7 @@ public class MongoExecutor {
             for (var section : data.getSections()) {
                 for (var doc : section.getDocuments()) {
                     var jsonTree = mapper.toJsonNode(doc);
-                    var db = (JsonNode) jsonTree.get("$db");
+                    var db = jsonTree.get("$db");
                     return db.asText();
                 }
             }

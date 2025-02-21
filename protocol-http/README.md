@@ -90,7 +90,7 @@ Add the handling of throttling and rate limits
 * resetFormat: Format of the headerReset value (default secondsLeft, can be utcEpochSeconds)
 * headerRetryAfter: Header for seconds after which should retry (default Retry-After)
 * resetTimeWindowSeconds: When counters are reset
-* usecustomResponse: If should use a custom response (see an [example](src/test/resources/ratelimitresponse.json))
+* useCustomResponse: If should use a custom response (see an [example](src/test/resources/ratelimitresponse.json))
 
 The file is located into the "path" `[dataDir]/[protocol instance id]/[rate-limit-plugin]/response.json
 

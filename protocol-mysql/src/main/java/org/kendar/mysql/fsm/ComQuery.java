@@ -1,6 +1,5 @@
 package org.kendar.mysql.fsm;
 
-import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CommandType;
 import org.kendar.mysql.executor.MySQLExecutor;
 import org.kendar.mysql.executor.MySQLProtoContext;
@@ -26,7 +25,7 @@ public class ComQuery extends ProtoState {
     }
 
     public Iterator<ProtoStep> execute(CommandEvent event) {
-        var inputBuffer = (MySQLBBuffer) event.getBuffer();
+        var inputBuffer = event.getBuffer();
         var context = (MySQLProtoContext) event.getContext();
         var capabilities = context.getClientCapabilities();
 //        if (CapabilityFlag.isFlagSet(capabilities, CapabilityFlag.CLIENT_QUERY_ATTRIBUTES)) {
