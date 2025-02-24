@@ -128,8 +128,11 @@ If you want to go on the specific functions by protocol:
     * Support for push parsing
     * RESP2 and RESP3 supported out of the box
 * [Mqtt](protocol-mqtt/README.md)
-    * Support QOS 1,2,3
-    * Support 3.x and 5.x protocols
+  * Support QOS 1,2,3
+  * Support 3.x and 5.x protocols
+* [DNS](protocol-dns-plugin/README.md)
+  * Support UDP and TCP
+  * Plugin to install in plugins directory!
 
 ## Help
 

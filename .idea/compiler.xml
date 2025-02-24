@@ -12,6 +12,7 @@
         <module name="protocol-test" />
         <module name="jacoco" />
         <module name="protocol-postgres" />
+        <module name="protocol-dns-plugin" />
         <module name="sample-plugins" />
         <module name="protocol-mysql" />
         <module name="protocol-runner" />

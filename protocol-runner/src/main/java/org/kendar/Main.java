@@ -87,9 +87,12 @@ public class Main {
 
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
-        for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class)) {
-            diService.bind(ec);
+        for(var plugin : pluginManager.getPlugins()){
+            for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class,plugin.getPluginId())) {
+                diService.bind(ec);
+            }
         }
+
         if (!parser.hasOption("cfg")) {
             var protocolMotherOption = options.getCommandOption("p");
             var protocolOptionsToAdd = new ArrayList<CommandOptions>();

@@ -19,8 +19,9 @@
         <module>protocol-mqtt</module>
         <module>jacoco</module>
         <module>protocol-http</module>
-        <module>sample-plugins</module>
         <module>protocol-common-jdbc</module>
+        <module>sample-plugins</module>
+        <module>protocol-dns-plugin</module>
     </modules>
 
     <properties>
