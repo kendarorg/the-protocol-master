@@ -230,7 +230,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             socket.setReuseAddress(true);
             socket.bind(new InetSocketAddress("0.0.0.0", settings.getPort()));
             // socket.setSoTimeout(0);
-            log.info("Dns server LOADED, port: " + settings.getPort());
+            log.info("[CL>TP][IN] Listening on *.:{} DNS:udp", settings.getPort());
             byte[] in = new byte[UDP_SIZE];
 
             // Read the request
@@ -258,6 +258,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private void runTcp() {
 
         try (ServerSocket serverSocket = new ServerSocket(settings.getPort())) {
+            log.info("[CL>TP][IN] Listening on *.:{} DNS:tcp", settings.getPort());
             while (dnsRunning) {
                 Socket clientSocket = serverSocket.accept();
                 executorService.submit(() -> {
