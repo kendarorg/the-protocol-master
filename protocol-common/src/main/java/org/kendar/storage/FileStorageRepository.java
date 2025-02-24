@@ -413,11 +413,11 @@ public class FileStorageRepository implements StorageRepository {
         var baos = new ByteArrayOutputStream();
         var globalSettings = diService.getInstance(GlobalSettings.class);
         var globalSettingsFile = mapper.serialize(globalSettings);
-        try {
-            Files.writeString(Path.of(targetDir,"settings.json").toAbsolutePath(),globalSettingsFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        ZIPSETTINGS try {
+//            Files.writeString(Path.of(targetDir,"settings.json").toAbsolutePath(),globalSettingsFile);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
         try (var zos = new ZipOutputStream(baos)) {
             for (var file : new File(Path.of(targetDir).toAbsolutePath().toString()).listFiles()) {
                 zipFile(file, file.getName(), zos);
@@ -446,10 +446,10 @@ public class FileStorageRepository implements StorageRepository {
                 throw new RuntimeException("Not a zip file!");
             }
             while (zipEntry != null) {
-                if(zipEntry.getName().equalsIgnoreCase("settings.json") &&
+                /*ZIPSETTINGS if(zipEntry.getName().equalsIgnoreCase("settings.json") &&
                         Path.of(targetDir).toAbsolutePath().compareTo(destDir.toPath().toAbsolutePath()) == 0) {
                     settingsDir =Path.of(destDir.getAbsolutePath(),zipEntry.getName()).toString();
-                }
+                }*/
                 File newFile = newFile(destDir, zipEntry);
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {
