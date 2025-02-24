@@ -36,6 +36,8 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private  Pattern ipPattern =
             Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
     private boolean dnsRunning;
+    private ServerSocket tcpSocket;
+    private DatagramSocket udpSocket;
 
     @TpmConstructor
     public DnsProtocol(GlobalSettings ini, DnsProtocolSettings settings,
@@ -168,7 +170,17 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
 
         if (!(containsAtLeastOneInternal && endsWith) && !isUpperCase) {
-            if (settings.getBlocked().stream().noneMatch(bl -> bl.equalsIgnoreCase(requestedDomain))) {
+            if (settings.getBlocked().stream().noneMatch(d ->{
+                if(d.startsWith("@")){
+                    if(!patterns.containsKey(d)){
+                        var pattern = Pattern.compile(d.substring(1));
+                        patterns.put(d,pattern);
+                    }
+                    return patterns.get(d).matcher(requestedDomain).matches();
+
+                }
+                return d.equalsIgnoreCase(requestedDomain);
+            })) {
                 ips = doResolve(requestedDomain);
             }
         }
@@ -229,6 +241,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         try (DatagramSocket socket = new DatagramSocket(null)) {
             socket.setReuseAddress(true);
             socket.bind(new InetSocketAddress("0.0.0.0", settings.getPort()));
+            udpSocket = socket;
             // socket.setSoTimeout(0);
             log.info("[CL>TP][IN] Listening on *.:{} DNS:udp", settings.getPort());
             byte[] in = new byte[UDP_SIZE];
@@ -250,7 +263,8 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
                 }
             }
-        } catch (Exception ex) {
+        } catch (SocketException ex) {
+        }catch (Exception ex) {
             log.error("Error running udp thread", ex);
         }
     }
@@ -258,6 +272,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private void runTcp() {
 
         try (ServerSocket serverSocket = new ServerSocket(settings.getPort())) {
+            tcpSocket = serverSocket;
             log.info("[CL>TP][IN] Listening on *.:{} DNS:tcp", settings.getPort());
             while (dnsRunning) {
                 Socket clientSocket = serverSocket.accept();
@@ -280,7 +295,9 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                     }
                 });
             }
-        } catch (Exception ex) {
+        } catch (SocketException ex) {
+
+        }catch (Exception ex) {
             log.error("Error running tcp thread", ex);
         }
     }
@@ -305,14 +322,36 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                 terminatedPlugins.add(plugin);
             }
         }
+        try {
+            tcpSocket.close();
+        } catch (Exception e) {
+
+        }
+        try {
+            udpSocket.close();
+        } catch (Exception e) {
+
+        }
         dnsRunning = false;
     }
+
+    private ConcurrentHashMap<String,Pattern> patterns = new ConcurrentHashMap<>();
 
     public List<String> doResolve(String requestedDomain) {
         if (requestedDomain == null || requestedDomain.length() == 0) {
             return new ArrayList<>();
         }
-        var matching = settings.getRegistered().stream().filter(d -> d.getName().equalsIgnoreCase(requestedDomain)).findFirst();
+        var matching = settings.getRegistered().stream().filter(d -> {
+            if(d.getName().startsWith("@")){
+                if(!patterns.containsKey(d.getName())){
+                    var pattern = Pattern.compile(d.getName().substring(1));
+                    patterns.put(d.getName(),pattern);
+                }
+                return patterns.get(d.getName()).matcher(requestedDomain).matches();
+
+            }
+            return d.getName().equalsIgnoreCase(requestedDomain);
+        }).findFirst();
         if (matching.isPresent()) {
             return List.of(matching.get().getIp());
         }
@@ -330,7 +369,12 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     }
 
     public List<String> resolveRemote(String requestedDomain) {
+        if(requestedDomain.equals(requestedDomain.toUpperCase())){
+            log.error("Cyclic call returning nothing");
+            return new ArrayList<>();
+        }
         Matcher ipPatternMatcher = ipPattern.matcher(requestedDomain);
+        //If it's an ip continue
         if (ipPatternMatcher.matches()) {
             return List.of(requestedDomain);
         }
@@ -354,7 +398,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         try {
             futures = executorService.invokeAll(runnables);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Error running DNS thread", e);
         }
         int finished = futures.size();
         // This method returns the time in millis
@@ -363,7 +407,6 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
         while (finished != 0) {
             if (timeEnd <= new Date().getTime()) {
-                // System.out.println("================");
                 for (var current : futures) {
                     current.cancel(true);
                 }
@@ -387,22 +430,21 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                             }
                         }
                         futures.clear();
-                        if (data.size() > 0) {
-                            //localDomains.put(requestedDomain.toLowerCase(Locale.ROOT), new HashSet<>(data));
+                        if (!data.isEmpty()) {
                             finished = 0;
                             break;
                         }
                     } catch (Exception e) {
-                        log.debug("Unable to try resolve " + requestedDomain);
+                        log.debug("Unable to try resolve {}", requestedDomain);
                     }
                 }
             }
         }
         var result = new ArrayList<>(data);
-        if(result.size()==0){
+        if(result.isEmpty()){
             return List.of();
         }
-        log.debug("Resolved remote " + requestedDomain + "=>" + result.get(0));
+        log.debug("Resolved remote {}=>{}", requestedDomain, result.get(0));
 
 
         return result;

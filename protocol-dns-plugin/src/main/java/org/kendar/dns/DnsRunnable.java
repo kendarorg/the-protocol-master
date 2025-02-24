@@ -26,7 +26,7 @@ public class DnsRunnable implements Callable<List<String>> {
         SimpleResolver resolver;
         List<String> result = new ArrayList<>();
         try {
-            log.debug("Request to " + requestedServer + " for " + requestedDomain);
+            log.debug("Request to {} for {}", requestedServer, requestedDomain);
             resolver = new SimpleResolver(requestedServer);
             resolver.setPort(53);
             var resolvers = new ArrayList<Resolver>();
@@ -50,8 +50,8 @@ public class DnsRunnable implements Callable<List<String>> {
         } catch (UnknownHostException | TextParseException e) {
             throw new UnknownHostException();
         }
-        if (result == null || result.size() == 0) {
-            log.debug("NOTRESOLVED with " + requestedServer + " for " + requestedDomain);
+        if (result.isEmpty()) {
+            log.debug("NOTRESOLVED with {} for {}", requestedServer, requestedDomain);
         }
         return result;
     }

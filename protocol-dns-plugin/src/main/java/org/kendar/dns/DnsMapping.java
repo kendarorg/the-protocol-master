@@ -5,6 +5,14 @@ public class DnsMapping {
     private String name;
     private long timestamp;
 
+    public DnsMapping(String ip, String name) {
+        this.ip = ip;
+        this.name = name;
+    }
+
+    public DnsMapping() {
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
