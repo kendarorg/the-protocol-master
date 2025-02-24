@@ -158,7 +158,6 @@ public class Main {
         if (apiServer != null) {
             apiServer.stop(0);
         }
-        diService.clean();
     }
 
     private static Boolean stopWhenQuitCommand() {
