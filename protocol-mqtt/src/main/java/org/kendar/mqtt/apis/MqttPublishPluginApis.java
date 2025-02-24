@@ -108,7 +108,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
         var pInstance = getDescriptor().getProtocolInstance();
         byte[] dataToSend;
         if (MimeChecker.isBinary(messageData.getContentType(), null)) {
-            dataToSend = Base64.decode((String) messageData.getBody());
+            dataToSend = Base64.decode(messageData.getBody());
         } else {
             dataToSend = messageData.getBody().getBytes();
         }

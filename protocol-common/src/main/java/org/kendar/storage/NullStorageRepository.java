@@ -1,5 +1,6 @@
 package org.kendar.storage;
 
+import org.kendar.di.annotations.TpmService;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.storage.generic.StorageRepository;
@@ -7,9 +8,13 @@ import org.kendar.storage.generic.StorageRepository;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+@TpmService(tags = "storage_null")
 public class NullStorageRepository implements StorageRepository {
-
     private final AtomicLong counter = new AtomicLong(0);
+
+    public NullStorageRepository() {
+        System.out.println("NullStorageRepository");
+    }
 
     @Override
     public void initialize() {
@@ -73,6 +78,26 @@ public class NullStorageRepository implements StorageRepository {
 
     @Override
     public void delete(String instanceId, long itemId) {
+
+    }
+
+    @Override
+    public List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId) {
+        return List.of();
+    }
+
+    @Override
+    public StorageFile readPluginFile(StorageFileIndex index) {
+        return null;
+    }
+
+    @Override
+    public void writePluginFile(StorageFile file) {
+
+    }
+
+    @Override
+    public void delPluginFile(StorageFileIndex storageFileIndex) {
 
     }
 

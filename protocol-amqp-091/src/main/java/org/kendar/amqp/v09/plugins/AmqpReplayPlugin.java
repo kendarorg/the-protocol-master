@@ -28,7 +28,7 @@ import java.util.*;
 public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(AmqpReplayPlugin.class);
-    private static List<String> repeatableItems = Arrays.asList(
+    private static final List<String> repeatableItems = Arrays.asList(
             "ExchangeDeclare", "QueueDeclare", "QueueBind", "ExchangeBind",
             "BasicConsume", "byte[]", "ConnectionStartOk", "ConnectionOpen",
             "ChannelOpen"

@@ -6,7 +6,6 @@ import org.kendar.postgres.jpa.CompanyJpa;
 import org.kendar.postgres.plugins.PostgresReplayPlugin;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.jpa.HibernateSessionFactory;
@@ -26,7 +25,7 @@ public class ReplayerTest {
     @Test
     void simpleJpaTest() throws Exception {
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("org.postgresql.Driver");
+        var proxy = new PostgresProxy("org.postgresql.Driver");
         var storage = new FileStorageRepository(Path.of("src",
                 "test", "resources", "replay"));
         storage.initialize();
@@ -34,7 +33,7 @@ public class ReplayerTest {
         var mapper = new JsonMapper();
         //gs.putService("storage", storage);
         var pl = new PostgresReplayPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicReplayPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

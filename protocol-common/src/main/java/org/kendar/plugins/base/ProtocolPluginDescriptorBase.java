@@ -51,6 +51,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
 
     /**
      * Set the settings
+     *
      * @param settings
      */
     public void setSettings(W settings) {

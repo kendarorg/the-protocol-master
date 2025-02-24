@@ -47,9 +47,9 @@ public class MockTest extends BasicTest {
 
     @Test
     public void countedMock() throws Exception {
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
+        baseProtocol.getProxy().getPluginHandlers().stream().filter(a ->
                 a.getId().equalsIgnoreCase("mock-plugin")).findFirst().get().setActive(true);
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
+        baseProtocol.getProxy().getPluginHandlers().stream().filter(a ->
                 a.getId().equalsIgnoreCase("record-plugin")).findFirst().get().setActive(false);
         var runned = false;
         Connection c = getProxyConnection();
@@ -77,9 +77,9 @@ public class MockTest extends BasicTest {
 
     @Test
     public void nthCall() throws Exception {
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
+        baseProtocol.getProxy().getPluginHandlers().stream().filter(a ->
                 a.getId().equalsIgnoreCase("mock-plugin")).findFirst().get().setActive(true);
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
+        baseProtocol.getProxy().getPluginHandlers().stream().filter(a ->
                 a.getId().equalsIgnoreCase("record-plugin")).findFirst().get().setActive(false);
         var runned = false;
         Connection c = getProxyConnection();
@@ -108,9 +108,9 @@ public class MockTest extends BasicTest {
 
     @Test
     public void both() throws Exception {
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
+        baseProtocol.getProxy().getPluginHandlers().stream().filter(a ->
                 a.getId().equalsIgnoreCase("mock-plugin")).findFirst().get().setActive(true);
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
+        baseProtocol.getProxy().getPluginHandlers().stream().filter(a ->
                 a.getId().equalsIgnoreCase("record-plugin")).findFirst().get().setActive(false);
         var runned = false;
         Connection c = getProxyConnection();
@@ -141,9 +141,9 @@ public class MockTest extends BasicTest {
 
     @Test
     void replacingMockQuery() throws Exception {
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
+        baseProtocol.getProxy().getPluginHandlers().stream().filter(a ->
                 a.getId().equalsIgnoreCase("mock-plugin")).findFirst().get().setActive(true);
-        baseProtocol.getProxy().getPlugins().stream().filter(a ->
+        baseProtocol.getProxy().getPluginHandlers().stream().filter(a ->
                 a.getId().equalsIgnoreCase("record-plugin")).findFirst().get().setActive(false);
         var runned = false;
         Connection c = getProxyConnection();

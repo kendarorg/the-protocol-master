@@ -4,7 +4,15 @@ import org.kendar.settings.ByteProtocolSettingsWithLogin;
 
 public class JdbcProtocolSettings extends ByteProtocolSettingsWithLogin {
     private String forceSchema;
+    private String driver;
 
+    public String getDriver() {
+        return driver;
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
 
     public String getForceSchema() {
         return forceSchema;

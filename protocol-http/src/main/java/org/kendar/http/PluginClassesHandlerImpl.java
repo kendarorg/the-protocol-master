@@ -4,6 +4,7 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.http.utils.plugins.PluginClassesHandler;
+import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -19,10 +20,11 @@ import java.util.Map;
 public class PluginClassesHandlerImpl implements PluginClassesHandler {
     private final Map<ProtocolPhase, List<PluginHandler>> plugins;
 
-    public PluginClassesHandlerImpl(List<ProtocolPluginDescriptor> inputPlugins,
+    public PluginClassesHandlerImpl(List<BasePluginDescriptor> inputPlugins,
                                     ProtoDescriptor protocol) {
         this.plugins = new HashMap<>();
-        for (var plugin : inputPlugins) {
+        for (var pl : inputPlugins) {
+            var plugin = (ProtocolPluginDescriptor) pl;
             var handlers = PluginHandler.of(plugin, protocol);
             for (var phase : plugin.getPhases()) {
                 if (!this.plugins.containsKey(phase)) {

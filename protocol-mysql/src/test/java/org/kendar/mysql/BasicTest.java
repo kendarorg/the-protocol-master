@@ -1,5 +1,6 @@
 package org.kendar.mysql;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
@@ -11,7 +12,6 @@ import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
-import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -23,6 +23,7 @@ import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -55,7 +56,7 @@ public class BasicTest {
 
     public static void beforeEachBase(TestInfo testInfo) {
         baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
+        var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl(), null,
                 mysqlContainer.getUserId(), mysqlContainer.getPassword());
         StorageRepository storage = new NullStorageRepository();
@@ -66,8 +67,20 @@ public class BasicTest {
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
+                try {
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
+                            Path.of("target", "tests", className, method, dsp).toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
+                try {
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
+                            Path.of("target", "tests", className, method).toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         storage.initialize();
@@ -76,15 +89,14 @@ public class BasicTest {
         var mapper = new JsonMapper();
         var pl = new MySqlRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
-        var pl1 = new MySqlMockPlugin(mapper);
+        var pl1 = new MySqlMockPlugin(mapper, storage);
         var global = new GlobalSettings();
         //global.putService("storage", storage);
         var mockPluginSettings = new BasicMockPluginSettings();
-        mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new MySqlReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl, pl1, rep));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep));
 
 
         pl.setActive(true);
@@ -101,7 +113,7 @@ public class BasicTest {
 
     public static void beforeEachBasePrep(TestInfo testInfo) {
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("com.mysql.cj.jdbc.Driver",
+        var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl() +
                         "?generateSimpleParameterMetadata=true" +
                         "&useServerPrepStmts=true", null,
@@ -116,8 +128,20 @@ public class BasicTest {
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
+                try {
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
+                            Path.of("target", "tests", className, method, dsp).toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
+                try {
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
+                            Path.of("target", "tests", className, method).toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         var global = new GlobalSettings();
@@ -127,16 +151,14 @@ public class BasicTest {
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
         var pl = new MySqlRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
-        var pl1 = new MySqlMockPlugin(mapper);
+        var pl1 = new MySqlMockPlugin(mapper, storage);
         var mockPluginSettings = new BasicMockPluginSettings();
-        mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
-        pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
-        proxy.setPlugins(List.of(pl, pl1));
+        proxy.setPluginHandlers(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         protocolServer = new TcpServer(baseProtocol);

@@ -130,7 +130,7 @@ public abstract class NetworkProxy extends Proxy {
 
         long start = System.currentTimeMillis();
         var pluginContext = new PluginContext(getCaller(), of.getClass().getSimpleName(), start, context);
-        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, new Object())) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.PRE_CALL, of, new Object())) {
             if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, null)) {
                 return;
             }
@@ -142,7 +142,7 @@ public abstract class NetworkProxy extends Proxy {
         }
         sock.write(of, getProtocol().buildBuffer());
 
-        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, new Object())) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.POST_CALL, of, new Object())) {
             if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, null)) {
                 break;
             }
@@ -187,7 +187,7 @@ public abstract class NetworkProxy extends Proxy {
         long start = System.currentTimeMillis();
         var pluginContext = new PluginContext(getCaller(), of.getClass().getSimpleName(), start, context);
 
-        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.PRE_CALL, of, toRead)) {
             if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
@@ -211,7 +211,7 @@ public abstract class NetworkProxy extends Proxy {
             }
         }
 
-        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, toRead)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.POST_CALL, of, toRead)) {
             if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
                 break;
             }
@@ -238,7 +238,7 @@ public abstract class NetworkProxy extends Proxy {
         long start = System.currentTimeMillis();
         var pluginContext = new PluginContext(getCaller(), "byte[]", start, context);
 
-        for (var plugin : getPlugins(ProtocolPhase.PRE_CALL, of, toRead)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.PRE_CALL, of, toRead)) {
             if (plugin.handle(pluginContext, ProtocolPhase.PRE_CALL, of, toRead)) {
                 return toRead;
             }
@@ -251,7 +251,7 @@ public abstract class NetworkProxy extends Proxy {
         sock.write(of);
         sock.read(toRead, optional);
 
-        for (var plugin : getPlugins(ProtocolPhase.POST_CALL, of, toRead)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.POST_CALL, of, toRead)) {
             if (plugin.handle(pluginContext, ProtocolPhase.POST_CALL, of, toRead)) {
                 break;
             }
@@ -260,7 +260,7 @@ public abstract class NetworkProxy extends Proxy {
     }
 
     public void respond(Object publish, PluginContext pluginContext) {
-        for (var plugin : getPlugins(ProtocolPhase.ASYNC_RESPONSE, new Object(), publish)) {
+        for (var plugin : getPluginHandlers(ProtocolPhase.ASYNC_RESPONSE, new Object(), publish)) {
             if (plugin.handle(pluginContext, ProtocolPhase.ASYNC_RESPONSE, null, publish)) {
                 break;
             }

@@ -40,7 +40,6 @@ without the need to mock a single request
 To mock single requests
 
 * active: If it is active
-* dataDir: The directory where the mock will be stored
 
 The mock files are exactly like the recorded files with an addition of a few fields
 
@@ -69,6 +68,8 @@ can be set to the following
 
 This is useful to generate "dynamic" responses
 
+The files are located into the "path" `[dataDir]/[protocol instance id]/[mock-plugin]
+
 ### rewrite-plugin
 
 To change some call, for example to rewrite all call to `localhost/microservice.1/*` to `remoteservice.com/*`
@@ -77,7 +78,6 @@ This can be used to avoid configuring the proxy on the application
 The recording will contain the target address!
 
 * active: If it is active
-* rewritesFile: the json file containing the rewrites
 
 The format, is the following. When settings a regexp the replacements (like $1 etc.)
 can be used.
@@ -97,6 +97,8 @@ An example of complex regexp
     "toReplace":"SELECT * FROM NEW_TABLE_$1 WHERE NEW_ID=$2 ORDER BY ID DESC",
     "regex": true
 ```
+
+The file is located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]/rewrite.json
 
 ### Connect to different servers
 

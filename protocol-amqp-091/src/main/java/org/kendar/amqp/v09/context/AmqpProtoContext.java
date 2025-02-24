@@ -51,9 +51,6 @@ public class AmqpProtoContext extends NetworkProtoContext {
                 return false;
             }
         }
-        if (!super.isConnected()) {
-            return false;
-        }
-        return true;
+        return super.isConnected();
     }
 }

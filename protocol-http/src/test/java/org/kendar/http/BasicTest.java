@@ -1,6 +1,7 @@
 package org.kendar.http;
 
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.http.plugins.*;
-import org.kendar.http.settings.HttpProtocolSettings;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.settings.GlobalSettings;
@@ -32,7 +32,9 @@ import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -137,8 +139,20 @@ public class BasicTest {
                     }
                 }
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
+                try {
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
+                            Path.of("target", "tests", className, method, dsp).toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
+                try {
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
+                            Path.of("target", "tests", className, method).toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         storage.initialize();
@@ -150,30 +164,38 @@ public class BasicTest {
         httpProtocolSettings.setProxy(FAKE_PORT_PROXY);
         httpProtocolSettings.setProtocolInstanceId("default");
         var rewriteSettings = new RewritePluginSettings();
-        rewriteSettings.setRewritesFile(Path.of("src", "test", "resources", "rewrite.json").toAbsolutePath().toString());
         httpProtocolSettings.getPlugins().put("rewrite-plugin", rewriteSettings);
 
         var recordingSettings = new HttpRecordPluginSettings();
         httpProtocolSettings.getPlugins().put("record-plugin", recordingSettings);
+
+        var reportSettings = new PluginSettings();
+        reportSettings.setActive(true);
+        httpProtocolSettings.getPlugins().put("report-plugin", reportSettings);
+
+        var latencySettings = new HttpLatencyPluginSettings();
+        httpProtocolSettings.getPlugins().put("latency-plugin", latencySettings);
+
+        var ratelimit = new HttpRateLimitPluginSettings();
+        httpProtocolSettings.getPlugins().put("rate-limit-plugin", ratelimit);
+
         var replaySettings = new HttpReplayPluginSettings();
         httpProtocolSettings.getPlugins().put("replay-plugin", replaySettings);
         var mockSettings = new BasicMockPluginSettings();
-        mockSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         httpProtocolSettings.getPlugins().put("mock-plugin", mockSettings);
         globalSettings.getProtocols().put("http", httpProtocolSettings);
-        //globalSettin//gs.putService("storage", storage);
         var settings = new PluginSettings();
         settings.setActive(true);
         var mapper = new JsonMapper();
-        baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, List.of(
+        baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, new ArrayList<>(List.of(
                 new HttpRecordPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, recordingSettings),
                 new HttpReplayPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(mapper),
                 new HttpReportPlugin(mapper).initialize(globalSettings, httpProtocolSettings, settings),
                 new HttpLatencyPlugin(mapper),
-                new HttpRateLimitPlugin(mapper),
-                new HttpMockPlugin(mapper).initialize(globalSettings, httpProtocolSettings, mockSettings),
-                new HttpRewritePlugin(mapper).initialize(globalSettings, httpProtocolSettings, rewriteSettings)));
+                new HttpRateLimitPlugin(mapper, storage),
+                new HttpMockPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, mockSettings),
+                new HttpRewritePlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
         baseProtocol.initialize();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

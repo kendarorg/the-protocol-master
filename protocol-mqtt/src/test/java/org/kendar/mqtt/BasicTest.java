@@ -125,7 +125,7 @@ public class BasicTest {
                 pls);
         var rep = new MqttReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = (MqttPublishPlugin) new MqttPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        proxy.setPlugins(List.of(pl, rep, publishPlugin));
+        proxy.setPluginHandlers(List.of(pl, rep, publishPlugin));
         rep.setActive(true);
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

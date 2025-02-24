@@ -1,5 +1,7 @@
 package org.kendar.plugins;
 
+import org.kendar.events.EventsQueue;
+import org.kendar.events.StorageReloadedEvent;
 import org.kendar.plugins.apis.BaseMockPluginApis;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
@@ -10,26 +12,26 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.storage.StorageFile;
+import org.kendar.storage.StorageFileIndex;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.JsonMapper;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<BasicMockPluginSettings> {
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
+    private final StorageRepository repository;
     protected Map<String, MockStorage> mocks = new HashMap<>();
-    private String mocksDir;
 
-    public MockPlugin(JsonMapper mapper) {
+
+    public MockPlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
+        this.repository = repository;
+        EventsQueue.register(UUID.randomUUID().toString(), (e) -> handleSettingsChanged(), StorageReloadedEvent.class);
     }
 
     protected static boolean isTemplateParameter(String tplSeg) {
@@ -94,26 +96,17 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
     protected abstract List<MockStorage> firstCheckOnMainPart(T request);
 
     @Override
-    protected boolean handleSettingsChanged(){
-        if (getSettings().getDataDir() == null) {
-            return false;
-        }
-        mocksDir = getSettings().getDataDir();
-        if (!Files.exists(Path.of(mocksDir).toAbsolutePath())) {
-            try {
-                Files.createDirectories(Path.of(mocksDir).toAbsolutePath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
         loadMocks();
         return true;
     }
+
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
 
         super.initialize(global, protocol, pluginSetting);
-        if(!handleSettingsChanged())return null;
+        if (!handleSettingsChanged()) return null;
 
         return this;
 
@@ -126,18 +119,17 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
 
     protected void loadMocks() {
         try {
-            var mocksPath = Path.of(getMocksDir()).toAbsolutePath();
+
             mocks = new HashMap<>();
             var presentAlready = new HashSet<Long>();
-            for (var file : mocksPath.toFile().listFiles()) {
-                if (file.isFile() && file.getName().endsWith("." + getInstanceId() + ".json")) {
-                    var si = mapper.deserialize(Files.readString(file.toPath()), MockStorage.class);
-                    if (presentAlready.contains(si.getIndex())) throw new RuntimeException(
-                            "Duplicate id " + si.getIndex() + " found in " + file.getName());
-                    presentAlready.add(si.getIndex());
-                    mocks.put(file.getName(), si);
-                    counters.put(si.getIndex(), new AtomicInteger(0));
-                }
+            for (var file : repository.listPluginFiles(getInstanceId(), getId())) {
+
+                var si = mapper.deserialize(repository.readPluginFile(file).getContent(), MockStorage.class);
+                if (presentAlready.contains(si.getIndex())) throw new RuntimeException(
+                        "Duplicate id " + si.getIndex() + " found in " + file.getIndex());
+                presentAlready.add(si.getIndex());
+                mocks.put(file.getIndex(), si);
+                counters.put(si.getIndex(), new AtomicInteger(0));
             }
 
         } catch (Exception e) {
@@ -155,10 +147,6 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
         return "mock-plugin";
     }
 
-    public String getMocksDir() {
-        return mocksDir;
-    }
-
     protected void handleActivation(boolean active) {
         if (active != this.isActive()) {
             counters.clear();
@@ -174,5 +162,16 @@ public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<Basi
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
         return List.of(new BaseMockPluginApis(this, getId(), getInstanceId()));
+    }
+
+    public void putMock(String mockfile, MockStorage inputObject) {
+        getMocks().put(mockfile, inputObject);
+        var serialized = mapper.serialize(inputObject);
+        repository.writePluginFile(new StorageFile(new StorageFileIndex(getInstanceId(), getId(), mockfile), serialized));
+    }
+
+    public void delMock(String mockfile) {
+        getMocks().remove(mockfile);
+        repository.delPluginFile(new StorageFileIndex(getInstanceId(), getId(), mockfile));
     }
 }

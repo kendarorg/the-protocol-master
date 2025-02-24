@@ -2,6 +2,7 @@ package org.kendar.proxy;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReplayStatusEvent;
+import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -28,6 +29,18 @@ public abstract class Proxy {
 
     protected Proxy() {
         EventsQueue.register(this.toString(), this::replayChange, ReplayStatusEvent.class);
+    }
+
+    public List<PluginHandler> getAllPlugins() {
+        var result = new HashMap<Class<?>, PluginHandler>();
+        for (var entry : allowedPlugins.values()) {
+            for (var pliList : entry.values()) {
+                for (var pli : pliList) {
+                    result.put(pli.getClass(), pli);
+                }
+            }
+        }
+        return new ArrayList<>(result.values());
     }
 
     private void replayChange(ReplayStatusEvent e) {
@@ -77,7 +90,7 @@ public abstract class Proxy {
      */
     public abstract void initialize();
 
-    public List<PluginHandler> getPlugins() {
+    public List<PluginHandler> getPluginHandlers() {
         var result = new HashMap<String, PluginHandler>();
         for (var item : allowedPlugins.entrySet()) {
             for (var phase : item.getValue().entrySet()) {
@@ -90,7 +103,7 @@ public abstract class Proxy {
         return new ArrayList<>(result.values());
     }
 
-    public void setPlugins(List<ProtocolPluginDescriptor> filters) {
+    public void setPluginHandlers(List<BasePluginDescriptor> filters) {
         for (var plugin : filters) {
             var handlers = PluginHandler.of(plugin, this.protocol);
             for (var handler : handlers) {
@@ -99,7 +112,7 @@ public abstract class Proxy {
                     allowedPlugins.put(pars, new HashMap<>());
                 }
                 var map = allowedPlugins.get(pars);
-                for (var phase : plugin.getPhases()) {
+                for (var phase : ((ProtocolPluginDescriptor) plugin).getPhases()) {
                     if (!map.containsKey(phase)) {
                         map.put((ProtocolPhase) phase, new ArrayList<>());
                     }
@@ -109,7 +122,7 @@ public abstract class Proxy {
         }
     }
 
-    public <I, J> List<PluginHandler> getPlugins(ProtocolPhase phase, I in, J out) {
+    public <I, J> List<PluginHandler> getPluginHandlers(ProtocolPhase phase, I in, J out) {
         var data = String.join(",",
                 in.getClass().getName(), out.getClass().getName());
         var anonymousData = String.join(",",

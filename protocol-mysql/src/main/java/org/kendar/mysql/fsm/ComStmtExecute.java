@@ -180,7 +180,7 @@ public class ComStmtExecute extends ProtoState {
     }
 
     public Iterator<ProtoStep> execute(CommandEvent event) {
-        var inputBuffer = (MySQLBBuffer) event.getBuffer();
+        var inputBuffer = event.getBuffer();
         var context = (MySQLProtoContext) event.getContext();
         var statementId = inputBuffer.readUB4();
         var flags = inputBuffer.get();  //TODO CURSOR

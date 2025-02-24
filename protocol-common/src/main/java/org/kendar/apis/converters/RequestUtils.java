@@ -178,7 +178,7 @@ public class RequestUtils {
             var firstHeader = new ArrayList<Byte>();
             for (; i < body.length; i++) {
                 if (body[i] == '\r' && body[i + 1] == '\n') {
-                    var data = (byte[]) toPrimitive(firstHeader);
+                    var data = toPrimitive(firstHeader);
                     var hh = new String(data).trim().split(":", 2);
                     block.headers.put(hh[0], hh[1]);
                     firstHeader.clear();

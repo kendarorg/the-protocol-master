@@ -26,7 +26,7 @@ import java.util.*;
 public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(MqttReplayPlugin.class);
-    private static List<String> repeatableItems = Arrays.asList(
+    private static final List<String> repeatableItems = Arrays.asList(
             "Connect", "Subscribe", "Publish"
     );
 
@@ -65,115 +65,6 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         }
     }
 
-    /*@Override
-    protected ReplayFindIndexResult findIndex(CallItemsQuery query, Object in) {
-        var result = super.findIndex(query, in);
-        var index = -1L;
-        if (result != null) {
-            index = result.getLine().getIndex();
-        }
-        switch (query.getType()) {
-            case "Connect": {
-                var cl = new CompactLine();
-                cl.setType("Connect");
-                cl.setCaller("MQTT");
-                cl.setIndex(index);
-                cl.getTags().put("input", "Connect");
-                cl.getTags().put("output", "ConnectAck");
-                return new ReplayFindIndexResult(cl,false);
-            }
-            case "Subscribe": {
-                var cl = new CompactLine();
-                cl.setType("Subscribe");
-                cl.setCaller("MQTT");
-                cl.setIndex(index);
-                cl.getTags().put("input", "Subscribe");
-                cl.getTags().put("output", "SubscribeAck");
-                return new ReplayFindIndexResult(cl,false);
-            }
-            case "Publish": {
-                var cl = new CompactLine();
-                cl.setType("Publish");
-                cl.setCaller("MQTT");
-                cl.setIndex(index);
-                var pub = (Publish) in;
-                cl.getTags().put("input", "Publish");
-                if (pub.getQos() == 1) {
-                    cl.getTags().put("output", "PublishAck");
-                } else if (pub.getQos() == 2) {
-                    cl.getTags().put("output", "PublishRec");
-                }
-                return new ReplayFindIndexResult(cl,false);
-            }
-        }
-        return result;
-    }*/
-
-    /*@Override
-    protected StorageItem readStorageItem(ReplayFindIndexResult index, Object in, PluginContext pluginContext) {
-        var resultFinal = super.readStorageItem(index, in, pluginContext);
-        StorageItem result = null;
-        //if(result==null && index.getIndex()==-1){
-        switch (index.getLine().getType()) {
-            case "Connect":
-                result = handleFakeConnect((Connect) in, pluginContext);
-                if (result == null && !getSettings().isBlockExternal()) {
-                    index.getLine().setIndex(-1);
-                    return null;
-                }
-                break;
-            case "Subscribe":
-                result = handleFakeSubscribe((Subscribe) in, pluginContext);
-                if (result == null && !getSettings().isBlockExternal()) {
-                    index.getLine().setIndex(-1);
-                    return null;
-                }
-                break;
-            case "Publish":
-                result = handleFakePublish((Publish) in, pluginContext);
-                if (result == null && !getSettings().isBlockExternal()) {
-                    index.getLine().setIndex(-1);
-                    return null;
-                }
-                break;
-            case "PublishRel":
-                result = handleFakePublishRel((PublishRel) in, pluginContext);
-                if (result == null && !getSettings().isBlockExternal()) {
-                    index.getLine().setIndex(-1);
-                    return null;
-                }
-                break;
-        }
-        if (result != null && getSettings().isBlockExternal()) {
-            if (resultFinal == null) return result;
-        }
-        return resultFinal;
-    }*/
-
-    /*
-    private StorageItem handleFakePublishRel(PublishRel publish, PluginContext pluginContext) {
-        StorageItem result;
-        //Connect for real
-        if (!getSettings().isBlockExternal()) {
-            return null;
-        }
-        var context = (MqttContext) pluginContext.getContext();
-
-        var subscribeAck = new PublishComp();
-        subscribeAck.setFullFlag((byte) 112);
-        subscribeAck.setPacketIdentifier(publish.getPacketIdentifier());
-        subscribeAck.setProtocolVersion(context.getProtocolVersion());
-        subscribeAck.setProtoDescriptor(context.getDescriptor());
-        result = new StorageItem();
-        result.setType("PublishRel");
-        result.setInputType("PublishRel");
-        result.setOutputType("PublishComp");
-        result.setConnectionId(pluginContext.getContextId());
-        result.setInput(publish);
-        result.setOutput(subscribeAck);
-        return result;
-    }*/
-
     @Override
     protected void sendBackResponses(ProtoContext context, List<StorageItem> storageItems) {
         if (storageItems.isEmpty()) return;
@@ -210,6 +101,7 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         }
     }
 
+    @SuppressWarnings({"RegExpEmptyAlternationBranch", "SuspiciousRegexArgument"})
     @Override
     protected Map<String, String> getContextTags(ProtoContext context) {
         if (context.getValue("TOPICS") != null) {
@@ -224,48 +116,6 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         return Map.of();
     }
 
-    /*
-    private StorageItem handleFakePublish(Publish publish, PluginContext pluginContext) {
-        StorageItem result;
-        //Connect for real
-        if (!getSettings().isBlockExternal()) {
-            return null;
-        }
-        var context = (MqttContext) pluginContext.getContext();
-        if (publish.getQos() == 0) {
-            return null;
-        } else if (publish.getQos() == 1) {
-            var subscribeAck = new PublishAck();
-            subscribeAck.setFullFlag((byte) 64);
-            subscribeAck.setPacketIdentifier(publish.getPacketIdentifier());
-            subscribeAck.setProtocolVersion(context.getProtocolVersion());
-            subscribeAck.setProtoDescriptor(context.getDescriptor());
-            result = new StorageItem();
-            result.setType("Publish");
-            result.setInputType("Publish");
-            result.setOutputType("PublishAck");
-            result.setConnectionId(pluginContext.getContextId());
-            result.setInput(publish);
-            result.setOutput(subscribeAck);
-            return result;
-        } else if (publish.getQos() == 2) {
-            var subscribeAck = new PublishRec();
-            subscribeAck.setFullFlag((byte) 80);
-            subscribeAck.setReasonCode((byte) 0);
-            subscribeAck.setPacketIdentifier(publish.getPacketIdentifier());
-            subscribeAck.setProtocolVersion(context.getProtocolVersion());
-            subscribeAck.setProtoDescriptor(context.getDescriptor());
-            result = new StorageItem();
-            result.setType("Publish");
-            result.setInputType("Publish");
-            result.setOutputType("PublishRec");
-            result.setConnectionId(pluginContext.getContextId());
-            result.setInput(publish);
-            result.setOutput(subscribeAck);
-            return result;
-        }
-        return null;
-    }*/
 
     @Override
     protected Map<String, String> buildTag(Object cll) {
@@ -289,49 +139,4 @@ public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSetting
         return repeatableItems;
     }
 
-    /*
-    private StorageItem handleFakeSubscribe(Subscribe subscribe, PluginContext pluginContext) {
-        StorageItem result;
-        //Connect for real
-        if (!getSettings().isBlockExternal()) {
-            return null;
-        }
-        var context = (MqttContext) pluginContext.getContext();
-        var subscribeAck = new SubscribeAck();
-        subscribeAck.setFullFlag((byte) -112);
-        subscribeAck.setPacketIdentifier(subscribe.getPacketIdentifier());
-        subscribeAck.setProtocolVersion(context.getProtocolVersion());
-        subscribeAck.setProtoDescriptor(context.getDescriptor());
-        result = new StorageItem();
-        result.setType("Subscribe");
-        result.setInputType("Subscribe");
-        result.setOutputType("SubscribeAck");
-        result.setConnectionId(pluginContext.getContextId());
-        result.setInput(subscribe);
-        result.setOutput(subscribeAck);
-        return result;
-    }
-
-    private StorageItem handleFakeConnect(Connect connect, PluginContext pluginContext) {
-        StorageItem result;
-        //Connect for real
-        if (!getSettings().isBlockExternal()) {
-            return null;
-        }
-        var context = (MqttContext) pluginContext.getContext();
-        var connectAck = new ConnectAck();
-        connectAck.setFullFlag((byte) 32);
-        connectAck.setSessionSet(false);
-        connectAck.setConnectReasonCode((byte) 0);
-        connectAck.setProtocolVersion(context.getProtocolVersion());
-        connectAck.setProtoDescriptor(context.getDescriptor());
-        result = new StorageItem();
-        result.setType("Connect");
-        result.setInputType("Connect");
-        result.setOutputType("ConnectAck");
-        result.setConnectionId(pluginContext.getContextId());
-        result.setInput(connect);
-        result.setOutput(connectAck);
-        return result;
-    }*/
 }

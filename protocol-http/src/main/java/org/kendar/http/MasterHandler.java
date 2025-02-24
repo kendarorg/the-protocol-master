@@ -148,7 +148,7 @@ public class MasterHandler implements HttpHandler {
             }
             sendResponse(response, httpExchange);
         } catch (Exception xx) {
-            log.trace("Http handling exception",xx);
+            log.trace("Http handling exception", xx);
         }
     }
 

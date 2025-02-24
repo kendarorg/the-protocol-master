@@ -117,11 +117,11 @@ public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor>
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/{#plugin}"})
     public boolean getSettings(Request reqp, Response resp) {
         var pluginInstance = getDescriptor();
-        if(ProtocolPluginDescriptorBase.class.isAssignableFrom(pluginInstance.getClass())){
-            var ppdb = (ProtocolPluginDescriptorBase)pluginInstance;
-            respondJson(resp,ppdb.getSettings());
-        }else{
-            respondKo(resp,"No plugin found with settings");
+        if (ProtocolPluginDescriptorBase.class.isAssignableFrom(pluginInstance.getClass())) {
+            var ppdb = (ProtocolPluginDescriptorBase) pluginInstance;
+            respondJson(resp, ppdb.getSettings());
+        } else {
+            respondKo(resp, "No plugin found with settings");
         }
         return true;
     }
@@ -146,13 +146,13 @@ public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor>
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/{#plugin}"})
     public boolean setSettings(Request reqp, Response resp) {
         var pluginInstance = getDescriptor();
-        if(ProtocolPluginDescriptorBase.class.isAssignableFrom(pluginInstance.getClass())){
+        if (ProtocolPluginDescriptorBase.class.isAssignableFrom(pluginInstance.getClass())) {
             var settings = mapper.deserialize(reqp.getRequestText().toString(), pluginInstance.getSettingClass());
-            var ppdb = (ProtocolPluginDescriptorBase)pluginInstance;
+            var ppdb = (ProtocolPluginDescriptorBase) pluginInstance;
             ppdb.setSettings((PluginSettings) settings);
             respondOk(resp);
-        }else{
-            respondKo(resp,"No plugin found with settings");
+        } else {
+            respondKo(resp, "No plugin found with settings");
         }
         return true;
     }

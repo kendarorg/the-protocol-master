@@ -1,4 +1,4 @@
-package org.kendar.testcontainer;
+package org.kendar.tests.testcontainer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -12,6 +12,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ReformatIndexes {
+    private static String getFileContent(Path file) throws IOException {
+        return Files.readString(file);
+    }
+
     //@Test
     void reformat() throws IOException {
         var path = Path.of("").toAbsolutePath().getParent();
@@ -35,7 +39,7 @@ public class ReformatIndexes {
             for (var file : result) {
                 try {
                     var changed = false;
-                    var content = Files.readString(file);
+                    var content = getFileContent(file);
                     var tree = mapper.readTree(content);
                     if (tree.get("input") != null
                             && tree.get("input").get("data") != null

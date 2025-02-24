@@ -127,8 +127,9 @@ public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends 
     }
 
     @Override
-    protected boolean handleSettingsChanged(){
-        ignoreTrivialCalls = ((BasicRecordPluginSettings) getSettings()).isIgnoreTrivialCalls();
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
+        ignoreTrivialCalls = getSettings().isIgnoreTrivialCalls();
         return true;
     }
 

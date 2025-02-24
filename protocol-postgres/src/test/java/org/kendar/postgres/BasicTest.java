@@ -1,5 +1,6 @@
 package org.kendar.postgres;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
@@ -11,7 +12,6 @@ import org.kendar.postgres.plugins.PostgresReportPlugin;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
-import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
@@ -23,6 +23,7 @@ import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -39,6 +40,7 @@ public class BasicTest {
     protected static PostgresSqlImage postgresContainer;
     protected static TcpServer protocolServer;
     protected static PostgresProtocol baseProtocol;
+    protected static StorageRepository storage;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
 
     public static void beforeClassBase() {
@@ -64,11 +66,11 @@ public class BasicTest {
     public static void beforeEachBase(TestInfo testInfo) {
 
         baseProtocol = new PostgresProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("org.postgresql.Driver",
+        var proxy = new PostgresProxy("org.postgresql.Driver",
                 postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
 
-        StorageRepository storage = new NullStorageRepository();
+        storage = new NullStorageRepository();
 
         if (testInfo != null && testInfo.getTestClass().isPresent() &&
                 testInfo.getTestMethod().isPresent()) {
@@ -77,8 +79,20 @@ public class BasicTest {
             if (testInfo.getDisplayName().startsWith("[")) {
                 var dsp = testInfo.getDisplayName().replaceAll("[^a-zA-Z0-9_\\-,.]", "_");
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method, dsp));
+                try {
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
+                            Path.of("target", "tests", className, method, dsp).toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 storage = new FileStorageRepository(Path.of("target", "tests", className, method));
+                try {
+                    FileUtils.copyDirectory(Path.of("src", "test", "resources", "data").toFile(),
+                            Path.of("target", "tests", className, method).toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         var mapper = new JsonMapper();
@@ -86,15 +100,14 @@ public class BasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var pl = new PostgresRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        var pl1 = new PostgresMockPlugin(mapper);
+        var pl1 = new PostgresMockPlugin(mapper, storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
         //global.putService("storage", storage);
-        mockPluginSettings.setDataDir(Path.of("src", "test", "resources", "mock").toAbsolutePath().toString());
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new PostgresReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl, pl1, rep));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

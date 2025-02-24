@@ -1,6 +1,8 @@
 package org.kendar.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.StorageReloadedEvent;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
@@ -9,24 +11,28 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.storage.StorageFileIndex;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItem;
 import org.kendar.utils.ReplacerItemInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptorBase<W> {
 
     private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();
+    private final StorageRepository repository;
 
-    public RewritePlugin(JsonMapper mapper) {
+    public RewritePlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
+        this.repository = repository;
+        EventsQueue.register(UUID.randomUUID().toString(), (e) -> handleSettingsChanged(), StorageReloadedEvent.class);
     }
 
     protected abstract Class<?> getIn();
@@ -65,19 +71,18 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
     protected abstract void replaceData(ReplacerItemInstance item, J toReplace, T request, K response);
 
     @Override
-    protected boolean handleSettingsChanged(){
-        var settings = getSettings();
-        if (settings.getRewritesFile() == null) return false;
-        var path = Path.of(settings.getRewritesFile()).toAbsolutePath();
-        if (!path.toFile().exists()) return false;
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
+        var rewriteFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(), getId(), "rewrite"));
+        if (rewriteFile == null) return false;
 
         try {
-            for (var replacer : mapper.deserialize(Files.readString(path), new TypeReference<List<ReplacerItem>>() {
+            for (var replacer : mapper.deserialize(rewriteFile.getContent(), new TypeReference<List<ReplacerItem>>() {
             })) {
                 replacers.add(new ReplacerItemInstance(replacer, useTrailing()));
             }
         } catch (Exception e) {
-            log.error("Unable to read rewrite file {}", settings.getRewritesFile(), e);
+            log.error("Unable to read rewrite file", e);
             throw new RuntimeException(e);
         }
         return true;
@@ -86,7 +91,7 @@ public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> ex
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        if(!handleSettingsChanged())return null;
+        if (!handleSettingsChanged()) return null;
 
         return this;
     }

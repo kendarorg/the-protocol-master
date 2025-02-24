@@ -93,7 +93,7 @@ public class BasicTest {
         var pl = new MongoRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         var rep = new MongoReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl, rep));
+        proxy.setPluginHandlers(List.of(pl, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         EventsQueue.register("recorder", (r) -> {

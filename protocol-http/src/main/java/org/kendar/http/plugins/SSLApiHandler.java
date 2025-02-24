@@ -7,7 +7,7 @@ import org.kendar.annotations.multi.PathParameter;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
-import org.kendar.http.settings.HttpProtocolSettings;
+import org.kendar.http.HttpProtocolSettings;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.utils.FileResourcesUtils;
 

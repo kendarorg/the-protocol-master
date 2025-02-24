@@ -77,8 +77,7 @@
           "recordSites": []
         },
         "mock-plugin": {
-          "active": false,
-          "dataDir": "target/mocks"
+          "active": false
         }
       }
     }

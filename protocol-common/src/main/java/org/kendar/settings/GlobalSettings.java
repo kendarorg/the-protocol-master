@@ -8,10 +8,10 @@ import java.util.Map;
 public class GlobalSettings {
     protected static final JsonMapper mapper = new JsonMapper();
     private final Map<String, Object> services = new HashMap<>();
+    private final String logType = "file";
     private String pluginsDir = "plugins";
     private String logLevel = "INFO";
     private String dataDir = "data";
-    private String logType = "file";
     private int apiPort = 0;
     private Map<String, Object> protocols = new HashMap<>();
     private Map<String, Object> plugins = new HashMap<>();
@@ -25,11 +25,11 @@ public class GlobalSettings {
         this.apiPort = apiPort;
     }
 
-    public void putService(String key, Object value) {
+    /*public void putService(String key, Object value) {
         services.put(key, value);
-    }
+    }*/
 
-    public <K> K getService(String key) {
+    /*public <K> K getService(String key) {
         return (K) services.get(key);
     }
 
@@ -41,15 +41,15 @@ public class GlobalSettings {
             }
         }
         return result;
-    }
+    }*/
 
-    public String getLogType() {
+    /*public String getLogType() {
         return logType;
     }
 
     public void setLogType(String logType) {
         this.logType = logType;
-    }
+    }*/
 
     public ProtocolSettings getProtocolForKey(String protocol) {
         if (!protocols.containsKey(protocol)) {

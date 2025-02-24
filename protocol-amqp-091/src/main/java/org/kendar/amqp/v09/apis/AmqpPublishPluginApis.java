@@ -97,7 +97,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                     body = Ko.class,
                     description = "In case of errors"
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void publish(Request request, Response response) {
         var messageData = mapper.deserialize(request.getRequestText().toString(), PublishAmqpMessage.class);
         var connectionId = Integer.parseInt(request.getPathParameter("connectionId"));

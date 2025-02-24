@@ -43,7 +43,7 @@ public class ProtoStackItem implements TaggedObject {
         this.tags = new ArrayList<>();
         this.state = state;
         if (event != null) {
-            this.tags = ((TaggedObject) event).getTag();
+            this.tags = event.getTag();
         }
         reset();
     }

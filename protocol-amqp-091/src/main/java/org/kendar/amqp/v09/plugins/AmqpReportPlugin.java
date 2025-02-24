@@ -66,7 +66,7 @@ public class AmqpReportPlugin extends ReportPlugin<PluginSettings> {
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, BodyFrame out) {
-        if (!isActive() && phase!=ProtocolPhase.ASYNC_RESPONSE) return false;
+        if (!isActive() && phase != ProtocolPhase.ASYNC_RESPONSE) return false;
 
         var context = pluginContext.getContext();
         var connectionId = context.getContextId();

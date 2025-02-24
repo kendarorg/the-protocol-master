@@ -18,15 +18,12 @@ import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
-import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -141,7 +138,8 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     }
 
     @Override
-    protected boolean handleSettingsChanged(){
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
         blockExternal = getSettings().isBlockExternal();
         matchSites = SiteMatcherUtils.setupSites(getSettings().getMatchSites());
         return true;

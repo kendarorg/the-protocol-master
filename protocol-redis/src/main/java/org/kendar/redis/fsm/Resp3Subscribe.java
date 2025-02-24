@@ -49,7 +49,7 @@ public class Resp3Subscribe extends ProtoState implements NetworkReturnMessage {
             var bytes = event.getMessage().getBytes(StandardCharsets.US_ASCII);
             resultBuffer.write(bytes);
         } catch (Exception ex) {
-            log.error("Error writing",ex);
+            log.error("Error writing", ex);
         }
     }
 

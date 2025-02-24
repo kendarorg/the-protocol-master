@@ -5,7 +5,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.kendar.postgres.plugins.PostgresRewritePlugin;
-import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItem;
@@ -55,7 +54,7 @@ public class QueryTranslationTest extends BasicTest {
     void testSimpleReplace(boolean regex, String find, String replace, String execute, String result) throws Exception {
 
         var baseProtocol = new PostgresProtocol(FAKE_PORT);
-        var proxy = new JdbcProxy("org.postgresql.Driver",
+        var proxy = new PostgresProxy("org.postgresql.Driver",
                 postgresContainer.getJdbcUrl(), null,
                 postgresContainer.getUserId(), postgresContainer.getPassword());
 
@@ -66,10 +65,10 @@ public class QueryTranslationTest extends BasicTest {
         replaceItem.setToReplace(replace);
         replaceList.add(replaceItem);
         var mapper = new JsonMapper();
-        var filter = new PostgresRewritePlugin(mapper);
+        var filter = new PostgresRewritePlugin(mapper, storage);
         filter.setReplacers(replaceList);
         filter.setActive(true);
-        proxy.setPlugins(List.of(filter));
+        proxy.setPluginHandlers(List.of(filter));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

@@ -93,7 +93,7 @@ public class ReplayerNotBlocking extends BasicTest {
         var settings = new BasicAysncReplayPluginSettings();
         settings.setBlockExternal(false);
         var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
-        proxy.setPlugins(List.of(pl));
+        proxy.setPluginHandlers(List.of(pl));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

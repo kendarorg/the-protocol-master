@@ -5,6 +5,7 @@ import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.sql.jdbc.storage.JdbcRequest;
 import org.kendar.sql.jdbc.storage.JdbcResponse;
+import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.ExtraStringReplacer;
 import org.kendar.utils.JsonMapper;
@@ -18,8 +19,8 @@ import java.util.regex.Pattern;
 public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> {
 
 
-    public JdbcMockPlugin(JsonMapper mapper) {
-        super(mapper);
+    public JdbcMockPlugin(JsonMapper mapper, StorageRepository repository) {
+        super(mapper, repository);
     }
 
     @Override

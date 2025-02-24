@@ -76,8 +76,6 @@ public abstract class StreamUtils {
      * @since 5.2.6
      */
     public static String copyToString(ByteArrayOutputStream baos, Charset charset) {
-        //Assert.notNull(baos, "No ByteArrayOutputStream specified");
-        //Assert.notNull(charset, "No Charset specified");
 
         return baos.toString(charset);
     }
@@ -91,8 +89,6 @@ public abstract class StreamUtils {
      * @throws IOException in case of I/O errors
      */
     public static void copy(byte[] in, OutputStream out) throws IOException {
-        //Assert.notNull(in, "No input byte array specified");
-        //Assert.notNull(out, "No OutputStream specified");
 
         out.write(in);
         out.flush();
@@ -108,9 +104,6 @@ public abstract class StreamUtils {
      * @throws IOException in case of I/O errors
      */
     public static void copy(String in, Charset charset, OutputStream out) throws IOException {
-        //Assert.notNull(in, "No input String specified");
-        //Assert.notNull(charset, "No Charset specified");
-        //Assert.notNull(out, "No OutputStream specified");
 
         out.write(in.getBytes(charset));
         out.flush();
@@ -126,8 +119,6 @@ public abstract class StreamUtils {
      * @throws IOException in case of I/O errors
      */
     public static int copy(InputStream in, OutputStream out) throws IOException {
-        //Assert.notNull(in, "No InputStream specified");
-        //Assert.notNull(out, "No OutputStream specified");
 
         int count = (int) in.transferTo(out);
         out.flush();
@@ -149,8 +140,6 @@ public abstract class StreamUtils {
      * @since 4.3
      */
     public static long copyRange(InputStream in, OutputStream out, long start, long end) throws IOException {
-        //Assert.notNull(in, "No InputStream specified");
-        //Assert.notNull(out, "No OutputStream specified");
 
         long skipped = in.skip(start);
         if (skipped < start) {

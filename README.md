@@ -37,6 +37,7 @@ Independent of the stack you are using
 * Security analysis (what goes on the wire)
 * Test new APIs easily
 * Understand all consequences of changes
+* Load on the fly complex scenarios with all the plugin settings and data for multiple subsequent tests
 
 ### Custom Plugins
 
@@ -97,6 +98,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Custom maven repository on [https://maven.kendar.org](https://maven.kendar.org/maven2/releases/org/kendar/protocol/)
 * More than 70% Test coverage, more than 550 tests
 * Environment-based dynamic settings (see TPM_REPLACE)
+* Scenes
 
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
@@ -132,99 +134,191 @@ If you want to go on the specific functions by protocol:
 ## Help
 
 ```
-The Protocol Master
+=======================
+= The Protocol Master =
+=======================
 If an environment variable exists TPM_REPLACE=a=b,c=d,e=f
 every occurrence of %a% in config file is replaced with 
 b value and so on
 
-	un     	unattended	Unattended run (default false)
-	cfg    	config    	Load config file
-	pld    	pluginsDir	Plugins directory (default plugins)
-	dd     	datadir   	Data directory (default data)
-	ll     	loglevel  	Log4j loglevel (default ERROR)
-	ap     	apis      	The port TPM controllers (default 0, as not active)
-	lt     	logType   	The log type (default file)
-	h      	help      	Show help
-	p      	protocol  	The protocols to start
-	       	          	Options: amqp091|mqtt|http|mysql|mongodb|postgres|redis
+  un                  unattended                 Unattended run (default false)
+  cfg                 config                     Load config file
+  pld                 pluginsDir                 Plugins directory (default plugins)
+  dd                  datadir                    Data directory (default file=data)]
+                                                 *Options:
+                                                 - encrypted=[absolute or relative path] save on disk encrypted
+                                                 the key is in ENCRYPTION_KEY environment variable
+                                                 - file=[absolute or relative path] save on disk
+                                                 - null=[anything] noop
+  ll                  loglevel                   Log4j loglevel (default ERROR)
+  ap                  apis                       The port TPM controllers (default 0, as not active)
+  h                   help                       Show help
+  p                   protocol                   The protocols to start
+                                                 *Options: amqp091|mqtt|http|mysql|mongodb|postgres|redis
 
-Amqp 0.9.1 Protocol
+MongoDB protocol (mongodb)
 
-	po     	port      	Listening port (default 5672)
-	pc     	connection	Connection (example amqp://localhost:5372)
-	pt     	timeout   	Timeout (deafult 30)
-	pu     	login     	Remote login
-	pw     	password  	Remote password
-	record 	          	Record Calls
-	replay 	          	Replay calls
+  po                  port                       Listening port (default 27018)
+  pc                  connection                 Connection (example mongodb://localhost:27018)
+  pt                  timeout                    Timeout (deafult 30)
+  pu                  login                      Remote login
+  pw                  password                   Remote password
+  report              report-plugin              Send 'report' events to global report plugin
+  record              record-plugin              Activate recording calls
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  replay              replay-plugin              Activate replaying calls
+    rpc               respectCallDurations       Respect call durations, default false
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    bx                blockExternalCalls         Block external calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
 
-Mqtt Protocol
+MQTT Protocol (mqtt)
 
-	po     	port      	Listening port (default 1883)
-	pc     	connection	Connection (example tcp://localhost:1884)
-	pt     	timeout   	Timeout (deafult 30)
-	pu     	login     	Remote login
-	pw     	password  	Remote password
-	record 	          	Record Calls
-	replay 	          	Replay calls
+  po                  port                       Listening port (default 1883)
+  pc                  connection                 Connection (example tcp://localhost:1883)
+  pt                  timeout                    Timeout (deafult 30)
+  pu                  login                      Remote login
+  pw                  password                   Remote password
+  replay              replay-plugin              Activate replaying calls
+    rpc               respectCallDurations       Respect call durations, default false
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    bx                blockExternalCalls         Block external calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  record              record-plugin              Activate recording calls
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  publish             publish-plugin             Publish asynchronous calls
+  report              report-plugin              Send 'report' events to global report plugin
 
-http Protocol
+MySQL protocol (mysql)
 
-	ht     	http      	Http port (default 80
-	hs     	https     	Https port (default 443
-	prx    	proxy     	Proxy port (default 9999
-	cn     	cname     	Cname (default C=US,O=Local Development,CN=local.org
-	der    	          	Der file (default resource://certificates/ca.der
-	key    	          	Key file (default resource://certificates/ca.key
-	rew    	rewrite   	Path of the rewrite queries file
-	record 	          	Record Calls
-	replay 	          	Replay calls
-	errors 	          	Random errors
-	latency	          	Random latency
+  po                  port                       Listening port (default 3306)
+  pc                  connection                 Connection (example jdbc:mysql://localhost:3306)
+  pt                  timeout                    Timeout (deafult 30)
+  pu                  login                      Remote login
+  pw                  password                   Remote password
+  js                  schema                     Force schema name
+  report              report-plugin              Send 'report' events to global report plugin
+  rewrite             rewrite-plugin             Rewrite the requests sent to the server
+  record              record-plugin              Activate recording calls
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  replay              replay-plugin              Activate replaying calls
+    rpc               respectCallDurations       Respect call durations, default false
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    bx                blockExternalCalls         Block external calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  mock                mock-plugin                Mock certain service requests
 
-mysql Protocol
+Amqp 0.9.1 Protocol (amqp091)
 
-	po     	port      	Listening port (default 3306)
-	pc     	connection	Connection (example jdbc:mysql://localhost:3306)
-	pt     	timeout   	Timeout (deafult 30)
-	pu     	login     	Remote login
-	pw     	password  	Remote password
-	js     	schema    	Force schema name
-	rew    	rewrite   	Path of the rewrite queries file
-	record 	          	Record Calls
-	replay 	          	Replay calls
+  po                  port                       Listening port (default 5672)
+  pc                  connection                 Connection (example amqp://localhost:5672)
+  pt                  timeout                    Timeout (deafult 30)
+  pu                  login                      Remote login
+  pw                  password                   Remote password
+  report              report-plugin              Send 'report' events to global report plugin
+  record              record-plugin              Activate recording calls
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  publish             publish-plugin             Publish asynchronous calls
+  replay              replay-plugin              Activate replaying calls
+    rpc               respectCallDurations       Respect call durations, default false
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    bx                blockExternalCalls         Block external calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
 
-MongoDb Protocol
+Http Protocol (http)
 
-	po     	port      	Listening port (default 27018)
-	pc     	connection	Connection (example mongodb://localhost:27018)
-	pt     	timeout   	Timeout (deafult 30)
-	pu     	login     	Remote login
-	pw     	password  	Remote password
-	record 	          	Record Calls
-	replay 	          	Replay calls
+  ht                  http                       Http port (default 80
+  hs                  https                      Https port (default 443
+  prx                 proxy                      Proxy port (default 9999
+  cn                  cname                      Cname (default C=US,O=Local Development,CN=local.org
+  der                                            Der file (default resource://certificates/ca.der
+  key                                            Key file (default resource://certificates/ca.key
+  latency             latency-plugin             Add latency to calls
+    max                                          Max milliseconds latency, default 0
+    min                                          Min milliseconds latency, default 0
+    lwh               latencyWhere               Modify latency on following websites @
+                                                 @REGEX or  STARTWITH. Default anything
+                                                 *Repeatable
+  record              record-plugin              Activate recording calls
+    ret               removeETags                Remove e-tags, default false
+    rwh               recordWhat                 Record following websites @
+                                                 @REGEX or  STARTWITH. Default anything
+                                                 *Repeatable
+  rewrite             rewrite-plugin             Rewrite the requests sent to the server
+  mock                mock-plugin                Mock certain service requests
+  report              report-plugin              Send 'report' events to global report plugin
+  error               error-plugin               Inject specific errors
+    msg               errorMessage               Error message
+    epc               percentOfErrors            Percent of errors, default 0, meaning 0%
+    err               errorCode                  Error code to show, default Error
+    ewh               errorWhere                 Generate erros on following websites @
+                                                 @REGEX or  STARTWITH. Default anything
+                                                 *Repeatable
+  replay              replay-plugin              Activate replaying calls
+    pwh               replayWhat                 Replay following websites @
+                                                 @REGEX or  STARTWITH. Default anything
+                                                 *Repeatable
+  rate-limit          rate-limit-plugin          Force rate limit plugin
+    rateLimit                                    Rate limit, default 120
+    resetTimeSeconds                             Reset time window in seconds
+    cpr                                          Cost per request, default 2
+    twh               throttleWhere              Generate throttle on following websites @
+                                                 @REGEX or  STARTWITH. Default anything
+                                                 *Repeatable
 
-postgres Protocol
+PostgreSQL protocol (postgres)
 
-	po     	port      	Listening port (default 5432)
-	pc     	connection	Connection (example jdbc:postgresql://localhost:5432/db?ssl=false)
-	pt     	timeout   	Timeout (deafult 30)
-	pu     	login     	Remote login
-	pw     	password  	Remote password
-	js     	schema    	Force schema name
-	rew    	rewrite   	Path of the rewrite queries file
-	record 	          	Record Calls
-	replay 	          	Replay calls
+  po                  port                       Listening port (default 5432)
+  pc                  connection                 Connection (example jdbc:postgresql://localhost:5432/db?ssl=false)
+  pt                  timeout                    Timeout (deafult 30)
+  pu                  login                      Remote login
+  pw                  password                   Remote password
+  js                  schema                     Force schema name
+  mock                mock-plugin                Mock certain service requests
+  replay              replay-plugin              Activate replaying calls
+    rpc               respectCallDurations       Respect call durations, default false
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    bx                blockExternalCalls         Block external calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  report              report-plugin              Send 'report' events to global report plugin
+  rewrite             rewrite-plugin             Rewrite the requests sent to the server
+  record              record-plugin              Activate recording calls
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
 
-Redis Protocol
+RESP2/RESP3 Protocol (redis)
 
-	po     	port      	Listening port (default 6379)
-	pc     	connection	Connection (example redis://localhost:5372)
-	pt     	timeout   	Timeout (deafult 30)
-	record 	          	Record Calls
-	replay 	          	Replay calls
+  po                  port                       Listening port (default 6379)
+  pc                  connection                 Connection (example redis://localhost:6379)
+  pt                  timeout                    Timeout (deafult 30)
+  replay              replay-plugin              Activate replaying calls
+    rpc               respectCallDurations       Respect call durations, default false
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    bx                blockExternalCalls         Block external calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  publish             publish-plugin             Publish asynchronous calls
+  report              report-plugin              Send 'report' events to global report plugin
+  record              record-plugin              Activate recording calls
+    itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
+    rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
 
 ```
+
+## Storage choices
+
+The global `dataDir` option is used to select the storage engine, setting the
+value to `[storage engine]=[storage engine connection string]`.
+
+When not specified the storage engine is `file`
+
+* path (relative or absolute), as `file` option
+* file= followed by the path (relative or absolute)
+* null= without connection string
+* encrypted= followed by the path (relative or absolute), must set "ENCRYPTION_KEY" value as environment variable
 
 ## How it was Born
 

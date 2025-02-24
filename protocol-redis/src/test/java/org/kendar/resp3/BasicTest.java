@@ -75,7 +75,7 @@ public class BasicTest {
 
         var rep = new RedisReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(pl, rep));
+        proxy.setPluginHandlers(List.of(pl, rep));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

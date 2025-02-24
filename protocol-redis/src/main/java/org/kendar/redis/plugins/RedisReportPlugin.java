@@ -21,7 +21,7 @@ public class RedisReportPlugin extends ReportPlugin<PluginSettings> {
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Resp3Message in, Resp3Response out) {
         if (isActive()) {
-            var message = phase==ProtocolPhase.ASYNC_RESPONSE?"RECEIVE":"SEND";
+            var message = phase == ProtocolPhase.ASYNC_RESPONSE ? "RECEIVE" : "SEND";
             var data = mapper.toJsonNode(in.getData());
             if (data.isArray()) {
                 if (data.get(0).textValue().equalsIgnoreCase("publish")) {
@@ -31,7 +31,7 @@ public class RedisReportPlugin extends ReportPlugin<PluginSettings> {
                     EventsQueue.send(new ReportDataEvent(
                             getInstanceId(),
                             getProtocol(),
-                            String.format("%s %s:%s:%s",message, data.get(0).textValue(), data.get(1).textValue(), data.get(2).textValue()),
+                            String.format("%s %s:%s:%s", message, data.get(0).textValue(), data.get(1).textValue(), data.get(2).textValue()),
                             connectionId,
                             pluginContext.getStart(),
                             duration,

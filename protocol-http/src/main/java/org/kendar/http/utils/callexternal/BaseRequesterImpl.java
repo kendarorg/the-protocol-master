@@ -192,7 +192,7 @@ public abstract class BaseRequesterImpl implements BaseRequester {
                                         request.getRequestText().toString(), ContentType.create(contentType));
                     }
                 } catch (Exception ex) {
-                    log.debug("Error creating request {} {}",request.buildUrl(), request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
+                    log.debug("Error creating request {} {}", request.buildUrl(), request.getHeader(ConstantsHeader.CONTENT_TYPE), ex);
                     entity =
                             new StringEntity(
                                     request.getRequestText().toString(), ContentType.create(ConstantsMime.STREAM));

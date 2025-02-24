@@ -139,6 +139,6 @@ Maps are defined as arrays of arrays, because in REDIS keys can be any value
 * @@MAP@@: Defines a RESP map ( https://redis.io/docs/latest/develop/reference/protocol-spec/#maps )
 * @@PUSH@@: Defines a RESP out of band push ( https://redis.io/docs/latest/develop/reference/protocol-spec/#pushes )
 
-Optionally it is possible to add the following text row on arrays: @@ARRAY@@. By default
+Optionally it is possible to add the following text row on arrays: @@ARRAY@@. By default,
 every collection is considered an array unless specified differently (hence the optionality
 of the array label)

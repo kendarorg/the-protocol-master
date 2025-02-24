@@ -40,8 +40,6 @@ public class BasicTest {
     protected JsonMapper mapper = new JsonMapper();
 
     public static void beforeClassBase() {
-        //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
-
         var dockerHost = Utils.getDockerHost();
         assertNotNull(dockerHost);
         var network = Network.newNetwork();
@@ -85,13 +83,12 @@ public class BasicTest {
         }
         storage.initialize();
         var gs = new GlobalSettings();
-        //gs.putService("storage", storage);
         var mapper = new JsonMapper();
         recordPlugin = new AmqpRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPlugins(List.of(
+        proxy.setPluginHandlers(List.of(
                 recordPlugin, rep, publishPlugin));
         recordPlugin.setActive(true);
         rep.setActive(true);

@@ -218,7 +218,7 @@ public class CertificatesManager {
                             params.setSSLParameters(sslParameters);
 
                         } catch (Exception ex) {
-                            sslLog.error("Error configuring https",ex);
+                            sslLog.error("Error configuring https", ex);
                         }
                     }
                 });

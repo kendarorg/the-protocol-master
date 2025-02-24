@@ -973,7 +973,7 @@ public class ServerImpl {
             }
         }
 
-        class LinkHandler implements HttpHandler {
+        static class LinkHandler implements HttpHandler {
             final Filter.Chain nextChain;
 
             LinkHandler(Filter.Chain nextChain) {
