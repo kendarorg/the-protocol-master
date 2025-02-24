@@ -73,8 +73,12 @@ public class SwaggerApi implements FilteringClass {
             tags = {"base/swagger"})
     public void loadSwagger(Request reqp, Response resp) throws JsonProcessingException {
 
-        OpenAPI swagger = new OpenAPI()
-                .addServersItem(new Server().url("http://" + localAddress + ":" + port));
+        OpenAPI swagger = new OpenAPI();
+        if(reqp.getPort()>0) {
+            swagger.addServersItem(new Server().url("http://" + reqp.getHost() + ":" + reqp.getPort()));
+        }else{
+            swagger.addServersItem(new Server().url("http://" + reqp.getHost() + ":" + port));
+        }
         swagger.setInfo(new Info()
                 .title("Local API")
                 .version("1.0.0"));
