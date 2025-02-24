@@ -37,6 +37,7 @@ Independent of the stack you are using
 * Security analysis (what goes on the wire)
 * Test new APIs easily
 * Understand all consequences of changes
+* Load on the fly complex scenarios with all the plugin settings and data for multiple subsequent tests
 
 ### Custom Plugins
 
@@ -97,6 +98,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Custom maven repository on [https://maven.kendar.org](https://maven.kendar.org/maven2/releases/org/kendar/protocol/)
 * More than 70% Test coverage, more than 550 tests
 * Environment-based dynamic settings (see TPM_REPLACE)
+* Scenes
 
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
