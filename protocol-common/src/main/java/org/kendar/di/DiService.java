@@ -480,4 +480,22 @@ public class DiService {
         }
         return result;
     }
+
+    public void clean() {
+        for (var item : children) {
+            item.clean();
+        }
+        children.clear();
+        for (var item : singletons.values()) {
+            destroy(item);
+        }
+        singletons.clear();
+        if (parent != null) {
+            parent.children.remove(this);
+        }
+        namedMappings.clear();
+        parent = null;
+        threads.clear();
+        singletons.put(DiService.class, this);
+    }
 }

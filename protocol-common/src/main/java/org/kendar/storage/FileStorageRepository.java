@@ -175,12 +175,6 @@ public class FileStorageRepository implements StorageRepository {
 
     protected ProtocolRepo initializeContent(String instanceId) {
 
-//        if (protocolRepo.contains(instanceId)) {
-//            return protocolRepo.get(instanceId);
-//        }
-
-        //synchronized (initializeContentLock) {
-
         return protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
             if (currRepo == null) {
                 currRepo = new ProtocolRepo();
@@ -208,16 +202,10 @@ public class FileStorageRepository implements StorageRepository {
             }
             return currRepo;
         });
-
-        //}
     }
 
     protected void initializeContentWrite(String instanceId) {
 
-//        if (protocolRepo.contains(instanceId)) {
-//            return;
-//        }
-        //synchronized (initializeContentLock) {
         protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
             if (currRepo == null) {
                 currRepo = new ProtocolRepo();
@@ -274,8 +262,7 @@ public class FileStorageRepository implements StorageRepository {
                 if (item.getStorageItem() != null) {
                     item.getStorageItem().setIndex(valueId);
                 }
-                //initializeContentWrite(item.getInstanceId());
-                //}
+
                 var id = padLeftZeros(String.valueOf(valueId), 10) + "." + item.getInstanceId() + ".json";
 
                 var repo = protocolRepo.get(item.getInstanceId());
@@ -433,6 +420,7 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void writeZip(byte[] byteArray) {
+        String settingsDir= null;
         var destDirString = Path.of(targetDir).toAbsolutePath().toString();
         File destDir = new File(destDirString);
         // create output directory if it doesn't exist
@@ -448,6 +436,10 @@ public class FileStorageRepository implements StorageRepository {
                 throw new RuntimeException("Not a zip file!");
             }
             while (zipEntry != null) {
+                if(zipEntry.getName().equalsIgnoreCase("settings.json") &&
+                        Path.of(targetDir).toAbsolutePath().compareTo(destDir.toPath().toAbsolutePath()) == 0) {
+                    settingsDir =Path.of(destDir.getAbsolutePath(),zipEntry.getName()).toString();
+                }
                 File newFile = newFile(destDir, zipEntry);
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {
@@ -474,7 +466,7 @@ public class FileStorageRepository implements StorageRepository {
             zis.closeEntry();
             zis.close();
             fis.close();
-            EventsQueue.send(new StorageReloadedEvent());
+            EventsQueue.send(new StorageReloadedEvent().withSettings(settingsDir));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

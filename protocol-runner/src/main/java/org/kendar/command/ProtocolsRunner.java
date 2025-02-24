@@ -64,7 +64,7 @@ public class ProtocolsRunner {
         return coptions;
     }
 
-    private static void loadConfigFile(ChangeableReference<GlobalSettings> settings, String s) {
+    public static void loadConfigFile(ChangeableReference<GlobalSettings> settings, String s) {
         var tpmReplace = System.getenv(TPM_REPLACE);
         var fr = new FileResourcesUtils().getFileFromResourceAsString(s);
         if (tpmReplace != null) {

@@ -14,6 +14,8 @@ import org.kendar.command.ProtocolCommandLineHandler;
 import org.kendar.command.ProtocolsRunner;
 import org.kendar.di.DiService;
 import org.kendar.di.TpmScopeType;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.StorageReloadedEvent;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -72,10 +74,11 @@ public class Main {
 
         if (parser.hasOption("unattended") || settings.get().isUnattended()) {
             stopWhenFalse = () -> {
-                Sleeper.sleep(10000);
+                Sleeper.sleep(500);
                 return true;
             };
         }
+        var localStopWhenFalse = stopWhenFalse;
         var pluginsDir = settings.get().getPluginsDir();
         var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
         if (!pathOfPluginsDir.toFile().exists()) {
@@ -124,8 +127,28 @@ public class Main {
                 return;
             }
         }
+        var shouldRun = true;
+        var storageReloaded = new ChangeableReference<StorageReloadedEvent>(null);
+        Supplier<Boolean> newStopWhenFalse = ()->{
+            if(storageReloaded.get()!=null && Files.exists(Path.of(storageReloaded.get().getSettings()))) return false;
+            return localStopWhenFalse.get();
+        };
+        EventsQueue.register("main", value -> {
+            storageReloaded.set(value);
 
-        execute(settings.get(), stopWhenFalse);
+        }, StorageReloadedEvent.class);
+        while(shouldRun) {
+
+            execute(settings.get(), newStopWhenFalse);
+            if (storageReloaded.get() != null && Files.exists(Path.of(storageReloaded.get().getSettings()))) {
+                stop();
+                Sleeper.sleep(1000);
+                ProtocolsRunner.loadConfigFile(settings,Path.of(storageReloaded.get().getSettings()).toString());
+                storageReloaded.set(null);
+            }else{
+                shouldRun = false;
+            }
+        }
     }
 
     public static void stop() {
@@ -136,6 +159,7 @@ public class Main {
         if (apiServer != null) {
             apiServer.stop(0);
         }
+        diService.clean();
     }
 
     private static Boolean stopWhenQuitCommand() {
