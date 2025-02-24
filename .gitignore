@@ -33,3 +33,4 @@ target
 /plugins/*.jar
 /data/*.*
 /protocol-runner/data/*.*
+/data/
