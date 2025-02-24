@@ -1,6 +1,8 @@
 package org.kendar.storage;
 
 import org.bouncycastle.crypto.CryptoException;
+import org.kendar.di.DiService;
+import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.Encryptor;
@@ -27,8 +29,9 @@ public class EncryptedStorageRepository extends FileStorageRepository {
         encryptor = getEncryptor();
     }
 
-    public EncryptedStorageRepository(GlobalSettings settings) {
-        super(settings);
+    @TpmConstructor
+    public EncryptedStorageRepository(GlobalSettings settings, DiService diService) {
+        super(settings,diService);
         encryptor = getEncryptor();
     }
 

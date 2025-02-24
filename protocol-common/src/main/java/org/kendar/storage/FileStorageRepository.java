@@ -1,6 +1,7 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.di.annotations.TpmService;
@@ -45,6 +46,7 @@ public class FileStorageRepository implements StorageRepository {
     protected final AtomicInteger executorItems = new AtomicInteger(0);
     protected final Object lock = new Object();
     protected String targetDir;
+    private DiService diService;
 
     public FileStorageRepository(String targetDir) {
 
@@ -57,7 +59,8 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     @TpmConstructor
-    public FileStorageRepository(GlobalSettings settings) {
+    public FileStorageRepository(GlobalSettings settings,DiService diService) {
+        this.diService = diService;
         var logsDir = settings.getDataDir();
         if (logsDir == null || logsDir.isEmpty()) {
             logsDir = Path.of("data",
@@ -408,6 +411,13 @@ public class FileStorageRepository implements StorageRepository {
     @Override
     public byte[] readAsZip() {
         var baos = new ByteArrayOutputStream();
+        var globalSettings = diService.getInstance(GlobalSettings.class);
+        var globalSettingsFile = mapper.serialize(globalSettings);
+        try {
+            Files.writeString(Path.of(targetDir,"settings.json").toAbsolutePath(),globalSettingsFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         try (var zos = new ZipOutputStream(baos)) {
             for (var file : new File(Path.of(targetDir).toAbsolutePath().toString()).listFiles()) {
                 zipFile(file, file.getName(), zos);
