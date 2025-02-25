@@ -5,15 +5,19 @@ import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.AlwaysActivePlugin;
 import org.kendar.plugins.base.BasePluginDescriptor;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
+import org.kendar.proxy.PluginContext;
+import org.kendar.proxy.PluginHandler;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.utils.PluginsLoggerFactory;
 import org.pf4j.Extension;
 import org.pf4j.ExtensionPoint;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.xbill.DNS.*;
 
 import java.io.*;
@@ -27,21 +31,24 @@ import java.util.regex.Pattern;
 @Extension
 @TpmService(tags = "dns")
 public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoint {
-    private static final Logger log = LoggerFactory.getLogger(DnsProtocol.class);
-    private  DnsProtocolSettings settings;
-    private List<String> dnsServers = new ArrayList<>();
-    private  List<BasePluginDescriptor> plugins;
-    private  ExecutorService executorService = Executors.newFixedThreadPool(20);
-    private  Map<String, List<String>> cached = new ConcurrentHashMap<>();
-    private  Pattern ipPattern =
+    private Logger log;
+    private static final int UDP_SIZE = 512;
+    private final Map<ProtocolPhase, List<PluginHandler>> pluginHandlers = new HashMap<>();
+    private final DnsProtocolSettings settings;
+    private final List<String> dnsServers = new ArrayList<>();
+    private final ExecutorService executorService = Executors.newFixedThreadPool(20);
+    private final Map<String, List<String>> cached = new ConcurrentHashMap<>();
+    private final Pattern ipPattern =
             Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
     private boolean dnsRunning;
     private ServerSocket tcpSocket;
     private DatagramSocket udpSocket;
+    private final ConcurrentHashMap<String, Pattern> patterns = new ConcurrentHashMap<>();
 
     @TpmConstructor
     public DnsProtocol(GlobalSettings ini, DnsProtocolSettings settings,
-                       @TpmNamed(tags = "dns") List<BasePluginDescriptor> plugins) {
+                       @TpmNamed(tags = "dns") List<BasePluginDescriptor> plugins, PluginsLoggerFactory loggerContext) {
+        log = loggerContext.getLogger(DnsProtocol.class);
         this.settings = settings;
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
@@ -62,11 +69,32 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                 } catch (UnknownHostException e) {
                     log.error("Unable to resolve IP address for DNS {}", childDns, e);
                 }
-            }else{
+            } else {
                 this.dnsServers.add(childDns);
             }
         }
-        this.plugins = plugins;
+        for (var i = plugins.size() - 1; i >= 0; i--) {
+            var plugin = plugins.get(i);
+            var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
+            if (specificPluginSetting != null || AlwaysActivePlugin.class.isAssignableFrom(plugin.getClass())) {
+                ((ProtocolPluginDescriptor) plugin).initialize(ini, settings, specificPluginSetting);
+                plugin.refreshStatus();
+            } else {
+                plugins.remove(i);
+            }
+        }
+        this.setPlugins(plugins);
+
+        for (var pl : plugins) {
+            var plugin = (ProtocolPluginDescriptor) pl;
+            var handlers = PluginHandler.of(plugin, this);
+            for (var phase : plugin.getPhases()) {
+                if (!this.pluginHandlers.containsKey(phase)) {
+                    this.pluginHandlers.put((ProtocolPhase) phase, new ArrayList<>());
+                }
+                this.pluginHandlers.get(phase).addAll(handlers);
+            }
+        }
     }
 
     public static int countOccurrencesOf(String string, String substring) {
@@ -82,11 +110,6 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         }
 
         return count;
-    }
-
-    @Override
-    public List<BasePluginDescriptor> getPlugins() {
-        return plugins;
     }
 
     @Override
@@ -112,14 +135,17 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     @Override
     public void start() {
         try {
-            int port = settings.getPort();
             dnsRunning = true;
             var th = new Thread(() -> {
-                runTcp();
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection",  "")) {
+                    runTcp();
+                }
             });
             th.start();
             th = new Thread(() -> {
-                runUdp();
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection",  "")) {
+                    runUdp();
+                }
             });
             th.start();
         } catch (Exception e) {
@@ -150,12 +176,20 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         Message response = new Message(request.getHeader().getID());
         response.getHeader().setFlag(Flags.QR);
         //response.getHeader().setFlag(Flags.AA );
+        var pluginContext = new PluginContext("dns","request",System.currentTimeMillis(),null);
 
         String requestedDomain = request.getQuestion().getName().toString(true);
 
-        log.debug("Requested domain " + requestedDomain);
 
         List<String> ips = new ArrayList<>();
+
+        log.debug("Requested domain " + requestedDomain);
+
+        if(handle(ProtocolPhase.PRE_CALL,pluginContext, requestedDomain, ips)){
+            return buildResponse(ips, requestedDomain, response, request);
+        }
+
+
 
         var splitted = requestedDomain.split("\\.");
         var containsAtLeastOneInternal = false;
@@ -170,11 +204,11 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
 
         if (!(containsAtLeastOneInternal && endsWith) && !isUpperCase) {
-            if (settings.getBlocked().stream().noneMatch(d ->{
-                if(d.startsWith("@")){
-                    if(!patterns.containsKey(d)){
+            if (settings.getBlocked().stream().noneMatch(d -> {
+                if (d.startsWith("@")) {
+                    if (!patterns.containsKey(d)) {
                         var pattern = Pattern.compile(d.substring(1));
-                        patterns.put(d,pattern);
+                        patterns.put(d, pattern);
                     }
                     return patterns.get(d).matcher(requestedDomain).matches();
 
@@ -189,6 +223,11 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             ips.add("127.0.0.1");
         }
 
+        handle(ProtocolPhase.POST_CALL,pluginContext, requestedDomain, ips);
+        return buildResponse(ips, requestedDomain, response, request);
+    }
+
+    private byte[] buildResponse(List<String> ips, String requestedDomain, Message response, Message request) throws IOException {
         byte[] resp;
         if (ips.size() > 0) {
             for (String ip : ips) {
@@ -221,8 +260,6 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             ex.printStackTrace();
         }
     }
-
-    private static final int UDP_SIZE = 512;
 
     private void resolveAll(InetAddress inAddress, int inPort, DatagramSocket socket, byte[] in) {
         try {
@@ -264,7 +301,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                 }
             }
         } catch (SocketException ex) {
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             log.error("Error running udp thread", ex);
         }
     }
@@ -297,7 +334,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             }
         } catch (SocketException ex) {
 
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             log.error("Error running tcp thread", ex);
         }
     }
@@ -315,8 +352,8 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     @Override
     public void terminate() {
         var terminatedPlugins = new HashSet<>();
-        for (var i = plugins.size() - 1; i >= 0; i--) {
-            var plugin = plugins.get(i);
+        for (var i = getPlugins().size() - 1; i >= 0; i--) {
+            var plugin = getPlugins().get(i);
             if (plugin.isActive() && !terminatedPlugins.contains(plugin)) {
                 plugin.terminate();
                 terminatedPlugins.add(plugin);
@@ -335,17 +372,15 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         dnsRunning = false;
     }
 
-    private ConcurrentHashMap<String,Pattern> patterns = new ConcurrentHashMap<>();
-
     public List<String> doResolve(String requestedDomain) {
         if (requestedDomain == null || requestedDomain.length() == 0) {
             return new ArrayList<>();
         }
         var matching = settings.getRegistered().stream().filter(d -> {
-            if(d.getName().startsWith("@")){
-                if(!patterns.containsKey(d.getName())){
+            if (d.getName().startsWith("@")) {
+                if (!patterns.containsKey(d.getName())) {
                     var pattern = Pattern.compile(d.getName().substring(1));
-                    patterns.put(d.getName(),pattern);
+                    patterns.put(d.getName(), pattern);
                 }
                 return patterns.get(d.getName()).matcher(requestedDomain).matches();
 
@@ -369,7 +404,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     }
 
     public List<String> resolveRemote(String requestedDomain) {
-        if(requestedDomain.equals(requestedDomain.toUpperCase())){
+        if (requestedDomain.equals(requestedDomain.toUpperCase())) {
             log.error("Cyclic call returning nothing");
             return new ArrayList<>();
         }
@@ -441,12 +476,25 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             }
         }
         var result = new ArrayList<>(data);
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             return List.of();
         }
         log.debug("Resolved remote {}=>{}", requestedDomain, result.get(0));
 
 
         return result;
+    }
+
+
+    private boolean handle(ProtocolPhase protocolPhase,PluginContext context, Object in, Object out) {
+        var handlers = pluginHandlers.get(protocolPhase);
+        if (handlers != null) {
+            for (var handler : handlers) {
+                if(handler.handle(context,protocolPhase,in,out)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

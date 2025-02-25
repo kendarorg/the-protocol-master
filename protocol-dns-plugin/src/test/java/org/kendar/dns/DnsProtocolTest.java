@@ -2,6 +2,7 @@ package org.kendar.dns;
 
 import org.junit.jupiter.api.Test;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.utils.PluginsLoggerFactory;
 import org.kendar.utils.Sleeper;
 import org.xbill.DNS.*;
 
@@ -42,7 +43,7 @@ public class DnsProtocolTest {
         var settings = new DnsProtocolSettings();
         settings.setPort(53);
         settings.setChildDns(List.of("127.0.0.1"));
-        var target = new DnsProtocol(new GlobalSettings(),settings, List.of());
+        var target = new DnsProtocol(new GlobalSettings(),settings, List.of(),new PluginsLoggerFactory());
         target.start();
         Sleeper.sleep(200);
 
@@ -56,7 +57,7 @@ public class DnsProtocolTest {
         var settings = new DnsProtocolSettings();
         settings.setPort(53);
         settings.setRegistered(List.of(new DnsMapping("10.0.0.1","www.google.com")));
-        var target = new DnsProtocol(new GlobalSettings(),settings, List.of());
+        var target = new DnsProtocol(new GlobalSettings(),settings, List.of(),new PluginsLoggerFactory());
         target.start();
         Sleeper.sleep(200);
 
@@ -70,7 +71,7 @@ public class DnsProtocolTest {
         var settings = new DnsProtocolSettings();
         settings.setPort(53);
         settings.setBlocked(List.of("www.google.com"));
-        var target = new DnsProtocol(new GlobalSettings(),settings, List.of());
+        var target = new DnsProtocol(new GlobalSettings(),settings, List.of(),new PluginsLoggerFactory());
         target.start();
         Sleeper.sleep(200);
 
@@ -85,7 +86,7 @@ public class DnsProtocolTest {
         var settings = new DnsProtocolSettings();
         settings.setPort(53);
         settings.setChildDns(List.of("8.8.8.8"));
-        var target = new DnsProtocol(new GlobalSettings(),settings, List.of());
+        var target = new DnsProtocol(new GlobalSettings(),settings, List.of(),new PluginsLoggerFactory());
         target.start();
         Sleeper.sleep(200);
 

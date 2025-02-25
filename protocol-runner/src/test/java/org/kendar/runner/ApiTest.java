@@ -53,7 +53,7 @@ public class ApiTest extends ApiTestBase {
         var httpclient = HttpClients.createDefault();
         var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent.zip"));
         var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
-        });
+        },"application/zip");
         assertEquals("OK", okResult.getResult());
         var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
         assertTrue(zip.length > 100);

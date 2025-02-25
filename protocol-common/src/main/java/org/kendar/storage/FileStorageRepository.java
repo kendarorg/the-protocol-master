@@ -46,7 +46,7 @@ public class FileStorageRepository implements StorageRepository {
     protected final AtomicInteger executorItems = new AtomicInteger(0);
     protected final Object lock = new Object();
     protected String targetDir;
-    private DiService diService;
+    protected DiService diService;
 
     public FileStorageRepository(String targetDir) {
 
@@ -58,17 +58,22 @@ public class FileStorageRepository implements StorageRepository {
         this.targetDir = targetDir.toAbsolutePath().toString();
     }
 
+    protected FileStorageRepository(){
+
+    }
+
+
     @TpmConstructor
     public FileStorageRepository(GlobalSettings settings,DiService diService) {
         this.diService = diService;
-        var logsDir = settings.getDataDir();
-        if (logsDir == null || logsDir.isEmpty()) {
-            logsDir = Path.of("data",
+        var dataDir = settings.getDataDir();
+        if (dataDir == null || dataDir.isEmpty()) {
+            dataDir = Path.of("data",
                     Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
         } else {
-            logsDir = logsDir.replace("file=", "");
+            dataDir = dataDir.replace("file=", "");
         }
-        this.targetDir = Path.of(logsDir).toAbsolutePath().toString();
+        this.targetDir = Path.of(dataDir).toAbsolutePath().toString();
         targetDir = ensureDirectory(targetDir);
     }
 
@@ -463,12 +468,13 @@ public class FileStorageRepository implements StorageRepository {
                     }
 
                     // write file content
-                    FileOutputStream fos = new FileOutputStream(newFile);
+                    var fos = new ByteArrayOutputStream();
                     int len;
                     while ((len = zis.read(buffer)) > 0) {
                         fos.write(buffer, 0, len);
                     }
                     fos.close();
+                    setFileContent(newFile.toPath(),new String(fos.toByteArray()));
                 }
                 zipEntry = zis.getNextEntry();
             }

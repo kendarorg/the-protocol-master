@@ -24,7 +24,12 @@
           "ip": "127.0.0.1",
           "name": "www.facebook.com"
         }
-      ]
+      ],
+      "plugins": {
+        "report-plugin": {
+          "active": true
+        }
+      }
     },
     "redis-01": {
       "protocol": "redis",
