@@ -8,6 +8,28 @@
     }
   },
   "protocols": {
+    "dns-01": {
+      "protocol": "dns",
+      "port": 53,
+      "childDns": [
+        "8.8.8.8",
+        "1.1.1.1"
+      ],
+      "blocked": [
+        "www.google.com"
+      ],
+      "registered": [
+        {
+          "ip": "127.0.0.1",
+          "name": "www.facebook.com"
+        }
+      ],
+      "plugins": {
+        "report-plugin": {
+          "active": true
+        }
+      }
+    },
     "postgres-01": {
       "protocol": "postgres",
       "port": 5432,

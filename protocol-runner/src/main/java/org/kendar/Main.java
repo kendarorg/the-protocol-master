@@ -24,6 +24,7 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.FileResourcesUtils;
+import org.kendar.utils.PluginsLoggerFactory;
 import org.kendar.utils.Sleeper;
 import org.pf4j.ExtensionPoint;
 import org.pf4j.JarPluginManager;
@@ -196,6 +197,14 @@ public class Main {
     public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse) throws Exception {
         if (ini == null) return;
 
+        var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
+
+
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        var log = loggerContext.getLogger("org.kendar");
+        log.setLevel(Level.toLevel(logLevel, Level.ERROR));
+        diService.register(PluginsLoggerFactory.class, new PluginsLoggerFactory());
+
         if (!ini.getDataDir().contains("=")) {
             ini.setDataDir("file=" + ini.getDataDir());
         }
@@ -206,12 +215,6 @@ public class Main {
         diService.overwrite(StorageRepository.class, storageInstance);
 
         diService.register(FileResourcesUtils.class, new FileResourcesUtils());
-        var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
-
-
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        var log = loggerContext.getLogger("org.kendar");
-        log.setLevel(Level.toLevel(logLevel, Level.ERROR));
         diService.register(FiltersConfiguration.class, new FiltersConfiguration());
         var apisFiltersLoader = diService.getInstance(ApiFiltersLoader.class);
 

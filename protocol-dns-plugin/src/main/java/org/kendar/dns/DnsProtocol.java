@@ -13,10 +13,11 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.PluginHandler;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.utils.PluginsLoggerFactory;
 import org.pf4j.Extension;
 import org.pf4j.ExtensionPoint;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.xbill.DNS.*;
 
 import java.io.*;
@@ -30,7 +31,7 @@ import java.util.regex.Pattern;
 @Extension
 @TpmService(tags = "dns")
 public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoint {
-    private static final Logger log = LoggerFactory.getLogger(DnsProtocol.class);
+    private Logger log;
     private static final int UDP_SIZE = 512;
     private final Map<ProtocolPhase, List<PluginHandler>> pluginHandlers = new HashMap<>();
     private final DnsProtocolSettings settings;
@@ -46,7 +47,8 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
     @TpmConstructor
     public DnsProtocol(GlobalSettings ini, DnsProtocolSettings settings,
-                       @TpmNamed(tags = "dns") List<BasePluginDescriptor> plugins) {
+                       @TpmNamed(tags = "dns") List<BasePluginDescriptor> plugins, PluginsLoggerFactory loggerContext) {
+        log = loggerContext.getLogger(DnsProtocol.class);
         this.settings = settings;
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);
@@ -133,14 +135,17 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     @Override
     public void start() {
         try {
-            int port = settings.getPort();
             dnsRunning = true;
             var th = new Thread(() -> {
-                runTcp();
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection",  "")) {
+                    runTcp();
+                }
             });
             th.start();
             th = new Thread(() -> {
-                runUdp();
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection",  "")) {
+                    runUdp();
+                }
             });
             th.start();
         } catch (Exception e) {

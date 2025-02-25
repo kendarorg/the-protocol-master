@@ -13,11 +13,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Calendar;
 
 @TpmService(tags = "storage_encrypted")
 public class EncryptedStorageRepository extends FileStorageRepository {
 
-    private final Encryptor encryptor;
+    private Encryptor encryptor;
+    private String password;
 
     public EncryptedStorageRepository(String targetDir) {
         super(targetDir);
@@ -31,8 +33,28 @@ public class EncryptedStorageRepository extends FileStorageRepository {
 
     @TpmConstructor
     public EncryptedStorageRepository(GlobalSettings settings, DiService diService) {
-        super(settings,diService);
+
+        this.diService = diService;
+        var dataDir = settings.getDataDir();
+        if (dataDir == null || dataDir.isEmpty()) {
+            dataDir = Path.of("data",
+                    Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
+        } else {
+            if(dataDir.contains("&")){
+                var spl = dataDir.split("&");
+                var pwd = spl[1].split("=");
+                this.password = pwd[1];
+                dataDir = spl[0].split("=")[1];
+            }else{
+                var spl = dataDir.split("=");
+                if(spl.length==2){
+                    dataDir = spl[1];
+                }
+            }
+        }
         encryptor = getEncryptor();
+        this.targetDir = Path.of(dataDir).toAbsolutePath().toString();
+        this.targetDir  = ensureDirectory(targetDir);
     }
 
     private Encryptor getEncryptor() {
@@ -44,6 +66,9 @@ public class EncryptedStorageRepository extends FileStorageRepository {
     }
 
     protected String getEncriptionKey() {
+        if(this.password!=null && !this.password.isEmpty()) {
+            return this.password;
+        }
         return System.getenv("ENCRYPTION_KEY");
     }
 

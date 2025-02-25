@@ -48,6 +48,11 @@ public class MimeChecker {
         }
         var mimeLow = mime.toLowerCase(Locale.ROOT);
         if (mimeLow.contains("text")) return false;
+        if (mimeLow.contains("zip")) return true;
+        if (mimeLow.contains("gz")) return true;
+        if (mimeLow.contains("tar")) return true;
+        if (mimeLow.contains("pdf")) return true;
+        if (mimeLow.contains("octet")) return true;
         if (mimeLow.contains("xml")) return false;
         if (mimeLow.contains("soap")) return false;
         if (mimeLow.contains("javascript")) return false;

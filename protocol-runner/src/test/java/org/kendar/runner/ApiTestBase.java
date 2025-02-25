@@ -39,10 +39,11 @@ public class ApiTestBase extends BasicTest {
         return new String(bytes);
     }
 
-    public static <T> T postRequest(String target, CloseableHttpClient httpclient, byte[] data, TypeReference<T> typeReference) throws IOException {
+    public static <T> T postRequest(String target, CloseableHttpClient httpclient, byte[] data, TypeReference<T> typeReference,String type) throws IOException {
         var httpget = new HttpPost(target);
         var be = new ByteArrayEntity(data);
         httpget.setEntity(be);
+        httpget.setHeader("Content-Type", type);
         var httpresponse = httpclient.execute(httpget);
 
         var sc = new Scanner(httpresponse.getEntity().getContent());
