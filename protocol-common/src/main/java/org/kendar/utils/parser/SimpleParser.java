@@ -1,7 +1,10 @@
 package org.kendar.utils.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.utils.JsonMapper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,12 +16,15 @@ import java.util.stream.Collectors;
 
 @TpmService
 public class SimpleParser {
+    private static final JsonMapper mapper = new JsonMapper();
     private static final Set<String> binaryOperator = Set.of("=", "<", ">",  "+", "-", "*", "%", "/", "!");
     private static final Set<FunctionDefinition> functionDefinitions = Set.of(
             new FunctionDefinition("CONCAT", -1),
             new FunctionDefinition("OR", -1),
             new FunctionDefinition("AND", -1),
-            new FunctionDefinition("LIKE", 2),
+            new FunctionDefinition("CONTAINS", 2),
+            new FunctionDefinition("FILTER", 2),
+            new FunctionDefinition("COUNT", 1),
             /*new FunctionDefinition("NOW", 0),
             new FunctionDefinition("MSTODATE", 1),
             new FunctionDefinition("NANOTODATE", 1),
@@ -28,7 +34,8 @@ public class SimpleParser {
             //new FunctionDefinition("IN", -1),
             new FunctionDefinition("NOT", 1),
             new FunctionDefinition("TRUE", 0),
-            new FunctionDefinition("FALSE", 0)
+            new FunctionDefinition("FALSE", 0),
+            new FunctionDefinition("NULL", 0)
     );
     private final Pattern pattern = Pattern.compile("^\\d*\\.?\\d+$");
 
@@ -203,9 +210,10 @@ public class SimpleParser {
         char[] charArray = input.toCharArray();
         var currentString = "";
         var prevSpecial = false;
+        var prevChar=' ';
         for (int i = 0; i < charArray.length; i++) {
             var character = charArray[i];
-            if (isBinaryOperator(character)) {
+            if (isBinaryOperator(character,prevChar)) {
                 if (prevSpecial) {
                     currentString += character;
                 } else {
@@ -220,7 +228,7 @@ public class SimpleParser {
             } else {
                 currentString += character;
             }
-
+            prevChar=character;
         }
         if (!currentString.isEmpty()) result.add(new Token(currentString,
                 prevSpecial ? TokenType.OPERATOR : TokenType.VARIABLE));
@@ -229,7 +237,8 @@ public class SimpleParser {
     }
 
 
-    private boolean isBinaryOperator(char character) {
+    private boolean isBinaryOperator(char character, char prevChar) {
+        if(prevChar=='[' && character=='*') return false;
         return binaryOperator.contains(String.valueOf(character));
     }
 
@@ -251,10 +260,18 @@ public class SimpleParser {
     public Object evaluate(Token tokenMap, JsonNode testClass) {
         for (int i = 0; i < tokenMap.children.size(); i++) {
             var child = tokenMap.children.get(i);
+            if(tokenMap.children.size()>(i+2)) {
+                if(TokenType.OPERATOR==tokenMap.children.get(i + 1).type){
+                    var operator = tokenMap.children.get(i + 1).value;
+                    return execBinaryOperation(tokenMap.children.get(i), operator, tokenMap.children.get(i + 2), testClass);
+                }
+            }
             if (child.type == TokenType.FUNCTION) {
                 return execFunction(child,testClass);
             } else if (child.type == TokenType.BLOCK) {
                 return evaluate(child, testClass);
+            }else if (child.type == TokenType.VARIABLE) {
+                return convertToValue(child, testClass);
             }else { //binary operator
                 if(tokenMap.children.size()>(i+2)) {
                     var operator = tokenMap.children.get(i + 1).value;
@@ -349,31 +366,25 @@ public class SimpleParser {
             remainder = oldArray[1];
         }
 
-        if (currentPart.endsWith("]")) {
-            var obj = testClass.get(currentPart);
-            if(!obj.isArray()){
-                throw new RuntimeException("Must be an array the variable " + originalVariable + " on " + variable);
-            }
-        } else {
-            var obj = testClass.get(currentPart);
-            if (obj == null) {
-                return null;
-            }
-            if (remainder == null) {
-                if (obj.isBigInteger() || obj.isLong() || obj.isInt() || obj.isShort())
-                    return BigDecimal.valueOf(obj.numberValue().longValue());
-                if (obj.isFloat()) return BigDecimal.valueOf(obj.floatValue());
-                if (obj.isBigDecimal()) return obj.decimalValue();
-                if (obj.isDouble()) return BigDecimal.valueOf(obj.doubleValue());
-                if (obj.isTextual()) return obj.textValue();
-                if (obj.isBoolean()) return obj.booleanValue();
-                throw new RuntimeException("Unsupported type: " + obj.getNodeType() + " for variable " + originalVariable + " on " + variable);
-            }else{
-                return convertToValue(originalVariable, remainder, obj);
-            }
+
+        var obj = testClass.get(currentPart);
+        if (obj == null) {
+            return null;
+        }
+        if (remainder == null) {
+            if(obj.isArray()||obj.isObject())return obj;
+            if (obj.isBigInteger() || obj.isLong() || obj.isInt() || obj.isShort())
+                return BigDecimal.valueOf(obj.numberValue().longValue());
+            if (obj.isFloat()) return BigDecimal.valueOf(obj.floatValue());
+            if (obj.isBigDecimal()) return obj.decimalValue();
+            if (obj.isDouble()) return BigDecimal.valueOf(obj.doubleValue());
+            if (obj.isTextual()) return obj.textValue();
+            if (obj.isBoolean()) return obj.booleanValue();
+            throw new RuntimeException("Unsupported type: " + obj.getNodeType() + " for variable " + originalVariable + " on " + variable);
+        }else{
+            return convertToValue(originalVariable, remainder, obj);
         }
 
-        return null;
     }
 
 
@@ -407,12 +418,72 @@ public class SimpleParser {
                 result  += convertToValue(child, testClass).toString();
             }
             return result;
-        }else if(token.value.equalsIgnoreCase("like")){
-            var what = convertToValue(token.children.get(0), testClass).toString();
-            var likeWhat = convertToValue(token.children.get(1), testClass).toString();
-            return what.contains(likeWhat);
+        }else if(token.value.equalsIgnoreCase("count")){
+            var value=convertToValue(token.children.get(0),testClass);
+            if(value==null){
+                return BigDecimal.valueOf(0);
+            }
+            if(JsonNode.class.isAssignableFrom(value.getClass())){
+                var obOrArray = (JsonNode)value;
+
+                if(!(obOrArray.isArray()||obOrArray.isObject()||obOrArray.isTextual())){
+                    throw new RuntimeException("count parameter must be an object or an array");
+                }
+                return BigDecimal.valueOf(obOrArray.size());
+            }else if(value instanceof String){
+                return BigDecimal.valueOf(((String) value).length());
+            }
+            throw new RuntimeException("Unsupported type for count: " + value.getClass());
+
+        }else if(token.value.equalsIgnoreCase("filter")){
+            var value=convertToValue(token.children.get(0),testClass);
+            var function=token.children.get(1);
+            if(JsonNode.class.isAssignableFrom(value.getClass())){
+
+                var obOrArray = (JsonNode)value;
+
+                if(!(obOrArray.isArray()||obOrArray.isObject()||obOrArray.isTextual())){
+                    throw new RuntimeException("count parameter must be an object or an array");
+                }
+                if(obOrArray.isArray()){
+                    ArrayNode result = mapper.getMapper().createArrayNode();
+
+                    for(var item:((ArrayNode)obOrArray)){
+                        var objectNode = mapper.getMapper().createObjectNode();
+                        objectNode.set("it",item);
+                        if((boolean) convertToValue(function,(JsonNode) objectNode)){
+                            result.add((JsonNode) item);
+                        }
+                    }
+                    return result;
+                }else if(obOrArray.isObject()){
+                    ArrayNode result = mapper.getMapper().createArrayNode();
+                    ObjectNode src = (ObjectNode) obOrArray;
+                    var iterator = src.fields();
+                    while(iterator.hasNext()){
+                        var item = iterator.next();ObjectNode partialSubNode = mapper.getMapper().createObjectNode();
+                        var textNodeKey = mapper.toJsonNode(item.getKey());
+                        partialSubNode.set("value", (JsonNode) item.getValue());
+                        partialSubNode.set("key",textNodeKey);
+                        if((boolean) convertToValue(function,(JsonNode) partialSubNode)){
+                            result.add((JsonNode) partialSubNode);
+                        }
+                    }
+                    return result;
+                }
+
+                return obOrArray.size();
+            }
+            throw new RuntimeException("Unsupported type for filter: " + value.getClass());
+
+        }else if(token.value.equalsIgnoreCase("contains")){
+            var where = convertToValue(token.children.get(0), testClass).toString();
+            var what = convertToValue(token.children.get(1), testClass).toString();
+            return where.contains(what);
         }else if(token.value.equalsIgnoreCase("isnull")){
             return convertToValue(token.children.get(0), testClass)==null;
+        }else if(token.value.equalsIgnoreCase("null")){
+            return null;
         }else if(token.value.equalsIgnoreCase("isnotnull")){
             return convertToValue(token.children.get(0), testClass)!=null;
         }else if(token.value.equalsIgnoreCase("not")){

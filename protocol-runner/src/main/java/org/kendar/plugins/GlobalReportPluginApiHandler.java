@@ -1,8 +1,5 @@
 package org.kendar.plugins;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Predicate;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -17,9 +14,10 @@ import org.kendar.plugins.apis.Status;
 import org.kendar.plugins.base.BasePluginApiHandler;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
+import org.kendar.utils.parser.Token;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
@@ -29,11 +27,13 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalReportPlugin plugin;
     private final StorageRepository repository;
+    private final SimpleParser simpleParser;
 
-    public GlobalReportPluginApiHandler(GlobalReportPlugin plugin, StorageRepository repository) {
+    public GlobalReportPluginApiHandler(GlobalReportPlugin plugin, StorageRepository repository, SimpleParser simpleParser) {
 
         this.plugin = plugin;
         this.repository = repository;
+        this.simpleParser = simpleParser;
     }
 
     @HttpMethodFilter(
@@ -91,10 +91,9 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             pathAddress = "/api/global/plugins/report-plugin/report",
             method = "GET", id = "GET /api/global/plugins/report-plugin/report")
     @TpmDoc(
-            description = "Handle the global report plugin data retrieval",
+            description = "Handle the global report plugin data retrieval<br>Uses <a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> query language",
             query = {
-                    @QueryString(key = "map", description = "<a href='https://github.com/json-path/JsonPath'>JsonPath</a> expression"),
-                    @QueryString(key = "reduce", description = "<a href='https://github.com/json-path/JsonPath'>JsonPath</a> expression")
+                    @QueryString(key = "tpmql", description = "<a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> selection query",example = "")
             },
             responses = {
                     @TpmResponse(
@@ -107,33 +106,23 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             },
             tags = {"plugins/global"})
     public boolean loadReport(Request reqp, Response resp) {
-        var result = new ArrayList<Map<String, Object>>();
-        var mapJsonPath = reqp.getQuery("map");
-        JsonPath map= null;
-        if(mapJsonPath != null) {
-            map = JsonPath.compile(mapJsonPath, new Predicate[]{});
+        var tpmqlstring = reqp.getQuery("tpmql");
+        Token tpmql = null;
+        if (tpmqlstring != null && !tpmqlstring.isEmpty()) {
+            tpmql = simpleParser.parse(tpmqlstring);
         }
-
-        var reduceJsonPath = reqp.getQuery("reduce");
-        JsonPath reduce= null;
-        if(reduceJsonPath != null) {
-            reduce = JsonPath.compile(reduceJsonPath, new Predicate[]{});
-        }
+        var result = new ArrayList<ReportDataEvent>();
         var allFiles = repository.listPluginFiles("global","report-plugin");
         for(var file : allFiles) {
             var text = repository.readPluginFile(file);
-            if(map != null) {
-                Map<String, Object> mapped = map.read(text.getContent());
-                if(mapped == null || mapped.isEmpty()) {
-                    continue;
+            var data = mapper.deserialize(text.getContent(),ReportDataEvent.class);
+            if (tpmql != null) {
+                var toEvaluate = mapper.toJsonNode(text.getContent());
+                if ((boolean) simpleParser.evaluate(tpmql, toEvaluate)) {
+                    result.add(data);
                 }
-            }
-            if(reduce != null) {
-                Map<String, Object> mapped = reduce.read(text.getContent());
-                result.add(mapped);
-            }else{
-                Map<String, Object> mapped = mapper.deserialize(text.getContent(), new TypeReference<Map<String, Object>>() {});
-                result.add(mapped);
+            } else {
+                result.add(data);
             }
         }
         respondJson(resp, result);

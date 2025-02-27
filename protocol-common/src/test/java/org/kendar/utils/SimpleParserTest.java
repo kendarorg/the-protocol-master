@@ -1,12 +1,10 @@
 package org.kendar.utils;
 
 import org.junit.jupiter.api.Test;
-import org.kendar.utils.parser.NumberClass;
-import org.kendar.utils.parser.SimpleClass;
-import org.kendar.utils.parser.SimpleParser;
-import org.kendar.utils.parser.SubObject;
+import org.kendar.utils.parser.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -185,9 +183,9 @@ public class SimpleParserTest {
     }
 
     @Test
-    void workOnLike() {
+    void workOnContains() {
         var target = new SimpleParser();
-        var toExecutOk = target.parse("AND(child.a=='test',LIKE(name,'the'))");
+        var toExecutOk = target.parse("AND(child.a=='test',CONTAINS(name,'the'))");
         var toExecutFalse = target.parse("AND(child.a=='test',name=='thasename')");
         var testClass = new SubObject("thename",new SimpleClass("test", "b","b", "e", "h"));
         var jsonMapper = new JsonMapper();
@@ -212,6 +210,45 @@ public class SimpleParserTest {
         assertTrue((Boolean)target.evaluate(toExecutOk3,jsonMapper.toJsonNode(testClass)));
         assertTrue((Boolean)target.evaluate(toExecutOk2,jsonMapper.toJsonNode(testClass)));
         assertTrue((Boolean)target.evaluate(toExecutOk1,jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+    }
+
+    @Test
+    void arrayCount() {
+        var target = new SimpleParser();
+        var toExecutOkRecord1 = target.parse("COUNT(child)==3");
+        var toExecutFalse = target.parse("COUNT(child)==4");
+        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b","b", "e", "h"),
+                new SimpleClass("test", "b","b", "e", "h"),new SimpleClass("z", "b","b", "e", "h")));
+        var jsonMapper = new JsonMapper();
+
+        assertTrue((Boolean)target.evaluate(toExecutOkRecord1,jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+    }
+
+    @Test
+    void arrayFilter() {
+        var target = new SimpleParser();
+        var toExecutOkRecord1 = target.parse("COUNT(FILTER(child,it.a=='z'))==1");
+        var toExecutFalse = target.parse("COUNT(FILTER(child,it.a=='b'))==1");
+        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b","b", "e", "h"),
+                new SimpleClass("test", "b","b", "e", "h"),new SimpleClass("z", "b","b", "e", "h")));
+        var jsonMapper = new JsonMapper();
+
+        assertTrue((Boolean)target.evaluate(toExecutOkRecord1,jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+    }
+
+    @Test
+    void objectFilter() {
+        var target = new SimpleParser();
+        var toExecutOkRecord1 = target.parse("COUNT(FILTER(child,COUNT(FILTER(it,AND(key=='a',value=='x')))>0))==1");
+        var toExecutFalse = target.parse("COUNT(FILTER(child,COUNT(FILTER(it,AND(key=='b',value=='b')))>0))==1");
+        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b","b", "e", "h"),
+                new SimpleClass("test", "b","b", "e", "h"),new SimpleClass("z", "b","b", "e", "h")));
+        var jsonMapper = new JsonMapper();
+
+        assertTrue((Boolean)target.evaluate(toExecutOkRecord1,jsonMapper.toJsonNode(testClass)));
         assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
     }
 }

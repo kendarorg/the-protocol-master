@@ -12,6 +12,7 @@ import org.kendar.storage.StorageFile;
 import org.kendar.storage.StorageFileIndex;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +32,13 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private final Map<String, Long> counters = new HashMap<>();
     private final StorageRepository repository;
     private final JsonMapper mapper;
+    private final SimpleParser simpleParser;
     private boolean active;
 
-    public GlobalReportPlugin(StorageRepository repository, JsonMapper mapper) {
+    public GlobalReportPlugin(StorageRepository repository, JsonMapper mapper, SimpleParser simpleParser) {
         this.repository = repository;
         this.mapper = mapper;
+        this.simpleParser = simpleParser;
     }
 
     public static String padLeftZeros(String inputString, int length) {
@@ -83,7 +86,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
 
     @Override
     public BasePluginApiHandler getApiHandler() {
-        return new GlobalReportPluginApiHandler(this, repository);
+        return new GlobalReportPluginApiHandler(this, repository,simpleParser);
     }
 
     @Override

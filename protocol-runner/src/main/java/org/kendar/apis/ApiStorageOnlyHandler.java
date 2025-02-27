@@ -22,6 +22,8 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
+import org.kendar.utils.parser.Token;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,12 +38,14 @@ public class ApiStorageOnlyHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalSettings settings;
     private final StorageRepository storage;
+    private final SimpleParser simpleParser;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
-    public ApiStorageOnlyHandler(GlobalSettings settings, StorageRepository storage) {
+    public ApiStorageOnlyHandler(GlobalSettings settings, StorageRepository storage, SimpleParser simpleParser) {
         this.settings = settings;
         this.storage = storage;
+        this.simpleParser = simpleParser;
     }
 
 
@@ -135,15 +139,19 @@ public class ApiStorageOnlyHandler implements FilteringClass {
     }
 
     @HttpMethodFilter(
-            pathAddress = "/api/global/storage/items",
-            method = "GET", id = "GET /api/global/storage/items")
+            pathAddress = "/api/global/storage/index",
+            method = "GET", id = "GET /api/global/storage/index")
     @TpmDoc(
-            description = "List all data",
-            query = @QueryString(
+            description = "List all recorded indexes<br>Uses <a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> query language",
+            query = {@QueryString(
                     key = "maxLength",
                     description = "Max length of tags. Default 100, -1 means no trim",
                     example = "100",
                     type = "integer"),
+                    @QueryString(
+                            key = "tpmql",
+                            description = "<a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> selection query",
+                            example = "")},
             responses = {
                     @TpmResponse(
                             body = CompactLineApi[].class
@@ -152,9 +160,13 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean getItems(Request reqp, Response resp) {
+    public boolean getIndexs(Request reqp, Response resp) {
 
-
+        var tpmqlstring = reqp.getQuery("tpmql");
+        Token tpmql = null;
+        if (tpmqlstring != null && !tpmqlstring.isEmpty()) {
+            tpmql = simpleParser.parse(tpmqlstring);
+        }
         try {
             var maxLengthStr = reqp.getQuery("maxLength");
             if (maxLengthStr == null) {
@@ -166,10 +178,17 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             for (var item : data) {
                 var api = mapper.deserialize(mapper.serialize(item), CompactLineApi.class);
                 if (api.getFullItemId() != null && !api.getFullItemId().isEmpty()) {
-                    var itemId = reqp.buildUrlNoQuery() + "/" + api.getFullItemId();
+                    var itemId = reqp.buildUrlNoQuery().replace("/index", "/item") + "/" + api.getFullItemId();
                     api.setFullItemAddress(itemId);
                 }
-                result.add(api);
+                if (tpmql != null) {
+                    var toEvaluate = mapper.toJsonNode(api);
+                    if ((boolean) simpleParser.evaluate(tpmql, toEvaluate)) {
+                        result.add(api);
+                    }
+                } else {
+                    result.add(api);
+                }
             }
             respondJson(resp, result);
         } catch (Exception ex) {
@@ -179,8 +198,66 @@ public class ApiStorageOnlyHandler implements FilteringClass {
     }
 
     @HttpMethodFilter(
-            pathAddress = "/api/global/storage/items/{protocol}/{index}",
-            method = "GET", id = "GET /api/global/storage/items/{protocol}/{index}")
+            pathAddress = "/api/global/storage/item",
+            method = "GET", id = "GET /api/global/storage/item")
+    @TpmDoc(
+            description = "List all recorded items<br>Uses <a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> query language",
+            query = {@QueryString(
+                    key = "tpmql",
+                    description = "<a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> selection query",
+                    example = "")},
+            responses = {
+                    @TpmResponse(
+                            body = StorageAndIndex[].class
+                    ), @TpmResponse(
+                    code = 500,
+                    body = Ko.class
+            )},
+            tags = {"base/storage"})
+    public boolean getItems(Request reqp, Response resp) {
+
+        var tpmqlstring = reqp.getQuery("tpmql");
+        Token tpmql = null;
+        if (tpmqlstring != null && !tpmqlstring.isEmpty()) {
+            tpmql = simpleParser.parse(tpmqlstring);
+        }
+        var result = new ArrayList<StorageAndIndex>();
+        try {
+            var sai = new StorageAndIndex();
+
+            for (var optIndex : storage.getAllIndexes(-1)) {
+                var fullText = storage.readById(optIndex.getProtocolInstanceId(), optIndex.getIndex());
+                if (fullText != null) {
+                    sai.setItem(fullText);
+                }
+                var api = mapper.deserialize(mapper.serialize(optIndex), CompactLineApi.class);
+                if (api.getFullItemId() != null && !api.getFullItemId().isEmpty()) {
+                    var theItemId = reqp.buildUrlNoQuery() + "/" + api.getFullItemId();
+                    api.setFullItemAddress(theItemId);
+                }
+                sai.setIndex(api);
+
+                if (tpmql != null) {
+                    var toEvaluate = mapper.toJsonNode(sai);
+                    if ((boolean) simpleParser.evaluate(tpmql, toEvaluate)) {
+                        result.add(sai);
+                    }
+                } else {
+                    result.add(sai);
+                }
+            }
+            respondJson(resp, result);
+
+            return true;
+        } catch (Exception ex) {
+            respondKo(resp, ex);
+        }
+        return true;
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/api/global/storage/item/{protocol}/{index}",
+            method = "GET", id = "GET /api/global/storage/item/{protocol}/{index}")
     @TpmDoc(
             description = "List single item",
             path = {
