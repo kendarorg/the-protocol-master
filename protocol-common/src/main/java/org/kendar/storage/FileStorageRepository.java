@@ -58,13 +58,13 @@ public class FileStorageRepository implements StorageRepository {
         this.targetDir = targetDir.toAbsolutePath().toString();
     }
 
-    protected FileStorageRepository(){
+    protected FileStorageRepository() {
 
     }
 
 
     @TpmConstructor
-    public FileStorageRepository(GlobalSettings settings,DiService diService) {
+    public FileStorageRepository(GlobalSettings settings, DiService diService) {
         this.diService = diService;
         var dataDir = settings.getDataDir();
         if (dataDir == null || dataDir.isEmpty()) {
@@ -435,7 +435,7 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void writeZip(byte[] byteArray) {
-        String settingsDir= null;
+        String settingsDir = null;
         var destDirString = Path.of(targetDir).toAbsolutePath().toString();
         File destDir = new File(destDirString);
         // create output directory if it doesn't exist
@@ -474,7 +474,7 @@ public class FileStorageRepository implements StorageRepository {
                         fos.write(buffer, 0, len);
                     }
                     fos.close();
-                    setFileContent(newFile.toPath(),new String(fos.toByteArray()));
+                    setFileContent(newFile.toPath(), new String(fos.toByteArray()));
                 }
                 zipEntry = zis.getNextEntry();
             }

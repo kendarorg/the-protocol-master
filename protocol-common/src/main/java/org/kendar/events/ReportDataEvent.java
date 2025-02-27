@@ -1,9 +1,9 @@
 package org.kendar.events;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class ReportDataEvent implements TpmEvent {
-
     private String instanceId;
     private String protocol;
     private String query;
@@ -11,10 +11,8 @@ public class ReportDataEvent implements TpmEvent {
     private long timestamp;
     private long duration;
     private Map<String, Object> tags;
-
     public ReportDataEvent() {
     }
-
     public ReportDataEvent(String instanceId,
                            String protocol,
                            String query,
@@ -29,6 +27,18 @@ public class ReportDataEvent implements TpmEvent {
         this.timestamp = timestamp;
         this.duration = duration;
         this.tags = tags;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ReportDataEvent that = (ReportDataEvent) o;
+        return connectionId == that.connectionId && timestamp == that.timestamp && duration == that.duration && Objects.equals(instanceId, that.instanceId) && Objects.equals(protocol, that.protocol) && Objects.equals(query, that.query) && Objects.equals(tags, that.tags);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(instanceId, protocol, query, connectionId, timestamp, duration, tags);
     }
 
     @Override

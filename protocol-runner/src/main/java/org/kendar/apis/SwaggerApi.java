@@ -74,9 +74,9 @@ public class SwaggerApi implements FilteringClass {
     public void loadSwagger(Request reqp, Response resp) throws JsonProcessingException {
 
         OpenAPI swagger = new OpenAPI();
-        if(reqp.getPort()>0) {
+        if (reqp.getPort() > 0) {
             swagger.addServersItem(new Server().url("http://" + reqp.getHost() + ":" + reqp.getPort()));
-        }else{
+        } else {
             swagger.addServersItem(new Server().url("http://" + reqp.getHost() + ":" + port));
         }
         swagger.setInfo(new Info()

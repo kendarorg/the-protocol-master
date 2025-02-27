@@ -12,9 +12,9 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 
 public class DnsRunnable implements Callable<List<String>> {
+    private static final Logger log = LoggerFactory.getLogger(DnsRunnable.class);
     private final String requestedServer;
     private final String requestedDomain;
-    private static final Logger log = LoggerFactory.getLogger(DnsRunnable.class);
 
     public DnsRunnable(String requestedServer, String requestedDomain) {
         this.requestedServer = requestedServer;

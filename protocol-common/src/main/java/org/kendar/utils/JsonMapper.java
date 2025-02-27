@@ -23,6 +23,10 @@ public class JsonMapper {
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
+    public ObjectMapper getMapper() {
+        return mapper;
+    }
+
     public String serializePretty(Object target) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(target);

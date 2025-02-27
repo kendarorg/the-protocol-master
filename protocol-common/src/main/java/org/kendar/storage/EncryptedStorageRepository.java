@@ -40,21 +40,21 @@ public class EncryptedStorageRepository extends FileStorageRepository {
             dataDir = Path.of("data",
                     Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
         } else {
-            if(dataDir.contains("&")){
+            if (dataDir.contains("&")) {
                 var spl = dataDir.split("&");
                 var pwd = spl[1].split("=");
                 this.password = pwd[1];
                 dataDir = spl[0].split("=")[1];
-            }else{
+            } else {
                 var spl = dataDir.split("=");
-                if(spl.length==2){
+                if (spl.length == 2) {
                     dataDir = spl[1];
                 }
             }
         }
         encryptor = getEncryptor();
         this.targetDir = Path.of(dataDir).toAbsolutePath().toString();
-        this.targetDir  = ensureDirectory(targetDir);
+        this.targetDir = ensureDirectory(targetDir);
     }
 
     private Encryptor getEncryptor() {
@@ -66,7 +66,7 @@ public class EncryptedStorageRepository extends FileStorageRepository {
     }
 
     protected String getEncriptionKey() {
-        if(this.password!=null && !this.password.isEmpty()) {
+        if (this.password != null && !this.password.isEmpty()) {
             return this.password;
         }
         return System.getenv("ENCRYPTION_KEY");
@@ -82,11 +82,11 @@ public class EncryptedStorageRepository extends FileStorageRepository {
             var prologue = "ENCRYPTED".getBytes(StandardCharsets.UTF_8);
             for (int i = 0; i < prologue.length; i++) {
                 var by = prologue[i];
-                if(result[i] != by) {
+                if (result[i] != by) {
                     return super.getFileContent(of);
                 }
             }
-            var toDecrypt = Arrays.copyOfRange(result,prologue.length,result.length);
+            var toDecrypt = Arrays.copyOfRange(result, prologue.length, result.length);
             return encryptor.decryptString(toDecrypt);
         } catch (CryptoException e) {
             throw new RuntimeException(e);
@@ -102,8 +102,8 @@ public class EncryptedStorageRepository extends FileStorageRepository {
             try {
                 var encryptedData = encryptor.encryptString(s);
                 var prologue = "ENCRYPTED".getBytes(StandardCharsets.UTF_8);
-                Files.write(of,prologue);
-                Files.write(of,encryptedData, StandardOpenOption.APPEND);
+                Files.write(of, prologue);
+                Files.write(of, encryptedData, StandardOpenOption.APPEND);
             } catch (CryptoException e) {
                 throw new RuntimeException(e);
             }

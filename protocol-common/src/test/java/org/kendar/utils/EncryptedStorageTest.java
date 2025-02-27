@@ -16,28 +16,28 @@ public class EncryptedStorageTest {
     @Test
     void testEncryptedStorage() throws NoSuchFieldException, IllegalAccessException, IOException {
 
-        var repopath = Path.of("target","EncryptedStorageTest","testEncryptedStorage");
-        var resultpath = Path.of("target","EncryptedStorageTest","testEncryptedStorage","instance","plugin","file.json");
-        var target = new EncryptedStorageRepository(repopath){
+        var repopath = Path.of("target", "EncryptedStorageTest", "testEncryptedStorage");
+        var resultpath = Path.of("target", "EncryptedStorageTest", "testEncryptedStorage", "instance", "plugin", "file.json");
+        var target = new EncryptedStorageRepository(repopath) {
             @Override
             protected String getEncriptionKey() {
                 return "testEncryptedStorage";
             }
         };
-        var index = new StorageFileIndex("instance","plugin","file");
-        var sf = new StorageFile(index,"test" );
+        var index = new StorageFileIndex("instance", "plugin", "file");
+        var sf = new StorageFile(index, "test");
         target.writePluginFile(sf);
         System.out.println(sf.toString());
         var written = Files.readAllBytes(resultpath);
         var prologue = "ENCRYPTED".getBytes(StandardCharsets.UTF_8);
         for (int i = 0; i < prologue.length; i++) {
             var by = prologue[i];
-            if(written[i] != by) {
+            if (written[i] != by) {
                 throw new RuntimeException("Wrong prologue");
             }
         }
 
         var decrypt = target.readPluginFile(index);
-        assertEquals("test",decrypt.getContent());
+        assertEquals("test", decrypt.getContent());
     }
 }
