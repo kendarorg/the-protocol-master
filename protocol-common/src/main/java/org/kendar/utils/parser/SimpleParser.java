@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @TpmService
 public class SimpleParser {
     private static final JsonMapper mapper = new JsonMapper();
-    private static final Set<String> binaryOperator = Set.of("=", "<", ">",  "+", "-", "*", "%", "/", "!");
+    private static final Set<String> binaryOperator = Set.of("=", "<", ">", "+", "-", "*", "%", "/", "!");
     private static final Set<FunctionDefinition> functionDefinitions = Set.of(
             new FunctionDefinition("CONCAT", -1),
             new FunctionDefinition("OR", -1),
@@ -61,7 +61,7 @@ public class SimpleParser {
                     } else {
                         currentString += character;
                         inString = false;
-                        stack.peekLast().children.add(new Token(currentString.substring(1,currentString.length()-1), TokenType.STRING));
+                        stack.peekLast().children.add(new Token(currentString.substring(1, currentString.length() - 1), TokenType.STRING));
                         currentString = "";
                     }
                 } else {
@@ -210,10 +210,10 @@ public class SimpleParser {
         char[] charArray = input.toCharArray();
         var currentString = "";
         var prevSpecial = false;
-        var prevChar=' ';
+        var prevChar = ' ';
         for (int i = 0; i < charArray.length; i++) {
             var character = charArray[i];
-            if (isBinaryOperator(character,prevChar)) {
+            if (isBinaryOperator(character, prevChar)) {
                 if (prevSpecial) {
                     currentString += character;
                 } else {
@@ -228,7 +228,7 @@ public class SimpleParser {
             } else {
                 currentString += character;
             }
-            prevChar=character;
+            prevChar = character;
         }
         if (!currentString.isEmpty()) result.add(new Token(currentString,
                 prevSpecial ? TokenType.OPERATOR : TokenType.VARIABLE));
@@ -238,7 +238,7 @@ public class SimpleParser {
 
 
     private boolean isBinaryOperator(char character, char prevChar) {
-        if(prevChar=='[' && character=='*') return false;
+        if (prevChar == '[' && character == '*') return false;
         return binaryOperator.contains(String.valueOf(character));
     }
 
@@ -260,26 +260,26 @@ public class SimpleParser {
     public Object evaluate(Token tokenMap, JsonNode testClass) {
         for (int i = 0; i < tokenMap.children.size(); i++) {
             var child = tokenMap.children.get(i);
-            if(tokenMap.children.size()>(i+2)) {
-                if(TokenType.OPERATOR==tokenMap.children.get(i + 1).type){
+            if (tokenMap.children.size() > (i + 2)) {
+                if (TokenType.OPERATOR == tokenMap.children.get(i + 1).type) {
                     var operator = tokenMap.children.get(i + 1).value;
                     return execBinaryOperation(tokenMap.children.get(i), operator, tokenMap.children.get(i + 2), testClass);
                 }
             }
             if (child.type == TokenType.FUNCTION) {
-                return execFunction(child,testClass);
+                return execFunction(child, testClass);
             } else if (child.type == TokenType.BLOCK) {
                 return evaluate(child, testClass);
-            }else if (child.type == TokenType.VARIABLE) {
+            } else if (child.type == TokenType.VARIABLE) {
                 return convertToValue(child, testClass);
-            }else { //binary operator
-                if(tokenMap.children.size()>(i+2)) {
+            } else { //binary operator
+                if (tokenMap.children.size() > (i + 2)) {
                     var operator = tokenMap.children.get(i + 1).value;
                     return execBinaryOperation(tokenMap.children.get(i), operator, tokenMap.children.get(i + 2), testClass);
-                }else if (child.type == TokenType.STRING) {
+                } else if (child.type == TokenType.STRING) {
                     return child.value;
-                }else if (child.type == TokenType.NUMBER) {
-                    return convertToValue(child,null);
+                } else if (child.type == TokenType.NUMBER) {
+                    return convertToValue(child, null);
                 }
             }
         }
@@ -349,9 +349,9 @@ public class SimpleParser {
         } else if (token.type == TokenType.NUMBER) {
             return new BigDecimal(token.value);
         } else if (token.type == TokenType.FUNCTION) {
-            return execFunction(token,testClass);
-        }else if (token.type == TokenType.BLOCK) {
-            return evaluate(token,testClass);
+            return execFunction(token, testClass);
+        } else if (token.type == TokenType.BLOCK) {
+            return evaluate(token, testClass);
         } else if (token.type == TokenType.VARIABLE) {
             return convertToValue(token.value, token.value, testClass);
         }
@@ -372,7 +372,7 @@ public class SimpleParser {
             return null;
         }
         if (remainder == null) {
-            if(obj.isArray()||obj.isObject())return obj;
+            if (obj.isArray() || obj.isObject()) return obj;
             if (obj.isBigInteger() || obj.isLong() || obj.isInt() || obj.isShort())
                 return BigDecimal.valueOf(obj.numberValue().longValue());
             if (obj.isFloat()) return BigDecimal.valueOf(obj.floatValue());
@@ -381,16 +381,14 @@ public class SimpleParser {
             if (obj.isTextual()) return obj.textValue();
             if (obj.isBoolean()) return obj.booleanValue();
             throw new RuntimeException("Unsupported type: " + obj.getNodeType() + " for variable " + originalVariable + " on " + variable);
-        }else{
+        } else {
             return convertToValue(originalVariable, remainder, obj);
         }
 
     }
 
 
-
-
-    private Object execFunction(Token token,JsonNode testClass) {
+    private Object execFunction(Token token, JsonNode testClass) {
 
         if (token.value.equalsIgnoreCase("true")) return Boolean.TRUE;
         if (token.value.equalsIgnoreCase("false")) return Boolean.FALSE;
@@ -399,73 +397,74 @@ public class SimpleParser {
         if (possibleFd == null) {
             throw new RuntimeException("Missing function " + token.value);
         }
-        if(token.value.equalsIgnoreCase("and")){
+        if (token.value.equalsIgnoreCase("and")) {
             var result = true;
-            for(var child:token.children){
+            for (var child : token.children) {
                 result = result && (boolean) convertToValue(child, testClass);
-                if(!result)break;
+                if (!result) break;
             }
             return result;
-        }else if(token.value.equalsIgnoreCase("or")){
+        } else if (token.value.equalsIgnoreCase("or")) {
             var result = false;
-            for(var child:token.children){
+            for (var child : token.children) {
                 result = result || (boolean) convertToValue(child, testClass);
             }
             return result;
-        }else if(token.value.equalsIgnoreCase("concat")){
+        } else if (token.value.equalsIgnoreCase("concat")) {
             var result = "";
-            for(var child:token.children){
-                result  += convertToValue(child, testClass).toString();
+            for (var child : token.children) {
+                result += convertToValue(child, testClass).toString();
             }
             return result;
-        }else if(token.value.equalsIgnoreCase("count")){
-            var value=convertToValue(token.children.get(0),testClass);
-            if(value==null){
+        } else if (token.value.equalsIgnoreCase("count")) {
+            var value = convertToValue(token.children.get(0), testClass);
+            if (value == null) {
                 return BigDecimal.valueOf(0);
             }
-            if(JsonNode.class.isAssignableFrom(value.getClass())){
-                var obOrArray = (JsonNode)value;
+            if (JsonNode.class.isAssignableFrom(value.getClass())) {
+                var obOrArray = (JsonNode) value;
 
-                if(!(obOrArray.isArray()||obOrArray.isObject()||obOrArray.isTextual())){
+                if (!(obOrArray.isArray() || obOrArray.isObject() || obOrArray.isTextual())) {
                     throw new RuntimeException("count parameter must be an object or an array");
                 }
                 return BigDecimal.valueOf(obOrArray.size());
-            }else if(value instanceof String){
+            } else if (value instanceof String) {
                 return BigDecimal.valueOf(((String) value).length());
             }
             throw new RuntimeException("Unsupported type for count: " + value.getClass());
 
-        }else if(token.value.equalsIgnoreCase("filter")){
-            var value=convertToValue(token.children.get(0),testClass);
-            var function=token.children.get(1);
-            if(JsonNode.class.isAssignableFrom(value.getClass())){
+        } else if (token.value.equalsIgnoreCase("filter")) {
+            var value = convertToValue(token.children.get(0), testClass);
+            var function = token.children.get(1);
+            if (JsonNode.class.isAssignableFrom(value.getClass())) {
 
-                var obOrArray = (JsonNode)value;
+                var obOrArray = (JsonNode) value;
 
-                if(!(obOrArray.isArray()||obOrArray.isObject()||obOrArray.isTextual())){
+                if (!(obOrArray.isArray() || obOrArray.isObject() || obOrArray.isTextual())) {
                     throw new RuntimeException("count parameter must be an object or an array");
                 }
-                if(obOrArray.isArray()){
+                if (obOrArray.isArray()) {
                     ArrayNode result = mapper.getMapper().createArrayNode();
 
-                    for(var item:((ArrayNode)obOrArray)){
+                    for (var item : ((ArrayNode) obOrArray)) {
                         var objectNode = mapper.getMapper().createObjectNode();
-                        objectNode.set("it",item);
-                        if((boolean) convertToValue(function,(JsonNode) objectNode)){
+                        objectNode.set("it", item);
+                        if ((boolean) convertToValue(function, (JsonNode) objectNode)) {
                             result.add((JsonNode) item);
                         }
                     }
                     return result;
-                }else if(obOrArray.isObject()){
+                } else if (obOrArray.isObject()) {
                     ArrayNode result = mapper.getMapper().createArrayNode();
                     ObjectNode src = (ObjectNode) obOrArray;
                     var iterator = src.fields();
-                    while(iterator.hasNext()){
-                        var item = iterator.next();ObjectNode partialSubNode = mapper.getMapper().createObjectNode();
+                    while (iterator.hasNext()) {
+                        var item = iterator.next();
+                        ObjectNode partialSubNode = mapper.getMapper().createObjectNode();
                         var textNodeKey = mapper.toJsonNode(item.getKey());
                         partialSubNode.set("value", (JsonNode) item.getValue());
-                        partialSubNode.set("key",textNodeKey);
-                        if((boolean) convertToValue(function,(JsonNode) partialSubNode)){
+                        partialSubNode.set("key", textNodeKey);
+                        if ((boolean) convertToValue(function, (JsonNode) partialSubNode)) {
                             result.add((JsonNode) partialSubNode);
                         }
                     }
@@ -476,18 +475,18 @@ public class SimpleParser {
             }
             throw new RuntimeException("Unsupported type for filter: " + value.getClass());
 
-        }else if(token.value.equalsIgnoreCase("contains")){
+        } else if (token.value.equalsIgnoreCase("contains")) {
             var where = convertToValue(token.children.get(0), testClass).toString();
             var what = convertToValue(token.children.get(1), testClass).toString();
             return where.contains(what);
-        }else if(token.value.equalsIgnoreCase("isnull")){
-            return convertToValue(token.children.get(0), testClass)==null;
-        }else if(token.value.equalsIgnoreCase("null")){
+        } else if (token.value.equalsIgnoreCase("isnull")) {
+            return convertToValue(token.children.get(0), testClass) == null;
+        } else if (token.value.equalsIgnoreCase("null")) {
             return null;
-        }else if(token.value.equalsIgnoreCase("isnotnull")){
-            return convertToValue(token.children.get(0), testClass)!=null;
-        }else if(token.value.equalsIgnoreCase("not")){
-            return !(boolean) convertToValue(token.children.get(0),testClass);
+        } else if (token.value.equalsIgnoreCase("isnotnull")) {
+            return convertToValue(token.children.get(0), testClass) != null;
+        } else if (token.value.equalsIgnoreCase("not")) {
+            return !(boolean) convertToValue(token.children.get(0), testClass);
         }
         return null;
     }

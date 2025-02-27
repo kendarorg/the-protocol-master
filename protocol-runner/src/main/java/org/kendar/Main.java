@@ -88,8 +88,8 @@ public class Main {
 
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
-        for(var plugin : pluginManager.getPlugins()){
-            for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class,plugin.getPluginId())) {
+        for (var plugin : pluginManager.getPlugins()) {
+            for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class, plugin.getPluginId())) {
                 diService.bind(ec);
             }
         }

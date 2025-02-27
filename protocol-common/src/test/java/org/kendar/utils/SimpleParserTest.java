@@ -17,7 +17,7 @@ public class SimpleParserTest {
                 "Token{type=VARIABLE, value='abc'}, " +
                 "Token{type=OPERATOR, value='='}, " +
                 "Token{type=STRING, value='\\'test'}" +
-                "]}",result.toString());
+                "]}", result.toString());
     }
 
     @Test
@@ -28,7 +28,7 @@ public class SimpleParserTest {
                 "Token{type=VARIABLE, value='abc'}, " +
                 "Token{type=OPERATOR, value='='}, " +
                 "Token{type=NUMBER, value='22'}" +
-                "]}",result.toString());
+                "]}", result.toString());
     }
 
     @Test
@@ -39,9 +39,8 @@ public class SimpleParserTest {
                 "Token{type=VARIABLE, value='abc'}, " +
                 "Token{type=OPERATOR, value='='}, " +
                 "Token{type=NUMBER, value='22.77'}" +
-                "]}",result.toString());
+                "]}", result.toString());
     }
-
 
 
     @Test
@@ -52,7 +51,7 @@ public class SimpleParserTest {
                 "Token{type=VARIABLE, value='abc'}, " +
                 "Token{type=OPERATOR, value='='}, " +
                 "Token{type=NUMBER, value='0.77'}" +
-                "]}",result.toString());
+                "]}", result.toString());
     }
 
     @Test
@@ -80,19 +79,19 @@ public class SimpleParserTest {
     @Test
     void missingCloseBracket() {
         var target = new SimpleParser();
-        assertThrows(RuntimeException.class,()->target.parse("a = A OR ( b+c 'd' e (f=d) c"),"Missing closing bracket");
+        assertThrows(RuntimeException.class, () -> target.parse("a = A OR ( b+c 'd' e (f=d) c"), "Missing closing bracket");
     }
 
     @Test
     void missingOpenBracket() {
         var target = new SimpleParser();
-        assertThrows(RuntimeException.class,()->target.parse("a = A OR ) c"),"Missing closing bracket");
+        assertThrows(RuntimeException.class, () -> target.parse("a = A OR ) c"), "Missing closing bracket");
     }
 
     @Test
     void missingString() {
         var target = new SimpleParser();
-        assertThrows(RuntimeException.class,()->target.parse("a = A OR ( b+c 'd e (f=d) c"),"Wrong string separator");
+        assertThrows(RuntimeException.class, () -> target.parse("a = A OR ( b+c 'd e (f=d) c"), "Wrong string separator");
     }
 
     @Test
@@ -123,7 +122,6 @@ public class SimpleParserTest {
     }
 
 
-
 //    @Test
 //    void evaluateComplex() {
 //        var target = new SimpleParser();
@@ -138,11 +136,11 @@ public class SimpleParserTest {
         var target = new SimpleParser();
         var toExecutOk = target.parse("a=='test'");
         var toExecutFalse = target.parse("a=='toast'");
-        var testClass = new SimpleClass("test", "b","b", "e", "h");
+        var testClass = new SimpleClass("test", "b", "b", "e", "h");
         var jsonMapper = new JsonMapper();
 
-        assertTrue((Boolean)target.evaluate(toExecutOk,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 
     @Test
@@ -150,11 +148,11 @@ public class SimpleParserTest {
         var target = new SimpleParser();
         var toExecutOk = target.parse("child.a=='test'");
         var toExecutFalse = target.parse("child.a=='toast'");
-        var testClass = new SubObject("name",new SimpleClass("test", "b","b", "e", "h"));
+        var testClass = new SubObject("name", new SimpleClass("test", "b", "b", "e", "h"));
         var jsonMapper = new JsonMapper();
 
-        assertTrue((Boolean)target.evaluate(toExecutOk,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 
 
@@ -163,11 +161,11 @@ public class SimpleParserTest {
         var target = new SimpleParser();
         var toExecutOk = target.parse("OR(child.a=='test',name=='thenadasdme')");
         var toExecutFalse = target.parse("AND(child.a=='test',name=='thasename')");
-        var testClass = new SubObject("thename",new SimpleClass("test", "b","b", "e", "h"));
+        var testClass = new SubObject("thename", new SimpleClass("test", "b", "b", "e", "h"));
         var jsonMapper = new JsonMapper();
 
-        assertTrue((Boolean)target.evaluate(toExecutOk,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 
     @Test
@@ -175,11 +173,11 @@ public class SimpleParserTest {
         var target = new SimpleParser();
         var toExecutOk = target.parse("AND(child.a=='test',name==CONCAT('the','name'))");
         var toExecutFalse = target.parse("AND(child.a=='test',name=='thasename')");
-        var testClass = new SubObject("thename",new SimpleClass("test", "b","b", "e", "h"));
+        var testClass = new SubObject("thename", new SimpleClass("test", "b", "b", "e", "h"));
         var jsonMapper = new JsonMapper();
 
-        assertTrue((Boolean)target.evaluate(toExecutOk,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 
     @Test
@@ -187,11 +185,11 @@ public class SimpleParserTest {
         var target = new SimpleParser();
         var toExecutOk = target.parse("AND(child.a=='test',CONTAINS(name,'the'))");
         var toExecutFalse = target.parse("AND(child.a=='test',name=='thasename')");
-        var testClass = new SubObject("thename",new SimpleClass("test", "b","b", "e", "h"));
+        var testClass = new SubObject("thename", new SimpleClass("test", "b", "b", "e", "h"));
         var jsonMapper = new JsonMapper();
 
-        assertTrue((Boolean)target.evaluate(toExecutOk,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 
     @Test
@@ -202,15 +200,15 @@ public class SimpleParserTest {
         var toExecutOk3 = target.parse("AND(doubleValue==(1.2+1),booleanValue)");
         var toExecutOk4 = target.parse("AND(doubleValue==(1.2+1),booleanValue!=FALSE)");
         var toExecutFalse = target.parse("AND(child.a=='test',name=='thasename')");
-        var testClass = new NumberClass(1,2.2,3.3f,new BigDecimal("4.4"),true);
+        var testClass = new NumberClass(1, 2.2, 3.3f, new BigDecimal("4.4"), true);
         var jsonMapper = new JsonMapper();
 
 
-        assertTrue((Boolean)target.evaluate(toExecutOk4,jsonMapper.toJsonNode(testClass)));
-        assertTrue((Boolean)target.evaluate(toExecutOk3,jsonMapper.toJsonNode(testClass)));
-        assertTrue((Boolean)target.evaluate(toExecutOk2,jsonMapper.toJsonNode(testClass)));
-        assertTrue((Boolean)target.evaluate(toExecutOk1,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk4, jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk3, jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk2, jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOk1, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 
     @Test
@@ -218,12 +216,12 @@ public class SimpleParserTest {
         var target = new SimpleParser();
         var toExecutOkRecord1 = target.parse("COUNT(child)==3");
         var toExecutFalse = target.parse("COUNT(child)==4");
-        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b","b", "e", "h"),
-                new SimpleClass("test", "b","b", "e", "h"),new SimpleClass("z", "b","b", "e", "h")));
+        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b", "b", "e", "h"),
+                new SimpleClass("test", "b", "b", "e", "h"), new SimpleClass("z", "b", "b", "e", "h")));
         var jsonMapper = new JsonMapper();
 
-        assertTrue((Boolean)target.evaluate(toExecutOkRecord1,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOkRecord1, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 
     @Test
@@ -231,12 +229,12 @@ public class SimpleParserTest {
         var target = new SimpleParser();
         var toExecutOkRecord1 = target.parse("COUNT(FILTER(child,it.a=='z'))==1");
         var toExecutFalse = target.parse("COUNT(FILTER(child,it.a=='b'))==1");
-        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b","b", "e", "h"),
-                new SimpleClass("test", "b","b", "e", "h"),new SimpleClass("z", "b","b", "e", "h")));
+        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b", "b", "e", "h"),
+                new SimpleClass("test", "b", "b", "e", "h"), new SimpleClass("z", "b", "b", "e", "h")));
         var jsonMapper = new JsonMapper();
 
-        assertTrue((Boolean)target.evaluate(toExecutOkRecord1,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOkRecord1, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 
     @Test
@@ -244,11 +242,11 @@ public class SimpleParserTest {
         var target = new SimpleParser();
         var toExecutOkRecord1 = target.parse("COUNT(FILTER(child,COUNT(FILTER(it,AND(key=='a',value=='x')))>0))==1");
         var toExecutFalse = target.parse("COUNT(FILTER(child,COUNT(FILTER(it,AND(key=='b',value=='b')))>0))==1");
-        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b","b", "e", "h"),
-                new SimpleClass("test", "b","b", "e", "h"),new SimpleClass("z", "b","b", "e", "h")));
+        var testClass = new SubObjectArray("thename", List.of(new SimpleClass("x", "b", "b", "e", "h"),
+                new SimpleClass("test", "b", "b", "e", "h"), new SimpleClass("z", "b", "b", "e", "h")));
         var jsonMapper = new JsonMapper();
 
-        assertTrue((Boolean)target.evaluate(toExecutOkRecord1,jsonMapper.toJsonNode(testClass)));
-        assertFalse((Boolean)target.evaluate(toExecutFalse,jsonMapper.toJsonNode(testClass)));
+        assertTrue((Boolean) target.evaluate(toExecutOkRecord1, jsonMapper.toJsonNode(testClass)));
+        assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
 }

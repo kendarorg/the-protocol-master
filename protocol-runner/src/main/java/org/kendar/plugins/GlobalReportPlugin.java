@@ -34,6 +34,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private final JsonMapper mapper;
     private final SimpleParser simpleParser;
     private boolean active;
+    private AtomicInteger counter = new AtomicInteger(0);
 
     public GlobalReportPlugin(StorageRepository repository, JsonMapper mapper, SimpleParser simpleParser) {
         this.repository = repository;
@@ -61,13 +62,11 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
         return this;
     }
 
-    private AtomicInteger counter = new AtomicInteger(0);
-
     private void handleReport(ReportDataEvent m) {
         if (isActive()) {
             var index = counter.incrementAndGet();
-            this.repository.writePluginFile(new StorageFile(new StorageFileIndex("global",getId(),
-                    padLeftZeros(index+"",10)+".report"), mapper.serialize(m)));
+            this.repository.writePluginFile(new StorageFile(new StorageFileIndex("global", getId(),
+                    padLeftZeros(index + "", 10) + ".report"), mapper.serialize(m)));
             log.info(m.toString());
             events.add(m);
             var tagId = m.getProtocol() + "." + m.getInstanceId();
@@ -86,7 +85,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
 
     @Override
     public BasePluginApiHandler getApiHandler() {
-        return new GlobalReportPluginApiHandler(this, repository,simpleParser);
+        return new GlobalReportPluginApiHandler(this, repository, simpleParser);
     }
 
     @Override

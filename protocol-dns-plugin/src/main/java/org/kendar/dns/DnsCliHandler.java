@@ -13,7 +13,7 @@ import java.util.List;
 
 @Extension
 @TpmService(tags = "dns")
-public class DnsCliHandler extends NetworkProtocolCommandLineHandler  implements ExtensionPoint {
+public class DnsCliHandler extends NetworkProtocolCommandLineHandler implements ExtensionPoint {
 
     @Override
     protected List<CommandOption> prepareCustomOptions(GlobalSettings globalSettings, ProtocolSettings genericSettings) {

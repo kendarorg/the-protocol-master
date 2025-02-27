@@ -48,25 +48,6 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         Sleeper.sleep(3000);
     }
 
-    @Test
-    void globalApiTest() throws Exception {
-
-        var httpclient = HttpClients.createDefault();
-        var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent.zip"));
-        var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
-        },"application/zip");
-        assertEquals("OK", okResult.getResult());
-        assertThrows(MalformedInputException.class,()->Files.readString(Path.of("target", "tests", "encrypted", "index.http-01.json")));
-        var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
-        assertTrue(zip.length > 100);
-        Files.write(Path.of("target", "downloaded.zip"), zip);
-        var expectedFiles = getPaths(data).stream().sorted().toList();
-        var testedFiles = getPaths(zip).stream().sorted().toList();
-        assertArrayEquals(expectedFiles.toArray(), testedFiles.toArray());
-
-    }
-
-
     protected static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
 
@@ -80,7 +61,25 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         return destFile;
     }
 
-    private List<String> getPaths(byte[] data){
+    @Test
+    void globalApiTest() throws Exception {
+
+        var httpclient = HttpClients.createDefault();
+        var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent.zip"));
+        var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
+        }, "application/zip");
+        assertEquals("OK", okResult.getResult());
+        assertThrows(MalformedInputException.class, () -> Files.readString(Path.of("target", "tests", "encrypted", "index.http-01.json")));
+        var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
+        assertTrue(zip.length > 100);
+        Files.write(Path.of("target", "downloaded.zip"), zip);
+        var expectedFiles = getPaths(data).stream().sorted().toList();
+        var testedFiles = getPaths(zip).stream().sorted().toList();
+        assertArrayEquals(expectedFiles.toArray(), testedFiles.toArray());
+
+    }
+
+    private List<String> getPaths(byte[] data) {
         try {
             File destDir = new File("test");
             byte[] buffer = new byte[1024];
@@ -118,7 +117,7 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
             zis.close();
             fis.close();
             return result;
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }

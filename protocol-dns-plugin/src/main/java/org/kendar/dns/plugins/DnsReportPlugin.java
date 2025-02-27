@@ -32,13 +32,13 @@ public class DnsReportPlugin extends ReportPlugin<PluginSettings> {
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),
                 getProtocol(),
-                phase==ProtocolPhase.PRE_CALL?"request":"response",
+                phase == ProtocolPhase.PRE_CALL ? "request" : "response",
                 connectionId,
                 pluginContext.getStart(),
-                phase==ProtocolPhase.PRE_CALL?0:duration,
+                phase == ProtocolPhase.PRE_CALL ? 0 : duration,
                 Map.of(
-                        "requestedDomain",requestedDomain,
-                        "ips",String.join(",",out)
+                        "requestedDomain", requestedDomain,
+                        "ips", String.join(",", out)
                 )
         ));
         return false;

@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 @Extension
 @TpmService(tags = "dns")
 public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoint {
-    private Logger log;
     private static final int UDP_SIZE = 512;
     private final Map<ProtocolPhase, List<PluginHandler>> pluginHandlers = new HashMap<>();
     private final DnsProtocolSettings settings;
@@ -40,10 +39,11 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private final Map<String, List<String>> cached = new ConcurrentHashMap<>();
     private final Pattern ipPattern =
             Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
+    private final ConcurrentHashMap<String, Pattern> patterns = new ConcurrentHashMap<>();
+    private Logger log;
     private boolean dnsRunning;
     private ServerSocket tcpSocket;
     private DatagramSocket udpSocket;
-    private final ConcurrentHashMap<String, Pattern> patterns = new ConcurrentHashMap<>();
 
     @TpmConstructor
     public DnsProtocol(GlobalSettings ini, DnsProtocolSettings settings,
@@ -137,13 +137,13 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         try {
             dnsRunning = true;
             var th = new Thread(() -> {
-                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection",  "")) {
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "")) {
                     runTcp();
                 }
             });
             th.start();
             th = new Thread(() -> {
-                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection",  "")) {
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "")) {
                     runUdp();
                 }
             });
@@ -176,7 +176,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         Message response = new Message(request.getHeader().getID());
         response.getHeader().setFlag(Flags.QR);
         //response.getHeader().setFlag(Flags.AA );
-        var pluginContext = new PluginContext("dns","request",System.currentTimeMillis(),null);
+        var pluginContext = new PluginContext("dns", "request", System.currentTimeMillis(), null);
 
         String requestedDomain = request.getQuestion().getName().toString(true);
 
@@ -185,10 +185,9 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
         log.debug("Requested domain " + requestedDomain);
 
-        if(handle(ProtocolPhase.PRE_CALL,pluginContext, requestedDomain, ips)){
+        if (handle(ProtocolPhase.PRE_CALL, pluginContext, requestedDomain, ips)) {
             return buildResponse(ips, requestedDomain, response, request);
         }
-
 
 
         var splitted = requestedDomain.split("\\.");
@@ -223,7 +222,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             ips.add("127.0.0.1");
         }
 
-        handle(ProtocolPhase.POST_CALL,pluginContext, requestedDomain, ips);
+        handle(ProtocolPhase.POST_CALL, pluginContext, requestedDomain, ips);
         return buildResponse(ips, requestedDomain, response, request);
     }
 
@@ -486,11 +485,11 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     }
 
 
-    private boolean handle(ProtocolPhase protocolPhase,PluginContext context, Object in, Object out) {
+    private boolean handle(ProtocolPhase protocolPhase, PluginContext context, Object in, Object out) {
         var handlers = pluginHandlers.get(protocolPhase);
         if (handlers != null) {
             for (var handler : handlers) {
-                if(handler.handle(context,protocolPhase,in,out)){
+                if (handler.handle(context, protocolPhase, in, out)) {
                     return true;
                 }
             }

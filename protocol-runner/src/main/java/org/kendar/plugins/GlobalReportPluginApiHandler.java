@@ -81,7 +81,6 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     }
 
 
-
     @Override
     public String getId() {
         return "global." + plugin.getId();
@@ -93,7 +92,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     @TpmDoc(
             description = "Handle the global report plugin data retrieval<br>Uses <a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> query language",
             query = {
-                    @QueryString(key = "tpmql", description = "<a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> selection query",example = "")
+                    @QueryString(key = "tpmql", description = "<a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> selection query", example = "")
             },
             responses = {
                     @TpmResponse(
@@ -112,10 +111,10 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             tpmql = simpleParser.parse(tpmqlstring);
         }
         var result = new ArrayList<ReportDataEvent>();
-        var allFiles = repository.listPluginFiles("global","report-plugin");
-        for(var file : allFiles) {
+        var allFiles = repository.listPluginFiles("global", "report-plugin");
+        for (var file : allFiles) {
             var text = repository.readPluginFile(file);
-            var data = mapper.deserialize(text.getContent(),ReportDataEvent.class);
+            var data = mapper.deserialize(text.getContent(), ReportDataEvent.class);
             if (tpmql != null) {
                 var toEvaluate = mapper.toJsonNode(text.getContent());
                 if ((boolean) simpleParser.evaluate(tpmql, toEvaluate)) {

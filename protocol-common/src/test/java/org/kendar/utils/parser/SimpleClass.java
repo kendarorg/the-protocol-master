@@ -1,13 +1,13 @@
 package org.kendar.utils.parser;
 
-public class SimpleClass{
+public class SimpleClass {
     private String a;
     private String b;
     private String d;
     private String h;
     private String c;
 
-    public SimpleClass(String a, String b,String c, String d, String h) {
+    public SimpleClass(String a, String b, String c, String d, String h) {
         this.a = a;
         this.b = b;
         this.c = c;

@@ -3,6 +3,11 @@ package org.kendar.utils.parser;
 import java.math.BigDecimal;
 
 public class NumberClass {
+    private int intValue;
+    private double doubleValue;
+    private float floatValue;
+    private BigDecimal bigDecimalValue;
+    private boolean booleanValue;
     public NumberClass(int intValue, double doubleValue, float floatValue, BigDecimal bigDecimalValue, boolean booleanValue) {
         this.intValue = intValue;
         this.doubleValue = doubleValue;
@@ -10,12 +15,6 @@ public class NumberClass {
         this.bigDecimalValue = bigDecimalValue;
         this.booleanValue = booleanValue;
     }
-
-    private int intValue;
-    private double doubleValue;
-    private float floatValue;
-    private BigDecimal bigDecimalValue;
-    private boolean booleanValue;
 
     public boolean isBooleanValue() {
         return booleanValue;
