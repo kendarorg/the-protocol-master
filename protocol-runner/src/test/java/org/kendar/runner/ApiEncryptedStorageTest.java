@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.kendar.Main;
 import org.kendar.plugins.apis.Ok;
-import org.kendar.utils.Sleeper;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -28,7 +27,6 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
     @AfterAll
     public static void cleanup() {
         Main.stop();
-        Sleeper.sleep(1000);
     }
 
     @BeforeAll
@@ -37,14 +35,12 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
             Main.stop();
         } catch (Exception e) {
         }
-        Sleeper.sleep(1000);
         var args = new String[]{
 
                 "-cfg", Path.of("src", "test", "resources", "apitestsencstorage.json").toString()
         };
         bs = new BasicTest();
         bs.startAndHandleUnexpectedErrors(args);
-        Sleeper.sleep(3000);
     }
 
     protected static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
