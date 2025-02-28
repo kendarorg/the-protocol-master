@@ -13,7 +13,7 @@ public class NullStorageRepository implements StorageRepository {
     private final AtomicLong counter = new AtomicLong(0);
 
     public NullStorageRepository() {
-        System.out.println("NullStorageRepository");
+
     }
 
     @Override
@@ -105,4 +105,6 @@ public class NullStorageRepository implements StorageRepository {
     public String getType() {
         return "storage";
     }
+
+
 }
