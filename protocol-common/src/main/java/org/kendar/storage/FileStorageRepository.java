@@ -418,11 +418,11 @@ public class FileStorageRepository implements StorageRepository {
         var baos = new ByteArrayOutputStream();
         var globalSettings = diService.getInstance(GlobalSettings.class);
         var globalSettingsFile = mapper.serialize(globalSettings);
-//        ZIPSETTINGS try {
-//            Files.writeString(Path.of(targetDir,"settings.json").toAbsolutePath(),globalSettingsFile);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            Files.writeString(Path.of(targetDir,"settings.json").toAbsolutePath(),globalSettingsFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         try (var zos = new ZipOutputStream(baos)) {
             for (var file : new File(Path.of(targetDir).toAbsolutePath().toString()).listFiles()) {
                 zipFile(file, file.getName(), zos);
@@ -435,7 +435,7 @@ public class FileStorageRepository implements StorageRepository {
 
     @Override
     public void writeZip(byte[] byteArray) {
-        String settingsDir = null;
+        String settingsPath = null;
         var destDirString = Path.of(targetDir).toAbsolutePath().toString();
         File destDir = new File(destDirString);
         // create output directory if it doesn't exist
@@ -451,10 +451,10 @@ public class FileStorageRepository implements StorageRepository {
                 throw new RuntimeException("Not a zip file!");
             }
             while (zipEntry != null) {
-                /*ZIPSETTINGS if(zipEntry.getName().equalsIgnoreCase("settings.json") &&
+                if(zipEntry.getName().equalsIgnoreCase("settings.json") &&
                         Path.of(targetDir).toAbsolutePath().compareTo(destDir.toPath().toAbsolutePath()) == 0) {
-                    settingsDir =Path.of(destDir.getAbsolutePath(),zipEntry.getName()).toString();
-                }*/
+                    settingsPath =Path.of(destDir.getAbsolutePath(),zipEntry.getName()).toString();
+                }
                 File newFile = newFile(destDir, zipEntry);
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {
@@ -482,7 +482,7 @@ public class FileStorageRepository implements StorageRepository {
             zis.closeEntry();
             zis.close();
             fis.close();
-            EventsQueue.send(new StorageReloadedEvent().withSettings(settingsDir));
+            EventsQueue.send(new StorageReloadedEvent().withSettings(settingsPath));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

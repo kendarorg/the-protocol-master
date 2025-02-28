@@ -14,6 +14,9 @@ import org.kendar.command.ProtocolCommandLineHandler;
 import org.kendar.command.ProtocolsRunner;
 import org.kendar.di.DiService;
 import org.kendar.di.TpmScopeType;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.StorageReloadedEvent;
+import org.kendar.events.TerminateEvent;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -38,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.function.Supplier;
 
 import static java.lang.System.exit;
 
@@ -49,16 +51,33 @@ public class Main {
     private static JarPluginManager pluginManager;
     private static HttpServer apiServer;
     private static DiService diService;
+    private static boolean terminateReceived=false;
+    private static Thread stopWhenQuitThread;
+    private static String changedSettings;
 
 
     public static void main(String[] args) throws Exception {
-
-        execute(args, Main::stopWhenQuitCommand);
+        var running = true;
+        var realArgs = args;
+        while (running) {
+            try {
+                execute(realArgs);
+                if (changedSettings != null && changedSettings.trim().length() > 0 && Files.exists(Path.of(changedSettings))) {
+                    realArgs = new String[]{"-cfg", changedSettings};
+                } else {
+                    running=false;
+                }
+            }catch (Exception e) {
+                System.err.println(e.getMessage());
+                exit(1);
+            }
+        }
         exit(0);
+
     }
 
 
-    public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public static void execute(String[] args) throws Exception {
         diService = new DiService();
         diService.loadPackage("org.kendar");
 
@@ -70,14 +89,8 @@ public class Main {
         parser.parseIgnoreMissing(args);
         diService.register(GlobalSettings.class, settings.get());
         diService.register(DiService.class, diService);
+        var unattended = parser.hasOption("unattended") || settings.get().isUnattended();
 
-        if (parser.hasOption("unattended") || settings.get().isUnattended()) {
-            stopWhenFalse = () -> {
-                Sleeper.sleep(500);
-                return true;
-            };
-        }
-        //var localStopWhenFalse = stopWhenFalse;
         var pluginsDir = settings.get().getPluginsDir();
         var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
         if (!pathOfPluginsDir.toFile().exists()) {
@@ -129,29 +142,7 @@ public class Main {
                 return;
             }
         }
-        execute(settings.get(), stopWhenFalse);
-//ZIPSETTINGS         var shouldRun = true;
-//        var storageReloaded = new ChangeableReference<StorageReloadedEvent>(null);
-//        Supplier<Boolean> newStopWhenFalse = ()->{
-//            if(storageReloaded.get()!=null && Files.exists(Path.of(storageReloaded.get().getSettings()))) return false;
-//            return localStopWhenFalse.get();
-//        };
-//        EventsQueue.register("main", value -> {
-//            storageReloaded.set(value);
-//
-//        }, StorageReloadedEvent.class);
-//        while(shouldRun) {
-//
-//            execute(settings.get(), newStopWhenFalse);
-//            if (storageReloaded.get() != null && Files.exists(Path.of(storageReloaded.get().getSettings()))) {
-//                stop();
-//                Sleeper.sleep(1000);
-//                ProtocolsRunner.loadConfigFile(settings,Path.of(storageReloaded.get().getSettings()).toString());
-//                storageReloaded.set(null);
-//            }else{
-//                shouldRun = false;
-//            }
-//        }
+        execute(settings.get(),unattended);
     }
 
     public static void stop() {
@@ -159,32 +150,32 @@ public class Main {
         for (var server : protocolServersCache.values()) {
             server.stop();
         }
+        protocolServersCache.clear();
         if (apiServer != null) {
             apiServer.stop(0);
         }
+        EventsQueue.getInstance().clean();
     }
 
-    private static Boolean stopWhenQuitCommand() {
+    private static void stopWhenQuitCommand() {
         var scanner = new Scanner(System.in);
         System.out.println("Press Q to quit");
         String line;
         line = scanner.nextLine();
         try {
-            if (line != null && line.trim().equalsIgnoreCase("q")) {
-                System.out.println("Exiting");
-                stop();
-                return false;
-            } else if (line != null) {
-                System.out.println("Command not recognized: " + line.trim());
-                return true;
-            } else {
-                return false;
+            while(true) {
+                if (line != null && line.trim().equalsIgnoreCase("q")) {
+                    System.out.println("Exiting");
+                    EventsQueue.send(new TerminateEvent());
+                    return;
+                } else if (line != null) {
+                    System.out.println("Command not recognized: " + line.trim());
+                }
             }
         } catch (Exception ex) {
             System.out.println("Exiting");
             System.err.println(ex);
-            stop();
-            return false;
+            EventsQueue.send(new TerminateEvent());
         }
     }
 
@@ -194,8 +185,24 @@ public class Main {
     }
 
 
-    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse) throws Exception {
+    private static void execute(GlobalSettings ini,boolean unattended) throws Exception {
         if (ini == null) return;
+
+        EventsQueue.register("main",(e)->{
+            terminateReceived = true;
+            stop();
+        },TerminateEvent.class);
+        EventsQueue.register("main",(e)->{
+            terminateReceived = true;
+            if(e.getSettings()!=null && Files.exists(Path.of(e.getSettings()))){
+                changedSettings = e.getSettings();
+            }
+            stop();
+        }, StorageReloadedEvent.class);
+
+        if(unattended){
+            ini.setUnattended(true);
+        }
 
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
 
@@ -304,7 +311,12 @@ public class Main {
             }
         }).start();
 
-        while (stopWhenFalse.get()) {
+        if(!unattended && stopWhenQuitThread ==null) {
+            stopWhenQuitThread = new Thread(Main::stopWhenQuitCommand);
+            stopWhenQuitThread.start();
+        }
+
+        while (!terminateReceived) {
             Sleeper.sleep(100);
         }
     }

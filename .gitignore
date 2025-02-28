@@ -34,3 +34,5 @@ target
 /data/*.*
 /protocol-runner/data/*.*
 /data/
+/protocol-runner/test/
+/protocol-runner/plugins/

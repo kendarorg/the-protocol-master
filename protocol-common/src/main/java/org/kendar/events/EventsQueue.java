@@ -132,6 +132,9 @@ public class EventsQueue {
     public List<TpmEvent> clean() {
         var result = new ArrayList<>(items);
         items.clear();
+        eventHandlers.clear();
+        commandHandlers.clear();
+        size.set(0L);
         return result;
     }
 

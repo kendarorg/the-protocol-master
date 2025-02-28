@@ -11,6 +11,8 @@ import org.kendar.apis.dtos.PluginIndex;
 import org.kendar.apis.dtos.ProtocolIndex;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.TerminateEvent;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
@@ -23,7 +25,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import static java.lang.System.exit;
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
@@ -140,7 +141,7 @@ public class ApiHandler implements FilteringClass {
             for (var plugin : instances) {
                 plugin.getServer().stop();
             }
-            exit(0);
+            EventsQueue.send(new TerminateEvent());
         }
     }
 
