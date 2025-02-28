@@ -64,7 +64,7 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
     void globalApiTest() throws Exception {
 
         var httpclient = HttpClients.createDefault();
-        var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent.zip"));
+        var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent_enc.zip"));
         var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
         }, "application/zip");
         assertEquals("OK", okResult.getResult());
