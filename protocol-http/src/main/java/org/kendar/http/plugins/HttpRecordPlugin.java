@@ -2,6 +2,8 @@ package org.kendar.http.plugins;
 
 import org.kendar.apis.base.Request;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.http.plugins.commons.MatchingRecRep;
+import org.kendar.http.plugins.commons.SiteMatcherUtils;
 import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
 import org.kendar.plugins.BasicRecordPlugin;
 import org.kendar.plugins.base.ProtocolPhase;

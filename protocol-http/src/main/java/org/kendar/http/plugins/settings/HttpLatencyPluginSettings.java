@@ -1,14 +1,11 @@
 package org.kendar.http.plugins.settings;
 
-import org.kendar.plugins.settings.BasicPercentPluginSettings;
+import org.kendar.plugins.settings.LatencyPluginSettings;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HttpLatencyPluginSettings extends BasicPercentPluginSettings {
-    private int minMs = 0;
-    private int maxMs = 0;
-
+public class HttpLatencyPluginSettings extends LatencyPluginSettings {
 
     private List<String> target = new ArrayList<>();
 
@@ -18,21 +15,5 @@ public class HttpLatencyPluginSettings extends BasicPercentPluginSettings {
 
     public void setTarget(List<String> target) {
         this.target = target;
-    }
-
-    public int getMinMs() {
-        return minMs;
-    }
-
-    public void setMinMs(int minMs) {
-        this.minMs = minMs;
-    }
-
-    public int getMaxMs() {
-        return maxMs;
-    }
-
-    public void setMaxMs(int maxMs) {
-        this.maxMs = maxMs;
     }
 }

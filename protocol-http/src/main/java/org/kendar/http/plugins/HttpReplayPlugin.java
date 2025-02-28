@@ -7,6 +7,8 @@ import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.http.plugins.commons.MatchingRecRep;
+import org.kendar.http.plugins.commons.SiteMatcherUtils;
 import org.kendar.http.plugins.settings.HttpReplayPluginSettings;
 import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.base.ProtocolPhase;

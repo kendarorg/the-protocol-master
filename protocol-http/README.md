@@ -16,6 +16,13 @@ on localhost the sites to build must be added on the "ssl/hosts"
 * https: https port for interception of calls (mostly with rewrite-plugin)
 * proxy: proxy port (used to intercept -everything-)
 
+Uses the following phases
+
+* CONNECT 
+* PRE_CALL (Before calling the real server)
+* POST_CALL
+* FINALIZE (After the response had been sent)
+
 ### SSL
 
 * der: root certificate path

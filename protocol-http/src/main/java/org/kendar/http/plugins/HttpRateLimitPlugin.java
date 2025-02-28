@@ -5,6 +5,8 @@ import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
+import org.kendar.http.plugins.commons.MatchingRecRep;
+import org.kendar.http.plugins.commons.SiteMatcherUtils;
 import org.kendar.http.plugins.settings.HttpRateLimitPluginSettings;
 import org.kendar.plugins.BasicPercentPlugin;
 import org.kendar.plugins.base.ProtocolPhase;

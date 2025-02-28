@@ -1,4 +1,4 @@
-package org.kendar.http.settings;
+package org.kendar.http.plugins.settings;
 
 import java.util.ArrayList;
 import java.util.List;

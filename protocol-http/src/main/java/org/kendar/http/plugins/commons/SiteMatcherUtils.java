@@ -1,4 +1,4 @@
-package org.kendar.http.plugins;
+package org.kendar.http.plugins.commons;
 
 import org.kendar.apis.base.Request;
 
