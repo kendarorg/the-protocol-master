@@ -44,7 +44,7 @@ public class MqttBasicTest {
     protected static MqttPublishPlugin publishPlugin;
     private static Server mqttBroker;
     protected static ProtocolPluginDescriptor errorPlugin;
-    protected static ProtocolPluginDescriptor errorPlugin
+    private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);

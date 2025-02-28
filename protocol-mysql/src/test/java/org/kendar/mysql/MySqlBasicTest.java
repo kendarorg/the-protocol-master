@@ -43,7 +43,7 @@ public class MySqlBasicTest {
     protected static MySQLProtocol baseProtocol;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static ProtocolPluginDescriptor errorPlugin;
-    protected static ProtocolPluginDescriptor errorPlugin
+    private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();

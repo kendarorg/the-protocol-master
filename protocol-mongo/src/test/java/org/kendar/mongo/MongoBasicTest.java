@@ -13,6 +13,7 @@ import org.kendar.mongo.plugins.MongoLatencyPlugin;
 import org.kendar.mongo.plugins.MongoNetErrorPlugin;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.mongo.plugins.MongoReportPlugin;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.plugins.settings.LatencyPluginSettings;
 import org.kendar.plugins.settings.NetworkErrorPluginSettings;
@@ -42,6 +43,8 @@ public class MongoBasicTest {
     protected static MongoDbImage mongoContainer;
     protected static TcpServer protocolServer;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static ProtocolPluginDescriptor errorPlugin;
+    private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();

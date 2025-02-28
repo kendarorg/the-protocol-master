@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class SimpleTest extends BasicTest {
+public class SimpleTest extends AmqpBasicTest {
 
     public static final String MAIN_QUEUE = "fuffa_queue";
     public static final String DEFAULT_MESSAGE_CONTENT = "zzzz details";

@@ -41,7 +41,7 @@ public class RedisBasicTest {
     protected static TcpServer protocolServer;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static ProtocolPluginDescriptor errorPlugin;
-    protected static ProtocolPluginDescriptor errorPlugin
+    private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
