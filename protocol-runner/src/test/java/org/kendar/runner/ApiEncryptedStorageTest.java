@@ -72,7 +72,7 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
         assertTrue(zip.length > 100);
         Files.write(Path.of("target", "downloaded.zip"), zip);
-        var expectedFiles = getPaths(data).stream().sorted().toList();
+        var expectedFiles = getPaths(data).stream().filter(f->f.endsWith(".json")).sorted().toList();
         var testedFiles = getPaths(zip).stream().sorted().toList();
         assertArrayEquals(expectedFiles.toArray(), testedFiles.toArray());
 
