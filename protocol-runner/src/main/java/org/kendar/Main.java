@@ -64,6 +64,7 @@ public class Main {
             try {
                 execute(realArgs);
                 if (changedSettings != null && changedSettings.trim().length() > 0 && Files.exists(Path.of(changedSettings))) {
+                    log.info("RESTARTING AFTER SETTINGS CHANGE");
                     realArgs = new String[]{"-cfg", changedSettings};
                 } else {
                     running=false;
