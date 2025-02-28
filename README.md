@@ -98,7 +98,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Custom maven repository on [https://maven.kendar.org](https://maven.kendar.org/maven2/releases/org/kendar/protocol/)
 * More than 70% Test coverage, more than 550 tests
 * Environment-based dynamic settings (see TPM_REPLACE)
-* Scenes
+* Support for full "test scenario" with embedded encryption (for GDPR purposes)
 
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
@@ -140,6 +140,8 @@ If you want to go on the specific functions by protocol:
 
 ## Help
 
+The DNS plugin is included in the help (should add it in the plugins dir)
+
 ```
 =======================
 = The Protocol Master =
@@ -154,14 +156,15 @@ b value and so on
   dd                  datadir                    Data directory (default file=data)]
                                                  *Options:
                                                  - encrypted=[absolute or relative path] save on disk encrypted
-                                                 the key is in ENCRYPTION_KEY environment variable
+                                                 the key is in ENCRYPTION_KEY environment variable or can be
+                                                 added encrypted=[path]&key=[key]
                                                  - file=[absolute or relative path] save on disk
                                                  - null=[anything] noop
   ll                  loglevel                   Log4j loglevel (default ERROR)
   ap                  apis                       The port TPM controllers (default 0, as not active)
   h                   help                       Show help
   p                   protocol                   The protocols to start
-                                                 *Options: amqp091|mqtt|http|mysql|mongodb|postgres|redis
+                                                 *Options: amqp091|mqtt|dns|http|mysql|mongodb|postgres|redis
 
 MongoDB protocol (mongodb)
 
@@ -179,6 +182,12 @@ MongoDB protocol (mongodb)
     itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
     bx                blockExternalCalls         Block external calls, default true
     rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  network-error       network-error-plugin       Change random bytes in the response data
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
+  latency             latency-plugin             Add latency to calls
+    max                                          Max milliseconds latency, default 0
+    min                                          Min milliseconds latency, default 0
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
 
 MQTT Protocol (mqtt)
 
@@ -195,8 +204,14 @@ MQTT Protocol (mqtt)
   record              record-plugin              Activate recording calls
     itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
     rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  latency             latency-plugin             Add latency to calls
+    max                                          Max milliseconds latency, default 0
+    min                                          Min milliseconds latency, default 0
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
   publish             publish-plugin             Publish asynchronous calls
   report              report-plugin              Send 'report' events to global report plugin
+  network-error       network-error-plugin       Change random bytes in the response data
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
 
 MySQL protocol (mysql)
 
@@ -206,11 +221,17 @@ MySQL protocol (mysql)
   pu                  login                      Remote login
   pw                  password                   Remote password
   js                  schema                     Force schema name
+  network-error       network-error-plugin       Change random bytes in the response data
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
   report              report-plugin              Send 'report' events to global report plugin
   rewrite             rewrite-plugin             Rewrite the requests sent to the server
   record              record-plugin              Activate recording calls
     itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
     rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  latency             latency-plugin             Add latency to calls
+    max                                          Max milliseconds latency, default 0
+    min                                          Min milliseconds latency, default 0
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
   replay              replay-plugin              Activate replaying calls
     rpc               respectCallDurations       Respect call durations, default false
     itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
@@ -247,7 +268,8 @@ Http Protocol (http)
   latency             latency-plugin             Add latency to calls
     max                                          Max milliseconds latency, default 0
     min                                          Min milliseconds latency, default 0
-    lwh               latencyWhere               Modify latency on following websites @
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
+    t                 target                     Modify latency on following websites @
                                                  @REGEX or  STARTWITH. Default anything
                                                  *Repeatable
   record              record-plugin              Activate recording calls
@@ -260,9 +282,9 @@ Http Protocol (http)
   report              report-plugin              Send 'report' events to global report plugin
   error               error-plugin               Inject specific errors
     msg               errorMessage               Error message
-    epc               percentOfErrors            Percent of errors, default 0, meaning 0%
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
     err               errorCode                  Error code to show, default Error
-    ewh               errorWhere                 Generate erros on following websites @
+    t                 target                     Generate erros on following websites @
                                                  @REGEX or  STARTWITH. Default anything
                                                  *Repeatable
   replay              replay-plugin              Activate replaying calls
@@ -273,7 +295,8 @@ Http Protocol (http)
     rateLimit                                    Rate limit, default 120
     resetTimeSeconds                             Reset time window in seconds
     cpr                                          Cost per request, default 2
-    twh               throttleWhere              Generate throttle on following websites @
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
+    t                 target                     Generate throttle on following websites @
                                                  @REGEX or  STARTWITH. Default anything
                                                  *Repeatable
 
@@ -286,6 +309,10 @@ PostgreSQL protocol (postgres)
   pw                  password                   Remote password
   js                  schema                     Force schema name
   mock                mock-plugin                Mock certain service requests
+  latency             latency-plugin             Add latency to calls
+    max                                          Max milliseconds latency, default 0
+    min                                          Min milliseconds latency, default 0
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
   replay              replay-plugin              Activate replaying calls
     rpc               respectCallDurations       Respect call durations, default false
     itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
@@ -293,6 +320,8 @@ PostgreSQL protocol (postgres)
     rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
   report              report-plugin              Send 'report' events to global report plugin
   rewrite             rewrite-plugin             Rewrite the requests sent to the server
+  network-error       network-error-plugin       Change random bytes in the response data
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
   record              record-plugin              Activate recording calls
     itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
     rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
@@ -309,9 +338,30 @@ RESP2/RESP3 Protocol (redis)
     rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
   publish             publish-plugin             Publish asynchronous calls
   report              report-plugin              Send 'report' events to global report plugin
+  latency             latency-plugin             Add latency to calls
+    max                                          Max milliseconds latency, default 0
+    min                                          Min milliseconds latency, default 0
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
   record              record-plugin              Activate recording calls
     itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
     rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
+  network-error       network-error-plugin       Change random bytes in the response data
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
+
+Dns Protocol (dns)
+
+  dp                  port                       Dns port (default 53)
+  cc                  cacheDns                   Cache DNS requests (default false)
+  cd                  childDns                   Child dns (default 8.8.8.8)
+                                                 *Repeatable
+  report              report-plugin              Send 'report' events to global report plugin
+  latency             latency-plugin             Add latency to calls
+    max                                          Max milliseconds latency, default 0
+    min                                          Min milliseconds latency, default 0
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
+  network-error       network-error-plugin       Change random bytes in the response data
+    pca               percentAction              Percent calls touched, default 50, meaning 50%
+
 
 ```
 
