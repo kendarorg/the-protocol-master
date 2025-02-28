@@ -2,7 +2,7 @@ package org.kendar.mqtt.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.RecordPlugin;
+import org.kendar.plugins.BasicRecordPlugin;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @TpmService(tags = "mqtt")
-public class MqttRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettings> {
+public class MqttRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSettings> {
     private static final List<String> toAvoid = List.of("Disconnect", "PingReq");
 
     public MqttRecordPlugin(JsonMapper mapper, StorageRepository storage) {

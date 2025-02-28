@@ -5,7 +5,7 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.fsm.*;
 import org.kendar.mqtt.fsm.dtos.Topic;
-import org.kendar.plugins.ReportPlugin;
+import org.kendar.plugins.BasicReportPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @TpmService(tags = "mqtt")
-public class MqttReportPlugin extends ReportPlugin<PluginSettings> {
+public class MqttReportPlugin extends BasicReportPlugin<PluginSettings> {
     public MqttReportPlugin(JsonMapper mapper) {
         super(mapper);
     }

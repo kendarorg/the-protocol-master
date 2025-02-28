@@ -6,7 +6,7 @@ import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.ReplayPlugin;
+import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 @TpmService(tags = "amqp091")
-public class AmqpReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
+public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(AmqpReplayPlugin.class);
     private static final List<String> repeatableItems = Arrays.asList(

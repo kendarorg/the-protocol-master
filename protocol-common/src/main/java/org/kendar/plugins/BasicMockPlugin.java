@@ -22,13 +22,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class MockPlugin<T, K> extends ProtocolPluginDescriptorBase<BasicMockPluginSettings> {
+public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase<BasicMockPluginSettings> {
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     private final StorageRepository repository;
     protected Map<String, MockStorage> mocks = new HashMap<>();
 
 
-    public MockPlugin(JsonMapper mapper, StorageRepository repository) {
+    public BasicMockPlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
         this.repository = repository;
         EventsQueue.register(UUID.randomUUID().toString(), (e) -> handleSettingsChanged(), StorageReloadedEvent.class);

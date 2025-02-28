@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.http.plugins.settings.HttpErrorPluginSettings;
+import org.kendar.plugins.BasicPercentPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -18,11 +19,11 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @TpmService(tags = "http")
-public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPluginSettings> {
+public class HttpErrorPlugin extends BasicPercentPlugin<HttpErrorPluginSettings> {
 
     private static final Logger log = LoggerFactory.getLogger(HttpErrorPlugin.class);
 
-    private List<MatchingRecRep> errorSites;
+    private List<MatchingRecRep> target;
 
     public HttpErrorPlugin(JsonMapper mapper) {
         super(mapper);
@@ -50,16 +51,12 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
 
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request request, Response response) {
-        if (!isActive()) return false;
-        if (SiteMatcherUtils.matchSite(request, errorSites)) {
-            var pc = ((double) getSettings().getErrorPercent()) / 100.0;
-            if (Math.random() < pc) {
-
-                log.info("Faking ERROR {}", request.buildUrl());
-                response.setStatusCode(getSettings().getShowError());
-                response.setResponseText(new TextNode(getSettings().getErrorMessage()));
-                return true;
-            }
+        if (!shouldRun()) return false;
+        if (SiteMatcherUtils.matchSite(request, target)) {
+            log.info("Faking ERROR {}", request.buildUrl());
+            response.setStatusCode(getSettings().getShowError());
+            response.setResponseText(new TextNode(getSettings().getErrorMessage()));
+            return true;
         }
 
         return false;
@@ -68,7 +65,7 @@ public class HttpErrorPlugin extends ProtocolPluginDescriptorBase<HttpErrorPlugi
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        errorSites = SiteMatcherUtils.setupSites(getSettings().getErrorSites());
+        target = SiteMatcherUtils.setupSites(getSettings().getTarget());
         return true;
     }
 

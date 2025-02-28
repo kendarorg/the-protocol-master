@@ -5,9 +5,10 @@ import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
+import org.kendar.http.plugins.settings.HttpRateLimitPluginSettings;
+import org.kendar.plugins.BasicPercentPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @TpmService(tags = "http")
-public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLimitPluginSettings> {
+public class HttpRateLimitPlugin extends BasicPercentPlugin<HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
     private final StorageRepository repository;
@@ -55,7 +56,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getLimitSites());
+        sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getTarget());
         customResponse = null;
         var responseFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(), getId(), "response"));
         if (responseFile != null) {
@@ -72,7 +73,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
-        if (isActive()) {
+        if (shouldRun()) {
             if (SiteMatcherUtils.matchSite(in, sitesToLimit)) {
                 return handleRateLimit(pluginContext, phase, in, out);
             }

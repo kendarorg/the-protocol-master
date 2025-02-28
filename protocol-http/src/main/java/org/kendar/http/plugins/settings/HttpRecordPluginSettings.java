@@ -1,4 +1,4 @@
-package org.kendar.http.plugins;
+package org.kendar.http.plugins.settings;
 
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 
@@ -7,7 +7,7 @@ import java.util.List;
 
 public class HttpRecordPluginSettings extends BasicRecordPluginSettings {
     private boolean removeEtags = true;
-    private List<String> recordSites = new ArrayList<>();
+    private List<String> target = new ArrayList<>();
 
     public boolean isRemoveEtags() {
         return removeEtags;
@@ -17,11 +17,11 @@ public class HttpRecordPluginSettings extends BasicRecordPluginSettings {
         this.removeEtags = removeEtags;
     }
 
-    public List<String> getRecordSites() {
-        return recordSites;
+    public List<String> getTarget() {
+        return target;
     }
 
-    public void setRecordSites(List<String> recordSites) {
-        this.recordSites = recordSites;
+    public void setTarget(List<String> target) {
+        this.target = target;
     }
 }

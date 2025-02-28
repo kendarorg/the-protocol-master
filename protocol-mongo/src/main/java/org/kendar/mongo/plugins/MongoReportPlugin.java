@@ -5,7 +5,7 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mongo.dtos.MongoCommandsConstants;
 import org.kendar.mongo.dtos.OpMsgContent;
-import org.kendar.plugins.ReportPlugin;
+import org.kendar.plugins.BasicReportPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
@@ -14,7 +14,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.Map;
 
 @TpmService(tags = "mongodb")
-public class MongoReportPlugin extends ReportPlugin<PluginSettings> {
+public class MongoReportPlugin extends BasicReportPlugin<PluginSettings> {
 
     public MongoReportPlugin(JsonMapper mapper) {
         super(mapper);

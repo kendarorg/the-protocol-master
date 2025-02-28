@@ -18,7 +18,7 @@ import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 
-public abstract class JdbcRecordPlugin extends RecordPlugin<BasicRecordPluginSettings> {
+public abstract class JdbcRecordPlugin extends BasicRecordPlugin<BasicRecordPluginSettings> {
 
 
     public JdbcRecordPlugin(JsonMapper mapper, StorageRepository storage) {

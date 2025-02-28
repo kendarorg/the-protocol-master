@@ -5,7 +5,7 @@ import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
-import org.kendar.plugins.ReportPlugin;
+import org.kendar.plugins.BasicReportPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
@@ -14,7 +14,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.Map;
 
 @TpmService(tags = "http")
-public class HttpReportPlugin extends ReportPlugin<PluginSettings> {
+public class HttpReportPlugin extends BasicReportPlugin<PluginSettings> {
 
     public HttpReportPlugin(JsonMapper mapper) {
         super(mapper);

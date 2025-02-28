@@ -2,7 +2,7 @@ package org.kendar.http.plugins.cli;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.http.plugins.HttpReplayPluginSettings;
+import org.kendar.http.plugins.settings.HttpReplayPluginSettings;
 import org.kendar.plugins.cli.AsyncReplayPluginCli;
 import org.kendar.settings.PluginSettings;
 
@@ -23,7 +23,7 @@ public class HttpReplayPluginCli extends AsyncReplayPluginCli {
                         "@REGEX or  STARTWITH. Default anything")
                 .withLong("replayWhat")
                 .asMultiple()
-                .withMultiCallback((s) -> ((HttpReplayPluginSettings) settings).setMatchSites(s)));
+                .withMultiCallback((s) -> ((HttpReplayPluginSettings) settings).setTarget(s)));
         return options.toArray(new CommandOption[0]);
     }
 }

@@ -2,7 +2,8 @@ package org.kendar.http.plugins.cli;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.http.plugins.HttpRateLimitPluginSettings;
+import org.kendar.http.plugins.settings.HttpErrorPluginSettings;
+import org.kendar.http.plugins.settings.HttpRateLimitPluginSettings;
 import org.kendar.plugins.cli.BasicPluginCli;
 import org.kendar.settings.PluginSettings;
 
@@ -35,11 +36,14 @@ public class HttpRateLimitPluginCli extends BasicPluginCli {
                 .withCallback((s) -> ((HttpRateLimitPluginSettings) settings).setResetTimeWindowSeconds(Integer.parseInt(s))));
         options.add(CommandOption.of("cpr", "Cost per request, default 2")
                 .withCallback((s) -> ((HttpRateLimitPluginSettings) settings).setCostPerRequest(Integer.parseInt(s))));
-        options.add(CommandOption.of("twh", "Generate throttle on following websites @\r\n" +
+        options.add(CommandOption.of("pc", "Percent calls touched, default 50, meaning 50%")
+                .withLong("percentAction")
+                .withCallback((s) -> ((HttpErrorPluginSettings) settings).setPercentAction(Integer.parseInt(s))));
+        options.add(CommandOption.of("t", "Generate throttle on following websites @\r\n" +
                         "@REGEX or  STARTWITH. Default anything")
-                .withLong("throttleWhere")
+                .withLong("target")
                 .asMultiple()
-                .withMultiCallback((s) -> ((HttpRateLimitPluginSettings) settings).setLimitSites(s)));
+                .withMultiCallback((s) -> ((HttpRateLimitPluginSettings) settings).setTarget(s)));
         return options.toArray(new CommandOption[0]);
     }
 

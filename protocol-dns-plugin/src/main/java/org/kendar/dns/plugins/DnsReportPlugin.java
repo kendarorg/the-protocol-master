@@ -3,7 +3,7 @@ package org.kendar.dns.plugins;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
-import org.kendar.plugins.ReportPlugin;
+import org.kendar.plugins.BasicReportPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Extension
 @TpmService(tags = "dns")
-public class DnsReportPlugin extends ReportPlugin<PluginSettings> {
+public class DnsReportPlugin extends BasicReportPlugin<PluginSettings> {
     public DnsReportPlugin(JsonMapper mapper) {
         super(mapper);
     }

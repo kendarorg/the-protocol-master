@@ -34,8 +34,8 @@ import java.util.*;
  *
  * @param <W> BasicReplayPluginSettings this should match the getSettingClass method
  */
-public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptorBase<W> {
-    private static final Logger log = LoggerFactory.getLogger(ReplayPlugin.class);
+public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> extends ProtocolPluginDescriptorBase<W> {
+    private static final Logger log = LoggerFactory.getLogger(BasicReplayPlugin.class);
     /**
      * Container for the completed items
      */
@@ -58,7 +58,7 @@ public abstract class ReplayPlugin<W extends BasicReplayPluginSettings> extends 
      */
     private final List<CompactLine> repeatable = new ArrayList<>();
 
-    public ReplayPlugin(JsonMapper mapper, StorageRepository storage) {
+    public BasicReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
         this.storage = storage;
     }

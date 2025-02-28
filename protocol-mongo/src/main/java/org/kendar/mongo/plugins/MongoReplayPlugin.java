@@ -4,7 +4,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
-import org.kendar.plugins.ReplayPlugin;
+import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
@@ -13,7 +13,7 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 
 @TpmService(tags = "mongodb")
-public class MongoReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
+public class MongoReplayPlugin extends BasicReplayPlugin<BasicReplayPluginSettings> {
     public MongoReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
     }

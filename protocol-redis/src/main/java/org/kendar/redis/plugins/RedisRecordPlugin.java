@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.WriteItemEvent;
-import org.kendar.plugins.RecordPlugin;
+import org.kendar.plugins.BasicRecordPlugin;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.redis.fsm.Resp3Response;
@@ -18,7 +18,7 @@ import org.kendar.utils.JsonMapper;
 import java.util.Map;
 
 @TpmService(tags = "redis")
-public class RedisRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettings> {
+public class RedisRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSettings> {
     public RedisRecordPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
     }

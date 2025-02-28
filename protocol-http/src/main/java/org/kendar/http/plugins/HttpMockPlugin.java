@@ -5,7 +5,7 @@ import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.MimeChecker;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.MockPlugin;
+import org.kendar.plugins.BasicMockPlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ChangeableReference;
@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @TpmService(tags = "http")
-public class HttpMockPlugin extends MockPlugin<Request, Response> {
+public class HttpMockPlugin extends BasicMockPlugin<Request, Response> {
 
     public HttpMockPlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper, repository);

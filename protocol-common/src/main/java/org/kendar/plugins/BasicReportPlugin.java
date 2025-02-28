@@ -7,8 +7,8 @@ import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 
-public abstract class ReportPlugin<W extends PluginSettings> extends ProtocolPluginDescriptorBase<W> {
-    public ReportPlugin(JsonMapper mapper) {
+public abstract class BasicReportPlugin<W extends PluginSettings> extends ProtocolPluginDescriptorBase<W> {
+    public BasicReportPlugin(JsonMapper mapper) {
         super(mapper);
     }
 

@@ -54,14 +54,14 @@
           "active": false,
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
-          "matchSites": [
+          "target": [
             "net_core_http",
             "net_core_rest"
           ]
         },
         "record-plugin": {
           "active": false,
-          "recordSites": []
+          "target": []
         },
         "mock-plugin": {
           "active": false

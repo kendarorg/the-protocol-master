@@ -35,11 +35,11 @@
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
           "blockExternal": true,
-          "matchSites": []
+          "target": []
         },
         "record-plugin": {
           "active": false,
-          "recordSites": []
+          "target": []
         }
       }
     }

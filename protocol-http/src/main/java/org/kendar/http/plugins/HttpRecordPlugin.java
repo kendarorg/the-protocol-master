@@ -2,7 +2,8 @@ package org.kendar.http.plugins;
 
 import org.kendar.apis.base.Request;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.RecordPlugin;
+import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
+import org.kendar.plugins.BasicRecordPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
@@ -17,8 +18,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @TpmService(tags = "http")
-public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
-    private List<MatchingRecRep> recordSites = new ArrayList<>();
+public class HttpRecordPlugin extends BasicRecordPlugin<HttpRecordPluginSettings> {
+    private List<MatchingRecRep> target = new ArrayList<>();
 
     public HttpRecordPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
@@ -42,7 +43,7 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     protected void postCall(PluginContext pluginContext, Object in, Object out) {
         var request = (Request) in;
-        if (SiteMatcherUtils.matchSite((Request) in, recordSites)) {
+        if (SiteMatcherUtils.matchSite((Request) in, target)) {
             var settings = getSettings();
             if (settings.isRemoveEtags()) {
                 var all = request.getHeader("If-none-match");
@@ -76,7 +77,7 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        recordSites = SiteMatcherUtils.setupSites(getSettings().getRecordSites());
+        target = SiteMatcherUtils.setupSites(getSettings().getTarget());
         return true;
     }
 

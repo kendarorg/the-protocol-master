@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class RewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptorBase<W> {
+public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, J> extends ProtocolPluginDescriptorBase<W> {
 
-    private static final Logger log = LoggerFactory.getLogger(RewritePlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicRewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();
     private final StorageRepository repository;
 
-    public RewritePlugin(JsonMapper mapper, StorageRepository repository) {
+    public BasicRewritePlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
         this.repository = repository;
         EventsQueue.register(UUID.randomUUID().toString(), (e) -> handleSettingsChanged(), StorageReloadedEvent.class);

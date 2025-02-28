@@ -1,11 +1,11 @@
-package org.kendar.http.plugins;
+package org.kendar.http.plugins.settings;
 
-import org.kendar.settings.PluginSettings;
+import org.kendar.plugins.settings.BasicPercentPluginSettings;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HttpRateLimitPluginSettings extends PluginSettings {
+public class HttpRateLimitPluginSettings extends BasicPercentPluginSettings {
     private String headerLimit = "RateLimit-Limit";
     private String headerRemaining = "RateLimit-Remaining";
     private String headerReset = "RateLimit-Reset";
@@ -15,7 +15,7 @@ public class HttpRateLimitPluginSettings extends PluginSettings {
     private int warningThresholdPercent = 80;
     private int rateLimit = 120;//or custom?
     private String resetFormat = "secondsLeft";//UtcEpochSeconds
-    private List<String> limitSites = new ArrayList<>();
+    private List<String> target = new ArrayList<>();
     private boolean useCustomResponse = false;
 
     public boolean isUseCustomResponse() {
@@ -26,12 +26,12 @@ public class HttpRateLimitPluginSettings extends PluginSettings {
         this.useCustomResponse = useCustomResponse;
     }
 
-    public List<String> getLimitSites() {
-        return limitSites;
+    public List<String> getTarget() {
+        return target;
     }
 
-    public void setLimitSites(List<String> limitSites) {
-        this.limitSites = limitSites;
+    public void setTarget(List<String> target) {
+        this.target = target;
     }
 
     public String getHeaderLimit() {

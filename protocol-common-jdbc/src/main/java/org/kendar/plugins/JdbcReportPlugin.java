@@ -11,7 +11,7 @@ import org.kendar.utils.JsonMapper;
 
 import java.util.Map;
 
-public abstract class JdbcReportPlugin extends ReportPlugin<PluginSettings> {
+public abstract class JdbcReportPlugin extends BasicReportPlugin<PluginSettings> {
 
     public JdbcReportPlugin(JsonMapper mapper) {
         super(mapper);

@@ -4,7 +4,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.fsm.ConnectAck;
 import org.kendar.mqtt.fsm.Publish;
-import org.kendar.plugins.ReplayPlugin;
+import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -23,7 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 @TpmService(tags = "mqtt")
-public class MqttReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
+public class MqttReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(MqttReplayPlugin.class);
     private static final List<String> repeatableItems = Arrays.asList(

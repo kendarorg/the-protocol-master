@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SiteMatcherUtils {
-    public static List<MatchingRecRep> setupSites(List<String> errorSites) {
-        if (errorSites == null || errorSites.isEmpty()) {
+    public static List<MatchingRecRep> setupSites(List<String> target) {
+        if (target == null || target.isEmpty()) {
             return new ArrayList<>();
         }
-        List<MatchingRecRep> destination = new ArrayList<>(errorSites.stream()
+        List<MatchingRecRep> destination = new ArrayList<>(target.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
                 .map(MatchingRecRep::new).toList());
         return destination;

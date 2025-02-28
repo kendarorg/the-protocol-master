@@ -24,13 +24,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase<W> {
+public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase<W> {
     protected static final JsonMapper mapper = new JsonMapper();
-    private static final Logger log = LoggerFactory.getLogger(RecordPlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicRecordPlugin.class);
     protected final StorageRepository storage;
     private boolean ignoreTrivialCalls = true;
 
-    public RecordPlugin(JsonMapper mapper, StorageRepository storage) {
+    public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
         this.storage = storage;
     }
