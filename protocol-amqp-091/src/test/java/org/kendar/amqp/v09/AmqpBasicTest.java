@@ -21,6 +21,8 @@ import org.kendar.tests.testcontainer.images.RabbitMqImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
@@ -91,21 +93,28 @@ public class AmqpBasicTest {
         publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         errorPlugin= new AmqpNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(80));
         latencyPlugin= new AmqpLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
-        rep.setActive(true);
+
         proxy.setPluginHandlers(List.of(
                 recordPlugin, rep, publishPlugin,errorPlugin,latencyPlugin));
-        recordPlugin.setActive(true);
-        rep.setActive(true);
+
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
+
         protocolServer = new TcpServer(baseProtocol);
 
         protocolServer.start();
+
+        recordPlugin.setActive(true);
+        rep.setActive(true);
+
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
+
+
+    protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
 
     public static void afterEachBase() {
         EventsQueue.unregister("recorder", ReportDataEvent.class);

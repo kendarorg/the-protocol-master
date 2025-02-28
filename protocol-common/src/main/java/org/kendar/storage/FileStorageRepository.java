@@ -213,7 +213,6 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     protected void initializeContentWrite(String instanceId) {
-
         protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
             if (currRepo == null) {
                 currRepo = new ProtocolRepo();

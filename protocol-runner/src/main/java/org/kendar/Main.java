@@ -220,8 +220,8 @@ public class Main {
 
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        var log = loggerContext.getLogger("org.kendar");
-        log.setLevel(Level.toLevel(logLevel, Level.ERROR));
+        var logx = loggerContext.getLogger("org.kendar");
+        logx.setLevel(Level.toLevel(logLevel, Level.ERROR));
         diService.register(PluginsLoggerFactory.class, new PluginsLoggerFactory());
 
         if (!ini.getDataDir().contains("=")) {
@@ -286,8 +286,10 @@ public class Main {
             }).start();
         }
 
+
         try {
             latch.await();
+            log.info("Servers started");
         } catch (InterruptedException ex) {
             log.error("Error waiting for plugin to start");
         }
@@ -332,6 +334,7 @@ public class Main {
 
         try {
             apiLatch.await();
+            log.info("APIs started");
             running=true;
         } catch (InterruptedException ex) {
             log.error("Error waiting for plugin to start");
