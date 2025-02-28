@@ -3,13 +3,13 @@ package org.kendar.amqp.v09;
 
 import com.rabbitmq.client.ConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
-import org.kendar.amqp.v09.plugins.AmqpPublishPlugin;
-import org.kendar.amqp.v09.plugins.AmqpRecordPlugin;
-import org.kendar.amqp.v09.plugins.AmqpReportPlugin;
+import org.kendar.amqp.v09.plugins.*;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.LatencyPluginSettings;
+import org.kendar.plugins.settings.NetworkErrorPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -30,14 +30,16 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class BasicTest {
+public class AmqpBasicTest {
     protected static final int FAKE_PORT = 5682;
     protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     protected static ProtocolPluginDescriptor publishPlugin;
     protected static ProtocolPluginDescriptor recordPlugin;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static ProtocolPluginDescriptor errorPlugin;
     protected JsonMapper mapper = new JsonMapper();
+    private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -87,9 +89,11 @@ public class BasicTest {
         recordPlugin = new AmqpRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = new AmqpPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        errorPlugin= new AmqpNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(80));
+        latencyPlugin= new AmqpLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
         rep.setActive(true);
         proxy.setPluginHandlers(List.of(
-                recordPlugin, rep, publishPlugin));
+                recordPlugin, rep, publishPlugin,errorPlugin,latencyPlugin));
         recordPlugin.setActive(true);
         rep.setActive(true);
         baseProtocol.setProxy(proxy);

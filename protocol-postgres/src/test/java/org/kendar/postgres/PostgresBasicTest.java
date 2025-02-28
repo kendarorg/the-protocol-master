@@ -4,11 +4,12 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
-import org.kendar.postgres.plugins.PostgresMockPlugin;
-import org.kendar.postgres.plugins.PostgresRecordPlugin;
-import org.kendar.postgres.plugins.PostgresReportPlugin;
+import org.kendar.plugins.settings.LatencyPluginSettings;
+import org.kendar.plugins.settings.NetworkErrorPluginSettings;
+import org.kendar.postgres.plugins.*;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class BasicTest {
+public class PostgresBasicTest {
 
     protected static final int FAKE_PORT = 5431;
     protected static PostgresSqlImage postgresContainer;
@@ -42,6 +43,8 @@ public class BasicTest {
     protected static PostgresProtocol baseProtocol;
     protected static StorageRepository storage;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static ProtocolPluginDescriptor errorPlugin
+    protected static ProtocolPluginDescriptor errorPlugin;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -101,13 +104,16 @@ public class BasicTest {
         //gs.putService("storage", storage);
         var pl = new PostgresRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         var pl1 = new PostgresMockPlugin(mapper, storage);
+        errorPlugin= new PostgresNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
+        latencyPlugin= new PostgresLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
+
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
         //global.putService("storage", storage);
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new PostgresReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, pl1, rep));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep,errorPlugin,latencyPlugin));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

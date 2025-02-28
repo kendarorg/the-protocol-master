@@ -37,7 +37,7 @@ import static org.apache.http.entity.ContentType.IMAGE_JPEG;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class SimpleTest extends BasicTest {
+public class HttpSimpleTest extends BasicTest {
 
     private static byte[] buildBytesData() {
         try {
@@ -202,6 +202,7 @@ public class SimpleTest extends BasicTest {
     void testLatencyPlugin() throws Exception {
         var latencyPlugin = (HttpLatencyPlugin) baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("latency-plugin")).findFirst().get();
         var lps = new HttpLatencyPluginSettings();
+        lps.setPercentAction(100);
         lps.setMinMs(2000);
         lps.setMaxMs(3000);
         latencyPlugin.initialize(globalSettings, httpProtocolSettings, lps);
@@ -268,6 +269,7 @@ public class SimpleTest extends BasicTest {
         var latencyPlugin = (HttpRateLimitPlugin) baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("rate-limit-plugin")).findFirst().get();
         var lps = new HttpRateLimitPluginSettings();
         lps.setResetTimeWindowSeconds(3);
+        lps.setPercentAction(100);
         latencyPlugin.initialize(globalSettings, httpProtocolSettings, lps);
         latencyPlugin.setActive(true);
 
@@ -332,6 +334,7 @@ public class SimpleTest extends BasicTest {
     void testRateLimitCustom() throws Exception {
         var latencyPlugin = (HttpRateLimitPlugin) baseProtocol.getPlugins().stream().filter(a -> a.getId().equalsIgnoreCase("rate-limit-plugin")).findFirst().get();
         var lps = new HttpRateLimitPluginSettings();
+        lps.setPercentAction(100);
         lps.setResetTimeWindowSeconds(3);
         lps.setUseCustomResponse(true);
         //lps.setCustomResponseFile(Path.of("src", "test", "resources", "ratelimitresponse.json").toString());

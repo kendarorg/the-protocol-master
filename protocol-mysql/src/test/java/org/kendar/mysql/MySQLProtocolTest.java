@@ -8,7 +8,7 @@ import java.sql.Statement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MySQLProtocolTest extends BasicTest {
+public class MySQLProtocolTest extends MySqlBasicTest {
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();

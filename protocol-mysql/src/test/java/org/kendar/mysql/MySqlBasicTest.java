@@ -4,11 +4,12 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
-import org.kendar.mysql.plugins.MySqlMockPlugin;
-import org.kendar.mysql.plugins.MySqlRecordPlugin;
-import org.kendar.mysql.plugins.MySqlReportPlugin;
+import org.kendar.mysql.plugins.*;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.LatencyPluginSettings;
+import org.kendar.plugins.settings.NetworkErrorPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -34,13 +35,15 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class BasicTest {
+public class MySqlBasicTest {
 
     protected static final int FAKE_PORT = 3310;
     protected static MysqlImage mysqlContainer;
     protected static TcpServer protocolServer;
     protected static MySQLProtocol baseProtocol;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static ProtocolPluginDescriptor errorPlugin;
+    protected static ProtocolPluginDescriptor errorPlugin
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -87,6 +90,9 @@ public class BasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
+        errorPlugin= new MySqlNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
+        latencyPlugin= new MySqlLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
+
         var pl = new MySqlRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
         var pl1 = new MySqlMockPlugin(mapper, storage);
@@ -96,7 +102,7 @@ public class BasicTest {
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new MySqlReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, pl1, rep));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep,errorPlugin,latencyPlugin));
 
 
         pl.setActive(true);

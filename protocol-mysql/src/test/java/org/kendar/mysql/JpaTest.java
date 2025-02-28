@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JpaTest extends BasicTest {
+public class JpaTest extends MySqlBasicTest {
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();

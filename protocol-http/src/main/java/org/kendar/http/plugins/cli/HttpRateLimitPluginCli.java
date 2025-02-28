@@ -36,7 +36,7 @@ public class HttpRateLimitPluginCli extends BasicPluginCli {
                 .withCallback((s) -> ((HttpRateLimitPluginSettings) settings).setResetTimeWindowSeconds(Integer.parseInt(s))));
         options.add(CommandOption.of("cpr", "Cost per request, default 2")
                 .withCallback((s) -> ((HttpRateLimitPluginSettings) settings).setCostPerRequest(Integer.parseInt(s))));
-        options.add(CommandOption.of("pc", "Percent calls touched, default 50, meaning 50%")
+        options.add(CommandOption.of("pca", "Percent calls touched, default 50, meaning 50%")
                 .withLong("percentAction")
                 .withCallback((s) -> ((HttpErrorPluginSettings) settings).setPercentAction(Integer.parseInt(s))));
         options.add(CommandOption.of("t", "Generate throttle on following websites @\r\n" +

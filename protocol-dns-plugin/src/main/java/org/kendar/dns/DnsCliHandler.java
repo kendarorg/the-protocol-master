@@ -31,7 +31,7 @@ public class DnsCliHandler extends NetworkProtocolCommandLineHandler implements 
                                 .withMandatoryParameter()
                                 .withCallback((s) -> settings.setUseCache(Boolean.parseBoolean(s))),
                         CommandOption.of("cd", "Child dns (default 8.8.8.8)")
-                                .withLong("cacheDns")
+                                .withLong("childDns")
                                 .withMandatoryParameter()
                                 .asMultiple()
                                 .withMultiCallback(settings::setChildDns)

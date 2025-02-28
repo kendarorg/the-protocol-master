@@ -13,7 +13,7 @@ import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ComplexOperationsTest extends BasicTest {
+public class ComplexOperationsTest extends PostgresBasicTest {
 
     @BeforeAll
     public static void beforeClass() {

@@ -24,7 +24,7 @@ public class BasicLatencyPluginCli extends BasicPluginCli {
                 .withCallback((s) -> ((LatencyPluginSettings) settings).setMaxMs(Integer.parseInt(s))));
         options.add(CommandOption.of("min", "Min milliseconds latency, default 0")
                 .withCallback((s) -> ((LatencyPluginSettings) settings).setMinMs(Integer.parseInt(s))));
-        options.add(CommandOption.of("pc", "Percent calls touched, default 50, meaning 50%")
+        options.add(CommandOption.of("pca", "Percent calls touched, default 50, meaning 50%")
                 .withLong("percentAction")
                 .withCallback((s) -> ((LatencyPluginSettings) settings).setPercentAction(Integer.parseInt(s))));
 

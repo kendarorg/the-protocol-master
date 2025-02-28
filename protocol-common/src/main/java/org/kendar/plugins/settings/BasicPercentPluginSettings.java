@@ -12,4 +12,8 @@ public class BasicPercentPluginSettings extends PluginSettings {
     }
 
     private int percentAction=50;
+    public BasicPercentPluginSettings withPercentAction(int percentAction) {
+        setPercentAction(percentAction);
+        return this;
+    }
 }

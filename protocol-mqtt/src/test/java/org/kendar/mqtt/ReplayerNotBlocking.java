@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class ReplayerNotBlocking extends BasicTest {
+public class ReplayerNotBlocking extends MqttBasicTest {
 
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/subscribe/";

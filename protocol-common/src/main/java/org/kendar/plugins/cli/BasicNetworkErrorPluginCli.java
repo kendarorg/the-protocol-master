@@ -20,7 +20,7 @@ public class BasicNetworkErrorPluginCli extends BasicPluginCli {
     @Override
     protected CommandOption[] buildPluginOptions(PluginSettings settings) {
         var options = new ArrayList<CommandOption>();
-        options.add(CommandOption.of("pc", "Percent calls touched, default 50, meaning 50%")
+        options.add(CommandOption.of("pca", "Percent calls touched, default 50, meaning 50%")
                 .withLong("percentAction")
                 .withCallback((s) -> ((NetworkErrorPluginSettings) settings).setPercentAction(Integer.parseInt(s))));
 

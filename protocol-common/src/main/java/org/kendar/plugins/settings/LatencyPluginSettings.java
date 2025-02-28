@@ -19,4 +19,10 @@ public class LatencyPluginSettings extends BasicPercentPluginSettings {
     public void setMaxMs(int maxMs) {
         this.maxMs = maxMs;
     }
+
+    public LatencyPluginSettings withMinMax(int minMs, int maxMs) {
+        setMinMs(minMs);
+        setMaxMs(maxMs);
+        return this;
+    }
 }

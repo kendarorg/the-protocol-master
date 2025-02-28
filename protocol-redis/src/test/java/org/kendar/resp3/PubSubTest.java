@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PubSubTest extends BasicTest {
+public class PubSubTest extends RedisBasicTest {
     public static final String CHANNEL_NAME = "commonChannel";
 
     @BeforeAll

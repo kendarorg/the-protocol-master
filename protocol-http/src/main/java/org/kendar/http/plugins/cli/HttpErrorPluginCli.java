@@ -32,7 +32,7 @@ public class HttpErrorPluginCli extends BasicPluginCli {
         options.add(CommandOption.of("msg", "Error message")
                 .withLong("errorMessage")
                 .withCallback((s) -> ((HttpErrorPluginSettings) settings).setErrorMessage(s)));
-        options.add(CommandOption.of("pc", "Percent calls touched, default 50, meaning 50%")
+        options.add(CommandOption.of("pca", "Percent calls touched, default 50, meaning 50%")
                 .withLong("percentAction")
                 .withCallback((s) -> ((HttpErrorPluginSettings) settings).setPercentAction(Integer.parseInt(s))));
         options.add(CommandOption.of("err", "Error code to show, default Error")

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class SubscribeTest extends BasicTest {
+public class SubscribeTest extends MqttBasicTest {
 
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/subscribe/";

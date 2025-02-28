@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class ExchangeTest extends BasicTest {
+public class ExchangeTest extends AmqpBasicTest {
 
     private static final String QUEUE_NAME = "square";
     private static final String EXCHANGE_NAME = "myExchange";

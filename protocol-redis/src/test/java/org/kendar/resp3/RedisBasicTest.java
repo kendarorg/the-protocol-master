@@ -4,9 +4,14 @@ package org.kendar.resp3;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.LatencyPluginSettings;
+import org.kendar.plugins.settings.NetworkErrorPluginSettings;
 import org.kendar.redis.Resp3Protocol;
 import org.kendar.redis.Resp3Proxy;
+import org.kendar.redis.plugins.RedisLatencyPlugin;
+import org.kendar.redis.plugins.RedisNetErrorPlugin;
 import org.kendar.redis.plugins.RedisRecordPlugin;
 import org.kendar.redis.plugins.RedisReportPlugin;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
@@ -29,12 +34,14 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class BasicTest {
+public class RedisBasicTest {
 
     protected static final int FAKE_PORT = 6389;
     protected static RedisImage redisImage;
     protected static TcpServer protocolServer;
     private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static ProtocolPluginDescriptor errorPlugin;
+    protected static ProtocolPluginDescriptor errorPlugin
 
     public static void beforeClassBase() {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -74,8 +81,11 @@ public class BasicTest {
         var pl = new RedisRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
 
         var rep = new RedisReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        errorPlugin= new RedisNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
+        latencyPlugin= new RedisLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
+
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, rep));
+        proxy.setPluginHandlers(List.of(pl, rep,errorPlugin,latencyPlugin));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

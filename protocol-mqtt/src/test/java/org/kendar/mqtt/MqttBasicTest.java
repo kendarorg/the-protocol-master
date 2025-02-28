@@ -9,10 +9,11 @@ import io.moquette.interception.messages.InterceptPublishMessage;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
-import org.kendar.mqtt.plugins.MqttPublishPlugin;
-import org.kendar.mqtt.plugins.MqttRecordPlugin;
-import org.kendar.mqtt.plugins.MqttReportPlugin;
+import org.kendar.mqtt.plugins.*;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.LatencyPluginSettings;
+import org.kendar.plugins.settings.NetworkErrorPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class BasicTest {
+public class MqttBasicTest {
     protected static final int FAKE_PORT = 1884;
     protected static List<InterceptPublishMessage> moquetteMessages = new ArrayList<>();
     //protected static RabbitMqImage rabbitContainer;
@@ -42,6 +43,8 @@ public class BasicTest {
     protected static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static MqttPublishPlugin publishPlugin;
     private static Server mqttBroker;
+    protected static ProtocolPluginDescriptor errorPlugin;
+    protected static ProtocolPluginDescriptor errorPlugin
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
         //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
@@ -125,7 +128,9 @@ public class BasicTest {
                 pls);
         var rep = new MqttReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = (MqttPublishPlugin) new MqttPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        proxy.setPluginHandlers(List.of(pl, rep, publishPlugin));
+        errorPlugin= new MqttNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
+        latencyPlugin= new MqttLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
+        proxy.setPluginHandlers(List.of(pl, rep, publishPlugin,errorPlugin,latencyPlugin));
         rep.setActive(true);
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

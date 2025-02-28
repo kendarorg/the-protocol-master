@@ -9,9 +9,13 @@ import com.mongodb.client.MongoClients;
 import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
+import org.kendar.mongo.plugins.MongoLatencyPlugin;
+import org.kendar.mongo.plugins.MongoNetErrorPlugin;
 import org.kendar.mongo.plugins.MongoRecordPlugin;
 import org.kendar.mongo.plugins.MongoReportPlugin;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
+import org.kendar.plugins.settings.LatencyPluginSettings;
+import org.kendar.plugins.settings.NetworkErrorPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -32,7 +36,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class BasicTest {
+public class MongoBasicTest {
 
     protected static final int FAKE_PORT = 27077;
     protected static MongoDbImage mongoContainer;
@@ -92,8 +96,10 @@ public class BasicTest {
         var mapper = new JsonMapper();
         var pl = new MongoRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         var rep = new MongoReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        errorPlugin= new MongoNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
+        latencyPlugin= new MongoLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, rep));
+        proxy.setPluginHandlers(List.of(pl, rep,errorPlugin,latencyPlugin));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         EventsQueue.register("recorder", (r) -> {
