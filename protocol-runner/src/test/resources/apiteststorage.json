@@ -3,6 +3,7 @@
   "logLevel": "INFO",
   "dataDir": "data/postgres",
   "apiPort": 5005,
+  "unattended":true,
   "plugins": {
     "report-plugin": {
       "active": true

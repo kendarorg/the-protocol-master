@@ -24,7 +24,6 @@ public class ApiTest extends ApiTestBase {
 
     @AfterAll
     public static void cleanup() {
-        bs.runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(1000);
 

@@ -3,6 +3,7 @@
   "logLevel": "INFO",
   "dataDir": "file={dataDir}",
   "apiPort": 9127,
+  "unattended":true,
   "plugins": {
     "report-plugin": {
         "active": true

@@ -30,12 +30,11 @@ public class StandardProtocolsTest extends BasicTest {
 
     @BeforeEach
     public void beforeEach() throws IOException {
-        runTheServer.set(true);
+        
     }
 
     @AfterEach
     public void afterEach() {
-        runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(100);
     }
@@ -85,7 +84,7 @@ public class StandardProtocolsTest extends BasicTest {
         stmt.close();
         c.close();
 
-        runTheServer.set(false);
+        
         Main.stop();
     }
 
@@ -134,14 +133,14 @@ public class StandardProtocolsTest extends BasicTest {
             }
         });
 
-        runTheServer.set(false);
+        
         Main.stop();
         assertTrue(verifyTestRun.get());
 
         System.out.println("REPLAYING ==============================================");
 
         //REPLAYING
-        runTheServer.set(true);
+        
         verifyTestRun.set(false);
 
         var replayArgs = new String[]{
@@ -185,7 +184,7 @@ public class StandardProtocolsTest extends BasicTest {
 
 
         System.out.println("COMPLETED SIMULATION ==============================================");
-        runTheServer.set(false);
+        
         Main.stop();
         assertTrue(verifyTestRun.get());
     }
@@ -240,7 +239,7 @@ public class StandardProtocolsTest extends BasicTest {
         var exstmt = c.createStatement();
         assertThrows(PSQLException.class, () -> exstmt.executeQuery("SELECT DENOMINATION FROM COMPANY_GG;"));
 
-        runTheServer.set(false);
+        
         Main.stop();
     }
 
@@ -290,7 +289,7 @@ public class StandardProtocolsTest extends BasicTest {
         stmt.close();
         c.close();
 
-        runTheServer.set(false);
+        
         Main.stop();
     }
 }

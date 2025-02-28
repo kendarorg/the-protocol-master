@@ -79,11 +79,15 @@ public class DiService {
 
     private void destroy() {
         for (var item : children) {
-            item.destroy();
+            try {
+                item.destroy();
+            }catch (Exception e) {}
         }
         children.clear();
         for (var item : singletons.values()) {
-            destroy(item);
+            try {
+                destroy(item);
+            }catch (Exception e) {}
         }
         singletons.clear();
         if (parent != null) {
@@ -482,6 +486,9 @@ public class DiService {
     }
 
     public void clean() {
+        try {
+            this.destroy();
+        }catch (Exception e) {}
         for (var item : children) {
             item.clean();
         }
@@ -496,6 +503,6 @@ public class DiService {
         namedMappings.clear();
         parent = null;
         threads.clear();
-        singletons.put(DiService.class, this);
+
     }
 }

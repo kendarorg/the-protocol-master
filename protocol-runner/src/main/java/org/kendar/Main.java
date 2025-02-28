@@ -54,6 +54,7 @@ public class Main {
     private static boolean terminateReceived=false;
     private static Thread stopWhenQuitThread;
     private static String changedSettings;
+    private static boolean running;
 
 
     public static void main(String[] args) throws Exception {
@@ -145,7 +146,12 @@ public class Main {
         execute(settings.get(),unattended);
     }
 
-    public static void stop() {
+    public static void stop(){
+        stopInternal();
+    }
+
+    private static void stopInternal() {
+
         if (protocolServersCache == null) return;
         for (var server : protocolServersCache.values()) {
             server.stop();
@@ -155,6 +161,10 @@ public class Main {
             apiServer.stop(0);
         }
         EventsQueue.getInstance().clean();
+        diService.clean();
+        log.info("Server stopped");
+        running =false;
+
     }
 
     private static void stopWhenQuitCommand() {
@@ -181,23 +191,25 @@ public class Main {
 
     public static boolean isRunning() {
         if (protocolServersCache == null) return false;
-        return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning);
+        return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning) && running;
     }
 
 
     private static void execute(GlobalSettings ini,boolean unattended) throws Exception {
+        running = false;
         if (ini == null) return;
 
         EventsQueue.register("main",(e)->{
+            stopInternal();
             terminateReceived = true;
-            stop();
         },TerminateEvent.class);
         EventsQueue.register("main",(e)->{
-            terminateReceived = true;
+
+            stopInternal();
             if(e.getSettings()!=null && Files.exists(Path.of(e.getSettings()))){
                 changedSettings = e.getSettings();
             }
-            stop();
+            terminateReceived = true;
         }, StorageReloadedEvent.class);
 
         if(unattended){
@@ -290,6 +302,7 @@ public class Main {
                 globalPlugins.remove(i);
             }
         }
+        CountDownLatch apiLatch = new CountDownLatch(1);
         new Thread(() -> {
             try {
                 for (var item : protocolServersCache.values()) {
@@ -309,6 +322,7 @@ public class Main {
             } catch (Exception e) {
                 log.error("Unable to start API serer", e);
             }
+            apiLatch.countDown();
         }).start();
 
         if(!unattended && stopWhenQuitThread ==null) {
@@ -316,8 +330,16 @@ public class Main {
             stopWhenQuitThread.start();
         }
 
+        try {
+            apiLatch.await();
+            running=true;
+        } catch (InterruptedException ex) {
+            log.error("Error waiting for plugin to start");
+        }
+
         while (!terminateReceived) {
             Sleeper.sleep(100);
         }
+        terminateReceived=false;
     }
 }

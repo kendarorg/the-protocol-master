@@ -7,11 +7,7 @@ import org.kendar.http.plugins.commons.SiteMatcherUtils;
 import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
 import org.kendar.plugins.BasicRecordPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
-import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.PluginSettings;
-import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
@@ -79,14 +75,8 @@ public class HttpRecordPlugin extends BasicRecordPlugin<HttpRecordPluginSettings
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
+        super.handleSettingsChanged();
         target = SiteMatcherUtils.setupSites(getSettings().getTarget());
         return true;
-    }
-
-    @Override
-    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global, protocol, pluginSetting);
-        handleSettingsChanged();
-        return this;
     }
 }

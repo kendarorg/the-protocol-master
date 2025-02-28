@@ -151,7 +151,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
         if (isActive() != active) {
             if (active) {
                 EventsQueue.send(new StartWriteEvent(getInstanceId()));
-                Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
+                Sleeper.sleep(1000000, () -> this.storage.getIndexes(getInstanceId()) != null);
             } else {
                 terminate();
             }

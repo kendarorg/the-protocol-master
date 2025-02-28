@@ -3,6 +3,7 @@
   "logLevel": "INFO",
   "dataDir": "encrypted=target/tests/encrypted&pwd=test",
   "apiPort": 5005,
+  "unattended":true,
   "plugins": {
     "report-plugin": {
       "active": true

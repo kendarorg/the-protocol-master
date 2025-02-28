@@ -76,7 +76,10 @@ public class BasicTest {
             if (exception.get() != null) {
                 throw new RuntimeException((Throwable) exception.get());
             }
-            Sleeper.sleep(100);
+            Sleeper.sleep(10);
         }
+        Sleeper.sleep(100);
+        System.out.println("Server started successfully");
+        Main.isRunning();
     }
 }
