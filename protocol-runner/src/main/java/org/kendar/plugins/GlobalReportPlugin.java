@@ -35,6 +35,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private final SimpleParser simpleParser;
     private boolean active;
     private AtomicInteger counter = new AtomicInteger(0);
+    private PluginSettings settings;
 
     public GlobalReportPlugin(StorageRepository repository, JsonMapper mapper, SimpleParser simpleParser) {
         this.repository = repository;
@@ -58,6 +59,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     @Override
     public GlobalPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings) {
         setActive(pluginSettings.isActive());
+        setSettings(pluginSettings);
         EventsQueue.register("GlobalReportPlugin", m -> executor.submit(() -> handleReport(m)), ReportDataEvent.class);
         return this;
     }
@@ -129,5 +131,13 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
 
     public GlobalReport getReport() {
         return new GlobalReport(events, counters);
+    }
+
+    public void setSettings(PluginSettings settings) {
+        this.settings = settings;
+    }
+
+    public PluginSettings getSettings() {
+        return settings;
     }
 }

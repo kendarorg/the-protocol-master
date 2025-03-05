@@ -13,6 +13,7 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.PluginHandler;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.PluginsLoggerFactory;
 import org.pf4j.Extension;
 import org.pf4j.ExtensionPoint;
@@ -44,6 +45,12 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private boolean dnsRunning;
     private ServerSocket tcpSocket;
     private DatagramSocket udpSocket;
+
+
+    @Override
+    public ProtocolSettings getSettings(){
+        return settings;
+    }
 
     @TpmConstructor
     public DnsProtocol(GlobalSettings ini, DnsProtocolSettings settings,

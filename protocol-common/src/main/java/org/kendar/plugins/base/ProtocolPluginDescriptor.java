@@ -53,4 +53,6 @@ public interface ProtocolPluginDescriptor<W extends PluginSettings> extends
     ProtoDescriptor getProtocolInstance();
 
     void setProtocolInstance(ProtoDescriptor protocol);
+
+    W getSettings();
 }

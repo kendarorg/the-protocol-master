@@ -57,7 +57,11 @@ public class DiService {
     }
 
     public static void setThreadContext(DiService threadContext) {
-        threads.put(Thread.currentThread(), threadContext);
+        if(threadContext==null) {
+            threads.remove(Thread.currentThread());
+        }else {
+            threads.put(Thread.currentThread(), threadContext);
+        }
     }
 
     public static List<String> getTags(Object instance) {

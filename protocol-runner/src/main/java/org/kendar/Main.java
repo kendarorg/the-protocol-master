@@ -239,6 +239,7 @@ public class Main {
         var apisFiltersLoader = diService.getInstance(ApiFiltersLoader.class);
 
         CountDownLatch latch = new CountDownLatch(ini.getProtocols().size());
+        var protocolInstances = new ArrayList<ProtocolInstance>();
         for (var item : ini.getProtocols().entrySet()) {
             new Thread(() -> {
                 try {
@@ -267,6 +268,7 @@ public class Main {
                                 protocolServersCache.get(item.getKey()),
                                 baseProtocol.getPlugins().stream().map(a -> (ProtocolPluginDescriptor) a).toList(),
                                 protocolFullSettings);
+                        protocolInstances.add(pi);
                         var apiHandler = localDiService.getInstance(ApiHandler.class);
                         apiHandler.addProtocol(pi);
                         for (var pl : protocolServersCache.get(item.getKey()).getProtoDescriptor().getPlugins()) {
@@ -294,6 +296,7 @@ public class Main {
         } catch (InterruptedException ex) {
             log.error("Error waiting for plugin to start");
         }
+        diService.registerNamed("protocols", protocolInstances);
 
         var globalPlugins = diService.getInstances(GlobalPluginDescriptor.class);
         for (int i = globalPlugins.size() - 1; i >= 0; i--) {

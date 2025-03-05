@@ -19,6 +19,7 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.proxy.ProxyServer;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.FileResourcesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
@@ -40,6 +42,15 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private HttpServer httpServer;
     private boolean httpRunning;
     private boolean httpsRunning;
+
+    @Override
+    public ProtocolSettings getSettings(){
+        return settings;
+    }
+
+    public Map<String,Integer> getPorts(){
+        return Map.of("proxy",settings.getProxy(),"http",settings.getHttp(),"https",settings.getHttps());
+    }
 
     @TpmConstructor
     public HttpProtocol(GlobalSettings ini, HttpProtocolSettings settings,
