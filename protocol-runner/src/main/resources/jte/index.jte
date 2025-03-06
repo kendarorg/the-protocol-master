@@ -54,7 +54,7 @@
                         </div>
                         <br>
                         <div class="input-group">
-                            <a href="#" type="button" class="btn btn-danger" onclick="restart()">
+                            <a href="#" type="button" class="btn btn-warning" onclick="restart()">
                                 Restart
                             </a>
                         </div>

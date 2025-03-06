@@ -15,6 +15,7 @@ import org.kendar.command.ProtocolsRunner;
 import org.kendar.di.DiService;
 import org.kendar.di.TpmScopeType;
 import org.kendar.events.EventsQueue;
+import org.kendar.events.RestartEvent;
 import org.kendar.events.StorageReloadedEvent;
 import org.kendar.events.TerminateEvent;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
@@ -52,6 +53,7 @@ public class Main {
     private static HttpServer apiServer;
     private static DiService diService;
     private static boolean terminateReceived=false;
+    private static boolean restartReceived=false;
     private static Thread stopWhenQuitThread;
     private static String changedSettings;
     private static boolean running;
@@ -66,6 +68,9 @@ public class Main {
                 if (changedSettings != null && changedSettings.trim().length() > 0 && Files.exists(Path.of(changedSettings))) {
                     log.info("RESTARTING AFTER SETTINGS CHANGE");
                     realArgs = new String[]{"-cfg", changedSettings};
+                } else if (restartReceived) {
+                    restartReceived=false;
+                    log.info("RESTARTING AFTER RESTART REQUEST");
                 } else {
                     running=false;
                 }
@@ -170,7 +175,7 @@ public class Main {
 
     private static void stopWhenQuitCommand() {
         var scanner = new Scanner(System.in);
-        System.out.println("Press Q to quit");
+        System.out.println("Press Q to quit, R to restart");
         String line;
         line = scanner.nextLine();
         try {
@@ -178,6 +183,10 @@ public class Main {
                 if (line != null && line.trim().equalsIgnoreCase("q")) {
                     System.out.println("Exiting");
                     EventsQueue.send(new TerminateEvent());
+                    return;
+                }if (line != null && line.trim().equalsIgnoreCase("r")) {
+                    System.out.println("Restarting");
+                    EventsQueue.send(new RestartEvent());
                     return;
                 } else if (line != null) {
                     System.out.println("Command not recognized: " + line.trim());
@@ -204,6 +213,10 @@ public class Main {
             stopInternal();
             terminateReceived = true;
         },TerminateEvent.class);
+        EventsQueue.register("main",(e)->{
+            stopInternal();
+            restartReceived = true;
+        },RestartEvent.class);
         EventsQueue.register("main",(e)->{
 
             stopInternal();
@@ -344,7 +357,7 @@ public class Main {
             log.error("Error waiting for plugin to start");
         }
 
-        while (!terminateReceived) {
+        while (!terminateReceived && !restartReceived) {
             Sleeper.sleep(100);
         }
         terminateReceived=false;

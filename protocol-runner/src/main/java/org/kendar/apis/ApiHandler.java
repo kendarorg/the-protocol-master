@@ -12,6 +12,7 @@ import org.kendar.apis.dtos.ProtocolIndex;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
+import org.kendar.events.RestartEvent;
 import org.kendar.events.TerminateEvent;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
@@ -121,6 +122,27 @@ public class ApiHandler implements FilteringClass {
                         PluginIndex(p.getId(), p.isActive())).
                 collect(Collectors.toList());
         respondJson(resp, result);
+    }
+
+    @SuppressWarnings("finally")
+    @HttpMethodFilter(
+            pathAddress = "/api/global/restart",
+            method = "GET", id = "GET /api/global/restart")
+    @TpmDoc(
+            description = "Restart",
+            responses = @TpmResponse(
+                    body = Ok.class
+            ),
+            tags = {"base/utils"})
+    public void restart(Request reqp, Response resp) {
+        try {
+            respondOk(resp);
+        } finally {
+            for (var plugin : instances) {
+                plugin.getServer().stop();
+            }
+            EventsQueue.send(new RestartEvent());
+        }
     }
 
 
