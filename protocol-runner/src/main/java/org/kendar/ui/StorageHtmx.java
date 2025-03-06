@@ -15,31 +15,30 @@ import org.kendar.utils.JsonMapper;
 @TpmService
 @HttpTypeFilter(
         blocking = true)
-public class MainHtmxPages implements FilteringClass {
-
+public class StorageHtmx implements FilteringClass {
     private final JsonMapper mapper;
     private final MultiTemplateEngine resolversFactory;
     private final DiService diService;
 
-    public MainHtmxPages(JsonMapper mapper, MultiTemplateEngine resolversFactory, DiService diService) {
+    public StorageHtmx(JsonMapper mapper, MultiTemplateEngine resolversFactory, DiService diService) {
         this.mapper = mapper;
         this.resolversFactory = resolversFactory;
         this.diService = diService;
     }
     @Override
     public String getId() {
-        return getClass().getName();
+        return this.getClass().getName();
     }
 
+
     @HttpMethodFilter(
-            pathAddress = "/",
-            method = "GET", id = "GET /")
-    public void root(Request request, Response response) {
+            pathAddress = "/storage",
+            method = "GET", id = "GET /storage")
+    public void storage(Request request, Response response) {
         var output = new StringOutput();
-        resolversFactory.render("index.jte",null,output);
+        resolversFactory.render("storage.jte",null,output);
         response.addHeader("Content-type","text/html");
         response.setResponseText(new TextNode(output.toString()));
         response.setStatusCode(200);
     }
-
 }
