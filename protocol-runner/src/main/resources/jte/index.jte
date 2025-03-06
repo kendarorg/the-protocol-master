@@ -33,18 +33,18 @@
             -->
 
             <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="headingStorage">
+                <div class="panel-heading" role="tab" id="headingMainIndex">
                     <h4 class="panel-title">
                         <a role="button" data-toggle="collapse" data-parent="#accordion"
-                           href="#collapseStorage"
-                           onclick="toggleAccordion('collapseStorage')"
-                           aria-expanded="true" aria-controls="collapseStorage">
+                           href="#collapseMainIndex"
+                           onclick="toggleAccordion('collapseMainIndex')"
+                           aria-expanded="true" aria-controls="collapseMainIndex">
                             TPM Main settings
                         </a>
                     </h4>
                 </div>
-                <div id="collapseStorage" class="panel-collapse collapse in" role="tabpanel"
-                     aria-labelledby="headingStorage">
+                <div id="collapseMainIndex" class="panel-collapse collapse in" role="tabpanel"
+                     aria-labelledby="headingMainIndex">
                     <div class="panel-body">
 
                         <div class="input-group">
@@ -67,6 +67,7 @@
                             <input type="text" readonly="true"
                                    class="form-control" value="${data.getApiPort()}">
                         </div>
+                        <br>
                         <div class="input-group">
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" type="button"
@@ -75,6 +76,7 @@
                             <input type="text" readonly="true"
                                    class="form-control" value="${data.getDataDir()}">
                         </div>
+                        <br>
                         <div class="input-group">
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" type="button"
@@ -82,6 +84,12 @@
                                 </span>
                             <input type="text" readonly="true"
                                    class="form-control" value="${data.getPluginsDir()}">
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <a href="#" type="button" class="btn  btn-success" onclick="downloadURI('/api/global/settings')">
+                                Download settings
+                            </a>
                         </div>
                     </div>
                 </div>

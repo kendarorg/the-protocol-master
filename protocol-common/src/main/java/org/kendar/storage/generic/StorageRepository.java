@@ -40,4 +40,8 @@ public interface StorageRepository extends Service {
     void writePluginFile(StorageFile file);
 
     void delPluginFile(StorageFileIndex storageFileIndex);
+
+    List<String> listFiles();
+    List<String> listInstanceIds();
+    List<String> listPluginIds(String instanceId);
 }

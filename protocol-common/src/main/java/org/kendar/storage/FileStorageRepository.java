@@ -1,6 +1,7 @@
 package org.kendar.storage;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.io.FilenameUtils;
 import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmPostConstruct;
@@ -412,6 +413,12 @@ public class FileStorageRepository implements StorageRepository {
                 .collect(Collectors.toList());
     }
 
+    protected List<File> listDirsUsingJavaIO(String dir) {
+        return Stream.of(new File(dir).listFiles())
+                .filter(file -> file.isDirectory())
+                .collect(Collectors.toList());
+    }
+
     @Override
     public byte[] readAsZip() {
         var baos = new ByteArrayOutputStream();
@@ -632,6 +639,47 @@ public class FileStorageRepository implements StorageRepository {
         if (filePath.toFile().exists()) {
             filePath.toFile().delete();
         }
+    }
+
+    @Override
+    public List<String> listFiles() {
+        var result = new ArrayList<String>();
+        var pluginDir = ensureDirectory(Path.of(targetDir).toAbsolutePath().toString());
+        for (var file : listFilesUsingJavaIO(Path.of(pluginDir).toAbsolutePath().toString())) {
+            if (file.getName().endsWith(".json")) {
+                result.add(FilenameUtils.getBaseName(file.getName()));
+            }
+
+        }
+        return result;
+    }
+
+    @Override
+    public List<String> listInstanceIds() {
+        var result = new ArrayList<String>();
+        var pluginDir = ensureDirectory(Path.of(targetDir).toAbsolutePath().toString());
+        for (var file : listDirsUsingJavaIO(Path.of(pluginDir).toAbsolutePath().toString())) {
+            if (file.getName().equalsIgnoreCase(".")||
+                    file.getName().equalsIgnoreCase("..")) {
+                continue;
+            }
+            result.add(file.getName());
+        }
+        return result;
+    }
+
+    @Override
+    public List<String> listPluginIds(String instanceId) {
+        var result = new ArrayList<String>();
+        var pluginDir = ensureDirectory(Path.of(targetDir,instanceId).toAbsolutePath().toString());
+        for (var file : listDirsUsingJavaIO(Path.of(pluginDir).toAbsolutePath().toString())) {
+            if (file.getName().equalsIgnoreCase(".")||
+                    file.getName().equalsIgnoreCase("..")) {
+                continue;
+            }
+            result.add(file.getName());
+        }
+        return result;
     }
 
     protected String getFileContent(Path of) throws IOException {

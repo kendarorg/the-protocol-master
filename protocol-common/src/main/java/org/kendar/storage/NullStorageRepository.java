@@ -102,6 +102,21 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public List<String> listFiles() {
+        return List.of();
+    }
+
+    @Override
+    public List<String> listInstanceIds() {
+        return List.of();
+    }
+
+    @Override
+    public List<String> listPluginIds(String instanceId) {
+        return List.of();
+    }
+
+    @Override
     public String getType() {
         return "storage";
     }

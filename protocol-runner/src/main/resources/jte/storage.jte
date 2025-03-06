@@ -7,17 +7,15 @@
 @template.header("storage")
 
 <script type="application/javascript">
-    function cleanStorage(){
+    function cleanStorage() {
         if (confirm("You want to remove ALL data?") == true) {
-            getData("/api/global/storage","DELETE",()=>{
+            getData("/api/global/storage", "DELETE", () => {
                 alert("All data deleted");
             })
         }
     }
 
-    function downloadStorage(){
-        downloadURI("/api/global/storage");
-    }
+
 </script>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -42,7 +40,8 @@
                     <div class="panel-body">
 
                         <div class="input-group">
-                            <a href="api/global/storage" type="button" class="btn  btn-success" onclick="downloadStorage()">
+                            <a href="#" type="button" class="btn  btn-success"
+                               onclick="downloadURI('/api/global/storage')">
                                 Download
                             </a>
                         </div>
@@ -58,7 +57,7 @@
                             <div class="input-group">
                                 <span class="input-group-btn">
                                     <label for="uploadStorage" class="btn btn-default"
-                                           >Browse</label>
+                                    >Browse</label>
                                     <button class="btn btn-default" type="button"
                                             onclick="async_file_send()">Upload</button>
                                 </span>
@@ -69,11 +68,33 @@
                                             onclick="async_file_clean('uploadStorage')">Clean</button>
                                 </span>
                             </div>
-                            <div><input id="uploadStorage" class="btn btn-success" style="visibility:hidden;height: 0px;width: 0px;padding: 0px;"
+                            <div><input id="uploadStorage" class="btn btn-success"
+                                        style="visibility:hidden;height: 0px;width: 0px;padding: 0px;"
                                         size="0"
                                         contentType="application/octet-stream" binary="true" type="file"
                                         path="api/global/storage"></div>
                         </form>
+                    </div>
+                </div>
+            </div>
+            <!-- 
+            BROWSE STORAGE
+            -->
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingBrowse">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                           href="#collapseBrowse"
+                           onclick="toggleAccordion('collapseBrowse')"
+                           aria-expanded="true" aria-controls="collapseBrowse">
+                            Browse Storage
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseBrowse" class="panel-collapse collapse" role="tabpanel"
+                     aria-labelledby="headingBrowse">
+                    <div class="panel-body">
+                        <div hx-get="/storage/tree?path=" hx-trigger="load"></div>
                     </div>
                 </div>
             </div>
