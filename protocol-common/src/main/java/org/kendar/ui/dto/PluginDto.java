@@ -1,6 +1,6 @@
 package org.kendar.ui.dto;
 
-public class PluginDto {
+public class PluginDto  extends BaseHtmxDto{
     private boolean active;
 
     public PluginDto() {

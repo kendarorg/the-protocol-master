@@ -177,7 +177,6 @@ public class ApiHandler implements FilteringClass {
         var plugin = reqp.getPathParameter("plugin");
         var action = reqp.getPathParameter("action");
 
-        {
             for (var instance : instances) {
                 var pluginInstance = instance.getPlugins().stream().filter(p ->
                         p.getId().equalsIgnoreCase(plugin)).findFirst();
@@ -190,7 +189,6 @@ public class ApiHandler implements FilteringClass {
             }
             respondOk(resp);
             return true;
-        }
     }
 
     public void addGLobalPlugins(List<GlobalPluginDescriptor> globalPlugins) {

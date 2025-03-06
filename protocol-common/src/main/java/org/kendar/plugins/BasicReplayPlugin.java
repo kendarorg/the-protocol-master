@@ -142,7 +142,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
     protected void handleActivation(boolean active) {
         try {
             if (this.isActive() != active) {
-
+                getSettings().setActive(active);
                 completedOutIndexes.clear();
                 completedIndexes.clear();
                 if (active) {

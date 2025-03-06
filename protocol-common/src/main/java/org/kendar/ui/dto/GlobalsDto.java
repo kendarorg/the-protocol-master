@@ -3,7 +3,7 @@ package org.kendar.ui.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GlobalsDto {
+public class GlobalsDto extends BaseHtmxDto{
     private List<PluginDto> plugins = new ArrayList<>();
 
     public List<PluginDto> getPlugins() {

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProtocolDto {
+public class ProtocolDto  extends BaseHtmxDto{
     private List<PluginDto> plugins = new ArrayList<PluginDto>();
     private String protocol;
     private String instanceId;
@@ -41,5 +41,9 @@ public class ProtocolDto {
 
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
+    }
+
+    public String getSafeInstanceId() {
+        return instanceId.replaceAll("-","");
     }
 }

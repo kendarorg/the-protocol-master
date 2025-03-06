@@ -149,6 +149,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     protected void handleActivation(boolean active) {
         EventsQueue.send(new RecordStatusEvent(active, getProtocol(), getId(), getInstanceId()));
         if (isActive() != active) {
+            getSettings().setActive(active);
             if (active) {
                 EventsQueue.send(new StartWriteEvent(getInstanceId()));
                 Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);

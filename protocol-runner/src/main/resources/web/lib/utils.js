@@ -50,3 +50,35 @@ htmx.defineExtension('submitjson', {
         return (JSON.stringify(parameters))
     }
 })
+
+
+
+function toggleAccordion(elementId){
+    var element = document.getElementById(elementId);
+    if (element.classList.contains("in")) {
+        console.log("CLOSE")
+        element.classList.remove("in")
+    } else {
+        console.log("OPEN")
+        element.classList.add("in")
+    }
+}
+
+function isAccordionOpen(elementId){
+    var element = document.getElementById(elementId);
+    return element.classList.contains("in");
+}
+
+function openAccordion(elementId){
+    console.log("OPEN "+elementId)
+    setTimeout(function() {
+        var element = document.getElementById(elementId);
+        if (!element.classList.contains("in")) {
+            console.log("OPEN")
+            element.classList.add("in")
+        }
+    }, 250);
+    //debugger;
+    //htmx.toggleClass(htmx.find("#elementId"), "in");
+
+}
