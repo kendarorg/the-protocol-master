@@ -63,6 +63,7 @@ public class PluginsHtmx implements FilteringClass {
         var model = new ProtocolStatusDto();
         var instances = (List<ProtocolInstance>)diService.getNamedInstance("protocols",new ArrayList<ProtocolInstance>().getClass());
         for(var instance: instances){
+            if(instance==null) continue;
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
             model.getProtocols().add(this.convert(protocol));
         }
