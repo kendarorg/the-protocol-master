@@ -9,6 +9,7 @@ import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.JsonMapper;
 
 @SuppressWarnings("HttpUrlsUsage")
@@ -36,7 +37,8 @@ public class MainHtmxPages implements FilteringClass {
             method = "GET", id = "GET /")
     public void root(Request request, Response response) {
         var output = new StringOutput();
-        resolversFactory.render("index.jte",null,output);
+        var settings = diService.getInstance(GlobalSettings.class);
+        resolversFactory.render("index.jte",settings,output);
         response.addHeader("Content-type","text/html");
         response.setResponseText(new TextNode(output.toString()));
         response.setStatusCode(200);

@@ -1,5 +1,6 @@
 @param String currentPage
 
+
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -16,21 +17,38 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+
+                <!--
+                MAIN
+                -->
                 @if(currentPage.startsWith("index"))
                     <li class="active" ><a  href="/">Main</a></li>
                 @else
                     <li><a href="/">Main</a></li>
                 @endif
+
+                <!--
+                STORAGE
+                -->
                 @if(currentPage.startsWith("storage"))
-                    <li class="active" ><a href="/storage">Storage</a></li>
+                    <li class="active" ><a  href="/storage">Storage</a>
+                    </li>
                 @else
-                    <li><a href="/storage">Storage</a></li>
+                    <li><a  href="/storage">Storage</a>
+                    </li>
                 @endif
+
+                <!--
+                PLUGINS
+                -->
                 @if(currentPage.startsWith("plugins"))
                     <li class="active" ><a  href="/plugins">Plugins</a></li>
                 @else
                     <li><a href="/plugins">Plugins</a></li>
                 @endif
+                <!--
+                GLOBAL PLUGINS
+                -->
                 @if(currentPage.startsWith("globalpl"))
                     <li class="active" ><a  href="/globalpl">Global-Plugins</a></li>
                 @else

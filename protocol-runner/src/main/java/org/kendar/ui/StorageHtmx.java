@@ -41,4 +41,15 @@ public class StorageHtmx implements FilteringClass {
         response.setResponseText(new TextNode(output.toString()));
         response.setStatusCode(200);
     }
+
+    @HttpMethodFilter(
+            pathAddress = "/storage/menu",
+            method = "GET", id = "GET /storage/menu")
+    public void storageMenu(Request request, Response response) {
+        var output = new StringOutput();
+        resolversFactory.render("storage/menu.jte",null,output);
+        response.addHeader("Content-type","text/html");
+        response.setResponseText(new TextNode(output.toString()));
+        response.setStatusCode(200);
+    }
 }

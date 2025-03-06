@@ -35,13 +35,15 @@
                             <div class="input-group">
                                 <label for="pluginId" class="control-label">Plugin Id</label>
                                 <div>
-                                    <input id="pluginId" type="text" readonly="true" size="30"  class="form-control" value="${data.getId()}">
+                                    <input id="pluginId" type="text" readonly="true" size="30" class="form-control"
+                                           value="${data.getId()}">
                                 </div>
                             </div>
                             <div class="input-group">
                                 <label for="settings" class="control-label">Settings</label>
                                 <div>
-                                    <textarea id="settings" class="form-control" rows="10" cols="60" >${data.getSettings()}</textarea>
+                                    <textarea id="settings" class="form-control" rows="10"
+                                              cols="60">${data.getSettings()}</textarea>
                                 </div>
                             </div>
                             <div class="input-group">
