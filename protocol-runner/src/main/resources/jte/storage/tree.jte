@@ -1,30 +1,20 @@
 @param org.kendar.ui.dto.FileTreeItemDto data
-<div>
-    <ul class="tree-padding tree-vertical-lines tree-horizontal-lines tree-summaries tree-markers tree-buttons">
-    @for(var element : data.getChildren())
-        @if(!element.isDirectory())
-            <li>${element.getName()}</li>
-        @else
-            <li>
-                <details>
-                    <summary>${element.getName()}</summary>
-                    <ul>
-                        @for(var plElement:element.getChildren())
+<li><span class="bi bi-folder2-open" onclick=""></span>${data.getName()}
+    <ul>
+        @for(var child :data.getChildren())
+            @if(child.isDirectory())
+                <li id="${child.getSafeIndex()}">
+                    <span class="bi bi-folder2"></span>
+                    <span
+                       hx-get="/storage/tree?parent=${child.getPath()}"
+                       hx-trigger="click"
+                       hx-target="#${child.getSafeIndex()}"
+                    > ${child.getName()}</span>
 
-                            <details>
-                                <summary>${plElement.getName()}</summary>
-                                <ul>
-                                    @for(var pflElement:plElement.getChildren())
-                                        <li>${pflElement.getName()}</li>
-                                    @endfor
-                                </ul>
-                            </details>
-
-                        @endfor
-                    </ul>
-                </details>
-            </li>
-        @endif
-    @endfor
-</ul>
-</div>
+                </li>
+            @else
+                <li><span class="bi bi-file-x"></span>${child.getName()}</li>
+            @endif
+        @endfor
+    </ul>
+</li>

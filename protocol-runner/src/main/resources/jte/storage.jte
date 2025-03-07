@@ -94,7 +94,9 @@
                 <div id="collapseBrowse" class="panel-collapse collapse" role="tabpanel"
                      aria-labelledby="headingBrowse">
                     <div class="panel-body">
-                        <div hx-get="/storage/tree?path=" hx-trigger="load"></div>
+                        <ul>
+                            <li hx-get="/storage/tree?parent=" hx-trigger="load"></li>
+                        </ul>
                     </div>
                 </div>
             </div>

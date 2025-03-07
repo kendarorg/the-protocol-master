@@ -255,25 +255,19 @@ function handle_file_select(evt) {
 // =========================================
 
 
-function listree() {
-    const subMenuHeadings = document.getElementsByClassName("listree-submenu-heading");
-    Array.from(subMenuHeadings).forEach(function(subMenuHeading){
-        subMenuHeading.classList.add("collapsed");
-        subMenuHeading.nextElementSibling.style.display = "none";
-        subMenuHeading.addEventListener('click', function(event){
-            event.preventDefault();
-            const subMenuList = event.target.nextElementSibling;
-            if(subMenuList.style.display=="none"){
-                subMenuHeading.classList.remove("collapsed");
-                subMenuHeading.classList.add("expanded");
-                subMenuList.style.display = "block";
-            }
-            else {
-                subMenuHeading.classList.remove("expanded");
-                subMenuHeading.classList.add("collapsed");
-                subMenuList.style.display = "none";
-            }
-            event.stopPropagation();
-        });
-    });
+function click123(e){
+    e = e || window.event;
+    var src = e.target || e.srcElement;
+    //src element is the eventsource
+}
+
+function toggleTree(event) {
+    var element = document.getElementById(elementId);
+    if (element.classList.contains("in")) {
+        console.log("CLOSE")
+        element.classList.remove("in")
+    } else {
+        console.log("OPEN")
+        element.classList.add("in")
+    }
 }
