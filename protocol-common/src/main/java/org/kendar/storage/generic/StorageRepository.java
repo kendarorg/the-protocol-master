@@ -8,6 +8,8 @@ import java.util.List;
 public interface StorageRepository extends Service {
     void initialize();
 
+    String getSettings();
+
     void write(LineToWrite lineToWrite);
 
     void finalizeWrite(String instanceId);

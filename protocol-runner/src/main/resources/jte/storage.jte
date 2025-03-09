@@ -15,6 +15,21 @@
         }
     }
 
+    function openTree(target,path) {
+        return htmx.ajax('GET', '/storage/tree?parent='+path, target);
+    }
+    function openFiles(path) {
+        return htmx.ajax('GET', '/storage/files?parent='+path, "#resultsContainer");
+    }
+    function openFile(path,name) {
+        return htmx.ajax('GET', '/storage/file?parent='+path+'&name='+name, "#resultsContainer");
+    }
+
+
+    function closeTree(target,path) {
+        return htmx.ajax('GET', '/storage/tree?close=true&parent='+path, target);
+    }
+
 
 </script>
 <div class="panel panel-default">
@@ -93,10 +108,22 @@
                 </div>
                 <div id="collapseBrowse" class="panel-collapse collapse" role="tabpanel"
                      aria-labelledby="headingBrowse">
+
                     <div class="panel-body">
-                        <ul>
-                            <li hx-get="/storage/tree?parent=" hx-trigger="load"></li>
-                        </ul>
+                        <div class="container-fluid">
+                            <div class="col-xs-6" >
+                                <ul class="tree" style="list-style-type: none;">
+                                    <li  hx-get="/storage/tree?parent=" hx-trigger="load"></li>
+                                </ul>
+                            </div>
+
+                            <div class="col-xs-6">
+                                <div id="resultsContainer" hx-get="/storage/files?parent=" hx-trigger="load">
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

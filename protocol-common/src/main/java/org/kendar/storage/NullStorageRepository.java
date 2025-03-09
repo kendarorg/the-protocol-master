@@ -22,6 +22,11 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
+    public String getSettings() {
+        return "";
+    }
+
+    @Override
     public void write(LineToWrite lineToWrite) {
 
     }

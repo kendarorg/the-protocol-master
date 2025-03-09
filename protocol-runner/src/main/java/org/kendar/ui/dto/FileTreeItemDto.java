@@ -13,6 +13,16 @@ public class FileTreeItemDto {
     }
 
 
+    private boolean open;
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
     private final String path;
     private List<FileTreeItemDto> children = new ArrayList<>();
     private String name;

@@ -5,3 +5,7 @@
 .active {
     display: block;
 }
+
+.tree ul {
+    list-style-type: none;
+}

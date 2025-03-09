@@ -175,6 +175,18 @@ public class FileStorageRepository implements StorageRepository {
         }
     }
 
+    @Override
+    public String getSettings() {
+        if(Files.exists(Path.of(targetDir,"settings.json"))){
+            try {
+                return Files.readString(Path.of(targetDir,"settings.json"));
+            } catch (IOException e) {
+                throw new RuntimeException();
+            }
+        }
+        return "";
+    }
+
     protected void finalizePlay(String instanceId) {
         synchronized (initializeContentLock) {
             log.info("Stop replaying {}", instanceId);

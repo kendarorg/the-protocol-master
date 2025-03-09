@@ -255,19 +255,3 @@ function handle_file_select(evt) {
 // =========================================
 
 
-function click123(e){
-    e = e || window.event;
-    var src = e.target || e.srcElement;
-    //src element is the eventsource
-}
-
-function toggleTree(event) {
-    var element = document.getElementById(elementId);
-    if (element.classList.contains("in")) {
-        console.log("CLOSE")
-        element.classList.remove("in")
-    } else {
-        console.log("OPEN")
-        element.classList.add("in")
-    }
-}
