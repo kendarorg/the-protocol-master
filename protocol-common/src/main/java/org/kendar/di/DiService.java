@@ -493,11 +493,14 @@ public class DiService {
         try {
             this.destroy();
         }catch (Exception e) {}
-        for (var item : children) {
+        for (int i = 0; i < children.size(); i++) {
+            var item = children.get(i);
             item.clean();
         }
         children.clear();
-        for (var item : singletons.values()) {
+        Object[] array = singletons.values().toArray();
+        for (int i = 0; i < array.length; i++) {
+            var item = array[i];
             destroy(item);
         }
         singletons.clear();
