@@ -90,7 +90,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(protocol.getProtocolInstanceId(),pluginSetting.getPlugin());
+        storage = repository.buildPluginFileManager(getInstanceId(),getId());
         return this;
     }
 

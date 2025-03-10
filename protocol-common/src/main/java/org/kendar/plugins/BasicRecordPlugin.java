@@ -138,7 +138,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(protocol.getProtocolInstanceId(),pluginSetting.getPlugin());
+        storage = repository.buildPluginFileManager(getInstanceId(),getId());
         handleSettingsChanged();
         return this;
     }

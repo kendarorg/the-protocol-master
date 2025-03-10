@@ -569,7 +569,7 @@ public class FileStorageRepository extends StorageRepository {
 
     
     public StorageFile readPluginFile(StorageFileIndex file) {
-        var realPath = buildRealPath(targetDir, file.getInstanceId(), file.getPluginId()).toString();
+        var realPath = buildRealPath( file.getInstanceId(), file.getPluginId()).toString();
         ensureDirectory(realPath);
         var filePath = Path.of(realPath, file.getIndex() + ".json");
         if (Files.exists(filePath)) {
@@ -585,7 +585,7 @@ public class FileStorageRepository extends StorageRepository {
 
     
     public void writePluginFile(StorageFile file) {
-        var realPath = buildRealPath(targetDir, file.getIndex().getInstanceId(), file.getIndex().getPluginId()).toString();
+        var realPath = buildRealPath( file.getIndex().getInstanceId(), file.getIndex().getPluginId()).toString();
         ensureDirectory(realPath);
         var filePath = Path.of(realPath, file.getIndex().getIndex() + ".json");
         try {

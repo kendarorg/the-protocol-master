@@ -92,7 +92,7 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(protocol.getProtocolInstanceId(),pluginSetting.getPlugin());
+        storage = repository.buildPluginFileManager(getInstanceId(),getId());
         if (!handleSettingsChanged()) return null;
 
         return this;

@@ -106,7 +106,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
 
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(protocol.getProtocolInstanceId(),pluginSetting.getPlugin());
+        storage = repository.buildPluginFileManager(getInstanceId(),getId());
         if (!handleSettingsChanged()) return null;
 
         return this;
