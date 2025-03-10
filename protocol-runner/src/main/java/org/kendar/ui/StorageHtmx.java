@@ -62,28 +62,6 @@ public class StorageHtmx implements FilteringClass {
         if(!close) {
             model.getChildren().addAll(repository.listDirs(path).stream().
                     map(instanceId -> new FileTreeItemDto(path, instanceId, true)).toList());
-            //if (path.isEmpty()) {
-//                model.getChildren().add(new FileTreeItemDto(path, "recordings", true));
-//                model.getChildren().addAll(repository.listInstanceIds().stream().
-//                        map(instanceId -> new FileTreeItemDto(path, instanceId, true)).toList());
-//                /*if (repository.listFiles().stream().anyMatch(f -> f.equalsIgnoreCase("settings"))) {
-//                    model.getChildren().add(new FileTreeItemDto(path, "settings", false));
-//                }*/
-//            } else if (split.length == 1) {
-//                if (split[0].equals("recordings")) {
-//                    /*model.getChildren().addAll(repository.listFiles().stream().
-//                            filter(f -> !f.equalsIgnoreCase("settings")).
-//                            map(instanceId -> new FileTreeItemDto(path, instanceId, false)).toList());*/
-//                } else {
-//                    model.getChildren().addAll(repository.listPluginIds(split[0]).stream().
-//                            map(instanceId -> new FileTreeItemDto(path, instanceId, true)).toList());
-//                }
-//            } else if (split.length == 2) {
-//                /*model.getChildren().addAll(repository.listPluginFiles(split[0], split[1]).stream().
-//                        map(f -> new FileTreeItemDto(path, f.getIndex(), false)).toList());*/
-//            } else {
-//                throw new RuntimeException("Invalid path ");
-//            }
         }
 
         var output = new StringOutput();

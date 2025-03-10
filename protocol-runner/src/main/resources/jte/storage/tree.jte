@@ -1,14 +1,14 @@
 @param org.kendar.ui.dto.FileTreeItemDto data
 
 @if(data.isOpen())
-<li  id="${data.getSafeIndex()}"><span class="bi bi-folder2-open"
-                                       onclick="closeTree('#${data.getSafeIndex()}','${data.getPath()}')"></span>${data.getName()}
+<li  id="${data.getSafePath()}"><span class="bi bi-folder2-open"
+                                       onclick="closeTree('#${data.getSafePath()}','${data.getPath()}')"></span>${data.getName()}
     <ul class="tree">
         @for(var child :data.getChildren())
             @if(child.isDirectory())
-                <li  id="${child.getSafeIndex()}" >
+                <li  id="${child.getSafePath()}" >
                     <span class="bi bi-folder2"
-                          onclick="openTree('#${child.getSafeIndex()}','${child.getPath()}').then(()=>openFiles('${child.getPath()}'))">
+                          onclick="openTree('#${child.getSafePath()}','${child.getPath()}').then(()=>openFiles('${child.getPath()}'))">
                     </span>
                     <span
                     > ${child.getName()}</span>
@@ -21,6 +21,8 @@
     </ul>
 </li>
 @else
-    <li  id="${data.getSafeIndex()}"><span class="bi bi-folder2"
-              onclick="openTree('#${data.getSafeIndex()}','${data.getPath()}').then(()=>openFiles('${data.getPath()}'))"></span>${data.getName()}</li>
+    <li  id="${data.getSafePath()}"><span class="bi bi-folder2"
+              onclick="openTree('#${data.getSafePath()}','${data.getPath()}').then(()=>openFiles('${data.getPath()}'))">
+
+        </span>&nbsp;${data.getName()}</li>
 @endif

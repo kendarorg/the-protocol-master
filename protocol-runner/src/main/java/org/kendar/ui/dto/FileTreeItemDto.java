@@ -8,10 +8,13 @@ public class FileTreeItemDto {
         return path;
     }
 
-    public String getSafeIndex() {
-        return path.replaceAll("/", "__")+"__"+name;
+    public String getSafePath() {
+        return path.replaceAll("/", "__");
     }
 
+//    public String getRealPath(){
+//        return path+"/"+name;
+//    }
 
     private boolean open;
 
@@ -23,26 +26,27 @@ public class FileTreeItemDto {
         this.open = open;
     }
 
-    private final String path;
+    private String path;
     private List<FileTreeItemDto> children = new ArrayList<>();
-    private String name;
+    //private String name;
     private boolean directory;
 
     public FileTreeItemDto(String path, boolean directory) {
         this.directory = directory;
-        if(path.isEmpty()){
-            this.path = "";
-            this.name = "root";
-        }else {
-            var fakePath = new ArrayList<>(List.of(path.split("/")));
-            this.name = fakePath.get(fakePath.size()-1);
-            fakePath.remove(fakePath.size()-1);
-            this.path = String.join("/", fakePath);
-        }
+        this.path = path;
+//        if(path.isEmpty()){
+//            this.path = "";
+//            this.name = "root";
+//        }else {
+//            var fakePath = new ArrayList<>(List.of(path.split("/")));
+//            this.name = fakePath.get(fakePath.size()-1);
+//            fakePath.remove(fakePath.size()-1);
+//            this.path = String.join("/", fakePath);*
+//        }
     }
 
     public FileTreeItemDto(String root,String name, boolean directory) {
-        this.name = name;
+        //this.name = name;
         this.directory = directory;
         this.path = root.length()>0?root+"/"+name:name;
     }
@@ -56,12 +60,10 @@ public class FileTreeItemDto {
     }
 
     public String getName() {
-        return name;
+        var ph =path.substring(path.lastIndexOf("/")+1);
+        return ph;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public boolean isDirectory() {
         return directory;

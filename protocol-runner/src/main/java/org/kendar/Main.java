@@ -259,9 +259,14 @@ public class Main {
                     var localDiService = diService.createChildScope(TpmScopeType.THREAD);
                     try {
                         var protocol = ini.getProtocolForKey(item.getKey());
-                        if (protocol == null) return;
+                        if (protocol == null) {
+                            throw new RuntimeException("Protocol " + protocol.getProtocol() + " not found");
+                        }
                         //Retrieve the type
                         var tempSettings = localDiService.getInstance(ProtocolSettings.class, protocol.getProtocol());
+                        if(tempSettings == null) {
+                            throw new RuntimeException("Protocol settings " + protocol.getProtocol() + " not found");
+                        }
                         //Load the real data
                         var protocolFullSettings = ini.getProtocol(item.getKey(), tempSettings.getClass());
                         protocolFullSettings.setProtocolInstanceId(item.getKey());
@@ -295,7 +300,7 @@ public class Main {
                         throw new RuntimeException(xx);
                     }
                 } catch (Exception ex) {
-                    log.error("Unable to start protocol {}", item.getKey(), ex);
+                    log.error("Unable to start protocol {}: {}", item.getKey(), ex.getMessage());
                 }
 
                 latch.countDown();
