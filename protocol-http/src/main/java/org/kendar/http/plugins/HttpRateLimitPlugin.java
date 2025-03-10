@@ -15,7 +15,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.storage.StorageFileIndex;
+import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -35,6 +35,7 @@ public class HttpRateLimitPlugin extends BasicPercentPlugin<HttpRateLimitPluginS
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
+    private PluginFileManager storage;
 
     public HttpRateLimitPlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
@@ -60,9 +61,9 @@ public class HttpRateLimitPlugin extends BasicPercentPlugin<HttpRateLimitPluginS
         if (getSettings() == null) return false;
         sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getTarget());
         customResponse = null;
-        var responseFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(), getId(), "response"));
+        var responseFile = storage.readFile( "response");
         if (responseFile != null) {
-            customResponse = mapper.deserialize(responseFile.getContent(), Response.class);
+            customResponse = mapper.deserialize(responseFile, Response.class);
         }
         return true;
     }
@@ -70,6 +71,7 @@ public class HttpRateLimitPlugin extends BasicPercentPlugin<HttpRateLimitPluginS
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
+        storage = repository.buildPluginFileManager(getInstanceId(),getId());
         if (!handleSettingsChanged()) return null;
         return this;
     }

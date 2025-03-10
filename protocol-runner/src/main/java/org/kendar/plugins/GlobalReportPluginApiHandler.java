@@ -111,12 +111,12 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             tpmql = simpleParser.parse(tpmqlstring);
         }
         var result = new ArrayList<ReportDataEvent>();
-        var allFiles = repository.listPluginFiles("global", "report-plugin");
+        var allFiles = repository.listFiles("global", "report-plugin");
         for (var file : allFiles) {
-            var text = repository.readPluginFile(file);
-            var data = mapper.deserialize(text.getContent(), ReportDataEvent.class);
+            var text = repository.readFile("global", "report-plugin",file);
+            var data = mapper.deserialize(text, ReportDataEvent.class);
             if (tpmql != null) {
-                var toEvaluate = mapper.toJsonNode(text.getContent());
+                var toEvaluate = mapper.toJsonNode(text);
                 if ((boolean) simpleParser.evaluate(tpmql, toEvaluate)) {
                     result.add(data);
                 }

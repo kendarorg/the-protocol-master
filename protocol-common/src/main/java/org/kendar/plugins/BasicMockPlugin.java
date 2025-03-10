@@ -12,8 +12,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.storage.StorageFile;
-import org.kendar.storage.StorageFileIndex;
+import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.JsonMapper;
@@ -26,6 +25,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     private final StorageRepository repository;
     protected Map<String, MockStorage> mocks = new HashMap<>();
+    private PluginFileManager storage;
 
 
     public BasicMockPlugin(JsonMapper mapper, StorageRepository repository) {
@@ -106,6 +106,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
 
         super.initialize(global, protocol, pluginSetting);
+        storage = repository.buildPluginFileManager(protocol.getProtocolInstanceId(),pluginSetting.getPlugin());
         if (!handleSettingsChanged()) return null;
 
         return this;
@@ -122,13 +123,13 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
 
             mocks = new HashMap<>();
             var presentAlready = new HashSet<Long>();
-            for (var file : repository.listPluginFiles(getInstanceId(), getId())) {
+            for (var file : storage.listFiles()) {
 
-                var si = mapper.deserialize(repository.readPluginFile(file).getContent(), MockStorage.class);
+                var si = mapper.deserialize(storage.readFile(file), MockStorage.class);
                 if (presentAlready.contains(si.getIndex())) throw new RuntimeException(
-                        "Duplicate id " + si.getIndex() + " found in " + file.getIndex());
+                        "Duplicate id " + si.getIndex() + " found in " + file);
                 presentAlready.add(si.getIndex());
-                mocks.put(file.getIndex(), si);
+                mocks.put(file, si);
                 counters.put(si.getIndex(), new AtomicInteger(0));
             }
 
@@ -167,11 +168,11 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
     public void putMock(String mockfile, MockStorage inputObject) {
         getMocks().put(mockfile, inputObject);
         var serialized = mapper.serialize(inputObject);
-        repository.writePluginFile(new StorageFile(new StorageFileIndex(getInstanceId(), getId(), mockfile), serialized));
+        storage.writeFile( mockfile, serialized);
     }
 
     public void delMock(String mockfile) {
         getMocks().remove(mockfile);
-        repository.delPluginFile(new StorageFileIndex(getInstanceId(), getId(), mockfile));
+        storage.deleteFile( mockfile);
     }
 }

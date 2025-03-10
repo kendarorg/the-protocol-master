@@ -17,6 +17,7 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.CompactLine;
+import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
@@ -47,7 +48,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
     /**
      * The storage to be used to retrieve the data
      */
-    protected final StorageRepository storage;
+    protected final StorageRepository repository;
     /**
      * Indexes locally loaded from the storage. They do not contain the first
      * responses
@@ -57,10 +58,11 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
      * Repeatable lines (connections etc)
      */
     private final List<CompactLine> repeatable = new ArrayList<>();
+    private PluginFileManager storage;
 
     public BasicReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
-        this.storage = storage;
+        this.repository = storage;
     }
 
     protected List<String> repeatableItems() {
@@ -88,6 +90,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
+        storage = repository.buildPluginFileManager(protocol.getProtocolInstanceId(),pluginSetting.getPlugin());
         return this;
     }
 
@@ -148,8 +151,8 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
                 if (active) {
                     var repeatableMessageTypes = repeatableItems();
                     EventsQueue.send(new StartPlayEvent(getInstanceId()));
-                    Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
-                    var toCleanIndexes = new ArrayList<>(this.storage.getIndexes(getInstanceId()));
+                    Sleeper.sleep(1000, () -> this.repository.getIndexes(getInstanceId()) != null);
+                    var toCleanIndexes = new ArrayList<>(this.repository.getIndexes(getInstanceId()));
                     var fromHereTheyAreNotResponses = false;
                     indexes.clear();
                     repeatable.clear();
@@ -222,7 +225,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
         query.setUsed(completedIndexes);
         query.getTags().putAll(buildTag(in));
         var index = findIndex(query, in);
-        if (storage == null) {
+        if (repository == null) {
             log.error("Missing storage for context {}-{}", pluginContext.getContext().getContextId(), pluginContext.getCaller());
         }
         if (index == null) {
@@ -279,7 +282,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
             respQuery.setStartAt(afterIndex);
             //respQuery.getTags().putAll(getContextTags(pluginContext.getContext()));
 
-            var responses = storage.readResponses(getInstanceId(), respQuery);
+            var responses = repository.readResponsesFromScenario(getInstanceId(), respQuery);
             var result = new ArrayList<StorageItem>();
             for (var response : responses) {
                 var idx = indexes.stream().filter(a -> a.getIndex() == response.getIndex()).findFirst();
@@ -330,7 +333,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
      * @return
      */
     protected StorageItem readStorageItem(ReplayFindIndexResult index, Object in, PluginContext pluginContext) {
-        var item = storage.readById(getInstanceId(), index.getLine().getIndex());
+        var item = repository.readFromScenarioById(getInstanceId(), index.getLine().getIndex());
         if (item != null && index.isRepeated()) {
             if (!getSettings().isBlockExternal()) {
                 return null;

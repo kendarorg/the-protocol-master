@@ -13,6 +13,7 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.CompactLine;
+import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
@@ -27,12 +28,13 @@ import java.util.Map;
 public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> extends ProtocolPluginDescriptorBase<W> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BasicRecordPlugin.class);
-    protected final StorageRepository storage;
+    protected final StorageRepository repository;
     private boolean ignoreTrivialCalls = true;
+    private PluginFileManager storage;
 
     public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
-        this.storage = storage;
+        this.repository = storage;
     }
 
     @Override
@@ -49,13 +51,13 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
         if (isActive()) {
             switch (phase) {
                 case PRE_CALL:
-                    pluginContext.getTags().put("id", storage.generateIndex());
+                    pluginContext.getTags().put("id", repository.generateIndex());
                     break;
                 case POST_CALL:
                     postCall(pluginContext, in, out);
                     break;
                 case ASYNC_RESPONSE:
-                    pluginContext.getTags().put("id", storage.generateIndex());
+                    pluginContext.getTags().put("id", repository.generateIndex());
                     asyncCall(pluginContext, out);
                     break;
             }
@@ -136,6 +138,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
+        storage = repository.buildPluginFileManager(protocol.getProtocolInstanceId(),pluginSetting.getPlugin());
         handleSettingsChanged();
         return this;
     }
@@ -152,7 +155,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
             getSettings().setActive(active);
             if (active) {
                 EventsQueue.send(new StartWriteEvent(getInstanceId()));
-                Sleeper.sleep(1000, () -> this.storage.getIndexes(getInstanceId()) != null);
+                Sleeper.sleep(1000, () -> this.repository.getIndexes(getInstanceId()) != null);
             } else {
                 terminate();
             }

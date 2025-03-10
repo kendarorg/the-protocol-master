@@ -8,8 +8,7 @@ import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
-import org.kendar.storage.StorageFile;
-import org.kendar.storage.StorageFileIndex;
+import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.parser.SimpleParser;
@@ -36,6 +35,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private boolean active;
     private AtomicInteger counter = new AtomicInteger(0);
     private PluginSettings settings;
+    private PluginFileManager storage;
 
     public GlobalReportPlugin(StorageRepository repository, JsonMapper mapper, SimpleParser simpleParser) {
         this.repository = repository;
@@ -59,6 +59,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     @Override
     public GlobalPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings) {
         setActive(pluginSettings.isActive());
+        storage = repository.buildPluginFileManager("global",getId());
         setSettings(pluginSettings);
         EventsQueue.register("GlobalReportPlugin", m -> executor.submit(() -> handleReport(m)), ReportDataEvent.class);
         return this;
@@ -67,8 +68,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private void handleReport(ReportDataEvent m) {
         if (isActive()) {
             var index = counter.incrementAndGet();
-            this.repository.writePluginFile(new StorageFile(new StorageFileIndex("global", getId(),
-                    padLeftZeros(index + "", 10) + ".report"), mapper.serialize(m)));
+            this.storage.writeFile(padLeftZeros(index + "", 10) + ".report", mapper.serialize(m));
             log.info(m.toString());
             events.add(m);
             var tagId = m.getProtocol() + "." + m.getInstanceId();

@@ -113,7 +113,7 @@ public class HttpReplayPlugin extends BasicReplayPlugin<HttpReplayPluginSettings
             return false;
 
         }
-        var storageItem = storage.readById(getInstanceId(), index.getLine().getIndex());
+        var storageItem = repository.readFromScenarioById(getInstanceId(), index.getLine().getIndex());
         if (storageItem == null) {
             storageItem = new StorageItem();
             storageItem.setIndex(index.getLine().getIndex());

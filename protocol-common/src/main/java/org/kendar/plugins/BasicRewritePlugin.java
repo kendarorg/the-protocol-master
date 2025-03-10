@@ -11,7 +11,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.storage.StorageFileIndex;
+import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItem;
@@ -28,6 +28,7 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     private static final Logger log = LoggerFactory.getLogger(BasicRewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();
     private final StorageRepository repository;
+    private PluginFileManager storage;
 
     public BasicRewritePlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
@@ -73,11 +74,11 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        var rewriteFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(), getId(), "rewrite"));
+        var rewriteFile = storage.readFile( "rewrite");
         if (rewriteFile == null) return false;
 
         try {
-            for (var replacer : mapper.deserialize(rewriteFile.getContent(), new TypeReference<List<ReplacerItem>>() {
+            for (var replacer : mapper.deserialize(rewriteFile, new TypeReference<List<ReplacerItem>>() {
             })) {
                 replacers.add(new ReplacerItemInstance(replacer, useTrailing()));
             }
@@ -91,6 +92,7 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
+        storage = repository.buildPluginFileManager(protocol.getProtocolInstanceId(),pluginSetting.getPlugin());
         if (!handleSettingsChanged()) return null;
 
         return this;
