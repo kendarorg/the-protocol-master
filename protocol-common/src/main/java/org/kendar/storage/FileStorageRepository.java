@@ -27,7 +27,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
 
 @TpmService(tags = "storage_file")
 public class FileStorageRepository extends StorageRepository {
@@ -135,25 +134,6 @@ public class FileStorageRepository extends StorageRepository {
         }
     }
 
-    /**
-     * Create new file from zip
-     * @param destinationDir
-     * @param zipEntry
-     * @return
-     * @throws IOException
-     */
-    protected static File createNewFileFromZip(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
-    }
 
     @TpmPostConstruct
     
@@ -404,7 +384,7 @@ public class FileStorageRepository extends StorageRepository {
         if (ctx == null) {
             String fileContent;
             try {
-                var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(id), 10) + "." + protocolInstanceId + ".json");
+                var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(id), 10) + "." + protocolInstanceId + ".json");
 
                 fileContent = getFileContent(filePath);
             } catch (IOException e) {
@@ -451,13 +431,21 @@ public class FileStorageRepository extends StorageRepository {
     }
 
     protected List<File> listFilesUsingJavaIO(String dir) {
-        return Stream.of(new File(dir).listFiles())
+        var files = new File(dir).listFiles();
+        if(files == null) {
+            return new ArrayList<>();
+        }
+        return Stream.of(files)
                 .filter(file -> !file.isDirectory())
                 .collect(Collectors.toList());
     }
 
     protected List<File> listDirsUsingJavaIO(String dir) {
-        return Stream.of(new File(dir).listFiles())
+        var files = new File(dir).listFiles();
+        if(files == null) {
+            return new ArrayList<>();
+        }
+        return Stream.of(files)
                 .filter(file -> file.isDirectory())
                 .collect(Collectors.toList());
     }
@@ -476,7 +464,7 @@ public class FileStorageRepository extends StorageRepository {
     
     public List<CompactLineComplete> getAllIndexes(int maxLen) {
         var result = new ArrayList<CompactLineComplete>();
-        for (var file : listFilesUsingJavaIO(Path.of(targetDir).toAbsolutePath().toString())) {
+        for (var file : listFilesUsingJavaIO(Path.of(targetDir,"scenario").toAbsolutePath().toString())) {
             if (file.getName().contains("index") && file.getName().endsWith(".json")) {
                 String fileContent;
                 var fileNameOnly = file.toPath().getFileName().toString();
@@ -494,7 +482,7 @@ public class FileStorageRepository extends StorageRepository {
                     var id = protocolInstanceId + "/" + padLeftZeros(String.valueOf(item.getIndex()), 10);
 
 
-                    var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(item.getIndex()), 10) + "." + protocolInstanceId + ".json");
+                    var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(item.getIndex()), 10) + "." + protocolInstanceId + ".json");
                     if (filePath.toFile().exists()) {
                         item.setFullItemId(id);
                     }
@@ -520,7 +508,7 @@ public class FileStorageRepository extends StorageRepository {
     
     public void updateRecording(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
         var indexFile = retrieveIndexFile(protocolInstanceId);
-        var indexPath = Path.of(targetDir, "index." + protocolInstanceId + ".json");
+        var indexPath = Path.of(targetDir, "scenario","index." + protocolInstanceId + ".json");
         for (int i = 0; i < indexFile.size(); i++) {
             var toCheck = indexFile.get(i);
             if (toCheck.getIndex() == itemId) {
@@ -528,7 +516,7 @@ public class FileStorageRepository extends StorageRepository {
                 indexFile.set(i, index);
                 var old = this.readFromScenarioById(protocolInstanceId, itemId);
 
-                var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+                var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
                 try {
                     item.setIndex(itemId);
                     item.setTimestamp(old.getTimestamp());
@@ -549,8 +537,8 @@ public class FileStorageRepository extends StorageRepository {
     public void deleteRecording(String protocolInstanceId, long itemId) {
         try {
             var indexFile = retrieveIndexFile(protocolInstanceId);
-            var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
-            var indexPath = Path.of(targetDir, "index." + protocolInstanceId + ".json");
+            var filePath = Path.of(targetDir, "scenario",padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+            var indexPath = Path.of(targetDir, "scenario","index." + protocolInstanceId + ".json");
             if (filePath.toFile().exists()) {
                 Files.delete(filePath);
             }
@@ -669,7 +657,10 @@ public class FileStorageRepository extends StorageRepository {
 
     private Path buildRealPath(String ... path) {
         var fullPath = new ArrayList<>(Arrays.asList(path));
-        var realPath= Path.of(targetDir,fullPath.toArray(new String[0]));
+        var realPath = Path.of(targetDir);
+        if(fullPath.size()>0) {
+            realPath = Path.of(targetDir, fullPath.toArray(new String[0]));
+        }
         var root= Path.of(targetDir);
         if(!realPath.toAbsolutePath().toString().contains(root.toAbsolutePath().toString())){
             throw new RuntimeException("Cannot naviagate outside project!");

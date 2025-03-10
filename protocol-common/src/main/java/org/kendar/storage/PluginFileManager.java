@@ -23,7 +23,7 @@ public class PluginFileManager {
     }
 
     public void writeFile(String fileName, String content){
-        this.repository.writeFile(instanceId, pluginId, fileName, content);
+        this.repository.writeFile(content,instanceId, pluginId, fileName);
     }
 
     public void deleteFile(String fileName){

@@ -33,7 +33,7 @@ public class EncryptedStorageRepository extends FileStorageRepository {
 
     @TpmConstructor
     public EncryptedStorageRepository(GlobalSettings settings, DiService diService) {
-
+        super(settings, diService);
         this.diService = diService;
         var dataDir = settings.getDataDir();
         if (dataDir == null || dataDir.isEmpty()) {

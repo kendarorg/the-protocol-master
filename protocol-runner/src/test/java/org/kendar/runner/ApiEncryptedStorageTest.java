@@ -64,7 +64,7 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
         }, "application/zip");
         assertEquals("OK", okResult.getResult());
-        assertThrows(MalformedInputException.class, () -> Files.readString(Path.of("target", "tests", "encrypted", "index.http-01.json")));
+        assertThrows(MalformedInputException.class, () -> Files.readString(Path.of("target", "tests", "encrypted","scenario", "index.http-01.json")));
         var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
         assertTrue(zip.length > 100);
         Files.write(Path.of("target", "downloaded.zip"), zip);

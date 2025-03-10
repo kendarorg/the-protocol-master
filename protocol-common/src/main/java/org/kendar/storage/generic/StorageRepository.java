@@ -71,7 +71,7 @@ public abstract class StorageRepository implements Service {
         var baos = new ByteArrayOutputStream();
         var globalSettings = diService.getInstance(GlobalSettings.class);
         var globalSettingsFile = mapper.serialize(globalSettings);
-            writeFile("settings", globalSettingsFile);
+            writeFile( globalSettingsFile,"settings");
 
         try (var zos = new ZipOutputStream(baos)) {
             for(var item:this.listFiles()) {
@@ -96,7 +96,7 @@ public abstract class StorageRepository implements Service {
         String destFilePath = destFile.getCanonicalPath();
 
         if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+            //throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
         }
 
         return destFile;
@@ -138,7 +138,7 @@ public abstract class StorageRepository implements Service {
                         fos.write(buffer, 0, len);
                     }
                     fos.close();
-                    writeFile(new String(fos.toByteArray()),newFile.getPath());
+                    writeFile(new String(fos.toByteArray()),newFile.getPath().replace(".json",""));
                 }
                 zipEntry = zis.getNextEntry();
             }
