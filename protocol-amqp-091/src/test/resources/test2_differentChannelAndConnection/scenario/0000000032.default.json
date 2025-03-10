@@ -1,0 +1,21 @@
+{
+  "timestamp": 1734945324415,
+  "constant": false,
+  "connectionId": 1,
+  "index": 32,
+  "output": {
+    "channel": 1,
+    "type": 3,
+    "proxyed": false,
+    "content": {
+      "bytes": "enp6eiBkZXRhaWxzMw==",
+      "chars": "zzzz details3"
+    },
+    "consumeId": 1,
+    "consumeOrigin": "fuffa_queue|1|{}"
+  },
+  "durationMs": 0,
+  "type": "RESPONSE",
+  "caller": "AMQP",
+  "outputType": "BodyFrame"
+}
