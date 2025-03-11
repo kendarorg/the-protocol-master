@@ -12,8 +12,7 @@ function sendData(path, verb, data, contentType, callback) {
     xhr.onreadystatechange = () => {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            if(callback)
-            callback(xhr.status, xhr.response);
+            if(typeof callback === 'function')callback(xhr.status, xhr.response);
             // Request finished. Do processing here.
         }
     };
@@ -27,7 +26,7 @@ function getData(path, verb, callback) {
     xhr.onreadystatechange = () => {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            callback(xhr.status, xhr.response);
+            if(typeof callback === 'function')callback(xhr.status, xhr.response);
             // Request finished. Do processing here.
         }
     };

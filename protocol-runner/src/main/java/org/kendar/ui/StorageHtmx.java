@@ -118,9 +118,18 @@ public class StorageHtmx implements FilteringClass {
             method = "POST", id = "POST /storage/file")
     public void storageFileCreateUpdate(Request request, Response response) {
         var path = request.getQuery("parent");
-        var model = new FileItemDto();
-        var sentContent = request.getRequestText().toString();
+        var sentContent = request.getRequestText().toPrettyString();
         repository.writeFile(sentContent,path);
+        response.addHeader("Content-type","text/html");
+        response.setStatusCode(200);
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/storage/file",
+            method = "DELETE", id = "DELETE /storage/file")
+    public void storageFileDelete(Request request, Response response) {
+        var path = request.getQuery("parent");
+        repository.deleteFile(path);
         response.addHeader("Content-type","text/html");
         response.setStatusCode(200);
     }

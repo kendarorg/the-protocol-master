@@ -151,6 +151,7 @@ public class PluginsHtmx implements FilteringClass {
             model.setProtocol(plugin.getProtocol());
             model.setActive(plugin.isActive());
             model.setSettings(mapper.serializePretty(plugin.getSettings()));
+            model.setSettingsObject(plugin.getSettings());
             resolversFactory.render("plugins/single.jte",model,output);
         }else{
             var plugin=(GlobalPluginDescriptor)diService.getInstances(GlobalPluginDescriptor.class)
@@ -160,6 +161,7 @@ public class PluginsHtmx implements FilteringClass {
             model.setProtocol("global");
             model.setActive(plugin.isActive());
             model.setSettings(mapper.serializePretty(plugin.getSettings()));
+            model.setSettingsObject(plugin.getSettings());
             resolversFactory.render("plugins/singlegl.jte",model,output);
         }
 

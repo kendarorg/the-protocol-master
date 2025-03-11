@@ -73,10 +73,11 @@
                 </div>
             </div>
         </div>
+        @template.optional(new org.kendar.ui.OptionalTemplate(data,data.getProtocol()+"/"+data.getId()+"/index.jte"))
     </div>
 </div>
 
-@template.optional(new org.kendar.ui.OptionalTemplate(data,data.getProtocol()+"/"+data.getId()+"/index.jte"))
+
 
 @template.footer()
 

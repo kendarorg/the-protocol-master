@@ -279,7 +279,7 @@ public class Main {
                         var ps = new TcpServer(baseProtocol);
                         ps.setOnStart(() -> DiService.setThreadContext(localDiService));
                         ps.start();
-                        Sleeper.sleep(5000, ps::isRunning);
+
                         protocolServersCache.put(item.getKey(), ps);
 
                         var pi = new ProtocolInstance(item.getKey(),
@@ -293,6 +293,7 @@ public class Main {
                             var apiHandlerPlugin = ((ProtocolPluginDescriptor) pl).getApiHandler();
                             apisFiltersLoader.getFilters().addAll(apiHandlerPlugin);
                         }
+                        Sleeper.sleep(5000, ps::isRunning);
                         //ini.putService(item.getKey(), pi);
                     } catch (Exception xx) {
                         //noinspection SuspiciousMethodCalls

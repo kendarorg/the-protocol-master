@@ -16,6 +16,7 @@
     }
 
     var selectedElement=null;
+    var selectedPath=null;
     function toggle(newElement){
         newElement+="_name";
         if(selectedElement!=null && selectedElement!=newElement){
@@ -29,10 +30,11 @@
 
     }
     function openTree(target,path) {
-
+        selectedPath=path;
         htmx.ajax('GET', '/storage/tree?parent='+path, {target:target, swap:'outerHTML'}).then(()=>openFiles(path)).then(()=>toggle(target));
     }
     function openFiles(path) {
+        selectedPath=path;
         htmx.ajax('GET', '/storage/files?parent='+path, "#resultsContainer");
     }
     function openFile(path,name) {
@@ -40,11 +42,17 @@
     }
 
     function closeTree(target,path) {
+        selectedPath=path;
         htmx.ajax('GET', '/storage/tree?close=true&parent='+path, {target:target, swap:'outerHTML'}).then(()=>openFiles(path)).then(()=>toggle(target));
     }
 
     function saveFile(path,data,callback) {
         return sendData('/storage/file?parent='+path, 'POST', data, 'application/json',callback)
+    }
+    function deleteFile(path) {
+        if (confirm("You want to remove "+path+"?") == true) {
+            return getData('/storage/file?parent=' + path, 'delete', 'application/json')
+        }
     }
 
 
