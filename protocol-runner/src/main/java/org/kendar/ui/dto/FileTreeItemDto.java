@@ -9,7 +9,7 @@ public class FileTreeItemDto {
     }
 
     public String getSafePath() {
-        return path.replaceAll("/", "__");
+        return path.replaceAll("/", "__").replaceAll("-", "_");
     }
 
 //    public String getRealPath(){

@@ -15,19 +15,36 @@
         }
     }
 
+    var selectedElement=null;
+    function toggle(newElement){
+        newElement+="_name";
+        if(selectedElement!=null && selectedElement!=newElement){
+            htmx.find(selectedElement).classList.toggle("selectedClass")
+            selectedElement = newElement;
+            htmx.find(newElement).classList.toggle("selectedClass")
+        }else if(selectedElement ==null){
+            selectedElement = newElement;
+            htmx.find(newElement).classList.toggle("selectedClass")
+        }
+
+    }
     function openTree(target,path) {
-        return htmx.ajax('GET', '/storage/tree?parent='+path, target);
+
+        htmx.ajax('GET', '/storage/tree?parent='+path, {target:target, swap:'outerHTML'}).then(()=>openFiles(path)).then(()=>toggle(target));
     }
     function openFiles(path) {
-        return htmx.ajax('GET', '/storage/files?parent='+path, "#resultsContainer");
+        htmx.ajax('GET', '/storage/files?parent='+path, "#resultsContainer");
     }
     function openFile(path,name) {
-        return htmx.ajax('GET', '/storage/file?parent='+path+'&name='+name, "#resultsContainer");
+        htmx.ajax('GET', '/storage/file?parent='+path+'&name='+name, "#resultsContainer");
     }
 
-
     function closeTree(target,path) {
-        return htmx.ajax('GET', '/storage/tree?close=true&parent='+path, target);
+        htmx.ajax('GET', '/storage/tree?close=true&parent='+path, {target:target, swap:'outerHTML'}).then(()=>openFiles(path)).then(()=>toggle(target));
+    }
+
+    function saveFile(path,data,callback) {
+        return sendData('/storage/file?parent='+path, 'POST', data, 'application/json',callback)
     }
 
 
@@ -111,13 +128,13 @@
 
                     <div class="panel-body">
                         <div class="container-fluid">
-                            <div class="col-xs-6" >
+                            <div class="col-xs-4" >
                                 <ul class="tree" style="list-style-type: none;">
-                                    <li  hx-get="/storage/tree?parent=" hx-trigger="load"></li>
+                                    <li hx-swap="outerHTML" hx-get="/storage/tree?parent=" hx-trigger="load"></li>
                                 </ul>
                             </div>
 
-                            <div class="col-xs-6">
+                            <div class="col-xs-8">
                                 <div id="resultsContainer" hx-get="/storage/files?parent=" hx-trigger="load">
 
                                 </div>

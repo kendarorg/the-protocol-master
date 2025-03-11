@@ -85,22 +85,6 @@ public class StorageHtmx implements FilteringClass {
         if(!close) {
             model.getChildren().addAll(repository.listFiles(path).stream().
                     map(instanceId -> new FileTreeItemDto(path, instanceId, false)).toList());
-            /*if (path.isEmpty()) {
-                if (repository.listFiles().stream().anyMatch(f -> f.equalsIgnoreCase("settings"))) {
-                    model.getChildren().add(new FileTreeItemDto(path, "settings", false));
-                }
-            } else if (split.length == 1) {
-                if (split[0].equals("recordings")) {
-                    model.getChildren().addAll(repository.listFiles().stream().
-                            filter(f -> !f.equalsIgnoreCase("settings")).
-                            map(instanceId -> new FileTreeItemDto(path, instanceId, false)).toList());
-                }
-            } else if (split.length == 2) {
-                model.getChildren().addAll(repository.listPluginFiles(split[0], split[1]).stream().
-                        map(f -> new FileTreeItemDto(path, f.getIndex(), false)).toList());
-            } else {
-                throw new RuntimeException("Invalid path ");
-            }*/
         }
 
         var output = new StringOutput();
@@ -115,46 +99,29 @@ public class StorageHtmx implements FilteringClass {
             method = "GET", id = "GET /storage/file")
     public void storageFile(Request request, Response response) {
         var path = request.getQuery("parent");
-        var split = path.split("/");
         var model = new FileItemDto();
 
             var data = repository.readFile(path);
             model.setContent(data);
             model.setPath(path);
-//
-//            if (path.isEmpty()) {
-//                var settings = repository.getSettings();
-//                if (settings != null) {
-//                    model.setContent(settings);
-//                    model.setPath("");
-//                    model.setName("settings");
-//                }
-//            } else if (split.length == 2) {
-//                if (split[0].equals("recordings")) {
-//                    var splittedname= split[1].split("\\.");
-//                    if(splittedname[0].equalsIgnoreCase("index")) {
-//                        var fc = repository.getIndexes(splittedname[1]);
-//                        model.setContent(mapper.serializePretty(fc));
-//                    }else {
-//                        var fc = repository.readFromScenarioById(splittedname[1], Integer.parseInt(splittedname[0]));
-//                        model.setContent(mapper.serializePretty(fc));
-//                    }
-//                    model.setPath(split[0]);
-//                    model.setName(split[1]);
-//                }
-//            } else if (split.length == 3) {
-//                var fc = repository.readPluginFile(new StorageFileIndex(split[0],split[1],split[2]));
-//                model.setContent(mapper.serializePretty(fc));
-//                model.setPath(split[0]);
-//                model.setName(split[1]);
-//            } else {
-//                throw new RuntimeException("Invalid path ");
-//            }
-
         var output = new StringOutput();
         resolversFactory.render("storage/file.jte",model,output);
         response.addHeader("Content-type","text/html");
         response.setResponseText(new TextNode(output.toString()));
+        response.setStatusCode(200);
+    }
+
+
+
+    @HttpMethodFilter(
+            pathAddress = "/storage/file",
+            method = "POST", id = "POST /storage/file")
+    public void storageFileCreateUpdate(Request request, Response response) {
+        var path = request.getQuery("parent");
+        var model = new FileItemDto();
+        var sentContent = request.getRequestText().toString();
+        repository.writeFile(sentContent,path);
+        response.addHeader("Content-type","text/html");
         response.setStatusCode(200);
     }
 }

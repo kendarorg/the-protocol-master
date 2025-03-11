@@ -12,11 +12,12 @@ function sendData(path, verb, data, contentType, callback) {
     xhr.onreadystatechange = () => {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
+            if(callback)
             callback(xhr.status, xhr.response);
             // Request finished. Do processing here.
         }
     };
-    xhr.send(data);
+    return xhr.send(data);
 }
 
 function getData(path, verb, callback) {
@@ -41,19 +42,31 @@ function deepClone(obj) {
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
 });
-
+/*
 htmx.defineExtension('submitjson', {
     onEvent: function (name, evt) {
         if (name === "htmx:configRequest") {
             evt.detail.headers['Content-Type'] = "application/json"
-            evt.detail.headers['X-API-Key'] = 'sjk_xxx'
         }
     },
     encodeParameters: function (xhr, parameters, elt) {
-        xhr.overrideMimeType('text/json') // override default mime type
+        xhr.overrideMimeType('application/json') // override default mime type
         return (JSON.stringify(parameters))
     }
-})
+})*/
+
+htmx.defineExtension('json-enc', {
+    onEvent: function (name, evt) {
+        if (name === "htmx:configRequest") {
+            evt.detail.headers['Content-Type'] = "application/json";
+        }
+    },
+
+    encodeParameters : function(xhr, parameters, elt) {
+        xhr.overrideMimeType('text/json');
+        return (JSON.stringify(parameters));
+    }
+});
 
 function downloadURI(uri, name) {
     var link = document.createElement("a");
@@ -251,7 +264,28 @@ function handle_file_select(evt) {
 }
 
 // =========================================
-// TREEVIEW
+// MODAL
 // =========================================
 
 
+// open modal by id
+function openModal(id,path) {
+    document.getElementById(id).classList.add('open');
+    document.body.classList.add('jw-modal-open');
+    htmx.ajax('GET', path, {target:"#"+id, swap:'outerHTML'})
+}
+
+// close currently open modal
+function closeModal() {
+    document.querySelector('.jw-modal.open').classList.remove('open');
+    document.body.classList.remove('jw-modal-open');
+}
+
+window.addEventListener('load', function() {
+    // close modals on background click
+    document.addEventListener('click', event => {
+        if (event.target.classList.contains('jw-modal')) {
+            closeModal();
+        }
+    });
+});

@@ -146,6 +146,7 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
                 respondText(response, request.buildUrl() + " Not Found");
             }
         } catch (Exception e) {
+            log.debug("Error handling request", e);
             respondKo(response, e);
         }
         sendResponse(response, httpExchange);

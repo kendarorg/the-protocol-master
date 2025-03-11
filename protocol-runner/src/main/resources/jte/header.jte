@@ -96,3 +96,12 @@
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
+
+<div id="modal-1" class="jw-modal">
+    <div class="jw-modal-body">
+        <div id="modal-content">
+
+        </div>
+        <button onclick="closeModal()">Close</button>
+    </div>
+</div>
