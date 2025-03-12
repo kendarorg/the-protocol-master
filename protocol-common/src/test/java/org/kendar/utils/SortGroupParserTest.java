@@ -18,7 +18,7 @@ public class SortGroupParserTest {
     void simple() {
         var target = new SimpleParser();
         var parsed = target.parse("SELECT(WHERE(val == 'a'))");
-        assertEquals("Token{type=BLOCK, children=[Token{type=FUNCTION, value='SELECT', children=[Token{type=FUNCTION, value='WHERE', children=[Token{type=BLOCK, children=[Token{type=VARIABLE, value='val'}, Token{type=OPERATOR, value='=='}, Token{type=STRING, value='a'}]}]}]}]}", parsed.toString());
+        assertEquals("Token{type=FUNCTION, value='SELECT', children=[Token{type=FUNCTION, value='WHERE', children=[Token{type=BLOCK, children=[Token{type=VARIABLE, value='val'}, Token{type=OPERATOR, value='=='}, Token{type=STRING, value='a'}]}]}]}", parsed.toString());
         var data = buildTestItems();
         var result = target.select(parsed, (ArrayNode) data);
         assertEquals(1, result.size());
@@ -114,8 +114,8 @@ public class SortGroupParserTest {
         });
 
         assertEquals(5, result.size());
-        assertEquals(1,result.get(0).getCounter());
-        assertEquals(6,result.get(4).getCounter());
+        assertEquals(1, result.get(0).getCounter());
+        assertEquals(6, result.get(4).getCounter());
     }
 
     @Test
@@ -132,16 +132,16 @@ public class SortGroupParserTest {
         });
 
         assertEquals(5, result.size());
-        assertEquals(6,result.get(0).getCounter());
-        assertEquals("a",result.get(0).getVal());
-        assertEquals(1,result.get(1).getCounter());
-        assertEquals("a",result.get(1).getVal());
-        assertEquals(2,result.get(2).getCounter());
-        assertEquals("b",result.get(2).getVal());
-        assertEquals(4,result.get(3).getCounter());
-        assertEquals("c",result.get(3).getVal());
-        assertEquals(3,result.get(4).getCounter());
-        assertEquals("c",result.get(4).getVal());
+        assertEquals(6, result.get(0).getCounter());
+        assertEquals("a", result.get(0).getVal());
+        assertEquals(1, result.get(1).getCounter());
+        assertEquals("a", result.get(1).getVal());
+        assertEquals(2, result.get(2).getCounter());
+        assertEquals("b", result.get(2).getVal());
+        assertEquals(4, result.get(3).getCounter());
+        assertEquals("c", result.get(3).getVal());
+        assertEquals(3, result.get(4).getCounter());
+        assertEquals("c", result.get(4).getVal());
     }
 
     @Test
@@ -150,6 +150,6 @@ public class SortGroupParserTest {
         var parsed = target.parse("SELECT(WHAT(date=MSTODATE(timestamp),instanceId,protocol,\n" +
                 "                            query=SUBSTR(query,20),duration),ORDERBY(ASC(date)))");
         assertEquals(
-    "Token{type=FUNCTION, value='SELECT', children=[Token{type=FUNCTION, value='WHAT', children=[Token{type=BLOCK, children=[Token{type=VARIABLE, value='date'}, Token{type=OPERATOR, value='='}, Token{type=FUNCTION, value='MSTODATE', children=[Token{type=BLOCK, children=[Token{type=VARIABLE, value='timestamp'}]}]}]}, Token{type=VARIABLE, value='instanceId'}, Token{type=VARIABLE, value='protocol'}, Token{type=BLOCK, children=[Token{type=VARIABLE, value='query'}, Token{type=OPERATOR, value='='}, Token{type=FUNCTION, value='SUBSTR', children=[Token{type=BLOCK, children=[Token{type=VARIABLE, value='query'}]}, Token{type=BLOCK, children=[Token{type=NUMBER, value='20'}]}]}]}, Token{type=VARIABLE, value='duration'}]}, Token{type=BLOCK, children=[Token{type=VARIABLE, value='ORDERBY'}, Token{type=BLOCK, children=[Token{type=VARIABLE, value='ASC'}, Token{type=BLOCK, children=[Token{type=VARIABLE, value='date'}]}]}]}]}",parsed.toString());
+                "Token{type=FUNCTION, value='SELECT', children=[Token{type=FUNCTION, value='WHAT', children=[Token{type=BLOCK, children=[Token{type=VARIABLE, value='date'}, Token{type=OPERATOR, value='='}, Token{type=FUNCTION, value='MSTODATE', children=[Token{type=BLOCK, children=[Token{type=VARIABLE, value='timestamp'}]}]}]}, Token{type=VARIABLE, value='instanceId'}, Token{type=VARIABLE, value='protocol'}, Token{type=BLOCK, children=[Token{type=VARIABLE, value='query'}, Token{type=OPERATOR, value='='}, Token{type=FUNCTION, value='SUBSTR', children=[Token{type=BLOCK, children=[Token{type=VARIABLE, value='query'}]}, Token{type=BLOCK, children=[Token{type=NUMBER, value='20'}]}]}]}, Token{type=VARIABLE, value='duration'}]}, Token{type=FUNCTION, value='ORDERBY', children=[Token{type=FUNCTION, value='ASC', children=[Token{type=VARIABLE, value='date'}]}]}]}", parsed.toString());
     }
 }

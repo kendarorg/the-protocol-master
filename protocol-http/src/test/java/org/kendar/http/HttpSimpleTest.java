@@ -258,10 +258,12 @@ public class HttpSimpleTest extends BasicTest {
 
         Sleeper.sleepNoException(1000, () -> getEvents() != null && !getEvents().isEmpty());
         var events = getEvents();
-        assertEquals(1, events.size());
+        assertEquals(2, events.size());
         var evt = events.get(0);
+        assertEquals("dns", evt.getProtocol());
+        evt = events.get(1);
         assertEquals("http", evt.getProtocol());
-        assertTrue(evt.getQuery().startsWith(method));
+        assertTrue(evt.getTags().containsKey("method"));
     }
 
     @Test
