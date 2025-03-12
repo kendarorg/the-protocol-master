@@ -249,4 +249,6 @@ public class SimpleParserTest {
         assertTrue((Boolean) target.evaluate(toExecutOkRecord1, jsonMapper.toJsonNode(testClass)));
         assertFalse((Boolean) target.evaluate(toExecutFalse, jsonMapper.toJsonNode(testClass)));
     }
+
+
 }

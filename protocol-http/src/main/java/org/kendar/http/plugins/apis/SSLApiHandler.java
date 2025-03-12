@@ -154,8 +154,6 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
     @HttpMethodFilter(
             pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/hosts",
             method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/hosts")
-    @TpmDoc(
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}/ssl-plugin/hosts"})
     public void retrieveHostsPage(Request request, Response response) {
 
         var model = new SinglePluginDto();

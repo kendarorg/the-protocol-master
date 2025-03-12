@@ -32,6 +32,7 @@ public class HttpReportPlugin extends BasicReportPlugin<PluginSettings> {
                 pluginContext.getStart(),
                 duration,
                 Map.of(
+                        "method", in.getMethod(),
                         "query", in.getQuery() + "",
                         "contentType", in.getFirstHeader("content-type", "unknown"),
                         "requestSize", in.getSize() + "",

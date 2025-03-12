@@ -7,10 +7,8 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.utils.JsonMapper;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -24,7 +22,10 @@ public class SimpleParser {
             new FunctionDefinition("AND", -1),
             new FunctionDefinition("CONTAINS", 2),
             new FunctionDefinition("FILTER", 2),
+            new FunctionDefinition("SUBSTR", 2),
+            new FunctionDefinition("WRAP", 2),
             new FunctionDefinition("COUNT", 1),
+            new FunctionDefinition("MSTODATE", 1),
             /*new FunctionDefinition("NOW", 0),
             new FunctionDefinition("MSTODATE", 1),
             new FunctionDefinition("NANOTODATE", 1),
@@ -35,9 +36,36 @@ public class SimpleParser {
             new FunctionDefinition("NOT", 1),
             new FunctionDefinition("TRUE", 0),
             new FunctionDefinition("FALSE", 0),
-            new FunctionDefinition("NULL", 0)
+            new FunctionDefinition("NULL", 0),
+            new FunctionDefinition("SELECT", -1),
+            new FunctionDefinition("WHAT", -1),//SELECT(WHAT,WHERE,GROUP)
+            new FunctionDefinition("ORDERBY", -1),
+            new FunctionDefinition("GROUPBY", -1),
+            new FunctionDefinition("WHERE", 1),
+            new FunctionDefinition("MAX", 1),
+            new FunctionDefinition("MIN", 1),
+            new FunctionDefinition("AVG", 1),
+            new FunctionDefinition("SUM", 1),
+            new FunctionDefinition("ASC", 1),
+            new FunctionDefinition("DESC", 1)
     );
+
+
     private final Pattern pattern = Pattern.compile("^\\d*\\.?\\d+$");
+
+    private static List<String> splitStringBySize(String str, int size) {
+        ArrayList<String> split = new ArrayList<>();
+        for (int i = 0; i <= str.length() / size; i++) {
+            split.add(str.substring(i * size, Math.min((i + 1) * size, str.length())));
+        }
+        return split;
+    }
+
+    public static String convertTime(long time) {
+        var date = new Date(time);
+        var format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        return format.format(date);
+    }
 
     public Token parse(String input) {
         var token = new Token(TokenType.BLOCK);
@@ -108,6 +136,9 @@ public class SimpleParser {
         updateWithFunctions(token);
         optimizeBlocks(token);
         recognizeNumbers(token);
+        if (token.type == TokenType.BLOCK && token.children.size() == 1 && token.children.get(0).value.equalsIgnoreCase("select")) {
+            return token.children.get(0);
+        }
 
         return token;
     }
@@ -123,7 +154,6 @@ public class SimpleParser {
             }
         }
     }
-
 
     private Token addToken(LinkedList<Token> stack, String s, TokenType tokenType) {
         var token = new Token(s, tokenType);
@@ -236,7 +266,6 @@ public class SimpleParser {
         return result;
     }
 
-
     private boolean isBinaryOperator(char character, char prevChar) {
         if (prevChar == '[' && character == '*') return false;
         return binaryOperator.contains(String.valueOf(character));
@@ -255,6 +284,36 @@ public class SimpleParser {
                 optimizeBlocks(child);
             }
         }
+    }
+
+    public ArrayNode select(Token select, ArrayNode inputArray) {
+        var resultArray = mapper.getMapper().createArrayNode();
+        if (!select.value.equalsIgnoreCase("select")) {
+            throw new RuntimeException("Input must start with 'select()'");
+        }
+        var what = select.children.stream().filter(child -> child.value != null && child.value.equalsIgnoreCase("what")).findFirst().orElse(null);
+        var where = select.children.stream().filter(child -> child.value != null && child.value.equalsIgnoreCase("where")).findFirst().orElse(null);
+        var group = select.children.stream().filter(child -> child.value != null && child.value.equalsIgnoreCase("groupby")).findFirst().orElse(null);
+        var order = select.children.stream().filter(child -> child.value != null && child.value.equalsIgnoreCase("orderby")).findFirst().orElse(null);
+        resultArray = applyWhere(where, inputArray, resultArray);
+
+        resultArray = applyProjectionWithoutGrouping(what, group, resultArray);
+        resultArray = applyGrouping(group, resultArray, what);
+        resultArray = applyOrder(order, resultArray);
+        return resultArray;
+    }
+
+    private ArrayNode applyWhere(Token where, ArrayNode inputArray, ArrayNode resultArray) {
+        if (where != null) {
+            for (var item : inputArray) {
+                if ((boolean) evaluate(where, item)) {
+                    resultArray.add(item);
+                }
+            }
+        } else {
+            resultArray = inputArray;
+        }
+        return resultArray;
     }
 
     public Object evaluate(Token tokenMap, JsonNode testClass) {
@@ -387,7 +446,6 @@ public class SimpleParser {
 
     }
 
-
     private Object execFunction(Token token, JsonNode testClass) {
 
         if (token.value.equalsIgnoreCase("true")) return Boolean.TRUE;
@@ -417,63 +475,36 @@ public class SimpleParser {
             }
             return result;
         } else if (token.value.equalsIgnoreCase("count")) {
-            var value = convertToValue(token.children.get(0), testClass);
-            if (value == null) {
-                return BigDecimal.valueOf(0);
-            }
-            if (JsonNode.class.isAssignableFrom(value.getClass())) {
-                var obOrArray = (JsonNode) value;
-
-                if (!(obOrArray.isArray() || obOrArray.isObject() || obOrArray.isTextual())) {
-                    throw new RuntimeException("count parameter must be an object or an array");
-                }
-                return BigDecimal.valueOf(obOrArray.size());
-            } else if (value instanceof String) {
-                return BigDecimal.valueOf(((String) value).length());
-            }
-            throw new RuntimeException("Unsupported type for count: " + value.getClass());
+            return parseCount(token, testClass);
 
         } else if (token.value.equalsIgnoreCase("filter")) {
-            var value = convertToValue(token.children.get(0), testClass);
-            var function = token.children.get(1);
-            if (JsonNode.class.isAssignableFrom(value.getClass())) {
+            return parseFilter(token, testClass);
 
-                var obOrArray = (JsonNode) value;
-
-                if (!(obOrArray.isArray() || obOrArray.isObject() || obOrArray.isTextual())) {
-                    throw new RuntimeException("count parameter must be an object or an array");
-                }
-                if (obOrArray.isArray()) {
-                    ArrayNode result = mapper.getMapper().createArrayNode();
-
-                    for (var item : ((ArrayNode) obOrArray)) {
-                        var objectNode = mapper.getMapper().createObjectNode();
-                        objectNode.set("it", item);
-                        if ((boolean) convertToValue(function, (JsonNode) objectNode)) {
-                            result.add((JsonNode) item);
-                        }
-                    }
-                    return result;
-                } else if (obOrArray.isObject()) {
-                    ArrayNode result = mapper.getMapper().createArrayNode();
-                    ObjectNode src = (ObjectNode) obOrArray;
-                    var iterator = src.fields();
-                    while (iterator.hasNext()) {
-                        var item = iterator.next();
-                        ObjectNode partialSubNode = mapper.getMapper().createObjectNode();
-                        var textNodeKey = mapper.toJsonNode(item.getKey());
-                        partialSubNode.set("value", (JsonNode) item.getValue());
-                        partialSubNode.set("key", textNodeKey);
-                        if ((boolean) convertToValue(function, (JsonNode) partialSubNode)) {
-                            result.add((JsonNode) partialSubNode);
-                        }
-                    }
-                    return result;
-                }
-
-                return obOrArray.size();
+        } else if (token.value.equalsIgnoreCase("substr")) {
+            var val = convertToValue(token.children.get(0), testClass);
+            var what = "";
+            if (val instanceof ObjectNode || val instanceof ArrayNode) {
+                what = mapper.serialize(val);
+            } else {
+                what = val.toString();
             }
-            throw new RuntimeException("Unsupported type for filter: " + value.getClass());
+            var length = Integer.parseInt(convertToValue(token.children.get(1), testClass).toString());
+            if (what.length() < length) return what;
+            var fullLenght = what.length();
+            return what.substring(0, length) + "...(" + fullLenght + ")";
+
+        } else if (token.value.equalsIgnoreCase("wrap")) {
+            var val = convertToValue(token.children.get(0), testClass);
+            var what = "";
+            if (val instanceof ObjectNode || val instanceof ArrayNode) {
+                what = mapper.serialize(val);
+            } else {
+                what = val.toString();
+            }
+            var length = Integer.parseInt(convertToValue(token.children.get(1), testClass).toString());
+            var wrapItem = convertToValue(token.children.get(2), testClass).toString();
+            var result = String.join(wrapItem, splitStringBySize(what, length));
+            return result;
 
         } else if (token.value.equalsIgnoreCase("contains")) {
             var where = convertToValue(token.children.get(0), testClass).toString();
@@ -487,7 +518,275 @@ public class SimpleParser {
             return convertToValue(token.children.get(0), testClass) != null;
         } else if (token.value.equalsIgnoreCase("not")) {
             return !(boolean) convertToValue(token.children.get(0), testClass);
+        } else if (token.value.equalsIgnoreCase("mstodate")) {
+            return convertTime(((BigDecimal) convertToValue(token.children.get(0), testClass)).longValue());
         }
         return null;
+    }
+
+    private BigDecimal parseCount(Token token, JsonNode testClass) {
+        var value = convertToValue(token.children.get(0), testClass);
+        if (value == null) {
+            return BigDecimal.valueOf(0);
+        }
+        if (JsonNode.class.isAssignableFrom(value.getClass())) {
+            var obOrArray = (JsonNode) value;
+
+            if (!(obOrArray.isArray() || obOrArray.isObject() || obOrArray.isTextual())) {
+                throw new RuntimeException("count parameter must be an object or an array");
+            }
+            return BigDecimal.valueOf(obOrArray.size());
+        } else if (value instanceof String) {
+            return BigDecimal.valueOf(((String) value).length());
+        }
+        throw new RuntimeException("Unsupported type for count: " + value.getClass());
+    }
+
+    private Object parseFilter(Token token, JsonNode testClass) {
+        var value = convertToValue(token.children.get(0), testClass);
+        var function = token.children.get(1);
+        if (JsonNode.class.isAssignableFrom(value.getClass())) {
+
+            var obOrArray = (JsonNode) value;
+
+            if (!(obOrArray.isArray() || obOrArray.isObject() || obOrArray.isTextual())) {
+                throw new RuntimeException("count parameter must be an object or an array");
+            }
+            if (obOrArray.isArray()) {
+                ArrayNode result = mapper.getMapper().createArrayNode();
+
+                for (var item : obOrArray) {
+                    var objectNode = mapper.getMapper().createObjectNode();
+                    objectNode.set("it", item);
+                    if ((boolean) convertToValue(function, objectNode)) {
+                        result.add(item);
+                    }
+                }
+                return result;
+            } else if (obOrArray.isObject()) {
+                ArrayNode result = mapper.getMapper().createArrayNode();
+                ObjectNode src = (ObjectNode) obOrArray;
+                var iterator = src.fields();
+                while (iterator.hasNext()) {
+                    var item = iterator.next();
+                    ObjectNode partialSubNode = mapper.getMapper().createObjectNode();
+                    var textNodeKey = mapper.toJsonNode(item.getKey());
+                    partialSubNode.set("value", item.getValue());
+                    partialSubNode.set("key", textNodeKey);
+                    if ((boolean) convertToValue(function, partialSubNode)) {
+                        result.add(partialSubNode);
+                    }
+                }
+                return result;
+            }
+
+            return obOrArray.size();
+        }
+        throw new RuntimeException("Unsupported type for filter: " + value.getClass());
+    }
+
+    public List<JsonNode> sort(List<JsonNode> list, String sortString) {
+        var sortItems = sortString.split(",");
+        var sortExpression = new ArrayList<SortSpec>();
+        for (int i = 0; i < sortItems.length; i++) {
+            var sortItem = sortItems[i].trim();
+            var splItem = sortItem.split("\\s+");
+            var ss = new SortSpec();
+            ss.field = splItem[0];
+            if (splItem.length == 1) {
+                ss.ascending = true;
+            } else {
+                ss.ascending = splItem[1].equalsIgnoreCase("ASC");
+            }
+            sortExpression.add(ss);
+        }
+        return list;
+    }
+
+    private ArrayNode applyGrouping(Token group, ArrayNode resultArray, Token what) {
+        if (group != null) {
+            var mapGroup = new HashMap<String, List<JsonNode>>();
+            var toGroupArray = resultArray;
+            resultArray = mapper.getMapper().createArrayNode();
+            //Load all items that should be grouped
+            buildGroups(group, toGroupArray, mapGroup);
+            if (what == null) {
+                buildGroupWithoutProjection(group, resultArray, mapGroup);
+            } else {
+                buildGroupWithProjection(what, group, resultArray, mapGroup);
+            }
+        }
+        return resultArray;
+    }
+
+    private void buildGroupWithoutProjection(Token group, ArrayNode resultArray, HashMap<String, List<JsonNode>> mapGroup) {
+        for (var item : mapGroup.values()) {
+            var objectNode = mapper.getMapper().createObjectNode();
+            var groupItem = item.get(0);
+            for (var whatValue : group.children) {
+                var value = convertToValue(whatValue, groupItem);
+                var jsonValue = mapper.convertValue(value);
+                objectNode.put(whatValue.value, jsonValue);
+            }
+            resultArray.add(objectNode);
+        }
+    }
+
+    private void buildGroups(Token group, ArrayNode toGroupArray, HashMap<String, List<JsonNode>> mapGroup) {
+        for (var item : toGroupArray) {
+            var groupKey = "";
+            for (var whatValue : group.children) {
+                if (whatValue.type != TokenType.VARIABLE) {
+                    throw new RuntimeException("Only variables can be grouped with 'groupby'");
+                }
+                var value = convertToValue(whatValue, item);
+                var jsonValue = mapper.convertValue(value);
+                groupKey += jsonValue.toString();
+            }
+            if (!mapGroup.containsKey(groupKey)) {
+                mapGroup.put(groupKey, new ArrayList<>());
+            }
+            mapGroup.get(groupKey).add(item);
+        }
+    }
+
+    private ArrayNode applyProjectionWithoutGrouping(Token what, Token group, ArrayNode resultArray) {
+        if (what != null && group == null) {
+            var toProjectArray = resultArray;
+            resultArray = mapper.getMapper().createArrayNode();
+            for (var item : toProjectArray) {
+                var objectNode = mapper.getMapper().createObjectNode();
+                for (var whatValue : what.children) {
+                    if (whatValue.children.size() == 0) {
+                        var value = convertToValue(whatValue, item);
+                        var jsonValue = mapper.convertValue(value);
+                        objectNode.set(whatValue.value, jsonValue);
+                    } else {
+                        if (!whatValue.children.get(1).value.equalsIgnoreCase("=")) {
+                            throw new RuntimeException("Should assign with '='");
+                        }
+                        var value = convertToValue(whatValue.children.get(2), item);
+                        var jsonValue = mapper.convertValue(value);
+                        objectNode.set(whatValue.children.get(0).value, jsonValue);
+                    }
+                }
+                resultArray.add(objectNode);
+            }
+        }
+        return resultArray;
+    }
+
+    private void buildGroupWithProjection(Token what, Token group, ArrayNode resultArray, HashMap<String, List<JsonNode>> mapGroup) {
+        var avgFields = new HashSet<String>();
+        for (var groupItems : mapGroup.values()) {
+            var objectNode = new HashMap<String, Object>();
+            for (var groupItem : groupItems) {
+                for (var whatValue : what.children) {
+                    var lvalue = whatValue.children.get(0).value;
+                    if (!whatValue.children.get(1).value.equalsIgnoreCase("=")) {
+                        throw new RuntimeException("Should assign with '='");
+                    }
+                    var rvalue = whatValue.children.get(2);
+                    if (rvalue.value.equalsIgnoreCase("count")) {
+                        if (objectNode.get(lvalue) == null) {
+                            objectNode.put(lvalue, 1L);
+                        } else {
+                            objectNode.put(lvalue, (long) objectNode.get(lvalue) + 1L);
+                        }
+                    } else if (rvalue.value.equalsIgnoreCase("sum") || rvalue.value.equalsIgnoreCase("avg")) {
+                        if (rvalue.value.equalsIgnoreCase("avg")) {
+                            avgFields.add(lvalue);
+                        }
+                        if (objectNode.get(lvalue) == null) {
+                            objectNode.put(lvalue, convertToValue(rvalue.children.get(0), groupItem));
+                        } else {
+                            var value = ((BigDecimal) objectNode.get(lvalue)).add((BigDecimal) convertToValue(rvalue.children.get(0), groupItem));
+                            objectNode.put(lvalue, value);
+                        }
+                    } else if (rvalue.value.equalsIgnoreCase("min") || rvalue.value.equalsIgnoreCase("max")) {
+                        if (objectNode.get(lvalue) == null) {
+                            objectNode.put(lvalue, convertToValue(rvalue.children.get(0), groupItem));
+                        } else {
+                            var prevValue = ((BigDecimal) objectNode.get(lvalue));
+                            var currValue = (BigDecimal) convertToValue(rvalue.children.get(0), groupItem);
+                            if (rvalue.value.equalsIgnoreCase("min")) {
+                                if (currValue.compareTo(prevValue) < 0) {
+                                    objectNode.put(lvalue, currValue);
+                                }
+                            } else {
+                                if (currValue.compareTo(prevValue) > 0) {
+                                    objectNode.put(lvalue, currValue);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            var groupItem = groupItems.get(0);
+            for (var whatValue : group.children) {
+                var value = convertToValue(whatValue, groupItem);
+                objectNode.put(whatValue.value, value);
+            }
+            for (var avgField : avgFields) {
+                var value = (BigDecimal) objectNode.get(avgField);
+                objectNode.put(avgField, value.divide(BigDecimal.valueOf(groupItems.size())));
+            }
+            resultArray.add(mapper.toJsonNode(objectNode));
+        }
+    }
+
+    private ArrayNode applyOrder(Token order, ArrayNode inputArray) {
+        ArrayNode resultArray = mapper.getMapper().createArrayNode();
+        if (order != null) {
+            var toSort = new ArrayList<JsonNode>();
+            var resIt = inputArray.iterator();
+            while (resIt.hasNext()) {
+                toSort.add(resIt.next());
+            }
+            Collections.sort(toSort, (o1, o2) -> {
+                var compareFunctions = new ArrayList<>(order.children);
+                while (!compareFunctions.isEmpty()) {
+                    var compareFunction = compareFunctions.remove(0);
+                    var asc = compareFunction.value.equalsIgnoreCase("ASC");
+
+                    var o1Value = convertToValue(compareFunction.children.get(0), o1);
+                    var o2Value = convertToValue(compareFunction.children.get(0), o2);
+                    if (o1Value == null && o2Value == null) continue;
+                    if (o1Value == null && o2Value != null) {
+                        if (asc) return 1;
+                        return -1;
+                    }
+                    if (o1Value != null && o2Value == null) {
+                        if (asc) return -1;
+                        return 1;
+                    }
+                    if(o1Value instanceof String){
+                        var result = ((String)o1Value).compareTo((String)o2Value);
+                        if(result == 0)continue;
+                        if(asc)return result;
+                        return -result;
+                    }
+                    if(o1Value instanceof BigDecimal){
+                        var result = ((BigDecimal)o1Value).compareTo((BigDecimal)o2Value);
+                        if(result == 0)continue;
+                        if(asc)return result;
+                        return -result;
+                    }
+                }
+                return 0;
+            });
+
+            for(var item: toSort) {
+                resultArray.add(item);
+            }
+        } else {
+            resultArray = inputArray;
+        }
+        return resultArray;
+    }
+
+    class SortSpec {
+        public String field;
+        public boolean ascending;
     }
 }
