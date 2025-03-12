@@ -1,5 +1,6 @@
 package org.kendar.plugins.apis;
 
+import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import gg.jte.output.StringOutput;
 import org.kendar.annotations.HttpMethodFilter;
@@ -19,6 +20,8 @@ import org.kendar.utils.JsonMapper;
 import org.kendar.utils.parser.SimpleParser;
 import org.kendar.utils.parser.Token;
 import org.kendar.utils.parser.TokenType;
+
+import java.util.List;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
@@ -111,29 +114,53 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
                     )
             },
             tags = {"plugins/global"})
-    public boolean loadReport(Request reqp, Response resp) {
+    public boolean loadReport(Request reqp, Response response) {
         var result = retrieveData(reqp);
         var format = reqp.getQuery("format");
         if(format == null) {format="json";}
 
         if(format.equalsIgnoreCase("json")) {
-            respondJson(resp, result.getRows());
+            respondJson(response, result.getRows());
+        }else if(format.equalsIgnoreCase("html")) {
+            var output = new StringOutput();
+            resolversFactory.render("global/report_plugin/html.jte",result,output);
+            response.addHeader("Content-type","text/html");
+            response.setResponseText(new TextNode(output.toString()));
+            response.setStatusCode(200);
         }else if(format.equalsIgnoreCase("csv")) {
-
-            /*CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
-                    .setHeader(HEADERS)
-                    .build();
-
-            try (final CSVPrinter printer = new CSVPrinter(sw, csvFormat)) {
-                AUTHOR_BOOK_MAP.forEach((author, title) -> {
-                    try {
-                        printer.printRecord(author, title);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+            var sb = new StringBuilder();
+            List<String> fields = result.getFields();
+            sb.append("idx");
+            for (int fieldIndex = 0; fieldIndex < fields.size(); fieldIndex++) {
+                sb.append(",").append(fields.get(fieldIndex));
             }
-            assertEquals(EXPECTED_FILESTREAM, sw.toString().trim());*/
+            sb.append("\n");
+            for(var rowIndex=0;rowIndex<result.getRows().size();rowIndex++) {
+                var row = result.getRows().get(rowIndex);
+                sb.append(rowIndex);
+                for (int fieldIndex = 0; fieldIndex < fields.size(); fieldIndex++) {
+                    var fieldValue = row.get(fields.get(fieldIndex));
+                    sb.append(",");
+                    if(fieldValue.isTextual()) {
+                        sb.append("\""+
+                                fieldValue.asText().replaceAll("\\\"","\\\\\"")+
+                                "\"");
+                    }else if(fieldValue.isObject()
+                            ||fieldValue.isArray()) {
+                        sb.append("\""+
+                                fieldValue.toString().replaceAll("\\\"","\\\\\"")+
+                                "\"");
+                    }else{
+                        sb.append(result.convert(fieldValue));
+                    }
+
+                }
+                sb.append("\n");
+            }
+            response.addHeader("Content-type","text/csv");
+            var binary = sb.toString().getBytes();
+            response.setResponseText(new BinaryNode(binary));
+            response.setStatusCode(200);
         }
         return true;
     }
