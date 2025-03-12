@@ -28,7 +28,7 @@
     <div id="collapse${element.getSafeInstanceId()}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading${element.getSafeInstanceId()}">
         <div class="panel-body">
-            <table class="table">
+            <table class="table table-bordered table-striped">
                 <tr>
                     <th>Instance</th>
                     <th>Plugin</th>

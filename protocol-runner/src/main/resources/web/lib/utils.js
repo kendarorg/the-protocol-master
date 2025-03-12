@@ -16,7 +16,12 @@ function sendData(path, verb, data, contentType, callback) {
             // Request finished. Do processing here.
         }
     };
-    return xhr.send(data);
+    if(data!=null){
+        return xhr.send(data);
+    }else{
+        return xhr.send();
+
+    }
 }
 
 function getData(path, verb, callback) {

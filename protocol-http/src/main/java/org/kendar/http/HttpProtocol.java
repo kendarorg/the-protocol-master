@@ -6,6 +6,9 @@ import org.kendar.apis.converters.RequestResponseBuilderImpl;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.events.EventsQueue;
+import org.kendar.http.events.SSLAddHostEvent;
+import org.kendar.http.events.SSLRemoveHostEvent;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
@@ -143,6 +146,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     @Override
     public void start() {
         try {
+            var protocol = this;
             int port = getOrDefault(settings.getHttp(), 4080);
             int httpsPort = getOrDefault(settings.getHttps(), 4443);
             var proxyPort = getOrDefault(settings.getProxy(), 9999);
@@ -172,6 +176,22 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                     sslAddress, backlog, cname, sslDer, sslKey, settings.getSSL().getHosts());
             log.info("[CL>TP][IN] Listening on *.:{} Https", httpsPort);
 
+
+            EventsQueue.register("http-"+getSettings().getProtocolInstanceId(),(e)->{
+                try {
+
+                    certificatesManager.setupSll(httpsServer, List.of(e.getHost()), cname, sslDer, sslKey);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Error updating ssl "+protocol.getSettings().getProtocolInstanceId(),ex);
+                }
+            }, SSLAddHostEvent.class);
+            EventsQueue.register("http-"+getSettings().getProtocolInstanceId(),(e)->{
+                try {
+                    certificatesManager.unsetSll(httpsServer, List.of(e.getHost()), cname, sslDer, sslKey);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Error updating ssl "+protocol.getSettings().getProtocolInstanceId(),ex);
+                }
+            }, SSLRemoveHostEvent.class);
 
             proxy = new ProxyServer(proxyPort)
                     .withHttpRedirect(port).withHttpsRedirect(httpsPort)

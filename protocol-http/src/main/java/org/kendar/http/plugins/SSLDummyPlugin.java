@@ -10,16 +10,19 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 
 @TpmService(tags = "http")
 public class SSLDummyPlugin extends ProtocolPluginDescriptorBase<SSLDummyPluginSettings> implements AlwaysActivePlugin {
+    private final MultiTemplateEngine resolversFactory;
     private HttpProtocolSettings protocolSettings;
 
-    public SSLDummyPlugin(JsonMapper mapper) {
+    public SSLDummyPlugin(JsonMapper mapper, MultiTemplateEngine resolversFactory) {
         super(mapper);
+        this.resolversFactory = resolversFactory;
     }
 
     @TpmPostConstruct
@@ -50,7 +53,7 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptorBase<SSLDummyPluginS
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new SSLApiHandler(this, getId(), getInstanceId(), protocolSettings));
+        return List.of(new SSLApiHandler(this, getId(), getInstanceId(), protocolSettings,resolversFactory));
     }
 
     @Override

@@ -120,6 +120,7 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
             Request request,
             Response response)
             throws InvocationTargetException, IllegalAccessException {
+        DiService.setThreadContext(diService);
         var config = filtersConfiguration;
         if (config == null) return false;
         var possibleMatches = new ArrayList<FilterDescriptor>();
