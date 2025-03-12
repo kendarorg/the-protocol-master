@@ -34,7 +34,7 @@
                 <div class="input-group">
                     <label for="tpmqlQueryLimit" class="control-label">Limit</label>
                     <div>
-                        <input type="number" id="tpmqlQueryLimit" class="form-control" value="0" />
+                        <input type="number" id="tpmqlQueryLimit" class="form-control" value="10" />
                     </div>
                 </div>
                 <div class="input-group">
