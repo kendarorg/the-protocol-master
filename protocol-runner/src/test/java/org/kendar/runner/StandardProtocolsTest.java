@@ -45,6 +45,7 @@ public class StandardProtocolsTest extends BasicTest {
         //RECORDING
         var args = new String[]{
                 "-datadir", Path.of("target", "tests", timestampForThisRun).toAbsolutePath().toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "postgres",
                 "-port", "" + FAKE_PORT,
@@ -96,6 +97,7 @@ public class StandardProtocolsTest extends BasicTest {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "postgres",
                 "-port", "" + FAKE_PORT,
@@ -145,6 +147,7 @@ public class StandardProtocolsTest extends BasicTest {
 
         var replayArgs = new String[]{
                 "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "postgres",
                 "-port", "" + FAKE_PORT,
@@ -195,6 +198,7 @@ public class StandardProtocolsTest extends BasicTest {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "postgres",
                 "-timeout", "4",
@@ -248,6 +252,7 @@ public class StandardProtocolsTest extends BasicTest {
         var timestampForThisRun = "" + new Date().getTime();
         var args = new String[]{
                 "-datadir", Path.of("target", "tests", timestampForThisRun).toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "postgres",
                 "-port", "" + FAKE_PORT,

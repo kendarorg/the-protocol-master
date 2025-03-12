@@ -33,6 +33,7 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-help","-unattended"
         };
@@ -48,6 +49,7 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-help", "http","-unattended"
         };
@@ -64,6 +66,7 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-help", "mysql","-unattended"
         };
@@ -80,6 +83,7 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-help", "postgres","-unattended"
         };
@@ -96,6 +100,7 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-help", "amqp091","-unattended"
         };
@@ -112,6 +117,7 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-help", "mqtt","-unattended"
         };
@@ -127,6 +133,7 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-help", "redis","-unattended"
         };
@@ -142,6 +149,7 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-help", "mongodb","-unattended"
         };

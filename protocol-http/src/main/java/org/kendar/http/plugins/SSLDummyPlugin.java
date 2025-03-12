@@ -3,6 +3,7 @@ package org.kendar.http.plugins;
 import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.http.HttpProtocolSettings;
+import org.kendar.http.plugins.apis.SSLApiHandler;
 import org.kendar.http.plugins.settings.SSLDummyPluginSettings;
 import org.kendar.plugins.base.*;
 import org.kendar.proxy.PluginContext;

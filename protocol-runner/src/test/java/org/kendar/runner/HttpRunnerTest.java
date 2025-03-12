@@ -73,6 +73,7 @@ public class HttpRunnerTest extends BasicTest {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "http",
                 "-http", "" + FAKE_PORT_HTTP,
@@ -108,6 +109,7 @@ public class HttpRunnerTest extends BasicTest {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "googleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "http",
                 "-http", "" + FAKE_PORT_HTTP,

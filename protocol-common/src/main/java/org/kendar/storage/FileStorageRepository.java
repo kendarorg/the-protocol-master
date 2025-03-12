@@ -66,6 +66,11 @@ public class FileStorageRepository extends StorageRepository {
     @TpmConstructor
     public FileStorageRepository(GlobalSettings settings, DiService diService) {
         super(diService,mapper);
+        initializeStorageRepo(settings,diService);
+
+    }
+
+    protected void initializeStorageRepo(GlobalSettings settings, DiService diService) {
         this.diService = diService;
         var dataDir = settings.getDataDir();
         if (dataDir == null || dataDir.isEmpty()) {
@@ -78,7 +83,6 @@ public class FileStorageRepository extends StorageRepository {
         targetDir = ensureDirectory(targetDir);
         ensureDirectory(getScenarioDir());
     }
-
 
 
     /**
@@ -629,8 +633,14 @@ public class FileStorageRepository extends StorageRepository {
 
     public void writeFile(String content,String ... path)  {
         var realPath = buildRealPath(path)+".json";
+        var fullPath = Path.of(realPath);
+        var parent = fullPath.getParent().toFile();
+        if(!parent.exists()){
+            fullPath.getParent().toFile().mkdirs();
+        }
+
         try {
-            setFileContent(Path.of(realPath),content);
+            setFileContent(fullPath,content);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

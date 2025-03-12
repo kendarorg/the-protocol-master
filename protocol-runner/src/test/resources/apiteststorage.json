@@ -1,7 +1,7 @@
 {
   "pluginsDir": "target/plugins",
   "logLevel": "INFO",
-  "dataDir": "data/postgres",
+  "dataDir": "src/test/resources/postgres",
   "apiPort": 5005,
   "unattended":true,
   "plugins": {

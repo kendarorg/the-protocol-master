@@ -76,7 +76,7 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
 
     private List<String> getPaths(byte[] data) {
         try {
-            File destDir = new File("test");
+            File destDir = new File(Path.of("target","tests","tempencrypted").toString());
             byte[] buffer = new byte[1024];
             var result = new ArrayList<String>();
             var fis = new ByteArrayInputStream(data);
