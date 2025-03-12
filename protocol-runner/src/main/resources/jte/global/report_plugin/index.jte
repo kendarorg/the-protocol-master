@@ -40,9 +40,13 @@
                 <div class="input-group">
                     <label for="tpmqlQuery" class="control-label">Query</label>
                     <div>
-                        <textarea id="tpmqlQuery" class="form-control" rows="1" cols="60" >
-SELECT(WHAT(date=MSTODATE(timestamp),instanceId,protocol,
-query=SUBSTR(query,50),duration,tags=WRAP(tags,50,' ')),WHERE(tags.method=='POST'),ORDERBY(DESC(date)))</textarea>
+                        <textarea id="tpmqlQuery" class="form-control" rows="6" cols="70" >
+SELECT(
+    WHAT(date=MSTODATE(timestamp),instanceId,protocol,
+        query=SUBSTR(query,50),duration,tags=WRAP(tags,50,' ')),
+    WHERE(tags.method=='POST'),
+    ORDERBY(DESC(date))
+)</textarea>
                     </div>
                 </div>
                 <div class="input-group">

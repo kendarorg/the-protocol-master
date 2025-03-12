@@ -16,6 +16,7 @@
                     <h4 class="panel-title">
                         <a role="button" data-toggle="collapse" data-parent="#accordion"
                            href="#collapseAvailableFunctions"
+                           onclick="toggleAccordion('collapseAvailableFunctions')"
                            aria-expanded="true" aria-controls="collapseAvailableFunctions">
                             ${data.getInstanceId()}/${data.getId()}
                         </a>
