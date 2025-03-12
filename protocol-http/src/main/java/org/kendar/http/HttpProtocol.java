@@ -7,6 +7,7 @@ import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
 import org.kendar.http.events.SSLAddHostEvent;
 import org.kendar.http.events.SSLRemoveHostEvent;
 import org.kendar.http.ssl.CertificatesManager;
@@ -28,9 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
@@ -193,10 +196,23 @@ public class HttpProtocol extends NetworkProtoDescriptor {
                 }
             }, SSLRemoveHostEvent.class);
 
+            var concurrentHashMap = new ConcurrentHashMap<String,String>();
             proxy = new ProxyServer(proxyPort)
                     .withHttpRedirect(port).withHttpsRedirect(httpsPort)
                     .withDnsResolver(host -> {
                         try {
+                            if(!concurrentHashMap.containsKey(host)){
+                                concurrentHashMap.put(host,host);
+                                EventsQueue.send(new ReportDataEvent(
+                                        getSettings().getProtocolInstanceId(),
+                                        "dns",
+                                        host,
+                                        -1,
+                                        new Date().getTime(),
+                                        0,
+                                        Map.of()
+                                ));
+                            }
                             certificatesManager.setupSll(httpsServer, List.of(host), cname, sslDer, sslKey);
                         } catch (Exception e) {
                             return host;

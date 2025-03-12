@@ -27,13 +27,14 @@ public class HttpReportPlugin extends BasicReportPlugin<PluginSettings> {
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),
                 getProtocol(),
-                in.getMethod() + " " + in.getProtocol() + "://" + in.getHost() + in.getPath(),
+                 in.getProtocol() + "://" + in.getHost() + in.getPath(),
                 0,
                 pluginContext.getStart(),
                 duration,
                 Map.of(
                         "method", in.getMethod(),
-                        "query", in.getQuery() + "",
+                        "host", in.getHost(),
+                        "query", in.getQuery()+"",
                         "contentType", in.getFirstHeader("content-type", "unknown"),
                         "requestSize", in.getSize() + "",
                         "returnType", out.getFirstHeader("content-type", "unknown"),
