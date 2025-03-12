@@ -98,7 +98,8 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             query = {
                     @QueryString(key = "tpmql", description = "<a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> selection query", example = ""),
                     @QueryString(key="start",description = "Start from record"),
-                    @QueryString(key="limit",description = "Limit to n records")
+                    @QueryString(key="limit",description = "Limit to n records"),
+                    @QueryString(key="format",description = "The return format, json|csv|html")
             },
             responses = {
                     @TpmResponse(
@@ -112,7 +113,28 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             tags = {"plugins/global"})
     public boolean loadReport(Request reqp, Response resp) {
         var result = retrieveData(reqp);
-        respondJson(resp, result.getRows());
+        var format = reqp.getQuery("format");
+        if(format == null) {format="json";}
+
+        if(format.equalsIgnoreCase("json")) {
+            respondJson(resp, result.getRows());
+        }else if(format.equalsIgnoreCase("csv")) {
+
+            /*CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
+                    .setHeader(HEADERS)
+                    .build();
+
+            try (final CSVPrinter printer = new CSVPrinter(sw, csvFormat)) {
+                AUTHOR_BOOK_MAP.forEach((author, title) -> {
+                    try {
+                        printer.printRecord(author, title);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+            assertEquals(EXPECTED_FILESTREAM, sw.toString().trim());*/
+        }
         return true;
     }
 

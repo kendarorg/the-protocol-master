@@ -49,12 +49,14 @@ SELECT(
 )</textarea>
                     </div>
                 </div>
+                <br>
                 <div class="input-group">
-                        <button type="button" class="btn btn-danger"
+                        <button type="button" class="btn btn-success"
                                 onclick="searchReport()">
                             Search
                         </button>
                 </div>
+                <br>
                 <div id="reportSearchResult"></div>
             </form>
         </div>
