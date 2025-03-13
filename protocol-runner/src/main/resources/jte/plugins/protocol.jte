@@ -1,16 +1,4 @@
 @param org.kendar.ui.dto.ProtocolDto element
-@if(!(boolean) element.getParameters().get("avoidScript"))
-<script type="application/javascript">
-    function reloadProtocol${element.getSafeInstanceId()}(callback){
-        console.log("reload${element.getInstanceId()}")
-        var isOpen = isAccordionOpen('collapse${element.getSafeInstanceId()}');
-        return htmx.ajax('GET', '/plugins/protocols?protocolId=${element.getInstanceId()}&avoidScript=true', '#${element.getSafeInstanceId()}panel').
-        then(()=>{
-            if(isOpen)openAccordion('collapse${element.getSafeInstanceId()}')
-        })
-    }
-</script>
-@endif
 
 <div id="${element.getSafeInstanceId()}panel" class="panel panel-default">
 

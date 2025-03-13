@@ -7,7 +7,6 @@
 </head>
 <body>
 @template.header("globalpl")
-
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -29,10 +28,10 @@
                                 <tr><td>${plugin.getId()}</td><td>
                                         @if(plugin.isActive())
                                             <button type="button" class="btn  btn-danger"
-                                                    onclick="getData('/api/global/plugins/${plugin.getId()}/stop','GET',()=>location.reload())">Stop</button>
+                                                    onclick="getData('/api/global/plugins/${plugin.getId()}/stop','GET',locationReload)">Stop</button>
                                         @else
                                             <button type="button" class="btn btn-success"
-                                                    onclick="getData('/api/global/plugins/${plugin.getId()}/start','GET',()=>location.reload())">Start</button>
+                                                    onclick="getData('/api/global/plugins/${plugin.getId()}/start','GET',locationReload)">Start</button>
 
                                         @endif
                                     </td>

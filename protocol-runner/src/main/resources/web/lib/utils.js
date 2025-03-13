@@ -293,3 +293,7 @@ window.addEventListener('load', function() {
         }
     });
 });
+
+function locationReload(){
+    location.reload();
+}

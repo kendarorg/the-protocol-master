@@ -1,16 +1,5 @@
 @param org.kendar.ui.dto.ProtocolStatusDto data
 
-@if(!(boolean) data.getParameters().get("avoidScript"))
-<script type="application/javascript">
-    function reloadWildcard(callback) {
-        console.log("reloadWildcard")
-        var isOpen = isAccordionOpen('collapseWildcard');
-        return htmx.ajax('GET', '/plugins/wildcard?avoidScript=true', '#wildcardPanel').then(() => {
-            if (isOpen) openAccordion('collapseWildcard');
-        })
-    }
-</script>
-@endif
 <div id="wildcardPanel" class="panel panel-default">
 
     <div class="panel-heading" role="tab" id="headingWildcard">
@@ -38,12 +27,12 @@
                         <td>
                             @if(element.getActive()==0)
                                 <button type="button" class="btn  btn-success"
-                                        onclick="getData('/api/protocols/all/plugins/${element.getId()}/start','GET',()=>reloadAll())">
+                                        onclick="getData('/api/protocols/all/plugins/${element.getId()}/start','GET',reloadAllPlugins)">
                                     Start
                                 </button>
                             @elseif(element.someActive())
                                 <button type="button" class="btn  btn-warning"
-                                        onclick="getData('/api/protocols/all/plugins/${element.getId()}/start','GET',()=>reloadAll())">
+                                        onclick="getData('/api/protocols/all/plugins/${element.getId()}/start','GET',reloadAllPlugins)">
                                     Start
                                 </button>
                             @endif
@@ -52,12 +41,12 @@
                         <td>
                             @if(element.getNotActive()==0)
                                 <button type="button" class="btn  btn-danger"
-                                        onclick="getData('/api/protocols/all/plugins/${element.getId()}/stop','GET',()=>reloadAll().then(()=>{}))">
+                                        onclick="getData('/api/protocols/all/plugins/${element.getId()}/stop','GET',reloadAllPlugins)">
                                     Stop
                                 </button>
                             @elseif(element.someActive())
                                 <button type="button" class="btn  btn-warning"
-                                        onclick="getData('/api/protocols/all/plugins/${element.getId()}/stop','GET',()=>reloadAll().then(()=>{}))">
+                                        onclick="getData('/api/protocols/all/plugins/${element.getId()}/stop','GET',reloadAllPlugins)">
                                     Stop
                                 </button>
                             @endif
