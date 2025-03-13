@@ -10,6 +10,7 @@ import org.kendar.plugins.apis.Ok;
 import org.kendar.utils.Sleeper;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -84,12 +85,12 @@ public class UiTest extends ApiTestBase {
         var path = "http://localhost:5005/api/global/plugins/report-plugin/report?"+
                 "tpmql="+tpmql+
                 "&start=0&limit=10";
-        actual = downloadRequestString(path+"&format=json", httpclient);
+        actual = new String(downloadRequest(path+"&format=json", httpclient), StandardCharsets.UTF_8);
         var msg =actual;
         assertTrue(actual.contains("\"2025/03/13 10:11:22.190\""),()->msg);
-        actual = downloadRequestString(path+"&format=csv", httpclient);
+        actual = new String(downloadRequest(path+"&format=csv", httpclient), StandardCharsets.UTF_8);
         assertTrue(actual.contains("0,\"2025/03/13 10:11:22.190\","));
-        actual = downloadRequestString(path+"&format=html", httpclient);
+        actual = new String(downloadRequest(path+"&format=html", httpclient), StandardCharsets.UTF_8);
         assertTrue(actual.contains("<td>2025/03/13 10:11:22.190</td>"));
 
 
