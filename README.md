@@ -2,9 +2,9 @@
 
 ![](protocolmaster_s.gif)
 
-"The Protocol Master" is an infrastructure simulator to test effortlessly your app in minutes (with no coding)
-supporting
-HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091 ... and all the compatible ones!
+"The Protocol Master" is an infrastructure simulator operable via [complete UI](docs/ui.md) or command line to test
+effortlessly your app in minutes (with no coding)
+supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091 ... and all the compatible ones!
 
 * Simulate wrong scenarios
 * Block troubles before production
@@ -28,7 +28,8 @@ various languages and environments
 ### How it works
 
 It's simple it's a `multiprotocol` proxy on your box (or whatever you want)
-Independent of the stack you are using
+Independent of the stack you are using. Operated via command line and via
+a [brand-new UI](docs/ui.md)
 
 ### Scenarios
 
@@ -85,6 +86,8 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
     * redis 3,redis 2
     * mqtt
     * rabbitmq/Amqp 0.9
+* Operate unattended via command lime
+* Operate via a [complete UI](docs/ui.md)
 * Mocked flow (all)
 * Support gzip,brotli,jacksonSmile,multipart and more (http/s)
 * Mocked error response (http/s)
