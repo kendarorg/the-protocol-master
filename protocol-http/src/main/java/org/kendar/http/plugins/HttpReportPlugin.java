@@ -52,10 +52,10 @@ public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings
             if(localIgnore.contains(in.getHost())){
                 return false;
             }
-            for(var ignored:getSettings().getIgnore()){
-                if(ignored.equalsIgnoreCase(in.getHost())){
-                    return false;
-                }
+        }
+        for(var ignored:getSettings().getIgnore()){
+            if(ignored.equalsIgnoreCase(in.getHost())){
+                return false;
             }
         }
 

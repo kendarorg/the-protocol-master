@@ -161,6 +161,14 @@ An example of complex regexp
 
 The file is located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]/rewrite.json
 
+### report-plugin
+
+When active send to the global report-plugin all request/response data
+
+* active: If it is active
+* ignoreTpm: If should ignore calls to TPM APIs when reporting
+* ignore: List of ip/dns to ignore when reporting
+
 ## Documentation used
 
 * https://stackoverflow.com/questions/9357585/creating-a-java-proxy-server-that-accepts-https

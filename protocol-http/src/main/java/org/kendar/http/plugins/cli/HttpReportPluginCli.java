@@ -26,8 +26,8 @@ public class HttpReportPluginCli extends BasicPluginCli {
     @Override
     protected CommandOption[] buildPluginOptions(PluginSettings settings) {
         var options = new ArrayList<CommandOption>();
-        options.add(CommandOption.of("ignTpm", "Do not send TPM calls reports, default true")
-                .withLong("percentAction")
+        options.add(CommandOption.of("itp", "Do not send TPM calls reports, default true, so, ignore")
+                .withLong("ignoreTpm")
                 .withCallback((s) -> ((HttpReportPluginSettings) settings).setIgnoreTpm(Boolean.parseBoolean(s))));
         return options.toArray(new CommandOption[0]);
     }

@@ -158,6 +158,7 @@ public class MultiRecordReplayTest extends BasicTest {
 
         assertEquals(14, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("postgres")).count());
         assertEquals(1, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("http")).count());
+        assertEquals(1, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("dns")).count());
 
 
         runTheServer.set(false);

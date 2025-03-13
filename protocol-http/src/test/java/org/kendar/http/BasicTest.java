@@ -21,10 +21,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.http.plugins.*;
-import org.kendar.http.plugins.settings.HttpLatencyPluginSettings;
-import org.kendar.http.plugins.settings.HttpRateLimitPluginSettings;
-import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
-import org.kendar.http.plugins.settings.HttpReplayPluginSettings;
+import org.kendar.http.plugins.settings.*;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.settings.GlobalSettings;
@@ -173,8 +170,9 @@ public class BasicTest {
         var recordingSettings = new HttpRecordPluginSettings();
         httpProtocolSettings.getPlugins().put("record-plugin", recordingSettings);
 
-        var reportSettings = new PluginSettings();
+        var reportSettings = new HttpReportPluginSettings();
         reportSettings.setActive(true);
+        reportSettings.setIgnoreTpm(false);
         httpProtocolSettings.getPlugins().put("report-plugin", reportSettings);
 
         var latencySettings = new HttpLatencyPluginSettings();

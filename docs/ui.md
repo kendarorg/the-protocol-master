@@ -72,3 +72,24 @@ SELECT(
 `
 
 ![global_report.png](ui/global_report.png)
+
+
+### Some useful query
+
+Find all dns calls
+
+`SELECT(
+    WHAT(date=MSTODATE(timestamp),instanceId,protocol,query),
+    WHERE(protocol=='dns'),
+    ORDERBY(DESC(date))
+)`
+
+Find all calls to specific host
+
+`SELECT(
+  WHAT(date=MSTODATE(timestamp),instanceId,protocol,
+  tags.method,
+  query=SUBSTR(query,50),duration,tags=WRAP(tags,50,' ')),
+  WHERE(tags.host=='HOST_TO_SEARCH_FOR'),
+  ORDERBY(DESC(date))
+)`
