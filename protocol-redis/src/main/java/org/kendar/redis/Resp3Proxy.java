@@ -1,6 +1,7 @@
 package org.kendar.redis;
 
 import org.kendar.di.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
@@ -20,7 +21,7 @@ public class Resp3Proxy extends NetworkProxy {
     }
 
     @TpmConstructor
-    public Resp3Proxy(ByteProtocolSettings settings) {
+    public Resp3Proxy(@TpmNamed(tags = "redis") ByteProtocolSettings settings) {
         super(settings.getConnectionString(), null, null);
     }
 

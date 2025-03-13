@@ -107,7 +107,6 @@ public class TcpServer {
             }
             return;
         }
-
         this.thread = new Thread(() -> {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
                 if (onStart != null) {

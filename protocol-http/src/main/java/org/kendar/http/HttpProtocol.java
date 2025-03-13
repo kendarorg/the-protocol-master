@@ -229,13 +229,13 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             log.info("[CL>TP][IN] Listening on *.:{} Http Proxy", proxyPort);
 
 
-            for (var i = plugins.size() - 1; i >= 0; i--) {
+            /*for (var i = plugins.size() - 1; i >= 0; i--) {
                 var plugin = plugins.get(i);
                 var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
                 if (specificPluginSetting != null) {
                     ((ProtocolPluginDescriptor) plugin).initialize(globalSettings, settings, specificPluginSetting);
                 }
-            }
+            }*/
 
             var handler = new MasterHandler(
                     new PluginClassesHandlerImpl(plugins, this),

@@ -13,6 +13,7 @@ import org.bson.conversions.Bson;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
 import org.kendar.di.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.iterators.ProcessId;
 import org.kendar.mongo.dtos.OpMsgContent;
@@ -41,7 +42,7 @@ public class MongoProxy extends Proxy {
     }
 
     @TpmConstructor
-    public MongoProxy(ByteProtocolSettingsWithLogin settings) {
+    public MongoProxy(@TpmNamed(tags = "mongodb") ByteProtocolSettingsWithLogin settings) {
         this(settings.getConnectionString(), ServerApiVersion.V1);
     }
 

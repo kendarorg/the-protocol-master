@@ -1,6 +1,7 @@
 package org.kendar.mqtt;
 
 import org.kendar.di.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.utils.MqttProxySocket;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -21,7 +22,7 @@ public class MqttProxy extends NetworkProxy {
     private static final Logger log = LoggerFactory.getLogger(MqttProxy.class);
 
     @TpmConstructor
-    public MqttProxy(ByteProtocolSettingsWithLogin settings) {
+    public MqttProxy(@TpmNamed(tags = "mqtt") ByteProtocolSettingsWithLogin settings) {
         super(settings.getConnectionString(), settings.getLogin(), settings.getPassword());
     }
 
