@@ -121,14 +121,14 @@ public abstract class StorageRepository implements Service {
 
                 File newFile = createNewFileFromZip(destDir, zipEntry);
                 if (zipEntry.isDirectory()) {
-                    if (!newFile.isDirectory() && !newFile.mkdirs()) {
+                    if (!newFile.mkdirs()) {
                         log.error("Could not create directory " + newFile.getAbsolutePath()+" isDir:"+newFile.isDirectory());
                         throw new IOException("Failed to create directory " + newFile);
                     }
                 } else {
                     // fix for Windows-created archives
                     File parent = newFile.getParentFile();
-                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                    if (!parent.mkdirs()) {
                         log.error("Could not create directory(2) " + newFile.getAbsolutePath()+" isDir:"+newFile.isDirectory());
                         throw new IOException("Failed to create directory " + parent);
                     }
