@@ -20,7 +20,6 @@ public class ApiTestStorage extends ApiTestBase {
 
     @AfterAll
     public static void cleanup() {
-        bs.runTheServer.set(false);
         Main.stop();
         Sleeper.sleep(1000);
     }
@@ -46,12 +45,12 @@ public class ApiTestStorage extends ApiTestBase {
 
         var httpclient = HttpClients.createDefault();
 
-        var items = getRequest("http://localhost:5005/api/global/storage/items",
+        var items = getRequest("http://localhost:5005/api/global/storage/index",
                 httpclient, new TypeReference<List<CompactLineApi>>() {
                 });
         assertEquals(12, items.size());
 
-        var item = getRequest("http://localhost:5005/api/global/storage/items/default/3",
+        var item = getRequest("http://localhost:5005/api/global/storage/item/default/3",
                 httpclient, new TypeReference<StorageAndIndex>() {
                 });
         assertEquals("JDBC", item.getItem().getCaller());

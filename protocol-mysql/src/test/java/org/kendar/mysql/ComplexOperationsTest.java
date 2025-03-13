@@ -10,7 +10,7 @@ import java.sql.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ComplexOperationsTest extends BasicTest {
+public class ComplexOperationsTest extends MySqlBasicTest {
 
     @BeforeAll
     public static void beforeClass() {

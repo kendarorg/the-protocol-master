@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PostgresProtocolTest extends BasicTest {
+public class PostgresProtocolTest extends PostgresBasicTest {
 
     @BeforeAll
     public static void beforeClass() {

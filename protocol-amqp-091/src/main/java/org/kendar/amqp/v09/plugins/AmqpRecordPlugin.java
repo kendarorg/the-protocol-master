@@ -6,7 +6,7 @@ import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.RecordPlugin;
+import org.kendar.plugins.BasicRecordPlugin;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @TpmService(tags = "amqp091")
-public class AmqpRecordPlugin extends RecordPlugin<BasicAysncRecordPluginSettings> {
+public class AmqpRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSettings> {
     private static final List<String> toAvoid = List.of("byte[]",
             "ConnectionStartOk", "ConnectionTuneOk", "ConnectionOpen", "ChannelOpen", "BasicPublish",
             "HeaderFrame", "BasicPublish", "BodyFrame", "BasicAck", "ChannelClose", "ConnectionClose",

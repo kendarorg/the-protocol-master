@@ -57,7 +57,11 @@ public class DiService {
     }
 
     public static void setThreadContext(DiService threadContext) {
-        threads.put(Thread.currentThread(), threadContext);
+        if(threadContext==null) {
+            threads.remove(Thread.currentThread());
+        }else {
+            threads.put(Thread.currentThread(), threadContext);
+        }
     }
 
     public static List<String> getTags(Object instance) {
@@ -79,11 +83,15 @@ public class DiService {
 
     private void destroy() {
         for (var item : children) {
-            item.destroy();
+            try {
+                item.destroy();
+            }catch (Exception e) {}
         }
         children.clear();
         for (var item : singletons.values()) {
-            destroy(item);
+            try {
+                destroy(item);
+            }catch (Exception e) {}
         }
         singletons.clear();
         if (parent != null) {
@@ -482,11 +490,17 @@ public class DiService {
     }
 
     public void clean() {
-        for (var item : children) {
+        try {
+            this.destroy();
+        }catch (Exception e) {}
+        for (int i = 0; i < children.size(); i++) {
+            var item = children.get(i);
             item.clean();
         }
         children.clear();
-        for (var item : singletons.values()) {
+        Object[] array = singletons.values().toArray();
+        for (int i = 0; i < array.length; i++) {
+            var item = array[i];
             destroy(item);
         }
         singletons.clear();
@@ -496,6 +510,6 @@ public class DiService {
         namedMappings.clear();
         parent = null;
         threads.clear();
-        singletons.put(DiService.class, this);
+
     }
 }

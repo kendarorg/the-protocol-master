@@ -7,9 +7,9 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.TpmEvent;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.http.plugins.HttpRecordPlugin;
-import org.kendar.http.plugins.HttpRecordPluginSettings;
+import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPlugin;
-import org.kendar.http.plugins.HttpReplayPluginSettings;
+import org.kendar.http.plugins.settings.HttpReplayPluginSettings;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -28,11 +28,11 @@ public class ReplayRecordFilters {
     private ConcurrentLinkedQueue<TpmEvent> events = new ConcurrentLinkedQueue<>();
 
     @Test
-    void testRecordSites() {
+    void testtarget() {
         try {
             events.clear();
             var mapper = new JsonMapper();
-            EventsQueue.register("testRecordSites", (e) -> events.add(e), WriteItemEvent.class);
+            EventsQueue.register("testtarget", (e) -> events.add(e), WriteItemEvent.class);
             var rwPlugin = new HttpRecordPlugin(mapper, new NullStorageRepository()) {
                 @Override
                 public boolean isActive() {
@@ -41,9 +41,9 @@ public class ReplayRecordFilters {
             };
             var settings = new HttpRecordPluginSettings();
             settings.setActive(true);
-            settings.getRecordSites().add("test_sites/*");
-            settings.getRecordSites().add("www.sara.com");
-            settings.getRecordSites().add("@.*microsoft.*");
+            settings.getTarget().add("test_sites/*");
+            settings.getTarget().add("www.sara.com");
+            settings.getTarget().add("@.*microsoft.*");
             var global = new GlobalSettings();
             //global.putService("storage", new NullStorageRepository());
             rwPlugin.initialize(global, new HttpProtocolSettings(), settings);
@@ -82,7 +82,7 @@ public class ReplayRecordFilters {
             events.clear();
         } finally {
 
-            EventsQueue.unregister("testRecordSites", WriteItemEvent.class);
+            EventsQueue.unregister("testtarget", WriteItemEvent.class);
         }
     }
 
@@ -103,9 +103,9 @@ public class ReplayRecordFilters {
         };
         var settings = new HttpReplayPluginSettings();
         settings.setActive(true);
-        settings.getMatchSites().add("test_sites");
-        settings.getMatchSites().add("www.sara.com");
-        settings.getMatchSites().add("@.*microsoft.*");
+        settings.getTarget().add("test_sites");
+        settings.getTarget().add("www.sara.com");
+        settings.getTarget().add("@.*microsoft.*");
         var global = new GlobalSettings();
         //global.putService("storage", new NullStorageRepository());
 

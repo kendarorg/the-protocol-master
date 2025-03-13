@@ -81,4 +81,8 @@ public class ReportDataEvent implements TpmEvent {
     public long getConnectionId() {
         return connectionId;
     }
+
+    public String toStringTags(){
+        return String.join(",",getTags().entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).toList());
+    }
 }

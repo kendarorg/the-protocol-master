@@ -1,7 +1,7 @@
 package org.kendar.redis.plugins;
 
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.ReplayPlugin;
+import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @TpmService(tags = "redis")
-public class RedisReplayPlugin extends ReplayPlugin<BasicAysncReplayPluginSettings> {
+public class RedisReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
 
     public RedisReplayPlugin(JsonMapper mapper, StorageRepository storage) {

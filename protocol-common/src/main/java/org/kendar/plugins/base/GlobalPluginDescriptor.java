@@ -19,6 +19,7 @@ public interface GlobalPluginDescriptor<W extends PluginSettings> extends Extens
      */
     GlobalPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings);
 
+    PluginSettings getSettings();
 
     /**
      * Retrieve the eventual APIs

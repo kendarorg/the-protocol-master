@@ -15,26 +15,21 @@ import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 @TpmService(tags = "storage_file")
-public class FileStorageRepository implements StorageRepository {
+public class FileStorageRepository extends StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
     protected static final ExecutorService executor = Executors.newSingleThreadExecutor();
     protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
@@ -48,23 +43,34 @@ public class FileStorageRepository implements StorageRepository {
     protected String targetDir;
     protected DiService diService;
 
+    private String getScenarioDir(){
+        return Path.of(targetDir,"scenario").toString();
+    }
+
     public FileStorageRepository(String targetDir) {
 
         this(Path.of(targetDir));
     }
 
     public FileStorageRepository(Path targetDir) {
-
+        super(null,null);
         this.targetDir = targetDir.toAbsolutePath().toString();
     }
 
     protected FileStorageRepository() {
+        super(null,null);
 
     }
 
 
     @TpmConstructor
     public FileStorageRepository(GlobalSettings settings, DiService diService) {
+        super(diService,mapper);
+        initializeStorageRepo(settings,diService);
+
+    }
+
+    protected void initializeStorageRepo(GlobalSettings settings, DiService diService) {
         this.diService = diService;
         var dataDir = settings.getDataDir();
         if (dataDir == null || dataDir.isEmpty()) {
@@ -75,37 +81,16 @@ public class FileStorageRepository implements StorageRepository {
         }
         this.targetDir = Path.of(dataDir).toAbsolutePath().toString();
         targetDir = ensureDirectory(targetDir);
+        ensureDirectory(getScenarioDir());
     }
 
-    protected static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
-        if (fileToZip.isHidden()) {
-            return;
-        }
-        if (fileToZip.isDirectory()) {
-            if (fileName.endsWith("/")) {
-                zipOut.putNextEntry(new ZipEntry(fileName));
-                zipOut.closeEntry();
-            } else {
-                zipOut.putNextEntry(new ZipEntry(fileName + "/"));
-                zipOut.closeEntry();
-            }
-            File[] children = fileToZip.listFiles();
-            for (File childFile : children) {
-                zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
-            }
-            return;
-        }
-        FileInputStream fis = new FileInputStream(fileToZip);
-        ZipEntry zipEntry = new ZipEntry(fileName);
-        zipOut.putNextEntry(zipEntry);
-        byte[] bytes = new byte[1024];
-        int length;
-        while ((length = fis.read(bytes)) >= 0) {
-            zipOut.write(bytes, 0, length);
-        }
-        fis.close();
-    }
 
+    /**
+     * Pad the names of the recordings to allow easy ordering
+     * @param inputString
+     * @param length
+     * @return
+     */
     public static String padLeftZeros(String inputString, int length) {
         if (inputString.length() >= length) {
             return inputString;
@@ -119,6 +104,11 @@ public class FileStorageRepository implements StorageRepository {
         return sb.toString();
     }
 
+    /**
+     * Certify that a directory exists
+     * @param td
+     * @return
+     */
     protected static String ensureDirectory(String td) {
         if (!Path.of(td).isAbsolute()) {
             Path currentRelativePath = Paths.get("").toAbsolutePath();
@@ -132,6 +122,10 @@ public class FileStorageRepository implements StorageRepository {
         return td;
     }
 
+    /**
+     * Delete -everything-
+     * @param dir
+     */
     protected static void cleanRecursive(File dir) {
         File[] files = dir.listFiles();
         if (files != null) {
@@ -144,36 +138,30 @@ public class FileStorageRepository implements StorageRepository {
         }
     }
 
-    protected static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
-    }
 
     @TpmPostConstruct
-    @Override
+    
     public void initialize() {
 
         try {
             targetDir = ensureDirectory(targetDir);
-            EventsQueue.register("FileStorageRepository", (e) -> write(e.getLineToWrite()), WriteItemEvent.class);
-            EventsQueue.register("FileStorageRepository", (e) -> finalizeWrite(e.getInstanceId()), FinalizeWriteEvent.class);
-            EventsQueue.register("FileStorageRepository", (e) -> initializeContentWrite(e.getInstanceId()), StartWriteEvent.class);
+            ensureDirectory(getScenarioDir());
+            EventsQueue.register("FileStorageRepository", (e) -> recordInteraction(e.getLineToWrite()), WriteItemEvent.class);
+            EventsQueue.register("FileStorageRepository", (e) -> finalizeRecording(e.getInstanceId()), FinalizeWriteEvent.class);
+            EventsQueue.register("FileStorageRepository", (e) -> initializeContentForWrite(e.getInstanceId()), StartWriteEvent.class);
             EventsQueue.register("FileStorageRepository", (e) -> finalizePlay(e.getInstanceId()), EndPlayEvent.class);
-            EventsQueue.register("FileStorageRepository", (e) -> initializeContent(e.getInstanceId()), StartPlayEvent.class);
+            EventsQueue.register("FileStorageRepository", (e) -> initializeContentForReplay(e.getInstanceId()), StartPlayEvent.class);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+
+    /**
+     * Conclude the replaying for a given protocol
+     * @param instanceId
+     */
     protected void finalizePlay(String instanceId) {
         synchronized (initializeContentLock) {
             log.info("Stop replaying {}", instanceId);
@@ -181,7 +169,12 @@ public class FileStorageRepository implements StorageRepository {
         }
     }
 
-    protected ProtocolRepo initializeContent(String instanceId) {
+    /**
+     * Initiazlie the writing reading for a specific protocol
+     * @param instanceId
+     * @return
+     */
+    protected ProtocolRepo initializeContentForReplay(String instanceId) {
 
         return protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
             if (currRepo == null) {
@@ -212,8 +205,7 @@ public class FileStorageRepository implements StorageRepository {
         });
     }
 
-    protected void initializeContentWrite(String instanceId) {
-
+    protected void initializeContentForWrite(String instanceId) {
         protocolRepo.compute(instanceId, (protocolInstanceId, currRepo) -> {
             if (currRepo == null) {
                 currRepo = new ProtocolRepo();
@@ -232,7 +224,12 @@ public class FileStorageRepository implements StorageRepository {
         });
     }
 
-    @Override
+    /**
+     * Retrieve indexes for recording/replaying
+     * @param instanceId
+     * @return
+     */
+    
     public List<CompactLine> getIndexes(String instanceId) {
         if (protocolRepo.get(instanceId) == null) {
             return null;
@@ -241,7 +238,10 @@ public class FileStorageRepository implements StorageRepository {
         return new ArrayList<>(repo.index);
     }
 
-    @Override
+    /**
+     * Reset all storage
+     */
+    
     public void clean() {
         protocolRepo.clear();
         var dir = Path.of(targetDir).toFile();
@@ -249,14 +249,22 @@ public class FileStorageRepository implements StorageRepository {
         EventsQueue.send(new StorageReloadedEvent());
     }
 
+    /**
+     * Create unique progressive id
+     * @return
+     */
     public long generateIndex() {
         synchronized (lock) {
             return storageCounter.incrementAndGet();
         }
     }
 
-    @Override
-    public void write(LineToWrite item) {
+    /**
+     * Record a line
+     * @param item
+     */
+    
+    public void recordInteraction(LineToWrite item) {
         executorItems.incrementAndGet();
         executor.submit(() -> {
 
@@ -278,10 +286,8 @@ public class FileStorageRepository implements StorageRepository {
                 repo.somethingWritten = true;
                 if (item.getStorageItem() != null) {
                     var result = mapper.serializePretty(item.getStorageItem());
-                    if (!Files.exists(Paths.get(targetDir))) {
-                        Files.createDirectories(Paths.get(targetDir));
-                    }
-                    writeContent(id, result);
+                    ensureDirectory(getScenarioDir());
+                    setFileContent(Path.of(targetDir, "scenario",id), result);
                 }
             } catch (Exception e) {
                 log.error("[TPM ][WR]: Error writing item", e);
@@ -291,14 +297,16 @@ public class FileStorageRepository implements StorageRepository {
         });
     }
 
-    private void writeContent(String id, String result) throws IOException {
-        setFileContent(Path.of(targetDir, id), result);
-    }
 
+    /**
+     * Retrieve all the index data for recording
+     * @param protocolInstanceId
+     * @return
+     */
     protected List<CompactLine> retrieveIndexFile(String protocolInstanceId) {
         String fileContent;
         try {
-            fileContent = getFileContent(Path.of(targetDir, "index." + protocolInstanceId + ".json"));
+            fileContent = getFileContent(Path.of(targetDir,"scenario", "index." + protocolInstanceId + ".json"));
         } catch (IOException e) {
             fileContent = "[]";
         }
@@ -306,11 +314,14 @@ public class FileStorageRepository implements StorageRepository {
         });
     }
 
+    /**
+     * Retrieve all scenario data
+     * @param protocolInstanceId
+     * @return
+     */
     protected List<StorageItem> readAllItems(String protocolInstanceId) {
-        if (!Files.exists(Paths.get(targetDir))) {
-            return new ArrayList<>();
-        }
-        var fileNames = Stream.of(new File(targetDir).listFiles())
+        ensureDirectory(getScenarioDir());
+        var fileNames = Stream.of(new File(getScenarioDir()).listFiles())
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .filter(name -> name.endsWith("." + protocolInstanceId + ".json"))
@@ -326,7 +337,7 @@ public class FileStorageRepository implements StorageRepository {
                 continue;
             }
             try {
-                var fileContent = getFileContent(Path.of(targetDir, fileName));
+                var fileContent = getFileContent(Path.of(targetDir,"scenario", fileName));
                 result.add(mapper.deserialize(fileContent, typeReference));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -335,8 +346,12 @@ public class FileStorageRepository implements StorageRepository {
         return result;
     }
 
-    @Override
-    public void finalizeWrite(String instanceId) {
+    /**
+     * Finalize recording
+     * @param instanceId
+     */
+    
+    public void finalizeRecording(String instanceId) {
         try {
             Sleeper.sleepNoException(1000, () -> executorItems.get() == 0, true);
             var repo = protocolRepo.get(instanceId);
@@ -347,10 +362,10 @@ public class FileStorageRepository implements StorageRepository {
                 return;
             }
             var indexFile = "index." + instanceId + ".json";
-            if (Files.exists(Path.of(targetDir, indexFile))) {
-                Files.delete(Path.of(targetDir, indexFile));
+            if (Files.exists(Path.of(targetDir, "scenario",indexFile))) {
+                Files.delete(Path.of(targetDir,"scenario", indexFile));
             }
-            setFileContent(Path.of(targetDir, indexFile),
+            setFileContent(Path.of(targetDir,"scenario", indexFile),
                     mapper.serializePretty(repo.index));
 
         } catch (IOException e) {
@@ -361,13 +376,19 @@ public class FileStorageRepository implements StorageRepository {
         log.info("Stop recording {}", instanceId);
     }
 
-    @Override
-    public StorageItem readById(String protocolInstanceId, long id) {
+    /**
+     * Read item from scenario
+     * @param protocolInstanceId
+     * @param id
+     * @return
+     */
+    
+    public StorageItem readFromScenarioById(String protocolInstanceId, long id) {
         var ctx = protocolRepo.get(protocolInstanceId);
         if (ctx == null) {
             String fileContent;
             try {
-                var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(id), 10) + "." + protocolInstanceId + ".json");
+                var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(id), 10) + "." + protocolInstanceId + ".json");
 
                 fileContent = getFileContent(filePath);
             } catch (IOException e) {
@@ -383,8 +404,14 @@ public class FileStorageRepository implements StorageRepository {
         return result;
     }
 
-    @Override
-    public List<StorageItem> readResponses(String protocolInstanceId, ResponseItemQuery query) {
+    /**
+     * Read all responses for scenario given data
+     * @param protocolInstanceId
+     * @param query
+     * @return
+     */
+    
+    public List<StorageItem> readResponsesFromScenario(String protocolInstanceId, ResponseItemQuery query) {
         var ctx = protocolRepo.get(protocolInstanceId);
         var result = new ArrayList<StorageItem>();
 
@@ -408,95 +435,40 @@ public class FileStorageRepository implements StorageRepository {
     }
 
     protected List<File> listFilesUsingJavaIO(String dir) {
-        return Stream.of(new File(dir).listFiles())
+        var files = new File(dir).listFiles();
+        if(files == null) {
+            return new ArrayList<>();
+        }
+        return Stream.of(files)
                 .filter(file -> !file.isDirectory())
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public byte[] readAsZip() {
-        var baos = new ByteArrayOutputStream();
-        var globalSettings = diService.getInstance(GlobalSettings.class);
-        var globalSettingsFile = mapper.serialize(globalSettings);
-//        ZIPSETTINGS try {
-//            Files.writeString(Path.of(targetDir,"settings.json").toAbsolutePath(),globalSettingsFile);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-        try (var zos = new ZipOutputStream(baos)) {
-            for (var file : new File(Path.of(targetDir).toAbsolutePath().toString()).listFiles()) {
-                zipFile(file, file.getName(), zos);
-            }
-        } catch (IOException ioe) {
-            log.error("Error Creating storage zip", ioe);
+    protected List<File> listDirsUsingJavaIO(String dir) {
+        var files = new File(dir).listFiles();
+        if(files == null) {
+            return new ArrayList<>();
         }
-        return baos.toByteArray();
+        return Stream.of(files)
+                .filter(file -> file.isDirectory())
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public void writeZip(byte[] byteArray) {
-        String settingsDir = null;
-        var destDirString = Path.of(targetDir).toAbsolutePath().toString();
-        File destDir = new File(destDirString);
-        // create output directory if it doesn't exist
-        if (!destDir.exists()) destDir.mkdirs();
-        ByteArrayInputStream fis;
-        //buffer for read and write data to file
-        byte[] buffer = new byte[1024];
-        try {
-            fis = new ByteArrayInputStream(byteArray);
-            ZipInputStream zis = new ZipInputStream(fis);
-            ZipEntry zipEntry = zis.getNextEntry();
-            if (zipEntry == null) {
-                throw new RuntimeException("Not a zip file!");
-            }
-            while (zipEntry != null) {
-                /*ZIPSETTINGS if(zipEntry.getName().equalsIgnoreCase("settings.json") &&
-                        Path.of(targetDir).toAbsolutePath().compareTo(destDir.toPath().toAbsolutePath()) == 0) {
-                    settingsDir =Path.of(destDir.getAbsolutePath(),zipEntry.getName()).toString();
-                }*/
-                File newFile = newFile(destDir, zipEntry);
-                if (zipEntry.isDirectory()) {
-                    if (!newFile.isDirectory() && !newFile.mkdirs()) {
-                        throw new IOException("Failed to create directory " + newFile);
-                    }
-                } else {
-                    // fix for Windows-created archives
-                    File parent = newFile.getParentFile();
-                    if (!parent.isDirectory() && !parent.mkdirs()) {
-                        throw new IOException("Failed to create directory " + parent);
-                    }
 
-                    // write file content
-                    var fos = new ByteArrayOutputStream();
-                    int len;
-                    while ((len = zis.read(buffer)) > 0) {
-                        fos.write(buffer, 0, len);
-                    }
-                    fos.close();
-                    setFileContent(newFile.toPath(), new String(fos.toByteArray()));
-                }
-                zipEntry = zis.getNextEntry();
-            }
-            //close last ZipEntry
-            zis.closeEntry();
-            zis.close();
-            fis.close();
-            EventsQueue.send(new StorageReloadedEvent().withSettings(settingsDir));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
+    
     public String getType() {
         return "storage";
     }
 
-    @Override
+    /**
+     * Retrieve all index data
+     * @param maxLen
+     * @return
+     */
+    
     public List<CompactLineComplete> getAllIndexes(int maxLen) {
         var result = new ArrayList<CompactLineComplete>();
-        for (var file : listFilesUsingJavaIO(Path.of(targetDir).toAbsolutePath().toString())) {
+        for (var file : listFilesUsingJavaIO(Path.of(targetDir,"scenario").toAbsolutePath().toString())) {
             if (file.getName().contains("index") && file.getName().endsWith(".json")) {
                 String fileContent;
                 var fileNameOnly = file.toPath().getFileName().toString();
@@ -514,7 +486,7 @@ public class FileStorageRepository implements StorageRepository {
                     var id = protocolInstanceId + "/" + padLeftZeros(String.valueOf(item.getIndex()), 10);
 
 
-                    var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(item.getIndex()), 10) + "." + protocolInstanceId + ".json");
+                    var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(item.getIndex()), 10) + "." + protocolInstanceId + ".json");
                     if (filePath.toFile().exists()) {
                         item.setFullItemId(id);
                     }
@@ -537,18 +509,18 @@ public class FileStorageRepository implements StorageRepository {
 
     }
 
-    @Override
-    public void update(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
+    
+    public void updateRecording(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
         var indexFile = retrieveIndexFile(protocolInstanceId);
-        var indexPath = Path.of(targetDir, "index." + protocolInstanceId + ".json");
+        var indexPath = Path.of(targetDir, "scenario","index." + protocolInstanceId + ".json");
         for (int i = 0; i < indexFile.size(); i++) {
             var toCheck = indexFile.get(i);
             if (toCheck.getIndex() == itemId) {
                 index.setIndex(itemId);
                 indexFile.set(i, index);
-                var old = this.readById(protocolInstanceId, itemId);
+                var old = this.readFromScenarioById(protocolInstanceId, itemId);
 
-                var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+                var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
                 try {
                     item.setIndex(itemId);
                     item.setTimestamp(old.getTimestamp());
@@ -565,12 +537,12 @@ public class FileStorageRepository implements StorageRepository {
 
     }
 
-    @Override
-    public void delete(String protocolInstanceId, long itemId) {
+    
+    public void deleteRecording(String protocolInstanceId, long itemId) {
         try {
             var indexFile = retrieveIndexFile(protocolInstanceId);
-            var filePath = Path.of(targetDir, padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
-            var indexPath = Path.of(targetDir, "index." + protocolInstanceId + ".json");
+            var filePath = Path.of(targetDir, "scenario",padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+            var indexPath = Path.of(targetDir, "scenario","index." + protocolInstanceId + ".json");
             if (filePath.toFile().exists()) {
                 Files.delete(filePath);
             }
@@ -587,25 +559,14 @@ public class FileStorageRepository implements StorageRepository {
         }
     }
 
-    @Override
-    public List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId) {
-        var result = new ArrayList<StorageFileIndex>();
-        var pluginDir = ensureDirectory(Path.of(targetDir, instanceId, pluginId).toAbsolutePath().toString());
-        for (var file : listFilesUsingJavaIO(Path.of(pluginDir).toAbsolutePath().toString())) {
-            if (file.getName().endsWith(".json")) {
-                result.add(new StorageFileIndex(instanceId, pluginId, file.getName().replace(".json", "")));
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public StorageFile readPluginFile(StorageFileIndex index) {
-        var pluginDir = ensureDirectory(Path.of(targetDir, index.getInstanceId(), index.getPluginId()).toAbsolutePath().toString());
-        var filePath = Path.of(pluginDir, index.getIndex() + ".json");
+    
+    public StorageFile readPluginFile(StorageFileIndex file) {
+        var realPath = buildRealPath( file.getInstanceId(), file.getPluginId()).toString();
+        ensureDirectory(realPath);
+        var filePath = Path.of(realPath, file.getIndex() + ".json");
         if (Files.exists(filePath)) {
             try {
-                return new StorageFile(index, getFileContent(filePath));
+                return new StorageFile(file, getFileContent(filePath));
             } catch (IOException e) {
                 return null;
             }
@@ -614,10 +575,11 @@ public class FileStorageRepository implements StorageRepository {
         return null;
     }
 
-    @Override
+    
     public void writePluginFile(StorageFile file) {
-        var pluginDir = ensureDirectory(Path.of(targetDir, file.getIndex().getInstanceId(), file.getIndex().getPluginId()).toAbsolutePath().toString());
-        var filePath = Path.of(pluginDir, file.getIndex().getIndex() + ".json");
+        var realPath = buildRealPath( file.getIndex().getInstanceId(), file.getIndex().getPluginId()).toString();
+        ensureDirectory(realPath);
+        var filePath = Path.of(realPath, file.getIndex().getIndex() + ".json");
         try {
             setFileContent(filePath, file.getContent());
         } catch (IOException e) {
@@ -626,14 +588,19 @@ public class FileStorageRepository implements StorageRepository {
 
     }
 
-    @Override
-    public void delPluginFile(StorageFileIndex file) {
-        var pluginDir = ensureDirectory(Path.of(targetDir, file.getInstanceId(), file.getPluginId()).toAbsolutePath().toString());
-        var filePath = Path.of(pluginDir, file.getIndex() + ".json");
-        if (filePath.toFile().exists()) {
-            filePath.toFile().delete();
-        }
+
+
+    protected static class ProtocolRepo {
+        public final Object lockObject = new Object();
+        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
+        public final List<StorageItem> outItems = new ArrayList<>();
+        public List<CompactLine> index = new ArrayList<>();
+        public boolean initialized = false;
+        public volatile boolean somethingWritten = false;
     }
+
+
+
 
     protected String getFileContent(Path of) throws IOException {
         return Files.readString(of);
@@ -643,12 +610,77 @@ public class FileStorageRepository implements StorageRepository {
         Files.writeString(of, s);
     }
 
-    protected static class ProtocolRepo {
-        public final Object lockObject = new Object();
-        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
-        public final List<StorageItem> outItems = new ArrayList<>();
-        public List<CompactLine> index = new ArrayList<>();
-        public boolean initialized = false;
-        public volatile boolean somethingWritten = false;
+    
+    public List<String> listFiles(String ... path){
+        var realPath = buildRealPath(path);
+        return listFilesUsingJavaIO(realPath.toString()).stream().map(s->s.getName().replace(".json", "")
+        ).collect(Collectors.toList());
+    }
+
+
+    public List<String> listDirs(String ... path){
+        var realPath = buildRealPath(path);
+        return listDirsUsingJavaIO(realPath.toString()).stream().map(s->s.getName()).collect(Collectors.toList());
+    }
+
+    public boolean fileExists(String ... path){
+        var realPath = buildRealPath(path);
+        if(Files.isDirectory(realPath)){
+            Files.exists(realPath);
+        }
+        return Files.exists(Path.of(realPath+".json"));
+    }
+
+    public void writeFile(String content,String ... path)  {
+        var realPath = buildRealPath(path)+".json";
+        var fullPath = Path.of(realPath);
+        var parent = fullPath.getParent().toFile();
+        if(!parent.exists()){
+            fullPath.getParent().toFile().mkdirs();
+        }
+
+        try {
+            setFileContent(fullPath,content);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteFile(String... path) {
+        var realPath = buildRealPath(path)+".json";
+        try {
+            if(!Files.exists(Path.of(realPath))){
+                return;
+            }
+            Files.deleteIfExists(Path.of(realPath));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String readFile(String ... path) {
+        var realPath = buildRealPath(path)+".json";
+        try {
+            if(!Files.exists(Path.of(realPath))){
+                return null;
+            }
+            return getFileContent(Path.of(realPath));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Path buildRealPath(String ... path) {
+        var fullPath = new ArrayList<>(Arrays.asList(path));
+        var realPath = Path.of(targetDir);
+        if(fullPath.size()>0) {
+            realPath = Path.of(targetDir, fullPath.toArray(new String[0]));
+        }
+        var root= Path.of(targetDir);
+        if(!realPath.toAbsolutePath().toString().contains(root.toAbsolutePath().toString())){
+            throw new RuntimeException("Cannot naviagate outside project!");
+        }
+        return realPath;
     }
 }

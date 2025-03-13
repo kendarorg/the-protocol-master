@@ -24,9 +24,7 @@ public class ApiTest extends ApiTestBase {
 
     @AfterAll
     public static void cleanup() {
-        bs.runTheServer.set(false);
         Main.stop();
-        Sleeper.sleep(1000);
 
     }
 
@@ -36,14 +34,12 @@ public class ApiTest extends ApiTestBase {
             Main.stop();
         } catch (Exception e) {
         }
-        Sleeper.sleep(1000);
         var args = new String[]{
 
                 "-cfg", Path.of("src", "test", "resources", "apitest.json").toString()
         };
         bs = new BasicTest();
         bs.startAndHandleUnexpectedErrors(args);
-        Sleeper.sleep(3000);
     }
 
 

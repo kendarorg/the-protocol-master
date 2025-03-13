@@ -27,6 +27,10 @@ public class JsonMapper {
         return mapper;
     }
 
+    public JsonNode convertValue(Object value) {
+        return mapper.convertValue(value,JsonNode.class);
+    }
+
     public String serializePretty(Object target) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(target);

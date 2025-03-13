@@ -2,7 +2,7 @@ package org.kendar.http.plugins.cli;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.http.plugins.HttpErrorPluginSettings;
+import org.kendar.http.plugins.settings.HttpErrorPluginSettings;
 import org.kendar.plugins.cli.BasicPluginCli;
 import org.kendar.settings.PluginSettings;
 
@@ -32,17 +32,17 @@ public class HttpErrorPluginCli extends BasicPluginCli {
         options.add(CommandOption.of("msg", "Error message")
                 .withLong("errorMessage")
                 .withCallback((s) -> ((HttpErrorPluginSettings) settings).setErrorMessage(s)));
-        options.add(CommandOption.of("epc", "Percent of errors, default 0, meaning 0%")
-                .withLong("percentOfErrors")
-                .withCallback((s) -> ((HttpErrorPluginSettings) settings).setErrorPercent(Integer.parseInt(s))));
+        options.add(CommandOption.of("pca", "Percent calls touched, default 50, meaning 50%")
+                .withLong("percentAction")
+                .withCallback((s) -> ((HttpErrorPluginSettings) settings).setPercentAction(Integer.parseInt(s))));
         options.add(CommandOption.of("err", "Error code to show, default Error")
                 .withLong("errorCode")
                 .withCallback((s) -> ((HttpErrorPluginSettings) settings).setShowError(Integer.parseInt(s))));
-        options.add(CommandOption.of("ewh", "Generate erros on following websites @\r\n" +
+        options.add(CommandOption.of("t", "Generate erros on following websites @\r\n" +
                         "@REGEX or  STARTWITH. Default anything")
-                .withLong("errorWhere")
+                .withLong("target")
                 .asMultiple()
-                .withMultiCallback((s) -> ((HttpErrorPluginSettings) settings).setErrorSites(s)));
+                .withMultiCallback((s) -> ((HttpErrorPluginSettings) settings).setTarget(s)));
         return options.toArray(new CommandOption[0]);
     }
 

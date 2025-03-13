@@ -1,7 +1,7 @@
 package org.kendar.http;
 
 import org.kendar.di.annotations.TpmService;
-import org.kendar.http.settings.HttpSSLSettings;
+import org.kendar.http.plugins.settings.HttpSSLSettings;
 import org.kendar.settings.ProtocolSettings;
 
 @TpmService(tags = "http")

@@ -2,7 +2,7 @@ package org.kendar.http.plugins.cli;
 
 import org.kendar.cli.CommandOption;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.http.plugins.HttpRecordPluginSettings;
+import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
 import org.kendar.plugins.cli.AsyncRecordPluginCli;
 import org.kendar.settings.PluginSettings;
 
@@ -26,7 +26,7 @@ public class HttpRecordPluginCli extends AsyncRecordPluginCli {
                         "@REGEX or  STARTWITH. Default anything")
                 .withLong("recordWhat")
                 .asMultiple()
-                .withMultiCallback((s) -> ((HttpRecordPluginSettings) settings).setRecordSites(s)));
+                .withMultiCallback((s) -> ((HttpRecordPluginSettings) settings).setTarget(s)));
         return options.toArray(new CommandOption[0]);
     }
 

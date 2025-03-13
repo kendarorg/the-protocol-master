@@ -19,6 +19,12 @@ the SaslStart message is not supported
 * connectionString: the connection string for the real server (e.g. mongodb://localhost:27018 )
 * timeoutSeconds: the timeout to drop the connections
 
+Uses the following phases
+
+* PRE_CALL (Before calling the real server)
+* POST_CALL
+* PRE_SOCKET_WRITE (Before sending data to the client)
+
 ## Plugins
 
 ### record-plugin
@@ -36,6 +42,27 @@ without the need to mock a single request
 * active: If it is active
 * respectCallDuration: respect the duration of the round trip
 * blockExternal: Block calls to real service when not matching (default true)
+
+### report-plugin
+
+Send all activity on the internal events queue (the default subscriber if active is the global-report-plugin)
+
+* active: If it is active
+
+### network-error-plugin
+
+Change random bytes on the data sent back to the client
+
+* active: If it is active
+* percentAction: the percent of calls to generate errors
+
+### latency-plugin
+
+Introduce random latency
+
+* active: If it is active
+* minMs: Minimum latency added (default 0)
+* maxMs: Max latency added (default 0)
 
 ## Missing features
 

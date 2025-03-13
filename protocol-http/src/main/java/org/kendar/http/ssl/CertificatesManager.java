@@ -174,32 +174,20 @@ public class CertificatesManager {
         return ctx;
     }
 
-    public void setupSll(HttpsServer port, List<String> hosts, String cname, String der, String key) throws Exception {
+    public void unsetSll(HttpsServer port, List<String> inserted, String cname, String der, String key) throws Exception {
         var hostsSize = registeredHosts.size();
-        var inserted = new ArrayList<String>();
-        for (var host : hosts) {
-            var hstSpl = host.split("\\.");
-            if (hstSpl.length > 2) {
-                StringBuilder newHost = new StringBuilder("*");
-                for (var i = 1; i < hstSpl.length; i++) {
-                    newHost.append(".").append(hstSpl[i]);
-                }
-                if (!registeredHosts.containsKey(newHost.toString())) {
-                    inserted.add(newHost.toString());
-                    registeredHosts.put(newHost.toString(), newHost.toString());
-                }
-            }
-
-            if (!registeredHosts.containsKey(host)) {
-                inserted.add(host);
-                registeredHosts.put(host, host);
-            }
+        for(var host : inserted) {
+            registeredHosts.remove(host);
         }
 
+        reinitializeSslContext(port, inserted, cname, der, key, hostsSize);
+    }
+
+    private void reinitializeSslContext(HttpsServer port, List<String> inserted, String cname, String der, String key, int hostsSize) throws Exception {
         if (hostsSize == registeredHosts.size() && port.getHttpsConfigurator() != null) {
             return;
         }
-        sslLog.debug("[SERVER] Add ssl hosts: {}", String.join(",", inserted));
+        sslLog.debug("[SERVER] Changed ssl hosts: {}", String.join(",", inserted));
         var sslContextInt = getSslContext(new ArrayList<>(registeredHosts.values()), cname, der, key);
         port.setHttpsConfigurator(
                 new HttpsConfigurator(sslContextInt) {
@@ -222,6 +210,31 @@ public class CertificatesManager {
                         }
                     }
                 });
+    }
+
+    public void setupSll(HttpsServer port, List<String> hosts, String cname, String der, String key) throws Exception {
+        var hostsSize = registeredHosts.size();
+        var inserted = new ArrayList<String>();
+        for (var host : hosts) {
+            var hstSpl = host.split("\\.");
+            if (hstSpl.length > 2) {
+                StringBuilder newHost = new StringBuilder("*");
+                for (var i = 1; i < hstSpl.length; i++) {
+                    newHost.append(".").append(hstSpl[i]);
+                }
+                if (!registeredHosts.containsKey(newHost.toString())) {
+                    inserted.add(newHost.toString());
+                    registeredHosts.put(newHost.toString(), newHost.toString());
+                }
+            }
+
+            if (!registeredHosts.containsKey(host)) {
+                inserted.add(host);
+                registeredHosts.put(host, host);
+            }
+        }
+
+        reinitializeSslContext(port, inserted, cname, der, key, hostsSize);
     }
 
     public void updateProvider() {

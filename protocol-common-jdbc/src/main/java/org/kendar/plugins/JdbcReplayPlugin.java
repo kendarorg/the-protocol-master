@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class JdbcReplayPlugin extends ReplayPlugin<BasicReplayPluginSettings> {
+public abstract class JdbcReplayPlugin extends BasicReplayPlugin<BasicReplayPluginSettings> {
 
     public JdbcReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);

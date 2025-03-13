@@ -10,7 +10,7 @@ import org.kendar.utils.ReplacerItemInstance;
 
 import java.util.List;
 
-public abstract class JdbcRewritePlugin extends RewritePlugin<JdbcCall, SelectResult, RewritePluginSettings, String> {
+public abstract class JdbcRewritePlugin extends BasicRewritePlugin<JdbcCall, SelectResult, RewritePluginSettings, String> {
     public JdbcRewritePlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper, repository);
     }

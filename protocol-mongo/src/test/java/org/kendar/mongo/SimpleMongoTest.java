@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SimpleMongoTest extends BasicTest {
+public class SimpleMongoTest extends MongoBasicTest {
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();

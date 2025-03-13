@@ -21,7 +21,6 @@
         <plugin.version>1.0.0</plugin.version>
         <plugin.provider/>
         <plugin.dependencies/>
-        <dns.java.version>3.4.0</dns.java.version>
     </properties>
 
     <build>
@@ -151,6 +150,8 @@
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
+            <!-- !!! VERY IMPORTANT -->
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

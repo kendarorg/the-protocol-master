@@ -9,6 +9,7 @@ public enum ProtocolPhase {
     CONNECT("CONNECT"),
     POST_CALL("POST_CALL"),
     FINALIZE("FINALIZE"),
+    PRE_SOCKET_WRITE("PRE_SOCKET_WRITE"),
     ASYNC_RESPONSE("ASYNC_RESPONSE");
     private final String text;
 

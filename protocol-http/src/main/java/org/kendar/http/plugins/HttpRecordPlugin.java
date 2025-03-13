@@ -2,13 +2,12 @@ package org.kendar.http.plugins;
 
 import org.kendar.apis.base.Request;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.RecordPlugin;
+import org.kendar.http.plugins.commons.MatchingRecRep;
+import org.kendar.http.plugins.commons.SiteMatcherUtils;
+import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
+import org.kendar.plugins.BasicRecordPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
-import org.kendar.settings.GlobalSettings;
-import org.kendar.settings.PluginSettings;
-import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
@@ -17,8 +16,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @TpmService(tags = "http")
-public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
-    private List<MatchingRecRep> recordSites = new ArrayList<>();
+public class HttpRecordPlugin extends BasicRecordPlugin<HttpRecordPluginSettings> {
+    private List<MatchingRecRep> target = new ArrayList<>();
 
     public HttpRecordPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
@@ -42,7 +41,7 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     protected void postCall(PluginContext pluginContext, Object in, Object out) {
         var request = (Request) in;
-        if (SiteMatcherUtils.matchSite((Request) in, recordSites)) {
+        if (SiteMatcherUtils.matchSite((Request) in, target)) {
             var settings = getSettings();
             if (settings.isRemoveEtags()) {
                 var all = request.getHeader("If-none-match");
@@ -76,14 +75,8 @@ public class HttpRecordPlugin extends RecordPlugin<HttpRecordPluginSettings> {
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        recordSites = SiteMatcherUtils.setupSites(getSettings().getRecordSites());
+        super.handleSettingsChanged();
+        target = SiteMatcherUtils.setupSites(getSettings().getTarget());
         return true;
-    }
-
-    @Override
-    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
-        super.initialize(global, protocol, pluginSetting);
-        handleSettingsChanged();
-        return this;
     }
 }

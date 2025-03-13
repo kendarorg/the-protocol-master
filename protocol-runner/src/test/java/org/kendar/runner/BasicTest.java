@@ -11,7 +11,7 @@ import org.testcontainers.containers.Network;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -23,7 +23,7 @@ public class BasicTest {
     protected static TcpServer protocolServer;
     protected static JsonMapper mapper = new JsonMapper();
 
-    protected AtomicBoolean runTheServer = new AtomicBoolean(true);
+    //protected AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -51,19 +51,20 @@ public class BasicTest {
         return c;
     }
 
-    protected void startAndHandleUnexpectedErrors(String... args) {
+    protected void startAndHandleUnexpectedErrors(String... availableArgs) {
         AtomicReference exception = new AtomicReference(null);
         var serverThread = new Thread(() -> {
             try {
-                Main.execute(args, () -> {
-                    try {
-                        Sleeper.sleep(100);
-                        return runTheServer.get();
-                    } catch (Exception e) {
-                        exception.set(e);
-                        return false;
+                var args = availableArgs;
+                if(Arrays.stream(args).noneMatch((a->a.equalsIgnoreCase("-unattended")))){
+                    var newArgs = new String[args.length + 1];
+                    newArgs[0] = "-unattended";
+                    for (int i = 0; i < args.length; i++) {
+                        newArgs[i+1] = args[i];
                     }
-                });
+                    args=newArgs;
+                }
+                Main.execute(args);
                 exception.set(new Exception("Terminated abruptly"));
             } catch (Exception ex) {
                 exception.set(new Exception("Terminated with error", ex));
@@ -75,7 +76,10 @@ public class BasicTest {
             if (exception.get() != null) {
                 throw new RuntimeException((Throwable) exception.get());
             }
-            Sleeper.sleep(100);
+            Sleeper.sleep(10);
         }
+        Sleeper.sleep(100);
+        System.out.println("Server started successfully");
+        Main.isRunning();
     }
 }

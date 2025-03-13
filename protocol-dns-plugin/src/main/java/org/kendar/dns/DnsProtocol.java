@@ -13,6 +13,7 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.PluginHandler;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.PluginsLoggerFactory;
 import org.pf4j.Extension;
 import org.pf4j.ExtensionPoint;
@@ -44,6 +45,12 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private boolean dnsRunning;
     private ServerSocket tcpSocket;
     private DatagramSocket udpSocket;
+
+
+    @Override
+    public ProtocolSettings getSettings(){
+        return settings;
+    }
 
     @TpmConstructor
     public DnsProtocol(GlobalSettings ini, DnsProtocolSettings settings,
@@ -179,14 +186,14 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         var pluginContext = new PluginContext("dns", "request", System.currentTimeMillis(), null);
 
         String requestedDomain = request.getQuestion().getName().toString(true);
-
+        pluginContext.getTags().put("requestedDomain", requestedDomain);
 
         List<String> ips = new ArrayList<>();
 
         log.debug("Requested domain " + requestedDomain);
 
         if (handle(ProtocolPhase.PRE_CALL, pluginContext, requestedDomain, ips)) {
-            return buildResponse(ips, requestedDomain, response, request);
+            return buildResponse(ips, requestedDomain, response, request, pluginContext);
         }
 
 
@@ -221,12 +228,12 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             ips = new ArrayList<>();
             ips.add("127.0.0.1");
         }
-
+        pluginContext.getTags().put("foundedIps", String.join(",", ips));
         handle(ProtocolPhase.POST_CALL, pluginContext, requestedDomain, ips);
-        return buildResponse(ips, requestedDomain, response, request);
+        return buildResponse(ips, requestedDomain, response, request,pluginContext);
     }
 
-    private byte[] buildResponse(List<String> ips, String requestedDomain, Message response, Message request) throws IOException {
+    private byte[] buildResponse(List<String> ips, String requestedDomain, Message response, Message request, PluginContext pluginContext) throws IOException {
         byte[] resp;
         if (ips.size() > 0) {
             for (String ip : ips) {
@@ -241,6 +248,8 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         } else {
             resp = errorMessage(request, Rcode.NXDOMAIN);
         }
+
+        handle(ProtocolPhase.PRE_SOCKET_WRITE, pluginContext, resp, null);
         return resp;
     }
 
@@ -256,7 +265,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             dataOutputStream.flush();
             log.debug("SENDING RESPONSE");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error resolving response", ex);
         }
     }
 
@@ -269,7 +278,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                     new DatagramPacket(resp, resp.length, inAddress, inPort);
             socket.send(outdp);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error resolving response", e);
         }
     }
 

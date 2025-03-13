@@ -5,6 +5,7 @@ import org.kendar.buffers.BBufferEndianness;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.exceptions.ConnectionExeception;
 import org.kendar.exceptions.UnknownCommandException;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
@@ -131,7 +132,15 @@ public abstract class NetworkProtoContext extends ProtoContext {
         var length = resultBuffer.size();
         //Create a bytebuffer fitting
         var response = ByteBuffer.allocate(length);
-        response.put(resultBuffer.toArray());
+        var toSend = resultBuffer.toArray();
+        if(this.proxy!=null) {
+            for(var ph:proxy.getPluginHandlers(ProtocolPhase.PRE_SOCKET_WRITE,toSend,new Object())){
+                if(ph.handle(null,ProtocolPhase.PRE_SOCKET_WRITE,toSend,null)){
+                    break;
+                }
+            }
+        }
+        response.put(toSend);
         //To send
         response.flip();
         log.debug("[CL<TP][TX]: Sending back: {}", returnMessage.getClass().getSimpleName());

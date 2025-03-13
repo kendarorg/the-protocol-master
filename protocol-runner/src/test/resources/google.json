@@ -3,6 +3,7 @@
   "logLevel": "INFO",
   "dataDir": "target/tests/fromini",
   "apiPort": 8095,
+  "unattended":true,
   "plugins": {
     "report-plugin": {
       "active": true
@@ -35,11 +36,11 @@
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
           "blockExternal": true,
-          "matchSites": []
+          "target": []
         },
         "record-plugin": {
           "active": false,
-          "recordSites": []
+          "target": []
         }
       }
     }

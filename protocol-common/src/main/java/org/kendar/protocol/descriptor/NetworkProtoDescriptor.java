@@ -14,6 +14,7 @@ import org.kendar.tcpserver.ClientServerChannel;
 import org.slf4j.MDC;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Descriptor for network protocol
@@ -154,5 +155,9 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
 
     public boolean isWrapperRunning() {
         throw new RuntimeException("Not implemented");
+    }
+
+    public Map<String,Integer> getPorts(){
+        return Map.of("main",getPort());
     }
 }

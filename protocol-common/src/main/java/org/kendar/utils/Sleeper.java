@@ -33,10 +33,13 @@ public class Sleeper {
     public static void sleep(long timeoutMillis, BooleanSupplier booleanSupplier) {
         try {
             Object obj = new Object();
-            var times = (int) timeoutMillis / 100;
-            for (int i = 0; i < 100; i++) {
+
+            var times = (int) timeoutMillis;
+            var counter = 100;
+            if(times<=100)counter =2;
+            for (int i = 0; i < timeoutMillis; i+=counter) {
                 synchronized (obj) {
-                    obj.wait(times);
+                    obj.wait(counter);
                 }
                 if (booleanSupplier.getAsBoolean()) {
                     return;

@@ -15,7 +15,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class SimpleTest extends BasicTest {
+public class SimpleTest extends MqttBasicTest {
 
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/exit/";

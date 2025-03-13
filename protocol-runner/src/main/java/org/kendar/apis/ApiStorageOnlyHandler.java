@@ -24,6 +24,8 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.parser.SimpleParser;
 import org.kendar.utils.parser.Token;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,18 +38,19 @@ import static org.kendar.apis.ApiUtils.*;
 @HttpTypeFilter()
 public class ApiStorageOnlyHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(ApiStorageOnlyHandler.class);
     private final GlobalSettings settings;
     private final StorageRepository storage;
     private final SimpleParser simpleParser;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
+
     public ApiStorageOnlyHandler(GlobalSettings settings, StorageRepository storage, SimpleParser simpleParser) {
         this.settings = settings;
         this.storage = storage;
         this.simpleParser = simpleParser;
     }
-
 
     @HttpMethodFilter(
             pathAddress = "/api/global/storage",
@@ -128,6 +131,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             storage.initialize();
             respondOk(resp);
         } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
             respondKo(resp, ex);
         }
         return true;
@@ -226,7 +230,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             var sai = new StorageAndIndex();
 
             for (var optIndex : storage.getAllIndexes(-1)) {
-                var fullText = storage.readById(optIndex.getProtocolInstanceId(), optIndex.getIndex());
+                var fullText = storage.readFromScenarioById(optIndex.getProtocolInstanceId(), optIndex.getIndex());
                 if (fullText != null) {
                     sai.setItem(fullText);
                 }
@@ -279,7 +283,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
         try {
             var instanceId = reqp.getPathParameter("protocol");
             var itemId = Long.parseLong(reqp.getPathParameter("index"));
-            result.setItem(storage.readById(instanceId, itemId));
+            result.setItem(storage.readFromScenarioById(instanceId, itemId));
             var optIndex = storage.getAllIndexes(-1).stream().filter(a -> a.getIndex() == itemId).findFirst();
             if (optIndex.isPresent()) {
                 var api = mapper.deserialize(mapper.serialize(optIndex.get()), CompactLineApi.class);
@@ -330,7 +334,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     request.getItem().setIndex(itemId);
                 }
                 request.getIndex().setIndex(itemId);
-                storage.update(itemId, indexItem.getProtocolInstanceId(), request.getIndex(), request.getItem());
+                storage.updateRecording(itemId, indexItem.getProtocolInstanceId(), request.getIndex(), request.getItem());
                 respondJson(resp, new Ok());
             }
         } catch (Exception ex) {
@@ -363,7 +367,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
         try {
             var instanceId = reqp.getPathParameter("protocol");
             var itemId = Long.parseLong(reqp.getPathParameter("index"));
-            storage.delete(instanceId, itemId);
+            storage.deleteRecording(instanceId, itemId);
         } catch (Exception ex) {
             respondKo(resp, ex);
         }

@@ -14,6 +14,7 @@ import org.kendar.apis.filters.FiltersConfiguration;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.MimeChecker;
+import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
@@ -35,15 +36,17 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
     private final List<FilteringClass> filteringClassList;
     private final FiltersConfiguration filtersConfiguration;
     private final List<GlobalPluginDescriptor> globalPluginDescriptors;
+    private final DiService diService;
     private final RequestResponseBuilderImpl requestResponseBuilder = new RequestResponseBuilderImpl();
     private final Logger log = LoggerFactory.getLogger(ApiFiltersLoader.class);
 
     public ApiFiltersLoader(List<FilteringClass> filteringClassList,
                             FiltersConfiguration filtersConfiguration,
-                            List<GlobalPluginDescriptor> globalPluginDescriptors) {
+                            List<GlobalPluginDescriptor> globalPluginDescriptors, DiService diService) {
         this.filteringClassList = filteringClassList;
         this.filtersConfiguration = filtersConfiguration;
         this.globalPluginDescriptors = globalPluginDescriptors;
+        this.diService = diService;
     }
 
     public static Method[] getAllMethodsInHierarchy(Class<?> objectClass) {
@@ -117,6 +120,7 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
             Request request,
             Response response)
             throws InvocationTargetException, IllegalAccessException {
+        DiService.setThreadContext(diService);
         var config = filtersConfiguration;
         if (config == null) return false;
         var possibleMatches = new ArrayList<FilterDescriptor>();
@@ -134,6 +138,7 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
+        DiService.setThreadContext(diService);
         Response response = new Response();
         try {
             var request = requestResponseBuilder.fromExchange(httpExchange, "http");
@@ -142,9 +147,11 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
                 respondText(response, request.buildUrl() + " Not Found");
             }
         } catch (Exception e) {
+            log.debug("Error handling request", e);
             respondKo(response, e);
         }
         sendResponse(response, httpExchange);
+        DiService.setThreadContext(null);
     }
 
     private void sendResponse(Response response, HttpExchange httpExchange) throws IOException {

@@ -33,14 +33,12 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help"
+                "-help","-unattended"
         };
 
-        Main.execute(args, () -> {
-            Sleeper.sleep(100);
-            return false;
-        });
+        Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
     }
@@ -51,13 +49,11 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "http"
+                "-help", "http","-unattended"
         };
-        Main.execute(args, () -> {
-            Sleeper.sleep(100);
-            return false;
-        });
+        Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
         ;
@@ -70,13 +66,11 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "mysql"
+                "-help", "mysql","-unattended"
         };
-        Main.execute(args, () -> {
-            Sleeper.sleep(100);
-            return false;
-        });
+        Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
         ;
@@ -89,13 +83,11 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "postgres"
+                "-help", "postgres","-unattended"
         };
-        Main.execute(args, () -> {
-            Sleeper.sleep(100);
-            return false;
-        });
+        Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
         ;
@@ -108,13 +100,11 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "amqp091"
+                "-help", "amqp091","-unattended"
         };
-        Main.execute(args, () -> {
-            Sleeper.sleep(100);
-            return false;
-        });
+        Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
         assertTrue(standardOutput.contains("amqp091"));
@@ -127,13 +117,11 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "mqtt"
+                "-help", "mqtt","-unattended"
         };
-        Main.execute(args, () -> {
-            Sleeper.sleep(100);
-            return false;
-        });
+        Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
         assertTrue(standardOutput.contains("mqtt"));
@@ -145,16 +133,13 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "redis"
+                "-help", "redis","-unattended"
         };
-        Main.execute(args, () -> {
-            Sleeper.sleep(100);
-            return false;
-        });
+        Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
-        ;
         assertTrue(standardOutput.contains("redis"));
     }
 
@@ -164,13 +149,11 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "mongodb"
+                "-help", "mongodb","-unattended"
         };
-        Main.execute(args, () -> {
-            Sleeper.sleep(100);
-            return false;
-        });
+        Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
         ;

@@ -6,6 +6,10 @@ import org.kendar.apis.converters.RequestResponseBuilderImpl;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.ReportDataEvent;
+import org.kendar.http.events.SSLAddHostEvent;
+import org.kendar.http.events.SSLRemoveHostEvent;
 import org.kendar.http.ssl.CertificatesManager;
 import org.kendar.http.utils.ConnectionBuilderImpl;
 import org.kendar.http.utils.callexternal.ExternalRequesterImpl;
@@ -19,13 +23,17 @@ import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.proxy.ProxyServer;
 import org.kendar.server.KendarHttpsServer;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.FileResourcesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
@@ -40,6 +48,15 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private HttpServer httpServer;
     private boolean httpRunning;
     private boolean httpsRunning;
+
+    @Override
+    public ProtocolSettings getSettings(){
+        return settings;
+    }
+
+    public Map<String,Integer> getPorts(){
+        return Map.of("proxy",settings.getProxy(),"http",settings.getHttp(),"https",settings.getHttps());
+    }
 
     @TpmConstructor
     public HttpProtocol(GlobalSettings ini, HttpProtocolSettings settings,
@@ -132,6 +149,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     @Override
     public void start() {
         try {
+            var protocol = this;
             int port = getOrDefault(settings.getHttp(), 4080);
             int httpsPort = getOrDefault(settings.getHttps(), 4443);
             var proxyPort = getOrDefault(settings.getProxy(), 9999);
@@ -162,10 +180,39 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             log.info("[CL>TP][IN] Listening on *.:{} Https", httpsPort);
 
 
+            EventsQueue.register("http-"+getSettings().getProtocolInstanceId(),(e)->{
+                try {
+
+                    certificatesManager.setupSll(httpsServer, List.of(e.getHost()), cname, sslDer, sslKey);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Error updating ssl "+protocol.getSettings().getProtocolInstanceId(),ex);
+                }
+            }, SSLAddHostEvent.class);
+            EventsQueue.register("http-"+getSettings().getProtocolInstanceId(),(e)->{
+                try {
+                    certificatesManager.unsetSll(httpsServer, List.of(e.getHost()), cname, sslDer, sslKey);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Error updating ssl "+protocol.getSettings().getProtocolInstanceId(),ex);
+                }
+            }, SSLRemoveHostEvent.class);
+
+            var concurrentHashMap = new ConcurrentHashMap<String,String>();
             proxy = new ProxyServer(proxyPort)
                     .withHttpRedirect(port).withHttpsRedirect(httpsPort)
                     .withDnsResolver(host -> {
                         try {
+                            if(!concurrentHashMap.containsKey(host)){
+                                concurrentHashMap.put(host,host);
+                                EventsQueue.send(new ReportDataEvent(
+                                        getSettings().getProtocolInstanceId(),
+                                        "dns",
+                                        host,
+                                        -1,
+                                        new Date().getTime(),
+                                        0,
+                                        Map.of()
+                                ));
+                            }
                             certificatesManager.setupSll(httpsServer, List.of(host), cname, sslDer, sslKey);
                         } catch (Exception e) {
                             return host;
@@ -182,13 +229,13 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             log.info("[CL>TP][IN] Listening on *.:{} Http Proxy", proxyPort);
 
 
-            for (var i = plugins.size() - 1; i >= 0; i--) {
+            /*for (var i = plugins.size() - 1; i >= 0; i--) {
                 var plugin = plugins.get(i);
                 var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
                 if (specificPluginSetting != null) {
                     ((ProtocolPluginDescriptor) plugin).initialize(globalSettings, settings, specificPluginSetting);
                 }
-            }
+            }*/
 
             var handler = new MasterHandler(
                     new PluginClassesHandlerImpl(plugins, this),

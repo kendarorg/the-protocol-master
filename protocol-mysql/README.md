@@ -19,6 +19,12 @@ PROXYED CONNETION STRING!!!
 * forceSchema: the force is called in case the jdbc driver does not allow setting the schema from connection string
 * force3BytesOkPacketInfo: default to false. For some client (like python peewee) this should be set to true
 
+Uses the following phases
+
+* PRE_CALL (Before calling the real server)
+* POST_CALL
+* PRE_SOCKET_WRITE (Before sending data to the client)
+
 ## Plugins
 
 ### record-plugin
@@ -101,6 +107,27 @@ An example of complex regexp
 ```
 
 The file is located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]/rewrite.json
+
+### report-plugin
+
+Send all activity on the internal events queue (the default subscriber if active is the global-report-plugin)
+
+* active: If it is active
+
+### network-error-plugin
+
+Change random bytes on the data sent back to the client
+
+* active: If it is active
+* percentAction: the percent of calls to generate errors
+
+### latency-plugin
+
+Introduce random latency
+
+* active: If it is active
+* minMs: Minimum latency added (default 0)
+* maxMs: Max latency added (default 0)
 
 ## Missing features
 

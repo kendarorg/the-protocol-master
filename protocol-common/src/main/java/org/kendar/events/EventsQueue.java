@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public class EventsQueue {
     private static final Logger log = LoggerFactory.getLogger(EventsQueue.class);
-    private static final EventsQueue instance = new EventsQueue();
+    private static EventsQueue instance = new EventsQueue();
     private static final AtomicLong size = new AtomicLong(0);
 
     private final HashMap<String, Map<String, Consumer<TpmEvent>>> eventHandlers = new HashMap<>();
@@ -19,6 +19,7 @@ public class EventsQueue {
     //private final HashMap<String, Class> conversions = new HashMap<>();
     private final HashMap<String, CommandConsumer> commandHandlers = new HashMap<>();
     private final ConcurrentLinkedQueue<TpmEvent> items = new ConcurrentLinkedQueue<>();
+    private boolean running = true;
 
     private EventsQueue() {
         start();
@@ -85,7 +86,7 @@ public class EventsQueue {
      */
     private void start() {
         new Thread(() -> {
-            while (true) {
+            while (running) {
                 if (items.isEmpty()) {
                     Thread.onSpinWait();
                     continue;
@@ -132,6 +133,11 @@ public class EventsQueue {
     public List<TpmEvent> clean() {
         var result = new ArrayList<>(items);
         items.clear();
+        eventHandlers.clear();
+        commandHandlers.clear();
+        size.set(0L);
+        running =false;
+        instance = new EventsQueue();
         return result;
     }
 

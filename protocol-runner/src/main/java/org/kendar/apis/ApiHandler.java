@@ -11,6 +11,9 @@ import org.kendar.apis.dtos.PluginIndex;
 import org.kendar.apis.dtos.ProtocolIndex;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.RestartEvent;
+import org.kendar.events.TerminateEvent;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
@@ -23,7 +26,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import static java.lang.System.exit;
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
@@ -122,6 +124,27 @@ public class ApiHandler implements FilteringClass {
         respondJson(resp, result);
     }
 
+    @SuppressWarnings("finally")
+    @HttpMethodFilter(
+            pathAddress = "/api/global/restart",
+            method = "GET", id = "GET /api/global/restart")
+    @TpmDoc(
+            description = "Restart",
+            responses = @TpmResponse(
+                    body = Ok.class
+            ),
+            tags = {"base/utils"})
+    public void restart(Request reqp, Response resp) {
+        try {
+            respondOk(resp);
+        } finally {
+            for (var plugin : instances) {
+                plugin.getServer().stop();
+            }
+            EventsQueue.send(new RestartEvent());
+        }
+    }
+
 
     @SuppressWarnings("finally")
     @HttpMethodFilter(
@@ -140,7 +163,7 @@ public class ApiHandler implements FilteringClass {
             for (var plugin : instances) {
                 plugin.getServer().stop();
             }
-            exit(0);
+            EventsQueue.send(new TerminateEvent());
         }
     }
 
@@ -176,7 +199,6 @@ public class ApiHandler implements FilteringClass {
         var plugin = reqp.getPathParameter("plugin");
         var action = reqp.getPathParameter("action");
 
-        {
             for (var instance : instances) {
                 var pluginInstance = instance.getPlugins().stream().filter(p ->
                         p.getId().equalsIgnoreCase(plugin)).findFirst();
@@ -189,7 +211,6 @@ public class ApiHandler implements FilteringClass {
             }
             respondOk(resp);
             return true;
-        }
     }
 
     public void addGLobalPlugins(List<GlobalPluginDescriptor> globalPlugins) {

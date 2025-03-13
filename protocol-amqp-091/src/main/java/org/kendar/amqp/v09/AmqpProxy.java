@@ -2,6 +2,7 @@ package org.kendar.amqp.v09;
 
 import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.di.annotations.TpmConstructor;
+import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
@@ -17,7 +18,7 @@ import java.nio.channels.AsynchronousChannelGroup;
 public class AmqpProxy extends NetworkProxy {
 
     @TpmConstructor
-    public AmqpProxy(ByteProtocolSettingsWithLogin settings) {
+    public AmqpProxy(@TpmNamed(tags = "amqp091") ByteProtocolSettingsWithLogin settings) {
         super(settings.getConnectionString(), settings.getLogin(), settings.getPassword());
     }
 

@@ -74,10 +74,10 @@ The plugins can be activated or deactivated via [apis](apis.md).
           "replayId": "replay{timestamp}",
           "respectCallDuration": true,
           "blockExternal": true,
-          "matchSites": []
+          "target": []
         },
         "record-plugin": {
           "record": false,
-          "recordSites": []
+          "target": []
         }
 ```

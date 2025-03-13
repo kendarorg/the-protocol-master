@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SimpleTest extends BasicTest {
+public class SimpleTest extends RedisBasicTest {
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();

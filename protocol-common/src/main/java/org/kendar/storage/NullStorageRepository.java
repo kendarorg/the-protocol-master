@@ -1,19 +1,62 @@
 package org.kendar.storage;
 
+import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @TpmService(tags = "storage_null")
-public class NullStorageRepository implements StorageRepository {
+public class NullStorageRepository extends StorageRepository {
     private final AtomicLong counter = new AtomicLong(0);
+    public NullStorageRepository(){
+        super(null, null);
+    }
+    public NullStorageRepository(DiService diService, JsonMapper mapper) {
+        super(diService, mapper);
+    }
 
-    public NullStorageRepository() {
-        System.out.println("NullStorageRepository");
+    @Override
+    public void deleteRecording(String protocolInstanceId, long itemId) {
+
+    }
+
+    @Override
+    public void updateRecording(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
+
+    }
+
+
+    public String getType() {
+        return "storage";
+    }
+
+    @Override
+    public List<String> listDirs(String... path) {
+        return List.of();
+    }
+
+    @Override
+    public String readFile(String... path) {
+        return "";
+    }
+
+    @Override
+    public List<String> listFiles(String... path) {
+        return List.of();
+    }
+
+    @Override
+    public void writeFile(String content, String... path) {
+
+    }
+
+    @Override
+    public void deleteFile(String... path) {
+
     }
 
     @Override
@@ -22,22 +65,12 @@ public class NullStorageRepository implements StorageRepository {
     }
 
     @Override
-    public void write(LineToWrite lineToWrite) {
-
-    }
-
-    @Override
-    public void finalizeWrite(String instanceId) {
-
-    }
-
-    @Override
-    public StorageItem readById(String instanceId, long id) {
+    public StorageItem readFromScenarioById(String instanceId, long id) {
         return null;
     }
 
     @Override
-    public List<StorageItem> readResponses(String instanceId, ResponseItemQuery query) {
+    public List<StorageItem> readResponsesFromScenario(String instanceId, ResponseItemQuery query) {
         return List.of();
     }
 
@@ -53,7 +86,7 @@ public class NullStorageRepository implements StorageRepository {
 
     @Override
     public long generateIndex() {
-        return counter.incrementAndGet();
+        return 0;
     }
 
     @Override
@@ -69,40 +102,5 @@ public class NullStorageRepository implements StorageRepository {
     @Override
     public void clean() {
 
-    }
-
-    @Override
-    public void update(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
-
-    }
-
-    @Override
-    public void delete(String instanceId, long itemId) {
-
-    }
-
-    @Override
-    public List<StorageFileIndex> listPluginFiles(String instanceId, String pluginId) {
-        return List.of();
-    }
-
-    @Override
-    public StorageFile readPluginFile(StorageFileIndex index) {
-        return null;
-    }
-
-    @Override
-    public void writePluginFile(StorageFile file) {
-
-    }
-
-    @Override
-    public void delPluginFile(StorageFileIndex storageFileIndex) {
-
-    }
-
-    @Override
-    public String getType() {
-        return "storage";
     }
 }

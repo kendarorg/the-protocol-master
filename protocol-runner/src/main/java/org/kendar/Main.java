@@ -14,6 +14,10 @@ import org.kendar.command.ProtocolCommandLineHandler;
 import org.kendar.command.ProtocolsRunner;
 import org.kendar.di.DiService;
 import org.kendar.di.TpmScopeType;
+import org.kendar.events.EventsQueue;
+import org.kendar.events.RestartEvent;
+import org.kendar.events.StorageReloadedEvent;
+import org.kendar.events.TerminateEvent;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -38,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.function.Supplier;
 
 import static java.lang.System.exit;
 
@@ -49,16 +52,39 @@ public class Main {
     private static JarPluginManager pluginManager;
     private static HttpServer apiServer;
     private static DiService diService;
+    private static boolean terminateReceived=false;
+    private static boolean restartReceived=false;
+    private static Thread stopWhenQuitThread;
+    private static String changedSettings;
+    private static boolean running;
 
 
     public static void main(String[] args) throws Exception {
-
-        execute(args, Main::stopWhenQuitCommand);
+        var running = true;
+        var realArgs = args;
+        while (running) {
+            try {
+                execute(realArgs);
+                if (changedSettings != null && changedSettings.trim().length() > 0 && Files.exists(Path.of(changedSettings))) {
+                    log.info("RESTARTING AFTER SETTINGS CHANGE");
+                    realArgs = new String[]{"-cfg", changedSettings};
+                } else if (restartReceived) {
+                    restartReceived=false;
+                    log.info("RESTARTING AFTER RESTART REQUEST");
+                } else {
+                    running=false;
+                }
+            }catch (Exception e) {
+                System.err.println(e.getMessage());
+                exit(1);
+            }
+        }
         exit(0);
+
     }
 
 
-    public static void execute(String[] args, Supplier<Boolean> stopWhenFalse) throws Exception {
+    public static void execute(String[] args) throws Exception {
         diService = new DiService();
         diService.loadPackage("org.kendar");
 
@@ -70,14 +96,8 @@ public class Main {
         parser.parseIgnoreMissing(args);
         diService.register(GlobalSettings.class, settings.get());
         diService.register(DiService.class, diService);
+        var unattended = parser.hasOption("unattended") || settings.get().isUnattended();
 
-        if (parser.hasOption("unattended") || settings.get().isUnattended()) {
-            stopWhenFalse = () -> {
-                Sleeper.sleep(500);
-                return true;
-            };
-        }
-        //var localStopWhenFalse = stopWhenFalse;
         var pluginsDir = settings.get().getPluginsDir();
         var pathOfPluginsDir = Path.of(pluginsDir).toAbsolutePath();
         if (!pathOfPluginsDir.toFile().exists()) {
@@ -129,80 +149,92 @@ public class Main {
                 return;
             }
         }
-        execute(settings.get(), stopWhenFalse);
-//ZIPSETTINGS         var shouldRun = true;
-//        var storageReloaded = new ChangeableReference<StorageReloadedEvent>(null);
-//        Supplier<Boolean> newStopWhenFalse = ()->{
-//            if(storageReloaded.get()!=null && Files.exists(Path.of(storageReloaded.get().getSettings()))) return false;
-//            return localStopWhenFalse.get();
-//        };
-//        EventsQueue.register("main", value -> {
-//            storageReloaded.set(value);
-//
-//        }, StorageReloadedEvent.class);
-//        while(shouldRun) {
-//
-//            execute(settings.get(), newStopWhenFalse);
-//            if (storageReloaded.get() != null && Files.exists(Path.of(storageReloaded.get().getSettings()))) {
-//                stop();
-//                Sleeper.sleep(1000);
-//                ProtocolsRunner.loadConfigFile(settings,Path.of(storageReloaded.get().getSettings()).toString());
-//                storageReloaded.set(null);
-//            }else{
-//                shouldRun = false;
-//            }
-//        }
+        execute(settings.get(),unattended);
     }
 
-    public static void stop() {
+    public static void stop(){
+        stopInternal();
+    }
+
+    private static void stopInternal() {
+
         if (protocolServersCache == null) return;
         for (var server : protocolServersCache.values()) {
             server.stop();
         }
+        protocolServersCache.clear();
         if (apiServer != null) {
             apiServer.stop(0);
         }
+        EventsQueue.getInstance().clean();
+        diService.clean();
+        log.info("Server stopped");
+        running =false;
+
     }
 
-    private static Boolean stopWhenQuitCommand() {
+    private static void stopWhenQuitCommand() {
         var scanner = new Scanner(System.in);
-        System.out.println("Press Q to quit");
+        System.out.println("Press Q to quit, R to restart");
         String line;
         line = scanner.nextLine();
         try {
-            if (line != null && line.trim().equalsIgnoreCase("q")) {
-                System.out.println("Exiting");
-                stop();
-                return false;
-            } else if (line != null) {
-                System.out.println("Command not recognized: " + line.trim());
-                return true;
-            } else {
-                return false;
+            while(true) {
+                if (line != null && line.trim().equalsIgnoreCase("q")) {
+                    System.out.println("Exiting");
+                    EventsQueue.send(new TerminateEvent());
+                    return;
+                }if (line != null && line.trim().equalsIgnoreCase("r")) {
+                    System.out.println("Restarting");
+                    EventsQueue.send(new RestartEvent());
+                    return;
+                } else if (line != null) {
+                    System.out.println("Command not recognized: " + line.trim());
+                }
             }
         } catch (Exception ex) {
             System.out.println("Exiting");
             System.err.println(ex);
-            stop();
-            return false;
+            EventsQueue.send(new TerminateEvent());
         }
     }
 
     public static boolean isRunning() {
         if (protocolServersCache == null) return false;
-        return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning);
+        return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning) && running;
     }
 
 
-    public static void execute(GlobalSettings ini, Supplier<Boolean> stopWhenFalse) throws Exception {
+    private static void execute(GlobalSettings ini,boolean unattended) throws Exception {
+        running = false;
         if (ini == null) return;
+
+        EventsQueue.register("main",(e)->{
+            stopInternal();
+            terminateReceived = true;
+        },TerminateEvent.class);
+        EventsQueue.register("main",(e)->{
+            stopInternal();
+            restartReceived = true;
+        },RestartEvent.class);
+        EventsQueue.register("main",(e)->{
+            if(e.getSettings()!=null && Files.exists(Path.of(e.getSettings()))){
+                stopInternal();
+                changedSettings = e.getSettings();
+                terminateReceived = true;
+            }
+        }, StorageReloadedEvent.class);
+
+        if(unattended){
+            ini.setUnattended(true);
+        }
 
         var logLevel = ProtocolsRunner.getOrDefault(ini.getLogLevel(), "INFO");
 
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        var log = loggerContext.getLogger("org.kendar");
-        log.setLevel(Level.toLevel(logLevel, Level.ERROR));
+        var logx = loggerContext.getLogger("org.kendar");
+        logx.setLevel(Level.toLevel(logLevel, Level.ERROR));
         diService.register(PluginsLoggerFactory.class, new PluginsLoggerFactory());
 
         if (!ini.getDataDir().contains("=")) {
@@ -219,15 +251,21 @@ public class Main {
         var apisFiltersLoader = diService.getInstance(ApiFiltersLoader.class);
 
         CountDownLatch latch = new CountDownLatch(ini.getProtocols().size());
+        var protocolInstances = new ArrayList<ProtocolInstance>();
         for (var item : ini.getProtocols().entrySet()) {
             new Thread(() -> {
                 try {
                     var localDiService = diService.createChildScope(TpmScopeType.THREAD);
                     try {
                         var protocol = ini.getProtocolForKey(item.getKey());
-                        if (protocol == null) return;
+                        if (protocol == null) {
+                            throw new RuntimeException("Protocol " + protocol.getProtocol() + " not found");
+                        }
                         //Retrieve the type
                         var tempSettings = localDiService.getInstance(ProtocolSettings.class, protocol.getProtocol());
+                        if(tempSettings == null) {
+                            throw new RuntimeException("Protocol settings " + protocol.getProtocol() + " not found");
+                        }
                         //Load the real data
                         var protocolFullSettings = ini.getProtocol(item.getKey(), tempSettings.getClass());
                         protocolFullSettings.setProtocolInstanceId(item.getKey());
@@ -240,19 +278,21 @@ public class Main {
                         var ps = new TcpServer(baseProtocol);
                         ps.setOnStart(() -> DiService.setThreadContext(localDiService));
                         ps.start();
-                        Sleeper.sleep(5000, ps::isRunning);
+
                         protocolServersCache.put(item.getKey(), ps);
 
                         var pi = new ProtocolInstance(item.getKey(),
                                 protocolServersCache.get(item.getKey()),
                                 baseProtocol.getPlugins().stream().map(a -> (ProtocolPluginDescriptor) a).toList(),
                                 protocolFullSettings);
+                        protocolInstances.add(pi);
                         var apiHandler = localDiService.getInstance(ApiHandler.class);
                         apiHandler.addProtocol(pi);
                         for (var pl : protocolServersCache.get(item.getKey()).getProtoDescriptor().getPlugins()) {
                             var apiHandlerPlugin = ((ProtocolPluginDescriptor) pl).getApiHandler();
                             apisFiltersLoader.getFilters().addAll(apiHandlerPlugin);
                         }
+                        Sleeper.sleep(5000, ps::isRunning);
                         //ini.putService(item.getKey(), pi);
                     } catch (Exception xx) {
                         //noinspection SuspiciousMethodCalls
@@ -260,18 +300,21 @@ public class Main {
                         throw new RuntimeException(xx);
                     }
                 } catch (Exception ex) {
-                    log.error("Unable to start protocol {}", item.getKey(), ex);
+                    log.error("Unable to start protocol {}: {}", item.getKey(), ex.getMessage());
                 }
 
                 latch.countDown();
             }).start();
         }
 
+
         try {
             latch.await();
+            log.info("Servers started");
         } catch (InterruptedException ex) {
             log.error("Error waiting for plugin to start");
         }
+        diService.registerNamed("protocols", protocolInstances);
 
         var globalPlugins = diService.getInstances(GlobalPluginDescriptor.class);
         for (int i = globalPlugins.size() - 1; i >= 0; i--) {
@@ -283,6 +326,7 @@ public class Main {
                 globalPlugins.remove(i);
             }
         }
+        CountDownLatch apiLatch = new CountDownLatch(1);
         new Thread(() -> {
             try {
                 for (var item : protocolServersCache.values()) {
@@ -302,10 +346,25 @@ public class Main {
             } catch (Exception e) {
                 log.error("Unable to start API serer", e);
             }
+            apiLatch.countDown();
         }).start();
 
-        while (stopWhenFalse.get()) {
+        if(!unattended && stopWhenQuitThread ==null) {
+            stopWhenQuitThread = new Thread(Main::stopWhenQuitCommand);
+            stopWhenQuitThread.start();
+        }
+
+        try {
+            apiLatch.await();
+            log.info("APIs started");
+            running=true;
+        } catch (InterruptedException ex) {
+            log.error("Error waiting for plugin to start");
+        }
+
+        while (!terminateReceived && !restartReceived) {
             Sleeper.sleep(100);
         }
+        terminateReceived=false;
     }
 }

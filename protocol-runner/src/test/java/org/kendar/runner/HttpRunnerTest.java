@@ -27,7 +27,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,7 +35,7 @@ public class HttpRunnerTest extends BasicTest {
     static int FAKE_PORT_HTTP = 8087;
     static int FAKE_PORT_HTTPS = 8487;
     static int FAKE_PORT_PROXY = 9999;
-    private final AtomicBoolean runTheServer = new AtomicBoolean(true);
+    //private final AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     private static boolean listening(int port) throws IllegalStateException {
         try (Socket ignored = new Socket("localhost", port)) {
@@ -50,13 +49,13 @@ public class HttpRunnerTest extends BasicTest {
 
     @BeforeEach
     public void beforeEach() throws IOException {
-        runTheServer.set(true);
+
         Sleeper.sleep(500);
     }
 
     @AfterEach
     public void afterEach() {
-        runTheServer.set(false);
+
         Main.stop();
         Sleeper.sleep(5000, () -> {
             var res = listening(8087) || listening(8487) || listening(9999);
@@ -74,6 +73,7 @@ public class HttpRunnerTest extends BasicTest {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "http",
                 "-http", "" + FAKE_PORT_HTTP,
@@ -109,6 +109,7 @@ public class HttpRunnerTest extends BasicTest {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "googleTest").toString(),
+                "-pluginsDir",Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
                 "-protocol", "http",
                 "-http", "" + FAKE_PORT_HTTP,

@@ -7,7 +7,10 @@ import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.ConstantsHeader;
 import org.kendar.apis.utils.ConstantsMime;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.ReplayPlugin;
+import org.kendar.http.plugins.commons.MatchingRecRep;
+import org.kendar.http.plugins.commons.SiteMatcherUtils;
+import org.kendar.http.plugins.settings.HttpReplayPluginSettings;
+import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.proxy.PluginContext;
@@ -28,10 +31,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @TpmService(tags = "http")
-public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
+public class HttpReplayPlugin extends BasicReplayPlugin<HttpReplayPluginSettings> {
     private static final Logger log = LoggerFactory.getLogger(HttpReplayPlugin.class);
     private boolean blockExternal = true;
-    private List<MatchingRecRep> matchSites = new ArrayList<>();
+    private List<MatchingRecRep> target = new ArrayList<>();
 
     public HttpReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
@@ -60,7 +63,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
             if (phase == ProtocolPhase.PRE_CALL) {
                 var request = (Request) in;
                 var response = (Response) out;
-                if (SiteMatcherUtils.matchSite((Request) in, matchSites)) {
+                if (SiteMatcherUtils.matchSite((Request) in, target)) {
                     var sent = doSend(pluginContext, request, response);
                     if (!sent) {
                         if (blockExternal) {
@@ -110,7 +113,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
             return false;
 
         }
-        var storageItem = storage.readById(getInstanceId(), index.getLine().getIndex());
+        var storageItem = repository.readFromScenarioById(getInstanceId(), index.getLine().getIndex());
         if (storageItem == null) {
             storageItem = new StorageItem();
             storageItem.setIndex(index.getLine().getIndex());
@@ -141,7 +144,7 @@ public class HttpReplayPlugin extends ReplayPlugin<HttpReplayPluginSettings> {
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
         blockExternal = getSettings().isBlockExternal();
-        matchSites = SiteMatcherUtils.setupSites(getSettings().getMatchSites());
+        target = SiteMatcherUtils.setupSites(getSettings().getTarget());
         return true;
     }
 

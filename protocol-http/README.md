@@ -16,6 +16,13 @@ on localhost the sites to build must be added on the "ssl/hosts"
 * https: https port for interception of calls (mostly with rewrite-plugin)
 * proxy: proxy port (used to intercept -everything-)
 
+Uses the following phases
+
+* CONNECT 
+* PRE_CALL (Before calling the real server)
+* POST_CALL
+* FINALIZE (After the response had been sent)
+
 ### SSL
 
 * der: root certificate path
@@ -30,7 +37,7 @@ on localhost the sites to build must be added on the "ssl/hosts"
 The data will be stored in the global dataDir
 
 * active: If it is active
-* recordSites: list of matching ```hosts/path``` to record. When empty everything is recorded. When prepending with @
+* target: list of matching ```hosts/path``` to record. When empty everything is recorded. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
   else exact match
 * `removeEtags`: default to true, cleans all ETag-related fields to avoid caching
@@ -41,7 +48,7 @@ The data will be loaded from the global dataDir. This is used to replay a whole 
 without the need to mock a single request
 
 * active: If it is active
-* matchSites: list of matching ```hosts/path``` to replay. When empty everything is replayed. When prepending with @
+* target: list of matching ```hosts/path``` to replay. When empty everything is replayed. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
   else exact match
 * respectCallDuration: respect the duration of the round trip
@@ -52,20 +59,20 @@ without the need to mock a single request
 Generate random errors
 
 * active: If it is active
-* errorSites: list of matching ```hosts/path``` to generate errors on. When empty everything can generate errors. When
+* target: list of matching ```hosts/path``` to generate errors on. When empty everything can generate errors. When
   prepending with @
   uses regexp instead can use a simple string with * as wildcard
   else exact match
 * showError: The error code to expose
 * errorMessage: the error message to write to output
-* errorPercent: the percent of calls to generate errors
+* percentAction: the percent of calls to generate errors
 
 ### latency-plugin
 
 Introduce random latency
 
 * active: If it is active
-* latencySites: list of matching ```hosts/path``` to apply latency on. When empty everything
+* target: list of matching ```hosts/path``` to apply latency on. When empty everything
   has latency. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
   else exact match
@@ -77,7 +84,7 @@ Introduce random latency
 Add the handling of throttling and rate limits
 
 * active: If it is active
-* limitSites: list of matching ```hosts/path``` to apply throttling on. When empty everything
+* target: list of matching ```hosts/path``` to apply throttling on. When empty everything
   has throttling. When prepending with @
   uses regexp instead can use a simple string with * as wildcard
   else exact match
@@ -153,6 +160,14 @@ An example of complex regexp
 ```
 
 The file is located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]/rewrite.json
+
+### report-plugin
+
+When active send to the global report-plugin all request/response data
+
+* active: If it is active
+* ignoreTpm: If should ignore calls to TPM APIs when reporting
+* ignore: List of ip/dns to ignore when reporting
 
 ## Documentation used
 

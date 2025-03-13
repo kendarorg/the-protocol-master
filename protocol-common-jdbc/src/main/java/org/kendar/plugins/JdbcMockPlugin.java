@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class JdbcMockPlugin extends MockPlugin<JdbcCall, SelectResult> {
+public abstract class JdbcMockPlugin extends BasicMockPlugin<JdbcCall, SelectResult> {
 
 
     public JdbcMockPlugin(JsonMapper mapper, StorageRepository repository) {

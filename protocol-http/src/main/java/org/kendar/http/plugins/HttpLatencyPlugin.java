@@ -3,23 +3,25 @@ package org.kendar.http.plugins;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.http.plugins.commons.MatchingRecRep;
+import org.kendar.http.plugins.commons.SiteMatcherUtils;
+import org.kendar.http.plugins.settings.HttpLatencyPluginSettings;
+import org.kendar.plugins.BasicPercentPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.utils.ChaosUtils;
 import org.kendar.utils.JsonMapper;
-import org.kendar.utils.Sleeper;
 
 import java.util.List;
-import java.util.Random;
 
 @TpmService(tags = "http")
-public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyPluginSettings> {
+public class HttpLatencyPlugin extends BasicPercentPlugin<HttpLatencyPluginSettings> {
 
-    private List<MatchingRecRep> latencySites;
+    private List<MatchingRecRep> target;
 
     public HttpLatencyPlugin(JsonMapper mapper) {
         super(mapper);
@@ -28,7 +30,7 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyP
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        latencySites = SiteMatcherUtils.setupSites(getSettings().getLatencySites());
+        target = SiteMatcherUtils.setupSites(getSettings().getTarget());
         return true;
     }
 
@@ -45,14 +47,10 @@ public class HttpLatencyPlugin extends ProtocolPluginDescriptorBase<HttpLatencyP
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
-        if (isActive()) {
-            if (SiteMatcherUtils.matchSite(in, latencySites)) {
+        if (shouldRun()) {
+            if (SiteMatcherUtils.matchSite(in, target)) {
                 HttpLatencyPluginSettings s = getSettings();
-                Random r = new Random();
-                int waitMs = r.nextInt(s.getMaxMs() - s.getMinMs()) + s.getMinMs();
-                if (waitMs > 0) {
-                    Sleeper.sleep(waitMs);
-                }
+                ChaosUtils.randomWait(s.getMinMs(), s.getMaxMs());
             }
         }
         return false;

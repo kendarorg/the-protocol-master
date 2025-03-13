@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class BuildDataTypesJson extends BasicTest {
+public class BuildDataTypesJson extends PostgresBasicTest {
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();

@@ -8,7 +8,7 @@ import org.kendar.annotations.multi.TpmRequest;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
-import org.kendar.plugins.MockPlugin;
+import org.kendar.plugins.BasicMockPlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
 
@@ -18,10 +18,10 @@ import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
 @HttpTypeFilter()
-public class BaseMockPluginApis extends ProtocolPluginApiHandlerDefault<MockPlugin> {
+public class BaseMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMockPlugin> {
 
 
-    public BaseMockPluginApis(MockPlugin descriptor, String id, String instanceId) {
+    public BaseMockPluginApis(BasicMockPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);
     }
 

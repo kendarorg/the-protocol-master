@@ -5,14 +5,17 @@ import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
+import org.kendar.http.plugins.commons.MatchingRecRep;
+import org.kendar.http.plugins.commons.SiteMatcherUtils;
+import org.kendar.http.plugins.settings.HttpRateLimitPluginSettings;
+import org.kendar.plugins.BasicPercentPlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.storage.StorageFileIndex;
+import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -24,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 @TpmService(tags = "http")
-public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLimitPluginSettings> {
+public class HttpRateLimitPlugin extends BasicPercentPlugin<HttpRateLimitPluginSettings> {
     private final Object sync = new Object();
     private final Logger log = LoggerFactory.getLogger(HttpRateLimitPlugin.class);
     private final StorageRepository repository;
@@ -32,6 +35,7 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     private Calendar resetTime;
     private int resourcesRemaining = -1;
     private Response customResponse;
+    private PluginFileManager storage;
 
     public HttpRateLimitPlugin(JsonMapper mapper, StorageRepository repository) {
         super(mapper);
@@ -55,11 +59,11 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getLimitSites());
+        sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getTarget());
         customResponse = null;
-        var responseFile = repository.readPluginFile(new StorageFileIndex(getInstanceId(), getId(), "response"));
+        var responseFile = storage.readFile( "response");
         if (responseFile != null) {
-            customResponse = mapper.deserialize(responseFile.getContent(), Response.class);
+            customResponse = mapper.deserialize(responseFile, Response.class);
         }
         return true;
     }
@@ -67,12 +71,13 @@ public class HttpRateLimitPlugin extends ProtocolPluginDescriptorBase<HttpRateLi
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
+        storage = repository.buildPluginFileManager(getInstanceId(),getId());
         if (!handleSettingsChanged()) return null;
         return this;
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
-        if (isActive()) {
+        if (shouldRun()) {
             if (SiteMatcherUtils.matchSite(in, sitesToLimit)) {
                 return handleRateLimit(pluginContext, phase, in, out);
             }

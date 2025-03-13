@@ -25,31 +25,6 @@ public class GlobalSettings {
         this.apiPort = apiPort;
     }
 
-    /*public void putService(String key, Object value) {
-        services.put(key, value);
-    }*/
-
-    /*public <K> K getService(String key) {
-        return (K) services.get(key);
-    }
-
-    public <K> Map<String, K> getServices(Class<K> type) {
-        var result = new HashMap<String, K>();
-        for (var kvp : services.entrySet()) {
-            if (type.isAssignableFrom(kvp.getValue().getClass())) {
-                result.put(kvp.getKey(), (K) kvp.getValue());
-            }
-        }
-        return result;
-    }*/
-
-    /*public String getLogType() {
-        return logType;
-    }
-
-    public void setLogType(String logType) {
-        this.logType = logType;
-    }*/
 
     public ProtocolSettings getProtocolForKey(String protocol) {
         if (!protocols.containsKey(protocol)) {
@@ -61,22 +36,18 @@ public class GlobalSettings {
         return mapper.deserialize(mapper.serialize(protocols.get(protocol)), ProtocolSettings.class);
     }
 
-    public PluginSettings getPluginForKey(String protocol) {
-        if (!plugins.containsKey(protocol)) {
-            return null;
-        }
-        if (ProtocolSettings.class.isAssignableFrom(plugins.get(protocol).getClass())) {
-            return (PluginSettings) plugins.get(protocol);
-        }
-        return mapper.deserialize(mapper.serialize(plugins.get(protocol)), PluginSettings.class);
-    }
-
     public ProtocolSettings getProtocol(String protocol, Class<?> clazz) {
         if (!protocols.containsKey(protocol)) {
             return null;
         }
         var protocolData = protocols.get(protocol);
-        return (ProtocolSettings) mapper.deserialize(mapper.serialize(protocolData), clazz);
+        if(clazz.isAssignableFrom(protocolData.getClass())) {
+            return (ProtocolSettings) protocolData;
+        }else{
+            var deserialized = mapper.deserialize(mapper.serialize(protocolData), clazz);
+            protocols.put(protocol,deserialized);
+            return (ProtocolSettings) deserialized;
+        }
     }
 
     public PluginSettings getPlugin(String plugin, Class<?> clazz) {
@@ -84,7 +55,13 @@ public class GlobalSettings {
             return null;
         }
         var pluginsData = plugins.get(plugin);
-        return (PluginSettings) mapper.deserialize(mapper.serialize(pluginsData), clazz);
+        if(clazz.isAssignableFrom(pluginsData.getClass())) {
+            return (PluginSettings) pluginsData;
+        }else{
+            var deserialized = mapper.deserialize(mapper.serialize(pluginsData), clazz);
+            plugins.put(plugin,deserialized);
+            return (PluginSettings) deserialized;
+        }
     }
 
     public Map<String, Object> getProtocols() {

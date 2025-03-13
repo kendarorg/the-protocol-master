@@ -3,6 +3,7 @@
   "logLevel": "INFO",
   "dataDir": "target/tests/apitest",
   "apiPort": 5005,
+  "unattended":true,
   "plugins": {
     "report-plugin": {
       "active": true
@@ -23,7 +24,7 @@
       },
       "plugins": {
         "record-plugin": {
-          "recordSites": [
+          "target": [
             "unknown"
           ]
         },
