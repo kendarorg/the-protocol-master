@@ -24,6 +24,8 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.parser.SimpleParser;
 import org.kendar.utils.parser.Token;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -130,11 +132,13 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             storage.initialize();
             respondOk(resp);
         } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
             respondKo(resp, ex);
         }
         return true;
     }
 
+    private static final Logger log = LoggerFactory.getLogger(ApiStorageOnlyHandler.class);
     @Override
     public String getId() {
         return this.getClass().getName();

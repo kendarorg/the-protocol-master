@@ -59,10 +59,13 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         return destFile;
     }
 
+
+
     @Test
     void globalApiTest() throws Exception {
 
         var httpclient = HttpClients.createDefault();
+        System.out.println(Path.of("src", "test", "resources", "testcontent_enc.zip").toAbsolutePath()+" Exists "+Files.exists(Path.of("src", "test", "resources", "testcontent_enc.zip")));
         var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent_enc.zip"));
         var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
         }, "application/zip");
