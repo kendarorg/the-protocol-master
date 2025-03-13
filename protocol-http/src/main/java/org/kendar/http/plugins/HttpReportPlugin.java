@@ -11,7 +11,7 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.utils.JsonMapper;
 
-import java.net.UnknownHostException;
+import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -19,23 +19,31 @@ import java.util.Map;
 public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings> {
     private HashSet<String> localIgnore = new HashSet<>();
 
+    public interface MySupplier{
+        String get() throws Exception;
+    }
+
+    private static void tryAddName(HashSet<String> toFill, MySupplier supplier) {
+        try{
+            var data = supplier.get();
+            toFill.add(data);
+        }catch (Exception e){}
+    }
+
     public HttpReportPlugin(JsonMapper mapper) {
         super(mapper);
         localIgnore.add("127.0.0.1");
         localIgnore.add("localhost");
-        try {
-            localIgnore.add(java.net.InetAddress.getLocalHost().getCanonicalHostName());
-        } catch (UnknownHostException e) {
 
-        }try {
-            localIgnore.add(java.net.InetAddress.getLocalHost().getHostName());
-        } catch (UnknownHostException e) {
+        tryAddName(localIgnore, ()->InetAddress.getLocalHost().getCanonicalHostName());
+        tryAddName(localIgnore, ()->InetAddress.getLocalHost().getHostName());
+        tryAddName(localIgnore, ()->InetAddress.getLocalHost().getHostAddress());
+        tryAddName(localIgnore, ()->InetAddress.getByName(InetAddress.getLocalHost() .getHostAddress() ).getHostAddress());
+    }
 
-        }try {
-            localIgnore.add(java.net.InetAddress.getLocalHost().getHostAddress());
-        } catch (UnknownHostException e) {
-
-        }
+    @Override
+    public Class<?> getSettingClass() {
+        return HttpReportPluginSettings.class;
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
@@ -43,6 +51,11 @@ public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings
         if(getSettings().isIgnoreTpm()){
             if(localIgnore.contains(in.getHost())){
                 return false;
+            }
+            for(var ignored:getSettings().getIgnore()){
+                if(ignored.equalsIgnoreCase(in.getHost())){
+                    return false;
+                }
             }
         }
 
