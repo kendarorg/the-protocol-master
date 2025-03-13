@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -36,7 +35,6 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
             Main.stop();
         } catch (Exception e) {
         }
-        System.out.println(Path.of("src", "test", "resources", "apitestsencstorage.json").toAbsolutePath()+" Exists "+Files.exists(Path.of("src", "test", "resources", "apitestsencstorage.json")));
 
         var args = new String[]{
 
@@ -59,21 +57,14 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         return destFile;
     }
 
-
-
     @Test
     void globalApiTest() throws Exception {
 
         var httpclient = HttpClients.createDefault();
-        System.out.println(Path.of("src", "test", "resources", "testcontent_enc.zip").toAbsolutePath()+" Exists "+Files.exists(Path.of("src", "test", "resources", "testcontent_enc.zip")));
         var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent_enc.zip"));
         var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
         }, "application/zip");
         assertEquals("OK", okResult.getResult());
-        Files.find(Paths.get(Path.of("target").toString()),
-                        Integer.MAX_VALUE,
-                        (filePath, fileAttr) -> fileAttr.isRegularFile())
-                .forEach(System.out::println);
         assertThrows(MalformedInputException.class, () ->
                 Files.readString(Path.of("target", "tests", "encrypted","scenario", "index.http-01.json")));
         var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);

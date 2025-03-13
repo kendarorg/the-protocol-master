@@ -38,18 +38,19 @@ import static org.kendar.apis.ApiUtils.*;
 @HttpTypeFilter()
 public class ApiStorageOnlyHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
+    private static final Logger log = LoggerFactory.getLogger(ApiStorageOnlyHandler.class);
     private final GlobalSettings settings;
     private final StorageRepository storage;
     private final SimpleParser simpleParser;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
+
     public ApiStorageOnlyHandler(GlobalSettings settings, StorageRepository storage, SimpleParser simpleParser) {
         this.settings = settings;
         this.storage = storage;
         this.simpleParser = simpleParser;
     }
-
 
     @HttpMethodFilter(
             pathAddress = "/api/global/storage",
@@ -127,8 +128,6 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                 inputData = reqp.getRequestText().textValue().getBytes();
             }
             storage.writeZip(inputData);
-            //ENC
-            System.out.println("UPLOADED FILE");
             storage.initialize();
             respondOk(resp);
         } catch (Exception ex) {
@@ -138,7 +137,6 @@ public class ApiStorageOnlyHandler implements FilteringClass {
         return true;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(ApiStorageOnlyHandler.class);
     @Override
     public String getId() {
         return this.getClass().getName();

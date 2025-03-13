@@ -13,80 +13,23 @@ import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public abstract class StorageRepository implements Service {
+    protected static final Logger log = LoggerFactory.getLogger(StorageRepository.class);
     private final DiService diService;
     private final JsonMapper mapper;
-    protected static final Logger log = LoggerFactory.getLogger(StorageRepository.class);
 
     public StorageRepository(DiService diService, JsonMapper mapper) {
         this.diService = diService;
         this.mapper = mapper;
-    }
-    public PluginFileManager buildPluginFileManager(String instanceId,String pluginId) {
-        return new PluginFileManager(this,instanceId,pluginId);
-    }
-
-    public abstract void deleteRecording(String protocolInstanceId, long itemId);
-    public abstract void updateRecording(long itemId, String protocolInstanceId, CompactLine index, StorageItem item);
-    public abstract List<String> listDirs(String ... path);
-    public abstract String readFile(String ... path);
-    public abstract List<String> listFiles(String ... path);
-    public abstract void writeFile(String content,String ... path);
-    public abstract void deleteFile(String ... path);
-
-    public abstract void initialize();
-
-    public String getSettings() {
-        return readFile("settings");
-    }
-
-    public abstract StorageItem readFromScenarioById(String instanceId, long id);
-
-    public abstract List<StorageItem> readResponsesFromScenario(String instanceId, ResponseItemQuery query);
-
-
-    protected void zipFile(String fileName, ZipOutputStream zipOut) throws IOException {
-        var content = this.readFile(fileName).getBytes();
-        ZipEntry zipEntry = new ZipEntry(fileName+".json");
-        zipOut.putNextEntry(zipEntry);
-        zipOut.write(content, 0, content.length);
-    }
-
-    protected void zipDir(String fileName, ZipOutputStream zipOut) throws IOException {
-        ZipEntry zipEntry = new ZipEntry(fileName+"/");
-        zipOut.putNextEntry(zipEntry);
-        zipOut.closeEntry();
-        for(var item:this.listFiles(fileName)) {
-            zipFile(fileName+"/"+item,zipOut);
-        }
-    }
-
-    public byte[] readAsZip() {
-        var baos = new ByteArrayOutputStream();
-        var globalSettings = diService.getInstance(GlobalSettings.class);
-        var globalSettingsFile = mapper.serialize(globalSettings);
-            writeFile( globalSettingsFile,"settings");
-
-        try (var zos = new ZipOutputStream(baos)) {
-            for(var item:this.listFiles()) {
-                zipFile(item,zos);
-            }
-            for(var item:this.listDirs()){
-                zipDir(item,zos);
-            }
-            /*(for (var file : new File(Path.of(targetDir).toAbsolutePath().toString()).listFiles()) {
-                zipFile(file, file.getName(), zos);
-            }*/
-        } catch (IOException ioe) {
-            log.error("Error Creating storage zip", ioe);
-        }
-        return baos.toByteArray();
     }
 
     protected static File createNewFileFromZip(File destinationDir, ZipEntry zipEntry) throws IOException {
@@ -101,10 +44,77 @@ public abstract class StorageRepository implements Service {
 
         return destFile;
     }
+
+    public PluginFileManager buildPluginFileManager(String instanceId, String pluginId) {
+        return new PluginFileManager(this, instanceId, pluginId);
+    }
+
+    public abstract void deleteRecording(String protocolInstanceId, long itemId);
+
+    public abstract void updateRecording(long itemId, String protocolInstanceId, CompactLine index, StorageItem item);
+
+    public abstract List<String> listDirs(String... path);
+
+    public abstract String readFile(String... path);
+
+    public abstract List<String> listFiles(String... path);
+
+    public abstract void writeFile(String content, String... path);
+
+    public abstract void deleteFile(String... path);
+
+    public abstract void initialize();
+
+    public String getSettings() {
+        return readFile("settings");
+    }
+
+    public abstract StorageItem readFromScenarioById(String instanceId, long id);
+
+    public abstract List<StorageItem> readResponsesFromScenario(String instanceId, ResponseItemQuery query);
+
+    protected void zipFile(String fileName, ZipOutputStream zipOut) throws IOException {
+        var content = this.readFile(fileName).getBytes();
+        ZipEntry zipEntry = new ZipEntry(fileName + ".json");
+        zipOut.putNextEntry(zipEntry);
+        zipOut.write(content, 0, content.length);
+    }
+
+    protected void zipDir(String fileName, ZipOutputStream zipOut) throws IOException {
+        ZipEntry zipEntry = new ZipEntry(fileName + "/");
+        zipOut.putNextEntry(zipEntry);
+        zipOut.closeEntry();
+        for (var item : this.listFiles(fileName)) {
+            zipFile(fileName + "/" + item, zipOut);
+        }
+    }
+
+    public byte[] readAsZip() {
+        var baos = new ByteArrayOutputStream();
+        var globalSettings = diService.getInstance(GlobalSettings.class);
+        var globalSettingsFile = mapper.serialize(globalSettings);
+        writeFile(globalSettingsFile, "settings");
+
+        try (var zos = new ZipOutputStream(baos)) {
+            for (var item : this.listFiles()) {
+                zipFile(item, zos);
+            }
+            for (var item : this.listDirs()) {
+                zipDir(item, zos);
+            }
+            /*(for (var file : new File(Path.of(targetDir).toAbsolutePath().toString()).listFiles()) {
+                zipFile(file, file.getName(), zos);
+            }*/
+        } catch (IOException ioe) {
+            log.error("Error Creating storage zip", ioe);
+        }
+        return baos.toByteArray();
+    }
+
     public void writeZip(byte[] byteArray) {
 //        String settingsPath = null;
 //        var destDirString = Path.of(targetDir).toAbsolutePath().toString();
-      File destDir = new File("");
+        File destDir = new File("");
 //        // create output directory if it doesn't exist
 //        if (!destDir.exists()) destDir.mkdirs();
         ByteArrayInputStream fis;
@@ -120,14 +130,14 @@ public abstract class StorageRepository implements Service {
             while (zipEntry != null) {
 
                 File newFile = createNewFileFromZip(destDir, zipEntry);
-                if (!zipEntry.isDirectory()){
+                if (!zipEntry.isDirectory()) {
                     var fos = new ByteArrayOutputStream();
                     int len;
                     while ((len = zis.read(buffer)) > 0) {
                         fos.write(buffer, 0, len);
                     }
                     fos.close();
-                    writeFile(new String(fos.toByteArray()),newFile.getPath().replace(".json",""));
+                    writeFile(fos.toString(), newFile.getPath().replace(".json", ""));
                 }
                 zipEntry = zis.getNextEntry();
             }
