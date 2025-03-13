@@ -36,6 +36,7 @@ target
 /data/
 /protocol-runner/test/
 /protocol-runner/plugins/
-/jte-classes/
+jte-classes
 /extensions.idx
 /plugins/
+/protocol-runner/extensions.idx

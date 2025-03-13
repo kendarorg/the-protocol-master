@@ -120,6 +120,7 @@ public abstract class StorageRepository implements Service {
         ByteArrayInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
+        var settingsChanged= false;
         try {
             fis = new ByteArrayInputStream(byteArray);
             ZipInputStream zis = new ZipInputStream(fis);
@@ -131,6 +132,9 @@ public abstract class StorageRepository implements Service {
 
                 File newFile = createNewFileFromZip(destDir, zipEntry);
                 if (!zipEntry.isDirectory()) {
+                    if(zipEntry.getName().equalsIgnoreCase("settings.json")) {
+                        settingsChanged=true;
+                    }
                     var fos = new ByteArrayOutputStream();
                     int len;
                     while ((len = zis.read(buffer)) > 0) {
@@ -145,7 +149,11 @@ public abstract class StorageRepository implements Service {
             zis.closeEntry();
             zis.close();
             fis.close();
-            EventsQueue.send(new StorageReloadedEvent().withSettings("settings"));
+            var evt = new StorageReloadedEvent();
+            if(settingsChanged){
+                evt.withSettings("settings");
+            }
+            EventsQueue.send(evt);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

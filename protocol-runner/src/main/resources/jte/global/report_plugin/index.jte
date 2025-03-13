@@ -1,13 +1,22 @@
 @param org.kendar.ui.dto.SinglePluginDto data
 <script>
-    function searchReport(){
-        var tpmql=document.getElementById('tpmqlQuery').value;
-        var start=document.getElementById('tpmqlQueryStart').value;
-        var limit=document.getElementById('tpmqlQueryLimit').value;
+    function searchReport() {
+        var tpmql = document.getElementById('tpmqlQuery').value;
+        var start = document.getElementById('tpmqlQueryStart').value;
+        var limit = document.getElementById('tpmqlQueryLimit').value;
         htmx.ajax('GET',
             '/global/plugins/report-plugin/report/search?' +
-            'tpmql='+encodeURI(tpmql)+"&start="+start+"&limit="+limit,
-            {target:"#reportSearchResult", swap:'outerHTML'});
+            'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit,
+            {target: "#reportSearchResult", swap: 'outerHTML'});
+    }
+
+    function downloadReport(type) {
+        var tpmql = document.getElementById('tpmqlQuery').value;
+        var start = document.getElementById('tpmqlQueryStart').value;
+        var limit = document.getElementById('tpmqlQueryLimit').value;
+        downloadURI('/api/global/plugins/report-plugin/report?'+
+            'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit+'&format='+type
+        );
     }
 </script>
 <div class="panel panel-default">
@@ -28,19 +37,19 @@
                 <div class="input-group">
                     <label for="tpmqlQueryStart" class="control-label">Start</label>
                     <div>
-                        <input type="number" id="tpmqlQueryStart" class="form-control" value="0" />
+                        <input type="number" id="tpmqlQueryStart" class="form-control" value="0"/>
                     </div>
                 </div>
                 <div class="input-group">
                     <label for="tpmqlQueryLimit" class="control-label">Limit</label>
                     <div>
-                        <input type="number" id="tpmqlQueryLimit" class="form-control" value="10" />
+                        <input type="number" id="tpmqlQueryLimit" class="form-control" value="10"/>
                     </div>
                 </div>
                 <div class="input-group">
                     <label for="tpmqlQuery" class="control-label">Query</label>
                     <div>
-                        <textarea id="tpmqlQuery" class="form-control" rows="6" cols="70" >
+                        <textarea id="tpmqlQuery" class="form-control" rows="6" cols="70">
 SELECT(
     WHAT(date=MSTODATE(timestamp),instanceId,protocol,
         query=SUBSTR(query,50),duration,tags=WRAP(tags,50,' ')),
@@ -51,10 +60,25 @@ SELECT(
                 </div>
                 <br>
                 <div class="input-group">
-                        <button type="button" class="btn btn-success"
-                                onclick="searchReport()">
-                            Search
-                        </button>
+                    <button type="button" class="btn btn-success"
+                            onclick="searchReport()">
+                        Search
+                    </button>
+                    &nbsp;
+                    <button type="button" class="btn btn-success"
+                            onclick="downloadReport('csv')">
+                        Download csv
+                    </button>
+                    &nbsp;
+                    <button type="button" class="btn btn-success"
+                            onclick="downloadReport('html')">
+                        Download html
+                    </button>
+                    &nbsp;
+                    <button type="button" class="btn btn-success"
+                            onclick="downloadReport('json')">
+                        Download json
+                    </button>
                 </div>
                 <br>
                 <div id="reportSearchResult"></div>

@@ -218,12 +218,11 @@ public class Main {
             restartReceived = true;
         },RestartEvent.class);
         EventsQueue.register("main",(e)->{
-
-            stopInternal();
             if(e.getSettings()!=null && Files.exists(Path.of(e.getSettings()))){
+                stopInternal();
                 changedSettings = e.getSettings();
+                terminateReceived = true;
             }
-            terminateReceived = true;
         }, StorageReloadedEvent.class);
 
         if(unattended){
