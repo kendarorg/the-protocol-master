@@ -120,20 +120,7 @@ public abstract class StorageRepository implements Service {
             while (zipEntry != null) {
 
                 File newFile = createNewFileFromZip(destDir, zipEntry);
-                if (zipEntry.isDirectory()) {
-                    if (!newFile.mkdirs()) {
-                        log.error("Could not create directory " + newFile.getAbsolutePath()+" isDir:"+newFile.isDirectory());
-                        throw new IOException("Failed to create directory " + newFile);
-                    }
-                } else {
-                    // fix for Windows-created archives
-                    File parent = newFile.getParentFile();
-                    if (!parent.mkdirs()) {
-                        log.error("Could not create directory(2) " + newFile.getAbsolutePath()+" isDir:"+newFile.isDirectory());
-                        throw new IOException("Failed to create directory " + parent);
-                    }
-
-                    // write file content
+                if (!zipEntry.isDirectory()){
                     var fos = new ByteArrayOutputStream();
                     int len;
                     while ((len = zis.read(buffer)) > 0) {
