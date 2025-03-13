@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -64,6 +65,10 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
         }, "application/zip");
         assertEquals("OK", okResult.getResult());
+        Files.find(Paths.get(Path.of("target").toString()),
+                        Integer.MAX_VALUE,
+                        (filePath, fileAttr) -> fileAttr.isRegularFile())
+                .forEach(System.out::println);
         assertThrows(MalformedInputException.class, () ->
                 Files.readString(Path.of("target", "tests", "encrypted","scenario", "index.http-01.json")));
         var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
@@ -87,10 +92,6 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
                 throw new RuntimeException("Not a zip file!");
             }
             while (zipEntry != null) {
-                /*ZIPSETTINGS if(zipEntry.getName().equalsIgnoreCase("settings.json") &&
-                        Path.of(targetDir).toAbsolutePath().compareTo(destDir.toPath().toAbsolutePath()) == 0) {
-                    settingsDir =Path.of(destDir.getAbsolutePath(),zipEntry.getName()).toString();
-                }*/
                 File newFile = newFile(destDir, zipEntry);
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {
