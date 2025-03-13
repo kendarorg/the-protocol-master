@@ -102,6 +102,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * More than 70% Test coverage, more than 550 tests
 * Environment-based dynamic settings (see TPM_REPLACE)
 * Support for full "test scenario" with embedded encryption (for GDPR purposes)
+* Internal query language [TPMql](docs/tpmql.md) for all searches in APIs and UI
 
 The configuration is based on command line parameters or a json properties file
 for the usage check [here](docs/properties.md)
