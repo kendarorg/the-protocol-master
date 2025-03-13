@@ -125,6 +125,8 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                 inputData = reqp.getRequestText().textValue().getBytes();
             }
             storage.writeZip(inputData);
+            //ENC
+            System.out.println("UPLOADED FILE");
             storage.initialize();
             respondOk(resp);
         } catch (Exception ex) {
