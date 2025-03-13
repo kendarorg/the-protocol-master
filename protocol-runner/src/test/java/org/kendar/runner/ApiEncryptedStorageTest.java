@@ -36,6 +36,8 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
             Main.stop();
         } catch (Exception e) {
         }
+        System.out.println(Path.of("src", "test", "resources", "apitestsencstorage.json").toAbsolutePath()+" Exists "+Files.exists(Path.of("src", "test", "resources", "apitestsencstorage.json")));
+
         var args = new String[]{
 
                 "-cfg", Path.of("src", "test", "resources", "apitestsencstorage.json").toString(),"-unattended"
