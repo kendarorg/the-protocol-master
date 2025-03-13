@@ -6,7 +6,7 @@
 <body>
 @template.header("storage")
 
-<script type="application/javascript">
+<script type="text/javascript">
     function cleanStorage() {
         if (confirm("You want to remove ALL data?") == true) {
             getData("/api/global/storage", "DELETE", () => {
@@ -156,7 +156,7 @@
 
     </div>
 </div>
-<script type="application/javascript">
+<script type="text/javascript">
     document.getElementById('uploadStorage').addEventListener('change', (evt) => handle_file_select(evt), false);
 </script>
 @template.footer()

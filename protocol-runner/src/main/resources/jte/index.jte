@@ -8,7 +8,7 @@
 @template.header("index")
 
 
-<script type="application/javascript">
+<script type="text/javascript">
     function terminate() {
         if (confirm("You want to terminate the process?") == true) {
             getData("/api/global/terminate", "GET", () => {
