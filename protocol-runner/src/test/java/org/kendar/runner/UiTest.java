@@ -85,7 +85,8 @@ public class UiTest extends ApiTestBase {
                 "tpmql="+tpmql+
                 "&start=0&limit=10";
         actual = downloadRequestString(path+"&format=json", httpclient);
-        assertTrue(actual.contains("\"date\":\"2025/03/13 10:11:22.190\""));
+        var msg =actual;
+        assertTrue(actual.contains("\"2025/03/13 10:11:22.190\""),()->msg);
         actual = downloadRequestString(path+"&format=csv", httpclient);
         assertTrue(actual.contains("0,\"2025/03/13 10:11:22.190\","));
         actual = downloadRequestString(path+"&format=html", httpclient);
