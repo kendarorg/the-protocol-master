@@ -650,7 +650,7 @@ public class FileStorageRepository extends StorageRepository {
     public void deleteFile(String... path) {
         var realPath = buildRealPath(path)+".json";
         try {
-            if(!fileExists(realPath)){
+            if(!Files.exists(Path.of(realPath))){
                 return;
             }
             Files.deleteIfExists(Path.of(realPath));
@@ -662,7 +662,7 @@ public class FileStorageRepository extends StorageRepository {
     public String readFile(String ... path) {
         var realPath = buildRealPath(path)+".json";
         try {
-            if(!fileExists(realPath)){
+            if(!Files.exists(Path.of(realPath))){
                 return null;
             }
             return getFileContent(Path.of(realPath));
