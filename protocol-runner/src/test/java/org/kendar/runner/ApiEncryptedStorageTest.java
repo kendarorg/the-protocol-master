@@ -38,7 +38,7 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         }
         var args = new String[]{
 
-                "-cfg", Path.of("src", "test", "resources", "apitestsencstorage.json").toString()
+                "-cfg", Path.of("src", "test", "resources", "apitestsencstorage.json").toString(),"-unattended"
         };
         bs = new BasicTest();
         bs.startAndHandleUnexpectedErrors(args);
