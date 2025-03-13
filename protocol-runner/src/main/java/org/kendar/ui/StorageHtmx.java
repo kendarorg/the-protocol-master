@@ -118,7 +118,7 @@ public class StorageHtmx implements FilteringClass {
             method = "POST", id = "POST /storage/file")
     public void storageFileCreateUpdate(Request request, Response response) {
         var path = request.getQuery("parent");
-        var sentContent = request.getRequestText().toPrettyString();
+        var sentContent = request.getRequestText().asText();
         repository.writeFile(sentContent,path);
         response.addHeader("Content-type","text/html");
         response.setStatusCode(200);
