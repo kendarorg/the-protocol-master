@@ -24,6 +24,7 @@ various languages and environments
 * .Net Core/Entity Framework/MySQL
 * Go/Redis/Postgres
 * Java/Spring/MySQL/MQTT
+* Intercept a phone with pre-setup VPN container
 
 ### How it works
 
