@@ -46,6 +46,13 @@ For the TPM APIs a new (yay!)
 * `MSTODATE(expression_string)`: convert to readable date in format YYYY/MM/DD HH:MM:SS.SSSS
 * `WRAP(expression,integer,string)`: wrap the string in blocks of integer length using string as separator
 
+In the select the expression are evaluated in this order
+
+* WHERE
+* GROUPBY
+* WHAT
+* ORDERBY
+
 ### Examples
 
 Given the object

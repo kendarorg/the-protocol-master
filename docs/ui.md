@@ -84,6 +84,14 @@ Find all dns calls
     ORDERBY(DESC(date))
 )`
 
+Find all grouped DNS calls
+
+`SELECT(
+    WHAT(cnt=COUNT(),rd=tags.requestedDomain),
+GROUPBY(tags.requestedDomain),
+ORDERBY(DESC(cnt))
+)`
+
 Find all calls to specific host
 
 `SELECT(
