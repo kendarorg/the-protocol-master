@@ -1,14 +1,15 @@
-package org.kendar.amqp.v09.apis;
+package org.kendar.amqp.v09.plugins.apis;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.kendar.amqp.v09.apis.dtos.AmqpConnection;
-import org.kendar.amqp.v09.apis.dtos.PublishAmqpMessage;
 import org.kendar.amqp.v09.context.AmqpProtoContext;
 import org.kendar.amqp.v09.messages.frames.BodyFrame;
 import org.kendar.amqp.v09.messages.frames.HeaderFrame;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.amqp.v09.plugins.AmqpPublishPlugin;
+import org.kendar.amqp.v09.plugins.apis.dtos.AmqpConnection;
+import org.kendar.amqp.v09.plugins.apis.dtos.AmqpConnections;
+import org.kendar.amqp.v09.plugins.apis.dtos.PublishAmqpMessage;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -21,18 +22,24 @@ import org.kendar.apis.utils.MimeChecker;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ContentData;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 
 @HttpTypeFilter()
 public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpPublishPlugin> {
-    public AmqpPublishPluginApis(AmqpPublishPlugin descriptor, String id, String instanceId) {
+    private final MultiTemplateEngine resolversFactory;
+
+    public AmqpPublishPluginApis(AmqpPublishPlugin descriptor, String id, String instanceId
+            , MultiTemplateEngine resolversFactory) {
         super(descriptor, id, instanceId);
 
+        this.resolversFactory = resolversFactory;
     }
 
     @HttpMethodFilter(
@@ -50,6 +57,11 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void getConnections(Request request, Response response) {
+        var result = loadConnections();
+        respondJson(response, result);
+    }
+
+    private List<AmqpConnection> loadConnections() {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<AmqpConnection>();
         for (var ccache : pInstance.getContextsCache().entrySet()) {
@@ -71,7 +83,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                 result.add(connection);
             }
         }
-        respondJson(response, result);
+        return result;
     }
 
     @HttpMethodFilter(
@@ -164,4 +176,17 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         bf.setContent(content);
         context.write(bf);
     }
+
+    @HttpMethodFilter(
+            pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/connections",
+            method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/connections")
+    public void retrieveConnections(Request request, Response response) {
+
+        var connections = loadConnections();
+        var model = new AmqpConnections();
+        model.setConnections(connections);
+        model.setInstanceId(getProtocolInstanceId());
+        resolversFactory.render("amqp091/publish_plugin/connections.jte",model,response);
+    }
+
 }

@@ -1,7 +1,5 @@
 package org.kendar.http.plugins.apis;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-import gg.jte.output.StringOutput;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -164,10 +162,6 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
         var sets = new SSLDummyPluginSettings();
         model.setSettings(new JsonMapper().serializePretty(sets));
         model.setSettingsObject(sets);
-        var output = new StringOutput();
-        resolversFactory.render("http/ssl_plugin/hosts.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("http/ssl_plugin/hosts.jte",model,response);
     }
 }

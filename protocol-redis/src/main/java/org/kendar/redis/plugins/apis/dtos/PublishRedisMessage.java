@@ -1,4 +1,4 @@
-package org.kendar.redis.api.dto;
+package org.kendar.redis.plugins.apis.dtos;
 
 public class PublishRedisMessage {
     private String contentType;

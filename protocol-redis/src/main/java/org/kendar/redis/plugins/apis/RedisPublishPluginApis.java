@@ -1,4 +1,4 @@
-package org.kendar.redis.api;
+package org.kendar.redis.plugins.apis;
 
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
@@ -12,12 +12,14 @@ import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
 import org.kendar.redis.Resp3Context;
-import org.kendar.redis.api.dto.PublishRedisMessage;
-import org.kendar.redis.api.dto.RedisConnection;
 import org.kendar.redis.fsm.events.Resp3Message;
 import org.kendar.redis.parser.Resp3ParseException;
 import org.kendar.redis.parser.Resp3Parser;
 import org.kendar.redis.plugins.RedisPublishPlugin;
+import org.kendar.redis.plugins.apis.dtos.PublishRedisMessage;
+import org.kendar.redis.plugins.apis.dtos.RedisConnection;
+import org.kendar.redis.plugins.apis.dtos.RedisConnections;
+import org.kendar.ui.MultiTemplateEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +30,12 @@ import static org.kendar.apis.ApiUtils.respondJson;
 @HttpTypeFilter()
 public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<RedisPublishPlugin> {
     private final Resp3Parser parser = new Resp3Parser();
+    private final MultiTemplateEngine resolversFactory;
 
-    public RedisPublishPluginApis(RedisPublishPlugin descriptor, String id, String instanceId) {
+    public RedisPublishPluginApis(RedisPublishPlugin descriptor, String id, String instanceId, MultiTemplateEngine resolversFactory) {
         super(descriptor, id, instanceId);
 
+        this.resolversFactory = resolversFactory;
     }
 
     @HttpMethodFilter(
@@ -49,6 +53,11 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void getConnections(Request request, Response response) {
+        var result = loadConnections();
+        respondJson(response, result);
+    }
+
+    private ArrayList<RedisConnection> loadConnections() {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<RedisConnection>();
         for (var ccache : pInstance.getContextsCache().entrySet()) {
@@ -64,7 +73,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
             result.add(connection);
 
         }
-        respondJson(response, result);
+        return result;
     }
 
     @HttpMethodFilter(
@@ -103,17 +112,34 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
         var pInstance = getDescriptor().getProtocolInstance();
         String dataToSend = messageData.getBody();
 
+        var sentData = false;
         for (var contxtKvp : pInstance.getContextsCache().entrySet()) {
             var context = (Resp3Context) contxtKvp.getValue();
             if (connectionId != -1 && connectionId != contxtKvp.getKey()) {
                 continue;
             }
+            sentData = true;
             var data = List.of("message", queue, dataToSend);
             var string = parser.serialize(mapper.toJsonNode(data));
             var message = new Resp3Message(context, null, data, string);
             context.write(message);
         }
 
+        if(!sentData) {
+            throw new RuntimeException("No existing topic to send to");
+        }
 
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/connections",
+            method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/connections")
+    public void retrieveConnections(Request request, Response response) {
+
+        var connections = loadConnections();
+        var model = new RedisConnections();
+        model.setConnections(connections);
+        model.setInstanceId(getProtocolInstanceId());
+        resolversFactory.render("redis/publish_plugin/connections.jte",model,response);
     }
 }

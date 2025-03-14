@@ -93,3 +93,9 @@ Find all calls to specific host
   WHERE(tags.host=='HOST_TO_SEARCH_FOR'),
   ORDERBY(DESC(date))
 )`
+
+### Send data to queues
+
+For amqp, mqtt and redis you can send data directly via the UI
+
+![send_on_queue.png](ui/send_on_queue.png)

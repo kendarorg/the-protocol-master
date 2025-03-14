@@ -21,6 +21,7 @@ import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
@@ -127,7 +128,7 @@ public class MqttBasicTest {
         var pl = new MqttRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(),
                 pls);
         var rep = new MqttReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        publishPlugin = (MqttPublishPlugin) new MqttPublishPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        publishPlugin = (MqttPublishPlugin) new MqttPublishPlugin(mapper,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         errorPlugin= new MqttNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin= new MqttLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
         proxy.setPluginHandlers(List.of(pl, rep, publishPlugin,errorPlugin,latencyPlugin));

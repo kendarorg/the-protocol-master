@@ -5,7 +5,7 @@
     </envs>
     <option name="MAIN_CLASS_NAME" value="org.kendar.Main" />
     <module name="protocol-runner" />
-    <option name="PROGRAM_PARAMETERS" value="-cfg settings_mqtt.json" />
+    <option name="PROGRAM_PARAMETERS" value="-cfg settings.json" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.kendar.*" />

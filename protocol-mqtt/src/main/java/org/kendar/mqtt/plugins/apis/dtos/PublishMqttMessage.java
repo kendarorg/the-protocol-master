@@ -1,4 +1,4 @@
-package org.kendar.mqtt.apis.dtos;
+package org.kendar.mqtt.plugins.apis.dtos;
 
 public class PublishMqttMessage {
     private String contentType;

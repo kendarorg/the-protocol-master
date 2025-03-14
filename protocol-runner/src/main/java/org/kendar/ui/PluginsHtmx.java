@@ -44,22 +44,17 @@ public class PluginsHtmx implements FilteringClass {
             pathAddress = "/globalpl",
             method = "GET", id = "GET /globalpl")
     public void globalpl(Request request, Response response) {
-        var output = new StringOutput();
         var model = new GlobalsDto();
         for(var globalPlugin:diService.getInstances(GlobalPluginDescriptor.class)){
             model.getPlugins().add(convert(null,globalPlugin));
         }
-        resolversFactory.render("globalpl.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("globalpl.jte",model,response);
     }
 
     @HttpMethodFilter(
             pathAddress = "/plugins",
             method = "GET", id = "GET /plugins")
     public void plugins(Request request, Response response) {
-        var output = new StringOutput();
         var model = new ProtocolStatusDto();
         var instances = (List<ProtocolInstance>)diService.getNamedInstance("protocols",new ArrayList<ProtocolInstance>().getClass());
         for(var instance: instances){
@@ -67,10 +62,7 @@ public class PluginsHtmx implements FilteringClass {
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
             model.getProtocols().add(this.convert(protocol));
         }
-        resolversFactory.render("plugins.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("plugins.jte",model,response);
     }
 
     @HttpMethodFilter(
@@ -78,7 +70,6 @@ public class PluginsHtmx implements FilteringClass {
             method = "GET", id = "GET /plugins/wildcard")
     public void pluginsWildcard(Request request, Response response) {
         var avoidScript = "true".equalsIgnoreCase(request.getQuery("avoidScript"));
-        var output = new StringOutput();
         var model = new ProtocolStatusDto();
         model.getParameters().put("avoidScript",avoidScript);
         var instances = (List<ProtocolInstance>)diService.getNamedInstance("protocols",new ArrayList<ProtocolInstance>().getClass());
@@ -86,10 +77,7 @@ public class PluginsHtmx implements FilteringClass {
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
             model.getProtocols().add(this.convert(protocol));
         }
-        resolversFactory.render("plugins/wildcard.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("plugins/wildcard.jte",model,response);
     }
 
     @HttpMethodFilter(
@@ -97,7 +85,6 @@ public class PluginsHtmx implements FilteringClass {
             method = "GET", id = "GET /plugins/active")
     public void pluginsActive(Request request, Response response) {
         var avoidScript = "true".equalsIgnoreCase(request.getQuery("avoidScript"));
-        var output = new StringOutput();
         var model = new ProtocolStatusDto();
         model.getParameters().put("avoidScript",avoidScript);
         var instances = (List<ProtocolInstance>)diService.getNamedInstance("protocols",new ArrayList<ProtocolInstance>().getClass());
@@ -105,10 +92,7 @@ public class PluginsHtmx implements FilteringClass {
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
             model.getProtocols().add(this.convert(protocol));
         }
-        resolversFactory.render("plugins/active.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("plugins/active.jte",model,response);
     }
 
     @HttpMethodFilter(
@@ -117,17 +101,13 @@ public class PluginsHtmx implements FilteringClass {
     public void pluginsProtocols(Request request, Response response) {
         var avoidScript = "true".equalsIgnoreCase(request.getQuery("avoidScript"));
         var protocolId = request.getQuery("protocolId");
-        var output = new StringOutput();
         var instances = (List<ProtocolInstance>)diService.getNamedInstance("protocols",new ArrayList<ProtocolInstance>().getClass());
         for(var instance: instances){
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
             if(protocol.getSettings().getProtocolInstanceId().equals(protocolId)){
                 var model = this.convert(protocol);
                 model.getParameters().put("avoidScript",avoidScript);
-                resolversFactory.render("plugins/protocol.jte",model,output);
-                response.addHeader("Content-type","text/html");
-                response.setResponseText(new TextNode(output.toString()));
-                response.setStatusCode(200);
+                resolversFactory.render("plugins/protocol.jte",model,response);
                 return;
             }
         }
@@ -140,7 +120,6 @@ public class PluginsHtmx implements FilteringClass {
     public void singlePlugin(Request request, Response response) {
         var instanceId = request.getPathParameter("protocolInstanceId");
         var pluginId = request.getPathParameter("pluginId");
-        var output = new StringOutput();
         var model = new SinglePluginDto();
         if(!instanceId.equalsIgnoreCase("global")){
             var instances = (List<ProtocolInstance>)diService.getNamedInstance("protocols",new ArrayList<ProtocolInstance>().getClass());
@@ -152,7 +131,7 @@ public class PluginsHtmx implements FilteringClass {
             model.setActive(plugin.isActive());
             model.setSettings(mapper.serializePretty(plugin.getSettings()));
             model.setSettingsObject(plugin.getSettings());
-            resolversFactory.render("plugins/single.jte",model,output);
+            resolversFactory.render("plugins/single.jte",model,response);
         }else{
             var plugin=(GlobalPluginDescriptor)diService.getInstances(GlobalPluginDescriptor.class)
                     .stream().filter(i->i.getId().equalsIgnoreCase(pluginId)).findFirst().orElse(null);
@@ -162,12 +141,8 @@ public class PluginsHtmx implements FilteringClass {
             model.setActive(plugin.isActive());
             model.setSettings(mapper.serializePretty(plugin.getSettings()));
             model.setSettingsObject(plugin.getSettings());
-            resolversFactory.render("plugins/singlegl.jte",model,output);
+            resolversFactory.render("plugins/singlegl.jte",model,response);
         }
-
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
     }
 
     private ProtocolDto convert(NetworkProtoDescriptor protocol) {

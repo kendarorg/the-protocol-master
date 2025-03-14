@@ -1,6 +1,39 @@
-package org.kendar.amqp.v09.apis.dtos;
+package org.kendar.amqp.v09.plugins.apis.dtos;
+
+import org.kendar.utils.JsonMapper;
+
+import java.util.Objects;
 
 public class AmqpConnection {
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        AmqpConnection that = (AmqpConnection) o;
+        return canPublish == that.canPublish && consumeId == that.consumeId && Objects.equals(id, that.id) && Objects.equals(channel, that.channel) && Objects.equals(consumeOrigin, that.consumeOrigin) && Objects.equals(consumerTag, that.consumerTag) && Objects.equals(exchange, that.exchange);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, channel, consumeOrigin, consumerTag, canPublish, consumeId, exchange);
+    }
+
+    public String serialized(){
+        return new JsonMapper().serialize(this);
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", channel=" + channel +
+                ", consumeOrigin='" + consumeOrigin + '\'' +
+                ", consumerTag=" + consumerTag +
+                ", canPublish=" + canPublish +
+                ", consumeId=" + consumeId +
+                ", exchange='" + exchange + '\'' +
+                '}';
+    }
+
     private Integer id;
     private Short channel;
     private String consumeOrigin;
