@@ -18,6 +18,13 @@ For the TPM APIs a new (yay!)
 
 ### Functions
 
+In the select the expression are evaluated in this order
+
+* WHERE
+* GROUPBY
+* WHAT
+* ORDERBY
+
 * `AND(expression_boolean*)` returns `boolean`
 * `OR(expression_boolean*)` returns `boolean`
 * `ISNULL(expression)` returns `boolean`
@@ -40,18 +47,12 @@ For the TPM APIs a new (yay!)
 * `SELECT(WHAT(),WHERE(),GROUPBY(),ORDERBY())` returns a list, all parameters optional
 * `WHAT(fieldname|fieldname=expression|group_ops(fieldname)*)` select fieldname, or assign to fieldname the value of the expression
 * `WHERE(boolean_expression)` execute a query
-* `GROUPBY(fieldname*)`
+* `GROUPBY(fieldname*)` all fields of select must be in format `variable=expression` where `expression` can be the variable itself e.g. `tags.path=tags.path`  
 * `ORDERBY(order_expression*)`
 * `SUBSTR(expression,integer)`: substring, if done with objects and array, first serializes to json string
 * `MSTODATE(expression_string)`: convert to readable date in format YYYY/MM/DD HH:MM:SS.SSSS
 * `WRAP(expression,integer,string)`: wrap the string in blocks of integer length using string as separator
 
-In the select the expression are evaluated in this order
-
-* WHERE
-* GROUPBY
-* WHAT
-* ORDERBY
 
 ### Examples
 
