@@ -122,11 +122,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
         if(format.equalsIgnoreCase("json")) {
             respondJson(response, result.getRows());
         }else if(format.equalsIgnoreCase("html")) {
-            var output = new StringOutput();
-            resolversFactory.render("global/report_plugin/html.jte",result,output);
-            response.addHeader("Content-type","text/html");
-            response.setResponseText(new TextNode(output.toString()));
-            response.setStatusCode(200);
+            resolversFactory.render("global/report_plugin/html.jte",result,response);
         }else if(format.equalsIgnoreCase("csv")) {
             var sb = new StringBuilder();
             List<String> fields = result.getFields();
@@ -170,11 +166,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             method = "GET", id = "GET /global/plugins/report-plugin/report/search")
     public void retrieveHostsPage(Request reqp, Response response) {
         var model = retrieveData(reqp);
-        var output = new StringOutput();
-        resolversFactory.render("global/report_plugin/search.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("global/report_plugin/search.jte",model,response);
     }
 
     private GlobalReportResult retrieveData(Request reqp) {

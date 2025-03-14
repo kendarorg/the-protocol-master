@@ -2,7 +2,7 @@ package org.kendar.mqtt.plugins;
 
 import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.MqttContext;
-import org.kendar.mqtt.apis.MqttPublishPluginApis;
+import org.kendar.mqtt.plugins.apis.MqttPublishPluginApis;
 import org.kendar.mqtt.fsm.PublishAck;
 import org.kendar.mqtt.fsm.PublishRec;
 import org.kendar.mqtt.fsm.PublishRel;
@@ -11,6 +11,7 @@ import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.PluginSettings;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 
 import java.util.List;
@@ -20,9 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MqttPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettings> {
     private final ConcurrentHashMap<Integer, PublishRel> expectPubRel = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, PublishAck> expectPubAck = new ConcurrentHashMap<>();
+    private final MultiTemplateEngine resolversFactory;
 
-    public MqttPublishPlugin(JsonMapper mapper) {
+    public MqttPublishPlugin(JsonMapper mapper, MultiTemplateEngine resolversFactory) {
         super(mapper);
+        this.resolversFactory = resolversFactory;
     }
 
     @Override
@@ -71,7 +74,7 @@ public class MqttPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettin
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new MqttPublishPluginApis(this, getId(), getInstanceId()));
+        return List.of(new MqttPublishPluginApis(this, getId(), getInstanceId(),resolversFactory));
     }
 
     public void expectPubRec(MqttContext context, PublishRel pubRel) {

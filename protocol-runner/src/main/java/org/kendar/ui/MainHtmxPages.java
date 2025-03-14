@@ -36,12 +36,8 @@ public class MainHtmxPages implements FilteringClass {
             pathAddress = "/",
             method = "GET", id = "GET /")
     public void root(Request request, Response response) {
-        var output = new StringOutput();
         var settings = diService.getInstance(GlobalSettings.class);
-        resolversFactory.render("index.jte",settings,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("index.jte",settings,response);
     }
 
 }

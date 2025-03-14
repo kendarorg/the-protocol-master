@@ -1,4 +1,4 @@
-package org.kendar.mqtt.apis;
+package org.kendar.mqtt.plugins.apis;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.kendar.annotations.HttpMethodFilter;
@@ -11,16 +11,18 @@ import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.MimeChecker;
 import org.kendar.mqtt.MqttContext;
-import org.kendar.mqtt.apis.dtos.MqttConnection;
-import org.kendar.mqtt.apis.dtos.PublishMqttMessage;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.Publish;
 import org.kendar.mqtt.fsm.PublishAck;
 import org.kendar.mqtt.fsm.PublishRel;
 import org.kendar.mqtt.plugins.MqttPublishPlugin;
+import org.kendar.mqtt.plugins.apis.dtos.MqttConnection;
+import org.kendar.mqtt.plugins.apis.dtos.MqttConnections;
+import org.kendar.mqtt.plugins.apis.dtos.PublishMqttMessage;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ContentData;
 
 import java.util.ArrayList;
@@ -30,8 +32,12 @@ import static org.kendar.apis.ApiUtils.respondJson;
 
 @HttpTypeFilter()
 public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttPublishPlugin> {
-    public MqttPublishPluginApis(MqttPublishPlugin descriptor, String id, String instanceId) {
+    private final MultiTemplateEngine resolversFactory;
+
+    public MqttPublishPluginApis(MqttPublishPlugin descriptor, String id, String instanceId
+            , MultiTemplateEngine resolversFactory) {
         super(descriptor, id, instanceId);
+        this.resolversFactory = resolversFactory;
     }
 
     @HttpMethodFilter(
@@ -49,6 +55,11 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/publish-plugin"})
     public void getConnections(Request request, Response response) {
+        var result = loadConnections();
+        respondJson(response, result);
+    }
+
+    private ArrayList<MqttConnection> loadConnections() {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<MqttConnection>();
         for (var ccache : pInstance.getContextsCache().entrySet()) {
@@ -69,7 +80,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             }
 
         }
-        respondJson(response, result);
+        return result;
     }
 
     @HttpMethodFilter(
@@ -113,6 +124,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             dataToSend = messageData.getBody().getBytes();
         }
 
+        var sentData =false;
 
         for (var contxtKvp : pInstance.getContextsCache().entrySet()) {
             var context = (MqttContext) contxtKvp.getValue();
@@ -125,7 +137,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             if (topicAvailable.isEmpty()) {
                 continue;
             }
-
+            sentData=true;
             var packetIdentifier = (short) context.packetToUse();
             var message = new Publish();
             message.setPacketIdentifier(packetIdentifier);
@@ -170,6 +182,22 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             }
             context.write(message);
         }
+        if(!sentData) {
+            throw new RuntimeException("No existing topic to send to");
+        }
 
+    }
+
+
+    @HttpMethodFilter(
+            pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/connections",
+            method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/connections")
+    public void retrieveConnections(Request request, Response response) {
+
+        var connections = loadConnections();
+        var model = new MqttConnections();
+        model.setConnections(connections);
+        model.setInstanceId(getProtocolInstanceId());
+        resolversFactory.render("mqtt/publish_plugin/connections.jte",model,response);
     }
 }

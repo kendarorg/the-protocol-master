@@ -41,11 +41,7 @@ public class StorageHtmx implements FilteringClass {
             pathAddress = "/storage",
             method = "GET", id = "GET /storage")
     public void storage(Request request, Response response) {
-        var output = new StringOutput();
-        resolversFactory.render("storage.jte",null,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("storage.jte",null,response);
     }
 
     @HttpMethodFilter(
@@ -64,11 +60,7 @@ public class StorageHtmx implements FilteringClass {
                     map(instanceId -> new FileTreeItemDto(path, instanceId, true)).toList());
         }
 
-        var output = new StringOutput();
-        resolversFactory.render("storage/tree.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("storage/tree.jte",model,response);
     }
 
     @HttpMethodFilter(
@@ -87,11 +79,7 @@ public class StorageHtmx implements FilteringClass {
                     map(instanceId -> new FileTreeItemDto(path, instanceId, false)).toList());
         }
 
-        var output = new StringOutput();
-        resolversFactory.render("storage/files.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("storage/files.jte",model,response);
     }
 
     @HttpMethodFilter(
@@ -104,11 +92,7 @@ public class StorageHtmx implements FilteringClass {
             var data = repository.readFile(path);
             model.setContent(data);
             model.setPath(path);
-        var output = new StringOutput();
-        resolversFactory.render("storage/file.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("storage/file.jte",model,response);
     }
 
 

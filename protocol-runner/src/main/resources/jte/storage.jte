@@ -15,42 +15,65 @@
         }
     }
 
-    var selectedElement=null;
-    var selectedPath=null;
-    function toggle(newElement){
-        newElement+="_name";
-        if(selectedElement!=null && selectedElement!=newElement){
+    var selectedElement = null;
+    var selectedPath = null;
+
+    function toggle(newElement) {
+        newElement += "_name";
+        if (selectedElement != null && selectedElement != newElement) {
             htmx.find(selectedElement).classList.toggle("selectedClass")
             selectedElement = newElement;
             htmx.find(newElement).classList.toggle("selectedClass")
-        }else if(selectedElement ==null){
+        } else if (selectedElement == null) {
             selectedElement = newElement;
             htmx.find(newElement).classList.toggle("selectedClass")
         }
 
     }
-    function openTree(target,path) {
-        selectedPath=path;
-        htmx.ajax('GET', '/storage/tree?parent='+path, {target:target, swap:'outerHTML'}).then(()=>openFiles(path)).then(()=>toggle(target));
+
+    function resetFiles(path) {
+        if (path.localeCompare(selectedPath) != 0) {
+            var item =htmx.find("#fileContainerData");
+            if(item) {
+                htmx.remove(item);
+            }
+        }
     }
+
+    function openTree(target, path) {
+        resetFiles(path);
+        selectedPath = path;
+        htmx.ajax('GET', '/storage/tree?parent=' + path, {
+            target: target,
+            swap: 'outerHTML'
+        }).then(() => openFiles(path)).then(() => toggle(target));
+    }
+
     function openFiles(path) {
-        selectedPath=path;
-        htmx.ajax('GET', '/storage/files?parent='+path, "#resultsContainer");
-    }
-    function openFile(path,name) {
-        htmx.ajax('GET', '/storage/file?parent='+path+'&name='+name, "#resultsContainer");
+        resetFiles(path);
+        selectedPath = path;
+        htmx.ajax('GET', '/storage/files?parent=' + path, "#resultsContainer");
     }
 
-    function closeTree(target,path) {
-        selectedPath=path;
-        htmx.ajax('GET', '/storage/tree?close=true&parent='+path, {target:target, swap:'outerHTML'}).then(()=>openFiles(path)).then(()=>toggle(target));
+    function openFile(path, name) {
+        htmx.ajax('GET', '/storage/file?parent=' + path + '&name=' + name, "#fileContainer");
     }
 
-    function saveFile(path,data,callback) {
-        return sendData('/storage/file?parent='+path, 'POST', data, 'application/json',callback)
+    function closeTree(target, path) {
+        resetFiles(path);
+        selectedPath = path;
+        htmx.ajax('GET', '/storage/tree?close=true&parent=' + path, {
+            target: target,
+            swap: 'outerHTML'
+        }).then(() => openFiles(path)).then(() => toggle(target));
     }
+
+    function saveFile(path, data, callback) {
+        return sendData('/storage/file?parent=' + path, 'POST', data, 'application/json', callback)
+    }
+
     function deleteFile(path) {
-        if (confirm("You want to remove "+path+"?") == true) {
+        if (confirm("You want to remove " + path + "?") == true) {
             return getData('/storage/file?parent=' + path, 'delete', 'application/json')
         }
     }
@@ -136,7 +159,10 @@
 
                     <div class="panel-body">
                         <div class="container-fluid">
-                            <div class="col-xs-4" >
+                            <div class="col-xs-12">
+                                <div id="fileContainer"></div>
+                            </div>
+                            <div class="col-xs-4">
                                 <ul class="tree" style="list-style-type: none;">
                                     <li hx-swap="outerHTML" hx-get="/storage/tree?parent=" hx-trigger="load"></li>
                                 </ul>

@@ -5,9 +5,9 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.junit.jupiter.api.*;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
-import org.kendar.mqtt.apis.MqttPublishPluginApis;
-import org.kendar.mqtt.apis.dtos.MqttConnection;
-import org.kendar.mqtt.apis.dtos.PublishMqttMessage;
+import org.kendar.mqtt.plugins.apis.MqttPublishPluginApis;
+import org.kendar.mqtt.plugins.apis.dtos.MqttConnection;
+import org.kendar.mqtt.plugins.apis.dtos.PublishMqttMessage;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
