@@ -80,7 +80,7 @@ public class DataTypesTest extends MySqlBasicTest {
                 //TODO Arguments.of("xml",)
                 Arguments.of("blob", "Bytes", new byte[]{1, 2, 3, 4}),
                 Arguments.of("timestamp", "Timestamp",
-                        Timestamp.valueOf("2022-03-05 12:38:18")),
+                        Timestamp.valueOf("2022-03-05 12:38:18.0")),
                 Arguments.of("time|time", "Time",
                         new Time(4, 5, 6)),
                 Arguments.of("date_ext|date", "Date",

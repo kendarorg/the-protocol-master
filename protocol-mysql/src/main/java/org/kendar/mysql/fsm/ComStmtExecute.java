@@ -105,7 +105,8 @@ public class ComStmtExecute extends ProtoState {
                                         inputBuffer.get());
                                 break;
                             default: //all fields set (11)
-                                SimpleDateFormat outDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                SimpleDateFormat outDateFormat = new SimpleDateFormat(
+                                        "yyyy-MM-dd HH:mm:ss");
                                 ((Calendar) value).set(
                                         inputBuffer.readUB2(),
                                         inputBuffer.get() - 1,
@@ -113,8 +114,13 @@ public class ComStmtExecute extends ProtoState {
                                         inputBuffer.get(),
                                         inputBuffer.get(),
                                         inputBuffer.get());
-                                var microSec = String.format("%06d", inputBuffer.readUB4());
-                                String s = outDateFormat.format(((Calendar) value).getTime()) + "." + microSec;
+
+
+                                String s = outDateFormat.format(((Calendar) value).getTime());
+                                if(mysqlFieldType==0x07){
+                                    var microSec = String.format("%06d", inputBuffer.readUB4());
+                                    s+= "." + microSec;
+                                }
                                 value = java.sql.Timestamp.valueOf(s);
                                 break;
                         }
