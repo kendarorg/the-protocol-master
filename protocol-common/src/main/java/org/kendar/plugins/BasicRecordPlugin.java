@@ -2,7 +2,9 @@ package org.kendar.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.events.*;
+import org.kendar.plugins.apis.BaseRecordPluginApis;
 import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
@@ -17,6 +19,7 @@ import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -29,12 +32,14 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BasicRecordPlugin.class);
     protected final StorageRepository repository;
+    private final MultiTemplateEngine resolversFactory;
     private boolean ignoreTrivialCalls = true;
     private PluginFileManager storage;
 
-    public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage) {
+    public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage, MultiTemplateEngine resolversFactory) {
         super(mapper);
         this.repository = storage;
+        this.resolversFactory = resolversFactory;
     }
 
     @Override
@@ -160,6 +165,11 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
                 terminate();
             }
         }
+    }
+
+
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new BaseRecordPluginApis(this, getId(), getInstanceId(),storage,resolversFactory));
     }
 
     @Override

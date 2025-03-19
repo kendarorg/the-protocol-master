@@ -89,7 +89,7 @@ public class AmqpBasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         var mapper = new JsonMapper();
-        recordPlugin = new AmqpRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        recordPlugin = new AmqpRecordPlugin(mapper, storage,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = new AmqpPublishPlugin(mapper,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         errorPlugin= new AmqpNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(80));

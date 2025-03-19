@@ -34,7 +34,11 @@ public class ApiUtils {
 
     public static void respondJson(Response resp, Object toSerialiez) {
         resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-        resp.setResponseText(mapper.toJsonNode(toSerialiez));
+        if(toSerialiez instanceof String) {
+            resp.setResponseText(new TextNode((String)toSerialiez));
+        }else {
+            resp.setResponseText(mapper.toJsonNode(toSerialiez));
+        }
     }
 
 

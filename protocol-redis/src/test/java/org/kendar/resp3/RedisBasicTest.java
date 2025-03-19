@@ -23,6 +23,7 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.RedisImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
@@ -78,7 +79,7 @@ public class RedisBasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new RedisRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        var pl = new RedisRecordPlugin(mapper, storage,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
 
         var rep = new RedisReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         errorPlugin= new RedisNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));

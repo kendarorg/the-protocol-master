@@ -125,7 +125,7 @@ public class MqttBasicTest {
         var pls = new BasicAysncRecordPluginSettings();
         pls.setResetConnectionsOnStart(false);
         var mapper = new JsonMapper();
-        var pl = new MqttRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(),
+        var pl = new MqttRecordPlugin(mapper, storage,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(),
                 pls);
         var rep = new MqttReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         publishPlugin = (MqttPublishPlugin) new MqttPublishPlugin(mapper,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());

@@ -14,6 +14,7 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 
 import java.util.List;
@@ -21,8 +22,8 @@ import java.util.List;
 public abstract class JdbcRecordPlugin extends BasicRecordPlugin<BasicRecordPluginSettings> {
 
 
-    public JdbcRecordPlugin(JsonMapper mapper, StorageRepository storage) {
-        super(mapper, storage);
+    public JdbcRecordPlugin(JsonMapper mapper, StorageRepository storage, MultiTemplateEngine resolversFactory) {
+        super(mapper, storage,resolversFactory);
     }
 
     @Override

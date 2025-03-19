@@ -20,6 +20,7 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.MysqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
@@ -93,7 +94,7 @@ public class MySqlBasicTest {
         errorPlugin= new MySqlNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin= new MySqlLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
 
-        var pl = new MySqlRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new MySqlRecordPlugin(mapper, storage,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
         var pl1 = new MySqlMockPlugin(mapper, storage);
         var global = new GlobalSettings();
@@ -156,7 +157,7 @@ public class MySqlBasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new MySqlRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new MySqlRecordPlugin(mapper, storage,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
         var pl1 = new MySqlMockPlugin(mapper, storage);

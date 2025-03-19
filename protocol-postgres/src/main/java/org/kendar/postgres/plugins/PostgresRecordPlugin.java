@@ -10,6 +10,7 @@ import org.kendar.sql.parser.dtos.SimpleToken;
 import org.kendar.sql.parser.dtos.TokenType;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 
 import java.util.HashMap;
@@ -21,8 +22,8 @@ public class PostgresRecordPlugin extends JdbcRecordPlugin {
     private static final SqlStringParser parser = new SqlStringParser("$");
 
     @TpmConstructor
-    public PostgresRecordPlugin(JsonMapper mapper, StorageRepository storage) {
-        super(mapper, storage);
+    public PostgresRecordPlugin(JsonMapper mapper, StorageRepository storage, MultiTemplateEngine resolversFactory) {
+        super(mapper, storage,resolversFactory);
     }
 
     @Override

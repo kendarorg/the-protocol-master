@@ -20,6 +20,7 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.PostgresSqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.testcontainers.containers.Network;
@@ -102,7 +103,7 @@ public class PostgresBasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var pl = new PostgresRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new PostgresRecordPlugin(mapper, storage,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         var pl1 = new PostgresMockPlugin(mapper, storage);
         errorPlugin= new PostgresNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin= new PostgresLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));

@@ -14,6 +14,7 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.NullStorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -33,7 +34,7 @@ public class ReplayRecordFilters {
             events.clear();
             var mapper = new JsonMapper();
             EventsQueue.register("testtarget", (e) -> events.add(e), WriteItemEvent.class);
-            var rwPlugin = new HttpRecordPlugin(mapper, new NullStorageRepository()) {
+            var rwPlugin = new HttpRecordPlugin(mapper, new NullStorageRepository(),new MultiTemplateEngine()) {
                 @Override
                 public boolean isActive() {
                     return true;
