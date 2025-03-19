@@ -144,22 +144,20 @@ The format, is the following. When settings a regexp the replacements (like $1 e
 can be used. Please remind that what follows the founded request is added at the end!
 
 ```
-[
     {"toFind":"http://localhost/microservice.1",
     "toReplace":"https://remoteservice.com",
     "isRegex":false}
-]
 ```
 
 An example of complex regexp
 
 ```
-    "toFind": "http://localhost/multireg/([a-zA-Z0-9]+)/test/([0-9]+)",
+    {"toFind": "http://localhost/multireg/([a-zA-Z0-9]+)/test/([0-9]+)",
     "toReplace": "https://www.$1.com/test/$2",
-    "regex": true
+    "regex": true}
 ```
 
-The file is located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]/rewrite.json
+The files are located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]
 
 ### report-plugin
 

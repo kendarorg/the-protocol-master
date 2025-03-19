@@ -70,12 +70,13 @@ This is useful to generate "dynamic" responses
 
 The files are located into the "path" `[dataDir]/[protocol instance id]/[mock-plugin]
 
+
 ### rewrite-plugin
 
-To change some call, for example to rewrite all call to `localhost/microservice.1/*` to `remoteservice.com/*`
+To change some call, for example to rewrite all call to `SELECT * FROM XX` to `SELECT * FROM YY`
 This can be used to avoid configuring the proxy on the application
 
-The recording will contain the target address!
+The recording will contain the target call!
 
 * active: If it is active
 
@@ -98,7 +99,7 @@ An example of complex regexp
     "regex": true
 ```
 
-The file is located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]/rewrite.json
+The files are located into the "path" `[dataDir]/[protocol instance id]/[rewrite-plugin]
 
 ### Connect to different servers
 
