@@ -9,6 +9,9 @@
 
 
 <script type="text/javascript">
+    function cleanAccordionStatus(){
+        localStorage.setItem("accordionStatus","{}");
+    }
     function terminate() {
         if (confirm("You want to terminate the process?") == true) {
             getData("/api/global/terminate", "GET", () => {
@@ -56,6 +59,12 @@
                         <div class="input-group">
                             <a href="#" type="button" class="btn btn-warning" onclick="restart()">
                                 Restart
+                            </a>
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <a href="#" type="button" class="btn btn-success" onclick="cleanAccordionStatus()">
+                                Clean open accordions status
                             </a>
                         </div>
                         <br>

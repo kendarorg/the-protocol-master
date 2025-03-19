@@ -140,6 +140,8 @@ function downloadURI(uri, name) {
 // ACCORDION HANDLING
 // ===============================================
 
+
+
 function toggleAccordion(elementId) {
     var element = document.getElementById(elementId);
     if (element.classList.contains("in")) {
