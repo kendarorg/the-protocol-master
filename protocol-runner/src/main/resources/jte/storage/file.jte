@@ -1,5 +1,5 @@
 @param org.kendar.ui.dto.FileItemDto data
-<div id="fileContainer" style="max-width: 100%;" >
+<div id="resultsContainer" style="max-width: 100%;" >
     <form id="fileContainerData" style="max-width: 100%;">
         <div class="input-group" style="max-width: 100%;">
             <label for="fileContent" class="control-label">${data.getPath()}</label>

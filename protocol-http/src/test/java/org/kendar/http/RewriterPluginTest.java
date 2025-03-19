@@ -8,6 +8,7 @@ import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 
 import java.nio.file.Path;
@@ -20,7 +21,7 @@ public class RewriterPluginTest {
         var settings = new RewritePluginSettings();
         var storage = new FileStorageRepository(Path.of("src", "test", "resources", "data"));
         settings.setActive(true);
-        var target = new HttpRewritePlugin(new JsonMapper(), storage);
+        var target = new HttpRewritePlugin(new JsonMapper(), storage,new MultiTemplateEngine());
         var global = new GlobalSettings();
         //global.putService("storage", new NullStorageRepository());
 

@@ -10,11 +10,14 @@
                class="form-control">
     </div>
     <br>
-    <ul style="list-style-type: none;">
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>File</th>
+        </tr>
         @for(var file:data.getChildren())
             @if(!file.isDirectory())
-                <li><span onclick="openFile('${file.getPath()}','${file.getName()}')">${file.getName()}</span></li>
+                <tr><td><span onclick="openFile('${file.getPath()}','${file.getName()}')">${file.getName()}</span></td></tr>
             @endif
         @endfor
-    </ul>
+    </table>
 </div>

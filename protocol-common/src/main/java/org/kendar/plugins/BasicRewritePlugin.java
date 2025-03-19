@@ -1,11 +1,9 @@
 package org.kendar.plugins;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
-import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
+import org.kendar.plugins.apis.BaseRewritePluginApis;
+import org.kendar.plugins.base.*;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -13,6 +11,7 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItem;
 import org.kendar.utils.ReplacerItemInstance;
@@ -28,11 +27,13 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     private static final Logger log = LoggerFactory.getLogger(BasicRewritePlugin.class);
     private final List<ReplacerItemInstance> replacers = new ArrayList<>();
     private final StorageRepository repository;
+    private final MultiTemplateEngine resolversFactory;
     private PluginFileManager storage;
 
-    public BasicRewritePlugin(JsonMapper mapper, StorageRepository repository) {
+    public BasicRewritePlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
         super(mapper);
         this.repository = repository;
+        this.resolversFactory = resolversFactory;
         EventsQueue.register(UUID.randomUUID().toString(), (e) -> handleSettingsChanged(), StorageReloadedEvent.class);
     }
 
@@ -48,6 +49,10 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     @Override
     public Class<?> getSettingClass() {
         return RewritePluginSettings.class;
+    }
+
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new BaseRewritePluginApis(this, getId(), getInstanceId(),storage,resolversFactory));
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object request, Object response) {
@@ -74,17 +79,14 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        var rewriteFile = storage.readFile( "rewrite");
-        if (rewriteFile == null) return false;
-
-        try {
-            for (var replacer : mapper.deserialize(rewriteFile, new TypeReference<List<ReplacerItem>>() {
-            })) {
+        for(var rewriteFile:storage.listFiles()){
+            try {
+                var fileData = storage.readFile(rewriteFile);
+                var replacer = mapper.deserialize(fileData, ReplacerItem.class);
                 replacers.add(new ReplacerItemInstance(replacer, useTrailing()));
+            }catch(Exception e){
+                log.error("Failed to load rewrite file {}",rewriteFile, e);
             }
-        } catch (Exception e) {
-            log.error("Unable to read rewrite file", e);
-            throw new RuntimeException(e);
         }
         return true;
     }

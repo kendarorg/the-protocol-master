@@ -158,6 +158,9 @@
         },
         "mock-plugin": {
           "active": false
+        },
+        "rewrite-plugin": {
+          "active": false
         }
       }
     },

@@ -30,6 +30,7 @@ import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
@@ -197,7 +198,7 @@ public class BasicTest {
                 new HttpLatencyPlugin(mapper),
                 new HttpRateLimitPlugin(mapper, storage),
                 new HttpMockPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, mockSettings),
-                new HttpRewritePlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
+                new HttpRewritePlugin(mapper, storage,new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
         baseProtocol.initialize();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

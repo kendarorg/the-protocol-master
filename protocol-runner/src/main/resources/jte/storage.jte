@@ -56,7 +56,10 @@
     }
 
     function openFile(path, name) {
-        htmx.ajax('GET', '/storage/file?parent=' + path + '&name=' + name, "#fileContainer");
+        htmx.ajax('GET', '/storage/file?parent=' + path + '&name=' + name, {
+            target:"#resultsContainer",
+            swap: 'outerHTML'
+        });
     }
 
     function closeTree(target, path) {
@@ -169,7 +172,7 @@
                             </div>
 
                             <div class="col-xs-8">
-                                <div id="resultsContainer" hx-get="/storage/files?parent=" hx-trigger="load">
+                                <div id="resultsContainer" hx-get="/storage/files?parent=" target="outerHTML" hx-trigger="load">
 
                                 </div>
                             </div>
