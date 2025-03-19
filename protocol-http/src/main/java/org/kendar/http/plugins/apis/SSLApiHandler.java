@@ -126,7 +126,7 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/ssl-plugin"})
     public void addHost(Request reqp, Response resp) {
         var host = reqp.getQuery("host");
-        EventsQueue.send(new SSLAddHostEvent(host));
+        EventsQueue.send(new SSLAddHostEvent(host,getProtocolInstanceId()));
         protocolSettings.getSSL().getHosts().add(host);
         respondJson(resp,protocolSettings.getSSL().getHosts());
     }

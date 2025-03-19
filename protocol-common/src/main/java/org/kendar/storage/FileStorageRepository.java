@@ -614,13 +614,13 @@ public class FileStorageRepository extends StorageRepository {
     public List<String> listFiles(String ... path){
         var realPath = buildRealPath(path);
         return listFilesUsingJavaIO(realPath.toString()).stream().map(s->s.getName().replace(".json", "")
-        ).collect(Collectors.toList());
+        ).sorted().collect(Collectors.toList());
     }
 
 
     public List<String> listDirs(String ... path){
         var realPath = buildRealPath(path);
-        return listDirsUsingJavaIO(realPath.toString()).stream().map(s->s.getName()).collect(Collectors.toList());
+        return listDirsUsingJavaIO(realPath.toString()).stream().map(s->s.getName()).sorted().collect(Collectors.toList());
     }
 
     public boolean fileExists(String ... path){

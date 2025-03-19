@@ -33,8 +33,8 @@
 
     function resetFiles(path) {
         if (path.localeCompare(selectedPath) != 0) {
-            var item =htmx.find("#fileContainerData");
-            if(item) {
+            var item = htmx.find("#fileContainerData");
+            if (item) {
                 htmx.remove(item);
             }
         }
@@ -57,7 +57,7 @@
 
     function openFile(path, name) {
         htmx.ajax('GET', '/storage/file?parent=' + path + '&name=' + name, {
-            target:"#resultsContainer",
+            target: "#resultsContainer",
             swap: 'outerHTML'
         });
     }
@@ -166,13 +166,23 @@
                                 <div id="fileContainer"></div>
                             </div>
                             <div class="col-xs-4">
-                                <ul class="tree" style="list-style-type: none;">
-                                    <li hx-swap="outerHTML" hx-get="/storage/tree?parent=" hx-trigger="load"></li>
-                                </ul>
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <ul class="tree" style="list-style-type: none;">
+                                            <li hx-swap="outerHTML" hx-get="/storage/tree?parent="
+                                                hx-trigger="load"></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-xs-8">
-                                <div id="resultsContainer" hx-get="/storage/files?parent=" target="outerHTML" hx-trigger="load">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div id="resultsContainer" hx-get="/storage/files?parent=" target="outerHTML"
+                                             hx-trigger="load">
+                                        </div>
+                                    </div>
 
                                 </div>
                             </div>

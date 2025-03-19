@@ -48,7 +48,7 @@
     </div>
     <br>
     <div class="input-group">
-        <label for="testTarget" class="control-label">To Replace</label>
+        <label for="testTarget" class="control-label">To Verify</label>
         <div>
             <textarea id="testTarget" rows="4" cols="60" class="form-control"></textarea>
         </div>

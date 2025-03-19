@@ -25,8 +25,8 @@
         data.regex = document.getElementById("regex").checked;
         sendData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/rewrite/' + filename, 'POST',
             JSON.stringify(data), 'application/json', () => {
-            location.reload()
-        })
+                location.reload()
+            })
     }
 
     function testMatching() {
@@ -34,11 +34,11 @@
         var data = retrieveValues({
             toFind: null,
             toReplace: null,
-            testTarget:null
+            testTarget: null
         });
         data.regex = document.getElementById("regex").checked;
         sendData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/test', 'POST',
-            JSON.stringify(data), 'application/json', (code,result) => {
+            JSON.stringify(data), 'application/json', (code, result) => {
                 alert(result);
             })
     }
@@ -56,7 +56,7 @@
                href="#collapseSpecificPlugin"
                onclick="toggleAccordion('collapseSpecificPlugin')"
                aria-expanded="true" aria-controls="collapseSpecificPlugin">
-                Error plugin settings
+                Rewrite plugin settings
             </a>
         </h4>
     </div>
@@ -65,30 +65,40 @@
         <div class="panel-body">
             <div class="container-fluid">
                 <div class="col-xs-4">
-                    <div class="input-group">
+
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="input-group">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button"
                                     onclick="openSpecificFile(retrieveValue('createNewFile'))">
                                 Create</button>
                         </span>
-                        <input id="createNewFile" type="text" size="30"
-                               class="form-control">
+                                <input id="createNewFile" type="text" size="30"
+                                       class="form-control">
+                            </div>
+                            <br>
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>Replace Id</th>
+                                </tr>
+                                @for(var file:files)
+                                    <tr>
+                                        <td><span onclick="openSpecificFile('${file}')">${file}</span></td>
+                                    </tr>
+                                @endfor
+                            </table>
+                        </div>
                     </div>
-                    <br>
-                    <table class="table table-bordered table-striped">
-                        <tr>
-                            <th>Replace Id</th>
-                        </tr>
-                        @for(var file:files)
-                            <tr>
-                                <td><span onclick="openSpecificFile('${file}')">${file}</span></td>
-                            </tr>
-                        @endfor
-                    </table>
 
                 </div>
                 <div class="col-xs-8">
-                    <div id="singleFile"></div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div id="singleFile"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

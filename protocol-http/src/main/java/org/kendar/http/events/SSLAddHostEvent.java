@@ -6,11 +6,22 @@ import org.kendar.events.TpmEvent;
 public class SSLAddHostEvent implements TpmEvent{
     private String host;
 
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    private String instanceId;
+
     public SSLAddHostEvent() {
     }
 
-    public SSLAddHostEvent(String host) {
+    public SSLAddHostEvent(String host,String instanceId) {
         this.host = host;
+        this.instanceId = instanceId;
     }
 
     public String getHost() {
