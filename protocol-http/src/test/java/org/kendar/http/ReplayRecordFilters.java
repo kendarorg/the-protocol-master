@@ -18,6 +18,7 @@ import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
+import org.kendar.utils.parser.SimpleParser;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -34,7 +35,8 @@ public class ReplayRecordFilters {
             events.clear();
             var mapper = new JsonMapper();
             EventsQueue.register("testtarget", (e) -> events.add(e), WriteItemEvent.class);
-            var rwPlugin = new HttpRecordPlugin(mapper, new NullStorageRepository(),new MultiTemplateEngine()) {
+            var rwPlugin = new HttpRecordPlugin(mapper, new NullStorageRepository(),
+                    new MultiTemplateEngine(),new SimpleParser()) {
                 @Override
                 public boolean isActive() {
                     return true;

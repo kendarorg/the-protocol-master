@@ -7,11 +7,13 @@ import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 
 @TpmService(tags = "mongodb")
 public class MongoRecordPlugin extends BasicRecordPlugin<BasicRecordPluginSettings> {
-    public MongoRecordPlugin(JsonMapper mapper, StorageRepository storage, MultiTemplateEngine resolversFactory) {
-        super(mapper, storage,resolversFactory);
+    public MongoRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                             MultiTemplateEngine resolversFactory, SimpleParser parser) {
+        super(mapper, storage,resolversFactory,parser);
     }
 
     @Override

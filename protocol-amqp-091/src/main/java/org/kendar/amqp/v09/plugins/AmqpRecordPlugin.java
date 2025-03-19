@@ -13,6 +13,7 @@ import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +26,9 @@ public class AmqpRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSe
             "HeaderFrame", "BasicPublish", "BodyFrame", "BasicAck", "ChannelClose", "ConnectionClose",
             "QueueDeclare", "ExchangeDeclare", "QueueDelete", "ExchangeDelete");
 
-    public AmqpRecordPlugin(JsonMapper mapper, StorageRepository storage, MultiTemplateEngine resolversFactory) {
-        super(mapper, storage,resolversFactory);
+    public AmqpRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                            MultiTemplateEngine resolversFactory, SimpleParser parser) {
+        super(mapper, storage,resolversFactory,parser);
     }
 
     private static int getConsumeId(JsonNode data, int consumeId) {

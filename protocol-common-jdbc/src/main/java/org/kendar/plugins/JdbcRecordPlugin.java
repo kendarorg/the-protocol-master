@@ -16,14 +16,16 @@ import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 
 import java.util.List;
 
 public abstract class JdbcRecordPlugin extends BasicRecordPlugin<BasicRecordPluginSettings> {
 
 
-    public JdbcRecordPlugin(JsonMapper mapper, StorageRepository storage, MultiTemplateEngine resolversFactory) {
-        super(mapper, storage,resolversFactory);
+    public JdbcRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                            MultiTemplateEngine resolversFactory, SimpleParser parser) {
+        super(mapper, storage,resolversFactory,parser);
     }
 
     @Override

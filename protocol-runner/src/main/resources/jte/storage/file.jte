@@ -17,6 +17,11 @@
                     onclick="deleteFile('${data.getPath()}')">
                 Delete
             </button>
+            &nbsp;
+            <button type="button" class="btn  btn-success"
+                    onclick="prettifyJson('fileContent')">
+                Prettify Json
+            </button>
         </div>
     </form>
 </div>

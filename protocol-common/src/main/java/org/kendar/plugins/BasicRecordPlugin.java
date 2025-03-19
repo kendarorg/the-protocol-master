@@ -22,6 +22,7 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
+import org.kendar.utils.parser.SimpleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +34,16 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     private static final Logger log = LoggerFactory.getLogger(BasicRecordPlugin.class);
     protected final StorageRepository repository;
     private final MultiTemplateEngine resolversFactory;
+    private final SimpleParser parser;
     private boolean ignoreTrivialCalls = true;
     private PluginFileManager storage;
 
-    public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage, MultiTemplateEngine resolversFactory) {
+    public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                             MultiTemplateEngine resolversFactory, SimpleParser parser) {
         super(mapper);
         this.repository = storage;
         this.resolversFactory = resolversFactory;
+        this.parser = parser;
     }
 
     @Override
@@ -169,7 +173,8 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
 
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new BaseRecordPluginApis(this, getId(), getInstanceId(),storage,resolversFactory));
+        return List.of(new BaseRecordPluginApis(this, getId(), getInstanceId(),
+                storage,resolversFactory,parser));
     }
 
     @Override

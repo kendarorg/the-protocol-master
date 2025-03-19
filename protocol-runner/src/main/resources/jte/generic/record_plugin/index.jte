@@ -16,6 +16,14 @@
         })
     }
 
+    function searchFiles(tpmql){
+        return htmx.ajax('GET', '/protocols/${data.getInstanceId()}/plugins/${data.getId()}/file?'+
+            "tpmql="+encodeURIComponent(tpmql), {
+            target: '#filesList',
+            swap: 'outerHTML'
+        })
+    }
+
     function saveContentFile() {
         var filename = retrieveValue("currentFileName");
         var data = retrieveValue('body');
@@ -62,24 +70,18 @@
                             <br>
                             <div class="input-group">
                                 <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button"
-                                            onclick="openSpecificFile(retrieveValue('searchFiles'))">
+                                    <button class="btn btn-default" type="button" onclick="searchFiles(retrieveValue('searchFiles'))">
                                         Search</button>
                                 </span>
                                 <input id="searchFiles" type="text"
                                        class="form-control">
                             </div>
                             <br>
-                            <table class="table table-bordered table-striped">
-                                <tr>
-                                    <th>Replace Id</th>
-                                </tr>
-                                @for(var file:files)
-                                    <tr>
-                                        <td><span onclick="openSpecificFile('${file}')">${file}</span></td>
-                                    </tr>
-                                @endfor
-                            </table>
+                            <div id="filesList" hx-get="/protocols/${data.getInstanceId()}/plugins/record-plugin/file"
+                                 target="outerHTML"
+                                 hx-trigger="load">
+                            </div>
+
                         </div>
                     </div>
 

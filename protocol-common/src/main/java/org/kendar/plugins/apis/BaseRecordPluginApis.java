@@ -14,6 +14,10 @@ import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
 import org.kendar.storage.PluginFileManager;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ReplacerItem;
+import org.kendar.utils.parser.SimpleParser;
+import org.kendar.utils.parser.Token;
+
+import java.util.ArrayList;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
@@ -24,12 +28,15 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
 
     private final PluginFileManager storage;
     private final MultiTemplateEngine resolversFactory;
+    private final SimpleParser parser;
 
     public BaseRecordPluginApis(BasicRecordPlugin descriptor, String id, String instanceId,
-                                PluginFileManager storage, MultiTemplateEngine resolversFactory) {
+                                PluginFileManager storage, MultiTemplateEngine resolversFactory,
+                                SimpleParser parser) {
         super(descriptor, id, instanceId);
         this.storage = storage;
         this.resolversFactory = resolversFactory;
+        this.parser = parser;
     }
 
     @HttpMethodFilter(
@@ -62,7 +69,7 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
     public void getSingleFile(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("record");
-        respondJson(resp, new RecordItemFile(getProtocolInstanceId(),storage.getRepository().readFile("scenario",mockfile),mockfile));
+        respondJson(resp, new RecordItemFile(getProtocolInstanceId(), storage.getRepository().readFile("scenario", mockfile), mockfile));
     }
 
     @HttpMethodFilter(
@@ -83,7 +90,7 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
     public void putSingleFile(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("record");
         var inputData = reqp.getRequestText().toString();
-        storage.getRepository().writeFile(inputData,"scenario",mockfile);
+        storage.getRepository().writeFile(inputData, "scenario", mockfile);
         respondOk(resp);
     }
 
@@ -103,7 +110,7 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
     public void delSingleMock(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("record");
-        storage.getRepository().deleteFile("scenario",mockfile);
+        storage.getRepository().deleteFile("scenario", mockfile);
         respondOk(resp);
     }
 
@@ -112,13 +119,46 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
             method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/{id}")
     public void retrieveFile(Request reqp, Response response) {
         var fileId = reqp.getPathParameter("id");
-        var file = storage.getRepository().readFile("scenario",fileId);
-        if(file == null) {
+        var file = storage.getRepository().readFile("scenario", fileId);
+        if (file == null) {
             file = "{}";
             storage.writeFile(fileId, file);
         }
-        var model = new RecordItemFile(getProtocolInstanceId(),file,fileId);
-        resolversFactory.render("generic/record_plugin/single.jte",model,response);
+        var model = new RecordItemFile(getProtocolInstanceId(), file, fileId);
+        resolversFactory.render("generic/record_plugin/single.jte", model, response);
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/file",
+            method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/file")
+    public void retrieveFiles(Request reqp, Response response) {
+        var tpmqlstring = reqp.getQuery("tpmql");
+        Token tpmql = null;
+        if (tpmqlstring != null && !tpmqlstring.isEmpty()) {
+            tpmql = parser.parse(tpmqlstring);
+        }
+
+
+        var files = storage.getRepository().listFiles("scenario");
+        var result = new ArrayList<String>();
+
+
+        for (var file : files) {
+            if (!file.endsWith("." + getProtocolInstanceId())) continue;
+            if (file.startsWith("index.")) {
+                result.add(file);
+                continue;
+            }
+            if (tpmql != null) {
+                var si = mapper.toJsonNode(storage.getRepository().readFile("scenario", file));
+                if ((boolean) parser.evaluate(tpmql, si)) {
+                    result.add(file);
+                }
+            } else {
+                result.add(file);
+            }
+        }
+        resolversFactory.render("generic/record_plugin/list.jte", result, response);
     }
 
 }

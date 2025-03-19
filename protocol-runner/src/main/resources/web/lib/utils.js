@@ -136,6 +136,12 @@ function downloadURI(uri, name) {
 //         .catch(() => alert('An error sorry'));
 }
 
+function prettifyJson(elementId){
+    var raw = retrieveValue(elementId);
+    const obj = JSON.parse(raw);
+    document.getElementById(elementId).value = JSON.stringify(obj, null, 2);
+}
+
 // ===============================================
 // ACCORDION HANDLING
 // ===============================================

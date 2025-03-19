@@ -9,10 +9,15 @@
                 onclick="deleteContentFile()">
             Delete
         </button>
-        &nbsp;
+        &nbsp;&nbsp;
         <button type="button" class="btn  btn-success"
                 onclick="saveContentFile()">
             Update
+        </button>
+        &nbsp;
+        <button type="button" class="btn  btn-success"
+                onclick="prettifyJson('body')">
+            Prettify Json
         </button>
     </div>
     <br>
