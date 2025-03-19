@@ -29,6 +29,20 @@
         })
     }
 
+    function testMatching() {
+        var filename = retrieveValue("currentFileName");
+        var data = retrieveValues({
+            toFind: null,
+            toReplace: null,
+            testTarget:null
+        });
+        data.regex = document.getElementById("regex").checked;
+        sendData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/test', 'POST',
+            JSON.stringify(data), 'application/json', (code,result) => {
+                alert(result);
+            })
+    }
+
     function deleteContentFile() {
         getData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/rewrite/' + filename, 'DELETE', () => {
             location.reload()

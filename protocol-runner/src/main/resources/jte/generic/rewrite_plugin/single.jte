@@ -9,9 +9,15 @@
                 onclick="deleteContentFile()">
             Delete
         </button>
+        &nbsp;
         <button type="button" class="btn  btn-success"
                 onclick="saveContentFile()">
             Update
+        </button>
+        &nbsp;
+        <button type="button" class="btn  btn-success"
+                onclick="testMatching()">
+            Test
         </button>
     </div>
     <br>
@@ -38,6 +44,13 @@
         <label for="toReplace" class="control-label">To Replace</label>
         <div>
             <textarea id="toReplace" rows="4" cols="60" class="form-control">${data.getReplacerItem().getToReplace()}</textarea>
+        </div>
+    </div>
+    <br>
+    <div class="input-group">
+        <label for="testTarget" class="control-label">To Replace</label>
+        <div>
+            <textarea id="testTarget" rows="4" cols="60" class="form-control"></textarea>
         </div>
     </div>
     <br>

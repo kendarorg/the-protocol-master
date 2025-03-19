@@ -11,13 +11,14 @@ import org.kendar.apis.base.Response;
 import org.kendar.plugins.BasicRewritePlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.plugins.apis.dtos.ReplacerItemFile;
+import org.kendar.plugins.apis.dtos.TestReplacerItem;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
 import org.kendar.storage.PluginFileManager;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ReplacerItem;
+import org.kendar.utils.ReplacerItemInstance;
 
-import static org.kendar.apis.ApiUtils.respondJson;
-import static org.kendar.apis.ApiUtils.respondOk;
+import static org.kendar.apis.ApiUtils.*;
 
 @HttpTypeFilter()
 public class BaseRewritePluginApis extends ProtocolPluginApiHandlerDefault<BasicRewritePlugin> {
@@ -90,6 +91,38 @@ public class BaseRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basic
         storage.writeFile(mockfile, inputData);
         respondOk(resp);
         return true;
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/test",
+            method = "POST", id = "POST /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/test")
+    @TpmDoc(
+            description = "Test the expression",
+            requests = @TpmRequest(body = TestReplacerItem.class),
+            responses = {@TpmResponse(
+                    body = String.class
+            ), @TpmResponse(
+                    code = 404,
+                    body = Ko.class
+            ), @TpmResponse(
+                    code = 500,
+                    body = Ko.class
+            )},
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/rewrite-plugin"})
+    public void testReplacement(Request reqp, Response resp) {
+        try {
+            var data = reqp.getRequestText().toString();
+            var toCheck = mapper.deserialize(data, TestReplacerItem.class);
+            var instance = new ReplacerItemInstance(toCheck, false);
+            var result = instance.run(toCheck.getTestTarget());
+            if (!toCheck.getTestTarget().equalsIgnoreCase(result)) {
+                respondText(resp,result);
+            }else{
+                respondKo(resp,"Not matched");
+            }
+        }catch (Exception ex){
+            respondKo(resp,ex.getMessage());
+        }
     }
 
     @HttpMethodFilter(

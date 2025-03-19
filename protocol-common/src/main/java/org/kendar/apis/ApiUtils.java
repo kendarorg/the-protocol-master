@@ -38,9 +38,9 @@ public class ApiUtils {
     }
 
 
-    public static void respondText(Response resp, String toSerialiez) {
+    public static void respondText(Response resp, String data) {
         resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
-        resp.setResponseText(new TextNode(toSerialiez));
+        resp.setResponseText(new TextNode(data));
     }
 
     public static void respondFile(Response resp, byte[] data, String contentType, String name) {
