@@ -8,7 +8,11 @@ public class PluginFileManager {
     private final String instanceId;
     private final String pluginId;
 
-    public PluginFileManager(StorageRepository repository,String instanceId,String pluginId) {
+    public StorageRepository getRepository() {
+        return repository;
+    }
+
+    public PluginFileManager(StorageRepository repository, String instanceId, String pluginId) {
         this.repository = repository;
         this.instanceId = instanceId;
         this.pluginId = pluginId;

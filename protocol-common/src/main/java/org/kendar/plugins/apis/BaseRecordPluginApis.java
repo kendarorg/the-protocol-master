@@ -87,7 +87,7 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
         var mockfile = reqp.getPathParameter("record");
         var inputData = reqp.getRequestText().toString();
         mapper.deserialize(inputData, MockStorage.class);
-        storage.writeFile(mockfile, inputData);
+        storage.getRepository().writeFile(inputData,"scenario",mockfile);
         respondOk(resp);
         throw new NotImplementedException("SHOULD ADAPT THE INDEX");
     }
@@ -108,7 +108,7 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
     public boolean delSingleMock(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("record");
-        storage.deleteFile(mockfile);
+        storage.getRepository().deleteFile("scenario",mockfile);
         respondOk(resp);
         throw new NotImplementedException("SHOULD ADAPT THE INDEX");
     }
@@ -118,7 +118,7 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
             method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/{id}")
     public void retrieveFile(Request reqp, Response response) {
         var fileId = reqp.getPathParameter("id");
-        var file = storage.readFile(fileId);
+        var file = storage.getRepository().readFile("scenario",fileId);
         if(file == null) {
             file = "{}";
             storage.writeFile(fileId, file);
