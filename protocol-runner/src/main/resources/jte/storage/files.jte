@@ -3,7 +3,7 @@
     <div class="input-group">
         <span class="input-group-btn">
             <button class="btn btn-default" type="button"
-                    onclick="saveFile('${data.getPath()}/'+document.getElementById('createNewStorageFile').value,'',()=>openFiles('${data.getPath()}'))">
+                    onclick="saveFile('${data.getPath()}/'+retrieveValue('createNewStorageFile'),'',()=>openFiles('${data.getPath()}'))">
                 Create</button>
         </span>
         <input id="createNewStorageFile" type="text" size="30"

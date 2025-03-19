@@ -7,7 +7,7 @@
 <div class="panel-body" id="sslHostSettings">
     <script>
         function addHost(){
-            var val = document.getElementById('sslHostToAdd').value;
+            var val = retrieveValue('sslHostToAdd').;
             if(val!==null && val.length>0){
                 sendData('/api/protocols/${data.getInstanceId()}/plugins/ssl-plugin/hosts?host='+val,'POST',null,'application/json',()=>{
                     htmx.ajax('GET', '/protocols/${data.getInstanceId()}/plugins/ssl-plugin/hosts', {

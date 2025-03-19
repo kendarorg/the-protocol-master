@@ -1,9 +1,9 @@
 @param org.kendar.ui.dto.SinglePluginDto data
 <script>
     function searchReport() {
-        var tpmql = document.getElementById('tpmqlQuery').value;
-        var start = document.getElementById('tpmqlQueryStart').value;
-        var limit = document.getElementById('tpmqlQueryLimit').value;
+        var tpmql = retrieveValue('tpmqlQuery');
+        var start = retrieveValue('tpmqlQueryStart');
+        var limit = retrieveValue('tpmqlQueryLimit');
         htmx.ajax('GET',
             '/global/plugins/report-plugin/report/search?' +
             'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit,
@@ -11,9 +11,9 @@
     }
 
     function downloadReport(type) {
-        var tpmql = document.getElementById('tpmqlQuery').value;
-        var start = document.getElementById('tpmqlQueryStart').value;
-        var limit = document.getElementById('tpmqlQueryLimit').value;
+        var tpmql = retrieveValue('tpmqlQuery');
+        var start = retrieveValue('tpmqlQueryStart');
+        var limit = retrieveValue('tpmqlQueryLimit');
         downloadURI('/api/global/plugins/report-plugin/report?'+
             'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit+'&format='+type
         );

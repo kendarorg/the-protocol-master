@@ -9,7 +9,7 @@
         <br>
         <div class="input-group">
             <button type="button" class="btn btn-success"
-                    onclick="saveFile('${data.getPath()}',document.getElementById('fileContent').value,()=>openFile('${data.getPath()}'))">
+                    onclick="saveFile('${data.getPath()}',retrieveValue('fileContent'),()=>openFile('${data.getPath()}'))">
                 Update
             </button>
             &nbsp;

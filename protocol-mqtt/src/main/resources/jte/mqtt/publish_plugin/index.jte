@@ -9,14 +9,13 @@
     <script type="text/javascript">
         function sendQueueData() {
             var c = getSelectedConnection();
-            var topic = document.getElementById("topic").value
+            var topic = retrieveValue("topic")
 
             var path = '/api/protocols/${data.getInstanceId()}/plugins/publish-plugin/connections/' + c + '/' + topic;
-            var contentType = document.getElementById("contentType").value;
-            var toSend = {
-                contentType: contentType,
-                body: document.getElementById("message").value
-            }
+            var toSend = retrieveValues({
+                contentType: null,
+                body: null
+            });
             console.log("Sending");
             console.log(toSend);
 
@@ -61,8 +60,8 @@
                        value="">
             </div>
             <div class="input-group">
-                <label for="message" class="control-label">Message</label>
-                <textarea id="message" class="form-control" rows="10" cols="60"></textarea>
+                <label for="body" class="control-label">Message</label>
+                <textarea id="body" class="form-control" rows="10" cols="60"></textarea>
                 <br>
             </div>
             <div class="input-group">

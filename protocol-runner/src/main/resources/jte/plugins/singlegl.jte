@@ -56,7 +56,7 @@
                                     &nbsp;
                                     <button type="button" class="btn btn-danger"
                                             onclick="sendData('/api/global/plugins/${data.getId()}/settings','PUT',
-                                                    document.getElementById('settings').value,'application/json',()=>location.reload())">
+                                                    retrieveValue('settings'),'application/json',()=>location.reload())">
                                         Update Settings
                                     </button>
                                 </div>

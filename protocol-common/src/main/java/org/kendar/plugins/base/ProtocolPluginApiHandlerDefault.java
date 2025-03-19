@@ -8,9 +8,11 @@ import org.kendar.annotations.multi.TpmRequest;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
+import org.kendar.di.DiService;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.apis.Status;
+import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.utils.JsonMapper;
 
@@ -149,6 +151,9 @@ public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor>
         if (ProtocolPluginDescriptorBase.class.isAssignableFrom(pluginInstance.getClass())) {
             var settings = mapper.deserialize(reqp.getRequestText().toString(), pluginInstance.getSettingClass());
             var ppdb = (ProtocolPluginDescriptorBase) pluginInstance;
+            var globalSettings = DiService.getThreadContext().getInstance(GlobalSettings.class);
+            var pfk = globalSettings.getProtocolForKey(ppdb.getInstanceId());
+            pfk.getPlugins().put(pluginInstance.getId(),settings);
             ppdb.setSettings((PluginSettings) settings);
             respondOk(resp);
         } else {

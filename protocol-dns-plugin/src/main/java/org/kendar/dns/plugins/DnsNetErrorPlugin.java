@@ -15,6 +15,6 @@ public class DnsNetErrorPlugin extends BasicNetworkErrorPlugin<NetworkErrorPlugi
 
     @Override
     public String getProtocol() {
-        return "mqtt";
+        return "dns";
     }
 }

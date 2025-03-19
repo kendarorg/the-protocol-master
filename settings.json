@@ -113,6 +113,21 @@
         ]
       },
       "plugins": {
+        "latency-plugin": {
+          "target": [
+            "@(net-core-rest|localhost|127.0.0.1)\\/api/tasks.*"
+          ],
+          "minMs": 50,
+          "maxMs": 5000
+        },
+        "rate-limit-plugin": {
+          "target": [
+            "@(net-core-rest|localhost|127.0.0.1)\\/api/tasks.*"
+          ],
+          "rateLimit": 120,
+          "warningThresholdPercent": 80,
+          "resetTimeWindowSeconds": 60
+        },
         "sample-http": {
           "active": true
         },
@@ -120,7 +135,10 @@
           "active": false,
           "errorCode": 0,
           "errorMessage": "ERROR",
-          "percentage": 0
+          "percentage": 0,
+          "target": [
+            "@(net-core-rest|localhost|127.0.0.1)\\/api/tasks.*"
+          ]
         },
         "report-plugin": {
           "active": true

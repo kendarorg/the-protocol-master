@@ -10,15 +10,15 @@
         function sendQueueData() {
             var c = getSelectedConnection().split("_");
             var path = '/api/protocols/${data.getInstanceId()}/plugins/publish-plugin/connections/' + c[0] + '/' + c[1];
-            var contentType = document.getElementById("contentType").value;
-            var toSend = {
-                contentType: contentType,
-                appId: document.getElementById("appId").value,
-                propertyFlag: document.getElementById("propertyFlag").value,
-                deliveryMode: document.getElementById("deliveryMode").value,
-                deliveryTag: document.getElementById("deliveryTag").value,
-                body: document.getElementById("message").value
-            }
+            var toSend = retrieveValues(
+                {
+                contentType: null,
+                appId:null,
+                propertyFlag: null,
+                deliveryMode: null,
+                deliveryTag: null,
+                body: null
+            });
             console.log("Sending");
             console.log(toSend);
 
@@ -78,8 +78,8 @@
                        value="1">
             </div>
             <div class="input-group">
-                <label for="message" class="control-label">Message</label>
-                <textarea id="message" class="form-control" rows="10" cols="60"></textarea>
+                <label for="body" class="control-label">Message</label>
+                <textarea id="body" class="form-control" rows="10" cols="60"></textarea>
                 <br>
             </div>
             <div class="input-group">

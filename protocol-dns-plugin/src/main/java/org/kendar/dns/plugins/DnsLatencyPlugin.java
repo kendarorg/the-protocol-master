@@ -15,7 +15,7 @@ public class DnsLatencyPlugin extends BasicLatencyPlugin<LatencyPluginSettings> 
 
     @Override
     public String getProtocol() {
-        return "mqtt";
+        return "dns";
     }
 
 }

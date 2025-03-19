@@ -21,8 +21,14 @@ public class ApiUtils {
         respondJson(resp, new Ko(error));
     }
 
+    public static void respondKo(Response resp, String error,int code) {
+        resp.setStatusCode(code);
+        respondJson(resp, new Ko(error));
+    }
+
 
     public static void respondKo(Response resp, Exception error) {
+
         respondKo(resp, error.getMessage());
     }
 

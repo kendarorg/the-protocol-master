@@ -2,6 +2,28 @@
 // XMLHTTPREQUEST UTILS
 // ===============================================
 
+function retrieveValue(id){
+    var el = document.getElementById(id);
+    return el.value;
+}
+
+function retrieveValues(obj){
+    var propertyNames = Object.getOwnPropertyNames(obj);
+    for(var i=0;i<propertyNames.length;i++){
+        var id = propertyNames[i];
+        try {
+
+            var val = retrieveValue(id);
+            obj[id]=val;
+        }catch (error){
+            if(obj[id]===null) {
+                console.warn("Missing id " + id);
+            }
+        }
+    }
+    return obj;
+}
+
 function sendData(path, verb, data, contentType, callback) {
     const xhr = new XMLHttpRequest();
     xhr.open(verb, path);
@@ -12,7 +34,13 @@ function sendData(path, verb, data, contentType, callback) {
     xhr.onreadystatechange = () => {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            if(typeof callback === 'function')callback(xhr.status, xhr.response);
+            if(typeof callback === 'function'){
+                callback(xhr.status, xhr.response);
+            }
+            if(xhr.status!=200){
+                console.error(xhr);
+            }
+
             // Request finished. Do processing here.
         }
     };
@@ -31,8 +59,12 @@ function getData(path, verb, callback) {
     xhr.onreadystatechange = () => {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            if(typeof callback === 'function')callback(xhr.status, xhr.response);
-            // Request finished. Do processing here.
+            if(typeof callback === 'function'){
+                callback(xhr.status, xhr.response);
+            }
+            if(xhr.status!=200){
+                console.error(xhr);
+            }
         }
     };
     xhr.send();
@@ -111,11 +143,41 @@ function downloadURI(uri, name) {
 function toggleAccordion(elementId) {
     var element = document.getElementById(elementId);
     if (element.classList.contains("in")) {
-        console.log("CLOSE")
+        console.log("CLOSE "+elementId)
         element.classList.remove("in")
+        setAccordionStatus(elementId,"closed");
     } else {
-        console.log("OPEN")
+        console.log("OPEN "+elementId)
         element.classList.add("in")
+        setAccordionStatus(elementId,"open");
+    }
+}
+
+function getAccordionStatus(){
+    var item =localStorage.getItem("accordionStatus");
+    if(item==null){
+        item="{}";
+    }
+    return JSON.parse(item);
+}
+
+function setAccordionStatus(elementId,status){
+    var panelStatus = getAccordionStatus();
+    panelStatus[window.location.pathname+"."+elementId]={
+        elementId:elementId,
+        status:status,
+        path:window.location.pathname
+    };
+    localStorage.setItem("accordionStatus",JSON.stringify(panelStatus));
+}
+
+function closeAccordion(elementId) {
+    var element = document.getElementById(elementId);
+    if (element.classList.contains("in")) {
+
+        console.log("CLOSE "+elementId)
+        element.classList.remove("in")
+        setAccordionStatus(elementId,"closed");
     }
 }
 
@@ -131,6 +193,7 @@ function openAccordion(elementId) {
         if (!element.classList.contains("in")) {
             console.log("OPEN")
             element.classList.add("in")
+            setAccordionStatus(elementId,"open");
         }
     }, 250);
     //debugger;
@@ -163,6 +226,9 @@ function send_file(path, data, contentType, output, outputCode) {
             }
             if (typeof output !== 'undefined' && output !== null) {
                 output.innerHTML = xhr.response;
+            }
+            if(xhr.status!=200){
+                console.error(xhr);
             }
             // Request finished. Do processing here.
         }
