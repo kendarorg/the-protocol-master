@@ -27,11 +27,11 @@ public class ProtocolSettings {
         this.protocol = protocol;
     }
 
-    public PluginSettings getPlugin(String protocol, Class<?> clazz) {
-        if (!plugins.containsKey(protocol)) {
+    public PluginSettings getPlugin(String pluginId, Class<?> clazz) {
+        if (!plugins.containsKey(pluginId)) {
             return null;
         }
-        var protocolData = plugins.get(protocol);
+        var protocolData = plugins.get(pluginId);
         return (PluginSettings) mapper.deserialize(mapper.serialize(protocolData), clazz);
     }
 

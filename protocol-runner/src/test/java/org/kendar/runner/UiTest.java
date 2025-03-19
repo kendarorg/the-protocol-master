@@ -77,7 +77,7 @@ public class UiTest extends ApiTestBase {
         actual = downloadRequestString("http://localhost:5005/storage/file?parent=scenario/0000000001.default&name=0000000001.default", httpclient);
         assertTrue(actual.contains("\"fixedHeader\": \"CONNACK\""));
         actual = downloadRequestString("http://localhost:5005/plugins/global/report-plugin", httpclient);
-        assertTrue(actual.contains("Global/report-plugin"));
+        assertTrue(actual.contains("global/report-plugin"));
 
 
 

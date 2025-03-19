@@ -28,6 +28,11 @@
       "plugins": {
         "report-plugin": {
           "active": true
+        },
+        "network-error-plugin": {},
+        "latency-plugin": {
+          "minMs": 50,
+          "maxMs": 5000
         }
       }
     },
@@ -42,6 +47,7 @@
         "record-plugin": {
           "resetConnectionsOnStart": true
         },
+        "network-error-plugin": {},
         "replay-plugin": {
           "resetConnectionsOnStart": true,
           "respectCallDuration": true
@@ -50,6 +56,10 @@
           "active": true
         },
         "publish-plugin": {
+        },
+        "latency-plugin": {
+          "minMs": 50,
+          "maxMs": 5000
         }
       }
     },
@@ -61,8 +71,21 @@
       "timeout": 30,
       "connectionString": "jdbc:mysql://192.168.56.2:23306/db",
       "plugins": {
+        "network-error-plugin": {},
+        "replay-plugin": {
+        },
+        "record-plugin": {
+
+        },
         "mock-plugin": {
           "active": false
+        },
+        "rewrite-plugin": {
+          "active": false
+        },
+        "latency-plugin": {
+          "minMs": 50,
+          "maxMs": 5000
         }
       }
     },
@@ -74,8 +97,21 @@
       "timeout": 30,
       "connectionString": "jdbc:mysql://localhost:3306",
       "plugins": {
+        "network-error-plugin": {},
+        "replay-plugin": {
+        },
+        "record-plugin": {
+
+        },
         "mock-plugin": {
           "active": false
+        },
+        "rewrite-plugin": {
+          "active": false
+        },
+        "latency-plugin": {
+          "minMs": 50,
+          "maxMs": 5000
         }
       }
     },
@@ -87,6 +123,7 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "network-error-plugin": {},
         "publish-plugin": {
         },
         "record-plugin": {
@@ -95,6 +132,10 @@
         "replay-plugin": {
           "resetConnectionsOnStart": true,
           "respectCallDuration": true
+        },
+        "latency-plugin": {
+          "minMs": 50,
+          "maxMs": 5000
         }
       }
     },
@@ -172,6 +213,7 @@
       "timeout": 30,
       "connectionString": "tcp://192.168.56.2:25672",
       "plugins": {
+        "network-error-plugin": {},
         "publish-plugin": {
         },
         "record-plugin": {
@@ -180,6 +222,10 @@
         "replay-plugin": {
           "resetConnectionsOnStart": true,
           "respectCallDuration": true
+        },
+        "latency-plugin": {
+          "minMs": 50,
+          "maxMs": 5000
         }
       }
     },
@@ -191,12 +237,17 @@
       "timeout": 30,
       "connectionString": "tcp://192.168.56.2:26672",
       "plugins": {
+        "network-error-plugin": {},
         "publish-plugin": {
         },
         "record-plugin": {
         },
         "replay-plugin": {
           "respectCallDuration": true
+        },
+        "latency-plugin": {
+          "minMs": 50,
+          "maxMs": 5000
         }
       }
     }
