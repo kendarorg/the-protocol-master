@@ -1,6 +1,5 @@
 package org.kendar.plugins.apis;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -10,7 +9,6 @@ import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.plugins.BasicRecordPlugin;
-import org.kendar.plugins.MockStorage;
 import org.kendar.plugins.apis.dtos.RecordItemFile;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
 import org.kendar.storage.PluginFileManager;
@@ -44,7 +42,7 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
                     description = "Retrieve all the record ids"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public boolean listAllMocks(Request reqp, Response resp) {
+    public boolean listAllFiles(Request reqp, Response resp) {
 
         var result = storage.listFiles();
         respondJson(resp, result);
@@ -62,10 +60,9 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
                     description = "Retrieve the record file"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public boolean getSingleMock(Request reqp, Response resp) {
+    public void getSingleFile(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("record");
-        respondJson(resp, new RecordItemFile(getProtocolInstanceId(),storage.readFile(mockfile),mockfile));
-        return true;
+        respondJson(resp, new RecordItemFile(getProtocolInstanceId(),storage.getRepository().readFile("scenario",mockfile),mockfile));
     }
 
     @HttpMethodFilter(
@@ -83,13 +80,11 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public boolean putSingleMock(Request reqp, Response resp) {
+    public void putSingleFile(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("record");
         var inputData = reqp.getRequestText().toString();
-        mapper.deserialize(inputData, MockStorage.class);
         storage.getRepository().writeFile(inputData,"scenario",mockfile);
         respondOk(resp);
-        throw new NotImplementedException("SHOULD ADAPT THE INDEX");
     }
 
     @HttpMethodFilter(
@@ -106,11 +101,10 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public boolean delSingleMock(Request reqp, Response resp) {
+    public void delSingleMock(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("record");
         storage.getRepository().deleteFile("scenario",mockfile);
         respondOk(resp);
-        throw new NotImplementedException("SHOULD ADAPT THE INDEX");
     }
 
     @HttpMethodFilter(
@@ -125,7 +119,6 @@ public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicR
         }
         var model = new RecordItemFile(getProtocolInstanceId(),file,fileId);
         resolversFactory.render("generic/record_plugin/single.jte",model,response);
-        throw new RuntimeException("SHOULD USE GLOBAL STORAGE");
     }
 
 }

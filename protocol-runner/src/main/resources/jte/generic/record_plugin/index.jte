@@ -18,13 +18,9 @@
 
     function saveContentFile() {
         var filename = retrieveValue("currentFileName");
-        var data = retrieveValues({
-            toFind: null,
-            toReplace: null
-        });
-        data.regex = document.getElementById("regex").checked;
+        var data = retrieveValue('body');
         sendData('/api/protocols/${data.getInstanceId()}/plugins/record-plugin/record/' + filename, 'POST',
-            JSON.stringify(data), 'application/json', () => {
+            data, 'application/json', () => {
                 location.reload()
             })
     }
@@ -55,12 +51,22 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <div class="input-group">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="button"
-                                    onclick="openSpecificFile(retrieveValue('createNewFile'))">
-                                Create</button>
-                        </span>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button"
+                                            onclick="openSpecificFile(retrieveValue('createNewFile'))">
+                                        Create</button>
+                                </span>
                                 <input id="createNewFile" type="text" size="30"
+                                       class="form-control">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button"
+                                            onclick="openSpecificFile(retrieveValue('searchFiles'))">
+                                        Search</button>
+                                </span>
+                                <input id="searchFiles" type="text"
                                        class="form-control">
                             </div>
                             <br>

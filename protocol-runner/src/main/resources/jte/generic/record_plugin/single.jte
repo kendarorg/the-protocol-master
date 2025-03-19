@@ -19,7 +19,7 @@
     <br>
     <br>
     <div class="input-group">
-        <label for="body" class="control-label">To Verify</label>
+        <label for="body" class="control-label">Content</label>
         <div>
             <textarea id="body" rows="4" cols="60" class="form-control">${data.getBody()}</textarea>
         </div>
