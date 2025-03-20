@@ -4,6 +4,9 @@
 
 function retrieveValue(id){
     var el = document.getElementById(id);
+    if(el.type==="number"){
+        return +el.value;
+    }
     return el.value;
 }
 

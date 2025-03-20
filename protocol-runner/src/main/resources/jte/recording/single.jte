@@ -62,15 +62,21 @@
             <div class="input-group ">
                 <label for="durationMs" class="control-label">Duration MS</label>
                 <div>
-                    <input id="durationMs" type="text" class="form-control" value="${data.getData().getDurationMs()}"/>
+                    <input id="durationMs" type="number" class="form-control" value="${data.getData().getDurationMs()}"/>
                 </div>
             </div>
 
             <div class="input-group ">
                 <label for="timestamp" class="control-label">Timestamp</label>
                 <div>
-                    <input id="timestamp" type="text" class="form-control" value="${data.getData().getTimestamp()}"/>
+                    <input id="timestamp" type="number" class="form-control" value="${data.getData().getTimestamp()}"/>
                 </div>
+            </div>
+            <div class="input-group ">
+                <button type="button" class="btn  btn-success"
+                        onclick="copyData()">
+                    Copy
+                </button>
             </div>
         </div>
 

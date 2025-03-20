@@ -57,7 +57,12 @@ public abstract class JdbcRecordPlugin extends BasicRecordPlugin<BasicRecordPlug
         if (!shouldNotSaveJdbc(storageItem, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
+            if(!shouldIgnoreTrivialCalls()){
+                storageItem.setTrivial(true);
+                EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
+            }else {
+                EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
+            }
         }
     }
 

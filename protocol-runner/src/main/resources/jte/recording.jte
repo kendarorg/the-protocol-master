@@ -22,6 +22,26 @@
             '/recording/search/' +id,
             {target: "#recordingSingleFile", swap: 'outerHTML'});
     }
+
+    function copyData(){
+        var toSend = retrieveValues(
+            {
+                connectionId: null,
+                index:null,
+                durationMs: null,
+                type: null,
+                caller: null,
+                inputType: null,
+                outputType: null,
+                timestamp:null,
+                constant:false
+            });
+        toSend.input = JSON.parse(retrieveValue("input"));
+        toSend.output = JSON.parse(retrieveValue("output"));
+        console.log("Copying record");
+        console.log(toSend);
+        navigator.clipboard.writeText(JSON.stringify(toSend));
+    }
 </script>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -69,7 +89,7 @@ SELECT(
 		type=index.type
         query=SUBSTR(index.query,50),
 		durationMs=data.durationMs,
-		tags=SUBSTR(WRAP(index.tags,50,' '),100)),
+		tags=SUBSTR(index.tags,100)),
     ORDERBY(ASC(index))
 )</textarea>
                             </div>

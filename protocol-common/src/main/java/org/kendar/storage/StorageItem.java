@@ -10,6 +10,7 @@ import org.kendar.utils.JsonMapper;
  */
 public class StorageItem {
     protected static final JsonMapper mapper = new JsonMapper();
+    private boolean trivial = false;
     private long timestamp = System.currentTimeMillis();
     private boolean constant;
     private int connectionId;
@@ -25,6 +26,14 @@ public class StorageItem {
     private Object inAs;
     private String inputType;
     private String outputType;
+
+    public boolean isTrivial() {
+        return trivial;
+    }
+
+    public void setTrivial(boolean trivial) {
+        this.trivial = trivial;
+    }
 
     /**
      * Needed for serialization

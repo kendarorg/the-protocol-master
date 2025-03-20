@@ -35,7 +35,6 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     protected final StorageRepository repository;
     private final MultiTemplateEngine resolversFactory;
     private final SimpleParser parser;
-    private boolean ignoreTrivialCalls = true;
     private PluginFileManager storage;
 
     public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage,
@@ -53,7 +52,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldIgnoreTrivialCalls() {
-        return ignoreTrivialCalls;
+        return getSettings().isIgnoreTrivialCalls();
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
@@ -120,7 +119,12 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
         if (!shouldNotSave(in, out, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
+            if(!shouldIgnoreTrivialCalls()){
+                storageItem.setTrivial(true);
+                EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
+            }else {
+                EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
+            }
         }
     }
 
@@ -140,7 +144,6 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        ignoreTrivialCalls = getSettings().isIgnoreTrivialCalls();
         return true;
     }
 
