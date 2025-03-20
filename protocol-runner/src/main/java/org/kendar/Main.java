@@ -300,7 +300,7 @@ public class Main {
                         throw new RuntimeException(xx);
                     }
                 } catch (Exception ex) {
-                    log.error("Unable to start protocol {}: {}", item.getKey(), ex.getMessage());
+                    log.error("Unable to start protocol {}: {}", item.getKey(), ex.getMessage(),ex);
                 }
 
                 latch.countDown();
