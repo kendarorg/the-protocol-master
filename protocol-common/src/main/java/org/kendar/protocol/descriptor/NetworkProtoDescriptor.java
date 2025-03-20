@@ -157,7 +157,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
         throw new RuntimeException("Not implemented");
     }
 
-    public Map<String,Integer> getPorts(){
-        return Map.of("main",getPort());
+    public Map<String, Integer> getPorts() {
+        return Map.of("main", getPort());
     }
 }

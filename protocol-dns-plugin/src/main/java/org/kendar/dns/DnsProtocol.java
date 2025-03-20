@@ -47,11 +47,6 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private DatagramSocket udpSocket;
 
 
-    @Override
-    public ProtocolSettings getSettings(){
-        return settings;
-    }
-
     @TpmConstructor
     public DnsProtocol(GlobalSettings ini, DnsProtocolSettings settings,
                        @TpmNamed(tags = "dns") List<BasePluginDescriptor> plugins, PluginsLoggerFactory loggerContext) {
@@ -117,6 +112,11 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         }
 
         return count;
+    }
+
+    @Override
+    public ProtocolSettings getSettings() {
+        return settings;
     }
 
     @Override
@@ -230,7 +230,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         }
         pluginContext.getTags().put("foundedIps", String.join(",", ips));
         handle(ProtocolPhase.POST_CALL, pluginContext, requestedDomain, ips);
-        return buildResponse(ips, requestedDomain, response, request,pluginContext);
+        return buildResponse(ips, requestedDomain, response, request, pluginContext);
     }
 
     private byte[] buildResponse(List<String> ips, String requestedDomain, Message response, Message request, PluginContext pluginContext) throws IOException {

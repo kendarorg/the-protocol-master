@@ -1,10 +1,10 @@
 package org.kendar.utils.parser;
 
 public class SimpleValResult {
+    private String val;
+
     public SimpleValResult() {
     }
-
-    private String val;
 
     public String getVal() {
         return val;

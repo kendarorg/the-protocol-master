@@ -186,7 +186,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         var model = new AmqpConnections();
         model.setConnections(connections);
         model.setInstanceId(getProtocolInstanceId());
-        resolversFactory.render("amqp091/publish_plugin/connections.jte",model,response);
+        resolversFactory.render("amqp091/publish_plugin/connections.jte", model, response);
     }
 
 }

@@ -1,1 +1,12 @@
-{"instanceId":"postgres-01","protocol":"postgres","query":"insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *","connectionId":1,"timestamp":1742478173429,"duration":9,"tags":{"inputsCount":"4","resultsCount":"1"}}
+{
+  "instanceId": "postgres-01",
+  "protocol": "postgres",
+  "query": "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *",
+  "connectionId": 1,
+  "timestamp": 1742478173429,
+  "duration": 9,
+  "tags": {
+    "inputsCount": "4",
+    "resultsCount": "1"
+  }
+}

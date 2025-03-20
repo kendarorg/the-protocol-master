@@ -12,20 +12,20 @@
             var path = '/api/protocols/${data.getInstanceId()}/plugins/publish-plugin/connections/' + c[0] + '/' + c[1];
             var toSend = retrieveValues(
                 {
-                contentType: null,
-                appId:null,
-                propertyFlag: null,
-                deliveryMode: null,
-                deliveryTag: null,
-                body: null
-            });
+                    contentType: null,
+                    appId: null,
+                    propertyFlag: null,
+                    deliveryMode: null,
+                    deliveryTag: null,
+                    body: null
+                });
             console.log("Sending");
             console.log(toSend);
 
             sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status) => {
-                if(status==200){
+                if (status == 200) {
                     alert("Data Sent!");
-                }else{
+                } else {
                     alert("Error sending data!")
                 }
 

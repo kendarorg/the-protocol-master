@@ -4,9 +4,11 @@ import org.kendar.events.TpmEvent;
 
 public class SSLRemoveHostEvent implements TpmEvent {
     String host;
-    public SSLRemoveHostEvent(){
+
+    public SSLRemoveHostEvent() {
 
     }
+
     public SSLRemoveHostEvent(String host) {
         this.host = host;
     }

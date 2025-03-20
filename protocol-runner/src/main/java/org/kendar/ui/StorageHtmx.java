@@ -1,7 +1,5 @@
 package org.kendar.ui;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-import gg.jte.output.StringOutput;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.apis.FilteringClass;
@@ -31,6 +29,7 @@ public class StorageHtmx implements FilteringClass {
         this.diService = diService;
         this.repository = repository;
     }
+
     @Override
     public String getId() {
         return this.getClass().getName();
@@ -41,7 +40,7 @@ public class StorageHtmx implements FilteringClass {
             pathAddress = "/storage",
             method = "GET", id = "GET /storage")
     public void storage(Request request, Response response) {
-        resolversFactory.render("storage.jte",null,response);
+        resolversFactory.render("storage.jte", null, response);
     }
 
     @HttpMethodFilter(
@@ -50,17 +49,17 @@ public class StorageHtmx implements FilteringClass {
     public void storageDirs(Request request, Response response) {
         var path = request.getQuery("parent");
         var split = path.split("/");
-        var close = request.getQuery("close")!=null && request.getQuery("close").
+        var close = request.getQuery("close") != null && request.getQuery("close").
                 equalsIgnoreCase("true");
 
-        var model = new FileTreeItemDto(path,true);
+        var model = new FileTreeItemDto(path, true);
         model.setOpen(!close);
-        if(!close) {
+        if (!close) {
             model.getChildren().addAll(repository.listDirs(path).stream().
                     map(instanceId -> new FileTreeItemDto(path, instanceId, true)).toList());
         }
 
-        resolversFactory.render("storage/tree.jte",model,response);
+        resolversFactory.render("storage/tree.jte", model, response);
     }
 
     @HttpMethodFilter(
@@ -69,17 +68,17 @@ public class StorageHtmx implements FilteringClass {
     public void storageFiles(Request request, Response response) {
         var path = request.getQuery("parent");
         var split = path.split("/");
-        var close = request.getQuery("close")!=null && request.getQuery("close").
+        var close = request.getQuery("close") != null && request.getQuery("close").
                 equalsIgnoreCase("true");
 
-        var model = new FileTreeItemDto(path,true);
+        var model = new FileTreeItemDto(path, true);
         model.setOpen(!close);
-        if(!close) {
+        if (!close) {
             model.getChildren().addAll(repository.listFiles(path).stream().
                     map(instanceId -> new FileTreeItemDto(path, instanceId, false)).toList());
         }
 
-        resolversFactory.render("storage/files.jte",model,response);
+        resolversFactory.render("storage/files.jte", model, response);
     }
 
     @HttpMethodFilter(
@@ -89,12 +88,11 @@ public class StorageHtmx implements FilteringClass {
         var path = request.getQuery("parent");
         var model = new FileItemDto();
 
-            var data = repository.readFile(path);
-            model.setContent(data);
-            model.setPath(path);
-        resolversFactory.render("storage/file.jte",model,response);
+        var data = repository.readFile(path);
+        model.setContent(data);
+        model.setPath(path);
+        resolversFactory.render("storage/file.jte", model, response);
     }
-
 
 
     @HttpMethodFilter(
@@ -103,8 +101,8 @@ public class StorageHtmx implements FilteringClass {
     public void storageFileCreateUpdate(Request request, Response response) {
         var path = request.getQuery("parent");
         var sentContent = request.getRequestText().asText();
-        repository.writeFile(sentContent,path);
-        response.addHeader("Content-type","text/html");
+        repository.writeFile(sentContent, path);
+        response.addHeader("Content-type", "text/html");
         response.setStatusCode(200);
     }
 
@@ -114,7 +112,7 @@ public class StorageHtmx implements FilteringClass {
     public void storageFileDelete(Request request, Response response) {
         var path = request.getQuery("parent");
         repository.deleteFile(path);
-        response.addHeader("Content-type","text/html");
+        response.addHeader("Content-type", "text/html");
         response.setStatusCode(200);
     }
 }

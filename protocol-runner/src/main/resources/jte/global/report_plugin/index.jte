@@ -14,12 +14,12 @@
         var tpmql = retrieveValue('tpmqlQuery');
         var start = retrieveValue('tpmqlQueryStart');
         var limit = retrieveValue('tpmqlQueryLimit');
-        downloadURI('/api/global/plugins/report-plugin/report?'+
-            'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit+'&format='+type
+        downloadURI('/api/global/plugins/report-plugin/report?' +
+            'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit + '&format=' + type
         );
     }
 
-    function deleteReports(){
+    function deleteReports() {
         if (confirm("You want to delete all reports data?") == true) {
             getData("/api/global/plugins/report-plugin/report", "DELETE", () => {
                 alert("All cleaned up");

@@ -7,7 +7,7 @@
 @template.header("recording")
 
 <script type="text/javascript">
-    function searchRecording(){
+    function searchRecording() {
         var tpmql = retrieveValue('tpmqlQuery');
         var start = retrieveValue('tpmqlQueryStart');
         var limit = retrieveValue('tpmqlQueryLimit');
@@ -16,34 +16,35 @@
             'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit,
             {target: "#recordingSearchResult", swap: 'outerHTML'});
     }
-    function openById(id){
+
+    function openById(id) {
         openAccordion('collapseStorageSingleFile')
         htmx.ajax('GET',
-            '/recording/search/' +id,
+            '/recording/search/' + id,
             {target: "#recordingSingleFile", swap: 'outerHTML'});
     }
 
-    function copyData(){
+    function copyData() {
         var toSend = retrieveValues(
             {
                 connectionId: null,
-                index:null,
+                index: null,
                 durationMs: null,
                 type: null,
                 caller: null,
                 inputType: null,
                 outputType: null,
-                timestamp:null,
-                constant:false
+                timestamp: null,
+                constant: false
             });
         try {
             toSend.input = JSON.parse(retrieveValue("input"));
-        }catch (error){
+        } catch (error) {
             toSend.input = {};
         }
         try {
             toSend.output = JSON.parse(retrieveValue("output"));
-        }catch (error){
+        } catch (error) {
             toSend.output = {};
         }
         console.log("Copying record");
@@ -85,7 +86,8 @@
                             </div>
                         </div>
                         <div class="input-group">
-                            <label for="tpmqlQuery" class="control-label">Query. `index` field must be present to open the record</label>
+                            <label for="tpmqlQuery" class="control-label">Query. `index` field must be present to open
+                                the record</label>
                             <div>
                         <textarea id="tpmqlQuery" class="form-control" rows="10" cols="200">
 SELECT(

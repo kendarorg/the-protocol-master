@@ -14,7 +14,7 @@ For the TPM APIs a new (yay!)
 * expression: `[value|variable|function|binaryFunction|functionCall]`
 * group_ops: `MIN|MAX|AVG|COUNT`
 * order_expression: `ASC|DESC(fieldname)`: valid only for strings and numbers
-* 
+*
 
 ### Functions
 
@@ -45,14 +45,15 @@ In the select the expression are evaluated in this order
     * For strings count the length
     * If the object is null returns 0
 * `SELECT(WHAT(),WHERE(),GROUPBY(),ORDERBY())` returns a list, all parameters optional
-* `WHAT(fieldname|fieldname=expression|group_ops(fieldname)*)` select fieldname, or assign to fieldname the value of the expression
+* `WHAT(fieldname|fieldname=expression|group_ops(fieldname)*)` select fieldname, or assign to fieldname the value of the
+  expression
 * `WHERE(boolean_expression)` execute a query
-* `GROUPBY(fieldname*)` all fields of select must be in format `variable=expression` where `expression` can be the variable itself e.g. `tags.path=tags.path`  
+* `GROUPBY(fieldname*)` all fields of select must be in format `variable=expression` where `expression` can be the
+  variable itself e.g. `tags.path=tags.path`
 * `ORDERBY(order_expression*)`
 * `SUBSTR(expression,integer)`: substring, if done with objects and array, first serializes to json string
 * `MSTODATE(expression_string)`: convert to readable date in format YYYY/MM/DD HH:MM:SS.SSSS
 * `WRAP(expression,integer,string)`: wrap the string in blocks of integer length using string as separator
-
 
 ### Examples
 

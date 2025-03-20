@@ -60,7 +60,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     @Override
     public GlobalPluginDescriptor initialize(GlobalSettings global, PluginSettings pluginSettings) {
 
-        storage = repository.buildPluginFileManager("global",getId());
+        storage = repository.buildPluginFileManager("global", getId());
         storage.listFiles().forEach(file -> {
             var spl = file.split("\\.");
             var foundCounter = Long.parseLong(spl[0]);
@@ -78,30 +78,30 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     }
 
     private void handleReport(TerminateEvent m) {
-        handleReport(new ReportDataEvent("global","global","terminate",-1,new Date().getTime(),0,Map.of()));
+        handleReport(new ReportDataEvent("global", "global", "terminate", -1, new Date().getTime(), 0, Map.of()));
     }
 
     private void handleReport(SSLAddHostEvent m) {
-        handleReport(new ReportDataEvent(m.getInstanceId(),"http","addedhost:"+m.getHost(),-1,new Date().getTime(),0,Map.of()));
+        handleReport(new ReportDataEvent(m.getInstanceId(), "http", "addedhost:" + m.getHost(), -1, new Date().getTime(), 0, Map.of()));
     }
 
     private void handleReport(StorageReloadedEvent m) {
-        if(!isActive())return;
-        Map<String,Object> tags = new HashMap<>();
-        if(m.getSettings()!=null){
-            tags.put("addedSettings","true");
+        if (!isActive()) return;
+        Map<String, Object> tags = new HashMap<>();
+        if (m.getSettings() != null) {
+            tags.put("addedSettings", "true");
         }
-        handleReport(new ReportDataEvent("global","global","storage-reloaded",-1,new Date().getTime(),0,tags));
+        handleReport(new ReportDataEvent("global", "global", "storage-reloaded", -1, new Date().getTime(), 0, tags));
     }
 
     private void handleReport(ReplayStatusEvent m) {
-        if(!isActive())return;
-        handleReport(new ReportDataEvent(m.getInstanceId(),m.getProtocol(),m.isReplaying()?"start-replaying":"stop-replaying",-1,new Date().getTime(),0,Map.of()));
+        if (!isActive()) return;
+        handleReport(new ReportDataEvent(m.getInstanceId(), m.getProtocol(), m.isReplaying() ? "start-replaying" : "stop-replaying", -1, new Date().getTime(), 0, Map.of()));
     }
 
     private void handleReport(RecordStatusEvent m) {
-        if(!isActive())return;
-        handleReport(new ReportDataEvent(m.getInstanceId(),m.getProtocol(),m.isRecording()?"start-recording":"stop-recording",-1,new Date().getTime(),0,Map.of()));
+        if (!isActive()) return;
+        handleReport(new ReportDataEvent(m.getInstanceId(), m.getProtocol(), m.isRecording() ? "start-recording" : "stop-recording", -1, new Date().getTime(), 0, Map.of()));
     }
 
     private void handleReport(ReportDataEvent m) {
@@ -126,7 +126,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
 
     @Override
     public BasePluginApiHandler getApiHandler() {
-        return new GlobalReportPluginApiHandler(this, repository, simpleParser,resolversFactory);
+        return new GlobalReportPluginApiHandler(this, repository, simpleParser, resolversFactory);
     }
 
     @Override
@@ -178,11 +178,11 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
         return new GlobalReport(events, counters);
     }
 
-    public void setSettings(PluginSettings settings) {
-        this.settings = settings;
-    }
-
     public PluginSettings getSettings() {
         return settings;
+    }
+
+    public void setSettings(PluginSettings settings) {
+        this.settings = settings;
     }
 }

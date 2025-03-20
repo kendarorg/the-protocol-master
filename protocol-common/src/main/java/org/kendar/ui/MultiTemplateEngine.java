@@ -23,6 +23,7 @@ public class MultiTemplateEngine {
     public MultiTemplateEngine() {
 
     }
+
     @TpmConstructor
     public MultiTemplateEngine(MultiCodeResolver resolver) {
         this.resolver = resolver;
@@ -48,12 +49,16 @@ public class MultiTemplateEngine {
     }
 
     public void render(String name, Object param, TemplateOutput output) throws TemplateException {
-        if(templateEngine == null) {return;}
+        if (templateEngine == null) {
+            return;
+        }
         templateEngine.render(name, param, output);
     }
 
     public void render(String name, Object model, Response response) throws TemplateException {
-        if(templateEngine == null) {return;}
+        if (templateEngine == null) {
+            return;
+        }
         try {
             var output = new StringOutput();
             templateEngine.render(name, model, output);
@@ -66,12 +71,16 @@ public class MultiTemplateEngine {
     }
 
     public void render(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
-        if(templateEngine == null) {return;}
+        if (templateEngine == null) {
+            return;
+        }
         templateEngine.render(name, params, output);
     }
 
     public void render(String name, Map<String, Object> model, Response response) throws TemplateException {
-        if(templateEngine == null) {return;}
+        if (templateEngine == null) {
+            return;
+        }
         try {
             var output = new StringOutput();
             templateEngine.render(name, model, output);

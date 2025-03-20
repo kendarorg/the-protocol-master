@@ -8,13 +8,13 @@
 }
 
 <script type="text/javascript">
-    function updateData(){
+    function updateData() {
         var data = retrieveValues({
             active:${pluginSettings.isActive()},
-            percentAction:0
+            percentAction: 0
         });
         console.log(data);
-        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
+        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
             location.reload();
         })
     }
@@ -37,14 +37,16 @@
                 <button class="btn btn-danger" type="button"
                         onclick="updateData()">Upate settings
                 </button>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="percentAction" class="control-label">Percent action</label>
                 <div>
                     <input id="percentAction" type="number" class="form-control"
                            value="${pluginSettings.getPercentAction()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
         </div>
     </div>
 </div>

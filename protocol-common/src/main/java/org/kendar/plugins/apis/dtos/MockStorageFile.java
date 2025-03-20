@@ -6,8 +6,15 @@ public class MockStorageFile {
     private MockStorage mockStorage;
     private String fileName;
     private String protocolInstanceId;
-    public MockStorageFile(){
 
+    public MockStorageFile() {
+
+    }
+
+    public MockStorageFile(String protocolInstanceId, String fileName, MockStorage mockStorage) {
+        this.protocolInstanceId = protocolInstanceId;
+        this.mockStorage = mockStorage;
+        this.fileName = fileName;
     }
 
     public String getProtocolInstanceId() {
@@ -16,12 +23,6 @@ public class MockStorageFile {
 
     public void setProtocolInstanceId(String protocolInstanceId) {
         this.protocolInstanceId = protocolInstanceId;
-    }
-
-    public MockStorageFile(String protocolInstanceId, String fileName, MockStorage mockStorage) {
-        this.protocolInstanceId = protocolInstanceId;
-        this.mockStorage = mockStorage;
-        this.fileName = fileName;
     }
 
     public MockStorage getMockStorage() {

@@ -52,8 +52,8 @@ public class Main {
     private static JarPluginManager pluginManager;
     private static HttpServer apiServer;
     private static DiService diService;
-    private static boolean terminateReceived=false;
-    private static boolean restartReceived=false;
+    private static boolean terminateReceived = false;
+    private static boolean restartReceived = false;
     private static Thread stopWhenQuitThread;
     private static String changedSettings;
     private static boolean running;
@@ -69,12 +69,12 @@ public class Main {
                     log.info("RESTARTING AFTER SETTINGS CHANGE");
                     realArgs = new String[]{"-cfg", changedSettings};
                 } else if (restartReceived) {
-                    restartReceived=false;
+                    restartReceived = false;
                     log.info("RESTARTING AFTER RESTART REQUEST");
                 } else {
-                    running=false;
+                    running = false;
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println(e.getMessage());
                 exit(1);
             }
@@ -149,10 +149,10 @@ public class Main {
                 return;
             }
         }
-        execute(settings.get(),unattended);
+        execute(settings.get(), unattended);
     }
 
-    public static void stop(){
+    public static void stop() {
         stopInternal();
     }
 
@@ -169,7 +169,7 @@ public class Main {
         EventsQueue.getInstance().clean();
         diService.clean();
         log.info("Server stopped");
-        running =false;
+        running = false;
 
     }
 
@@ -179,12 +179,13 @@ public class Main {
         String line;
         line = scanner.nextLine();
         try {
-            while(true) {
+            while (true) {
                 if (line != null && line.trim().equalsIgnoreCase("q")) {
                     System.out.println("Exiting");
                     EventsQueue.send(new TerminateEvent());
                     return;
-                }if (line != null && line.trim().equalsIgnoreCase("r")) {
+                }
+                if (line != null && line.trim().equalsIgnoreCase("r")) {
                     System.out.println("Restarting");
                     EventsQueue.send(new RestartEvent());
                     return;
@@ -205,27 +206,27 @@ public class Main {
     }
 
 
-    private static void execute(GlobalSettings ini,boolean unattended) throws Exception {
+    private static void execute(GlobalSettings ini, boolean unattended) throws Exception {
         running = false;
         if (ini == null) return;
 
-        EventsQueue.register("main",(e)->{
+        EventsQueue.register("main", (e) -> {
             stopInternal();
             terminateReceived = true;
-        },TerminateEvent.class);
-        EventsQueue.register("main",(e)->{
+        }, TerminateEvent.class);
+        EventsQueue.register("main", (e) -> {
             stopInternal();
             restartReceived = true;
-        },RestartEvent.class);
-        EventsQueue.register("main",(e)->{
-            if(e.getSettings()!=null && Files.exists(Path.of(e.getSettings()))){
+        }, RestartEvent.class);
+        EventsQueue.register("main", (e) -> {
+            if (e.getSettings() != null && Files.exists(Path.of(e.getSettings()))) {
                 stopInternal();
                 changedSettings = e.getSettings();
                 terminateReceived = true;
             }
         }, StorageReloadedEvent.class);
 
-        if(unattended){
+        if (unattended) {
             ini.setUnattended(true);
         }
 
@@ -263,7 +264,7 @@ public class Main {
                         }
                         //Retrieve the type
                         var tempSettings = localDiService.getInstance(ProtocolSettings.class, protocol.getProtocol());
-                        if(tempSettings == null) {
+                        if (tempSettings == null) {
                             throw new RuntimeException("Protocol settings " + protocol.getProtocol() + " not found");
                         }
                         //Load the real data
@@ -300,7 +301,7 @@ public class Main {
                         throw new RuntimeException(xx);
                     }
                 } catch (Exception ex) {
-                    log.error("Unable to start protocol {}: {}", item.getKey(), ex.getMessage(),ex);
+                    log.error("Unable to start protocol {}: {}", item.getKey(), ex.getMessage(), ex);
                 }
 
                 latch.countDown();
@@ -349,7 +350,7 @@ public class Main {
             apiLatch.countDown();
         }).start();
 
-        if(!unattended && stopWhenQuitThread ==null) {
+        if (!unattended && stopWhenQuitThread == null) {
             stopWhenQuitThread = new Thread(Main::stopWhenQuitCommand);
             stopWhenQuitThread.start();
         }
@@ -357,7 +358,7 @@ public class Main {
         try {
             apiLatch.await();
             log.info("APIs started");
-            running=true;
+            running = true;
         } catch (InterruptedException ex) {
             log.error("Error waiting for plugin to start");
         }
@@ -365,6 +366,6 @@ public class Main {
         while (!terminateReceived && !restartReceived) {
             Sleeper.sleep(100);
         }
-        terminateReceived=false;
+        terminateReceived = false;
     }
 }

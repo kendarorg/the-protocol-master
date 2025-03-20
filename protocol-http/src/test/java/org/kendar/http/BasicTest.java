@@ -192,14 +192,14 @@ public class BasicTest {
         settings.setActive(true);
         var mapper = new JsonMapper();
         baseProtocol = new HttpProtocol(globalSettings, httpProtocolSettings, new ArrayList<>(List.of(
-                new HttpRecordPlugin(mapper, storage,new MultiTemplateEngine(),new SimpleParser()).initialize(globalSettings, httpProtocolSettings, recordingSettings),
+                new HttpRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(globalSettings, httpProtocolSettings, recordingSettings),
                 new HttpReplayPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, replaySettings),
                 new HttpErrorPlugin(mapper),
                 new HttpReportPlugin(mapper).initialize(globalSettings, httpProtocolSettings, settings),
                 new HttpLatencyPlugin(mapper),
                 new HttpRateLimitPlugin(mapper, storage),
-                new HttpMockPlugin(mapper, storage,new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, mockSettings),
-                new HttpRewritePlugin(mapper, storage,new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
+                new HttpMockPlugin(mapper, storage, new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, mockSettings),
+                new HttpRewritePlugin(mapper, storage, new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
         baseProtocol.initialize();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

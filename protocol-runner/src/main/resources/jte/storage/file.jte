@@ -1,11 +1,11 @@
 @param org.kendar.ui.dto.FileItemDto data
-<div id="resultsContainer"  >
-    <form id="fileContainerData" >
-        <div class="input-group" >
+<div id="resultsContainer">
+    <form id="fileContainerData">
+        <div class="input-group">
             <label for="fileContent" class="control-label">${data.getPath()}</label>
             <div>
                 <textarea id="fileContent" type="text" rows="8" cols="200" class="form-control"
-                          >${data.getContent()}</textarea>
+                >${data.getContent()}</textarea>
             </div>
         </div>
         <br>

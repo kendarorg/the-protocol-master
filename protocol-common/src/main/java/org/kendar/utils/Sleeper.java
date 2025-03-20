@@ -36,8 +36,8 @@ public class Sleeper {
 
             var times = (int) timeoutMillis;
             var counter = 100;
-            if(times<=100)counter =2;
-            for (int i = 0; i < timeoutMillis; i+=counter) {
+            if (times <= 100) counter = 2;
+            for (int i = 0; i < timeoutMillis; i += counter) {
                 synchronized (obj) {
                     obj.wait(counter);
                 }

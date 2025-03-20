@@ -66,7 +66,7 @@ public class QueryTranslationTest extends PostgresBasicTest {
         replaceItem.setToReplace(replace);
         replaceList.add(replaceItem);
         var mapper = new JsonMapper();
-        var filter = new PostgresRewritePlugin(mapper, storage,new MultiTemplateEngine());
+        var filter = new PostgresRewritePlugin(mapper, storage, new MultiTemplateEngine());
         filter.setReplacers(replaceList);
         filter.setActive(true);
         proxy.setPluginHandlers(List.of(filter));

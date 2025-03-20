@@ -8,16 +8,16 @@
 }
 
 <script type="text/javascript">
-    function updateData(){
+    function updateData() {
         var data = retrieveValues({
             active:${pluginSettings.isActive()},
-            percentAction:0,
-            showError:0,
-            errorMessage:"ERROR",
-            target:pluginTargets
+            percentAction: 0,
+            showError: 0,
+            errorMessage: "ERROR",
+            target: pluginTargets
         });
         console.log(data);
-        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
+        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
             location.reload();
         })
     }
@@ -40,21 +40,24 @@
                 <button class="btn btn-danger" type="button"
                         onclick="updateData()">Upate settings
                 </button>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="percentAction" class="control-label">Percent action</label>
                 <div>
                     <input id="percentAction" type="number" class="form-control"
                            value="${pluginSettings.getPercentAction()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="showError" class="control-label">Http error code</label>
                 <div>
                     <input id="showError" type="number" class="form-control"
                            value="${pluginSettings.getShowError()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="errorMessage" class="control-label">Error message</label>
                 <div>

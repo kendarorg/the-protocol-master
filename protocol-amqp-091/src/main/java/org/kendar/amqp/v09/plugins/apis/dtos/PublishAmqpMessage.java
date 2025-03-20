@@ -1,15 +1,15 @@
 package org.kendar.amqp.v09.plugins.apis.dtos;
 
 public class PublishAmqpMessage {
-    public PublishAmqpMessage(){
-
-    }
     private String contentType;
     private String appId;
     private String body;
     private int propertyFlag = -28664;
     private int deliveryMode = 1;
     private long deliveryTag = 1;
+    public PublishAmqpMessage() {
+
+    }
 
     public int getPropertyFlag() {
         return propertyFlag;

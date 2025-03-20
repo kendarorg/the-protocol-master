@@ -14,11 +14,12 @@ public class SimpleStringUtils {
         return result;
     }
 
-    public static String shorten(String input,int length) {
-        if(input.length() <= length) return input;
+    public static String shorten(String input, int length) {
+        if (input.length() <= length) return input;
         return input.substring(0, length);
     }
-    public static String convertTime(long time){
+
+    public static String convertTime(long time) {
         Date date = new Date(time);
         var format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         return format.format(date);

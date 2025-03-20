@@ -12,15 +12,15 @@
 <script type="text/javascript">
 
 
-    function updateData(){
+    function updateData() {
         var data = retrieveValues({
             active:${data.isActive()},
-            target:pluginTargets
+            target: pluginTargets
         });
         data.ignoreTrivialCalls = document.getElementById("ignoreTrivialCalls").checked;
         data.removeEtags = document.getElementById("removeEtags").checked;
         console.log(data);
-        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
+        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
             location.reload();
         })
     }
@@ -43,7 +43,8 @@
                 <button class="btn btn-danger" type="button"
                         onclick="updateData()">Upate settings
                 </button>
-            </div><br>
+            </div>
+            <br>
 
             <div class="input-group">
                 <div class="checkbox">
@@ -56,7 +57,8 @@
                         Ignore trivial calls
                     </label>
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <div class="checkbox">
                     <label>
@@ -68,7 +70,8 @@
                         Remove E-Tags
                     </label>
                 </div>
-            </div><br>
+            </div>
+            <br>
             @template.http.targets(targetsContainer)
         </div>
     </div>

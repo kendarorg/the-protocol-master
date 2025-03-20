@@ -7,8 +7,8 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.TpmEvent;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.http.plugins.HttpRecordPlugin;
-import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
 import org.kendar.http.plugins.HttpReplayPlugin;
+import org.kendar.http.plugins.settings.HttpRecordPluginSettings;
 import org.kendar.http.plugins.settings.HttpReplayPluginSettings;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
@@ -36,7 +36,7 @@ public class ReplayRecordFilters {
             var mapper = new JsonMapper();
             EventsQueue.register("testtarget", (e) -> events.add(e), WriteItemEvent.class);
             var rwPlugin = new HttpRecordPlugin(mapper, new NullStorageRepository(),
-                    new MultiTemplateEngine(),new SimpleParser()) {
+                    new MultiTemplateEngine(), new SimpleParser()) {
                 @Override
                 public boolean isActive() {
                     return true;

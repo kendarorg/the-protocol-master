@@ -125,7 +125,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
             context.write(message);
         }
 
-        if(!sentData) {
+        if (!sentData) {
             throw new RuntimeException("No existing topic to send to");
         }
 
@@ -140,6 +140,6 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
         var model = new RedisConnections();
         model.setConnections(connections);
         model.setInstanceId(getProtocolInstanceId());
-        resolversFactory.render("redis/publish_plugin/connections.jte",model,response);
+        resolversFactory.render("redis/publish_plugin/connections.jte", model, response);
     }
 }

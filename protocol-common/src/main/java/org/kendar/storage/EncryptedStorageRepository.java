@@ -31,6 +31,11 @@ public class EncryptedStorageRepository extends FileStorageRepository {
         encryptor = getEncryptor();
     }
 
+    @TpmConstructor
+    public EncryptedStorageRepository(GlobalSettings settings, DiService diService) {
+        super(settings, diService);
+    }
+
     protected void initializeStorageRepo(GlobalSettings settings, DiService diService) {
         this.diService = diService;
         var dataDir = settings.getDataDir();
@@ -53,11 +58,6 @@ public class EncryptedStorageRepository extends FileStorageRepository {
         encryptor = getEncryptor();
         this.targetDir = Path.of(dataDir).toAbsolutePath().toString();
         this.targetDir = ensureDirectory(targetDir);
-    }
-
-    @TpmConstructor
-    public EncryptedStorageRepository(GlobalSettings settings, DiService diService) {
-        super(settings, diService);
     }
 
     private Encryptor getEncryptor() {

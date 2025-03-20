@@ -176,14 +176,14 @@ public class CertificatesManager {
 
     public void unsetSll(HttpsServer port, List<String> inserted, String cname, String der, String key) throws Exception {
         var hostsSize = registeredHosts.size();
-        var changed =false;
-        for(var host : inserted) {
-            if(registeredHosts.containsKey(host)) {
+        var changed = false;
+        for (var host : inserted) {
+            if (registeredHosts.containsKey(host)) {
                 registeredHosts.remove(host);
-                changed= true;
+                changed = true;
             }
         }
-        if(!changed)return;
+        if (!changed) return;
         reinitializeSslContext(port, inserted, cname, der, key, hostsSize);
     }
 
@@ -220,9 +220,9 @@ public class CertificatesManager {
     public void setupSll(HttpsServer port, List<String> hosts, String cname, String der, String key) throws Exception {
         var hostsSize = registeredHosts.size();
         var inserted = new ArrayList<String>();
-        var changed =false;
+        var changed = false;
         for (var host : hosts) {
-            if(host.equalsIgnoreCase("localhost")||host.equalsIgnoreCase("127.0.0.1")){
+            if (host.equalsIgnoreCase("localhost") || host.equalsIgnoreCase("127.0.0.1")) {
                 continue;
             }
             var hstSpl = host.split("\\.");
@@ -232,19 +232,19 @@ public class CertificatesManager {
                     newHost.append(".").append(hstSpl[i]);
                 }
                 if (!registeredHosts.containsKey(newHost.toString())) {
-                    changed=true;
+                    changed = true;
                     inserted.add(newHost.toString());
                     registeredHosts.put(newHost.toString(), newHost.toString());
                 }
             }
 
             if (!registeredHosts.containsKey(host)) {
-                changed=true;
+                changed = true;
                 inserted.add(host);
                 registeredHosts.put(host, host);
             }
         }
-        if(!changed)return;
+        if (!changed) return;
         reinitializeSslContext(port, inserted, cname, der, key, hostsSize);
     }
 

@@ -116,12 +116,12 @@ public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basi
             var instance = new ReplacerItemInstance(toCheck, false);
             var result = instance.run(toCheck.getTestTarget());
             if (!toCheck.getTestTarget().equalsIgnoreCase(result)) {
-                respondText(resp,result);
-            }else{
-                respondKo(resp,"Not matched");
+                respondText(resp, result);
+            } else {
+                respondKo(resp, "Not matched");
             }
-        }catch (Exception ex){
-            respondKo(resp,ex.getMessage());
+        } catch (Exception ex) {
+            respondKo(resp, ex.getMessage());
         }
     }
 
@@ -152,12 +152,12 @@ public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basi
     public void retrieveFile(Request reqp, Response response) {
         var fileId = reqp.getPathParameter("id");
         var file = storage.readFile(fileId);
-        if(file == null) {
+        if (file == null) {
             file = mapper.serialize(new ReplacerItem());
             storage.writeFile(fileId, file);
         }
-        var model = new ReplacerItemFile(getProtocolInstanceId(),fileId, mapper.deserialize(file, ReplacerItem.class));
-        resolversFactory.render("generic/rewrite_plugin/single.jte",model,response);
+        var model = new ReplacerItemFile(getProtocolInstanceId(), fileId, mapper.deserialize(file, ReplacerItem.class));
+        resolversFactory.render("generic/rewrite_plugin/single.jte", model, response);
     }
 
 }

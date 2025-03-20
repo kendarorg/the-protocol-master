@@ -16,7 +16,7 @@ public class ReflectionTest {
     @Test
     void testReflection() {
         var example = new RedisRecordPlugin(new JsonMapper(),
-                new NullStorageRepository(),new MultiTemplateEngine(),
+                new NullStorageRepository(), new MultiTemplateEngine(),
                 new SimpleParser());
         var clazz = example.getClass();
         var handle = Arrays.stream(clazz.getMethods()).filter(m ->

@@ -10,6 +10,10 @@ public class RedisConnection {
         return id;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "{" +
@@ -28,10 +32,6 @@ public class RedisConnection {
     @Override
     public int hashCode() {
         return Objects.hash(id, subscription);
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getSubscription() {

@@ -75,7 +75,6 @@
         "replay-plugin": {
         },
         "record-plugin": {
-
         },
         "mock-plugin": {
           "active": false
@@ -101,7 +100,6 @@
         "replay-plugin": {
         },
         "record-plugin": {
-
         },
         "mock-plugin": {
           "active": false

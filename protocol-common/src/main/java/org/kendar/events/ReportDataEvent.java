@@ -11,8 +11,10 @@ public class ReportDataEvent implements TpmEvent {
     private long timestamp;
     private long duration;
     private Map<String, Object> tags;
+
     public ReportDataEvent() {
     }
+
     public ReportDataEvent(String instanceId,
                            String protocol,
                            String query,
@@ -82,7 +84,7 @@ public class ReportDataEvent implements TpmEvent {
         return connectionId;
     }
 
-    public String toStringTags(){
-        return String.join(",",getTags().entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).toList());
+    public String toStringTags() {
+        return String.join(",", getTags().entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).toList());
     }
 }

@@ -5,5 +5,5 @@ import org.kendar.plugins.cli.BasicNetworkErrorPluginCli;
 
 @TpmService(tags = "mysql")
 public class MySqlNetworErrorPluginCli extends BasicNetworkErrorPluginCli {
-    
+
 }

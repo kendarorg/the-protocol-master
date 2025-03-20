@@ -119,10 +119,10 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
         if (!shouldNotSave(in, out, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            if(!shouldIgnoreTrivialCalls()){
+            if (!shouldIgnoreTrivialCalls()) {
                 storageItem.setTrivial(true);
                 EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
-            }else {
+            } else {
                 EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
             }
         }
@@ -150,7 +150,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(getInstanceId(),getId());
+        storage = repository.buildPluginFileManager(getInstanceId(), getId());
         handleSettingsChanged();
         return this;
     }
@@ -177,7 +177,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
         return List.of(new BasicRecordPluginApis(this, getId(), getInstanceId(),
-                storage,resolversFactory,parser));
+                storage, resolversFactory, parser));
     }
 
     @Override

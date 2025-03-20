@@ -13,9 +13,9 @@ public class RecordingSearchResult {
 
 
     public String convert(JsonNode jsonNode) {
-        if(jsonNode.isBigDecimal()){
+        if (jsonNode.isBigDecimal()) {
             return jsonNode.decimalValue().toPlainString();
-        }else if(jsonNode.isArray()||jsonNode.isObject()){
+        } else if (jsonNode.isArray() || jsonNode.isObject()) {
             return new JsonMapper().serialize(jsonNode);
         }
         return jsonNode.asText();
@@ -29,11 +29,11 @@ public class RecordingSearchResult {
         this.fields = fields;
     }
 
-    public void setRows(ArrayNode rows) {
-        this.rows = rows;
-    }
-
     public ArrayNode getRows() {
         return rows;
+    }
+
+    public void setRows(ArrayNode rows) {
+        this.rows = rows;
     }
 }

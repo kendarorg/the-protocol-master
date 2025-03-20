@@ -8,24 +8,24 @@
 }
 
 <script type="text/javascript">
-    function updateData(){
+    function updateData() {
         var data = retrieveValues({
             active:${pluginSettings.isActive()},
-            percentAction:0,
-            headerLimit:null,
-            headerRemaining:null,
-            headerReset:null,
-            headerRetryAfter:0,
-            costPerRequest:0,
-            resetTimeWindowSeconds:0,
-            warningThresholdPercent:0,
-            rateLimit:0,
-            resetFormat:0,
-            useCustomResponse:false,
-            target:pluginTargets
+            percentAction: 0,
+            headerLimit: null,
+            headerRemaining: null,
+            headerReset: null,
+            headerRetryAfter: 0,
+            costPerRequest: 0,
+            resetTimeWindowSeconds: 0,
+            warningThresholdPercent: 0,
+            rateLimit: 0,
+            resetFormat: 0,
+            useCustomResponse: false,
+            target: pluginTargets
         });
         console.log(data);
-        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
+        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
             location.reload();
         })
     }
@@ -48,84 +48,96 @@
                 <button class="btn btn-danger" type="button"
                         onclick="updateData()">Upate settings
                 </button>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="percentAction" class="control-label">Percent action</label>
                 <div>
                     <input id="percentAction" type="number" class="form-control"
                            value="${pluginSettings.getPercentAction()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="headerLimit" class="control-label">Header limit</label>
                 <div>
                     <input id="headerLimit" type="text" class="form-control"
                            value="${pluginSettings.getHeaderLimit()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="headerRemaining" class="control-label">Header remaining</label>
                 <div>
                     <input id="headerRemaining" type="text" class="form-control"
                            value="${pluginSettings.getHeaderRemaining()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="headerReset" class="control-label">Header reset</label>
                 <div>
                     <input id="headerReset" type="text" class="form-control"
                            value="${pluginSettings.getHeaderReset()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="headerRetryAfter" class="control-label">Header retry after</label>
                 <div>
                     <input id="headerRetryAfter" type="text" class="form-control"
                            value="${pluginSettings.getHeaderRetryAfter()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="costPerRequest" class="control-label">Cost per request</label>
                 <div>
                     <input id="costPerRequest" type="number" class="form-control"
                            value="${pluginSettings.getCostPerRequest()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="resetTimeWindowSeconds" class="control-label">Reset time window seconds</label>
                 <div>
                     <input id="resetTimeWindowSeconds" type="number" class="form-control"
                            value="${pluginSettings.getResetTimeWindowSeconds()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="warningThresholdPercent" class="control-label">Warning threshold percent</label>
                 <div>
                     <input id="warningThresholdPercent" type="number" class="form-control"
                            value="${pluginSettings.getWarningThresholdPercent()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="rateLimit" class="control-label">Rate limit</label>
                 <div>
                     <input id="rateLimit" type="number" class="form-control"
                            value="${pluginSettings.getRateLimit()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="resetFormat" class="control-label">Reset format (secondsLeft/UtcEpochSeconds)</label>
                 <div>
                     <input id="resetFormat" type="number" class="form-control"
                            value="${pluginSettings.getResetFormat()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             @template.http.targets(targetsContainer)
             <br>
             <div class="input-group">
                 <button class="btn btn-danger" type="button"
                         onclick="updateData()">Upate settings
                 </button>
-            </div><br>
+            </div>
+            <br>
 
         </div>
     </div>

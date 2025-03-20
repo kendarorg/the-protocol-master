@@ -13,7 +13,7 @@ import org.kendar.utils.parser.SimpleParser;
 public class MongoRecordPlugin extends BasicRecordPlugin<BasicRecordPluginSettings> {
     public MongoRecordPlugin(JsonMapper mapper, StorageRepository storage,
                              MultiTemplateEngine resolversFactory, SimpleParser parser) {
-        super(mapper, storage,resolversFactory,parser);
+        super(mapper, storage, resolversFactory, parser);
     }
 
     @Override

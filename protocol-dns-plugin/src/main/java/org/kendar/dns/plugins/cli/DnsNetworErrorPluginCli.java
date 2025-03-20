@@ -7,5 +7,5 @@ import org.pf4j.Extension;
 @Extension
 @TpmService(tags = "dns")
 public class DnsNetworErrorPluginCli extends BasicNetworkErrorPluginCli {
-    
+
 }

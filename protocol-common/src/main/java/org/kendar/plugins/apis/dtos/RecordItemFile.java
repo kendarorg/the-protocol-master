@@ -5,14 +5,6 @@ public class RecordItemFile {
     private String fileName;
     private String instanceId;
 
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
-    }
-
     public RecordItemFile(String instanceId, String body, String fileName) {
         this.instanceId = instanceId;
         this.body = body;
@@ -20,6 +12,14 @@ public class RecordItemFile {
     }
 
     public RecordItemFile() {
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
     public String getBody() {

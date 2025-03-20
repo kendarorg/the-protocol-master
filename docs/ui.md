@@ -73,7 +73,6 @@ SELECT(
 
 ![global_report.png](ui/global_report.png)
 
-
 ### Some useful query
 
 Find all dns calls

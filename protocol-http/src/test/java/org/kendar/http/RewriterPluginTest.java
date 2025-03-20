@@ -21,7 +21,7 @@ public class RewriterPluginTest {
         var settings = new RewritePluginSettings();
         var storage = new FileStorageRepository(Path.of("src", "test", "resources", "data"));
         settings.setActive(true);
-        var target = new HttpRewritePlugin(new JsonMapper(), storage,new MultiTemplateEngine());
+        var target = new HttpRewritePlugin(new JsonMapper(), storage, new MultiTemplateEngine());
         var global = new GlobalSettings();
         //global.putService("storage", new NullStorageRepository());
 

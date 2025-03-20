@@ -21,7 +21,7 @@ public class MqttRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSe
 
     public MqttRecordPlugin(JsonMapper mapper, StorageRepository storage,
                             MultiTemplateEngine resolversFactory, SimpleParser parser) {
-        super(mapper, storage,resolversFactory,parser);
+        super(mapper, storage, resolversFactory, parser);
     }
 
     private static int getConsumeId(JsonNode data, int consumeId) {

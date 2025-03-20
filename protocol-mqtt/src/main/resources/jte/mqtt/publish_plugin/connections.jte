@@ -8,7 +8,8 @@
                     swap: 'outerHTML'
                 })
             }
-            function getSelectedConnection(){
+
+            function getSelectedConnection() {
                 var ele = document.getElementsByName('connectionRadios');
                 for (i = 0; i < ele.length; i++) {
                     if (ele[i].checked)

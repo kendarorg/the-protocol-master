@@ -8,15 +8,15 @@
 }
 
 <script type="text/javascript">
-    function updateData(){
+    function updateData() {
         var data = retrieveValues({
             active:${pluginSettings.isActive()},
-            minMs:0,
-            maxMs:0,
-            target:pluginTargets
+            minMs: 0,
+            maxMs: 0,
+            target: pluginTargets
         });
         console.log(data);
-        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
+        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
             location.reload();
         })
     }
@@ -39,21 +39,24 @@
                 <button class="btn btn-danger" type="button"
                         onclick="updateData()">Upate settings
                 </button>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="minMs" class="control-label">Min ms latency</label>
                 <div>
                     <input id="minMs" type="number" class="form-control"
                            value="${pluginSettings.getMinMs()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <label for="maxMs" class="control-label">Max ms latency</label>
                 <div>
                     <input id="maxMs" type="number" class="form-control"
                            value="${pluginSettings.getMaxMs()}">
                 </div>
-            </div><br>
+            </div>
+            <br>
             @template.http.targets(targetsContainer)
 
         </div>

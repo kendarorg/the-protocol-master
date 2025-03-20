@@ -45,31 +45,33 @@
 
 <script type="text/javascript">
     var pluginTargets = getAllTargets();
-    function addHost(){
+
+    function addHost() {
         var toAdd = retrieveValue('createNewTarget');
         pluginTargets.push(toAdd);
         ${targetsContainer.getApi()}();
     }
 
-    function verifyHost(){
+    function verifyHost() {
         var toSend = {
-            target:retrieveValue('createNewTarget'),
-            matchAgainst:retrieveValue('verifyMatch')
+            target: retrieveValue('createNewTarget'),
+            matchAgainst: retrieveValue('verifyMatch')
         };
-        sendData('/api/protocols/http/targets/verify', 'POST', JSON.stringify(toSend), 'application/json', (status,response) => {
-            if(status==200){
+        sendData('/api/protocols/http/targets/verify', 'POST', JSON.stringify(toSend), 'application/json', (status, response) => {
+            if (status == 200) {
                 alert("Pattern mathcing!");
-            }else if(status==404){
+            } else if (status == 404) {
                 alert("Pattern not mathcing!");
-            }else if(status==500){
-                alert("Error! "+response);
+            } else if (status == 500) {
+                alert("Error! " + response);
             }
 
         })
     }
-    function removeHost(host){
+
+    function removeHost(host) {
         if (confirm("You want to remove " + host + "?") == true) {
-            for (var i = 0;i<pluginTargets.length;i++) {
+            for (var i = 0; i < pluginTargets.length; i++) {
                 if (pluginTargets[i] == host) {
                     pluginTargets.splice(i, 1);
                     break;
@@ -78,13 +80,14 @@
             ${targetsContainer.getApi()}();
         }
     }
-    function getAllTargets(){
-        var result =[];
-        for(var i=0;i<100;i++){
-            try{
-                var value = retrieveValue('target_'+i);
+
+    function getAllTargets() {
+        var result = [];
+        for (var i = 0; i < 100; i++) {
+            try {
+                var value = retrieveValue('target_' + i);
                 result.push(value);
-            }catch (error){
+            } catch (error) {
                 continue;
             }
         }

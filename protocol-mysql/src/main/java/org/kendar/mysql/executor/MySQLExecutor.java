@@ -160,7 +160,7 @@ public class MySQLExecutor {
             return executeCommit(parse, protoContext);
         } else if (pvup.startsWith("ROLLBACK")) {
             return executeRollback(parse, protoContext);
-        }else if (pvup.startsWith("SHOW WARNINGS")) {
+        } else if (pvup.startsWith("SHOW WARNINGS")) {
             return executeShowWarning(parse, protoContext);
         }
         return switch (parsed.getType()) {
@@ -182,7 +182,6 @@ public class MySQLExecutor {
             }
         };
     }
-
 
 
     private Iterator<ProtoStep> changeTransactionIsolation(ProtoContext protoContext, String value) {
@@ -222,7 +221,7 @@ public class MySQLExecutor {
                 new ProxyMetadata("Code", false, Types.INTEGER, 10),
                 new ProxyMetadata("Message", false, Types.VARCHAR, 200)
         );
-        var packetNumber=0;
+        var packetNumber = 0;
         result.add(new ColumnsCount(metadata).withPacketNumber(++packetNumber));
         for (var field : metadata) {
             result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, false).

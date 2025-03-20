@@ -1,15 +1,15 @@
 @param org.kendar.ui.dto.ProtocolStatusDto data
 
 @if(!(boolean) data.getParameters().get("avoidScript"))
-<script type="text/javascript">
-    function reloadWildcard(callback) {
-        console.log("reloadWildcard")
-        var isOpen = isAccordionOpen('collapseWildcard');
-        return htmx.ajax('GET', '/plugins/wildcard?avoidScript=true', '#wildcardPanel').then(() => {
-            if (isOpen) openAccordion('collapseWildcard');
-        })
-    }
-</script>
+    <script type="text/javascript">
+        function reloadWildcard(callback) {
+            console.log("reloadWildcard")
+            var isOpen = isAccordionOpen('collapseWildcard');
+            return htmx.ajax('GET', '/plugins/wildcard?avoidScript=true', '#wildcardPanel').then(() => {
+                if (isOpen) openAccordion('collapseWildcard');
+            })
+        }
+    </script>
 @endif
 <div id="wildcardPanel" class="panel panel-default">
 

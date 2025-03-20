@@ -88,12 +88,12 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
     public void putSingleMock(Request reqp, Response resp) {
         var mockfile = reqp.getPathParameter("mockfile");
         var inputData = reqp.getRequestText().toString();
-        var data = mapper.deserialize(inputData,MockStorage.class);
-        var mocks = (Map<String,MockStorage>)getDescriptor().getMocks();
+        var data = mapper.deserialize(inputData, MockStorage.class);
+        var mocks = (Map<String, MockStorage>) getDescriptor().getMocks();
 
-        for(var kvp : mocks.entrySet()) {
-            if(kvp.getValue().getIndex()==data.getIndex() && !kvp.getKey().equals(mockfile)) {
-                respondKo(resp,"Duplicate index "+data.getIndex());
+        for (var kvp : mocks.entrySet()) {
+            if (kvp.getValue().getIndex() == data.getIndex() && !kvp.getKey().equals(mockfile)) {
+                respondKo(resp, "Duplicate index " + data.getIndex());
                 return;
             }
         }
@@ -130,12 +130,12 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
     public void retrieveFile(Request reqp, Response response) {
         var fileId = reqp.getPathParameter("id");
         var file = storage.readFile(fileId);
-        if(file == null) {
+        if (file == null) {
             file = mapper.serialize(new MockStorage());
             storage.writeFile(fileId, file);
         }
-        var model = new MockStorageFile(getProtocolInstanceId(),fileId, mapper.deserialize(file, MockStorage.class));
-        resolversFactory.render("generic/mock_plugin/single.jte",model,response);
+        var model = new MockStorageFile(getProtocolInstanceId(), fileId, mapper.deserialize(file, MockStorage.class));
+        resolversFactory.render("generic/mock_plugin/single.jte", model, response);
     }
 
 }

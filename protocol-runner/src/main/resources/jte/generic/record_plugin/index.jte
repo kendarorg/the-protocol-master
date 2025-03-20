@@ -10,13 +10,13 @@
 
 <script type="text/javascript">
 
-    function updateData(){
+    function updateData() {
         var data = retrieveValues({
             active:${data.isActive()}
         });
         data.ignoreTrivialCalls = document.getElementById("ignoreTrivialCalls").checked;
         console.log(data);
-        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
+        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
             location.reload();
         })
     }
@@ -39,7 +39,8 @@
                 <button class="btn btn-danger" type="button"
                         onclick="updateData()">Upate settings
                 </button>
-            </div><br>
+            </div>
+            <br>
 
 
             <div class="input-group">
@@ -53,7 +54,8 @@
                         Ignore trivial calls
                     </label>
                 </div>
-            </div><br>
+            </div>
+            <br>
         </div>
     </div>
 </div>

@@ -57,9 +57,9 @@ public class DiService {
     }
 
     public static void setThreadContext(DiService threadContext) {
-        if(threadContext==null) {
+        if (threadContext == null) {
             threads.remove(Thread.currentThread());
-        }else {
+        } else {
             threads.put(Thread.currentThread(), threadContext);
         }
     }
@@ -85,13 +85,15 @@ public class DiService {
         for (var item : children) {
             try {
                 item.destroy();
-            }catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
         children.clear();
         for (var item : singletons.values()) {
             try {
                 destroy(item);
-            }catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
         singletons.clear();
         if (parent != null) {
@@ -492,7 +494,8 @@ public class DiService {
     public void clean() {
         try {
             this.destroy();
-        }catch (Exception e) {}
+        } catch (Exception e) {
+        }
         for (int i = 0; i < children.size(); i++) {
             var item = children.get(i);
             item.clean();

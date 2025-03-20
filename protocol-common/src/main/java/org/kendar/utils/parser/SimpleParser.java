@@ -760,23 +760,23 @@ public class SimpleParser {
                         if (asc) return -1;
                         return 1;
                     }
-                    if(o1Value instanceof String){
-                        var result = ((String)o1Value).compareTo((String)o2Value);
-                        if(result == 0)continue;
-                        if(asc)return result;
+                    if (o1Value instanceof String) {
+                        var result = ((String) o1Value).compareTo((String) o2Value);
+                        if (result == 0) continue;
+                        if (asc) return result;
                         return -result;
                     }
-                    if(o1Value instanceof BigDecimal){
-                        var result = ((BigDecimal)o1Value).compareTo((BigDecimal)o2Value);
-                        if(result == 0)continue;
-                        if(asc)return result;
+                    if (o1Value instanceof BigDecimal) {
+                        var result = ((BigDecimal) o1Value).compareTo((BigDecimal) o2Value);
+                        if (result == 0) continue;
+                        if (asc) return result;
                         return -result;
                     }
                 }
                 return 0;
             });
 
-            for(var item: toSort) {
+            for (var item : toSort) {
                 resultArray.add(item);
             }
         } else {

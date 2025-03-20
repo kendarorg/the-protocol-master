@@ -23,7 +23,7 @@ import java.util.Map;
 public class RedisRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSettings> {
     public RedisRecordPlugin(JsonMapper mapper, StorageRepository storage,
                              MultiTemplateEngine resolversFactory, SimpleParser parser) {
-        super(mapper, storage,resolversFactory,parser);
+        super(mapper, storage, resolversFactory, parser);
     }
 
     private static boolean isClientSetInfo(ArrayNode input) {

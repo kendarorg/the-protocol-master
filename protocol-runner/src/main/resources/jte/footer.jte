@@ -9,11 +9,11 @@
                 var propertyName = propertyData.elementId;
                 var propertyStatus = propertyData.status;
                 var path = propertyData.path;
-                if(path!==window.location.pathname){
+                if (path !== window.location.pathname) {
                     continue;
                 }
                 var panel = document.getElementById(propertyName);
-                if(panel==null){
+                if (panel == null) {
                     continue;
                 }
 
@@ -27,6 +27,7 @@
             }
         }
     }
+
     setTimeout(function () {
         loadPanels();
     }, 500);

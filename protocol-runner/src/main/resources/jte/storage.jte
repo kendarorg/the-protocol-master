@@ -77,10 +77,10 @@
 
     function deleteFile(path) {
         if (confirm("You want to remove " + path + "?") == true) {
-            return getData('/storage/file?parent=' + path, 'delete', ()=>{
+            return getData('/storage/file?parent=' + path, 'delete', () => {
                 var pathSplitted = path.split('/');
                 pathSplitted.pop();
-                var parent = "/"+pathSplitted.join("/");
+                var parent = "/" + pathSplitted.join("/");
                 openFiles(parent)
             })
         }

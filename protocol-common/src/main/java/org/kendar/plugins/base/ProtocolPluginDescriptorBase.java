@@ -139,7 +139,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         var isChanged = active != this.isActive();
         if (isChanged) handleActivation(active);
         this.active = active;
-        if(getSettings() != null) {
+        if (getSettings() != null) {
             getSettings().setActive(active);
         }
 

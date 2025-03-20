@@ -1,85 +1,98 @@
 {
-  "timestamp" : 1742478171418,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 8,
-  "input" : {
-    "query" : "select * from information_schema.sequences",
-    "parameterValues" : [ ]
+  "timestamp": 1742478171418,
+  "constant": false,
+  "connectionId": 1,
+  "index": 8,
+  "input": {
+    "query": "select * from information_schema.sequences",
+    "parameterValues": []
   },
-  "output" : {
-    "selectResult" : {
-      "records" : [ ],
-      "metadata" : [ {
-        "columnName" : "sequence_catalog",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      }, {
-        "columnName" : "sequence_schema",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      }, {
-        "columnName" : "sequence_name",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      }, {
-        "columnName" : "data_type",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      }, {
-        "columnName" : "numeric_precision",
-        "byteData" : false,
-        "columnType" : "INTEGER",
-        "precision" : 10
-      }, {
-        "columnName" : "numeric_precision_radix",
-        "byteData" : false,
-        "columnType" : "INTEGER",
-        "precision" : 10
-      }, {
-        "columnName" : "numeric_scale",
-        "byteData" : false,
-        "columnType" : "INTEGER",
-        "precision" : 10
-      }, {
-        "columnName" : "start_value",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      }, {
-        "columnName" : "minimum_value",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      }, {
-        "columnName" : "maximum_value",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      }, {
-        "columnName" : "increment",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      }, {
-        "columnName" : "cycle_option",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 3
-      } ],
-      "count" : 0,
-      "intResult" : false,
-      "lastInsertedId" : 0
+  "output": {
+    "selectResult": {
+      "records": [],
+      "metadata": [
+        {
+          "columnName": "sequence_catalog",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        },
+        {
+          "columnName": "sequence_schema",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        },
+        {
+          "columnName": "sequence_name",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        },
+        {
+          "columnName": "data_type",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        },
+        {
+          "columnName": "numeric_precision",
+          "byteData": false,
+          "columnType": "INTEGER",
+          "precision": 10
+        },
+        {
+          "columnName": "numeric_precision_radix",
+          "byteData": false,
+          "columnType": "INTEGER",
+          "precision": 10
+        },
+        {
+          "columnName": "numeric_scale",
+          "byteData": false,
+          "columnType": "INTEGER",
+          "precision": 10
+        },
+        {
+          "columnName": "start_value",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        },
+        {
+          "columnName": "minimum_value",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        },
+        {
+          "columnName": "maximum_value",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        },
+        {
+          "columnName": "increment",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        },
+        {
+          "columnName": "cycle_option",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 3
+        }
+      ],
+      "count": 0,
+      "intResult": false,
+      "lastInsertedId": 0
     },
-    "intResult" : 0
+    "intResult": 0
   },
-  "durationMs" : 9,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "inputType" : "JdbcCall",
-  "outputType" : "SelectResult"
+  "durationMs": 9,
+  "type": "QUERY",
+  "caller": "JDBC",
+  "inputType": "JdbcCall",
+  "outputType": "SelectResult"
 }

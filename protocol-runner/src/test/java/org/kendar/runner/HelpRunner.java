@@ -3,7 +3,6 @@ package org.kendar.runner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.kendar.Main;
-import org.kendar.utils.Sleeper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -33,9 +32,9 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
-                "-pluginsDir",Path.of("target", "plugins").toString(),
+                "-pluginsDir", Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help","-unattended"
+                "-help", "-unattended"
         };
 
         Main.execute(args);
@@ -49,9 +48,9 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
-                "-pluginsDir",Path.of("target", "plugins").toString(),
+                "-pluginsDir", Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "http","-unattended"
+                "-help", "http", "-unattended"
         };
         Main.execute(args);
         final String standardOutput = getOut();
@@ -66,9 +65,9 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
-                "-pluginsDir",Path.of("target", "plugins").toString(),
+                "-pluginsDir", Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "mysql","-unattended"
+                "-help", "mysql", "-unattended"
         };
         Main.execute(args);
         final String standardOutput = getOut();
@@ -83,9 +82,9 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
-                "-pluginsDir",Path.of("target", "plugins").toString(),
+                "-pluginsDir", Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "postgres","-unattended"
+                "-help", "postgres", "-unattended"
         };
         Main.execute(args);
         final String standardOutput = getOut();
@@ -100,9 +99,9 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
-                "-pluginsDir",Path.of("target", "plugins").toString(),
+                "-pluginsDir", Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "amqp091","-unattended"
+                "-help", "amqp091", "-unattended"
         };
         Main.execute(args);
         final String standardOutput = getOut();
@@ -117,9 +116,9 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
-                "-pluginsDir",Path.of("target", "plugins").toString(),
+                "-pluginsDir", Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "mqtt","-unattended"
+                "-help", "mqtt", "-unattended"
         };
         Main.execute(args);
         final String standardOutput = getOut();
@@ -133,9 +132,9 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
-                "-pluginsDir",Path.of("target", "plugins").toString(),
+                "-pluginsDir", Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "redis","-unattended"
+                "-help", "redis", "-unattended"
         };
         Main.execute(args);
         final String standardOutput = getOut();
@@ -149,9 +148,9 @@ public class HelpRunner {
         var args = new String[]{
 
                 "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
-                "-pluginsDir",Path.of("target", "plugins").toString(),
+                "-pluginsDir", Path.of("target", "plugins").toString(),
                 "-loglevel", "DEBUG",
-                "-help", "mongodb","-unattended"
+                "-help", "mongodb", "-unattended"
         };
         Main.execute(args);
         final String standardOutput = getOut();

@@ -124,7 +124,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             dataToSend = messageData.getBody().getBytes();
         }
 
-        var sentData =false;
+        var sentData = false;
 
         for (var contxtKvp : pInstance.getContextsCache().entrySet()) {
             var context = (MqttContext) contxtKvp.getValue();
@@ -137,7 +137,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             if (topicAvailable.isEmpty()) {
                 continue;
             }
-            sentData=true;
+            sentData = true;
             var packetIdentifier = (short) context.packetToUse();
             var message = new Publish();
             message.setPacketIdentifier(packetIdentifier);
@@ -182,7 +182,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             }
             context.write(message);
         }
-        if(!sentData) {
+        if (!sentData) {
             throw new RuntimeException("No existing topic to send to");
         }
 
@@ -198,6 +198,6 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
         var model = new MqttConnections();
         model.setConnections(connections);
         model.setInstanceId(getProtocolInstanceId());
-        resolversFactory.render("mqtt/publish_plugin/connections.jte",model,response);
+        resolversFactory.render("mqtt/publish_plugin/connections.jte", model, response);
     }
 }

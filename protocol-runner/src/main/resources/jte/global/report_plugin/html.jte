@@ -1,16 +1,18 @@
-
 @param org.kendar.plugins.apis.GlobalReportResult data
 <html>
 <body>
 <style>
-    td
-    {border-left:1px solid black;
-        border-top:1px solid black;}
-    table
-    {border-right:1px solid black;
-        border-bottom:1px solid black;}
+    td {
+        border-left: 1px solid black;
+        border-top: 1px solid black;
+    }
+
+    table {
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
+    }
 </style>
-<table >
+<table>
     <tr>
         @for(var label:data.getFields())
             <th style="border:1px;">${label}</th>

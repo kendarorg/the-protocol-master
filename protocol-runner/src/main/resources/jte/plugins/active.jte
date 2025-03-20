@@ -1,16 +1,16 @@
 @param org.kendar.ui.dto.ProtocolStatusDto data
 
 @if(!(boolean) data.getParameters().get("avoidScript"))
-<script type="text/javascript">
-    function reloadActive(callback) {
-        console.log("reloadActive")
-        var isOpen = isAccordionOpen('collapseActive');
-        return htmx.ajax('GET', '/plugins/active?avoidScript=true', '#activePanel')
-        .then(() => {
-            if (isOpen) openAccordion('collapseActive');
-        })
-    }
-</script>
+    <script type="text/javascript">
+        function reloadActive(callback) {
+            console.log("reloadActive")
+            var isOpen = isAccordionOpen('collapseActive');
+            return htmx.ajax('GET', '/plugins/active?avoidScript=true', '#activePanel')
+                .then(() => {
+                    if (isOpen) openAccordion('collapseActive');
+                })
+        }
+    </script>
 @endif
 <div id="activePanel" class="panel panel-default">
 

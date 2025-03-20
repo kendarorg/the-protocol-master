@@ -28,9 +28,9 @@ public class GlobalReportResult {
     }
 
     public String convert(JsonNode jsonNode) {
-        if(jsonNode.isBigDecimal()){
+        if (jsonNode.isBigDecimal()) {
             return jsonNode.decimalValue().toPlainString();
-        }else if(jsonNode.isArray()||jsonNode.isObject()){
+        } else if (jsonNode.isArray() || jsonNode.isObject()) {
             return new JsonMapper().serialize(jsonNode);
         }
         return jsonNode.asText();

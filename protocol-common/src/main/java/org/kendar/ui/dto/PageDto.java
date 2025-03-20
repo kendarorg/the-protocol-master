@@ -1,4 +1,4 @@
 package org.kendar.ui.dto;
 
-public class PageDto  extends BaseHtmxDto{
+public class PageDto extends BaseHtmxDto {
 }

@@ -23,7 +23,7 @@ public class HttpRecordPlugin extends BasicRecordPlugin<HttpRecordPluginSettings
 
     public HttpRecordPlugin(JsonMapper mapper, StorageRepository storage,
                             MultiTemplateEngine resolversFactory, SimpleParser parser) {
-        super(mapper, storage,resolversFactory,parser);
+        super(mapper, storage, resolversFactory, parser);
     }
 
     @Override

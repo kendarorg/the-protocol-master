@@ -25,7 +25,7 @@ public class PostgresRecordPlugin extends JdbcRecordPlugin {
     @TpmConstructor
     public PostgresRecordPlugin(JsonMapper mapper, StorageRepository storage,
                                 MultiTemplateEngine resolversFactory, SimpleParser parser) {
-        super(mapper, storage,resolversFactory,parser);
+        super(mapper, storage, resolversFactory, parser);
     }
 
     @Override

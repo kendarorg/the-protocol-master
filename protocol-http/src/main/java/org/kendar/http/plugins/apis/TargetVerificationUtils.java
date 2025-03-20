@@ -28,6 +28,7 @@ public class TargetVerificationUtils implements FilteringClass {
     public TargetVerificationUtils(JsonMapper mapper) {
         this.mapper = mapper;
     }
+
     @Override
     public String getId() {
         return this.getClass().getName();
@@ -57,13 +58,13 @@ public class TargetVerificationUtils implements FilteringClass {
             var data = reqp.getRequestText().toString();
             var toCheck = mapper.deserialize(data, TargetVerificationInput.class);
             var matcher = SiteMatcherUtils.setupSites(List.of(toCheck.getTarget())).get(0);
-            if (matcher.match(toCheck.getMatchAgainst())){
+            if (matcher.match(toCheck.getMatchAgainst())) {
                 respondOk(resp);
-            }else{
-                respondKo(resp,"Not matching",404);
+            } else {
+                respondKo(resp, "Not matching", 404);
             }
-        }catch (Exception ex){
-            respondKo(resp,ex.getMessage());
+        } catch (Exception ex) {
+            respondKo(resp, ex.getMessage());
         }
     }
 }

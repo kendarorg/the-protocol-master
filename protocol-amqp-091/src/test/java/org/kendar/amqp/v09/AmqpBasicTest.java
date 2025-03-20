@@ -36,14 +36,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AmqpBasicTest {
     protected static final int FAKE_PORT = 5682;
+    protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
     protected static RabbitMqImage rabbitContainer;
     protected static TcpServer protocolServer;
     protected static ProtocolPluginDescriptor publishPlugin;
     protected static ProtocolPluginDescriptor recordPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static ProtocolPluginDescriptor errorPlugin;
-    protected JsonMapper mapper = new JsonMapper();
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
+    protected JsonMapper mapper = new JsonMapper();
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -91,14 +92,14 @@ public class AmqpBasicTest {
         var gs = new GlobalSettings();
         var mapper = new JsonMapper();
         recordPlugin = new AmqpRecordPlugin(mapper, storage,
-                new MultiTemplateEngine(),new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+                new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
         var rep = new AmqpReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        publishPlugin = new AmqpPublishPlugin(mapper,new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        errorPlugin= new AmqpNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(80));
-        latencyPlugin= new AmqpLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
+        publishPlugin = new AmqpPublishPlugin(mapper, new MultiTemplateEngine()).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        errorPlugin = new AmqpNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(80));
+        latencyPlugin = new AmqpLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
 
         proxy.setPluginHandlers(List.of(
-                recordPlugin, rep, publishPlugin,errorPlugin,latencyPlugin));
+                recordPlugin, rep, publishPlugin, errorPlugin, latencyPlugin));
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -115,9 +116,6 @@ public class AmqpBasicTest {
 
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
-
-
-    protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
 
     public static void afterEachBase() {
         EventsQueue.unregister("recorder", ReportDataEvent.class);

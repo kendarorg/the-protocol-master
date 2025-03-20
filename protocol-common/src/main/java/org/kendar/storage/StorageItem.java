@@ -27,14 +27,6 @@ public class StorageItem {
     private String inputType;
     private String outputType;
 
-    public boolean isTrivial() {
-        return trivial;
-    }
-
-    public void setTrivial(boolean trivial) {
-        this.trivial = trivial;
-    }
-
     /**
      * Needed for serialization
      */
@@ -65,6 +57,14 @@ public class StorageItem {
         this.caller = caller;
         this.inputType = inputType;
         this.outputType = outputType;
+    }
+
+    public boolean isTrivial() {
+        return trivial;
+    }
+
+    public void setTrivial(boolean trivial) {
+        this.trivial = trivial;
     }
 
     public long getTimestamp() {

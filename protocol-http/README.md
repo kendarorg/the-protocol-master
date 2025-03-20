@@ -18,7 +18,7 @@ on localhost the sites to build must be added on the "ssl/hosts"
 
 Uses the following phases
 
-* CONNECT 
+* CONNECT
 * PRE_CALL (Before calling the real server)
 * POST_CALL
 * FINALIZE (After the response had been sent)

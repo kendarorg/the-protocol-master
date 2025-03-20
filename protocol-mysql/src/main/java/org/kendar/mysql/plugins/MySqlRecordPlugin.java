@@ -25,7 +25,7 @@ public class MySqlRecordPlugin extends JdbcRecordPlugin {
 
     public MySqlRecordPlugin(JsonMapper mapper, StorageRepository storage,
                              MultiTemplateEngine resolversFactory, SimpleParser parser) {
-        super(mapper, storage,resolversFactory,parser);
+        super(mapper, storage, resolversFactory, parser);
     }
 
     @Override

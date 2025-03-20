@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProtocolDto  extends BaseHtmxDto{
+public class ProtocolDto extends BaseHtmxDto {
     private List<PluginDto> plugins = new ArrayList<PluginDto>();
     private String protocol;
     private String instanceId;
-    private Map<String,Integer> openPorts = new HashMap<>();
+    private Map<String, Integer> openPorts = new HashMap<>();
 
     public Map<String, Integer> getOpenPorts() {
         return openPorts;
@@ -44,6 +44,6 @@ public class ProtocolDto  extends BaseHtmxDto{
     }
 
     public String getSafeInstanceId() {
-        return instanceId.replaceAll("-","");
+        return instanceId.replaceAll("-", "");
     }
 }

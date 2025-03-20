@@ -109,7 +109,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
 
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(getInstanceId(),getId());
+        storage = repository.buildPluginFileManager(getInstanceId(), getId());
         if (!handleSettingsChanged()) return null;
 
         return this;
@@ -120,7 +120,8 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
     public Class<?> getSettingClass() {
         return BasicMockPluginSettings.class;
     }
-    public void reloadData(){
+
+    public void reloadData() {
         handleSettingsChanged();
     }
 
@@ -168,7 +169,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new BasicMockPluginApis(this, getId(), getInstanceId(),storage,resolversFactory));
+        return List.of(new BasicMockPluginApis(this, getId(), getInstanceId(), storage, resolversFactory));
     }
 
 }

@@ -9,9 +9,10 @@
 
 
 <script type="text/javascript">
-    function cleanAccordionStatus(){
-        localStorage.setItem("accordionStatus","{}");
+    function cleanAccordionStatus() {
+        localStorage.setItem("accordionStatus", "{}");
     }
+
     function terminate() {
         if (confirm("You want to terminate the process?") == true) {
             getData("/api/global/terminate", "GET", () => {
@@ -96,7 +97,8 @@
                         </div>
                         <br>
                         <div class="input-group">
-                            <a href="#" type="button" class="btn  btn-success" onclick="downloadURI('/api/global/settings')">
+                            <a href="#" type="button" class="btn  btn-success"
+                               onclick="downloadURI('/api/global/settings')">
                                 Download settings
                             </a>
                         </div>

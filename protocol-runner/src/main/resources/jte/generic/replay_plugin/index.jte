@@ -9,8 +9,8 @@
 }
 
 <script type="text/javascript">
-    
-    function updateData(){
+
+    function updateData() {
         var data = retrieveValues({
             active:${data.isActive()}
         });
@@ -18,7 +18,7 @@
         data.blockExternal = document.getElementById("blockExternal").checked;
         data.respectCallDuration = document.getElementById("respectCallDuration").checked;
         console.log(data);
-        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
+        sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
             location.reload();
         })
     }
@@ -41,7 +41,8 @@
                 <button class="btn btn-danger" type="button"
                         onclick="updateData()">Upate settings
                 </button>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <div class="checkbox">
                     <label>
@@ -53,7 +54,8 @@
                         Ignore trivial calls
                     </label>
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <div class="checkbox">
                     <label>
@@ -65,7 +67,8 @@
                         Respect calls duration
                     </label>
                 </div>
-            </div><br>
+            </div>
+            <br>
             <div class="input-group">
                 <div class="checkbox">
                     <label>
@@ -77,7 +80,8 @@
                         Block External calls
                     </label>
                 </div>
-            </div><br>
+            </div>
+            <br>
         </div>
     </div>
 </div>

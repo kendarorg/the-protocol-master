@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class HttpMockPlugin extends BasicMockPlugin<Request, Response> {
 
     public HttpMockPlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
-        super(mapper, repository,resolversFactory);
+        super(mapper, repository, resolversFactory);
     }
 
     private static void writeHeaderParameter(Response clonedResponse, HashMap<String, String> parameters) {

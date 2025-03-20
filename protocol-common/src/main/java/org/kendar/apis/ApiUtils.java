@@ -21,7 +21,7 @@ public class ApiUtils {
         respondJson(resp, new Ko(error));
     }
 
-    public static void respondKo(Response resp, String error,int code) {
+    public static void respondKo(Response resp, String error, int code) {
         resp.setStatusCode(code);
         respondJson(resp, new Ko(error));
     }
@@ -34,9 +34,9 @@ public class ApiUtils {
 
     public static void respondJson(Response resp, Object toSerialiez) {
         resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-        if(toSerialiez instanceof String) {
-            resp.setResponseText(new TextNode((String)toSerialiez));
-        }else {
+        if (toSerialiez instanceof String) {
+            resp.setResponseText(new TextNode((String) toSerialiez));
+        } else {
             resp.setResponseText(mapper.toJsonNode(toSerialiez));
         }
     }

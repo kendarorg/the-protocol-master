@@ -20,9 +20,9 @@
             console.log(toSend);
 
             sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status) => {
-                if(status==200){
+                if (status == 200) {
                     alert("Data Sent!");
-                }else{
+                } else {
                     alert("Error sending data!")
                 }
 

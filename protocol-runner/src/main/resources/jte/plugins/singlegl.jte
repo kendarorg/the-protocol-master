@@ -97,7 +97,6 @@
 </div>
 
 
-
 @template.footer()
 
 </body>

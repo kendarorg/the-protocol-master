@@ -56,13 +56,13 @@ public class BasicTest {
         var serverThread = new Thread(() -> {
             try {
                 var args = availableArgs;
-                if(Arrays.stream(args).noneMatch((a->a.equalsIgnoreCase("-unattended")))){
+                if (Arrays.stream(args).noneMatch((a -> a.equalsIgnoreCase("-unattended")))) {
                     var newArgs = new String[args.length + 1];
                     newArgs[0] = "-unattended";
                     for (int i = 0; i < args.length; i++) {
-                        newArgs[i+1] = args[i];
+                        newArgs[i + 1] = args[i];
                     }
-                    args=newArgs;
+                    args = newArgs;
                 }
                 Main.execute(args);
                 exception.set(new Exception("Terminated abruptly"));

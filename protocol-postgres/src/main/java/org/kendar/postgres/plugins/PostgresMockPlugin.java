@@ -13,7 +13,7 @@ public class PostgresMockPlugin extends JdbcMockPlugin {
 
     @TpmConstructor
     public PostgresMockPlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
-        super(mapper, repository,resolversFactory);
+        super(mapper, repository, resolversFactory);
     }
 
     @Override

@@ -133,9 +133,9 @@ public abstract class NetworkProtoContext extends ProtoContext {
         //Create a bytebuffer fitting
         var response = ByteBuffer.allocate(length);
         var toSend = resultBuffer.toArray();
-        if(this.proxy!=null) {
-            for(var ph:proxy.getPluginHandlers(ProtocolPhase.PRE_SOCKET_WRITE,toSend,new Object())){
-                if(ph.handle(null,ProtocolPhase.PRE_SOCKET_WRITE,toSend,null)){
+        if (this.proxy != null) {
+            for (var ph : proxy.getPluginHandlers(ProtocolPhase.PRE_SOCKET_WRITE, toSend, new Object())) {
+                if (ph.handle(null, ProtocolPhase.PRE_SOCKET_WRITE, toSend, null)) {
                     break;
                 }
             }

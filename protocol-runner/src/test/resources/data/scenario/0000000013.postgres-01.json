@@ -1,70 +1,89 @@
 {
-  "timestamp" : 1742478173437,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 13,
-  "input" : {
-    "query" : "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *",
-    "parameterValues" : [ {
-      "binary" : false,
-      "output" : false,
-      "type" : "VARCHAR",
-      "value" : "TEST RD"
-    }, {
-      "binary" : false,
-      "output" : false,
-      "type" : "INTEGER",
-      "value" : "22"
-    }, {
-      "binary" : false,
-      "output" : false,
-      "type" : "VARCHAR",
-      "value" : "Test Ltd"
-    }, {
-      "binary" : false,
-      "output" : false,
-      "type" : "DOUBLE",
-      "value" : "500.22"
-    } ]
+  "timestamp": 1742478173437,
+  "constant": false,
+  "connectionId": 1,
+  "index": 13,
+  "input": {
+    "query": "insert into COMPANY_JPA (ADDRESS, AGE, DENOMINATION, SALARY) values ($1, $2, $3, $4)\nRETURNING *",
+    "parameterValues": [
+      {
+        "binary": false,
+        "output": false,
+        "type": "VARCHAR",
+        "value": "TEST RD"
+      },
+      {
+        "binary": false,
+        "output": false,
+        "type": "INTEGER",
+        "value": "22"
+      },
+      {
+        "binary": false,
+        "output": false,
+        "type": "VARCHAR",
+        "value": "Test Ltd"
+      },
+      {
+        "binary": false,
+        "output": false,
+        "type": "DOUBLE",
+        "value": "500.22"
+      }
+    ]
   },
-  "output" : {
-    "selectResult" : {
-      "records" : [ [ "1", "TEST RD", "22", "Test Ltd", "500.22" ] ],
-      "metadata" : [ {
-        "columnName" : "id",
-        "byteData" : false,
-        "columnType" : "BIGINT",
-        "precision" : 19
-      }, {
-        "columnName" : "address",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 255
-      }, {
-        "columnName" : "age",
-        "byteData" : false,
-        "columnType" : "INTEGER",
-        "precision" : 10
-      }, {
-        "columnName" : "denomination",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 255
-      }, {
-        "columnName" : "salary",
-        "byteData" : false,
-        "columnType" : "DOUBLE",
-        "precision" : 17
-      } ],
-      "count" : 1,
-      "intResult" : false,
-      "lastInsertedId" : 0
+  "output": {
+    "selectResult": {
+      "records": [
+        [
+          "1",
+          "TEST RD",
+          "22",
+          "Test Ltd",
+          "500.22"
+        ]
+      ],
+      "metadata": [
+        {
+          "columnName": "id",
+          "byteData": false,
+          "columnType": "BIGINT",
+          "precision": 19
+        },
+        {
+          "columnName": "address",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 255
+        },
+        {
+          "columnName": "age",
+          "byteData": false,
+          "columnType": "INTEGER",
+          "precision": 10
+        },
+        {
+          "columnName": "denomination",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 255
+        },
+        {
+          "columnName": "salary",
+          "byteData": false,
+          "columnType": "DOUBLE",
+          "precision": 17
+        }
+      ],
+      "count": 1,
+      "intResult": false,
+      "lastInsertedId": 0
     },
-    "intResult" : 0
+    "intResult": 0
   },
-  "durationMs" : 8,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "inputType" : "JdbcCall",
-  "outputType" : "SelectResult"
+  "durationMs": 8,
+  "type": "QUERY",
+  "caller": "JDBC",
+  "inputType": "JdbcCall",
+  "outputType": "SelectResult"
 }

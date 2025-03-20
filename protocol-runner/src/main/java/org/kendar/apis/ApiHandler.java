@@ -199,18 +199,18 @@ public class ApiHandler implements FilteringClass {
         var plugin = reqp.getPathParameter("plugin");
         var action = reqp.getPathParameter("action");
 
-            for (var instance : instances) {
-                var pluginInstance = instance.getPlugins().stream().filter(p ->
-                        p.getId().equalsIgnoreCase(plugin)).findFirst();
-                if (pluginInstance.isEmpty()) continue;
-                if (action.equalsIgnoreCase("start")) {
-                    pluginInstance.get().setActive(true);
-                } else if (action.equalsIgnoreCase("stop")) {
-                    pluginInstance.get().setActive(false);
-                }
+        for (var instance : instances) {
+            var pluginInstance = instance.getPlugins().stream().filter(p ->
+                    p.getId().equalsIgnoreCase(plugin)).findFirst();
+            if (pluginInstance.isEmpty()) continue;
+            if (action.equalsIgnoreCase("start")) {
+                pluginInstance.get().setActive(true);
+            } else if (action.equalsIgnoreCase("stop")) {
+                pluginInstance.get().setActive(false);
             }
-            respondOk(resp);
-            return true;
+        }
+        respondOk(resp);
+        return true;
     }
 
     public void addGLobalPlugins(List<GlobalPluginDescriptor> globalPlugins) {

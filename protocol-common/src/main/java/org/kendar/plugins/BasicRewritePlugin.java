@@ -3,7 +3,10 @@ package org.kendar.plugins;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
 import org.kendar.plugins.apis.BasicRewritePluginApis;
-import org.kendar.plugins.base.*;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginApiHandler;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
@@ -52,7 +55,7 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     }
 
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new BasicRewritePluginApis(this, getId(), getInstanceId(),storage,resolversFactory));
+        return List.of(new BasicRewritePluginApis(this, getId(), getInstanceId(), storage, resolversFactory));
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object request, Object response) {
@@ -76,19 +79,20 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
 
     protected abstract void replaceData(ReplacerItemInstance item, J toReplace, T request, K response);
 
-    public void reloadData(){
+    public void reloadData() {
         handleSettingsChanged();
     }
+
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;
-        for(var rewriteFile:storage.listFiles()){
+        for (var rewriteFile : storage.listFiles()) {
             try {
                 var fileData = storage.readFile(rewriteFile);
                 var replacer = mapper.deserialize(fileData, ReplacerItem.class);
                 replacers.add(new ReplacerItemInstance(replacer, useTrailing()));
-            }catch(Exception e){
-                log.error("Failed to load rewrite file {}",rewriteFile, e);
+            } catch (Exception e) {
+                log.error("Failed to load rewrite file {}", rewriteFile, e);
             }
         }
         return true;
@@ -97,7 +101,7 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(getInstanceId(),getId());
+        storage = repository.buildPluginFileManager(getInstanceId(), getId());
         if (!handleSettingsChanged()) return null;
 
         return this;

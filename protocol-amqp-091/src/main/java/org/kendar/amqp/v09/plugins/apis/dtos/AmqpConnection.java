@@ -5,6 +5,14 @@ import org.kendar.utils.JsonMapper;
 import java.util.Objects;
 
 public class AmqpConnection {
+    private Integer id;
+    private Short channel;
+    private String consumeOrigin;
+    private Object consumerTag;
+    private boolean canPublish;
+    private int consumeId;
+    private String exchange;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -17,7 +25,7 @@ public class AmqpConnection {
         return Objects.hash(id, channel, consumeOrigin, consumerTag, canPublish, consumeId, exchange);
     }
 
-    public String serialized(){
+    public String serialized() {
         return new JsonMapper().serialize(this);
     }
 
@@ -33,14 +41,6 @@ public class AmqpConnection {
                 ", exchange='" + exchange + '\'' +
                 '}';
     }
-
-    private Integer id;
-    private Short channel;
-    private String consumeOrigin;
-    private Object consumerTag;
-    private boolean canPublish;
-    private int consumeId;
-    private String exchange;
 
     public Integer getId() {
         return id;

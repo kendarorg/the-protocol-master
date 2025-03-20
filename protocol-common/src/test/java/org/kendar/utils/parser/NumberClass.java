@@ -8,6 +8,7 @@ public class NumberClass {
     private float floatValue;
     private BigDecimal bigDecimalValue;
     private boolean booleanValue;
+
     public NumberClass(int intValue, double doubleValue, float floatValue, BigDecimal bigDecimalValue, boolean booleanValue) {
         this.intValue = intValue;
         this.doubleValue = doubleValue;

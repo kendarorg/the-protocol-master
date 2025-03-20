@@ -28,7 +28,7 @@ public class JsonMapper {
     }
 
     public JsonNode convertValue(Object value) {
-        return mapper.convertValue(value,JsonNode.class);
+        return mapper.convertValue(value, JsonNode.class);
     }
 
     public String serializePretty(Object target) {

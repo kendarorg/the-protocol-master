@@ -2,10 +2,10 @@ package org.kendar.mqtt.plugins;
 
 import org.kendar.di.annotations.TpmService;
 import org.kendar.mqtt.MqttContext;
-import org.kendar.mqtt.plugins.apis.MqttPublishPluginApis;
 import org.kendar.mqtt.fsm.PublishAck;
 import org.kendar.mqtt.fsm.PublishRec;
 import org.kendar.mqtt.fsm.PublishRel;
+import org.kendar.mqtt.plugins.apis.MqttPublishPluginApis;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
@@ -74,7 +74,7 @@ public class MqttPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettin
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new MqttPublishPluginApis(this, getId(), getInstanceId(),resolversFactory));
+        return List.of(new MqttPublishPluginApis(this, getId(), getInstanceId(), resolversFactory));
     }
 
     public void expectPubRec(MqttContext context, PublishRel pubRel) {

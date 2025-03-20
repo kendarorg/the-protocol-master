@@ -6,21 +6,22 @@
 }
 <div class="panel-body" id="sslHostSettings">
     <script>
-        function addHost(){
+        function addHost() {
             var val = retrieveValue('sslHostToAdd').;
-            if(val!==null && val.length>0){
-                sendData('/api/protocols/${data.getInstanceId()}/plugins/ssl-plugin/hosts?host='+val,'POST',null,'application/json',()=>{
+            if (val !== null && val.length > 0) {
+                sendData('/api/protocols/${data.getInstanceId()}/plugins/ssl-plugin/hosts?host=' + val, 'POST', null, 'application/json', () => {
                     htmx.ajax('GET', '/protocols/${data.getInstanceId()}/plugins/ssl-plugin/hosts', {
-                        target:'#sslHostSettings', swap:'outerHTML'
+                        target: '#sslHostSettings', swap: 'outerHTML'
                     })
                 })
             }
         }
-        function removeHost(host){
-            if(host!==null && host.length>0){
-                sendData('/api/protocols/${data.getInstanceId()}/plugins/ssl-plugin/hosts?host='+host,'DELETE',null,'application/json',()=>{
+
+        function removeHost(host) {
+            if (host !== null && host.length > 0) {
+                sendData('/api/protocols/${data.getInstanceId()}/plugins/ssl-plugin/hosts?host=' + host, 'DELETE', null, 'application/json', () => {
                     htmx.ajax('GET', '/protocols/${data.getInstanceId()}/plugins/ssl-plugin/hosts', {
-                        target:'#sslHostSettings', swap:'outerHTML'
+                        target: '#sslHostSettings', swap: 'outerHTML'
                     })
                 })
             }

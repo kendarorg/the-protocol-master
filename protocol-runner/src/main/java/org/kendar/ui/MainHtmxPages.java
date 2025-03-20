@@ -1,7 +1,5 @@
 package org.kendar.ui;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-import gg.jte.output.StringOutput;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.apis.FilteringClass;
@@ -27,6 +25,7 @@ public class MainHtmxPages implements FilteringClass {
         this.resolversFactory = resolversFactory;
         this.diService = diService;
     }
+
     @Override
     public String getId() {
         return getClass().getName();
@@ -37,7 +36,7 @@ public class MainHtmxPages implements FilteringClass {
             method = "GET", id = "GET /")
     public void root(Request request, Response response) {
         var settings = diService.getInstance(GlobalSettings.class);
-        resolversFactory.render("index.jte",settings,response);
+        resolversFactory.render("index.jte", settings, response);
     }
 
 }

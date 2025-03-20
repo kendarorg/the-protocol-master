@@ -70,7 +70,6 @@ This is useful to generate "dynamic" responses
 
 The files are located into the "path" `[dataDir]/[protocol instance id]/[mock-plugin]
 
-
 ### rewrite-plugin
 
 To change some call, for example to rewrite all call to `SELECT * FROM XX` to `SELECT * FROM YY`

@@ -1,25 +1,25 @@
 {
-  "timestamp" : 1742478173147,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 11,
-  "input" : {
-    "query" : "drop table if exists COMPANY_JPA cascade",
-    "parameterValues" : [ ]
+  "timestamp": 1742478173147,
+  "constant": false,
+  "connectionId": 1,
+  "index": 11,
+  "input": {
+    "query": "drop table if exists COMPANY_JPA cascade",
+    "parameterValues": []
   },
-  "output" : {
-    "selectResult" : {
-      "records" : [ ],
-      "metadata" : [ ],
-      "count" : 0,
-      "intResult" : true,
-      "lastInsertedId" : 0
+  "output": {
+    "selectResult": {
+      "records": [],
+      "metadata": [],
+      "count": 0,
+      "intResult": true,
+      "lastInsertedId": 0
     },
-    "intResult" : 0
+    "intResult": 0
   },
-  "durationMs" : 5,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "inputType" : "JdbcCall",
-  "outputType" : "SelectResult"
+  "durationMs": 5,
+  "type": "QUERY",
+  "caller": "JDBC",
+  "inputType": "JdbcCall",
+  "outputType": "SelectResult"
 }

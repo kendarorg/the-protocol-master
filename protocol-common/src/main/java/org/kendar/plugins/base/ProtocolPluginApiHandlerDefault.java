@@ -153,7 +153,7 @@ public class ProtocolPluginApiHandlerDefault<T extends ProtocolPluginDescriptor>
             var ppdb = (ProtocolPluginDescriptorBase) pluginInstance;
             var globalSettings = DiService.getThreadContext().getInstance(GlobalSettings.class);
             var pfk = globalSettings.getProtocolForKey(ppdb.getInstanceId());
-            pfk.getPlugins().put(pluginInstance.getId(),settings);
+            pfk.getPlugins().put(pluginInstance.getId(), settings);
             ppdb.setSettings((PluginSettings) settings);
             respondOk(resp);
         } else {

@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ProtocolStatusDto  extends BaseHtmxDto{
+public class ProtocolStatusDto extends BaseHtmxDto {
     private List<ProtocolDto> protocols = new ArrayList<ProtocolDto>();
 
     public List<PluginDto> getActivePlugins() {
         var result = new ArrayList<PluginDto>();
-        for(var protocol : protocols) {
-            for(var plugin : protocol.getPlugins()) {
-                if(plugin.isActive()) {
+        for (var protocol : protocols) {
+            for (var plugin : protocol.getPlugins()) {
+                if (plugin.isActive()) {
                     result.add(plugin);
                 }
             }
@@ -22,25 +22,25 @@ public class ProtocolStatusDto  extends BaseHtmxDto{
     }
 
     public List<WildcarPluginDto> getWildcardPlugins() {
-        var partial = new HashMap<String,List<PluginDto>>();
-        for(var protocol : protocols) {
-            for(var plugin : protocol.getPlugins()) {
-                if(AlwaysActivePlugin.class.isAssignableFrom(plugin.getClass())) {
+        var partial = new HashMap<String, List<PluginDto>>();
+        for (var protocol : protocols) {
+            for (var plugin : protocol.getPlugins()) {
+                if (AlwaysActivePlugin.class.isAssignableFrom(plugin.getClass())) {
                     continue;
                 }
-                if(!partial.containsKey(plugin.getId())){
-                    partial.put(plugin.getId(),new ArrayList<>());
+                if (!partial.containsKey(plugin.getId())) {
+                    partial.put(plugin.getId(), new ArrayList<>());
                 }
                 partial.get(plugin.getId()).add(plugin);
             }
         }
         var result = new ArrayList<WildcarPluginDto>();
-        for(var plugin : partial.values()) {
+        for (var plugin : partial.values()) {
             var dto = new WildcarPluginDto(plugin.get(0).getId());
             var active = plugin.stream().filter(pluginDto -> pluginDto.isActive()).count();
-            var inactive = plugin.size()-active;
-            dto.setActive((int)active);
-            dto.setNotActive((int)inactive);
+            var inactive = plugin.size() - active;
+            dto.setActive((int) active);
+            dto.setNotActive((int) inactive);
             result.add(dto);
         }
         return result;

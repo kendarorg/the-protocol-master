@@ -29,7 +29,7 @@ public class HttpLatencyPluginCli extends BasicLatencyPluginCli {
     @Override
     protected CommandOption[] buildPluginOptions(PluginSettings settings) {
         var options = new ArrayList<CommandOption>();
-        for(var opt:super.buildPluginOptions(settings)){
+        for (var opt : super.buildPluginOptions(settings)) {
             options.add(opt);
         }
         options.add(CommandOption.of("t", "Modify latency on following websites @\r\n" +

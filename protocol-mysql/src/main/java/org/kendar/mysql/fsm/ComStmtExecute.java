@@ -117,9 +117,9 @@ public class ComStmtExecute extends ProtoState {
 
 
                                 String s = outDateFormat.format(((Calendar) value).getTime());
-                                if(mysqlFieldType==0x07){
+                                if (mysqlFieldType == 0x07) {
                                     var microSec = String.format("%06d", inputBuffer.readUB4());
-                                    s+= "." + microSec;
+                                    s += "." + microSec;
                                 }
                                 value = java.sql.Timestamp.valueOf(s);
                                 break;

@@ -49,15 +49,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     private boolean httpRunning;
     private boolean httpsRunning;
 
-    @Override
-    public ProtocolSettings getSettings(){
-        return settings;
-    }
-
-    public Map<String,Integer> getPorts(){
-        return Map.of("proxy",settings.getProxy(),"http",settings.getHttp(),"https",settings.getHttps());
-    }
-
     @TpmConstructor
     public HttpProtocol(GlobalSettings ini, HttpProtocolSettings settings,
                         @TpmNamed(tags = "http") List<BasePluginDescriptor> plugins) {
@@ -77,7 +68,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
         java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
     }
 
-
     private static <T> T getOrDefault(Object value, T defaultValue) {
         if (value == null) {
             return defaultValue;
@@ -92,6 +82,15 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
         certificatesManager.setupSll(httpsServer, hosts, cname, der, key);
         return httpsServer;
+    }
+
+    @Override
+    public ProtocolSettings getSettings() {
+        return settings;
+    }
+
+    public Map<String, Integer> getPorts() {
+        return Map.of("proxy", settings.getProxy(), "http", settings.getHttp(), "https", settings.getHttps());
     }
 
     @Override
@@ -180,29 +179,29 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             log.info("[CL>TP][IN] Listening on *.:{} Https", httpsPort);
 
 
-            EventsQueue.register("http-"+getSettings().getProtocolInstanceId(),(e)->{
+            EventsQueue.register("http-" + getSettings().getProtocolInstanceId(), (e) -> {
                 try {
 
                     certificatesManager.setupSll(httpsServer, List.of(e.getHost()), cname, sslDer, sslKey);
                 } catch (Exception ex) {
-                    throw new RuntimeException("Error updating ssl "+protocol.getSettings().getProtocolInstanceId(),ex);
+                    throw new RuntimeException("Error updating ssl " + protocol.getSettings().getProtocolInstanceId(), ex);
                 }
             }, SSLAddHostEvent.class);
-            EventsQueue.register("http-"+getSettings().getProtocolInstanceId(),(e)->{
+            EventsQueue.register("http-" + getSettings().getProtocolInstanceId(), (e) -> {
                 try {
                     certificatesManager.unsetSll(httpsServer, List.of(e.getHost()), cname, sslDer, sslKey);
                 } catch (Exception ex) {
-                    throw new RuntimeException("Error updating ssl "+protocol.getSettings().getProtocolInstanceId(),ex);
+                    throw new RuntimeException("Error updating ssl " + protocol.getSettings().getProtocolInstanceId(), ex);
                 }
             }, SSLRemoveHostEvent.class);
 
-            var concurrentHashMap = new ConcurrentHashMap<String,String>();
+            var concurrentHashMap = new ConcurrentHashMap<String, String>();
             proxy = new ProxyServer(proxyPort)
                     .withHttpRedirect(port).withHttpsRedirect(httpsPort)
                     .withDnsResolver(host -> {
                         try {
-                            if(!concurrentHashMap.containsKey(host)){
-                                concurrentHashMap.put(host,host);
+                            if (!concurrentHashMap.containsKey(host)) {
+                                concurrentHashMap.put(host, host);
                                 EventsQueue.send(new ReportDataEvent(
                                         getSettings().getProtocolInstanceId(),
                                         "dns",

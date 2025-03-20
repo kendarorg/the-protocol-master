@@ -1,1 +1,12 @@
-{"instanceId":"postgres-01","protocol":"postgres","query":"SET application_name = 'PostgreSQL JDBC Driver'","connectionId":1,"timestamp":1742478171056,"duration":3,"tags":{"inputsCount":"0","resultsCount":"0"}}
+{
+  "instanceId": "postgres-01",
+  "protocol": "postgres",
+  "query": "SET application_name = 'PostgreSQL JDBC Driver'",
+  "connectionId": 1,
+  "timestamp": 1742478171056,
+  "duration": 3,
+  "tags": {
+    "inputsCount": "0",
+    "resultsCount": "0"
+  }
+}

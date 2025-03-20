@@ -9,7 +9,7 @@ import org.kendar.utils.JsonMapper;
 @TpmService(tags = "postgres")
 public class PostgresRewritePlugin extends JdbcRewritePlugin {
     public PostgresRewritePlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
-        super(mapper, repository,resolversFactory);
+        super(mapper, repository, resolversFactory);
     }
 
     @Override

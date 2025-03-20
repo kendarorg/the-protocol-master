@@ -43,8 +43,8 @@ public class MySqlBasicTest {
     protected static MysqlImage mysqlContainer;
     protected static TcpServer protocolServer;
     protected static MySQLProtocol baseProtocol;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static ProtocolPluginDescriptor errorPlugin;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {
@@ -92,19 +92,19 @@ public class MySqlBasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        errorPlugin= new MySqlNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
-        latencyPlugin= new MySqlLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
+        errorPlugin = new MySqlNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
+        latencyPlugin = new MySqlLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
 
-        var pl = new MySqlRecordPlugin(mapper, storage,new MultiTemplateEngine(),new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new MySqlRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
-        var pl1 = new MySqlMockPlugin(mapper, storage,new MultiTemplateEngine());
+        var pl1 = new MySqlMockPlugin(mapper, storage, new MultiTemplateEngine());
         var global = new GlobalSettings();
         //global.putService("storage", storage);
         var mockPluginSettings = new BasicMockPluginSettings();
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new MySqlReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, pl1, rep,errorPlugin,latencyPlugin));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin));
 
 
         pl.setActive(true);
@@ -158,10 +158,10 @@ public class MySqlBasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new MySqlRecordPlugin(mapper, storage,new MultiTemplateEngine(),new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new MySqlRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
-        var pl1 = new MySqlMockPlugin(mapper, storage,new MultiTemplateEngine());
+        var pl1 = new MySqlMockPlugin(mapper, storage, new MultiTemplateEngine());
         var mockPluginSettings = new BasicMockPluginSettings();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

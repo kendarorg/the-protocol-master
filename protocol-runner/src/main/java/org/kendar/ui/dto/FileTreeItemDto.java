@@ -4,29 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileTreeItemDto {
-    public String getPath() {
-        return path;
-    }
-
-    public String getSafePath() {
-        return path.replaceAll("/", "__").replaceAll("-", "_");
-    }
+    private boolean open;
+    private String path;
 
 //    public String getRealPath(){
 //        return path+"/"+name;
 //    }
-
-    private boolean open;
-
-    public boolean isOpen() {
-        return open;
-    }
-
-    public void setOpen(boolean open) {
-        this.open = open;
-    }
-
-    private String path;
     private List<FileTreeItemDto> children = new ArrayList<>();
     //private String name;
     private boolean directory;
@@ -45,10 +28,26 @@ public class FileTreeItemDto {
 //        }
     }
 
-    public FileTreeItemDto(String root,String name, boolean directory) {
+    public FileTreeItemDto(String root, String name, boolean directory) {
         //this.name = name;
         this.directory = directory;
-        this.path = root.length()>0?root+"/"+name:name;
+        this.path = root.length() > 0 ? root + "/" + name : name;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getSafePath() {
+        return path.replaceAll("/", "__").replaceAll("-", "_");
+    }
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
     }
 
     public List<FileTreeItemDto> getChildren() {
@@ -60,7 +59,7 @@ public class FileTreeItemDto {
     }
 
     public String getName() {
-        var ph =path.substring(path.lastIndexOf("/")+1);
+        var ph = path.substring(path.lastIndexOf("/") + 1);
         return ph;
     }
 

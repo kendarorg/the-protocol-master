@@ -53,7 +53,7 @@ public class SSLDummyPlugin extends ProtocolPluginDescriptorBase<SSLDummyPluginS
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new SSLApiHandler(this, getId(), getInstanceId(), protocolSettings,resolversFactory));
+        return List.of(new SSLApiHandler(this, getId(), getInstanceId(), protocolSettings, resolversFactory));
     }
 
     @Override

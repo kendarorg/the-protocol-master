@@ -1,30 +1,36 @@
 {
-  "timestamp" : 1742478171377,
-  "constant" : false,
-  "connectionId" : 1,
-  "index" : 6,
-  "input" : {
-    "query" : "select current_schema()",
-    "parameterValues" : [ ]
+  "timestamp": 1742478171377,
+  "constant": false,
+  "connectionId": 1,
+  "index": 6,
+  "input": {
+    "query": "select current_schema()",
+    "parameterValues": []
   },
-  "output" : {
-    "selectResult" : {
-      "records" : [ [ "public" ] ],
-      "metadata" : [ {
-        "columnName" : "current_schema",
-        "byteData" : false,
-        "columnType" : "VARCHAR",
-        "precision" : 2147483647
-      } ],
-      "count" : 1,
-      "intResult" : false,
-      "lastInsertedId" : 0
+  "output": {
+    "selectResult": {
+      "records": [
+        [
+          "public"
+        ]
+      ],
+      "metadata": [
+        {
+          "columnName": "current_schema",
+          "byteData": false,
+          "columnType": "VARCHAR",
+          "precision": 2147483647
+        }
+      ],
+      "count": 1,
+      "intResult": false,
+      "lastInsertedId": 0
     },
-    "intResult" : 0
+    "intResult": 0
   },
-  "durationMs" : 3,
-  "type" : "QUERY",
-  "caller" : "JDBC",
-  "inputType" : "JdbcCall",
-  "outputType" : "SelectResult"
+  "durationMs": 3,
+  "type": "QUERY",
+  "caller": "JDBC",
+  "inputType": "JdbcCall",
+  "outputType": "SelectResult"
 }

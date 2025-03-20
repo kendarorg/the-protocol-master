@@ -17,60 +17,60 @@
     }
 
 
-    function pasteData(){
-            navigator.clipboard.readText()
-                .then(text => {
-                    var obj = JSON.parse(text);
-                    setValue('type',obj['type']);
-                    setValue('index',obj['index']);
-                    setValue('caller',obj['caller']);
-                    setValue('inputType',obj['inputType']);
-                    setValue('outputType',obj['outputType']);
-                    setValue('nthRequest',obj['nthRequest']);
-                    setValue('count',obj['count']);
-                    setValue('output',JSON.stringify(obj['output']));
-                    setValue('input',JSON.stringify(obj['input']));
-                })
-                .catch(err => {
-                    console.error('Failed to read clipboard contents: ', err);
-                    alert("Invalid content! "+err);
-                });
+    function pasteData() {
+        navigator.clipboard.readText()
+            .then(text => {
+                var obj = JSON.parse(text);
+                setValue('type', obj['type']);
+                setValue('index', obj['index']);
+                setValue('caller', obj['caller']);
+                setValue('inputType', obj['inputType']);
+                setValue('outputType', obj['outputType']);
+                setValue('nthRequest', obj['nthRequest']);
+                setValue('count', obj['count']);
+                setValue('output', JSON.stringify(obj['output']));
+                setValue('input', JSON.stringify(obj['input']));
+            })
+            .catch(err => {
+                console.error('Failed to read clipboard contents: ', err);
+                alert("Invalid content! " + err);
+            });
     }
 
     function saveContentFile() {
         var toSend = retrieveValues(
             {
                 connectionId: 0,
-                index:-1,
+                index: -1,
                 durationMs: 0,
                 type: null,
                 caller: null,
                 inputType: null,
                 outputType: null,
-                timestamp:0,
-                constant:false,
-                nthRequest:-1,
-                count:-1
+                timestamp: 0,
+                constant: false,
+                nthRequest: -1,
+                count: -1
             });
         try {
             toSend.input = JSON.parse(retrieveValue("input"));
-        }catch (error){
+        } catch (error) {
             toSend.input = {};
         }
         try {
             toSend.output = JSON.parse(retrieveValue("output"));
-        }catch (error){
+        } catch (error) {
             toSend.output = {};
         }
         console.log("Copying record");
         console.log(toSend);
-        var fileName= retrieveValue("fileName");
-        var path ="/api/protocols/${data.getInstanceId()}/plugins/mock-plugin/mocks/"+fileName;
-        sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status,message) => {
-            if(status==200){
+        var fileName = retrieveValue("fileName");
+        var path = "/api/protocols/${data.getInstanceId()}/plugins/mock-plugin/mocks/" + fileName;
+        sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status, message) => {
+            if (status == 200) {
                 alert("Data Sent!");
-            }else{
-                alert("Error sending data! "+message)
+            } else {
+                alert("Error sending data! " + message)
             }
 
         })

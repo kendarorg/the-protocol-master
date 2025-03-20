@@ -1,1 +1,17 @@
-{"instanceId":"http-01","protocol":"http","query":"http://localhost/","connectionId":0,"timestamp":1742478173511,"duration":42,"tags":{"requestSize":"0","responseSize":"0","method":"GET","query":"{}","contentType":"unknown","returnType":"application/json","host":"localhost"}}
+{
+  "instanceId": "http-01",
+  "protocol": "http",
+  "query": "http://localhost/",
+  "connectionId": 0,
+  "timestamp": 1742478173511,
+  "duration": 42,
+  "tags": {
+    "requestSize": "0",
+    "responseSize": "0",
+    "method": "GET",
+    "query": "{}",
+    "contentType": "unknown",
+    "returnType": "application/json",
+    "host": "localhost"
+  }
+}

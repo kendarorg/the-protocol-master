@@ -5,5 +5,5 @@ import org.kendar.plugins.cli.BasicNetworkErrorPluginCli;
 
 @TpmService(tags = "mongodb")
 public class MongoNetworErrorPluginCli extends BasicNetworkErrorPluginCli {
-    
+
 }

@@ -12,12 +12,12 @@ public class OptionalTemplate {
     private final String template;
     private final String genericTemplate;
 
-    public OptionalTemplate(Object data, String template,String genericTemplate) {
+    public OptionalTemplate(Object data, String template, String genericTemplate) {
         this.data = data;
-        this.template = template.replaceAll("-","_");
-        if(genericTemplate!=null) {
-            this.genericTemplate = genericTemplate.replaceAll("-","_");
-        }else{
+        this.template = template.replaceAll("-", "_");
+        if (genericTemplate != null) {
+            this.genericTemplate = genericTemplate.replaceAll("-", "_");
+        } else {
             this.genericTemplate = null;
         }
 
@@ -31,8 +31,8 @@ public class OptionalTemplate {
             try {
                 mte.render(template, data, output);
                 return output.toString();
-            }catch (TemplateNotFoundException e) {
-                if(genericTemplate!=null) {
+            } catch (TemplateNotFoundException e) {
+                if (genericTemplate != null) {
                     usedTemplate = genericTemplate;
                     mte.render(genericTemplate, data, output);
                     return output.toString();
@@ -40,10 +40,10 @@ public class OptionalTemplate {
                 log.info("Not found template for {}", template);
                 return "";
             }
-        }catch (TemplateNotFoundException e){
-            log.info("Not found template for {} or {}", template,genericTemplate);
+        } catch (TemplateNotFoundException e) {
+            log.info("Not found template for {} or {}", template, genericTemplate);
             return "";
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error while generating template for {}", usedTemplate, e);
             return "";
         }

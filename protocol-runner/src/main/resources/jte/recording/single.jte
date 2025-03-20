@@ -61,7 +61,8 @@
             <div class="input-group ">
                 <label for="durationMs" class="control-label">Duration MS</label>
                 <div>
-                    <input id="durationMs" type="number" class="form-control" value="${data.getData().getDurationMs()}"/>
+                    <input id="durationMs" type="number" class="form-control"
+                           value="${data.getData().getDurationMs()}"/>
                 </div>
             </div>
 
@@ -115,9 +116,15 @@
         <div class="col-xs-12 "><label for="tags" class="control-label">Tags</label>
             <br>
             <table id="tags" class="table table-bordered table-striped">
-                <tr><th>Id</th><th>Value</th></tr>
+                <tr>
+                    <th>Id</th>
+                    <th>Value</th>
+                </tr>
                 @for(var kvp:data.getIndex().getTags().entrySet())
-                <tr><td>${kvp.getKey()}</td><td>${kvp.getValue()}</td></tr>
+                    <tr>
+                        <td>${kvp.getKey()}</td>
+                        <td>${kvp.getValue()}</td>
+                    </tr>
                 @endfor
             </table>
         </div>
