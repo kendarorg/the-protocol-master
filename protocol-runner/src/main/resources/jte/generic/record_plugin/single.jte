@@ -26,7 +26,7 @@
     <div class="input-group">
         <label for="body" class="control-label">Content</label>
         <div>
-            <textarea id="body" rows="4" cols="60" class="form-control">${data.getBody()}</textarea>
+            <textarea id="body" rows="4" cols="200" class="form-control">${data.getBody()}</textarea>
         </div>
     </div>
     <br>

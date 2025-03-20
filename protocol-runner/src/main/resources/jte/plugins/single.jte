@@ -80,7 +80,7 @@
                                 <label for="settings" class="control-label">Settings</label>
                                 <div>
                                     <textarea id="settings" class="form-control" rows="10"
-                                              cols="60">${data.getSettings()}</textarea>
+                                              cols="200">${data.getSettings()}</textarea>
                                 </div>
                             </div>
                             <div class="input-group">

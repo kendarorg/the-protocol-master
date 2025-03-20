@@ -37,21 +37,21 @@
     <div class="input-group">
         <label for="toFind" class="control-label">To Find</label>
         <div>
-            <textarea id="toFind" rows="4" cols="60" class="form-control">${data.getReplacerItem().getToFind()}</textarea>
+            <textarea id="toFind" rows="4" cols="200" class="form-control">${data.getReplacerItem().getToFind()}</textarea>
         </div>
     </div>
     <br>
     <div class="input-group">
         <label for="toReplace" class="control-label">To Replace</label>
         <div>
-            <textarea id="toReplace" rows="4" cols="60" class="form-control">${data.getReplacerItem().getToReplace()}</textarea>
+            <textarea id="toReplace" rows="4" cols="200" class="form-control">${data.getReplacerItem().getToReplace()}</textarea>
         </div>
     </div>
     <br>
     <div class="input-group">
         <label for="testTarget" class="control-label">To Verify</label>
         <div>
-            <textarea id="testTarget" rows="4" cols="60" class="form-control"></textarea>
+            <textarea id="testTarget" rows="4" cols="200" class="form-control"></textarea>
         </div>
     </div>
     <br>

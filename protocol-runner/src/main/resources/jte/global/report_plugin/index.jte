@@ -58,7 +58,7 @@
                 <div class="input-group">
                     <label for="tpmqlQuery" class="control-label">Query</label>
                     <div>
-                        <textarea id="tpmqlQuery" class="form-control" rows="6" cols="70">
+                        <textarea id="tpmqlQuery" class="form-control" rows="6" cols="200">
 SELECT(
     WHAT(date=MSTODATE(timestamp),instanceId,protocol,
         query=SUBSTR(query,50),duration,tags=WRAP(tags,50,' ')),
