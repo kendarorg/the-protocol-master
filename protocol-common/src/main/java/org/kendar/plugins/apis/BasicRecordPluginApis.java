@@ -23,16 +23,16 @@ import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
 @HttpTypeFilter()
-public class BaseRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicRecordPlugin> {
+public class BasicRecordPluginApis extends ProtocolPluginApiHandlerDefault<BasicRecordPlugin> {
 
 
     private final PluginFileManager storage;
     private final MultiTemplateEngine resolversFactory;
     private final SimpleParser parser;
 
-    public BaseRecordPluginApis(BasicRecordPlugin descriptor, String id, String instanceId,
-                                PluginFileManager storage, MultiTemplateEngine resolversFactory,
-                                SimpleParser parser) {
+    public BasicRecordPluginApis(BasicRecordPlugin descriptor, String id, String instanceId,
+                                 PluginFileManager storage, MultiTemplateEngine resolversFactory,
+                                 SimpleParser parser) {
         super(descriptor, id, instanceId);
         this.storage = storage;
         this.resolversFactory = resolversFactory;

@@ -1,0 +1,1 @@
+{"toFind":"http://localhost/regex/([a-zA-Z0-9]+)","toReplace":"https://www.$1.com","regex":true}

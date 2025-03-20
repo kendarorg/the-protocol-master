@@ -2,7 +2,7 @@ package org.kendar.plugins;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
-import org.kendar.plugins.apis.BaseRewritePluginApis;
+import org.kendar.plugins.apis.BasicRewritePluginApis;
 import org.kendar.plugins.base.*;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.proxy.PluginContext;
@@ -52,7 +52,7 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
     }
 
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new BaseRewritePluginApis(this, getId(), getInstanceId(),storage,resolversFactory));
+        return List.of(new BasicRewritePluginApis(this, getId(), getInstanceId(),storage,resolversFactory));
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object request, Object response) {
@@ -76,6 +76,9 @@ public abstract class BasicRewritePlugin<T, K, W extends RewritePluginSettings, 
 
     protected abstract void replaceData(ReplacerItemInstance item, J toReplace, T request, K response);
 
+    public void reloadData(){
+        handleSettingsChanged();
+    }
     @Override
     protected boolean handleSettingsChanged() {
         if (getSettings() == null) return false;

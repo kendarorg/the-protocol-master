@@ -10,35 +10,6 @@
 }
 
 <script type="text/javascript">
-    function openSpecificFile(file) {
-        return htmx.ajax('GET', '/protocols/${data.getInstanceId()}/plugins/${data.getId()}/file/' + file, {
-            target: '#singleFile',
-            swap: 'outerHTML'
-        })
-    }
-
-    function searchFiles(tpmql){
-        return htmx.ajax('GET', '/protocols/${data.getInstanceId()}/plugins/${data.getId()}/file?'+
-            "tpmql="+encodeURIComponent(tpmql), {
-            target: '#filesList',
-            swap: 'outerHTML'
-        })
-    }
-
-    function saveContentFile() {
-        var filename = retrieveValue("currentFileName");
-        var data = retrieveValue('body');
-        sendData('/api/protocols/${data.getInstanceId()}/plugins/record-plugin/record/' + filename, 'POST',
-            data, 'application/json', () => {
-                location.reload()
-            })
-    }
-
-    function deleteContentFile() {
-        getData('/api/protocols/${data.getInstanceId()}/plugins/record-plugin/record/' + filename, 'DELETE', () => {
-            location.reload()
-        })
-    }
 
     function updateData(){
         var data = retrieveValues({

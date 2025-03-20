@@ -8,6 +8,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.BasicMockPlugin;
 import org.kendar.plugins.MockStorage;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.JsonMapper;
 
@@ -21,8 +22,8 @@ import java.util.stream.Collectors;
 @TpmService(tags = "http")
 public class HttpMockPlugin extends BasicMockPlugin<Request, Response> {
 
-    public HttpMockPlugin(JsonMapper mapper, StorageRepository repository) {
-        super(mapper, repository);
+    public HttpMockPlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
+        super(mapper, repository,resolversFactory);
     }
 
     private static void writeHeaderParameter(Response clonedResponse, HashMap<String, String> parameters) {

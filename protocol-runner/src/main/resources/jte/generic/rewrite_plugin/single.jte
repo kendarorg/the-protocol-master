@@ -2,7 +2,6 @@
 
 <div id="singleFile">
 @if(data!=null)
-    <input type="hidden" id="currentFileName" value="${data.getFileName()}">
 
     <div class="input-group">
         <button type="button" class="btn  btn-danger"
@@ -19,6 +18,14 @@
                 onclick="testMatching()">
             Test
         </button>
+    </div>
+    <br>
+
+    <div class="input-group ">
+        <label for="fileName" class="control-label">File Name</label>
+        <div>
+            <input id="fileName" type="text" readonly="readonly" class="form-control" value="${data.getFileName()}"/>
+        </div>
     </div>
     <br>
     <div class="input-group">

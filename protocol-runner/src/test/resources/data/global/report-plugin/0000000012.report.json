@@ -1,0 +1,1 @@
+{"instanceId":"postgres-01","protocol":"postgres","query":"create table COMPANY_JPA (ID  bigserial not null, ADDRESS varchar(255), AGE int4, DENOMINATION varchar(255), SALARY float8, primary key (ID))","connectionId":1,"timestamp":1742478173155,"duration":9,"tags":{"inputsCount":"0","resultsCount":"0"}}

@@ -1,0 +1,69 @@
+{
+  "timestamp" : 1742478173511,
+  "constant" : false,
+  "connectionId" : 0,
+  "index" : 14,
+  "input" : {
+    "id" : 3,
+    "ms" : 1742478173511,
+    "method" : "GET",
+    "headers" : {
+      "Accept-encoding" : [ "gzip,deflate" ],
+      "Proxy-connection" : [ "Keep-Alive" ],
+      "Host" : [ "localhost:18080" ],
+      "User-agent" : [ "Apache-HttpClient/4.5.13 (Java/17.0.12)" ],
+      "Proxy-agent" : [ "Simple/0.1" ]
+    },
+    "protocol" : "http",
+    "soapRequest" : false,
+    "multipartData" : [ ],
+    "host" : "localhost",
+    "path" : "/",
+    "postParameters" : { },
+    "port" : 18080,
+    "query" : { },
+    "remoteHost" : "127.0.0.1",
+    "pathParameters" : { },
+    "size" : 0
+  },
+  "output" : {
+    "responseText" : {
+      "id" : 4,
+      "ms" : 1742478173536,
+      "method" : "GET",
+      "headers" : {
+        "Accept-encoding" : [ "gzip,deflate" ],
+        "Proxy-connection" : [ "Keep-Alive" ],
+        "Connection" : [ "Keep-Alive" ],
+        "Host" : [ "localhost:18080" ],
+        "X-block-recursive" : [ "http://localhost:18080/" ],
+        "User-agent" : [ "Apache-HttpClient/4.5.13 (Java/17.0.12)" ],
+        "Proxy-agent" : [ "Simple/0.1" ]
+      },
+      "protocol" : "http",
+      "soapRequest" : false,
+      "multipartData" : [ ],
+      "host" : "localhost",
+      "path" : "/",
+      "postParameters" : { },
+      "port" : 18080,
+      "query" : { },
+      "remoteHost" : "127.0.0.1",
+      "pathParameters" : { },
+      "size" : 0
+    },
+    "headers" : {
+      "Content-type" : [ "application/json" ],
+      "Content-length" : [ "497" ],
+      "Date" : [ "Thu, 20 Mar 2025 13:42:53 GMT" ]
+    },
+    "statusCode" : 200,
+    "messages" : [ ],
+    "size" : 0
+  },
+  "durationMs" : 43,
+  "type" : "GET",
+  "caller" : "HTTP",
+  "inputType" : "Request",
+  "outputType" : "Response"
+}

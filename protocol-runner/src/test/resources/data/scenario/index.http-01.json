@@ -1,0 +1,23 @@
+[ {
+  "index" : 14,
+  "timestamp" : 1742478173590,
+  "type" : "GET",
+  "caller" : "HTTP",
+  "durationMs" : 43,
+  "tags" : {
+    "path" : "/",
+    "query" : "",
+    "host" : "localhost"
+  }
+}, {
+  "index" : 16,
+  "timestamp" : 1742478173926,
+  "type" : "GET",
+  "caller" : "HTTP",
+  "durationMs" : 36,
+  "tags" : {
+    "path" : "/api/global/plugins/report-plugin/download",
+    "query" : "",
+    "host" : "localhost"
+  }
+} ]

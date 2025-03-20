@@ -10,6 +10,16 @@ function retrieveValue(id){
     return el.value;
 }
 
+function setValue(id,value){
+    var el = document.getElementById(id);
+    if(el.type==="number"){
+        el.value =+value;
+    }else{
+        el.value =value;
+    }
+
+}
+
 function retrieveValues(obj){
     var propertyNames = Object.getOwnPropertyNames(obj);
     for(var i=0;i<propertyNames.length;i++){

@@ -105,7 +105,7 @@ public class PostgresBasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var pl = new PostgresRecordPlugin(mapper, storage,new MultiTemplateEngine(),new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
-        var pl1 = new PostgresMockPlugin(mapper, storage);
+        var pl1 = new PostgresMockPlugin(mapper, storage,new MultiTemplateEngine());
         errorPlugin= new PostgresNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin= new PostgresLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
 

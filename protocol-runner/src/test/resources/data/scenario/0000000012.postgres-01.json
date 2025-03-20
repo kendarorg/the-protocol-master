@@ -1,0 +1,25 @@
+{
+  "timestamp" : 1742478173164,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 12,
+  "input" : {
+    "query" : "create table COMPANY_JPA (ID  bigserial not null, ADDRESS varchar(255), AGE int4, DENOMINATION varchar(255), SALARY float8, primary key (ID))",
+    "parameterValues" : [ ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ ],
+      "metadata" : [ ],
+      "count" : 0,
+      "intResult" : true,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 0
+  },
+  "durationMs" : 9,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
+}

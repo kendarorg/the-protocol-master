@@ -198,7 +198,7 @@ public class BasicTest {
                 new HttpReportPlugin(mapper).initialize(globalSettings, httpProtocolSettings, settings),
                 new HttpLatencyPlugin(mapper),
                 new HttpRateLimitPlugin(mapper, storage),
-                new HttpMockPlugin(mapper, storage).initialize(globalSettings, httpProtocolSettings, mockSettings),
+                new HttpMockPlugin(mapper, storage,new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, mockSettings),
                 new HttpRewritePlugin(mapper, storage,new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
         baseProtocol.initialize();
         EventsQueue.register("recorder", (r) -> {

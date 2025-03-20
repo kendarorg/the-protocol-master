@@ -97,7 +97,7 @@ public class MySqlBasicTest {
 
         var pl = new MySqlRecordPlugin(mapper, storage,new MultiTemplateEngine(),new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
-        var pl1 = new MySqlMockPlugin(mapper, storage);
+        var pl1 = new MySqlMockPlugin(mapper, storage,new MultiTemplateEngine());
         var global = new GlobalSettings();
         //global.putService("storage", storage);
         var mockPluginSettings = new BasicMockPluginSettings();
@@ -161,7 +161,7 @@ public class MySqlBasicTest {
         var pl = new MySqlRecordPlugin(mapper, storage,new MultiTemplateEngine(),new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
-        var pl1 = new MySqlMockPlugin(mapper, storage);
+        var pl1 = new MySqlMockPlugin(mapper, storage,new MultiTemplateEngine());
         var mockPluginSettings = new BasicMockPluginSettings();
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

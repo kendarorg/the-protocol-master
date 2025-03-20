@@ -21,14 +21,14 @@ import org.kendar.utils.ReplacerItemInstance;
 import static org.kendar.apis.ApiUtils.*;
 
 @HttpTypeFilter()
-public class BaseRewritePluginApis extends ProtocolPluginApiHandlerDefault<BasicRewritePlugin> {
+public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<BasicRewritePlugin> {
 
 
     private final PluginFileManager storage;
     private final MultiTemplateEngine resolversFactory;
 
-    public BaseRewritePluginApis(BasicRewritePlugin descriptor, String id, String instanceId,
-                                 PluginFileManager storage, MultiTemplateEngine resolversFactory) {
+    public BasicRewritePluginApis(BasicRewritePlugin descriptor, String id, String instanceId,
+                                  PluginFileManager storage, MultiTemplateEngine resolversFactory) {
         super(descriptor, id, instanceId);
         this.storage = storage;
         this.resolversFactory = resolversFactory;

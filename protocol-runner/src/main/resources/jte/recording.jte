@@ -36,8 +36,16 @@
                 timestamp:null,
                 constant:false
             });
-        toSend.input = JSON.parse(retrieveValue("input"));
-        toSend.output = JSON.parse(retrieveValue("output"));
+        try {
+            toSend.input = JSON.parse(retrieveValue("input"));
+        }catch (error){
+            toSend.input = {};
+        }
+        try {
+            toSend.output = JSON.parse(retrieveValue("output"));
+        }catch (error){
+            toSend.output = {};
+        }
         console.log("Copying record");
         console.log(toSend);
         navigator.clipboard.writeText(JSON.stringify(toSend));

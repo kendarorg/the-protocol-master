@@ -1,0 +1,1 @@
+{"instanceId":"postgres-01","protocol":"postgres","query":"select * from information_schema.sequences","connectionId":1,"timestamp":1742478171409,"duration":9,"tags":{"inputsCount":"0","resultsCount":"0"}}

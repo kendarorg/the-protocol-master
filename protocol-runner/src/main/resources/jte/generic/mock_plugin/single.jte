@@ -1,80 +1,94 @@
-@param org.kendar.ui.dto.RecordingLine data
+@param org.kendar.plugins.apis.dtos.MockStorageFile data
 
-!{
+
+<div id="singleFile">
+@if(data!=null)
+    !{
     var mapper = new org.kendar.utils.JsonMapper();
-    var input = mapper.serialize(data.getData().getInput());
-    var output = mapper.serialize(data.getData().getOutput());
-    if(data.getData().getInput()==null)input="";
-    if(data.getData().getOutput()==null)output="";
+    var input = mapper.serialize(data.getMockStorage().getInput());
+    var output = mapper.serialize(data.getMockStorage().getOutput());
+    if(data.getMockStorage().getInput()==null)input="";
+    if(data.getMockStorage().getOutput()==null)output="";
 }
 
-<div id="recordingSingleFile" class="panel panel-default">
+    <div class="input-group">
+        <button type="button" class="btn  btn-danger"
+                onclick="deleteContentFile()">
+            Delete
+        </button>
+        &nbsp;
+        <button type="button" class="btn  btn-success"
+                onclick="saveContentFile()">
+            Update
+        </button>
+    </div>
+    <br>
+
+
+    <div class="input-group ">
+        <label for="fileName" class="control-label">File Name</label>
+        <div>
+            <input id="fileName" type="text" readonly="readonly" class="form-control" value="${data.getFileName()}"/>
+        </div>
+    </div>
+    <br>
+    <div class="input-group">
+        <label for="count" class="control-label">Count</label>
+        <input id="count" type="number" class="form-control"
+               value="${data.getMockStorage().getCount()}">
+    </div>
+    <br>
+    <div class="input-group">
+        <label for="nthRequest" class="control-label">Nth request</label>
+        <input id="nthRequest" type="number" class="form-control"
+               value="${data.getMockStorage().getNthRequest()}">
+    </div>
+
+    <br>
     <div class="panel-body">
         <div class="col-xs-4 ">
+
             <div class="input-group ">
-                <label for="index" class="control-label">Index</label>
+                <label for="index" class="control-label">Index-Sets the order of mocks if needed</label>
                 <div>
-                    <input id="index" type="number" class="form-control" value="${data.getData().getIndex()}"/>
+                    <input id="index" type="text" class="form-control" value="${data.getMockStorage().getIndex()}"/>
                 </div>
             </div>
-
-
             <div class="input-group ">
                 <label for="type" class="control-label">Type</label>
                 <div>
-                    <input id="type" type="text" class="form-control" value="${data.getData().getType()}"/>
+                    <input id="type" type="text" class="form-control" value="${data.getMockStorage().getType()}"/>
                 </div>
             </div>
 
             <div class="input-group ">
                 <label for="caller" class="control-label">Caller</label>
                 <div>
-                    <input id="caller" type="text" class="form-control" value="${data.getData().getCaller()}"/>
+                    <input id="caller" type="text" class="form-control" value="${data.getMockStorage().getCaller()}"/>
                 </div>
             </div>
         </div>
         <div class="col-xs-4 ">
-            <div class="input-group ">
-                <label for="connectionId" class="control-label">Connection Id</label>
-                <div>
-                    <input id="connectionId" type="number" class="form-control"
-                           value="${data.getData().getConnectionId()}"/>
-                </div>
-            </div>
 
             <div class="input-group ">
                 <label for="inputType" class="control-label">Input Type</label>
                 <div>
-                    <input id="inputType" type="text" class="form-control" value="${data.getData().getInputType()}"/>
+                    <input id="inputType" type="text" class="form-control" value="${data.getMockStorage().getInputType()}"/>
                 </div>
             </div>
 
             <div class="input-group ">
                 <label for="outputType" class="control-label">Output Type</label>
                 <div>
-                    <input id="outputType" type="text" class="form-control" value="${data.getData().getOutputType()}"/>
+                    <input id="outputType" type="text" class="form-control" value="${data.getMockStorage().getOutputType()}"/>
                 </div>
             </div>
         </div>
         <div class="col-xs-4 ">
-
-            <div class="input-group ">
-                <label for="durationMs" class="control-label">Duration MS</label>
-                <div>
-                    <input id="durationMs" type="number" class="form-control" value="${data.getData().getDurationMs()}"/>
-                </div>
-            </div>
-
-            <div class="input-group ">
-                <label for="timestamp" class="control-label">Timestamp</label>
-                <div>
-                    <input id="timestamp" type="number" class="form-control" value="${data.getData().getTimestamp()}"/>
-                </div>
-            </div>
             <div class="input-group ">
                 <button type="button" class="btn  btn-success"
-                        onclick="copyData()">
-                    Copy
+                        onclick="pasteData()">
+                    Paste data
                 </button>
             </div>
         </div>
@@ -112,14 +126,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 "><label for="tags" class="control-label">Tags</label>
-            <br>
-            <table id="tags" class="table table-bordered table-striped">
-                <tr><th>Id</th><th>Value</th></tr>
-                @for(var kvp:data.getIndex().getTags().entrySet())
-                <tr><td>${kvp.getKey()}</td><td>${kvp.getValue()}</td></tr>
-                @endfor
-            </table>
-        </div>
     </div>
+@endif
 </div>

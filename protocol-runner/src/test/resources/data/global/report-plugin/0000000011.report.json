@@ -1,0 +1,1 @@
+{"instanceId":"postgres-01","protocol":"postgres","query":"drop table if exists COMPANY_JPA cascade","connectionId":1,"timestamp":1742478173142,"duration":5,"tags":{"inputsCount":"0","resultsCount":"0"}}

@@ -2,7 +2,7 @@ package org.kendar.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.events.*;
-import org.kendar.plugins.apis.BaseRecordPluginApis;
+import org.kendar.plugins.apis.BasicRecordPluginApis;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -176,7 +176,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
 
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new BaseRecordPluginApis(this, getId(), getInstanceId(),
+        return List.of(new BasicRecordPluginApis(this, getId(), getInstanceId(),
                 storage,resolversFactory,parser));
     }
 
