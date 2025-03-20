@@ -25,7 +25,7 @@ public abstract class JdbcRecordPlugin extends BasicRecordPlugin<BasicRecordPlug
 
     public JdbcRecordPlugin(JsonMapper mapper, StorageRepository storage,
                             MultiTemplateEngine resolversFactory, SimpleParser parser) {
-        super(mapper, storage, resolversFactory, parser);
+        super(mapper, storage,resolversFactory,parser);
     }
 
     @Override
@@ -57,10 +57,10 @@ public abstract class JdbcRecordPlugin extends BasicRecordPlugin<BasicRecordPlug
         if (!shouldNotSaveJdbc(storageItem, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            if (!shouldIgnoreTrivialCalls()) {
+            if(!shouldIgnoreTrivialCalls()){
                 storageItem.setTrivial(true);
                 EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
-            } else {
+            }else {
                 EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
             }
         }

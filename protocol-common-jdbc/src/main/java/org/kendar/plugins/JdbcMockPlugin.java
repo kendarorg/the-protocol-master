@@ -21,7 +21,7 @@ public abstract class JdbcMockPlugin extends BasicMockPlugin<JdbcCall, SelectRes
 
 
     public JdbcMockPlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
-        super(mapper, repository, resolversFactory);
+        super(mapper, repository,resolversFactory);
     }
 
     @Override

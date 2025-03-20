@@ -17,8 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Extension
 @TpmService(tags = "dns")
 public class DnsReportPlugin extends BasicReportPlugin<PluginSettings> {
-    private ConcurrentHashMap<String, Boolean> hostsRequested = new ConcurrentHashMap<>();
-
     public DnsReportPlugin(JsonMapper mapper) {
         super(mapper);
     }
@@ -28,9 +26,11 @@ public class DnsReportPlugin extends BasicReportPlugin<PluginSettings> {
         return "dns";
     }
 
+    private ConcurrentHashMap<String,Boolean> hostsRequested = new ConcurrentHashMap<>();
+
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, String requestedDomain, List<String> out) {
         if (!isActive()) return false;
-        if (!hostsRequested.containsKey(requestedDomain)) {
+        if(!hostsRequested.containsKey(requestedDomain)) {
             hostsRequested.put(requestedDomain, true);
             var connectionId = pluginContext.getIndex();
             var duration = System.currentTimeMillis() - pluginContext.getStart();
