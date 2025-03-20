@@ -18,6 +18,15 @@
             'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit+'&format='+type
         );
     }
+
+    function deleteReports(){
+        if (confirm("You want to delete all reports data?") == true) {
+            getData("/api/global/plugins/report-plugin/report", "DELETE", () => {
+                alert("All cleaned up");
+                location.reload();
+            })
+        }
+    }
 </script>
 <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="headingReportData">
@@ -78,6 +87,11 @@ SELECT(
                     <button type="button" class="btn btn-success"
                             onclick="downloadReport('json')">
                         Download json
+                    </button>
+                    &nbsp;
+                    <button type="button" class="btn btn-danger"
+                            onclick="deleteReports()">
+                        Delete all reports
                     </button>
                 </div>
                 <br>

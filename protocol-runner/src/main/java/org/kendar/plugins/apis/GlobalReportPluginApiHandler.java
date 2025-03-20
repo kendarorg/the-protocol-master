@@ -1,8 +1,6 @@
 package org.kendar.plugins.apis;
 
 import com.fasterxml.jackson.databind.node.BinaryNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import gg.jte.output.StringOutput;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -91,6 +89,24 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     @Override
     public String getId() {
         return "global." + plugin.getId();
+    }
+
+
+    @HttpMethodFilter(
+            pathAddress = "/api/global/plugins/report-plugin/report",
+            method = "DELETE", id = "DELETE /api/global/plugins/report-plugin/report")
+    @TpmDoc(
+            description = "Delete all report data",
+            responses = {
+                    @TpmResponse(
+                            body = Ok.class
+                    )
+            },
+            tags = {"plugins/global"})
+    public void deleteReports(Request reqp, Response response) {
+       for(var file: repository.listFiles("global", "report-plugin")){
+           repository.deleteFile("global", "report-plugin",file);
+       }
     }
 
     @HttpMethodFilter(
