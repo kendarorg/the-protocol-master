@@ -29,8 +29,8 @@
     @for(var i=0;i<targetsContainer.getTarget().size();i++)
         <tr>
             <td>
-                <input type="hidden" value=" ${targetsContainer.getTarget().get(i)}"
-                       id="target_${1}">
+                <input type="hidden" value="${targetsContainer.getTarget().get(i)}"
+                       id="target_${i}">
                 ${targetsContainer.getTarget().get(i)}
             </td>
             <td>
@@ -69,9 +69,9 @@
     }
     function removeHost(host){
         if (confirm("You want to remove " + host + "?") == true) {
-            for (let i = (pluginTargets.length - 1); i >= 0; i--) {
+            for (var i = 0;i<pluginTargets.length;i++) {
                 if (pluginTargets[i] == host) {
-                    pluginTargets = pluginTargets.splice(i, 1);
+                    pluginTargets.splice(i, 1);
                     break;
                 }
             }
@@ -85,7 +85,7 @@
                 var value = retrieveValue('target_'+i);
                 result.push(value);
             }catch (error){
-                break;
+                continue;
             }
         }
         return result;

@@ -6,7 +6,7 @@
     var protocolSettings = globalSettings.getProtocolForKey(data.getInstanceId());
     var storage = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.storage.generic.StorageRepository.class);
     var files = storage.listFiles("scenario").stream().filter(f->f.endsWith("."+protocolSettings.getProtocolInstanceId())).toList();
-    var pluginSettings = (org.kendar.plugins.settings.BasicRecordPluginSettings)protocolSettings.getPlugin(data.getId(),org.kendar.plugins.settings.BasicRecordPluginSettings.class);
+    var pluginSettings = (org.kendar.plugins.settings.BasicAysncRecordPluginSettings)protocolSettings.getPlugin(data.getId(),org.kendar.plugins.settings.BasicAysncRecordPluginSettings.class);
 }
 
 <script type="text/javascript">
@@ -45,6 +45,7 @@
             active:${data.isActive()}
         });
         data.ignoreTrivialCalls = document.getElementById("ignoreTrivialCalls").checked;
+        data.resetConnectionsOnStart = document.getElementById("resetConnectionsOnStart").checked;
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
             location.reload();
@@ -71,7 +72,6 @@
                 </button>
             </div><br>
 
-
             <div class="input-group">
                 <div class="checkbox">
                     <label>
@@ -81,6 +81,18 @@
                             <input id="ignoreTrivialCalls" type="checkbox">
                         @endif
                         Ignore trivial calls
+                    </label>
+                </div>
+            </div><br>
+            <div class="input-group">
+                <div class="checkbox">
+                    <label>
+                        @if(pluginSettings.isResetConnectionsOnStart())
+                            <input id="resetConnectionsOnStart" type="checkbox" checked>
+                        @else
+                            <input id="resetConnectionsOnStart" type="checkbox">
+                        @endif
+                        Reset connections on start
                     </label>
                 </div>
             </div><br>

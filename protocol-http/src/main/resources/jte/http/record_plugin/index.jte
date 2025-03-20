@@ -6,7 +6,8 @@
     var protocolSettings = globalSettings.getProtocolForKey(data.getInstanceId());
     var storage = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.storage.generic.StorageRepository.class);
     var files = storage.listFiles("scenario").stream().filter(f->f.endsWith("."+protocolSettings.getProtocolInstanceId())).toList();
-    var pluginSettings = (org.kendar.plugins.settings.BasicRecordPluginSettings)protocolSettings.getPlugin(data.getId(),org.kendar.plugins.settings.BasicRecordPluginSettings.class);
+    var pluginSettings = (org.kendar.http.plugins.settings.HttpRecordPluginSettings)protocolSettings.getPlugin(data.getId(),org.kendar.http.plugins.settings.HttpRecordPluginSettings.class);
+    var targetsContainer = new org.kendar.http.plugins.apis.dtos.TargetsContainer(pluginSettings.getTarget(),"updateData");
 }
 
 <script type="text/javascript">
@@ -42,9 +43,11 @@
 
     function updateData(){
         var data = retrieveValues({
-            active:${data.isActive()}
+            active:${data.isActive()},
+            target:pluginTargets
         });
         data.ignoreTrivialCalls = document.getElementById("ignoreTrivialCalls").checked;
+        data.removeEtags = document.getElementById("removeEtags").checked;
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {
             location.reload();
@@ -71,7 +74,6 @@
                 </button>
             </div><br>
 
-
             <div class="input-group">
                 <div class="checkbox">
                     <label>
@@ -84,6 +86,19 @@
                     </label>
                 </div>
             </div><br>
+            <div class="input-group">
+                <div class="checkbox">
+                    <label>
+                        @if(pluginSettings.isRemoveEtags())
+                            <input id="removeEtags" type="checkbox" checked>
+                        @else
+                            <input id="removeEtags" type="checkbox">
+                        @endif
+                        Remove E-Tags
+                    </label>
+                </div>
+            </div><br>
+            @template.http.targets(targetsContainer)
         </div>
     </div>
 </div>

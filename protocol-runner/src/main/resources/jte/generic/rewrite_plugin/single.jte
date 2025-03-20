@@ -25,10 +25,11 @@
         <div class="checkbox">
             <label>
                 @if(data.getReplacerItem().isRegex())
-                    <input id="regex" type="checkbox" checked> Is regexp
+                    <input id="regex" type="checkbox" checked>
                 @else
-                    <input id="regex" type="checkbox"> Is regexp
+                    <input id="regex" type="checkbox">
                 @endif
+                Is regexp
             </label>
         </div>
     </div>

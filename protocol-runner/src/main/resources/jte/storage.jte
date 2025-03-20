@@ -77,7 +77,12 @@
 
     function deleteFile(path) {
         if (confirm("You want to remove " + path + "?") == true) {
-            return getData('/storage/file?parent=' + path, 'delete', 'application/json')
+            return getData('/storage/file?parent=' + path, 'delete', ()=>{
+                var pathSplitted = path.split('/');
+                pathSplitted.pop();
+                var parent = "/"+pathSplitted.join("/");
+                openFiles(parent)
+            })
         }
     }
 
@@ -97,7 +102,7 @@
                            href="#collapseStorage"
                            onclick="toggleAccordion('collapseStorage')"
                            aria-expanded="true" aria-controls="collapseStorage">
-                            Global Storage-Scenario Handling
+                            Global Storage
                         </a>
                     </h4>
                 </div>

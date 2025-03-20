@@ -22,7 +22,7 @@
             rateLimit:0,
             resetFormat:0,
             useCustomResponse:false,
-            target:getAllTargets()
+            target:pluginTargets
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {

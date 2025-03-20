@@ -39,6 +39,17 @@
                 @endif
 
                 <!--
+                SCENARIO
+                -->
+                @if(currentPage.startsWith("recording"))
+                    <li class="active" ><a  href="/recording">Recording</a>
+                    </li>
+                @else
+                    <li><a  href="/recording">Recording</a>
+                    </li>
+                @endif
+
+                <!--
                 PLUGINS
                 -->
                 @if(currentPage.startsWith("plugins"))

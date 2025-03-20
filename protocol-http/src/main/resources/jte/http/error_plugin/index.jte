@@ -14,7 +14,7 @@
             percentAction:0,
             showError:0,
             errorMessage:"ERROR",
-            target:getAllTargets()
+            target:pluginTargets
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status,response) => {

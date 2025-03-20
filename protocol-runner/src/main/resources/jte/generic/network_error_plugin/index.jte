@@ -20,18 +20,18 @@
     }
 </script>
 <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="headingSpecificPlugin">
+    <div class="panel-heading" role="tab" id="headingSettings">
         <h4 class="panel-title">
             <a role="button" data-toggle="collapse" data-parent="#accordion"
-               href="#collapseSpecificPlugin"
-               onclick="toggleAccordion('collapseSpecificPlugin')"
-               aria-expanded="true" aria-controls="collapseSpecificPlugin">
+               href="#collapseSettings"
+               onclick="toggleAccordion('collapseSettings')"
+               aria-expanded="true" aria-controls="collapseSettings">
                 Network error plugin settings
             </a>
         </h4>
     </div>
-    <div id="collapseSpecificPlugin" class="panel-collapse collapse" role="tabpanel"
-         aria-labelledby="headingSpecificPlugin">
+    <div id="collapseSettings" class="panel-collapse collapse" role="tabpanel"
+         aria-labelledby="headingSettings">
         <div class="panel-body">
             <div class="input-group">
                 <button class="btn btn-danger" type="button"

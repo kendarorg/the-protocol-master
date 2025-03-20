@@ -12,11 +12,16 @@
     <br>
     <table class="table table-bordered table-striped">
         <tr>
-            <th>File</th>
+            <th>File</th><th></th>
         </tr>
         @for(var file:data.getChildren())
             @if(!file.isDirectory())
-                <tr><td><span onclick="openFile('${file.getPath()}','${file.getName()}')">${file.getName()}</span></td></tr>
+                <tr><td><span onclick="openFile('${file.getPath()}','${file.getName()}')">${file.getName()}</span></td>
+                    <td><button type="button" class="btn btn-danger"
+                                onclick="deleteFile('${file.getPath()}')">
+                            Delete
+                        </button></td>
+                </tr>
             @endif
         @endfor
     </table>
