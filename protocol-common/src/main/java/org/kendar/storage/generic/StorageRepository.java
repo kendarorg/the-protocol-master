@@ -4,6 +4,7 @@ import org.kendar.Service;
 import org.kendar.di.DiService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
+import org.kendar.exceptions.TPMException;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.CompactLineComplete;
@@ -126,7 +127,7 @@ public abstract class StorageRepository implements Service {
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry zipEntry = zis.getNextEntry();
             if (zipEntry == null) {
-                throw new RuntimeException("Not a zip file!");
+                throw new TPMException("Not a zip file!");
             }
             while (zipEntry != null) {
 
@@ -155,7 +156,7 @@ public abstract class StorageRepository implements Service {
             }
             EventsQueue.send(evt);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 

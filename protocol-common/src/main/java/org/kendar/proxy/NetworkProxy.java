@@ -1,6 +1,7 @@
 package org.kendar.proxy;
 
 import org.kendar.buffers.BBuffer;
+import org.kendar.exceptions.ProxyException;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.NetworkReturnMessage;
@@ -42,7 +43,7 @@ public abstract class NetworkProxy extends Proxy {
             this.password = password;
             init();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 
@@ -74,7 +75,7 @@ public abstract class NetworkProxy extends Proxy {
         try {
             group = AsynchronousChannelGroup.withThreadPool(executor);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 

@@ -1,6 +1,7 @@
 package org.kendar.di;
 
 import org.kendar.di.annotations.*;
+import org.kendar.exceptions.DiException;
 import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;
 import org.reflections.Reflections;
@@ -189,7 +190,7 @@ public class DiService {
             } else if (type instanceof ParameterizedType) {
                 clazz = (Class<?>) ((ParameterizedType) type).getRawType();
             } else {
-                throw new RuntimeException("Type " + type + " not supported");
+                throw new DiException("Type " + type + " not supported");
             }
 
             Class<?>[] interfaces = clazz.getInterfaces();
@@ -257,7 +258,7 @@ public class DiService {
                 for (var constr : constructors) {
                     if (null != constr.getAnnotation(TpmConstructor.class)) {
                         if (constructor != null) {
-                            throw new RuntimeException("Duplicate TpmConstructor constructor found");
+                            throw new DiException("Duplicate TpmConstructor constructor found");
                         }
                         constructor = constr;
                     }
@@ -265,7 +266,7 @@ public class DiService {
             }
 
             if (constructor == null) {
-                throw new RuntimeException("No TpmConstructor found");
+                throw new DiException("No TpmConstructor found");
             }
             Object result = null;
             if (constructor.getParameterCount() == 0) {
@@ -320,7 +321,7 @@ public class DiService {
             }
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Unable to instantiate " + clazz, e);
+            throw new DiException("Unable to instantiate " + clazz, e);
         }
     }
 
@@ -331,7 +332,7 @@ public class DiService {
                 try {
                     m.invoke(o);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                    throw new DiException(e);
                 }
                 break;
             }
@@ -346,7 +347,7 @@ public class DiService {
                 try {
                     m.invoke(o);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                    throw new DiException(e);
                 }
                 break;
             }
@@ -387,7 +388,7 @@ public class DiService {
 
     private <T> List<T> getInstancesInternal(String name, Class<T> clazz, DiService context, Type type, String... tags) {
         if (scope == TpmScopeType.NONE) {
-            throw new RuntimeException("Invalid Context");
+            throw new DiException("Invalid Context");
         }
         var result = new ArrayList<T>();
         if (name != null) {
@@ -445,7 +446,7 @@ public class DiService {
 
     public List<Class<?>> getNamedDefinitions(Class<?> type, String name, String... tags) {
         if (scope == TpmScopeType.NONE) {
-            throw new RuntimeException("Invalid Context");
+            throw new DiException("Invalid Context");
         }
         var result = new ArrayList<Class<?>>();
 

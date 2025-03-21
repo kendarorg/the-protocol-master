@@ -1,5 +1,6 @@
 package org.kendar.events;
 
+import org.kendar.exceptions.TPMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +76,7 @@ public class EventsQueue {
         if (prevConsumer == null || prevConsumer.id.equalsIgnoreCase(id)) {
             instance.commandHandlers.put(eventName, new CommandConsumer(id, realConsumer));
         } else {
-            throw new RuntimeException("Duplicate event " + eventName);
+            throw new TPMException("Duplicate event " + eventName);
         }
     }
 

@@ -6,6 +6,7 @@ import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.*;
+import org.kendar.exceptions.TPMException;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
@@ -153,7 +154,7 @@ public class FileStorageRepository extends StorageRepository {
             EventsQueue.register("FileStorageRepository", (e) -> initializeContentForReplay(e.getInstanceId()), StartPlayEvent.class);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
@@ -347,7 +348,7 @@ public class FileStorageRepository extends StorageRepository {
                 var fileContent = getFileContent(Path.of(targetDir, "scenario", fileName));
                 result.add(mapper.deserialize(fileContent, typeReference));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new TPMException(e);
             }
         }
         return result;
@@ -378,7 +379,7 @@ public class FileStorageRepository extends StorageRepository {
 
         } catch (IOException e) {
             log.error("[TPM  ][WR]: Unable to write index file");
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
 
         log.info("Stop recording {}", instanceId);
@@ -538,12 +539,12 @@ public class FileStorageRepository extends StorageRepository {
                     setFileContent(indexPath, mapper.serialize(indexFile));
                     setFileContent(filePath, mapper.serialize(item));
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new TPMException(e);
                 }
                 return;
             }
         }
-        throw new RuntimeException("ITem id " + itemId + " not found");
+        throw new TPMException("ITem id " + itemId + " not found");
 
     }
 
@@ -565,7 +566,7 @@ public class FileStorageRepository extends StorageRepository {
                 }
             }
         } catch (Exception ex) {
-            throw new RuntimeException("Unable to delete item " + itemId, ex);
+            throw new TPMException("Unable to delete item " + itemId, ex);
         }
     }
 
@@ -593,7 +594,7 @@ public class FileStorageRepository extends StorageRepository {
         try {
             setFileContent(filePath, file.getContent());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
 
     }
@@ -636,7 +637,7 @@ public class FileStorageRepository extends StorageRepository {
         try {
             setFileContent(fullPath, content);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
@@ -649,7 +650,7 @@ public class FileStorageRepository extends StorageRepository {
             }
             Files.deleteIfExists(Path.of(realPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
@@ -661,7 +662,7 @@ public class FileStorageRepository extends StorageRepository {
             }
             return getFileContent(Path.of(realPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
@@ -673,7 +674,7 @@ public class FileStorageRepository extends StorageRepository {
         }
         var root = Path.of(targetDir);
         if (!realPath.toAbsolutePath().toString().contains(root.toAbsolutePath().toString())) {
-            throw new RuntimeException("Cannot naviagate outside project!");
+            throw new TPMException("Cannot naviagate outside project!");
         }
         return realPath;
     }

@@ -2,6 +2,7 @@ package org.kendar.plugins;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
+import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.apis.BasicMockPluginApis;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
@@ -133,7 +134,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
             for (var file : storage.listFiles()) {
 
                 var si = mapper.deserialize(storage.readFile(file), MockStorage.class);
-                if (presentAlready.contains(si.getIndex())) throw new RuntimeException(
+                if (presentAlready.contains(si.getIndex())) throw new PluginException(
                         "Duplicate id " + si.getIndex() + " found in " + file);
                 presentAlready.add(si.getIndex());
                 mocks.put(file, si);
@@ -141,7 +142,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new PluginException("Unable to load mocks",e);
         }
     }
 

@@ -1,5 +1,7 @@
 package org.kendar.cli;
 
+import org.kendar.exceptions.CliException;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,7 +72,7 @@ public class CommandOptions implements CommandItem {
             if (!item.hasSubChoices()) {
                 mainArgs.remove(arg.get());
                 if (item.isMandatoryParameter() && arg.get().getValues().isEmpty()) {
-                    throw new RuntimeException("Mandatory parameter " + item + " not present");
+                    throw new CliException("Mandatory parameter " + item + " not present");
                 }
                 item.setValues(arg.get().getValues());
                 item.setPresent();
@@ -88,19 +90,19 @@ public class CommandOptions implements CommandItem {
                     var choices = item.getSubChoices().stream().map(CommandOptions::getId).collect(Collectors.toCollection(HashSet::new));
                     var availableChoices = String.join(", ", choices);
                     if (arg.get().getValues().isEmpty()) {
-                        throw new RuntimeException("Missing value " + item + " in command option " + item + " available choices are " + availableChoices);
+                        throw new CliException("Missing value " + item + " in command option " + item + " available choices are " + availableChoices);
                     }
                     if (arg.get().getValues().size() > 1) {
-                        throw new RuntimeException("Duplicate value " + item + " in command option " + item + " available choices are " + availableChoices);
+                        throw new CliException("Duplicate value " + item + " in command option " + item + " available choices are " + availableChoices);
                     }
                     var value = arg.get().getValues().get(0);
                     if (!choices.contains(value)) {
-                        throw new RuntimeException("Wrong value " + value + " in command option " + item + " available choices are " + availableChoices);
+                        throw new CliException("Wrong value " + value + " in command option " + item + " available choices are " + availableChoices);
                     }
                     mainArgs.remove(arg.get());
                     var itemPossible = item.getSubChoices().stream().filter(sc -> sc.getId().equalsIgnoreCase(value)).findFirst();
                     if (itemPossible.isEmpty()) {
-                        throw new RuntimeException("Wrong option " + value + " in command option " + item + " available choices are " + availableChoices);
+                        throw new CliException("Wrong option " + value + " in command option " + item + " available choices are " + availableChoices);
                     }
                     var subChoice = itemPossible.get();
                     if (subChoice.callback != null) {
@@ -168,13 +170,13 @@ public class CommandOptions implements CommandItem {
             if (commandOption.hasSubChoices()) {
                 if (commandOption.getLongCommand() != null) {
                     if (duplicateGuard.contains(commandOption.getLongCommand())) {
-                        throw new RuntimeException("Duplicate command " + commandOption + " " + commandOption.getLongCommand());
+                        throw new CliException("Duplicate command " + commandOption + " " + commandOption.getLongCommand());
                     }
                     duplicateGuard.add(commandOption.getLongCommand());
                 }
                 if (commandOption.getShortCommand() != null) {
                     if (duplicateGuard.contains(commandOption.getShortCommand())) {
-                        throw new RuntimeException("Duplicate command " + commandOption + " " + commandOption.getShortCommand());
+                        throw new CliException("Duplicate command " + commandOption + " " + commandOption.getShortCommand());
                     }
                     duplicateGuard.add(commandOption.getShortCommand());
                 }
@@ -182,7 +184,7 @@ public class CommandOptions implements CommandItem {
             }
             for (var item : commandOption.getLongShortCommands()) {
                 if (duplicateGuard.contains(item.toLowerCase())) {
-                    throw new RuntimeException("Duplicate inherited command " + item + " on option " + commandOption);
+                    throw new CliException("Duplicate inherited command " + item + " on option " + commandOption);
                 }
                 duplicateGuard.add(item.toLowerCase());
             }
@@ -191,7 +193,7 @@ public class CommandOptions implements CommandItem {
             if (commandOption.hasSubChoices() || commandOption.hasSubOptions()) {
                 for (var item : commandOption.getLongShortCommandsChild()) {
                     if (duplicateGuard.contains(item.toLowerCase())) {
-                        throw new RuntimeException("Duplicate inherited command " + item + " on option " + commandOption);
+                        throw new CliException("Duplicate inherited command " + item + " on option " + commandOption);
                     }
                 }
             }
@@ -220,7 +222,7 @@ public class CommandOptions implements CommandItem {
     public void parse(List<MainArg> mainArgs, boolean ignoreMissing) {
         parseInternal(mainArgs);
         if (!ignoreMissing && !mainArgs.isEmpty()) {
-            throw new RuntimeException("Unknown options " + mainArgs);
+            throw new CliException("Unknown options " + mainArgs);
         }
     }
 

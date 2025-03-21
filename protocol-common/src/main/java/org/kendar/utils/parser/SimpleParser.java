@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.ParserException;
 import org.kendar.utils.JsonMapper;
 
 import java.math.BigDecimal;
@@ -124,13 +125,13 @@ public class SimpleParser {
             }
         }
         if (inString) {
-            throw new RuntimeException("Missing closing string");
+            throw new ParserException("Missing closing string");
         }
         if (parenthesisLevel < 0) {
-            throw new RuntimeException("Missing opening bracket");
+            throw new ParserException("Missing opening bracket");
         }
         if (stack.size() > 1) {
-            throw new RuntimeException("Missing closing bracket");
+            throw new ParserException("Missing closing bracket");
         }
         parseGeneric(currentString, stack);
         updateWithFunctions(token);
@@ -177,13 +178,13 @@ public class SimpleParser {
                     item.type = TokenType.FUNCTION;
                     if (possibleFd.paramsCount != 0) {
                         if ((i + 1) >= children.size()) {
-                            throw new RuntimeException("Missing function params for " + item.value);
+                            throw new ParserException("Missing function params for " + item.value);
                         }
                         var nextBlock = children.get(i + 1);
                         children.set(i + 1, null);
                         i++;
                         if (nextBlock.type != TokenType.BLOCK) {
-                            throw new RuntimeException("Missing function params brackets for " + item.value);
+                            throw new ParserException("Missing function params brackets for " + item.value);
                         }
                         item.children = adaptAsFunctionParams(nextBlock.children);
                     }
@@ -209,13 +210,13 @@ public class SimpleParser {
                     item.type = TokenType.FUNCTION;
                     if (possibleFd.paramsCount != 0) {
                         if ((i + 1) >= children.size()) {
-                            throw new RuntimeException("Missing function params for " + item.value);
+                            throw new ParserException("Missing function params for " + item.value);
                         }
                         var nextBlock = children.get(i + 1);
                         children.set(i + 1, null);
                         i++;
                         if (nextBlock.type != TokenType.BLOCK) {
-                            throw new RuntimeException("Missing function params brackets for " + item.value);
+                            throw new ParserException("Missing function params brackets for " + item.value);
                         }
                         item.children = adaptAsFunctionParams(nextBlock.children);
                     }
@@ -289,7 +290,7 @@ public class SimpleParser {
     public ArrayNode select(Token select, ArrayNode inputArray) {
         var resultArray = mapper.getMapper().createArrayNode();
         if (!select.value.equalsIgnoreCase("select")) {
-            throw new RuntimeException("Input must start with 'select()'");
+            throw new ParserException("Input must start with 'select()'");
         }
         var what = select.children.stream().filter(child -> child.value != null && child.value.equalsIgnoreCase("what")).findFirst().orElse(null);
         var where = select.children.stream().filter(child -> child.value != null && child.value.equalsIgnoreCase("where")).findFirst().orElse(null);
@@ -363,7 +364,7 @@ public class SimpleParser {
             } else if (operator.equals("!=")) {
                 return !lValue.equals(rValue);
             }
-            throw new RuntimeException("Unsupported binary operator for Strings: " + operator);
+            throw new ParserException("Unsupported binary operator for Strings: " + operator);
         } else if (rValue instanceof BigDecimal) {
             if (operator.equals("==")) {
                 return lValue.equals(rValue);
@@ -390,14 +391,14 @@ public class SimpleParser {
             } else if (operator.equals("%")) {
                 return ((BigDecimal) lValue).remainder((BigDecimal) rValue);
             }
-            throw new RuntimeException("Unsupported binary operator for Numbers: " + operator);
+            throw new ParserException("Unsupported binary operator for Numbers: " + operator);
         } else if (rValue instanceof Boolean) {
             if (operator.equals("==")) {
                 return lValue == rValue;
             } else if (operator.equals("!=")) {
                 return lValue != rValue;
             }
-            throw new RuntimeException("Unsupported binary operator for Booleans: " + operator);
+            throw new ParserException("Unsupported binary operator for Booleans: " + operator);
         }
         return false;
     }
@@ -439,7 +440,7 @@ public class SimpleParser {
             if (obj.isDouble()) return BigDecimal.valueOf(obj.doubleValue());
             if (obj.isTextual()) return obj.textValue();
             if (obj.isBoolean()) return obj.booleanValue();
-            throw new RuntimeException("Unsupported type: " + obj.getNodeType() + " for variable " + originalVariable + " on " + variable);
+            throw new ParserException("Unsupported type: " + obj.getNodeType() + " for variable " + originalVariable + " on " + variable);
         } else {
             return convertToValue(originalVariable, remainder, obj);
         }
@@ -453,7 +454,7 @@ public class SimpleParser {
 
         var possibleFd = functionDefinitions.stream().filter(fd -> fd.name.equalsIgnoreCase(token.value)).findFirst().orElse(null);
         if (possibleFd == null) {
-            throw new RuntimeException("Missing function " + token.value);
+            throw new ParserException("Missing function " + token.value);
         }
         if (token.value.equalsIgnoreCase("and")) {
             var result = true;
@@ -533,13 +534,13 @@ public class SimpleParser {
             var obOrArray = (JsonNode) value;
 
             if (!(obOrArray.isArray() || obOrArray.isObject() || obOrArray.isTextual())) {
-                throw new RuntimeException("count parameter must be an object or an array");
+                throw new ParserException("count parameter must be an object or an array");
             }
             return BigDecimal.valueOf(obOrArray.size());
         } else if (value instanceof String) {
             return BigDecimal.valueOf(((String) value).length());
         }
-        throw new RuntimeException("Unsupported type for count: " + value.getClass());
+        throw new ParserException("Unsupported type for count: " + value.getClass());
     }
 
     private Object parseFilter(Token token, JsonNode testClass) {
@@ -550,7 +551,7 @@ public class SimpleParser {
             var obOrArray = (JsonNode) value;
 
             if (!(obOrArray.isArray() || obOrArray.isObject() || obOrArray.isTextual())) {
-                throw new RuntimeException("count parameter must be an object or an array");
+                throw new ParserException("count parameter must be an object or an array");
             }
             if (obOrArray.isArray()) {
                 ArrayNode result = mapper.getMapper().createArrayNode();
@@ -582,7 +583,7 @@ public class SimpleParser {
 
             return obOrArray.size();
         }
-        throw new RuntimeException("Unsupported type for filter: " + value.getClass());
+        throw new ParserException("Unsupported type for filter: " + value.getClass());
     }
 
     public List<JsonNode> sort(List<JsonNode> list, String sortString) {
@@ -637,7 +638,7 @@ public class SimpleParser {
             var groupKey = "";
             for (var whatValue : group.children) {
                 if (whatValue.type != TokenType.VARIABLE) {
-                    throw new RuntimeException("Only variables can be grouped with 'groupby'");
+                    throw new ParserException("Only variables can be grouped with 'groupby'");
                 }
                 var value = convertToValue(whatValue, item);
                 var jsonValue = mapper.convertValue(value);
@@ -663,7 +664,7 @@ public class SimpleParser {
                         objectNode.set(whatValue.value, jsonValue);
                     } else {
                         if (!whatValue.children.get(1).value.equalsIgnoreCase("=")) {
-                            throw new RuntimeException("Should assign with '='");
+                            throw new ParserException("Should assign with '='");
                         }
                         var value = convertToValue(whatValue.children.get(2), item);
                         var jsonValue = mapper.convertValue(value);
@@ -684,7 +685,7 @@ public class SimpleParser {
                 for (var whatValue : what.children) {
                     var lvalue = whatValue.children.get(0).value;
                     if (!whatValue.children.get(1).value.equalsIgnoreCase("=")) {
-                        throw new RuntimeException("Should assign with '='");
+                        throw new ParserException("Should assign with '='");
                     }
                     var rvalue = whatValue.children.get(2);
                     if (rvalue.value.equalsIgnoreCase("count")) {

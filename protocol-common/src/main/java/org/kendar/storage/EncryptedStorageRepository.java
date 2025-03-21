@@ -4,6 +4,7 @@ import org.bouncycastle.crypto.CryptoException;
 import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.TPMException;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.Encryptor;
 
@@ -92,7 +93,7 @@ public class EncryptedStorageRepository extends FileStorageRepository {
             var toDecrypt = Arrays.copyOfRange(result, prologue.length, result.length);
             return encryptor.decryptString(toDecrypt);
         } catch (CryptoException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
@@ -108,7 +109,7 @@ public class EncryptedStorageRepository extends FileStorageRepository {
                 Files.write(of, prologue);
                 Files.write(of, encryptedData, StandardOpenOption.APPEND);
             } catch (CryptoException e) {
-                throw new RuntimeException(e);
+                throw new TPMException(e);
             }
         }
 

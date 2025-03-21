@@ -3,6 +3,7 @@ package org.kendar.redis;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.ProxyException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
 import org.kendar.proxy.NetworkProxySocket;
@@ -35,7 +36,7 @@ public class Resp3Proxy extends NetworkProxy {
             return new Resp3ProxySocket(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group);
         } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 

@@ -18,6 +18,7 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.RestartEvent;
 import org.kendar.events.StorageReloadedEvent;
 import org.kendar.events.TerminateEvent;
+import org.kendar.exceptions.StartupException;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -260,12 +261,12 @@ public class Main {
                     try {
                         var protocol = ini.getProtocolForKey(item.getKey());
                         if (protocol == null) {
-                            throw new RuntimeException("Protocol " + protocol.getProtocol() + " not found");
+                            throw new StartupException("Protocol " + protocol.getProtocol() + " not found");
                         }
                         //Retrieve the type
                         var tempSettings = localDiService.getInstance(ProtocolSettings.class, protocol.getProtocol());
                         if (tempSettings == null) {
-                            throw new RuntimeException("Protocol settings " + protocol.getProtocol() + " not found");
+                            throw new StartupException("Protocol settings " + protocol.getProtocol() + " not found");
                         }
                         //Load the real data
                         var protocolFullSettings = ini.getProtocol(item.getKey(), tempSettings.getClass());
@@ -298,7 +299,7 @@ public class Main {
                     } catch (Exception xx) {
                         //noinspection SuspiciousMethodCalls
                         protocolServersCache.remove(item);
-                        throw new RuntimeException(xx);
+                        throw new StartupException(xx);
                     }
                 } catch (Exception ex) {
                     log.error("Unable to start protocol {}: {}", item.getKey(), ex.getMessage(), ex);

@@ -3,6 +3,7 @@ package org.kendar.protocol.context;
 
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.exceptions.FailedStateException;
+import org.kendar.exceptions.TPMException;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
@@ -411,7 +412,7 @@ public abstract class ProtoContext {
     protected ProtoState findThePossibleNextStateOnStack(ProtocolEvent event, int depth) {
         if (depth > 10) {
             log.error("Max recursion hit searching for possible events");
-            throw new RuntimeException("max recursion hit");
+            throw new TPMException("max recursion hit");
         }
 
 
@@ -682,7 +683,7 @@ public abstract class ProtoContext {
      * @return
      */
     protected List<ReturnMessage> runException(Exception ex, ProtoState state, ProtocolEvent event) {
-        throw new RuntimeException(ex);
+        throw new TPMException(ex);
     }
 
     /**

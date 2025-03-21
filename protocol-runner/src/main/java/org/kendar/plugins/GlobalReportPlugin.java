@@ -5,7 +5,6 @@ import org.kendar.events.*;
 import org.kendar.http.events.SSLAddHostEvent;
 import org.kendar.plugins.apis.GlobalReportPluginApiHandler;
 import org.kendar.plugins.base.BasePluginApiHandler;
-import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -152,15 +151,6 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     @Override
     public void setActive(boolean active) {
         this.active = true;
-    }
-
-    @Override
-    public BasePluginDescriptor duplicate() {
-        try {
-            return this.getClass().getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Should implement clone for " + this.getClass(), e);
-        }
     }
 
     @Override

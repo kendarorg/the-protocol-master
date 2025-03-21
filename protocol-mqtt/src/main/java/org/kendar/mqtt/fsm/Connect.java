@@ -180,7 +180,7 @@ public class Connect extends BasePropertiesMqttState {
         }
         if (cleanSession) {
             //TODOMQTT clean all sessions for connection
-            //throw new RuntimeException("CLEAN SESSION");
+            //throw new TPMException("CLEAN SESSION");
         }
 
         return iteratorOfRunnable(() -> proxy.sendAndExpect(context,

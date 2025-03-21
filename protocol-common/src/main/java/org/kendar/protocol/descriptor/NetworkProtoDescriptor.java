@@ -2,6 +2,7 @@ package org.kendar.protocol.descriptor;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
+import org.kendar.exceptions.TPMException;
 import org.kendar.plugins.base.AlwaysActivePlugin;
 import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -154,7 +155,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
     }
 
     public boolean isWrapperRunning() {
-        throw new RuntimeException("Not implemented");
+        throw new TPMException("Not implemented");
     }
 
     public Map<String, Integer> getPorts() {

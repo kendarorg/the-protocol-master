@@ -1,5 +1,10 @@
 @param org.kendar.ui.dto.ProtocolStatusDto data
 
+!{
+    var sortedData = data.getWildcardPlugins().stream().
+    sorted(java.util.Comparator.comparing(org.kendar.ui.dto.WildcarPluginDto::getId)).toList();
+ }
+
 @if(!(boolean) data.getParameters().get("avoidScript"))
     <script type="text/javascript">
         function reloadWildcard(callback) {
@@ -32,7 +37,7 @@
                     <th></th>
                     <th></th>
                 </tr>
-                @for(var element : data.getWildcardPlugins())
+                @for(var element : sortedData)
                     <tr>
                         <td>${element.getId()}</td>
                         <td>

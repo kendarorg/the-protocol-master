@@ -109,14 +109,6 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
         return this;
     }
 
-    public ProtocolPluginDescriptor duplicate() {
-        try {
-            return this.getClass().getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Should implement clone for " + this.getClass(), e);
-        }
-    }
-
     /**
      * Actiavion callback
      *

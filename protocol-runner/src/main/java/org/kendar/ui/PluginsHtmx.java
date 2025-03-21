@@ -15,6 +15,7 @@ import org.kendar.ui.dto.*;
 import org.kendar.utils.JsonMapper;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @SuppressWarnings("HttpUrlsUsage")
@@ -52,7 +53,9 @@ public class PluginsHtmx implements FilteringClass {
             method = "GET", id = "GET /plugins")
     public void plugins(Request request, Response response) {
         var model = new ProtocolStatusDto();
-        var instances = (List<ProtocolInstance>) diService.getNamedInstance("protocols", new ArrayList<ProtocolInstance>().getClass());
+        var instances = (List<ProtocolInstance>) diService.
+                getNamedInstance("protocols", new ArrayList<ProtocolInstance>().getClass())
+                .stream().sorted(Comparator.comparing(ProtocolInstance::getProtocolInstanceId)).toList();
         for (var instance : instances) {
             if (instance == null) continue;
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
@@ -68,7 +71,8 @@ public class PluginsHtmx implements FilteringClass {
         var avoidScript = "true".equalsIgnoreCase(request.getQuery("avoidScript"));
         var model = new ProtocolStatusDto();
         model.getParameters().put("avoidScript", avoidScript);
-        var instances = (List<ProtocolInstance>) diService.getNamedInstance("protocols", new ArrayList<ProtocolInstance>().getClass());
+        var instances = (List<ProtocolInstance>) diService.getNamedInstance("protocols",
+                new ArrayList<ProtocolInstance>().getClass());
         for (var instance : instances) {
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
             model.getProtocols().add(this.convert(protocol));
@@ -83,7 +87,8 @@ public class PluginsHtmx implements FilteringClass {
         var avoidScript = "true".equalsIgnoreCase(request.getQuery("avoidScript"));
         var model = new ProtocolStatusDto();
         model.getParameters().put("avoidScript", avoidScript);
-        var instances = (List<ProtocolInstance>) diService.getNamedInstance("protocols", new ArrayList<ProtocolInstance>().getClass());
+        var instances = (List<ProtocolInstance>) diService.getNamedInstance("protocols",
+                new ArrayList<ProtocolInstance>().getClass());
         for (var instance : instances) {
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
             model.getProtocols().add(this.convert(protocol));

@@ -10,6 +10,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
 import org.kendar.buffers.BBuffer;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpMsgSection;
 import org.kendar.mongo.fsm.events.OpMsgRequest;
@@ -81,7 +82,7 @@ public class OpMsg extends MongoState {
                 newData.getSections().add(section);
 
             } else {
-                throw new RuntimeException("INVALID PAYLOAD TYPE " + payloadType);
+                throw new TPMProtocolException("INVALID PAYLOAD TYPE " + payloadType);
             }
         }
 

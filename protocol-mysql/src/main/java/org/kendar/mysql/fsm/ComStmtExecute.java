@@ -1,6 +1,7 @@
 package org.kendar.mysql.fsm;
 
 import org.kendar.buffers.BBufferUtils;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CommandType;
 import org.kendar.mysql.executor.MySQLExecutor;
@@ -43,7 +44,7 @@ public class ComStmtExecute extends ProtoState {
                             inputBuffer.readUB4();
                     case (8) ->//MYSQL_TYPE_LONGLONG
                             inputBuffer.getLong();
-                    default -> throw new RuntimeException("MISSING MYSQL TYPE (for sql int) " + mysqlFieldType);
+                    default -> throw new TPMProtocolException("MISSING MYSQL TYPE (for sql int) " + mysqlFieldType);
                 };
                 break;
             case BOOLEAN:

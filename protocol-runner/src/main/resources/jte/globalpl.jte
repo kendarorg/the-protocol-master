@@ -1,5 +1,9 @@
 @param org.kendar.ui.dto.GlobalsDto data
 
+!{
+    var sortedData = data.getPlugins().stream().
+    sorted(java.util.Comparator.comparing(org.kendar.ui.dto.PluginDto::getId)).toList();
+ }
 <head>
 
     <title>The Protocol Master - Global Plugins</title>
@@ -29,7 +33,7 @@
                                 <th>Activation</th>
                                 <th>Manage</th>
                             </tr>
-                            @for(var plugin : data.getPlugins())
+                            @for(var plugin : sortedData)
                                 <tr>
                                     <td>${plugin.getId()}</td>
                                     <td>

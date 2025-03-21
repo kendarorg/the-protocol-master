@@ -1,5 +1,10 @@
 @param org.kendar.ui.dto.ProtocolStatusDto data
 
+
+!{
+    var sortedProtocols = data.getProtocols().stream().
+    sorted(java.util.Comparator.comparing(org.kendar.ui.dto.ProtocolDto::getInstanceId)).toList();
+ }
 <head>
 
     <title>The Protocol Master - Plugins</title>
@@ -49,7 +54,7 @@
             <!--
             PROTOCOL PLUGINS
             -->
-            @for(var element : data.getProtocols())
+            @for(var element : sortedProtocols)
                 <div hx-get="/plugins/protocols?protocolId=${element.getInstanceId()}" hx-trigger="load"></div>
             @endfor
         </div>

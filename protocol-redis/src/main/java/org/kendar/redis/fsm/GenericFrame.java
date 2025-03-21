@@ -2,6 +2,7 @@ package org.kendar.redis.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.states.ProtoState;
@@ -15,7 +16,7 @@ public class GenericFrame extends ProtoState implements NetworkReturnMessage, Ne
 
     @Override
     public void write(BBuffer resultBuffer) {
-        throw new RuntimeException();
+        throw new TPMProtocolException("Not implemented yet");
     }
 
     public boolean canRun(BytesEvent event) {

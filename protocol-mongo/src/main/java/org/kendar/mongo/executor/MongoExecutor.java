@@ -2,6 +2,7 @@ package org.kendar.mongo.executor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.client.MongoClient;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mongo.MongoProxy;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpQueryContent;
@@ -25,7 +26,7 @@ public class MongoExecutor {
             }
             return null;
         } catch (Exception e) {
-            throw new RuntimeException("Missing db on OpMsg");
+            throw new TPMProtocolException("Missing db on OpMsg");
         }
     }
 

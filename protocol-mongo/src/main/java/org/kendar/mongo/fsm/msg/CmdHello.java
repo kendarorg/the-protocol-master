@@ -1,6 +1,7 @@
 package org.kendar.mongo.fsm.msg;
 
 
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mongo.executor.MongoExecutor;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.fsm.StandardOpMsgCommand;
@@ -39,7 +40,7 @@ public class CmdHello extends StandardOpMsgCommand {
 
             return iteratorOfList(toSend);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new TPMProtocolException(ex);
         }
     }
 }

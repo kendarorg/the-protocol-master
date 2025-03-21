@@ -8,6 +8,7 @@ import org.kendar.annotations.multi.TpmRequest;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
+import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
@@ -126,7 +127,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
         }
 
         if (!sentData) {
-            throw new RuntimeException("No existing topic to send to");
+            throw new PluginException("No existing topic to send to");
         }
 
     }

@@ -1,4 +1,10 @@
 @param org.kendar.ui.dto.ProtocolDto element
+
+!{
+    var sortedData = element.getPlugins().stream().
+    sorted(java.util.Comparator.comparing(org.kendar.ui.dto.PluginDto::getId)).toList();
+ }
+
 @if(!(boolean) element.getParameters().get("avoidScript"))
     <script type="text/javascript">
         function reloadProtocol${element.getSafeInstanceId()}(callback) {
@@ -34,7 +40,7 @@
                     <th>Status</th>
                     <th>Manage</th>
                 </tr>
-                @for(var plugin : element.getPlugins())
+                @for(var plugin : sortedData)
                     <tr>
                         <td>${plugin.getInstanceId()}</td>
                         <td>${plugin.getId()}</td>

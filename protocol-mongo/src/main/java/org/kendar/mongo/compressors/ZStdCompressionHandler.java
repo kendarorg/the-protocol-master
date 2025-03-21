@@ -1,6 +1,7 @@
 package org.kendar.mongo.compressors;
 
 import com.github.luben.zstd.ZstdInputStream;
+import org.kendar.exceptions.TPMProtocolException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,7 +22,7 @@ public class ZStdCompressionHandler implements CompressionHandler {
 
             return zstdOutputStream.toByteArray();
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new TPMProtocolException(ex);
         }
     }
 

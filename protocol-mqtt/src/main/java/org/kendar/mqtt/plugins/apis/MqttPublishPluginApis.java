@@ -10,6 +10,7 @@ import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.utils.MimeChecker;
+import org.kendar.exceptions.PluginException;
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.Publish;
@@ -183,7 +184,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
             context.write(message);
         }
         if (!sentData) {
-            throw new RuntimeException("No existing topic to send to");
+            throw new PluginException("No existing topic to send to");
         }
 
     }

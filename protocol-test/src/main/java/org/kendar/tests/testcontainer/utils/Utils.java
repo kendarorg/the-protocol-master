@@ -18,7 +18,7 @@ public class Utils {
         Path jarPath = Path.of(rootPath.toString(), fullProjectPath, "target");
         String[] flist = jarPath.toFile().list();
         if (flist == null) {
-            throw new RuntimeException();
+            throw new RuntimeException("No jars found in " + jarPath);
         }
         for (String file : flist) {
             if (file.startsWith(jarName) && file.endsWith(".jar")) {

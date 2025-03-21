@@ -1,5 +1,6 @@
 package org.kendar.mysql.executor;
 
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.constants.ErrorCode;
 import org.kendar.mysql.constants.Language;
@@ -91,7 +92,7 @@ public class MySQLExecutor {
             parser = (SqlStringParser) protoContext.getValue("PARSER");
             if (parse.trim().isEmpty()) {
                 //return new ExecutorResult(ProtoState.iteratorOfList(new EmptyQueryResponse()));
-                throw new RuntimeException("MISSING QUERY");
+                throw new TPMProtocolException("MISSING QUERY");
             }
 
             if (protoContext.getProxy() == null) {
@@ -205,7 +206,7 @@ public class MySQLExecutor {
                     ((JdbcProxy) mysqlContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_SERIALIZABLE);
                     break;
                 default:
-                    throw new RuntimeException("Unsupported isolation " + transactionType);
+                    throw new TPMProtocolException("Unsupported isolation " + transactionType);
 
 
             }
@@ -400,7 +401,7 @@ public class MySQLExecutor {
             ps.close();
 
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new TPMProtocolException(ex);
         }
         return ProtoState.iteratorOfList(result.toArray(new ReturnMessage[0]));
     }

@@ -17,6 +17,7 @@ import org.kendar.apis.utils.MimeChecker;
 import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.ApiException;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +102,7 @@ public class ApiFiltersLoader implements CustomFiltersLoader, HttpHandler {
             }
             var id = ds.getId();
             if (duplicateIds.contains(id)) {
-                throw new RuntimeException("Duplicate filter id " + id);
+                throw new ApiException("Duplicate filter id " + id);
             }
             duplicateIds.add(id);
             filtersConfiguration.filtersById.put(id, ds);

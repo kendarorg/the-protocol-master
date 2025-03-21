@@ -3,6 +3,7 @@ package org.kendar.http.plugins;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.BasicRewritePlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.settings.RewritePluginSettings;
@@ -82,7 +83,7 @@ public class HttpRewritePlugin extends BasicRewritePlugin<Request, Response, Rew
                 source.setProtocol(url.getProtocol());
             }
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new PluginException(ex);
         }
     }
 }

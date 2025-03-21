@@ -2,6 +2,7 @@ package org.kendar.mqtt.plugins;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.PluginException;
 import org.kendar.mqtt.fsm.ConnectAck;
 import org.kendar.mqtt.fsm.Publish;
 import org.kendar.plugins.BasicReplayPlugin;
@@ -61,7 +62,7 @@ public class MqttReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
             ExtraBeanUtils.copyProperties(toread, result, "PacketIdentifier");
             BeanUtils.copyProperties(toread, result);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new PluginException(e);
         }
     }
 
@@ -89,13 +90,13 @@ public class MqttReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                 ReturnMessage fr = switch (clazz) {
                     case "ConnectAck" -> mapper.deserialize(out.toString(), ConnectAck.class);
                     case "Publish" -> mapper.deserialize(out.toString(), Publish.class);
-                    default -> throw new RuntimeException("MISSING " + clazz);
+                    default -> throw new PluginException("MISSING " + clazz);
                 };
                 if (fr != null) {
                     log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
                     ctx.write(fr);
                 } else {
-                    throw new RuntimeException("MISSING CLASS " + clazz);
+                    throw new PluginException("MISSING CLASS " + clazz);
                 }
             }
         }

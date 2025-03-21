@@ -3,8 +3,7 @@
 !{
     var globalSettings = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.settings.GlobalSettings.class);
     var protocolSettings = ((org.kendar.http.HttpProtocolSettings)globalSettings.getProtocol(data.getInstanceId(),org.kendar.http.HttpProtocolSettings.class));
-    var pluginSettings =((org.kendar.http.plugins.settings.HttpLatencyPluginSettings)protocolSettings.getPlugin(data.getId(),org.kendar.http.plugins.settings.HttpLatencyPluginSettings.class));
-    var targetsContainer = new org.kendar.http.plugins.apis.dtos.TargetsContainer(pluginSettings.getTarget(),"updateData");
+    var pluginSettings =((org.kendar.plugins.settings.LatencyPluginSettings)protocolSettings.getPlugin(data.getId(),org.kendar.plugins.settings.LatencyPluginSettings.class));
 }
 
 <script type="text/javascript">
@@ -13,8 +12,7 @@
             active:${pluginSettings.isActive()},
             minMs: 0,
             maxMs: 0,
-            percentAction:0,
-            target: pluginTargets
+            percentAction:0
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
@@ -66,7 +64,6 @@
                 </div>
             </div>
             <br>
-            @template.http.targets(targetsContainer)
 
         </div>
     </div>

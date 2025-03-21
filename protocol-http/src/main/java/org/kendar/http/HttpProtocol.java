@@ -8,6 +8,7 @@ import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.http.events.SSLAddHostEvent;
 import org.kendar.http.events.SSLRemoveHostEvent;
 import org.kendar.http.ssl.CertificatesManager;
@@ -184,14 +185,14 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
                     certificatesManager.setupSll(httpsServer, List.of(e.getHost()), cname, sslDer, sslKey);
                 } catch (Exception ex) {
-                    throw new RuntimeException("Error updating ssl " + protocol.getSettings().getProtocolInstanceId(), ex);
+                    throw new TPMProtocolException("Error updating ssl " + protocol.getSettings().getProtocolInstanceId(), ex);
                 }
             }, SSLAddHostEvent.class);
             EventsQueue.register("http-" + getSettings().getProtocolInstanceId(), (e) -> {
                 try {
                     certificatesManager.unsetSll(httpsServer, List.of(e.getHost()), cname, sslDer, sslKey);
                 } catch (Exception ex) {
-                    throw new RuntimeException("Error updating ssl " + protocol.getSettings().getProtocolInstanceId(), ex);
+                    throw new TPMProtocolException("Error updating ssl " + protocol.getSettings().getProtocolInstanceId(), ex);
                 }
             }, SSLRemoveHostEvent.class);
 
@@ -258,7 +259,7 @@ public class HttpProtocol extends NetworkProtoDescriptor {
             httpsRunning = true;
 
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new TPMProtocolException(ex);
         }
     }
 }

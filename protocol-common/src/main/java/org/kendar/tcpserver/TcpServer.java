@@ -1,6 +1,7 @@
 package org.kendar.tcpserver;
 
 import org.kendar.events.EventsQueue;
+import org.kendar.exceptions.TPMException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -68,7 +69,7 @@ public class TcpServer {
                     Sleeper.sleepNoException(2000, () -> !server.isOpen());
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new TPMException(e);
             } finally {
                 try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
                     var proxy = protoDescriptor.getProxy();
@@ -103,7 +104,7 @@ public class TcpServer {
                 protoDescriptor.cleanCounters();
                 protoDescriptor.start();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new TPMException(e);
             }
             return;
         }
@@ -116,7 +117,7 @@ public class TcpServer {
                     run();
                 } catch (IOException | ExecutionException | InterruptedException e) {
                     if (!(e.getCause() instanceof AsynchronousCloseException)) {
-                        throw new RuntimeException(e);
+                        throw new TPMException(e);
                     }
                 }
                 if (onStop != null) {

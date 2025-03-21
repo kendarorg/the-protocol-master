@@ -1,5 +1,6 @@
 package org.kendar.proxy;
 
+import org.kendar.exceptions.ProxyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +107,7 @@ public class ProxyServerHandler {
         } catch (IOException e) {
             //e.printStackTrace();  // TODO: implement catch
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         } finally {
             try {
                 clientSocket.close();

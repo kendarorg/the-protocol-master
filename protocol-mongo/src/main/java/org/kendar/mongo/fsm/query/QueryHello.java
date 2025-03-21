@@ -1,5 +1,6 @@
 package org.kendar.mongo.fsm.query;
 
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mongo.executor.MongoExecutor;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.mongo.fsm.events.OpQueryRequest;
@@ -43,7 +44,7 @@ public class QueryHello extends ProtoState {
         try {
             return getProtoSteps(event);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new TPMProtocolException(ex);
         }
     }
 }

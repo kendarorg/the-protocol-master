@@ -2,6 +2,7 @@ package org.kendar.protocol.states;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.exceptions.TPMException;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
@@ -53,7 +54,7 @@ public abstract class ProtoState {
                 getClass().getMethod("execute", message);
             }
         } catch (Exception e) {
-            throw new RuntimeException(exceptionMessage + e.getMessage(), e);
+            throw new TPMException(exceptionMessage + e.getMessage(), e);
         }
     }
 
@@ -178,7 +179,7 @@ public abstract class ProtoState {
                 //In case of missing data ask for more.
                 throw new AskMoreDataException();
             }
-            throw new RuntimeException(e.getCause());
+            throw new TPMException(e.getCause());
         }
     }
 
@@ -193,12 +194,12 @@ public abstract class ProtoState {
         try {
             meth = getClass().getMethod("execute", event.getClass());
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
         try {
             return (Iterator<ProtoStep>) meth.invoke(this, event);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
+            throw new TPMException(e.getCause());
         }
     }
 

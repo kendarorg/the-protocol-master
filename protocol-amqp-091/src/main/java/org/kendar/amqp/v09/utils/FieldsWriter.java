@@ -1,6 +1,7 @@
 package org.kendar.amqp.v09.utils;
 
 import org.kendar.buffers.BBuffer;
+import org.kendar.exceptions.TPMProtocolException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -89,7 +90,7 @@ public class FieldsWriter {
                 return;
             }
             default:
-                throw new RuntimeException("UNSUPPORTED TYPE " + value.getClass());
+                throw new TPMProtocolException("UNSUPPORTED TYPE " + value.getClass());
         }
     }
 

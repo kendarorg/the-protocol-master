@@ -1,5 +1,7 @@
 package org.kendar.mqtt.enums;
 
+import org.kendar.exceptions.TPMProtocolException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +55,7 @@ public enum MqttFixedHeader {
                 return BY_INT.get((int) by);
             }
         }
-        throw new RuntimeException("MISSING MESSAGE TYPE " + value);
+        throw new TPMProtocolException("MISSING MESSAGE TYPE " + value);
     }
 
     public int getValue() {

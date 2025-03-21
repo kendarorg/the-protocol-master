@@ -3,6 +3,7 @@ package org.kendar.mqtt;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.ProxyException;
 import org.kendar.mqtt.utils.MqttProxySocket;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
@@ -40,7 +41,7 @@ public class MqttProxy extends NetworkProxy {
             return new MqttProxySocket(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group);
         } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 

@@ -1,6 +1,8 @@
 package org.kendar.mongo.compressors;
 
 
+import org.kendar.exceptions.TPMProtocolException;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,7 +24,7 @@ public class ZlibCompressionHandler implements CompressionHandler {
 
             return outputStream.toByteArray();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMProtocolException(e);
         }
     }
 

@@ -2,6 +2,7 @@ package org.kendar.mqtt.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mqtt.MqttContext;
 import org.kendar.mqtt.enums.MqttFixedHeader;
 import org.kendar.mqtt.fsm.events.MqttPacket;
@@ -35,7 +36,7 @@ public class MqttPacketTranslator extends ProtoState implements NetworkReturnMes
 
     @Override
     public void write(BBuffer rb) {
-        throw new RuntimeException();
+        throw new TPMProtocolException("Not implemented yet");
     }
 
     public boolean canRun(BytesEvent event) {

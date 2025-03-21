@@ -1,5 +1,7 @@
 package org.kendar.cli;
 
+import org.kendar.exceptions.CliException;
+
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -116,7 +118,7 @@ public class CommandOption implements CommandItem {
 
             commandOption.setParent(this);
             if (duplicateGuardSubChoices.contains(commandOption.getId().toLowerCase())) {
-                throw new RuntimeException("Duplicate sub choice " + commandOption.getId());
+                throw new CliException("Duplicate sub choice " + commandOption.getId());
             }
             duplicateGuardSubChoices.add(commandOption.getId().toLowerCase());
         }
@@ -260,10 +262,10 @@ public class CommandOption implements CommandItem {
 
             commandOption.setParent(this);
             if (commandOption.getShortCommand() != null && duplicateGuardSubOptions.contains(commandOption.getShortCommand().toLowerCase())) {
-                throw new RuntimeException("Duplicate sub option " + commandOption);
+                throw new CliException("Duplicate sub option " + commandOption);
             }
             if (commandOption.getLongCommand() != null && duplicateGuardSubOptions.contains(commandOption.getLongCommand().toLowerCase())) {
-                throw new RuntimeException("Duplicate sub option " + commandOption);
+                throw new CliException("Duplicate sub option " + commandOption);
             }
             if (commandOption.getShortCommand() != null) {
                 subOptionsValues.put(commandOption.getShortCommand().toLowerCase(), commandOption);
