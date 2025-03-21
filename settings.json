@@ -115,7 +115,7 @@
     },
     "mqtt-01": {
       "protocol": "mqtt",
-      "port": 1885,
+      "port": 1886,
       "login": "remotelogin",
       "password": "remotepassword",
       "timeout": 30,
