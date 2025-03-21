@@ -30,7 +30,7 @@
             </a>
         </h4>
     </div>
-    <div id="collapseSettings" class="panel-collapse collapse" role="tabpanel"
+    <div id="collapseSettingsError" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="headingSettingsError">
         <div class="panel-body">
             <div class="input-group">
