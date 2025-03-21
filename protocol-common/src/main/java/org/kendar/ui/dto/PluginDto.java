@@ -1,7 +1,10 @@
 package org.kendar.ui.dto;
 
-public class PluginDto  extends BaseHtmxDto{
+public class PluginDto extends BaseHtmxDto {
     private boolean active;
+    private String instanceId;
+    private String protocol;
+    private String id;
 
     public PluginDto() {
     }
@@ -20,10 +23,6 @@ public class PluginDto  extends BaseHtmxDto{
     public void setActive(boolean active) {
         this.active = active;
     }
-
-    private String instanceId;
-    private String protocol;
-    private String id;
 
     public String getInstanceId() {
         return instanceId;

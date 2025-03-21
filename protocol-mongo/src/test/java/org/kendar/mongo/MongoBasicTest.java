@@ -26,8 +26,10 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.MongoDbImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
+import org.kendar.utils.parser.SimpleParser;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
@@ -97,12 +99,12 @@ public class MongoBasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new MongoRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new MongoRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
         var rep = new MongoReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        errorPlugin= new MongoNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
-        latencyPlugin= new MongoLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
+        errorPlugin = new MongoNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
+        latencyPlugin = new MongoLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, rep,errorPlugin,latencyPlugin));
+        proxy.setPluginHandlers(List.of(pl, rep, errorPlugin, latencyPlugin));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         EventsQueue.register("recorder", (r) -> {

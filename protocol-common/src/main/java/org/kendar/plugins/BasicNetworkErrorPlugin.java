@@ -16,14 +16,15 @@ public abstract class BasicNetworkErrorPlugin<W extends BasicPercentPluginSettin
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, byte[] in, Object out) {
         if (shouldRun() && in != null && in.length > 0) {
             var modified = false;
-            for(var i=0;i<in.length;i++) {
-                if(ChaosUtils.randomAction(5));{
-                    modified=true;
-                    in[i]=(byte)ChaosUtils.randomBetween(0,256);
+            for (var i = 0; i < in.length; i++) {
+                if (ChaosUtils.randomAction(5)) ;
+                {
+                    modified = true;
+                    in[i] = (byte) ChaosUtils.randomBetween(0, 256);
                 }
             }
-            if(!modified) {
-                in[0]=(byte)ChaosUtils.randomBetween(0,256);
+            if (!modified) {
+                in[0] = (byte) ChaosUtils.randomBetween(0, 256);
             }
         }
         return false;

@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @TpmService
 public class MultiCodeResolver implements CodeResolver {
     private final List<JteResolver> jteResolvers;
-    private final ConcurrentHashMap<String, CodeResolver> engines= new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String,Object> notEngines= new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CodeResolver> engines = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Object> notEngines = new ConcurrentHashMap<>();
 
     public MultiCodeResolver(List<JteResolver> resolvers) {
         this.jteResolvers = resolvers;
@@ -28,21 +28,21 @@ public class MultiCodeResolver implements CodeResolver {
 
     @Override
     public String resolveRequired(String name) throws TemplateNotFoundException {
-        if(engines.containsKey(name)) {
+        if (engines.containsKey(name)) {
             return engines.get(name).resolve(name);
-        }else if(notEngines.containsKey(name)) {
+        } else if (notEngines.containsKey(name)) {
             throw new TemplateNotFoundException(name + " not found");
         }
         String resolved = null;
-        for(var jteResolver : jteResolvers) {
+        for (var jteResolver : jteResolvers) {
             var resolver = jteResolver.getResolver();
             resolved = resolver.resolve(name);
-            if(resolved != null) {
+            if (resolved != null) {
                 engines.put(name, resolver);
                 return resolved;
             }
         }
-        if(resolved == null) {
+        if (resolved == null) {
             notEngines.put(name, name);
             throw new TemplateNotFoundException(name + " not found");
         }

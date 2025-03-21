@@ -1,5 +1,6 @@
 package org.kendar.sql.jdbc;
 
+import org.kendar.exceptions.ProxyException;
 import org.kendar.iterators.QueryResultIterator;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -179,14 +180,14 @@ public abstract class JdbcProxy extends Proxy {
                         maxRecordsAtomic.decrementAndGet();
                         return byteRow;
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        throw new ProxyException(e);
                     }
                 },
                 () -> {
                     try {
                         statement.close();
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        throw new ProxyException(e);
                     }
                 });
         while (qrIterator.hasNext()) {
@@ -223,7 +224,7 @@ public abstract class JdbcProxy extends Proxy {
                     try {
                         return resultSet.next() && maxRecordsAtomic.get() > 0;
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        throw new ProxyException(e);
                     }
                 },
                 () -> {
@@ -245,7 +246,7 @@ public abstract class JdbcProxy extends Proxy {
                         maxRecordsAtomic.decrementAndGet();
                         return byteRow;
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        throw new ProxyException(e);
                     }
                 },
                 () -> {
@@ -253,7 +254,7 @@ public abstract class JdbcProxy extends Proxy {
                         resultSet.close();
                         statement.close();
                     } catch (SQLException e) {
-                        throw new RuntimeException(e);
+                        throw new ProxyException(e);
                     }
                 }
         );
@@ -304,7 +305,7 @@ public abstract class JdbcProxy extends Proxy {
             }
             return result;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 
@@ -379,7 +380,7 @@ public abstract class JdbcProxy extends Proxy {
             }
             return fields;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 
@@ -405,7 +406,7 @@ public abstract class JdbcProxy extends Proxy {
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 
@@ -416,7 +417,7 @@ public abstract class JdbcProxy extends Proxy {
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setAutoCommit(false);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 
@@ -426,7 +427,7 @@ public abstract class JdbcProxy extends Proxy {
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setAutoCommit(true);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 
@@ -436,7 +437,7 @@ public abstract class JdbcProxy extends Proxy {
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.rollback();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 
@@ -446,7 +447,7 @@ public abstract class JdbcProxy extends Proxy {
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setTransactionIsolation(transactionIsolation);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 }

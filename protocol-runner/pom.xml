@@ -134,26 +134,26 @@
     <build>
         <plugins>
 
-<!--            <plugin>-->
-<!--                <groupId>gg.jte</groupId>-->
-<!--                <artifactId>jte-maven-plugin</artifactId>-->
-<!--                <version>${jte.version}</version>-->
-<!--                <configuration>-->
-<!--                    &lt;!&ndash; This is the directory where compiled templates are located. &ndash;&gt;-->
-<!--                    <targetDirectory>${project.build.directory}/jte-classes</targetDirectory>-->
-<!--                    &lt;!&ndash; This is the directory where your .jte files are located. &ndash;&gt;-->
-<!--                    <sourceDirectory>${project.basedir}/src/main/resources/jte</sourceDirectory>-->
-<!--                    <contentType>Html</contentType>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>generate-sources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <!--            <plugin>-->
+            <!--                <groupId>gg.jte</groupId>-->
+            <!--                <artifactId>jte-maven-plugin</artifactId>-->
+            <!--                <version>${jte.version}</version>-->
+            <!--                <configuration>-->
+            <!--                    &lt;!&ndash; This is the directory where compiled templates are located. &ndash;&gt;-->
+            <!--                    <targetDirectory>${project.build.directory}/jte-classes</targetDirectory>-->
+            <!--                    &lt;!&ndash; This is the directory where your .jte files are located. &ndash;&gt;-->
+            <!--                    <sourceDirectory>${project.basedir}/src/main/resources/jte</sourceDirectory>-->
+            <!--                    <contentType>Html</contentType>-->
+            <!--                </configuration>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <phase>generate-sources</phase>-->
+            <!--                        <goals>-->
+            <!--                            <goal>generate</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--            </plugin>-->
 
             <!-- Set a compiler level -->
             <plugin>

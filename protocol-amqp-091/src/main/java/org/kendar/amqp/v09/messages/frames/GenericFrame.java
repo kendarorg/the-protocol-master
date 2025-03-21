@@ -1,6 +1,7 @@
 package org.kendar.amqp.v09.messages.frames;
 
 import org.kendar.buffers.BBuffer;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.states.ProtoState;
@@ -40,7 +41,7 @@ public class GenericFrame extends ProtoState implements NetworkReturnMessage, Ne
 
     @Override
     public void write(BBuffer rb) {
-        throw new RuntimeException();
+        throw new TPMProtocolException("Not implemented yet");
 
     }
 

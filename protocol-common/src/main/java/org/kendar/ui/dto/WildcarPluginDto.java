@@ -1,6 +1,6 @@
 package org.kendar.ui.dto;
 
-public class WildcarPluginDto  extends BaseHtmxDto {
+public class WildcarPluginDto extends BaseHtmxDto {
     private int active;
     private int notActive;
     private String id;

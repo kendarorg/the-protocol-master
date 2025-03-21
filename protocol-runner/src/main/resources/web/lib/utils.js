@@ -2,6 +2,41 @@
 // XMLHTTPREQUEST UTILS
 // ===============================================
 
+function retrieveValue(id) {
+    var el = document.getElementById(id);
+    if (el.type === "number") {
+        return +el.value;
+    }
+    return el.value;
+}
+
+function setValue(id, value) {
+    var el = document.getElementById(id);
+    if (el.type === "number") {
+        el.value = +value;
+    } else {
+        el.value = value;
+    }
+
+}
+
+function retrieveValues(obj) {
+    var propertyNames = Object.getOwnPropertyNames(obj);
+    for (var i = 0; i < propertyNames.length; i++) {
+        var id = propertyNames[i];
+        try {
+
+            var val = retrieveValue(id);
+            obj[id] = val;
+        } catch (error) {
+            if (obj[id] === null) {
+                console.warn("Missing id " + id);
+            }
+        }
+    }
+    return obj;
+}
+
 function sendData(path, verb, data, contentType, callback) {
     const xhr = new XMLHttpRequest();
     xhr.open(verb, path);
@@ -12,13 +47,19 @@ function sendData(path, verb, data, contentType, callback) {
     xhr.onreadystatechange = () => {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            if(typeof callback === 'function')callback(xhr.status, xhr.response);
+            if (typeof callback === 'function') {
+                callback(xhr.status, xhr.response);
+            }
+            if (xhr.status != 200) {
+                console.error(xhr);
+            }
+
             // Request finished. Do processing here.
         }
     };
-    if(data!=null){
+    if (data != null) {
         return xhr.send(data);
-    }else{
+    } else {
         return xhr.send();
 
     }
@@ -31,8 +72,12 @@ function getData(path, verb, callback) {
     xhr.onreadystatechange = () => {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            if(typeof callback === 'function')callback(xhr.status, xhr.response);
-            // Request finished. Do processing here.
+            if (typeof callback === 'function') {
+                callback(xhr.status, xhr.response);
+            }
+            if (xhr.status != 200) {
+                console.error(xhr);
+            }
         }
     };
     xhr.send();
@@ -66,7 +111,7 @@ htmx.defineExtension('json-enc', {
         }
     },
 
-    encodeParameters : function(xhr, parameters, elt) {
+    encodeParameters: function (xhr, parameters, elt) {
         xhr.overrideMimeType('text/json');
         return (JSON.stringify(parameters));
     }
@@ -104,18 +149,55 @@ function downloadURI(uri, name) {
 //         .catch(() => alert('An error sorry'));
 }
 
+function prettifyJson(elementId) {
+    var raw = retrieveValue(elementId);
+    const obj = JSON.parse(raw);
+    document.getElementById(elementId).value = JSON.stringify(obj, null, 2);
+}
+
 // ===============================================
 // ACCORDION HANDLING
 // ===============================================
 
+
 function toggleAccordion(elementId) {
     var element = document.getElementById(elementId);
     if (element.classList.contains("in")) {
-        console.log("CLOSE")
+        console.log("CLOSE " + elementId)
         element.classList.remove("in")
+        setAccordionStatus(elementId, "closed");
     } else {
-        console.log("OPEN")
+        console.log("OPEN " + elementId)
         element.classList.add("in")
+        setAccordionStatus(elementId, "open");
+    }
+}
+
+function getAccordionStatus() {
+    var item = localStorage.getItem("accordionStatus");
+    if (item == null) {
+        item = "{}";
+    }
+    return JSON.parse(item);
+}
+
+function setAccordionStatus(elementId, status) {
+    var panelStatus = getAccordionStatus();
+    panelStatus[window.location.pathname + "." + elementId] = {
+        elementId: elementId,
+        status: status,
+        path: window.location.pathname
+    };
+    localStorage.setItem("accordionStatus", JSON.stringify(panelStatus));
+}
+
+function closeAccordion(elementId) {
+    var element = document.getElementById(elementId);
+    if (element.classList.contains("in")) {
+
+        console.log("CLOSE " + elementId)
+        element.classList.remove("in")
+        setAccordionStatus(elementId, "closed");
     }
 }
 
@@ -131,6 +213,7 @@ function openAccordion(elementId) {
         if (!element.classList.contains("in")) {
             console.log("OPEN")
             element.classList.add("in")
+            setAccordionStatus(elementId, "open");
         }
     }, 250);
     //debugger;
@@ -163,6 +246,9 @@ function send_file(path, data, contentType, output, outputCode) {
             }
             if (typeof output !== 'undefined' && output !== null) {
                 output.innerHTML = xhr.response;
+            }
+            if (xhr.status != 200) {
+                console.error(xhr);
             }
             // Request finished. Do processing here.
         }
@@ -273,10 +359,10 @@ function handle_file_select(evt) {
 
 
 // open modal by id
-function openModal(id,path) {
+function openModal(id, path) {
     document.getElementById(id).classList.add('open');
     document.body.classList.add('jw-modal-open');
-    htmx.ajax('GET', path, {target:"#"+id, swap:'outerHTML'})
+    htmx.ajax('GET', path, {target: "#" + id, swap: 'outerHTML'})
 }
 
 // close currently open modal
@@ -285,7 +371,7 @@ function closeModal() {
     document.body.classList.remove('jw-modal-open');
 }
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     // close modals on background click
     document.addEventListener('click', event => {
         if (event.target.classList.contains('jw-modal')) {
@@ -294,6 +380,6 @@ window.addEventListener('load', function() {
     });
 });
 
-function locationReload(){
+function locationReload() {
     location.reload();
 }

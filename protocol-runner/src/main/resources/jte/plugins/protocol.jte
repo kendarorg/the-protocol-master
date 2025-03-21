@@ -1,15 +1,20 @@
 @param org.kendar.ui.dto.ProtocolDto element
+
+!{
+    var sortedData = element.getPlugins().stream().
+    sorted(java.util.Comparator.comparing(org.kendar.ui.dto.PluginDto::getId)).toList();
+ }
+
 @if(!(boolean) element.getParameters().get("avoidScript"))
-<script type="text/javascript">
-    function reloadProtocol${element.getSafeInstanceId()}(callback){
-        console.log("reload${element.getInstanceId()}")
-        var isOpen = isAccordionOpen('collapse${element.getSafeInstanceId()}');
-        return htmx.ajax('GET', '/plugins/protocols?protocolId=${element.getInstanceId()}&avoidScript=true', '#${element.getSafeInstanceId()}panel').
-        then(()=>{
-            if(isOpen)openAccordion('collapse${element.getSafeInstanceId()}')
-        })
-    }
-</script>
+    <script type="text/javascript">
+        function reloadProtocol${element.getSafeInstanceId()}(callback) {
+            console.log("reload${element.getInstanceId()}")
+            var isOpen = isAccordionOpen('collapse${element.getSafeInstanceId()}');
+            return htmx.ajax('GET', '/plugins/protocols?protocolId=${element.getInstanceId()}&avoidScript=true', '#${element.getSafeInstanceId()}panel').then(() => {
+                if (isOpen) openAccordion('collapse${element.getSafeInstanceId()}')
+            })
+        }
+    </script>
 @endif
 
 <div id="${element.getSafeInstanceId()}panel" class="panel panel-default">
@@ -35,7 +40,7 @@
                     <th>Status</th>
                     <th>Manage</th>
                 </tr>
-                @for(var plugin : element.getPlugins())
+                @for(var plugin : sortedData)
                     <tr>
                         <td>${plugin.getInstanceId()}</td>
                         <td>${plugin.getId()}</td>

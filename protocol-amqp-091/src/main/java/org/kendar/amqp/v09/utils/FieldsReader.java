@@ -1,6 +1,7 @@
 package org.kendar.amqp.v09.utils;
 
 import org.kendar.buffers.BBuffer;
+import org.kendar.exceptions.TPMProtocolException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -82,8 +83,8 @@ public class FieldsReader {
             case 'V':
                 break;
             default:
-                throw new RuntimeException
-                        ("Unrecognised type in table");
+                throw new TPMProtocolException
+                        ("Unrecognised type in table field: " + type);
         }
         return value;
 

@@ -4,6 +4,7 @@ import org.bouncycastle.crypto.CryptoException;
 import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.TPMException;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.Encryptor;
 
@@ -31,6 +32,11 @@ public class EncryptedStorageRepository extends FileStorageRepository {
         encryptor = getEncryptor();
     }
 
+    @TpmConstructor
+    public EncryptedStorageRepository(GlobalSettings settings, DiService diService) {
+        super(settings, diService);
+    }
+
     protected void initializeStorageRepo(GlobalSettings settings, DiService diService) {
         this.diService = diService;
         var dataDir = settings.getDataDir();
@@ -53,11 +59,6 @@ public class EncryptedStorageRepository extends FileStorageRepository {
         encryptor = getEncryptor();
         this.targetDir = Path.of(dataDir).toAbsolutePath().toString();
         this.targetDir = ensureDirectory(targetDir);
-    }
-
-    @TpmConstructor
-    public EncryptedStorageRepository(GlobalSettings settings, DiService diService) {
-        super(settings, diService);
     }
 
     private Encryptor getEncryptor() {
@@ -92,7 +93,7 @@ public class EncryptedStorageRepository extends FileStorageRepository {
             var toDecrypt = Arrays.copyOfRange(result, prologue.length, result.length);
             return encryptor.decryptString(toDecrypt);
         } catch (CryptoException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
@@ -104,11 +105,10 @@ public class EncryptedStorageRepository extends FileStorageRepository {
         } else {
             try {
                 var encryptedData = encryptor.encryptString(s);
-                var prologue = "ENCRYPTED".getBytes(StandardCharsets.UTF_8);
-                Files.write(of, prologue);
+                Files.writeString(of, "ENCRYPTED");
                 Files.write(of, encryptedData, StandardOpenOption.APPEND);
             } catch (CryptoException e) {
-                throw new RuntimeException(e);
+                throw new TPMException(e);
             }
         }
 

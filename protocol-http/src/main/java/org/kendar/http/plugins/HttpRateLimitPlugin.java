@@ -61,7 +61,7 @@ public class HttpRateLimitPlugin extends BasicPercentPlugin<HttpRateLimitPluginS
         if (getSettings() == null) return false;
         sitesToLimit = SiteMatcherUtils.setupSites(getSettings().getTarget());
         customResponse = null;
-        var responseFile = storage.readFile( "response");
+        var responseFile = storage.readFile("response");
         if (responseFile != null) {
             customResponse = mapper.deserialize(responseFile, Response.class);
         }
@@ -71,7 +71,7 @@ public class HttpRateLimitPlugin extends BasicPercentPlugin<HttpRateLimitPluginS
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(getInstanceId(),getId());
+        storage = repository.buildPluginFileManager(getInstanceId(), getId());
         if (!handleSettingsChanged()) return null;
         return this;
     }

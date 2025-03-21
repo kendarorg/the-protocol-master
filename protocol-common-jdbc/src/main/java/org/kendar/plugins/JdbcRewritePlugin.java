@@ -5,14 +5,15 @@ import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.sql.jdbc.SelectResult;
 import org.kendar.sql.jdbc.proxy.JdbcCall;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItemInstance;
 
 import java.util.List;
 
 public abstract class JdbcRewritePlugin extends BasicRewritePlugin<JdbcCall, SelectResult, RewritePluginSettings, String> {
-    public JdbcRewritePlugin(JsonMapper mapper, StorageRepository repository) {
-        super(mapper, repository);
+    public JdbcRewritePlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
+        super(mapper, repository,resolversFactory);
     }
 
     @Override

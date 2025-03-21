@@ -188,7 +188,7 @@ public class PostgresDataConverter {
             case TypesOids.Void:
                 return Void.class;
             default:
-                throw new RuntimeException("NOT RECOGNIZED COLUMN TYPE " + columnType);
+                throw new TPMException("NOT RECOGNIZED COLUMN TYPE " + columnType);
         }
     }
 

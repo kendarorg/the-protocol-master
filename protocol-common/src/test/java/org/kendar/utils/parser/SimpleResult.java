@@ -1,10 +1,10 @@
 package org.kendar.utils.parser;
 
-public class SimpleResult{
+public class SimpleResult {
+    private String result;
+
     public SimpleResult() {
     }
-
-    private String result;
 
     public String getResult() {
         return result;

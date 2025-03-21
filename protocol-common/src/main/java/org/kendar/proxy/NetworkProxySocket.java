@@ -1,6 +1,7 @@
 package org.kendar.proxy;
 
 import org.kendar.buffers.BBuffer;
+import org.kendar.exceptions.ProxyException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProtocolEvent;
@@ -139,7 +140,7 @@ public abstract class NetworkProxySocket {
                                         semaphore.release();
 
                                     } catch (InterruptedException e) {
-                                        throw new RuntimeException(e);
+                                        throw new ProxyException(e);
                                     }
                                 }
 
@@ -172,7 +173,7 @@ public abstract class NetworkProxySocket {
             });
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 
@@ -238,7 +239,7 @@ public abstract class NetworkProxySocket {
             }
 
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
 
         var returnMessage = new ArrayList<ReturnMessage>();
@@ -246,7 +247,7 @@ public abstract class NetworkProxySocket {
             if (optional) {
                 return returnMessage;
             }
-            throw new RuntimeException("UNABLE TO FIND Contains STILL (" + received.size() + ")");
+            throw new ProxyException("UNABLE TO FIND Contains STILL (" + received.size() + ")");
         } else {
             //FLW16 RUN THE FOUNDED MESSAGE
             Iterator<ProtoStep> it = protoState.executeEvent(founded);

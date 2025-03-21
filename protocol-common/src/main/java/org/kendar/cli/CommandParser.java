@@ -128,9 +128,7 @@ public class CommandParser {
         var firstLine = true;
         for (var item : result) {
             StringBuilder levelSpace = new StringBuilder();
-            for (var i = 0; i < item.getLevel(); i++) {
-                levelSpace.append("  ");
-            }
+            levelSpace.append("  ".repeat(Math.max(0, item.getLevel())));
             if (!item.isBlock()) {
                 item.setShortCommand(item.getShortCommand() + sbShort.substring(levelSpace.length() + item.getShortCommand().length()));
                 item.setLongCommand(item.getLongCommand() + sbLong.substring(item.getLongCommand().length()));

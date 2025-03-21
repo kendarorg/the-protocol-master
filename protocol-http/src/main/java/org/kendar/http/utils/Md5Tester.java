@@ -1,6 +1,8 @@
 package org.kendar.http.utils;
 
 
+import org.kendar.exceptions.TPMException;
+
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -23,7 +25,7 @@ public class Md5Tester {
             BigInteger bigInt = new BigInteger(1, digest);
             return bigInt.toString(16);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 }

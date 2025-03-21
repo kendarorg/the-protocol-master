@@ -17,28 +17,25 @@ import java.util.Map;
 
 @TpmService(tags = "http")
 public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings> {
-    private HashSet<String> localIgnore = new HashSet<>();
-
-    public interface MySupplier{
-        String get() throws Exception;
-    }
-
-    private static void tryAddName(HashSet<String> toFill, MySupplier supplier) {
-        try{
-            var data = supplier.get();
-            toFill.add(data);
-        }catch (Exception e){}
-    }
+    private final HashSet<String> localIgnore = new HashSet<>();
 
     public HttpReportPlugin(JsonMapper mapper) {
         super(mapper);
         localIgnore.add("127.0.0.1");
         localIgnore.add("localhost");
 
-        tryAddName(localIgnore, ()->InetAddress.getLocalHost().getCanonicalHostName());
-        tryAddName(localIgnore, ()->InetAddress.getLocalHost().getHostName());
-        tryAddName(localIgnore, ()->InetAddress.getLocalHost().getHostAddress());
-        tryAddName(localIgnore, ()->InetAddress.getByName(InetAddress.getLocalHost() .getHostAddress() ).getHostAddress());
+        tryAddName(localIgnore, () -> InetAddress.getLocalHost().getCanonicalHostName());
+        tryAddName(localIgnore, () -> InetAddress.getLocalHost().getHostName());
+        tryAddName(localIgnore, () -> InetAddress.getLocalHost().getHostAddress());
+        tryAddName(localIgnore, () -> InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()).getHostAddress());
+    }
+
+    private static void tryAddName(HashSet<String> toFill, MySupplier supplier) {
+        try {
+            var data = supplier.get();
+            toFill.add(data);
+        } catch (Exception e) {
+        }
     }
 
     @Override
@@ -48,13 +45,13 @@ public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Request in, Response out) {
         if (!isActive()) return false;
-        if(getSettings().isIgnoreTpm()){
-            if(localIgnore.contains(in.getHost())){
+        if (getSettings().isIgnoreTpm()) {
+            if (localIgnore.contains(in.getHost())) {
                 return false;
             }
         }
-        for(var ignored:getSettings().getIgnore()){
-            if(ignored.equalsIgnoreCase(in.getHost())){
+        for (var ignored : getSettings().getIgnore()) {
+            if (ignored.equalsIgnoreCase(in.getHost())) {
                 return false;
             }
         }
@@ -63,14 +60,14 @@ public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings
         EventsQueue.send(new ReportDataEvent(
                 getInstanceId(),
                 getProtocol(),
-                 in.getProtocol() + "://" + in.getHost() + in.getPath(),
+                in.getProtocol() + "://" + in.getHost() + in.getPath(),
                 0,
                 pluginContext.getStart(),
                 duration,
                 Map.of(
                         "method", in.getMethod(),
                         "host", in.getHost(),
-                        "query", in.getQuery()+"",
+                        "query", in.getQuery() + "",
                         "contentType", in.getFirstHeader("content-type", "unknown"),
                         "requestSize", in.getSize() + "",
                         "returnType", out.getFirstHeader("content-type", "unknown"),
@@ -82,5 +79,9 @@ public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings
     @Override
     public String getProtocol() {
         return "http";
+    }
+
+    public interface MySupplier {
+        String get() throws Exception;
     }
 }

@@ -6,6 +6,7 @@ import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmPostConstruct;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.events.*;
+import org.kendar.exceptions.TPMException;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.ResponseItemQuery;
@@ -43,50 +44,31 @@ public class FileStorageRepository extends StorageRepository {
     protected String targetDir;
     protected DiService diService;
 
-    private String getScenarioDir(){
-        return Path.of(targetDir,"scenario").toString();
-    }
-
     public FileStorageRepository(String targetDir) {
 
         this(Path.of(targetDir));
     }
 
     public FileStorageRepository(Path targetDir) {
-        super(null,null);
+        super(null, null);
         this.targetDir = targetDir.toAbsolutePath().toString();
     }
 
     protected FileStorageRepository() {
-        super(null,null);
+        super(null, null);
 
     }
-
 
     @TpmConstructor
     public FileStorageRepository(GlobalSettings settings, DiService diService) {
-        super(diService,mapper);
-        initializeStorageRepo(settings,diService);
+        super(diService, mapper);
+        initializeStorageRepo(settings, diService);
 
     }
-
-    protected void initializeStorageRepo(GlobalSettings settings, DiService diService) {
-        this.diService = diService;
-        var dataDir = settings.getDataDir();
-        if (dataDir == null || dataDir.isEmpty()) {
-            dataDir = Path.of("data",
-                    Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
-        } else {
-            dataDir = dataDir.replace("file=", "");
-        }
-        this.targetDir = Path.of(dataDir).toAbsolutePath().toString();
-        targetDir = ensureDirectory(targetDir);
-        ensureDirectory(getScenarioDir());
-    }
-
 
     /**
      * Pad the names of the recordings to allow easy ordering
+     *
      * @param inputString
      * @param length
      * @return
@@ -106,6 +88,7 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Certify that a directory exists
+     *
      * @param td
      * @return
      */
@@ -124,6 +107,7 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Delete -everything-
+     *
      * @param dir
      */
     protected static void cleanRecursive(File dir) {
@@ -138,9 +122,26 @@ public class FileStorageRepository extends StorageRepository {
         }
     }
 
+    private String getScenarioDir() {
+        return Path.of(targetDir, "scenario").toString();
+    }
+
+    protected void initializeStorageRepo(GlobalSettings settings, DiService diService) {
+        this.diService = diService;
+        var dataDir = settings.getDataDir();
+        if (dataDir == null || dataDir.isEmpty()) {
+            dataDir = Path.of("data",
+                    Long.toString(Calendar.getInstance().getTimeInMillis())).toAbsolutePath().toString();
+        } else {
+            dataDir = dataDir.replace("file=", "");
+        }
+        this.targetDir = Path.of(dataDir).toAbsolutePath().toString();
+        targetDir = ensureDirectory(targetDir);
+        ensureDirectory(getScenarioDir());
+    }
 
     @TpmPostConstruct
-    
+
     public void initialize() {
 
         try {
@@ -153,13 +154,14 @@ public class FileStorageRepository extends StorageRepository {
             EventsQueue.register("FileStorageRepository", (e) -> initializeContentForReplay(e.getInstanceId()), StartPlayEvent.class);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
 
     /**
      * Conclude the replaying for a given protocol
+     *
      * @param instanceId
      */
     protected void finalizePlay(String instanceId) {
@@ -171,6 +173,7 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Initiazlie the writing reading for a specific protocol
+     *
      * @param instanceId
      * @return
      */
@@ -226,10 +229,11 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Retrieve indexes for recording/replaying
+     *
      * @param instanceId
      * @return
      */
-    
+
     public List<CompactLine> getIndexes(String instanceId) {
         if (protocolRepo.get(instanceId) == null) {
             return null;
@@ -241,7 +245,7 @@ public class FileStorageRepository extends StorageRepository {
     /**
      * Reset all storage
      */
-    
+
     public void clean() {
         protocolRepo.clear();
         var dir = Path.of(targetDir).toFile();
@@ -251,6 +255,7 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Create unique progressive id
+     *
      * @return
      */
     public long generateIndex() {
@@ -261,9 +266,10 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Record a line
+     *
      * @param item
      */
-    
+
     public void recordInteraction(LineToWrite item) {
         executorItems.incrementAndGet();
         executor.submit(() -> {
@@ -287,7 +293,7 @@ public class FileStorageRepository extends StorageRepository {
                 if (item.getStorageItem() != null) {
                     var result = mapper.serializePretty(item.getStorageItem());
                     ensureDirectory(getScenarioDir());
-                    setFileContent(Path.of(targetDir, "scenario",id), result);
+                    setFileContent(Path.of(targetDir, "scenario", id), result);
                 }
             } catch (Exception e) {
                 log.error("[TPM ][WR]: Error writing item", e);
@@ -300,13 +306,14 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Retrieve all the index data for recording
+     *
      * @param protocolInstanceId
      * @return
      */
     protected List<CompactLine> retrieveIndexFile(String protocolInstanceId) {
         String fileContent;
         try {
-            fileContent = getFileContent(Path.of(targetDir,"scenario", "index." + protocolInstanceId + ".json"));
+            fileContent = getFileContent(Path.of(targetDir, "scenario", "index." + protocolInstanceId + ".json"));
         } catch (IOException e) {
             fileContent = "[]";
         }
@@ -316,6 +323,7 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Retrieve all scenario data
+     *
      * @param protocolInstanceId
      * @return
      */
@@ -337,10 +345,10 @@ public class FileStorageRepository extends StorageRepository {
                 continue;
             }
             try {
-                var fileContent = getFileContent(Path.of(targetDir,"scenario", fileName));
+                var fileContent = getFileContent(Path.of(targetDir, "scenario", fileName));
                 result.add(mapper.deserialize(fileContent, typeReference));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new TPMException(e);
             }
         }
         return result;
@@ -348,9 +356,10 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Finalize recording
+     *
      * @param instanceId
      */
-    
+
     public void finalizeRecording(String instanceId) {
         try {
             Sleeper.sleepNoException(1000, () -> executorItems.get() == 0, true);
@@ -362,15 +371,15 @@ public class FileStorageRepository extends StorageRepository {
                 return;
             }
             var indexFile = "index." + instanceId + ".json";
-            if (Files.exists(Path.of(targetDir, "scenario",indexFile))) {
-                Files.delete(Path.of(targetDir,"scenario", indexFile));
+            if (Files.exists(Path.of(targetDir, "scenario", indexFile))) {
+                Files.delete(Path.of(targetDir, "scenario", indexFile));
             }
-            setFileContent(Path.of(targetDir,"scenario", indexFile),
+            setFileContent(Path.of(targetDir, "scenario", indexFile),
                     mapper.serializePretty(repo.index));
 
         } catch (IOException e) {
             log.error("[TPM  ][WR]: Unable to write index file");
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
 
         log.info("Stop recording {}", instanceId);
@@ -378,17 +387,18 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Read item from scenario
+     *
      * @param protocolInstanceId
      * @param id
      * @return
      */
-    
+
     public StorageItem readFromScenarioById(String protocolInstanceId, long id) {
         var ctx = protocolRepo.get(protocolInstanceId);
         if (ctx == null) {
             String fileContent;
             try {
-                var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(id), 10) + "." + protocolInstanceId + ".json");
+                var filePath = Path.of(targetDir, "scenario", padLeftZeros(String.valueOf(id), 10) + "." + protocolInstanceId + ".json");
 
                 fileContent = getFileContent(filePath);
             } catch (IOException e) {
@@ -406,11 +416,12 @@ public class FileStorageRepository extends StorageRepository {
 
     /**
      * Read all responses for scenario given data
+     *
      * @param protocolInstanceId
      * @param query
      * @return
      */
-    
+
     public List<StorageItem> readResponsesFromScenario(String protocolInstanceId, ResponseItemQuery query) {
         var ctx = protocolRepo.get(protocolInstanceId);
         var result = new ArrayList<StorageItem>();
@@ -436,7 +447,7 @@ public class FileStorageRepository extends StorageRepository {
 
     protected List<File> listFilesUsingJavaIO(String dir) {
         var files = new File(dir).listFiles();
-        if(files == null) {
+        if (files == null) {
             return new ArrayList<>();
         }
         return Stream.of(files)
@@ -446,29 +457,29 @@ public class FileStorageRepository extends StorageRepository {
 
     protected List<File> listDirsUsingJavaIO(String dir) {
         var files = new File(dir).listFiles();
-        if(files == null) {
+        if (files == null) {
             return new ArrayList<>();
         }
         return Stream.of(files)
-                .filter(file -> file.isDirectory())
+                .filter(File::isDirectory)
                 .collect(Collectors.toList());
     }
 
 
-    
     public String getType() {
         return "storage";
     }
 
     /**
      * Retrieve all index data
+     *
      * @param maxLen
      * @return
      */
-    
+
     public List<CompactLineComplete> getAllIndexes(int maxLen) {
         var result = new ArrayList<CompactLineComplete>();
-        for (var file : listFilesUsingJavaIO(Path.of(targetDir,"scenario").toAbsolutePath().toString())) {
+        for (var file : listFilesUsingJavaIO(Path.of(targetDir, "scenario").toAbsolutePath().toString())) {
             if (file.getName().contains("index") && file.getName().endsWith(".json")) {
                 String fileContent;
                 var fileNameOnly = file.toPath().getFileName().toString();
@@ -486,7 +497,7 @@ public class FileStorageRepository extends StorageRepository {
                     var id = protocolInstanceId + "/" + padLeftZeros(String.valueOf(item.getIndex()), 10);
 
 
-                    var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(item.getIndex()), 10) + "." + protocolInstanceId + ".json");
+                    var filePath = Path.of(targetDir, "scenario", padLeftZeros(String.valueOf(item.getIndex()), 10) + "." + protocolInstanceId + ".json");
                     if (filePath.toFile().exists()) {
                         item.setFullItemId(id);
                     }
@@ -509,10 +520,10 @@ public class FileStorageRepository extends StorageRepository {
 
     }
 
-    
+
     public void updateRecording(long itemId, String protocolInstanceId, CompactLine index, StorageItem item) {
         var indexFile = retrieveIndexFile(protocolInstanceId);
-        var indexPath = Path.of(targetDir, "scenario","index." + protocolInstanceId + ".json");
+        var indexPath = Path.of(targetDir, "scenario", "index." + protocolInstanceId + ".json");
         for (int i = 0; i < indexFile.size(); i++) {
             var toCheck = indexFile.get(i);
             if (toCheck.getIndex() == itemId) {
@@ -520,7 +531,7 @@ public class FileStorageRepository extends StorageRepository {
                 indexFile.set(i, index);
                 var old = this.readFromScenarioById(protocolInstanceId, itemId);
 
-                var filePath = Path.of(targetDir,"scenario", padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+                var filePath = Path.of(targetDir, "scenario", padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
                 try {
                     item.setIndex(itemId);
                     item.setTimestamp(old.getTimestamp());
@@ -528,21 +539,21 @@ public class FileStorageRepository extends StorageRepository {
                     setFileContent(indexPath, mapper.serialize(indexFile));
                     setFileContent(filePath, mapper.serialize(item));
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new TPMException(e);
                 }
                 return;
             }
         }
-        throw new RuntimeException("ITem id " + itemId + " not found");
+        throw new TPMException("ITem id " + itemId + " not found");
 
     }
 
-    
+
     public void deleteRecording(String protocolInstanceId, long itemId) {
         try {
             var indexFile = retrieveIndexFile(protocolInstanceId);
-            var filePath = Path.of(targetDir, "scenario",padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
-            var indexPath = Path.of(targetDir, "scenario","index." + protocolInstanceId + ".json");
+            var filePath = Path.of(targetDir, "scenario", padLeftZeros(String.valueOf(itemId), 10) + "." + protocolInstanceId + ".json");
+            var indexPath = Path.of(targetDir, "scenario", "index." + protocolInstanceId + ".json");
             if (filePath.toFile().exists()) {
                 Files.delete(filePath);
             }
@@ -555,13 +566,13 @@ public class FileStorageRepository extends StorageRepository {
                 }
             }
         } catch (Exception ex) {
-            throw new RuntimeException("Unable to delete item " + itemId, ex);
+            throw new TPMException("Unable to delete item " + itemId, ex);
         }
     }
 
-    
+
     public StorageFile readPluginFile(StorageFileIndex file) {
-        var realPath = buildRealPath( file.getInstanceId(), file.getPluginId()).toString();
+        var realPath = buildRealPath(file.getInstanceId(), file.getPluginId()).toString();
         ensureDirectory(realPath);
         var filePath = Path.of(realPath, file.getIndex() + ".json");
         if (Files.exists(filePath)) {
@@ -575,32 +586,18 @@ public class FileStorageRepository extends StorageRepository {
         return null;
     }
 
-    
+
     public void writePluginFile(StorageFile file) {
-        var realPath = buildRealPath( file.getIndex().getInstanceId(), file.getIndex().getPluginId()).toString();
+        var realPath = buildRealPath(file.getIndex().getInstanceId(), file.getIndex().getPluginId()).toString();
         ensureDirectory(realPath);
         var filePath = Path.of(realPath, file.getIndex().getIndex() + ".json");
         try {
             setFileContent(filePath, file.getContent());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
 
     }
-
-
-
-    protected static class ProtocolRepo {
-        public final Object lockObject = new Object();
-        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
-        public final List<StorageItem> outItems = new ArrayList<>();
-        public List<CompactLine> index = new ArrayList<>();
-        public boolean initialized = false;
-        public volatile boolean somethingWritten = false;
-    }
-
-
-
 
     protected String getFileContent(Path of) throws IOException {
         return Files.readString(of);
@@ -610,77 +607,84 @@ public class FileStorageRepository extends StorageRepository {
         Files.writeString(of, s);
     }
 
-    
-    public List<String> listFiles(String ... path){
+    public List<String> listFiles(String... path) {
         var realPath = buildRealPath(path);
-        return listFilesUsingJavaIO(realPath.toString()).stream().map(s->s.getName().replace(".json", "")
-        ).collect(Collectors.toList());
+        return listFilesUsingJavaIO(realPath.toString()).stream().map(s -> s.getName().replace(".json", "")
+        ).sorted().collect(Collectors.toList());
     }
 
-
-    public List<String> listDirs(String ... path){
+    public List<String> listDirs(String... path) {
         var realPath = buildRealPath(path);
-        return listDirsUsingJavaIO(realPath.toString()).stream().map(s->s.getName()).collect(Collectors.toList());
+        return listDirsUsingJavaIO(realPath.toString()).stream().map(File::getName).sorted().collect(Collectors.toList());
     }
 
-    public boolean fileExists(String ... path){
+    public boolean fileExists(String... path) {
         var realPath = buildRealPath(path);
-        if(Files.isDirectory(realPath)){
+        if (Files.isDirectory(realPath)) {
             Files.exists(realPath);
         }
-        return Files.exists(Path.of(realPath+".json"));
+        return Files.exists(Path.of(realPath + ".json"));
     }
 
-    public void writeFile(String content,String ... path)  {
-        var realPath = buildRealPath(path)+".json";
+    public void writeFile(String content, String... path) {
+        var realPath = buildRealPath(path) + ".json";
         var fullPath = Path.of(realPath);
         var parent = fullPath.getParent().toFile();
-        if(!parent.exists()){
+        if (!parent.exists()) {
             fullPath.getParent().toFile().mkdirs();
         }
 
         try {
-            setFileContent(fullPath,content);
+            setFileContent(fullPath, content);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
     @Override
     public void deleteFile(String... path) {
-        var realPath = buildRealPath(path)+".json";
+        var realPath = buildRealPath(path) + ".json";
         try {
-            if(!Files.exists(Path.of(realPath))){
+            if (!Files.exists(Path.of(realPath))) {
                 return;
             }
             Files.deleteIfExists(Path.of(realPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
-    public String readFile(String ... path) {
-        var realPath = buildRealPath(path)+".json";
+    public String readFile(String... path) {
+        var realPath = buildRealPath(path) + ".json";
         try {
-            if(!Files.exists(Path.of(realPath))){
+            if (!Files.exists(Path.of(realPath))) {
                 return null;
             }
             return getFileContent(Path.of(realPath));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 
-    private Path buildRealPath(String ... path) {
+    private Path buildRealPath(String... path) {
         var fullPath = new ArrayList<>(Arrays.asList(path));
         var realPath = Path.of(targetDir);
-        if(fullPath.size()>0) {
+        if (!fullPath.isEmpty()) {
             realPath = Path.of(targetDir, fullPath.toArray(new String[0]));
         }
-        var root= Path.of(targetDir);
-        if(!realPath.toAbsolutePath().toString().contains(root.toAbsolutePath().toString())){
-            throw new RuntimeException("Cannot naviagate outside project!");
+        var root = Path.of(targetDir);
+        if (!realPath.toAbsolutePath().toString().contains(root.toAbsolutePath().toString())) {
+            throw new TPMException("Cannot naviagate outside project!");
         }
         return realPath;
+    }
+
+    protected static class ProtocolRepo {
+        public final Object lockObject = new Object();
+        public final ConcurrentHashMap<Long, StorageItem> inMemoryDb = new ConcurrentHashMap<>();
+        public final List<StorageItem> outItems = new ArrayList<>();
+        public List<CompactLine> index = new ArrayList<>();
+        public boolean initialized = false;
+        public volatile boolean somethingWritten = false;
     }
 }

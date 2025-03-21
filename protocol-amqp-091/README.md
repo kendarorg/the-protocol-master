@@ -49,6 +49,7 @@ All callback are replayed automatically
 ### publish-plugin
 
 Exposes two APIs
+
 * Retrieve the current connections and if they are subscribed to something
 * Send a message to a currently active connection
 

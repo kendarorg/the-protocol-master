@@ -21,20 +21,30 @@ public class ApiUtils {
         respondJson(resp, new Ko(error));
     }
 
+    public static void respondKo(Response resp, String error, int code) {
+        resp.setStatusCode(code);
+        respondJson(resp, new Ko(error));
+    }
+
 
     public static void respondKo(Response resp, Exception error) {
+
         respondKo(resp, error.getMessage());
     }
 
     public static void respondJson(Response resp, Object toSerialiez) {
         resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-        resp.setResponseText(mapper.toJsonNode(toSerialiez));
+        if (toSerialiez instanceof String) {
+            resp.setResponseText(new TextNode((String) toSerialiez));
+        } else {
+            resp.setResponseText(mapper.toJsonNode(toSerialiez));
+        }
     }
 
 
-    public static void respondText(Response resp, String toSerialiez) {
+    public static void respondText(Response resp, String data) {
         resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.TEXT);
-        resp.setResponseText(new TextNode(toSerialiez));
+        resp.setResponseText(new TextNode(data));
     }
 
     public static void respondFile(Response resp, byte[] data, String contentType, String name) {

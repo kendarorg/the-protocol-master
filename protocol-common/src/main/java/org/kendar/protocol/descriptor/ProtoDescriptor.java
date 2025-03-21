@@ -1,5 +1,6 @@
 package org.kendar.protocol.descriptor;
 
+import org.kendar.exceptions.TPMException;
 import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.ProtocolApiHandler;
 import org.kendar.protocol.context.ProtoContext;
@@ -165,7 +166,7 @@ public abstract class ProtoDescriptor {
      */
     protected void initializeTag(String tag, ProtoState start) {
         start.setProtoDescriptor(this);
-        if (this.taggedStates.containsKey(tag)) throw new RuntimeException("Duplicate Tag");
+        if (this.taggedStates.containsKey(tag)) throw new TPMException("Duplicate Tag");
         this.taggedStates.put(tag, start);
     }
 
@@ -216,7 +217,7 @@ public abstract class ProtoDescriptor {
      */
     protected void addInterruptState(ProtoState state) {
         if (!(state instanceof InterruptProtoState)) {
-            throw new RuntimeException(state.getClass().getSimpleName() + " is not an InterruptProtoState");
+            throw new TPMException(state.getClass().getSimpleName() + " is not an InterruptProtoState");
         }
         state.setProtoDescriptor(this);
         interrupts.add(state);

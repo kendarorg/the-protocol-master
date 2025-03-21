@@ -1,9 +1,9 @@
 @param org.kendar.ui.dto.SinglePluginDto data
 <script>
     function searchReport() {
-        var tpmql = document.getElementById('tpmqlQuery').value;
-        var start = document.getElementById('tpmqlQueryStart').value;
-        var limit = document.getElementById('tpmqlQueryLimit').value;
+        var tpmql = retrieveValue('tpmqlQuery');
+        var start = retrieveValue('tpmqlQueryStart');
+        var limit = retrieveValue('tpmqlQueryLimit');
         htmx.ajax('GET',
             '/global/plugins/report-plugin/report/search?' +
             'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit,
@@ -11,12 +11,21 @@
     }
 
     function downloadReport(type) {
-        var tpmql = document.getElementById('tpmqlQuery').value;
-        var start = document.getElementById('tpmqlQueryStart').value;
-        var limit = document.getElementById('tpmqlQueryLimit').value;
-        downloadURI('/api/global/plugins/report-plugin/report?'+
-            'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit+'&format='+type
+        var tpmql = retrieveValue('tpmqlQuery');
+        var start = retrieveValue('tpmqlQueryStart');
+        var limit = retrieveValue('tpmqlQueryLimit');
+        downloadURI('/api/global/plugins/report-plugin/report?' +
+            'tpmql=' + encodeURI(tpmql) + "&start=" + start + "&limit=" + limit + '&format=' + type
         );
+    }
+
+    function deleteReports() {
+        if (confirm("You want to delete all reports data?") == true) {
+            getData("/api/global/plugins/report-plugin/report", "DELETE", () => {
+                alert("All cleaned up");
+                location.reload();
+            })
+        }
     }
 </script>
 <div class="panel panel-default">
@@ -49,7 +58,7 @@
                 <div class="input-group">
                     <label for="tpmqlQuery" class="control-label">Query</label>
                     <div>
-                        <textarea id="tpmqlQuery" class="form-control" rows="6" cols="70">
+                        <textarea id="tpmqlQuery" class="form-control" rows="6" cols="200">
 SELECT(
     WHAT(date=MSTODATE(timestamp),instanceId,protocol,
         query=SUBSTR(query,50),duration,tags=WRAP(tags,50,' ')),
@@ -78,6 +87,11 @@ SELECT(
                     <button type="button" class="btn btn-success"
                             onclick="downloadReport('json')">
                         Download json
+                    </button>
+                    &nbsp;
+                    <button type="button" class="btn btn-danger"
+                            onclick="deleteReports()">
+                        Delete all reports
                     </button>
                 </div>
                 <br>

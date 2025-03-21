@@ -3,10 +3,12 @@ package org.kendar.http.plugins;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.BasicRewritePlugin;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItemInstance;
 
@@ -19,8 +21,8 @@ public class HttpRewritePlugin extends BasicRewritePlugin<Request, Response, Rew
     private static final String HTTP = "http";
     private static final String HTTPS = "https";
 
-    public HttpRewritePlugin(JsonMapper mapper, StorageRepository repository) {
-        super(mapper, repository);
+    public HttpRewritePlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
+        super(mapper, repository, resolversFactory);
     }
 
 
@@ -81,7 +83,7 @@ public class HttpRewritePlugin extends BasicRewritePlugin<Request, Response, Rew
                 source.setProtocol(url.getProtocol());
             }
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new PluginException(ex);
         }
     }
 }

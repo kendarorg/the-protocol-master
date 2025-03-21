@@ -7,6 +7,7 @@ import org.kendar.plugins.cli.BasicLatencyPluginCli;
 import org.kendar.settings.PluginSettings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @TpmService(tags = "http")
 public class HttpLatencyPluginCli extends BasicLatencyPluginCli {
@@ -17,21 +18,9 @@ public class HttpLatencyPluginCli extends BasicLatencyPluginCli {
     }
 
     @Override
-    protected String getPluginName() {
-        return "latency-plugin";
-    }
-
-    @Override
-    protected String getPluginDescription() {
-        return "Add latency to calls";
-    }
-
-    @Override
     protected CommandOption[] buildPluginOptions(PluginSettings settings) {
         var options = new ArrayList<CommandOption>();
-        for(var opt:super.buildPluginOptions(settings)){
-            options.add(opt);
-        }
+        options.addAll(Arrays.asList(super.buildPluginOptions(settings)));
         options.add(CommandOption.of("t", "Modify latency on following websites @\r\n" +
                         "@REGEX or  STARTWITH. Default anything")
                 .withLong("target")

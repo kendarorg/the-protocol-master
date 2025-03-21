@@ -1,0 +1,12 @@
+{
+  "instanceId": "postgres-01",
+  "protocol": "postgres",
+  "query": "select companyjpa0_.DENOMINATION as col_0_0_ from COMPANY_JPA companyjpa0_",
+  "connectionId": 1,
+  "timestamp": 1742478173859,
+  "duration": 8,
+  "tags": {
+    "inputsCount": "0",
+    "resultsCount": "1"
+  }
+}

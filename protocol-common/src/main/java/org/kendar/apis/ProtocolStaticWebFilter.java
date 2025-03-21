@@ -1,6 +1,7 @@
 package org.kendar.apis;
 
 import org.kendar.apis.filters.StaticWebFilter;
+import org.kendar.exceptions.ApiException;
 import org.kendar.plugins.base.ProtocolApiHandler;
 import org.kendar.utils.FileResourcesUtils;
 
@@ -20,7 +21,7 @@ public abstract class ProtocolStaticWebFilter extends StaticWebFilter implements
         try {
             loadAllStuffs();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ApiException("Unable to load data for protocol "+protocolInstanceId,e);
         }
     }
 

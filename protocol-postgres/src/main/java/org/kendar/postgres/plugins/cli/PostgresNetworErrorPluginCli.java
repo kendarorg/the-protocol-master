@@ -5,5 +5,5 @@ import org.kendar.plugins.cli.BasicNetworkErrorPluginCli;
 
 @TpmService(tags = "postgres")
 public class PostgresNetworErrorPluginCli extends BasicNetworkErrorPluginCli {
-    
+
 }

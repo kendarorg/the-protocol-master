@@ -1,4 +1,3 @@
-
 @param org.kendar.plugins.apis.GlobalReportResult data
 <table id="reportSearchResult" class="table table-bordered table-striped">
     <tr>

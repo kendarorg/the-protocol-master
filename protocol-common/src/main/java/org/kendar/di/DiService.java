@@ -1,6 +1,7 @@
 package org.kendar.di;
 
 import org.kendar.di.annotations.*;
+import org.kendar.exceptions.DiException;
 import org.kendar.utils.TimerInstance;
 import org.kendar.utils.TimerService;
 import org.reflections.Reflections;
@@ -57,9 +58,9 @@ public class DiService {
     }
 
     public static void setThreadContext(DiService threadContext) {
-        if(threadContext==null) {
+        if (threadContext == null) {
             threads.remove(Thread.currentThread());
-        }else {
+        } else {
             threads.put(Thread.currentThread(), threadContext);
         }
     }
@@ -85,13 +86,15 @@ public class DiService {
         for (var item : children) {
             try {
                 item.destroy();
-            }catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
         children.clear();
         for (var item : singletons.values()) {
             try {
                 destroy(item);
-            }catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
         singletons.clear();
         if (parent != null) {
@@ -187,7 +190,7 @@ public class DiService {
             } else if (type instanceof ParameterizedType) {
                 clazz = (Class<?>) ((ParameterizedType) type).getRawType();
             } else {
-                throw new RuntimeException("Type " + type + " not supported");
+                throw new DiException("Type " + type + " not supported");
             }
 
             Class<?>[] interfaces = clazz.getInterfaces();
@@ -248,23 +251,7 @@ public class DiService {
             }
             var constructors = clazz.getConstructors();
             var clazzNamed = clazz.getAnnotation(TpmNamed.class);
-            Constructor constructor = null;
-            if (constructors.length == 1) {
-                constructor = constructors[0];
-            } else {
-                for (var constr : constructors) {
-                    if (null != constr.getAnnotation(TpmConstructor.class)) {
-                        if (constructor != null) {
-                            throw new RuntimeException("Duplicate TpmConstructor constructor found");
-                        }
-                        constructor = constr;
-                    }
-                }
-            }
-
-            if (constructor == null) {
-                throw new RuntimeException("No TpmConstructor found");
-            }
+            var constructor = retrieveConstructor(constructors);
             Object result = null;
             if (constructor.getParameterCount() == 0) {
                 var singleton = getSingletonMapping(clazz);
@@ -318,8 +305,29 @@ public class DiService {
             }
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Unable to instantiate " + clazz, e);
+            throw new DiException("Unable to instantiate " + clazz, e);
         }
+    }
+
+    private static Constructor retrieveConstructor(Constructor<?>[] constructors) {
+        Constructor constructor = null;
+        if (constructors.length == 1) {
+            constructor = constructors[0];
+        } else {
+            for (var constr : constructors) {
+                if (null != constr.getAnnotation(TpmConstructor.class)) {
+                    if (constructor != null) {
+                        throw new DiException("Duplicate TpmConstructor constructor found");
+                    }
+                    constructor = constr;
+                }
+            }
+        }
+
+        if (constructor == null) {
+            throw new DiException("No TpmConstructor found");
+        }
+        return constructor;
     }
 
     private Object destroy(Object o) {
@@ -329,7 +337,7 @@ public class DiService {
                 try {
                     m.invoke(o);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                    throw new DiException(e);
                 }
                 break;
             }
@@ -344,7 +352,7 @@ public class DiService {
                 try {
                     m.invoke(o);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                    throw new DiException(e);
                 }
                 break;
             }
@@ -385,7 +393,7 @@ public class DiService {
 
     private <T> List<T> getInstancesInternal(String name, Class<T> clazz, DiService context, Type type, String... tags) {
         if (scope == TpmScopeType.NONE) {
-            throw new RuntimeException("Invalid Context");
+            throw new DiException("Invalid Context");
         }
         var result = new ArrayList<T>();
         if (name != null) {
@@ -443,7 +451,7 @@ public class DiService {
 
     public List<Class<?>> getNamedDefinitions(Class<?> type, String name, String... tags) {
         if (scope == TpmScopeType.NONE) {
-            throw new RuntimeException("Invalid Context");
+            throw new DiException("Invalid Context");
         }
         var result = new ArrayList<Class<?>>();
 
@@ -492,7 +500,8 @@ public class DiService {
     public void clean() {
         try {
             this.destroy();
-        }catch (Exception e) {}
+        } catch (Exception e) {
+        }
         for (int i = 0; i < children.size(); i++) {
             var item = children.get(i);
             item.clean();

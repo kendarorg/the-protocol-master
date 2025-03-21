@@ -1,16 +1,21 @@
 @param org.kendar.ui.dto.ProtocolStatusDto data
 
+!{
+    var sortedData = data.getActivePlugins().stream().
+    sorted(java.util.Comparator.comparing(org.kendar.ui.dto.PluginDto::getId)).toList();
+ }
+
 @if(!(boolean) data.getParameters().get("avoidScript"))
-<script type="text/javascript">
-    function reloadActive(callback) {
-        console.log("reloadActive")
-        var isOpen = isAccordionOpen('collapseActive');
-        return htmx.ajax('GET', '/plugins/active?avoidScript=true', '#activePanel')
-        .then(() => {
-            if (isOpen) openAccordion('collapseActive');
-        })
-    }
-</script>
+    <script type="text/javascript">
+        function reloadActive(callback) {
+            console.log("reloadActive")
+            var isOpen = isAccordionOpen('collapseActive');
+            return htmx.ajax('GET', '/plugins/active?avoidScript=true', '#activePanel')
+                .then(() => {
+                    if (isOpen) openAccordion('collapseActive');
+                })
+        }
+    </script>
 @endif
 <div id="activePanel" class="panel panel-default">
 
@@ -34,7 +39,7 @@
                     <th>Stop</th>
                     <th>Manage</th>
                 </tr>
-                @for(var element : data.getActivePlugins())
+                @for(var element : sortedData)
                     <tr>
                         <td>${element.getInstanceId()}</td>
                         <td>${element.getId()}</td>

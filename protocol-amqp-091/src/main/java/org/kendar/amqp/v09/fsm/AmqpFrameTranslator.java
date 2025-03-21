@@ -3,6 +3,7 @@ package org.kendar.amqp.v09.fsm;
 import org.kendar.amqp.v09.fsm.events.AmqpFrame;
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ProtoStep;
@@ -48,7 +49,7 @@ public class AmqpFrameTranslator extends ProtoState implements NetworkReturnMess
 
     @Override
     public void write(BBuffer rb) {
-        throw new RuntimeException();
+        throw new TPMProtocolException("Not implemented");
 
     }
 

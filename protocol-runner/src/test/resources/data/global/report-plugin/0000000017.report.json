@@ -1,0 +1,17 @@
+{
+  "instanceId": "http-01",
+  "protocol": "http",
+  "query": "http://localhost/api/global/plugins/report-plugin/download",
+  "connectionId": 0,
+  "timestamp": 1742478173888,
+  "duration": 36,
+  "tags": {
+    "requestSize": "0",
+    "responseSize": "0",
+    "method": "GET",
+    "query": "{}",
+    "contentType": "unknown",
+    "returnType": "application/json",
+    "host": "localhost"
+  }
+}

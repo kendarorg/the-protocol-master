@@ -2,6 +2,7 @@ package org.kendar.redis.fsm.events;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.buffers.BBuffer;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
@@ -23,7 +24,7 @@ public class Resp3Message extends ProtocolEvent implements NetworkReturnMessage 
             this.message = parser.serialize(data);
             this.data = parser.parse(message);
         } catch (Exception ex) {
-            throw new RuntimeException("UNABLE TO DESERIALIZE FROM JSON NODE");
+            throw new TPMProtocolException("UNABLE TO DESERIALIZE FROM JSON NODE");
         }
     }
 

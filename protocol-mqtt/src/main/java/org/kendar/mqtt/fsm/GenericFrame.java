@@ -2,6 +2,7 @@ package org.kendar.mqtt.fsm;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.AskMoreDataException;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mqtt.utils.MqttBBuffer;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
@@ -11,7 +12,7 @@ import org.kendar.proxy.NetworkProxySplitterState;
 public class GenericFrame extends ProtoState implements NetworkReturnMessage, NetworkProxySplitterState {
     @Override
     public void write(BBuffer resultBuffer) {
-        throw new RuntimeException();
+        throw new TPMProtocolException("Not implemented yet");
     }
 
     public boolean canRun(BytesEvent event) {

@@ -1,0 +1,12 @@
+{
+  "instanceId": "postgres-01",
+  "protocol": "postgres",
+  "query": "select current_schema()",
+  "connectionId": 1,
+  "timestamp": 1742478171374,
+  "duration": 4,
+  "tags": {
+    "inputsCount": "0",
+    "resultsCount": "1"
+  }
+}

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.kendar.buffers.BBuffer;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.JsonException;
 
 import java.util.Base64;
 
@@ -28,14 +29,14 @@ public class JsonMapper {
     }
 
     public JsonNode convertValue(Object value) {
-        return mapper.convertValue(value,JsonNode.class);
+        return mapper.convertValue(value, JsonNode.class);
     }
 
     public String serializePretty(Object target) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(target);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonException(e);
         }
     }
 
@@ -47,7 +48,7 @@ public class JsonMapper {
                 return mapper.writeValueAsString(target);
             }
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonException(e);
         }
     }
 
@@ -56,9 +57,9 @@ public class JsonMapper {
             if (serialized == null) return null;
             if (serialized instanceof String) return mapper.readValue((String) serialized, target);
             if (serialized instanceof JsonNode) return mapper.treeToValue((JsonNode) serialized, target);
-            throw new RuntimeException("ERROR");
+            throw new JsonException("ERROR");
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonException(e);
         }
     }
 
@@ -67,9 +68,9 @@ public class JsonMapper {
             if (serialized == null) return null;
             if (serialized instanceof String) return mapper.readValue((String) serialized, target);
             if (serialized instanceof JsonNode) return mapper.treeToValue((JsonNode) serialized, target);
-            throw new RuntimeException("ERROR");
+            throw new JsonException("ERROR");
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonException(e);
         }
     }
 
@@ -91,7 +92,7 @@ public class JsonMapper {
             }
             return mapper.readTree(mapper.writeValueAsString(of));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonException(e);
         }
     }
 

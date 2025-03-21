@@ -42,7 +42,7 @@ public class DnsRunnable implements Callable<List<String>> {
             if (records != null) {
                 for (org.xbill.DNS.Record record : records) {
                     String realip = ((ARecord) records[0]).getAddress().getHostAddress();
-                    log.debug("Resolved with " + requestedServer + " for " + requestedDomain + ": " + realip);
+                    log.debug("Resolved with {} for {}: {}", requestedServer, requestedDomain, realip);
                     result.add(realip);
 
                 }

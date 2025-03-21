@@ -7,7 +7,9 @@ import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +19,9 @@ import java.util.Map;
 public class MqttRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSettings> {
     private static final List<String> toAvoid = List.of("Disconnect", "PingReq");
 
-    public MqttRecordPlugin(JsonMapper mapper, StorageRepository storage) {
-        super(mapper, storage);
+    public MqttRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                            MultiTemplateEngine resolversFactory, SimpleParser parser) {
+        super(mapper, storage, resolversFactory, parser);
     }
 
     private static int getConsumeId(JsonNode data, int consumeId) {

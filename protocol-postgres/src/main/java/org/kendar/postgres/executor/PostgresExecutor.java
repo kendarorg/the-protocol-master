@@ -1,5 +1,6 @@
 package org.kendar.postgres.executor;
 
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.postgres.dtos.Binding;
 import org.kendar.postgres.dtos.Field;
 import org.kendar.postgres.dtos.Parse;
@@ -209,7 +210,7 @@ public class PostgresExecutor {
                     ((JdbcProxy) protoContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_SERIALIZABLE);
                     break;
                 default:
-                    throw new RuntimeException("Unsupported isolation " + transactionType);
+                    throw new TPMProtocolException("Unsupported isolation " + transactionType);
 
 
             }

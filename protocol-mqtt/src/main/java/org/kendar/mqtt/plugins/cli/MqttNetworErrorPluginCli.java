@@ -5,5 +5,5 @@ import org.kendar.plugins.cli.BasicNetworkErrorPluginCli;
 
 @TpmService(tags = "mqtt")
 public class MqttNetworErrorPluginCli extends BasicNetworkErrorPluginCli {
-    
+
 }

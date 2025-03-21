@@ -1,5 +1,7 @@
 package org.kendar.http.utils.dns;
 
+import org.kendar.exceptions.TPMProtocolException;
+
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +27,7 @@ public class DnsMultiResolverImpl implements DnsMultiResolver {
                     result = InetAddress.getByName(dnsName);
                     return result.getHostAddress();
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new TPMProtocolException(e);
                 }
             });
             if (addresses == null) {

@@ -1,5 +1,7 @@
 package org.kendar.utils;
 
+import org.kendar.exceptions.TPMException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class ExtraStringReplacer {
                             paramName += ch2;
                         } else if (ch2 == '}') {
                             if (previousIsParameter) {
-                                throw new RuntimeException();
+                                throw new TPMException("Invalid parameter name: " + paramName);
                             }
                             result.add(sb);
                             sb = "";

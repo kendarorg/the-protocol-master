@@ -1,0 +1,9 @@
+{
+  "instanceId": "http-01",
+  "protocol": "dns",
+  "query": "localhost",
+  "connectionId": -1,
+  "timestamp": 1742478175357,
+  "duration": 0,
+  "tags": {}
+}

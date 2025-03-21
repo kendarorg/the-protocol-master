@@ -38,7 +38,7 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
 
         var args = new String[]{
 
-                "-cfg", Path.of("src", "test", "resources", "apitestsencstorage.json").toString(),"-unattended"
+                "-cfg", Path.of("src", "test", "resources", "apitestsencstorage.json").toString(), "-unattended"
         };
         bs = new BasicTest();
         bs.startAndHandleUnexpectedErrors(args);
@@ -66,11 +66,11 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
         }, "application/zip");
         assertEquals("OK", okResult.getResult());
         assertThrows(MalformedInputException.class, () ->
-                Files.readString(Path.of("target", "tests", "encrypted","scenario", "index.http-01.json")));
+                Files.readString(Path.of("target", "tests", "encrypted", "scenario", "index.http-01.json")));
         var zip = downloadRequest("http://localhost:5005/api/global/storage", httpclient);
         assertTrue(zip.length > 100);
         Files.write(Path.of("target", "downloaded.zip"), zip);
-        var expectedFiles = getPaths(data).stream().filter(f->f.endsWith(".json")).sorted().toList();
+        var expectedFiles = getPaths(data).stream().filter(f -> f.endsWith(".json")).sorted().toList();
         var testedFiles = getPaths(zip).stream().sorted().toList();
         assertArrayEquals(expectedFiles.toArray(), testedFiles.toArray());
 
@@ -78,7 +78,7 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
 
     private List<String> getPaths(byte[] data) {
         try {
-            File destDir = new File(Path.of("target","tests","tempencrypted").toString());
+            File destDir = new File(Path.of("target", "tests", "tempencrypted").toString());
             byte[] buffer = new byte[1024];
             var result = new ArrayList<String>();
             var fis = new ByteArrayInputStream(data);

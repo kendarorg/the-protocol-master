@@ -4,6 +4,7 @@ import org.kendar.Service;
 import org.kendar.di.DiService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
+import org.kendar.exceptions.TPMException;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.CompactLineComplete;
@@ -112,28 +113,24 @@ public abstract class StorageRepository implements Service {
     }
 
     public void writeZip(byte[] byteArray) {
-//        String settingsPath = null;
-//        var destDirString = Path.of(targetDir).toAbsolutePath().toString();
         File destDir = new File("");
-//        // create output directory if it doesn't exist
-//        if (!destDir.exists()) destDir.mkdirs();
         ByteArrayInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
-        var settingsChanged= false;
+        var settingsChanged = false;
         try {
             fis = new ByteArrayInputStream(byteArray);
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry zipEntry = zis.getNextEntry();
             if (zipEntry == null) {
-                throw new RuntimeException("Not a zip file!");
+                throw new TPMException("Not a zip file!");
             }
             while (zipEntry != null) {
 
                 File newFile = createNewFileFromZip(destDir, zipEntry);
                 if (!zipEntry.isDirectory()) {
-                    if(zipEntry.getName().equalsIgnoreCase("settings.json")) {
-                        settingsChanged=true;
+                    if (zipEntry.getName().equalsIgnoreCase("settings.json")) {
+                        settingsChanged = true;
                     }
                     var fos = new ByteArrayOutputStream();
                     int len;
@@ -150,12 +147,12 @@ public abstract class StorageRepository implements Service {
             zis.close();
             fis.close();
             var evt = new StorageReloadedEvent();
-            if(settingsChanged){
+            if (settingsChanged) {
                 evt.withSettings("settings");
             }
             EventsQueue.send(evt);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new TPMException(e);
         }
     }
 

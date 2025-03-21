@@ -3,8 +3,8 @@ package org.kendar.utils.parser;
 import java.util.Objects;
 
 public class FunctionDefinition {
-    public String name;
-    public int paramsCount;
+    public final String name;
+    public final int paramsCount;
 
     public FunctionDefinition(String name, int paramsCount) {
         this.name = name;

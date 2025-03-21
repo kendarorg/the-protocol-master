@@ -1,6 +1,7 @@
 package org.kendar.redis.plugins;
 
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
@@ -74,7 +75,7 @@ public class RedisReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginS
                 ReturnMessage fr = new Resp3Message(ctx, null, out);
                 ctx.write(fr);
             } else {
-                throw new RuntimeException("MISSING RESPONSE_CLASS");
+                throw new PluginException("MISSING RESPONSE_CLASS");
             }
 
         }

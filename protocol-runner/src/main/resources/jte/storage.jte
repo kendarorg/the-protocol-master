@@ -15,43 +15,74 @@
         }
     }
 
-    var selectedElement=null;
-    var selectedPath=null;
-    function toggle(newElement){
-        newElement+="_name";
-        if(selectedElement!=null && selectedElement!=newElement){
+    var selectedElement = null;
+    var selectedPath = null;
+
+    function toggle(newElement) {
+        newElement += "_name";
+        if (selectedElement != null && selectedElement != newElement) {
             htmx.find(selectedElement).classList.toggle("selectedClass")
             selectedElement = newElement;
             htmx.find(newElement).classList.toggle("selectedClass")
-        }else if(selectedElement ==null){
+        } else if (selectedElement == null) {
             selectedElement = newElement;
             htmx.find(newElement).classList.toggle("selectedClass")
         }
 
     }
-    function openTree(target,path) {
-        selectedPath=path;
-        htmx.ajax('GET', '/storage/tree?parent='+path, {target:target, swap:'outerHTML'}).then(()=>openFiles(path)).then(()=>toggle(target));
+
+    function resetFiles(path) {
+        if (path.localeCompare(selectedPath) != 0) {
+            var item = htmx.find("#fileContainerData");
+            if (item) {
+                htmx.remove(item);
+            }
+        }
     }
+
+    function openTree(target, path) {
+        resetFiles(path);
+        selectedPath = path;
+        htmx.ajax('GET', '/storage/tree?parent=' + path, {
+            target: target,
+            swap: 'outerHTML'
+        }).then(() => openFiles(path)).then(() => toggle(target));
+    }
+
     function openFiles(path) {
-        selectedPath=path;
-        htmx.ajax('GET', '/storage/files?parent='+path, "#resultsContainer");
-    }
-    function openFile(path,name) {
-        htmx.ajax('GET', '/storage/file?parent='+path+'&name='+name, "#resultsContainer");
+        resetFiles(path);
+        selectedPath = path;
+        htmx.ajax('GET', '/storage/files?parent=' + path, "#resultsContainer");
     }
 
-    function closeTree(target,path) {
-        selectedPath=path;
-        htmx.ajax('GET', '/storage/tree?close=true&parent='+path, {target:target, swap:'outerHTML'}).then(()=>openFiles(path)).then(()=>toggle(target));
+    function openFile(path, name) {
+        htmx.ajax('GET', '/storage/file?parent=' + path + '&name=' + name, {
+            target: "#resultsContainer",
+            swap: 'outerHTML'
+        });
     }
 
-    function saveFile(path,data,callback) {
-        return sendData('/storage/file?parent='+path, 'POST', data, 'application/json',callback)
+    function closeTree(target, path) {
+        resetFiles(path);
+        selectedPath = path;
+        htmx.ajax('GET', '/storage/tree?close=true&parent=' + path, {
+            target: target,
+            swap: 'outerHTML'
+        }).then(() => openFiles(path)).then(() => toggle(target));
     }
+
+    function saveFile(path, data, callback) {
+        return sendData('/storage/file?parent=' + path, 'POST', data, 'application/json', callback)
+    }
+
     function deleteFile(path) {
-        if (confirm("You want to remove "+path+"?") == true) {
-            return getData('/storage/file?parent=' + path, 'delete', 'application/json')
+        if (confirm("You want to remove " + path + "?") == true) {
+            return getData('/storage/file?parent=' + path, 'delete', () => {
+                var pathSplitted = path.split('/');
+                pathSplitted.pop();
+                var parent = "/" + pathSplitted.join("/");
+                openFiles(parent)
+            })
         }
     }
 
@@ -71,7 +102,7 @@
                            href="#collapseStorage"
                            onclick="toggleAccordion('collapseStorage')"
                            aria-expanded="true" aria-controls="collapseStorage">
-                            Global Storage-Scenario Handling
+                            Global Storage
                         </a>
                     </h4>
                 </div>
@@ -136,14 +167,27 @@
 
                     <div class="panel-body">
                         <div class="container-fluid">
-                            <div class="col-xs-4" >
-                                <ul class="tree" style="list-style-type: none;">
-                                    <li hx-swap="outerHTML" hx-get="/storage/tree?parent=" hx-trigger="load"></li>
-                                </ul>
+                            <div class="col-xs-12">
+                                <div id="fileContainer"></div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <ul class="tree" style="list-style-type: none;">
+                                            <li hx-swap="outerHTML" hx-get="/storage/tree?parent="
+                                                hx-trigger="load"></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-xs-8">
-                                <div id="resultsContainer" hx-get="/storage/files?parent=" hx-trigger="load">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div id="resultsContainer" hx-get="/storage/files?parent=" target="outerHTML"
+                                             hx-trigger="load">
+                                        </div>
+                                    </div>
 
                                 </div>
                             </div>

@@ -2,7 +2,8 @@ package org.kendar.plugins;
 
 import org.kendar.events.EventsQueue;
 import org.kendar.events.StorageReloadedEvent;
-import org.kendar.plugins.apis.BaseMockPluginApis;
+import org.kendar.exceptions.PluginException;
+import org.kendar.plugins.apis.BasicMockPluginApis;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -14,6 +15,7 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ChangeableReference;
 import org.kendar.utils.JsonMapper;
 
@@ -24,13 +26,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase<BasicMockPluginSettings> {
     protected final ConcurrentHashMap<Long, AtomicInteger> counters = new ConcurrentHashMap<>();
     private final StorageRepository repository;
+    private final MultiTemplateEngine resolversFactory;
     protected Map<String, MockStorage> mocks = new HashMap<>();
     private PluginFileManager storage;
 
 
-    public BasicMockPlugin(JsonMapper mapper, StorageRepository repository) {
+    public BasicMockPlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {
         super(mapper);
         this.repository = repository;
+        this.resolversFactory = resolversFactory;
         EventsQueue.register(UUID.randomUUID().toString(), (e) -> handleSettingsChanged(), StorageReloadedEvent.class);
     }
 
@@ -106,7 +110,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
 
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(getInstanceId(),getId());
+        storage = repository.buildPluginFileManager(getInstanceId(), getId());
         if (!handleSettingsChanged()) return null;
 
         return this;
@@ -118,15 +122,19 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
         return BasicMockPluginSettings.class;
     }
 
+    public void reloadData() {
+        handleSettingsChanged();
+    }
+
     protected void loadMocks() {
         try {
-
+            counters.clear();
             mocks = new HashMap<>();
             var presentAlready = new HashSet<Long>();
             for (var file : storage.listFiles()) {
 
                 var si = mapper.deserialize(storage.readFile(file), MockStorage.class);
-                if (presentAlready.contains(si.getIndex())) throw new RuntimeException(
+                if (presentAlready.contains(si.getIndex())) throw new PluginException(
                         "Duplicate id " + si.getIndex() + " found in " + file);
                 presentAlready.add(si.getIndex());
                 mocks.put(file, si);
@@ -134,7 +142,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new PluginException("Unable to load mocks",e);
         }
     }
 
@@ -162,17 +170,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new BaseMockPluginApis(this, getId(), getInstanceId()));
+        return List.of(new BasicMockPluginApis(this, getId(), getInstanceId(), storage, resolversFactory));
     }
 
-    public void putMock(String mockfile, MockStorage inputObject) {
-        getMocks().put(mockfile, inputObject);
-        var serialized = mapper.serialize(inputObject);
-        storage.writeFile( mockfile, serialized);
-    }
-
-    public void delMock(String mockfile) {
-        getMocks().remove(mockfile);
-        storage.deleteFile( mockfile);
-    }
 }

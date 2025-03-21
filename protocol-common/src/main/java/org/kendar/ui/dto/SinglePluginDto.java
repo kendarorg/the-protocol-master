@@ -14,11 +14,11 @@ public class SinglePluginDto extends PluginDto {
         this.settings = settings;
     }
 
-    public void setSettingsObject(PluginSettings settingsObject) {
-        this.settingsObject = settingsObject;
-    }
-
     public PluginSettings getSettingsObject() {
         return settingsObject;
+    }
+
+    public void setSettingsObject(PluginSettings settingsObject) {
+        this.settingsObject = settingsObject;
     }
 }

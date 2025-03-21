@@ -36,13 +36,6 @@ public interface BasePluginDescriptor<W extends PluginSettings> {
      */
     void setActive(boolean active);
 
-    /**
-     * Clone, this is need to overcome the missing construtors in plugin system
-     *
-     * @return
-     */
-    BasePluginDescriptor duplicate();
-
 
     void refreshStatus();
 }

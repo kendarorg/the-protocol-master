@@ -73,7 +73,6 @@ SELECT(
 
 ![global_report.png](ui/global_report.png)
 
-
 ### Some useful query
 
 Find all dns calls
@@ -82,6 +81,14 @@ Find all dns calls
     WHAT(date=MSTODATE(timestamp),instanceId,protocol,query),
     WHERE(protocol=='dns'),
     ORDERBY(DESC(date))
+)`
+
+Find all grouped DNS calls
+
+`SELECT(
+    WHAT(cnt=COUNT(),rd=tags.requestedDomain),
+GROUPBY(tags.requestedDomain),
+ORDERBY(DESC(cnt))
 )`
 
 Find all calls to specific host
@@ -93,3 +100,9 @@ Find all calls to specific host
   WHERE(tags.host=='HOST_TO_SEARCH_FOR'),
   ORDERBY(DESC(date))
 )`
+
+### Send data to queues
+
+For amqp, mqtt and redis you can send data directly via the UI
+
+![send_on_queue.png](ui/send_on_queue.png)

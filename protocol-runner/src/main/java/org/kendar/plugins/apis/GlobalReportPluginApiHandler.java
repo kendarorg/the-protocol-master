@@ -1,8 +1,6 @@
 package org.kendar.plugins.apis;
 
 import com.fasterxml.jackson.databind.node.BinaryNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import gg.jte.output.StringOutput;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -35,7 +33,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     private final MultiTemplateEngine resolversFactory;
 
     public GlobalReportPluginApiHandler(GlobalReportPlugin plugin, StorageRepository repository, SimpleParser simpleParser,
-             MultiTemplateEngine resolversFactory) {
+                                        MultiTemplateEngine resolversFactory) {
 
         this.plugin = plugin;
         this.repository = repository;
@@ -93,6 +91,24 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
         return "global." + plugin.getId();
     }
 
+
+    @HttpMethodFilter(
+            pathAddress = "/api/global/plugins/report-plugin/report",
+            method = "DELETE", id = "DELETE /api/global/plugins/report-plugin/report")
+    @TpmDoc(
+            description = "Delete all report data",
+            responses = {
+                    @TpmResponse(
+                            body = Ok.class
+                    )
+            },
+            tags = {"plugins/global"})
+    public void deleteReports(Request reqp, Response response) {
+        for (var file : repository.listFiles("global", "report-plugin")) {
+            repository.deleteFile("global", "report-plugin", file);
+        }
+    }
+
     @HttpMethodFilter(
             pathAddress = "/api/global/plugins/report-plugin/report",
             method = "GET", id = "GET /api/global/plugins/report-plugin/report")
@@ -100,9 +116,9 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             description = "Handle the global report plugin data retrieval<br>Uses <a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> query language",
             query = {
                     @QueryString(key = "tpmql", description = "<a href='https://github.com/kendarorg/the-protocol-master/blob/main/docs/tpmql.md'>TPMql</a> selection query", example = ""),
-                    @QueryString(key="start",description = "Start from record"),
-                    @QueryString(key="limit",description = "Limit to n records"),
-                    @QueryString(key="format",description = "The return format, json|csv|html")
+                    @QueryString(key = "start", description = "Start from record"),
+                    @QueryString(key = "limit", description = "Limit to n records"),
+                    @QueryString(key = "format", description = "The return format, json|csv|html")
             },
             responses = {
                     @TpmResponse(
@@ -117,17 +133,15 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     public boolean loadReport(Request reqp, Response response) {
         var result = retrieveData(reqp);
         var format = reqp.getQuery("format");
-        if(format == null) {format="json";}
+        if (format == null) {
+            format = "json";
+        }
 
-        if(format.equalsIgnoreCase("json")) {
+        if (format.equalsIgnoreCase("json")) {
             respondJson(response, result.getRows());
-        }else if(format.equalsIgnoreCase("html")) {
-            var output = new StringOutput();
-            resolversFactory.render("global/report_plugin/html.jte",result,output);
-            response.addHeader("Content-type","text/html");
-            response.setResponseText(new TextNode(output.toString()));
-            response.setStatusCode(200);
-        }else if(format.equalsIgnoreCase("csv")) {
+        } else if (format.equalsIgnoreCase("html")) {
+            resolversFactory.render("global/report_plugin/html.jte", result, response);
+        } else if (format.equalsIgnoreCase("csv")) {
             var sb = new StringBuilder();
             List<String> fields = result.getFields();
             sb.append("idx");
@@ -135,29 +149,29 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
                 sb.append(",").append(fields.get(fieldIndex));
             }
             sb.append("\n");
-            for(var rowIndex=0;rowIndex<result.getRows().size();rowIndex++) {
+            for (var rowIndex = 0; rowIndex < result.getRows().size(); rowIndex++) {
                 var row = result.getRows().get(rowIndex);
                 sb.append(rowIndex);
                 for (int fieldIndex = 0; fieldIndex < fields.size(); fieldIndex++) {
                     var fieldValue = row.get(fields.get(fieldIndex));
                     sb.append(",");
-                    if(fieldValue.isTextual()) {
-                        sb.append("\""+
-                                fieldValue.asText().replaceAll("\\\"","\\\\\"")+
+                    if (fieldValue.isTextual()) {
+                        sb.append("\"" +
+                                fieldValue.asText().replaceAll("\\\"", "\\\\\"") +
                                 "\"");
-                    }else if(fieldValue.isObject()
-                            ||fieldValue.isArray()) {
-                        sb.append("\""+
-                                fieldValue.toString().replaceAll("\\\"","\\\\\"")+
+                    } else if (fieldValue.isObject()
+                            || fieldValue.isArray()) {
+                        sb.append("\"" +
+                                fieldValue.toString().replaceAll("\\\"", "\\\\\"") +
                                 "\"");
-                    }else{
+                    } else {
                         sb.append(result.convert(fieldValue));
                     }
 
                 }
                 sb.append("\n");
             }
-            response.addHeader("Content-type","text/csv");
+            response.addHeader("Content-type", "text/csv");
             var binary = sb.toString().getBytes();
             response.setResponseText(new BinaryNode(binary));
             response.setStatusCode(200);
@@ -170,65 +184,61 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             method = "GET", id = "GET /global/plugins/report-plugin/report/search")
     public void retrieveHostsPage(Request reqp, Response response) {
         var model = retrieveData(reqp);
-        var output = new StringOutput();
-        resolversFactory.render("global/report_plugin/search.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("global/report_plugin/search.jte", model, response);
     }
 
     private GlobalReportResult retrieveData(Request reqp) {
         var tpmqlstring = reqp.getQuery("tpmql");
         var start = Integer.parseInt(reqp.getQuery("start"));
         var limit = Integer.parseInt(reqp.getQuery("limit"));
-        var limitSet = limit>0;
+        var limitSet = limit > 0;
         Token tpmql = null;
-        var isSelect=false;
+        var isSelect = false;
         if (tpmqlstring != null && !tpmqlstring.isEmpty()) {
             tpmql = simpleParser.parse(tpmqlstring);
-            isSelect = tpmql.value.equalsIgnoreCase("select") && tpmql.type== TokenType.FUNCTION;
+            isSelect = tpmql.value.equalsIgnoreCase("select") && tpmql.type == TokenType.FUNCTION;
         }
 
         var model = mapper.getMapper().createArrayNode();
         var allFiles = repository.listFiles("global", "report-plugin");
         for (var file : allFiles) {
-            var text = repository.readFile("global", "report-plugin",file);
+            var text = repository.readFile("global", "report-plugin", file);
             var data = mapper.toJsonNode(text);
 
-            if(!isSelect) {
+            if (!isSelect) {
                 var isMatching = true;
                 if (tpmql != null) {
                     isMatching = ((boolean) simpleParser.evaluate(tpmql, data));
                 }
-                if(isMatching) {
-                    if(start>0){
+                if (isMatching) {
+                    if (start > 0) {
                         start--;
                         continue;
                     }
-                    if(limitSet){
-                        if(limit>0){
+                    if (limitSet) {
+                        if (limit > 0) {
                             limit--;
-                        }else{
+                        } else {
                             break;
                         }
                     }
                     model.add(data);
                 }
-            }else{
+            } else {
                 model.add(data);
             }
         }
-        if(isSelect && tpmql != null) {
-            var result =mapper.getMapper().createArrayNode();
-            for(var item:simpleParser.select(tpmql,model)){
-                if(start>0){
+        if (isSelect && tpmql != null) {
+            var result = mapper.getMapper().createArrayNode();
+            for (var item : simpleParser.select(tpmql, model)) {
+                if (start > 0) {
                     start--;
                     continue;
                 }
-                if(limitSet){
-                    if(limit>0){
+                if (limitSet) {
+                    if (limit > 0) {
                         limit--;
-                    }else{
+                    } else {
                         break;
                     }
                 }
@@ -238,9 +248,9 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
         }
         var result = new GlobalReportResult();
         result.setRows(model);
-        if(model.size() > 0) {
+        if (!model.isEmpty()) {
             var fn = model.get(0).fieldNames();
-            while(fn.hasNext()){
+            while (fn.hasNext()) {
                 result.getFields().add(fn.next());
             }
         }

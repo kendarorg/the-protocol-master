@@ -5,5 +5,5 @@ import org.kendar.plugins.cli.BasicNetworkErrorPluginCli;
 
 @TpmService(tags = "redis")
 public class RedisNetworErrorPluginCli extends BasicNetworkErrorPluginCli {
-    
+
 }

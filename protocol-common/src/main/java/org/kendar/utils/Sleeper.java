@@ -1,5 +1,7 @@
 package org.kendar.utils;
 
+import org.kendar.exceptions.TPMException;
+
 import java.util.function.BooleanSupplier;
 
 /**
@@ -36,8 +38,8 @@ public class Sleeper {
 
             var times = (int) timeoutMillis;
             var counter = 100;
-            if(times<=100)counter =2;
-            for (int i = 0; i < timeoutMillis; i+=counter) {
+            if (times <= 100) counter = 2;
+            for (int i = 0; i < timeoutMillis; i += counter) {
                 synchronized (obj) {
                     obj.wait(counter);
                 }
@@ -49,7 +51,7 @@ public class Sleeper {
         } catch (Exception ex) {
 
         }
-        throw new RuntimeException("Sleeper sleep timed out");
+        throw new TPMException("Sleeper sleep timed out");
     }
 
     public static void sleepNoException(long timeoutMillis, BooleanSupplier booleanSupplier) {

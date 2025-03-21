@@ -1,7 +1,5 @@
 package org.kendar.ui;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-import gg.jte.output.StringOutput;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.apis.FilteringClass;
@@ -12,7 +10,6 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.JsonMapper;
 
-@SuppressWarnings("HttpUrlsUsage")
 @TpmService
 @HttpTypeFilter(
         blocking = true)
@@ -27,6 +24,7 @@ public class MainHtmxPages implements FilteringClass {
         this.resolversFactory = resolversFactory;
         this.diService = diService;
     }
+
     @Override
     public String getId() {
         return getClass().getName();
@@ -36,12 +34,8 @@ public class MainHtmxPages implements FilteringClass {
             pathAddress = "/",
             method = "GET", id = "GET /")
     public void root(Request request, Response response) {
-        var output = new StringOutput();
         var settings = diService.getInstance(GlobalSettings.class);
-        resolversFactory.render("index.jte",settings,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("index.jte", settings, response);
     }
 
 }

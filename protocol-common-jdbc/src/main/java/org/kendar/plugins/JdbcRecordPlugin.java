@@ -14,15 +14,18 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 
 import java.util.List;
 
 public abstract class JdbcRecordPlugin extends BasicRecordPlugin<BasicRecordPluginSettings> {
 
 
-    public JdbcRecordPlugin(JsonMapper mapper, StorageRepository storage) {
-        super(mapper, storage);
+    public JdbcRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                            MultiTemplateEngine resolversFactory, SimpleParser parser) {
+        super(mapper, storage,resolversFactory,parser);
     }
 
     @Override
@@ -54,7 +57,12 @@ public abstract class JdbcRecordPlugin extends BasicRecordPlugin<BasicRecordPlug
         if (!shouldNotSaveJdbc(storageItem, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
+            if(!shouldIgnoreTrivialCalls()){
+                storageItem.setTrivial(true);
+                EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
+            }else {
+                EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
+            }
         }
     }
 

@@ -12,9 +12,11 @@ import java.util.concurrent.atomic.AtomicLong;
 @TpmService(tags = "storage_null")
 public class NullStorageRepository extends StorageRepository {
     private final AtomicLong counter = new AtomicLong(0);
-    public NullStorageRepository(){
+
+    public NullStorageRepository() {
         super(null, null);
     }
+
     public NullStorageRepository(DiService diService, JsonMapper mapper) {
         super(diService, mapper);
     }

@@ -4,6 +4,7 @@ import org.kendar.amqp.v09.utils.AmqpProxySocket;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.ProxyException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
 import org.kendar.proxy.NetworkProxySocket;
@@ -36,7 +37,7 @@ public class AmqpProxy extends NetworkProxy {
             return new AmqpProxySocket(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group);
         } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            throw new ProxyException(e);
         }
     }
 

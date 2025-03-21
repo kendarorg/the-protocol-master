@@ -23,8 +23,10 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.RedisImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
+import org.kendar.utils.parser.SimpleParser;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
@@ -39,8 +41,8 @@ public class RedisBasicTest {
     protected static final int FAKE_PORT = 6389;
     protected static RedisImage redisImage;
     protected static TcpServer protocolServer;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static ProtocolPluginDescriptor errorPlugin;
+    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {
@@ -78,14 +80,14 @@ public class RedisBasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new RedisRecordPlugin(mapper, storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        var pl = new RedisRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
 
         var rep = new RedisReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
-        errorPlugin= new RedisNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new NetworkErrorPluginSettings().withPercentAction(100));
-        latencyPlugin= new RedisLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(),new LatencyPluginSettings().withMinMax(500,1000).withPercentAction(100));
+        errorPlugin = new RedisNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
+        latencyPlugin = new RedisLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
 
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, rep,errorPlugin,latencyPlugin));
+        proxy.setPluginHandlers(List.of(pl, rep, errorPlugin, latencyPlugin));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();

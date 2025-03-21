@@ -176,10 +176,14 @@ public class CertificatesManager {
 
     public void unsetSll(HttpsServer port, List<String> inserted, String cname, String der, String key) throws Exception {
         var hostsSize = registeredHosts.size();
-        for(var host : inserted) {
-            registeredHosts.remove(host);
+        var changed = false;
+        for (var host : inserted) {
+            if (registeredHosts.containsKey(host)) {
+                registeredHosts.remove(host);
+                changed = true;
+            }
         }
-
+        if (!changed) return;
         reinitializeSslContext(port, inserted, cname, der, key, hostsSize);
     }
 
@@ -187,6 +191,7 @@ public class CertificatesManager {
         if (hostsSize == registeredHosts.size() && port.getHttpsConfigurator() != null) {
             return;
         }
+
         sslLog.debug("[SERVER] Changed ssl hosts: {}", String.join(",", inserted));
         var sslContextInt = getSslContext(new ArrayList<>(registeredHosts.values()), cname, der, key);
         port.setHttpsConfigurator(
@@ -215,7 +220,11 @@ public class CertificatesManager {
     public void setupSll(HttpsServer port, List<String> hosts, String cname, String der, String key) throws Exception {
         var hostsSize = registeredHosts.size();
         var inserted = new ArrayList<String>();
+        var changed = false;
         for (var host : hosts) {
+            if (host.equalsIgnoreCase("localhost") || host.equalsIgnoreCase("127.0.0.1")) {
+                continue;
+            }
             var hstSpl = host.split("\\.");
             if (hstSpl.length > 2) {
                 StringBuilder newHost = new StringBuilder("*");
@@ -223,17 +232,19 @@ public class CertificatesManager {
                     newHost.append(".").append(hstSpl[i]);
                 }
                 if (!registeredHosts.containsKey(newHost.toString())) {
+                    changed = true;
                     inserted.add(newHost.toString());
                     registeredHosts.put(newHost.toString(), newHost.toString());
                 }
             }
 
             if (!registeredHosts.containsKey(host)) {
+                changed = true;
                 inserted.add(host);
                 registeredHosts.put(host, host);
             }
         }
-
+        if (!changed) return;
         reinitializeSslContext(port, inserted, cname, der, key, hostsSize);
     }
 

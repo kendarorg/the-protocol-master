@@ -5,16 +5,20 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.proxy.PluginContext;
-import org.kendar.redis.api.RedisPublishPluginApis;
+import org.kendar.redis.plugins.apis.RedisPublishPluginApis;
 import org.kendar.settings.PluginSettings;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 
 import java.util.List;
 
 @TpmService(tags = "redis")
 public class RedisPublishPlugin extends ProtocolPluginDescriptorBase<PluginSettings> {
-    public RedisPublishPlugin(JsonMapper mapper) {
+    private final MultiTemplateEngine resolversFactory;
+
+    public RedisPublishPlugin(JsonMapper mapper, MultiTemplateEngine resolversFactory) {
         super(mapper);
+        this.resolversFactory = resolversFactory;
     }
 
     @Override
@@ -38,6 +42,6 @@ public class RedisPublishPlugin extends ProtocolPluginDescriptorBase<PluginSetti
 
     @Override
     protected List<ProtocolPluginApiHandler> buildApiHandler() {
-        return List.of(new RedisPublishPluginApis(this, getId(), getInstanceId()));
+        return List.of(new RedisPublishPluginApis(this, getId(), getInstanceId(), resolversFactory));
     }
 }

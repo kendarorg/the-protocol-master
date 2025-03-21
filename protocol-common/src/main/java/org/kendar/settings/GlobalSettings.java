@@ -41,11 +41,11 @@ public class GlobalSettings {
             return null;
         }
         var protocolData = protocols.get(protocol);
-        if(clazz.isAssignableFrom(protocolData.getClass())) {
+        if (clazz.isAssignableFrom(protocolData.getClass())) {
             return (ProtocolSettings) protocolData;
-        }else{
+        } else {
             var deserialized = mapper.deserialize(mapper.serialize(protocolData), clazz);
-            protocols.put(protocol,deserialized);
+            protocols.put(protocol, deserialized);
             return (ProtocolSettings) deserialized;
         }
     }
@@ -55,11 +55,11 @@ public class GlobalSettings {
             return null;
         }
         var pluginsData = plugins.get(plugin);
-        if(clazz.isAssignableFrom(pluginsData.getClass())) {
+        if (clazz.isAssignableFrom(pluginsData.getClass())) {
             return (PluginSettings) pluginsData;
-        }else{
+        } else {
             var deserialized = mapper.deserialize(mapper.serialize(pluginsData), clazz);
-            plugins.put(plugin,deserialized);
+            plugins.put(plugin, deserialized);
             return (PluginSettings) deserialized;
         }
     }

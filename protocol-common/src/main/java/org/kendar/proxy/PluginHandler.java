@@ -1,6 +1,7 @@
 package org.kendar.proxy;
 
 
+import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
@@ -26,7 +27,7 @@ public class PluginHandler {
             this.typeOut = (typeOut);
             this.method = method;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new PluginException(e);
         }
     }
 
@@ -79,7 +80,7 @@ public class PluginHandler {
             }
             return false;
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new PluginException(e);
         }
     }
 

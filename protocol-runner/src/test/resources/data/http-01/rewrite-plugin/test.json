@@ -1,0 +1,5 @@
+{
+  "toFind": "a",
+  "toReplace": "b",
+  "regex": true
+}

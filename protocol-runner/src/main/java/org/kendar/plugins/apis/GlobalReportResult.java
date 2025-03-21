@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GlobalReportResult {
-    private List<String> fields = new ArrayList<String>();
+    private List<String> fields = new ArrayList<>();
     private ArrayNode rows = null;
 
     public List<String> getFields() {
@@ -28,9 +28,9 @@ public class GlobalReportResult {
     }
 
     public String convert(JsonNode jsonNode) {
-        if(jsonNode.isBigDecimal()){
+        if (jsonNode.isBigDecimal()) {
             return jsonNode.decimalValue().toPlainString();
-        }else if(jsonNode.isArray()||jsonNode.isObject()){
+        } else if (jsonNode.isArray() || jsonNode.isObject()) {
             return new JsonMapper().serialize(jsonNode);
         }
         return jsonNode.asText();

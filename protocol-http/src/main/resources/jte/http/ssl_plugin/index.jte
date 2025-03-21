@@ -57,7 +57,7 @@
     <div id="collapseSslHosts" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="headingSslHosts">
 
-            @template.http.ssl_plugin.hosts(data)
+        @template.http.ssl_plugin.hosts(data)
 
     </div>
 </div>

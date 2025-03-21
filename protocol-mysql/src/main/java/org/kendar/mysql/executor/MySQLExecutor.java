@@ -1,5 +1,6 @@
 package org.kendar.mysql.executor;
 
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.constants.ErrorCode;
 import org.kendar.mysql.constants.Language;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -90,7 +92,7 @@ public class MySQLExecutor {
             parser = (SqlStringParser) protoContext.getValue("PARSER");
             if (parse.trim().isEmpty()) {
                 //return new ExecutorResult(ProtoState.iteratorOfList(new EmptyQueryResponse()));
-                throw new RuntimeException("MISSING QUERY");
+                throw new TPMProtocolException("MISSING QUERY");
             }
 
             if (protoContext.getProxy() == null) {
@@ -159,6 +161,8 @@ public class MySQLExecutor {
             return executeCommit(parse, protoContext);
         } else if (pvup.startsWith("ROLLBACK")) {
             return executeRollback(parse, protoContext);
+        } else if (pvup.startsWith("SHOW WARNINGS")) {
+            return executeShowWarning(parse, protoContext);
         }
         return switch (parsed.getType()) {
             case UPDATE -> executeQuery(999999, parsed, protoContext, parse, "UPDATE", parameterValues, text);
@@ -179,6 +183,7 @@ public class MySQLExecutor {
             }
         };
     }
+
 
     private Iterator<ProtoStep> changeTransactionIsolation(ProtoContext protoContext, String value) {
         var mysqlContext = (MySQLProtoContext) protoContext;
@@ -201,13 +206,35 @@ public class MySQLExecutor {
                     ((JdbcProxy) mysqlContext.getProxy()).setIsolation(protoContext, Connection.TRANSACTION_SERIALIZABLE);
                     break;
                 default:
-                    throw new RuntimeException("Unsupported isolation " + transactionType);
+                    throw new TPMProtocolException("Unsupported isolation " + transactionType);
 
 
             }
         }
 
         return ProtoState.iteratorOfList(new EOFPacket());
+    }
+
+    private Iterator<ProtoStep> executeShowWarning(String parse, MySQLProtoContext protoContext) {
+        var result = new ArrayList<ReturnMessage>();
+        var metadata = List.of(
+                new ProxyMetadata("Level", false, Types.BIGINT, 20),
+                new ProxyMetadata("Code", false, Types.INTEGER, 10),
+                new ProxyMetadata("Message", false, Types.VARCHAR, 200)
+        );
+        var packetNumber = 0;
+        result.add(new ColumnsCount(metadata).withPacketNumber(++packetNumber));
+        for (var field : metadata) {
+            result.add(new ColumnDefinition(field, Language.UTF8_GENERAL_CI, false).
+                    withPacketNumber(++packetNumber));
+        }
+        result.add(new EOFPacket().
+                withStatusFlags(0x022).
+                withPacketNumber(++packetNumber));
+
+        result.add(new EOFPacket().
+                withPacketNumber(++packetNumber));
+        return ProtoState.iteratorOfList(result.toArray(new ReturnMessage[0]));
     }
 
     private Iterator<ProtoStep> executeQuery(int maxRecords, SqlParseResult parsed, MySQLProtoContext protoContext, String parse, String operation, List<BindingParameter> parameterValues, boolean text) throws SQLException {
@@ -374,7 +401,7 @@ public class MySQLExecutor {
             ps.close();
 
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new TPMProtocolException(ex);
         }
         return ProtoState.iteratorOfList(result.toArray(new ReturnMessage[0]));
     }

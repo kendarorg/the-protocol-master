@@ -13,14 +13,17 @@ import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 
 import java.util.Map;
 
 @TpmService(tags = "redis")
 public class RedisRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSettings> {
-    public RedisRecordPlugin(JsonMapper mapper, StorageRepository storage) {
-        super(mapper, storage);
+    public RedisRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                             MultiTemplateEngine resolversFactory, SimpleParser parser) {
+        super(mapper, storage, resolversFactory, parser);
     }
 
     private static boolean isClientSetInfo(ArrayNode input) {

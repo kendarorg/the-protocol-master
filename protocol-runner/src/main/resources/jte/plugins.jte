@@ -1,5 +1,10 @@
 @param org.kendar.ui.dto.ProtocolStatusDto data
 
+
+!{
+    var sortedProtocols = data.getProtocols().stream().
+    sorted(java.util.Comparator.comparing(org.kendar.ui.dto.ProtocolDto::getInstanceId)).toList();
+ }
 <head>
 
     <title>The Protocol Master - Plugins</title>
@@ -8,23 +13,23 @@
 <body>
 <script type="text/javascript">
 
-    function reloadAllPlugins(){
+    function reloadAllPlugins() {
         var promise = null;
-        if (typeof reloadActive === 'function'){
+        if (typeof reloadActive === 'function') {
             promise = reloadActive();
         }
-        if (typeof reloadWildcard === 'function'){
-            if(promise!=null){
-                promise.then(()=>reloadWildcard());
-            }else {
+        if (typeof reloadWildcard === 'function') {
+            if (promise != null) {
+                promise.then(() => reloadWildcard());
+            } else {
                 promise = reloadWildcard();
             }
         }
         @for(var element : data.getProtocols())
-        if (typeof reloadProtocol${element.getSafeInstanceId()} === 'function'){
-            if(promise!=null){
-                promise.then(()=>reloadProtocol${element.getSafeInstanceId()}());
-            }else {
+        if (typeof reloadProtocol${element.getSafeInstanceId()} === 'function') {
+            if (promise != null) {
+                promise.then(() => reloadProtocol${element.getSafeInstanceId()}());
+            } else {
                 promise = reloadProtocol${element.getSafeInstanceId()}();
             }
         }
@@ -49,7 +54,7 @@
             <!--
             PROTOCOL PLUGINS
             -->
-            @for(var element : data.getProtocols())
+            @for(var element : sortedProtocols)
                 <div hx-get="/plugins/protocols?protocolId=${element.getInstanceId()}" hx-trigger="load"></div>
             @endfor
         </div>

@@ -10,7 +10,9 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.proxy.PluginContext;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,8 +21,9 @@ import java.util.stream.Collectors;
 public class HttpRecordPlugin extends BasicRecordPlugin<HttpRecordPluginSettings> {
     private List<MatchingRecRep> target = new ArrayList<>();
 
-    public HttpRecordPlugin(JsonMapper mapper, StorageRepository storage) {
-        super(mapper, storage);
+    public HttpRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                            MultiTemplateEngine resolversFactory, SimpleParser parser) {
+        super(mapper, storage, resolversFactory, parser);
     }
 
     @Override

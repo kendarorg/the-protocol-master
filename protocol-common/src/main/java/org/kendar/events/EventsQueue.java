@@ -1,5 +1,6 @@
 package org.kendar.events;
 
+import org.kendar.exceptions.TPMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +12,8 @@ import java.util.function.Function;
 
 public class EventsQueue {
     private static final Logger log = LoggerFactory.getLogger(EventsQueue.class);
-    private static EventsQueue instance = new EventsQueue();
     private static final AtomicLong size = new AtomicLong(0);
-
+    private static EventsQueue instance = new EventsQueue();
     private final HashMap<String, Map<String, Consumer<TpmEvent>>> eventHandlers = new HashMap<>();
 
     //private final HashMap<String, Class> conversions = new HashMap<>();
@@ -76,7 +76,7 @@ public class EventsQueue {
         if (prevConsumer == null || prevConsumer.id.equalsIgnoreCase(id)) {
             instance.commandHandlers.put(eventName, new CommandConsumer(id, realConsumer));
         } else {
-            throw new RuntimeException("Duplicate event " + eventName);
+            throw new TPMException("Duplicate event " + eventName);
         }
     }
 
@@ -136,7 +136,7 @@ public class EventsQueue {
         eventHandlers.clear();
         commandHandlers.clear();
         size.set(0L);
-        running =false;
+        running = false;
         instance = new EventsQueue();
         return result;
     }

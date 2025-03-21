@@ -41,7 +41,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private final Pattern ipPattern =
             Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
     private final ConcurrentHashMap<String, Pattern> patterns = new ConcurrentHashMap<>();
-    private Logger log;
+    private final Logger log;
     private boolean dnsRunning;
     private ServerSocket tcpSocket;
     private DatagramSocket udpSocket;
@@ -105,8 +105,8 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     }
 
     public static int countOccurrencesOf(String string, String substring) {
-        if (string == null || string.length() == 0
-                || substring == null || substring.length() == 0) {
+        if (string == null || string.isEmpty()
+                || substring == null || substring.isEmpty()) {
             return 0;
         }
 
@@ -190,7 +190,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
         List<String> ips = new ArrayList<>();
 
-        log.debug("Requested domain " + requestedDomain);
+        log.debug("Requested domain {}", requestedDomain);
 
         if (handle(ProtocolPhase.PRE_CALL, pluginContext, requestedDomain, ips)) {
             return buildResponse(ips, requestedDomain, response, request, pluginContext);
@@ -235,9 +235,9 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
     private byte[] buildResponse(List<String> ips, String requestedDomain, Message response, Message request, PluginContext pluginContext) throws IOException {
         byte[] resp;
-        if (ips.size() > 0) {
+        if (!ips.isEmpty()) {
             for (String ip : ips) {
-                log.debug("FOUNDED IP " + ip + " FOR " + requestedDomain);
+                log.debug("FOUNDED IP {} FOR {}", ip, requestedDomain);
                 // Add answers as needed
                 response.addRecord(
                         org.xbill.DNS.Record.fromString(Name.fromString(requestedDomain + "."), Type.A, DClass.IN, 1000, ip,
@@ -381,7 +381,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     }
 
     public List<String> doResolve(String requestedDomain) {
-        if (requestedDomain == null || requestedDomain.length() == 0) {
+        if (requestedDomain == null || requestedDomain.isEmpty()) {
             return new ArrayList<>();
         }
         var matching = settings.getRegistered().stream().filter(d -> {
@@ -463,7 +463,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                     finished--;
                     try {
                         var currentData = current.get();
-                        if (currentData.size() == 0) {
+                        if (currentData.isEmpty()) {
                             continue;
                         }
                         data.addAll(current.get());

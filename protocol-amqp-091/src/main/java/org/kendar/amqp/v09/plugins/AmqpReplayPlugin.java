@@ -6,6 +6,7 @@ import org.kendar.amqp.v09.messages.methods.basic.BasicCancel;
 import org.kendar.amqp.v09.messages.methods.basic.BasicConsume;
 import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
@@ -64,7 +65,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
         try {
             ExtraBeanUtils.copyProperties(toread, result, "Reserved1", "consumerTag");
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new PluginException(e);
         }
     }
 
@@ -116,7 +117,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                     log.debug("[SERVER][CB]: {}", fr.getClass().getSimpleName());
                     ctx.write(fr);
                 } else {
-                    throw new RuntimeException("MISSING CLASS " + clazz);
+                    throw new PluginException("MISSING CLASS " + clazz);
                 }
             }
         }

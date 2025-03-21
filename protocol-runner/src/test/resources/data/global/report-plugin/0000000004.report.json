@@ -1,0 +1,12 @@
+{
+  "instanceId": "postgres-01",
+  "protocol": "postgres",
+  "query": "SELECT t.typname,t.oid FROM pg_catalog.pg_type t JOIN pg_catalog.pg_namespace n ON (t.typnamespace = n.oid)  WHERE n.nspname  != 'pg_toast' AND  (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid))",
+  "connectionId": 1,
+  "timestamp": 1742478171209,
+  "duration": 12,
+  "tags": {
+    "inputsCount": "0",
+    "resultsCount": "403"
+  }
+}

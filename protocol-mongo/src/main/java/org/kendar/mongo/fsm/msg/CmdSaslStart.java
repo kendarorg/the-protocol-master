@@ -4,6 +4,7 @@ import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
+import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mongo.dtos.OpMsgContent;
 import org.kendar.mongo.dtos.OpMsgSection;
 import org.kendar.mongo.executor.MongoExecutor;
@@ -79,7 +80,7 @@ public class CmdSaslStart extends StandardOpMsgCommand {
             toSend.getSections().add(section);
             return iteratorOfList(toSend);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new TPMProtocolException(ex);
         }
     }
 }

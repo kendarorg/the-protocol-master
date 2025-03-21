@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.kendar.postgres.plugins.PostgresRewritePlugin;
 import org.kendar.tcpserver.TcpServer;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.ReplacerItem;
 import org.kendar.utils.Sleeper;
@@ -65,7 +66,7 @@ public class QueryTranslationTest extends PostgresBasicTest {
         replaceItem.setToReplace(replace);
         replaceList.add(replaceItem);
         var mapper = new JsonMapper();
-        var filter = new PostgresRewritePlugin(mapper, storage);
+        var filter = new PostgresRewritePlugin(mapper, storage, new MultiTemplateEngine());
         filter.setReplacers(replaceList);
         filter.setActive(true);
         proxy.setPluginHandlers(List.of(filter));

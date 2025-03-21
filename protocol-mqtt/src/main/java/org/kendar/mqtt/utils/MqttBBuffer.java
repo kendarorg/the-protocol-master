@@ -2,6 +2,7 @@ package org.kendar.mqtt.utils;
 
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
+import org.kendar.exceptions.TPMProtocolException;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -61,7 +62,7 @@ public class MqttBBuffer extends BBuffer {
         } while ((digit & 0x80) != 0);
 
         if (value < 0 || value > VARIABLE_BYTE_INT_MAX) {
-            throw new RuntimeException("This property must be a number between 0 and " + VARIABLE_BYTE_INT_MAX
+            throw new TPMProtocolException("This property must be a number between 0 and " + VARIABLE_BYTE_INT_MAX
                     + ". Read value was: " + value);
         }
 
@@ -83,7 +84,7 @@ public class MqttBBuffer extends BBuffer {
         } while ((digit & 0x80) != 0);
 
         if (value < 0 || value > VARIABLE_BYTE_INT_MAX) {
-            throw new RuntimeException("This property must be a number between 0 and " + VARIABLE_BYTE_INT_MAX
+            throw new TPMProtocolException("This property must be a number between 0 and " + VARIABLE_BYTE_INT_MAX
                     + ". Read value was: " + value);
         }
 

@@ -10,7 +10,9 @@ import org.kendar.sql.parser.dtos.TokenType;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +23,9 @@ public class MySqlRecordPlugin extends JdbcRecordPlugin {
     private static final String SELECT_TRANS = "SELECT @@session.transaction_read_only";
     private static final SqlStringParser parser = new SqlStringParser("?");
 
-    public MySqlRecordPlugin(JsonMapper mapper, StorageRepository storage) {
-        super(mapper, storage);
+    public MySqlRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                             MultiTemplateEngine resolversFactory, SimpleParser parser) {
+        super(mapper, storage, resolversFactory, parser);
     }
 
     @Override

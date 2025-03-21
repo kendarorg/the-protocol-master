@@ -2,7 +2,9 @@ package org.kendar.plugins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.events.*;
+import org.kendar.plugins.apis.BasicRecordPluginApis;
 import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
@@ -17,8 +19,10 @@ import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.LineToWrite;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
+import org.kendar.utils.parser.SimpleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +33,16 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BasicRecordPlugin.class);
     protected final StorageRepository repository;
-    private boolean ignoreTrivialCalls = true;
+    private final MultiTemplateEngine resolversFactory;
+    private final SimpleParser parser;
     private PluginFileManager storage;
 
-    public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage) {
+    public BasicRecordPlugin(JsonMapper mapper, StorageRepository storage,
+                             MultiTemplateEngine resolversFactory, SimpleParser parser) {
         super(mapper);
         this.repository = storage;
+        this.resolversFactory = resolversFactory;
+        this.parser = parser;
     }
 
     @Override
@@ -44,7 +52,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldIgnoreTrivialCalls() {
-        return ignoreTrivialCalls;
+        return getSettings().isIgnoreTrivialCalls();
     }
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
@@ -111,7 +119,12 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
         if (!shouldNotSave(in, out, compactLine) || !shouldIgnoreTrivialCalls()) {
             EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
         } else {
-            EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
+            if (!shouldIgnoreTrivialCalls()) {
+                storageItem.setTrivial(true);
+                EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), storageItem, compactLine, id)));
+            } else {
+                EventsQueue.send(new WriteItemEvent(new LineToWrite(getInstanceId(), compactLine, id)));
+            }
         }
     }
 
@@ -130,15 +143,13 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     @Override
     protected boolean handleSettingsChanged() {
-        if (getSettings() == null) return false;
-        ignoreTrivialCalls = getSettings().isIgnoreTrivialCalls();
-        return true;
+        return getSettings() != null;
     }
 
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(getInstanceId(),getId());
+        storage = repository.buildPluginFileManager(getInstanceId(), getId());
         handleSettingsChanged();
         return this;
     }
@@ -160,6 +171,12 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
                 terminate();
             }
         }
+    }
+
+
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new BasicRecordPluginApis(this, getId(), getInstanceId(),
+                storage, resolversFactory, parser));
     }
 
     @Override

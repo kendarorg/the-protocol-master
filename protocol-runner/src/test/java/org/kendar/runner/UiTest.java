@@ -34,7 +34,7 @@ public class UiTest extends ApiTestBase {
         }
         var args = new String[]{
 
-                "-cfg", Path.of("src", "test", "resources", "uitest.json").toString(),"-unattended"
+                "-cfg", Path.of("src", "test", "resources", "uitest.json").toString(), "-unattended"
         };
         bs = new BasicTest();
         bs.startAndHandleUnexpectedErrors(args);
@@ -77,21 +77,19 @@ public class UiTest extends ApiTestBase {
         actual = downloadRequestString("http://localhost:5005/storage/file?parent=scenario/0000000001.default&name=0000000001.default", httpclient);
         assertTrue(actual.contains("\"fixedHeader\": \"CONNACK\""));
         actual = downloadRequestString("http://localhost:5005/plugins/global/report-plugin", httpclient);
-        assertTrue(actual.contains("Global/report-plugin"));
+        assertTrue(actual.contains("global/report-plugin"));
 
 
-
-        var tpmql=URLEncoder.encode("SELECT(WHAT(date=MSTODATE(timestamp),instanceId,protocol,query=SUBSTR(query,50),duration,tags=WRAP(tags,50,' ')),ORDERBY(DESC(date)) )");
-        var path = "http://localhost:5005/api/global/plugins/report-plugin/report?"+
-                "tpmql="+tpmql+
+        var tpmql = URLEncoder.encode("SELECT(WHAT(date=MSTODATE(timestamp),instanceId,protocol,query=SUBSTR(query,50),duration,tags=WRAP(tags,50,' ')),ORDERBY(DESC(date)) )");
+        var path = "http://localhost:5005/api/global/plugins/report-plugin/report?" +
+                "tpmql=" + tpmql +
                 "&start=0&limit=10";
-        actual = new String(downloadRequest(path+"&format=json", httpclient), StandardCharsets.UTF_8);
+        actual = new String(downloadRequest(path + "&format=json", httpclient), StandardCharsets.UTF_8);
 
-        actual = new String(downloadRequest(path+"&format=csv", httpclient), StandardCharsets.UTF_8);
+        actual = new String(downloadRequest(path + "&format=csv", httpclient), StandardCharsets.UTF_8);
         //assertTrue(actual.contains("0,\"2025/03/13 10:11:22.190\","));
-        actual = new String(downloadRequest(path+"&format=html", httpclient), StandardCharsets.UTF_8);
+        actual = new String(downloadRequest(path + "&format=html", httpclient), StandardCharsets.UTF_8);
         //assertTrue(actual.contains("<td>2025/03/13 10:11:22.190</td>"));
-
 
 
     }

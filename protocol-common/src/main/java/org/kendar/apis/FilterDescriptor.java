@@ -16,6 +16,7 @@ import org.kendar.apis.matchers.FilterMatcher;
 import org.kendar.apis.utils.CustomFiltersLoader;
 import org.kendar.apis.utils.GenericFilterExecutor;
 import org.kendar.apis.utils.IdBuilder;
+import org.kendar.exceptions.ApiException;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,7 @@ public class FilterDescriptor {
         try {
             this.id = IdBuilder.buildId(typeFilter, methodFilter, filterClass, id);
         } catch (IncompleteAnnotationException ex) {
-            throw new RuntimeException("Missing id", ex);
+            throw new ApiException("Missing id", ex);
         }
         var pathPattern = methodFilter.pathPattern();
         var pathAddress = methodFilter.pathAddress();
@@ -116,7 +117,7 @@ public class FilterDescriptor {
         for (var matcher : executor.getMatchers()) {
             matcher.initialize();
             if (!matcher.validate()) {
-                throw new RuntimeException("Invalid filter");
+                throw new ApiException("Invalid filter");
             }
         }
         matchers = executor.getMatchers();

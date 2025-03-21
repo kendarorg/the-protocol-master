@@ -117,14 +117,18 @@ public class ApiHandler implements FilteringClass {
             tags = {"plugins/protocols"})
     public void getProtocolPlugins(Request reqp, Response resp) {
         var protocolInstanceId = reqp.getPathParameter("id");
-        var instance = instances.stream().filter(p -> p.getProtocolInstanceId().equals(protocolInstanceId)).findFirst();
+        var instance = instances.stream().filter(p -> p.getProtocolInstanceId().equals(protocolInstanceId))
+                .findFirst();
+        if(instance.isEmpty()){
+            respondJson(resp,List.of());
+            return;
+        }
         var result = instance.get().getPlugins().stream().map(p -> new
                         PluginIndex(p.getId(), p.isActive())).
                 collect(Collectors.toList());
         respondJson(resp, result);
     }
 
-    @SuppressWarnings("finally")
     @HttpMethodFilter(
             pathAddress = "/api/global/restart",
             method = "GET", id = "GET /api/global/restart")
@@ -146,7 +150,6 @@ public class ApiHandler implements FilteringClass {
     }
 
 
-    @SuppressWarnings("finally")
     @HttpMethodFilter(
             pathAddress = "/api/global/terminate",
             method = "GET", id = "GET /api/global/terminate")
@@ -199,18 +202,18 @@ public class ApiHandler implements FilteringClass {
         var plugin = reqp.getPathParameter("plugin");
         var action = reqp.getPathParameter("action");
 
-            for (var instance : instances) {
-                var pluginInstance = instance.getPlugins().stream().filter(p ->
-                        p.getId().equalsIgnoreCase(plugin)).findFirst();
-                if (pluginInstance.isEmpty()) continue;
-                if (action.equalsIgnoreCase("start")) {
-                    pluginInstance.get().setActive(true);
-                } else if (action.equalsIgnoreCase("stop")) {
-                    pluginInstance.get().setActive(false);
-                }
+        for (var instance : instances) {
+            var pluginInstance = instance.getPlugins().stream().filter(p ->
+                    p.getId().equalsIgnoreCase(plugin)).findFirst();
+            if (pluginInstance.isEmpty()) continue;
+            if (action.equalsIgnoreCase("start")) {
+                pluginInstance.get().setActive(true);
+            } else if (action.equalsIgnoreCase("stop")) {
+                pluginInstance.get().setActive(false);
             }
-            respondOk(resp);
-            return true;
+        }
+        respondOk(resp);
+        return true;
     }
 
     public void addGLobalPlugins(List<GlobalPluginDescriptor> globalPlugins) {

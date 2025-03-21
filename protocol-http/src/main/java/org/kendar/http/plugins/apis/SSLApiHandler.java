@@ -1,7 +1,5 @@
 package org.kendar.http.plugins.apis;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-import gg.jte.output.StringOutput;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -101,7 +99,6 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
     }
 
 
-
     @HttpMethodFilter(
             pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/hosts",
             method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/hosts")
@@ -113,7 +110,7 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/ssl-plugin"})
     public void retrieveHosts(Request reqp, Response resp) {
-        respondJson(resp,protocolSettings.getSSL().getHosts());
+        respondJson(resp, protocolSettings.getSSL().getHosts());
     }
 
     @HttpMethodFilter(
@@ -121,16 +118,16 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
             method = "POST", id = "POST /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/hosts/")
     @TpmDoc(
             description = "Add host",
-            query = @QueryString(key = "host",description = "Host to add" ),
+            query = @QueryString(key = "host", description = "Host to add"),
             responses = @TpmResponse(
                     body = Ok.class
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/ssl-plugin"})
     public void addHost(Request reqp, Response resp) {
         var host = reqp.getQuery("host");
-        EventsQueue.send(new SSLAddHostEvent(host));
+        EventsQueue.send(new SSLAddHostEvent(host, getProtocolInstanceId()));
         protocolSettings.getSSL().getHosts().add(host);
-        respondJson(resp,protocolSettings.getSSL().getHosts());
+        respondJson(resp, protocolSettings.getSSL().getHosts());
     }
 
 
@@ -139,7 +136,7 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
             method = "DELETE", id = "DELETE /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/hosts")
     @TpmDoc(
             description = "Del host",
-            query = @QueryString(key = "host",description = "Host to del" ),
+            query = @QueryString(key = "host", description = "Host to del"),
             responses = @TpmResponse(
                     body = Ok.class
             ),
@@ -148,7 +145,7 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
         var host = reqp.getQuery("host");
         EventsQueue.send(new SSLRemoveHostEvent(host));
         protocolSettings.getSSL().getHosts().remove(host);
-        respondJson(resp,protocolSettings.getSSL().getHosts());
+        respondJson(resp, protocolSettings.getSSL().getHosts());
     }
 
     @HttpMethodFilter(
@@ -164,10 +161,6 @@ public class SSLApiHandler implements ProtocolPluginApiHandler {
         var sets = new SSLDummyPluginSettings();
         model.setSettings(new JsonMapper().serializePretty(sets));
         model.setSettingsObject(sets);
-        var output = new StringOutput();
-        resolversFactory.render("http/ssl_plugin/hosts.jte",model,output);
-        response.addHeader("Content-type","text/html");
-        response.setResponseText(new TextNode(output.toString()));
-        response.setStatusCode(200);
+        resolversFactory.render("http/ssl_plugin/hosts.jte", model, response);
     }
 }
