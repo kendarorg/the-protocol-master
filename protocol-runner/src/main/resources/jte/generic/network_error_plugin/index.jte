@@ -25,7 +25,7 @@
             <a role="button" data-toggle="collapse" data-parent="#accordion"
                href="#collapseSettingsError"
                onclick="toggleAccordion('collapseSettingsError')"
-               aria-expanded="true" aria-controls="collapseSettingError">
+               aria-expanded="true" aria-controls="collapseSettingsError">
                 Network error plugin settings
             </a>
         </h4>
