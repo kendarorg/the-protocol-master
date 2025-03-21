@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ProtocolStatusDto extends BaseHtmxDto {
-    private List<ProtocolDto> protocols = new ArrayList<ProtocolDto>();
+    private List<ProtocolDto> protocols = new ArrayList<>();
 
     public List<PluginDto> getActivePlugins() {
         var result = new ArrayList<PluginDto>();
@@ -37,7 +37,7 @@ public class ProtocolStatusDto extends BaseHtmxDto {
         var result = new ArrayList<WildcarPluginDto>();
         for (var plugin : partial.values()) {
             var dto = new WildcarPluginDto(plugin.get(0).getId());
-            var active = plugin.stream().filter(pluginDto -> pluginDto.isActive()).count();
+            var active = plugin.stream().filter(PluginDto::isActive).count();
             var inactive = plugin.size() - active;
             dto.setActive((int) active);
             dto.setNotActive((int) inactive);

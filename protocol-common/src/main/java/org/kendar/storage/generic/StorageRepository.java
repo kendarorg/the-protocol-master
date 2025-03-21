@@ -113,11 +113,7 @@ public abstract class StorageRepository implements Service {
     }
 
     public void writeZip(byte[] byteArray) {
-//        String settingsPath = null;
-//        var destDirString = Path.of(targetDir).toAbsolutePath().toString();
         File destDir = new File("");
-//        // create output directory if it doesn't exist
-//        if (!destDir.exists()) destDir.mkdirs();
         ByteArrayInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];

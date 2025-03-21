@@ -12,7 +12,6 @@ import org.kendar.ui.dto.FileItemDto;
 import org.kendar.ui.dto.FileTreeItemDto;
 import org.kendar.utils.JsonMapper;
 
-@SuppressWarnings("HttpUrlsUsage")
 @TpmService
 @HttpTypeFilter(
         blocking = true)

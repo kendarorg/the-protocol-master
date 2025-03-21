@@ -251,23 +251,7 @@ public class DiService {
             }
             var constructors = clazz.getConstructors();
             var clazzNamed = clazz.getAnnotation(TpmNamed.class);
-            Constructor constructor = null;
-            if (constructors.length == 1) {
-                constructor = constructors[0];
-            } else {
-                for (var constr : constructors) {
-                    if (null != constr.getAnnotation(TpmConstructor.class)) {
-                        if (constructor != null) {
-                            throw new DiException("Duplicate TpmConstructor constructor found");
-                        }
-                        constructor = constr;
-                    }
-                }
-            }
-
-            if (constructor == null) {
-                throw new DiException("No TpmConstructor found");
-            }
+            var constructor = retrieveConstructor(constructors);
             Object result = null;
             if (constructor.getParameterCount() == 0) {
                 var singleton = getSingletonMapping(clazz);
@@ -323,6 +307,27 @@ public class DiService {
         } catch (Exception e) {
             throw new DiException("Unable to instantiate " + clazz, e);
         }
+    }
+
+    private static Constructor retrieveConstructor(Constructor<?>[] constructors) {
+        Constructor constructor = null;
+        if (constructors.length == 1) {
+            constructor = constructors[0];
+        } else {
+            for (var constr : constructors) {
+                if (null != constr.getAnnotation(TpmConstructor.class)) {
+                    if (constructor != null) {
+                        throw new DiException("Duplicate TpmConstructor constructor found");
+                    }
+                    constructor = constr;
+                }
+            }
+        }
+
+        if (constructor == null) {
+            throw new DiException("No TpmConstructor found");
+        }
+        return constructor;
     }
 
     private Object destroy(Object o) {

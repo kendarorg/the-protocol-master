@@ -23,10 +23,6 @@ public class Encryptor {
 
 
     public Encryptor(byte[] key) {
-            /*
-            cipher = new PaddedBlockCipher(
-                       new CBCBlockCipher(new DESEngine()));
-            */
         cipher = new PaddedBlockCipher(
                 new CBCBlockCipher(new BlowfishEngine()));
         this.key = new KeyParameter(key);

@@ -248,7 +248,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
         }
         var result = new GlobalReportResult();
         result.setRows(model);
-        if (model.size() > 0) {
+        if (!model.isEmpty()) {
             var fn = model.get(0).fieldNames();
             while (fn.hasNext()) {
                 result.getFields().add(fn.next());

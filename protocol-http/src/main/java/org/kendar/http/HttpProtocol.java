@@ -161,7 +161,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
 
             // initialise the HTTP server
-//            var proxyConfig = loadRewritersConfiguration(settings);
             var dnsHandler = new DnsMultiResolverImpl();
             var connectionBuilder = new ConnectionBuilderImpl(dnsHandler);
             var requestResponseBuilder = new RequestResponseBuilderImpl();
@@ -227,15 +226,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
 
             proxy.start();
             log.info("[CL>TP][IN] Listening on *.:{} Http Proxy", proxyPort);
-
-
-            /*for (var i = plugins.size() - 1; i >= 0; i--) {
-                var plugin = plugins.get(i);
-                var specificPluginSetting = settings.getPlugin(plugin.getId(), plugin.getSettingClass());
-                if (specificPluginSetting != null) {
-                    ((ProtocolPluginDescriptor) plugin).initialize(globalSettings, settings, specificPluginSetting);
-                }
-            }*/
 
             var handler = new MasterHandler(
                     new PluginClassesHandlerImpl(plugins, this),

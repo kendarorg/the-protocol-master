@@ -32,7 +32,7 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private final SimpleParser simpleParser;
     private final MultiTemplateEngine resolversFactory;
     private boolean active;
-    private AtomicInteger counter = new AtomicInteger(0);
+    private final AtomicInteger counter = new AtomicInteger(0);
     private PluginSettings settings;
     private PluginFileManager storage;
 

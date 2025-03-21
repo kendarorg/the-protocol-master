@@ -105,8 +105,7 @@ public class EncryptedStorageRepository extends FileStorageRepository {
         } else {
             try {
                 var encryptedData = encryptor.encryptString(s);
-                var prologue = "ENCRYPTED".getBytes(StandardCharsets.UTF_8);
-                Files.write(of, prologue);
+                Files.writeString(of, "ENCRYPTED");
                 Files.write(of, encryptedData, StandardOpenOption.APPEND);
             } catch (CryptoException e) {
                 throw new TPMException(e);

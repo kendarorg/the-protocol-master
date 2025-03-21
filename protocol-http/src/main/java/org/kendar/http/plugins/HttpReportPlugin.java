@@ -17,7 +17,7 @@ import java.util.Map;
 
 @TpmService(tags = "http")
 public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings> {
-    private HashSet<String> localIgnore = new HashSet<>();
+    private final HashSet<String> localIgnore = new HashSet<>();
 
     public HttpReportPlugin(JsonMapper mapper) {
         super(mapper);

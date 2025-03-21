@@ -47,13 +47,12 @@ public class ColumnDefinition extends MySQLReturnMessage {
     }
 
     private long getMaxColumnDisplaySize(JDBCType columnType) {
-        long value = switch (columnType) {
+        return switch (columnType) {
             case BOOLEAN, BIT -> 1;
             case BIGINT, INTEGER, SMALLINT, TINYINT, DOUBLE, FLOAT, DATE, TIME, TIME_WITH_TIMEZONE, TIMESTAMP,
                  TIMESTAMP_WITH_TIMEZONE -> 32;
             default -> 999999999L;
         };
-        return value;
     }
 
     private int toMysql(JDBCType columnType) {

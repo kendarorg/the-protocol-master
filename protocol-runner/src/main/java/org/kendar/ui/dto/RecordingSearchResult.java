@@ -9,7 +9,7 @@ import java.util.List;
 
 public class RecordingSearchResult {
     private ArrayNode rows;
-    private List<String> fields = new ArrayList<String>();
+    private List<String> fields = new ArrayList<>();
 
 
     public String convert(JsonNode jsonNode) {

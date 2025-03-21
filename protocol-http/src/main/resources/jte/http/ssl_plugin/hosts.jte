@@ -4,6 +4,7 @@
     var globalSettings = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.settings.GlobalSettings.class);
     var ssl =((org.kendar.http.HttpProtocolSettings)globalSettings.getProtocol(data.getInstanceId(),org.kendar.http.HttpProtocolSettings.class)).getSSL();
 }
+<!--suppress Annotator -->
 <div class="panel-body" id="sslHostSettings">
     <script>
         function addHost() {

@@ -66,7 +66,7 @@ public class Main {
         while (running) {
             try {
                 execute(realArgs);
-                if (changedSettings != null && changedSettings.trim().length() > 0 && Files.exists(Path.of(changedSettings))) {
+                if (changedSettings != null && !changedSettings.trim().isEmpty() && Files.exists(Path.of(changedSettings))) {
                     log.info("RESTARTING AFTER SETTINGS CHANGE");
                     realArgs = new String[]{"-cfg", changedSettings};
                 } else if (restartReceived) {
@@ -314,7 +314,7 @@ public class Main {
             latch.await();
             log.info("Servers started");
         } catch (InterruptedException ex) {
-            log.error("Error waiting for plugin to start");
+            log.error("Error waiting for protocols to start");
         }
         diService.registerNamed("protocols", protocolInstances);
 
@@ -361,7 +361,7 @@ public class Main {
             log.info("APIs started");
             running = true;
         } catch (InterruptedException ex) {
-            log.error("Error waiting for plugin to start");
+            log.error("Error waiting for api server to start");
         }
 
         while (!terminateReceived && !restartReceived) {

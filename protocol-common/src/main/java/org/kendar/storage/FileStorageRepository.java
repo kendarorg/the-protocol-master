@@ -461,7 +461,7 @@ public class FileStorageRepository extends StorageRepository {
             return new ArrayList<>();
         }
         return Stream.of(files)
-                .filter(file -> file.isDirectory())
+                .filter(File::isDirectory)
                 .collect(Collectors.toList());
     }
 
@@ -615,7 +615,7 @@ public class FileStorageRepository extends StorageRepository {
 
     public List<String> listDirs(String... path) {
         var realPath = buildRealPath(path);
-        return listDirsUsingJavaIO(realPath.toString()).stream().map(s -> s.getName()).sorted().collect(Collectors.toList());
+        return listDirsUsingJavaIO(realPath.toString()).stream().map(File::getName).sorted().collect(Collectors.toList());
     }
 
     public boolean fileExists(String... path) {
@@ -669,7 +669,7 @@ public class FileStorageRepository extends StorageRepository {
     private Path buildRealPath(String... path) {
         var fullPath = new ArrayList<>(Arrays.asList(path));
         var realPath = Path.of(targetDir);
-        if (fullPath.size() > 0) {
+        if (!fullPath.isEmpty()) {
             realPath = Path.of(targetDir, fullPath.toArray(new String[0]));
         }
         var root = Path.of(targetDir);

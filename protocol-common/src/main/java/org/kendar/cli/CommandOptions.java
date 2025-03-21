@@ -47,18 +47,7 @@ public class CommandOptions implements CommandItem {
             }
             var parent = caller.getParent();
             if (parent != null) {
-                var isMine = true;
-                var commandOptions = parent.getCommandOptions();
-                for (CommandOption coFounded : commandOptions) {
-                    for (var arg = 0; arg < matchingArgIndex; arg++) {
-                        var wrongArg = mainArgs.get(arg);
-                        if (wrongArg.getId().equalsIgnoreCase(coFounded.getLongCommand()) || wrongArg.getId().equalsIgnoreCase(coFounded.getShortCommand())) {
-                            isMine = false;
-                            break;
-                        }
-                    }
-
-                }
+                var isMine = checkIfItIsMine(mainArgs, parent, matchingArgIndex);
                 if (!isMine) {
                     continue;
                 }
@@ -122,6 +111,22 @@ public class CommandOptions implements CommandItem {
                 }
             }
         }
+    }
+
+    private static boolean checkIfItIsMine(List<MainArg> mainArgs, CommandItem parent, int matchingArgIndex) {
+        var isMine = true;
+        var commandOptions = parent.getCommandOptions();
+        for (CommandOption coFounded : commandOptions) {
+            for (var arg = 0; arg < matchingArgIndex; arg++) {
+                var wrongArg = mainArgs.get(arg);
+                if (wrongArg.getId().equalsIgnoreCase(coFounded.getLongCommand()) || wrongArg.getId().equalsIgnoreCase(coFounded.getShortCommand())) {
+                    isMine = false;
+                    break;
+                }
+            }
+
+        }
+        return isMine;
     }
 
     protected static void printHelpListOfCommands(ArrayList<HelpLine> result, List<CommandOption> co, int level) {

@@ -193,7 +193,7 @@ public class SimpleParser {
                 updateWithFunctions(item);
             }
         }
-        token.children = children.stream().filter(f -> f != null).collect(Collectors.toList());
+        token.children = children.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     private List<Token> adaptAsFunctionParams(List<Token> children) {
@@ -366,32 +366,22 @@ public class SimpleParser {
             }
             throw new ParserException("Unsupported binary operator for Strings: " + operator);
         } else if (rValue instanceof BigDecimal) {
-            if (operator.equals("==")) {
-                return lValue.equals(rValue);
-            } else if (operator.equals("!=")) {
-                return !lValue.equals(rValue);
-            } else if (operator.equals(">")) {
-                return ((BigDecimal) lValue).compareTo((BigDecimal) rValue) > 0;
-            } else if (operator.equals(">=")) {
-                return ((BigDecimal) lValue).compareTo((BigDecimal) rValue) > 0 ||
+            return switch (operator) {
+                case "==" -> lValue.equals(rValue);
+                case "!=" -> !lValue.equals(rValue);
+                case ">" -> ((BigDecimal) lValue).compareTo((BigDecimal) rValue) > 0;
+                case ">=" -> ((BigDecimal) lValue).compareTo((BigDecimal) rValue) > 0 ||
                         ((BigDecimal) lValue).compareTo((BigDecimal) rValue) == 0;
-            } else if (operator.equals("<")) {
-                return ((BigDecimal) lValue).compareTo((BigDecimal) rValue) < 0;
-            } else if (operator.equals("<=")) {
-                return ((BigDecimal) lValue).compareTo((BigDecimal) rValue) < 0 ||
+                case "<" -> ((BigDecimal) lValue).compareTo((BigDecimal) rValue) < 0;
+                case "<=" -> ((BigDecimal) lValue).compareTo((BigDecimal) rValue) < 0 ||
                         ((BigDecimal) lValue).compareTo((BigDecimal) rValue) == 0;
-            } else if (operator.equals("-")) {
-                return ((BigDecimal) lValue).subtract((BigDecimal) rValue);
-            } else if (operator.equals("+")) {
-                return ((BigDecimal) lValue).add((BigDecimal) rValue);
-            } else if (operator.equals("/")) {
-                return ((BigDecimal) lValue).divide((BigDecimal) rValue);
-            } else if (operator.equals("*")) {
-                return ((BigDecimal) lValue).multiply((BigDecimal) rValue);
-            } else if (operator.equals("%")) {
-                return ((BigDecimal) lValue).remainder((BigDecimal) rValue);
-            }
-            throw new ParserException("Unsupported binary operator for Numbers: " + operator);
+                case "-" -> ((BigDecimal) lValue).subtract((BigDecimal) rValue);
+                case "+" -> ((BigDecimal) lValue).add((BigDecimal) rValue);
+                case "/" -> ((BigDecimal) lValue).divide((BigDecimal) rValue);
+                case "*" -> ((BigDecimal) lValue).multiply((BigDecimal) rValue);
+                case "%" -> ((BigDecimal) lValue).remainder((BigDecimal) rValue);
+                default -> throw new ParserException("Unsupported binary operator for Numbers: " + operator);
+            };
         } else if (rValue instanceof Boolean) {
             if (operator.equals("==")) {
                 return lValue == rValue;
@@ -504,8 +494,7 @@ public class SimpleParser {
             }
             var length = Integer.parseInt(convertToValue(token.children.get(1), testClass).toString());
             var wrapItem = convertToValue(token.children.get(2), testClass).toString();
-            var result = String.join(wrapItem, splitStringBySize(what, length));
-            return result;
+            return String.join(wrapItem, splitStringBySize(what, length));
 
         } else if (token.value.equalsIgnoreCase("contains")) {
             var where = convertToValue(token.children.get(0), testClass).toString();
@@ -627,7 +616,7 @@ public class SimpleParser {
             for (var whatValue : group.children) {
                 var value = convertToValue(whatValue, groupItem);
                 var jsonValue = mapper.convertValue(value);
-                objectNode.put(whatValue.value, jsonValue);
+                objectNode.set(whatValue.value, jsonValue);
             }
             resultArray.add(objectNode);
         }
@@ -658,7 +647,7 @@ public class SimpleParser {
             for (var item : toProjectArray) {
                 var objectNode = mapper.getMapper().createObjectNode();
                 for (var whatValue : what.children) {
-                    if (whatValue.children.size() == 0) {
+                    if (whatValue.children.isEmpty()) {
                         var value = convertToValue(whatValue, item);
                         var jsonValue = mapper.convertValue(value);
                         objectNode.set(whatValue.value, jsonValue);
@@ -744,7 +733,7 @@ public class SimpleParser {
             while (resIt.hasNext()) {
                 toSort.add(resIt.next());
             }
-            Collections.sort(toSort, (o1, o2) -> {
+            toSort.sort((o1, o2) -> {
                 var compareFunctions = new ArrayList<>(order.children);
                 while (!compareFunctions.isEmpty()) {
                     var compareFunction = compareFunctions.remove(0);
@@ -786,6 +775,7 @@ public class SimpleParser {
         return resultArray;
     }
 
+    @SuppressWarnings("InnerClassMayBeStatic")
     class SortSpec {
         public String field;
         public boolean ascending;

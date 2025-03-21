@@ -29,6 +29,12 @@ public class PostgresCallConverter {
                 map(String::trim).
                 filter(pp -> (!pp.isEmpty() && !pp.equalsIgnoreCase(","))).
                 toList();
+        var finalParams = retrieveFinalParams(parameterValues, resultingParams, singleOut);
+        query += String.join(",", finalParams) + ")}";
+        return query;
+    }
+
+    private static ArrayList<String> retrieveFinalParams(List<BindingParameter> parameterValues, List<String> resultingParams, boolean singleOut) {
         var paramIndex = 0;
         var finalParams = new ArrayList<String>();
         for (String parPar : resultingParams) {
@@ -47,7 +53,6 @@ public class PostgresCallConverter {
             finalParams.add("?");
             paramIndex++;
         }
-        query += String.join(",", finalParams) + ")}";
-        return query;
+        return finalParams;
     }
 }

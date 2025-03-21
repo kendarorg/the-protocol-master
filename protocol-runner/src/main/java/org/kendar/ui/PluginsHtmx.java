@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@SuppressWarnings("HttpUrlsUsage")
 @TpmService
 @HttpTypeFilter(
         blocking = true)
@@ -134,7 +133,7 @@ public class PluginsHtmx implements FilteringClass {
             model.setSettingsObject(plugin.getSettings());
             resolversFactory.render("plugins/single.jte", model, response);
         } else {
-            var plugin = (GlobalPluginDescriptor) diService.getInstances(GlobalPluginDescriptor.class)
+            var plugin = diService.getInstances(GlobalPluginDescriptor.class)
                     .stream().filter(i -> i.getId().equalsIgnoreCase(pluginId)).findFirst().orElse(null);
             model.setId(plugin.getId());
             model.setInstanceId("global");

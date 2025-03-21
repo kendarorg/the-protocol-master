@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GlobalReportResult {
-    private List<String> fields = new ArrayList<String>();
+    private List<String> fields = new ArrayList<>();
     private ArrayNode rows = null;
 
     public List<String> getFields() {

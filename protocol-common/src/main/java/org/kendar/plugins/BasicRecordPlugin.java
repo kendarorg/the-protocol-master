@@ -143,8 +143,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     @Override
     protected boolean handleSettingsChanged() {
-        if (getSettings() == null) return false;
-        return true;
+        return getSettings() != null;
     }
 
     @Override

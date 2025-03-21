@@ -10,10 +10,9 @@ public class SiteMatcherUtils {
         if (target == null || target.isEmpty()) {
             return new ArrayList<>();
         }
-        List<MatchingRecRep> destination = new ArrayList<>(target.stream()
+        return new ArrayList<>(target.stream()
                 .map(String::trim).filter(s -> !s.isEmpty())
                 .map(MatchingRecRep::new).toList());
-        return destination;
     }
 
     public static boolean matchSite(Request site, List<MatchingRecRep> sites) {

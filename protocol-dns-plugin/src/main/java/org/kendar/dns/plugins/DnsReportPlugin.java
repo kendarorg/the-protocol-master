@@ -26,7 +26,7 @@ public class DnsReportPlugin extends BasicReportPlugin<PluginSettings> {
         return "dns";
     }
 
-    private ConcurrentHashMap<String,Boolean> hostsRequested = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,Boolean> hostsRequested = new ConcurrentHashMap<>();
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, String requestedDomain, List<String> out) {
         if (!isActive()) return false;

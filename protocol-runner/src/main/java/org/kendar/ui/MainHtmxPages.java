@@ -10,7 +10,6 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.utils.JsonMapper;
 
-@SuppressWarnings("HttpUrlsUsage")
 @TpmService
 @HttpTypeFilter(
         blocking = true)
