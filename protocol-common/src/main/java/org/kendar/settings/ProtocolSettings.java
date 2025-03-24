@@ -1,5 +1,6 @@
 package org.kendar.settings;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.kendar.utils.JsonMapper;
 
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 public class ProtocolSettings {
     protected static final JsonMapper mapper = new JsonMapper();
     private String protocol;
+    @JsonIgnore
     private String protocolInstanceId;
     private Map<String, Object> plugins = new HashMap<>();
 

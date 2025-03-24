@@ -253,6 +253,17 @@ public class FileStorageRepository extends StorageRepository {
         EventsQueue.send(new StorageReloadedEvent());
     }
 
+    @Override
+    public boolean existsFile(String... path) {
+        var realPath = buildRealPath(path) + ".json";
+        var fullPath = Path.of(realPath);
+        var parent = fullPath.getParent().toFile();
+        if (!parent.exists()) {
+            return false;
+        }
+        return fullPath.toFile().exists();
+    }
+
     /**
      * Create unique progressive id
      *

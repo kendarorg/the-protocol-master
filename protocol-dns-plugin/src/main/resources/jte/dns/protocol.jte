@@ -1,7 +1,7 @@
 @param org.kendar.settings.ProtocolSettings protocolSettings
 
 !{
-    var protocol = (org.kendar.settings.ByteProtocolSettings)protocolSettings;
+    var protocol = (org.kendar.dns.DnsProtocolSettings)protocolSettings;
     var safeId = new java.util.function.Function<org.kendar.settings.ProtocolSettings,String>(){
             @Override
             public String apply(org.kendar.settings.ProtocolSettings protocolSettings) {
@@ -9,6 +9,19 @@
             }
         };
 }
+<script type="text/javascript">
+    function updateData${safeId.apply(protocol)}() {
+        if (confirm("You will be restarting the application, are you sure?")) {
+            var data = {
+                port:retrieveValue('port${safeId.apply(protocol)}')
+            };
+            console.log(data);
+            sendData('/api/protocols/${protocol.getProtocolInstanceId()}', 'POST', JSON.stringify(data), 'application/json', (status, response) => {
+                location.reload();
+            })
+        }
+    }
+</script>
 <div id="ProtocolPanel${safeId.apply(protocol)}" class="panel panel-default">
 
     <div class="panel-heading" role="tab" id="headingProtocol${safeId.apply(protocol)}">
@@ -27,11 +40,17 @@
 
 
             <div class="input-group">
-                <label for="port" class="control-label">Listening port</label>
+                <label for="port${safeId.apply(protocol)}" class="control-label">Listening port</label>
                 <div>
-                    <input id="http" type="number" class="form-control"
+                    <input id="port${safeId.apply(protocol)}" type="number" class="form-control"
                            value="${protocol.getPort()}">
                 </div>
+            </div>
+            <br>
+            <div class="input-group">
+                <button class="btn btn-danger" type="button"
+                        onclick="updateData${safeId.apply(protocol)}()">Update settings
+                </button>
             </div>
             <br>
         </div>

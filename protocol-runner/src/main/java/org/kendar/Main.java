@@ -236,10 +236,12 @@ public class Main {
             restartReceived = true;
         }, RestartEvent.class);
         EventsQueue.register("main", (e) -> {
-            if (e.getSettings() != null && Files.exists(Path.of(e.getSettings()))) {
-                stopInternal();
-                changedSettings = e.getSettings();
-                terminateReceived = true;
+            if (e.getSettings() != null) {
+                if(Files.exists(Path.of(e.getSettings()))) {
+                    stopInternal();
+                    changedSettings = e.getSettings();
+                    terminateReceived = true;
+                }
             }
         }, StorageReloadedEvent.class);
 

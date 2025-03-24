@@ -105,4 +105,9 @@ public class NullStorageRepository extends StorageRepository {
     public void clean() {
 
     }
+
+    @Override
+    public boolean existsFile(String... path) {
+        return false;
+    }
 }

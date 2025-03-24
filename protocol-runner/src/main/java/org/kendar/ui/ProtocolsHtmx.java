@@ -32,14 +32,21 @@ public class ProtocolsHtmx implements FilteringClass {
     @HttpMethodFilter(
             pathAddress = "/protocols",
             method = "GET", id = "GET /protocols")
-    public void recording(Request request, Response response) {
+    public void retrieve(Request request, Response response) {
         var data = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.settings.GlobalSettings.class);
-        var safeId = new java.util.function.Function<org.kendar.settings.ProtocolSettings,String>(){
-            @Override
-            public String apply(org.kendar.settings.ProtocolSettings protocolSettings) {
-                return protocolSettings.getProtocolInstanceId().replaceAll("-","");
-            }
-        };
+        var sortedProtocol = data.getProtocols().entrySet().stream().
+                sorted(java.util.Comparator.comparing(java.util.Map.Entry::getKey)).
+                map(s-> data.getProtocolForKey(s.getKey())).toList();
+
+        resolversFactory.render("protocols.jte", sortedProtocol, response);
+    }
+
+
+    @HttpMethodFilter(
+            pathAddress = "/protocols/{protocolId}",
+            method = "GET", id = "GET /protocols/{protocolId}")
+    public void storeProtocolSetting(Request request, Response response) {
+        var data = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.settings.GlobalSettings.class);
         var sortedProtocol = data.getProtocols().entrySet().stream().
                 sorted(java.util.Comparator.comparing(java.util.Map.Entry::getKey)).
                 map(s-> data.getProtocolForKey(s.getKey())).toList();
