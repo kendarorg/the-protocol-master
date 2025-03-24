@@ -85,7 +85,6 @@ public class SwaggerApi implements FilteringClass {
         Map<String, Schema> schemas = new HashMap<>();
         Map<String, PathItem> expectedPaths = new HashMap<>();
         for (var kvp : filtersConfiguration.filters) {
-
             handleSingleFilter(swagger, schemas, expectedPaths, kvp);
 
         }

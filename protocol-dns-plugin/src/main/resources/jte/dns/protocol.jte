@@ -66,6 +66,24 @@
                 </button>
             </div>
             <br>
+            <table class="table table-bordered table-striped">
+                <th><td>Registered DNS</td><td>Ip</td></th>
+                @for(var registered:protocol.getRegistered())
+                    <tr>
+                        <td>${registered.getName()}</td>
+                        <td>${registered.getIp()}</td>
+                    </tr>
+                @endfor
+            </table>
+            <br>
+            <table>
+                <th><td>Blocked DNS</td></th>
+                @for(var blocked:protocol.getBlocked())
+                    <tr>
+                        <td>${blocked}</td>
+                    </tr>
+                @endfor
+            </table>
         </div>
     </div>
 </div>
