@@ -415,8 +415,6 @@ public class SimpleParser {
         if (oldArray.length > 1) {
             remainder = oldArray[1];
         }
-
-
         var obj = testClass.get(currentPart);
         if (obj == null) {
             return null;

@@ -8,6 +8,7 @@
 <input type="hidden" id="rowsCount" value="${data.getRows().size()}">
 <table id="reportSearchResult" class="table table-bordered table-striped">
     <tr>
+        <th></th>
         @for(var i=0;i<fields.size();i++)
             <th>${fields.get(i)}<input type="hidden" id="label_${i}" value="${fields.get(i)}"></th>
         @endfor
