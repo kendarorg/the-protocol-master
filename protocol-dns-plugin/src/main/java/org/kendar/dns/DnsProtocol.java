@@ -3,10 +3,8 @@ package org.kendar.dns;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.base.AlwaysActivePlugin;
-import org.kendar.plugins.base.BasePluginDescriptor;
-import org.kendar.plugins.base.ProtocolPhase;
-import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.dns.apis.DnsApis;
+import org.kendar.plugins.base.*;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -14,6 +12,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.PluginHandler;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.kendar.utils.JsonMapper;
 import org.kendar.utils.PluginsLoggerFactory;
 import org.pf4j.Extension;
 import org.pf4j.ExtensionPoint;
@@ -42,10 +41,15 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             Pattern.compile("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
     private final ConcurrentHashMap<String, Pattern> patterns = new ConcurrentHashMap<>();
     private final Logger log;
+    private final JsonMapper mapper;
     private boolean dnsRunning;
     private ServerSocket tcpSocket;
     private DatagramSocket udpSocket;
 
+    @Override
+    public List<ProtocolApiHandler> getApiHandler() {
+        return List.of(new DnsApis(mapper,this, (DnsProtocolSettings) getSettings()));
+    }
 
     @Override
     public ProtocolSettings getSettings(){
@@ -54,7 +58,9 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
 
     @TpmConstructor
     public DnsProtocol(GlobalSettings ini, DnsProtocolSettings settings,
-                       @TpmNamed(tags = "dns") List<BasePluginDescriptor> plugins, PluginsLoggerFactory loggerContext) {
+                       @TpmNamed(tags = "dns") List<BasePluginDescriptor> plugins,
+                       PluginsLoggerFactory loggerContext) {
+        mapper = new JsonMapper();
         log = loggerContext.getLogger(DnsProtocol.class);
         this.settings = settings;
         for (var i = plugins.size() - 1; i >= 0; i--) {
@@ -504,5 +510,10 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             }
         }
         return false;
+    }
+
+    public void clearCache() {
+        cached.clear();
+        patterns.clear();
     }
 }
