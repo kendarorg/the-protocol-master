@@ -27,19 +27,19 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.TcpServer;
-import org.kendar.utils.ChangeableReference;
-import org.kendar.utils.FileResourcesUtils;
-import org.kendar.utils.PluginsLoggerFactory;
-import org.kendar.utils.Sleeper;
+import org.kendar.utils.*;
 import org.pf4j.ExtensionPoint;
 import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -109,12 +109,23 @@ public class Main {
 
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
+        var classLoaders = new HashMap<String,ClassLoader>();
+        var paths = new HashSet<URL>();
         for (var plugin : pluginManager.getPlugins()) {
+
+
             for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class, plugin.getPluginId())) {
+                var cl = ec.getClassLoader();
+                paths.add(plugin.getPluginPath().toUri().toURL());
+                classLoaders.put(cl.toString(), cl);
                 diService.bind(ec);
             }
         }
-
+        var plcl = new TPMPluginsClassLoader(
+                ClassLoader.getSystemClassLoader(),
+                paths.stream().toList(),
+                classLoaders.values().toArray(new ClassLoader[0]));
+        diService.register(TPMPluginsClassLoader.class, plcl);
         if (!parser.hasOption("cfg")) {
             var protocolMotherOption = options.getCommandOption("p");
             var protocolOptionsToAdd = new ArrayList<CommandOptions>();
