@@ -34,13 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
@@ -109,21 +107,28 @@ public class Main {
 
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
-        var classLoaders = new HashMap<String,ClassLoader>();
-        var paths = new HashSet<URL>();
+        // Retrieve all the class-loaders for the plugins
+        var classLoaders = new HashMap<String, ClassLoader>();
+        // Retrieve all the Jar URLs
+        var jarUrls = new HashSet<String>();
         for (var plugin : pluginManager.getPlugins()) {
-
-
             for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class, plugin.getPluginId())) {
                 var cl = ec.getClassLoader();
-                paths.add(plugin.getPluginPath().toUri().toURL());
+                jarUrls.add(plugin.getPluginPath().toUri().toURL().toString());
                 classLoaders.put(cl.toString(), cl);
                 diService.bind(ec);
             }
         }
         var plcl = new TPMPluginsClassLoader(
                 ClassLoader.getSystemClassLoader(),
-                paths.stream().toList(),
+                jarUrls.stream().map(u -> {
+                    try {
+                        return new URL(u);
+                    } catch (MalformedURLException e) {
+                        log.error("Unable to load plugin url {}", u, e);
+                        return null;
+                    }
+                }).filter(Objects::nonNull).toList(),
                 classLoaders.values().toArray(new ClassLoader[0]));
         diService.register(TPMPluginsClassLoader.class, plcl);
         if (!parser.hasOption("cfg")) {

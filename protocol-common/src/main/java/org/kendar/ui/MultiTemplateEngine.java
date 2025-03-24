@@ -9,7 +9,6 @@ import gg.jte.output.StringOutput;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.utils.JsonMapper;
 import org.kendar.utils.TPMPluginsClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,27 +16,35 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.Map;
 
+/**
+ * Wraps the JTE template engine
+ */
 @TpmService
 public class MultiTemplateEngine {
 
-    private JsonMapper mapper;
+    private static final Logger log = LoggerFactory.getLogger(MultiTemplateEngine.class);
     private MultiCodeResolver resolver;
     private TemplateEngine templateEngine;
 
+    /**
+     * Constructor for testing
+     */
     public MultiTemplateEngine() {
 
     }
 
+    /**
+     * @param resolver              The code resolver
+     * @param tpmPluginsClassLoader The URLClassLoader
+     */
     @TpmConstructor
-    public MultiTemplateEngine(MultiCodeResolver resolver, TPMPluginsClassLoader TPMPluginsClassLoader) {
-        this.mapper = new JsonMapper();
+    public MultiTemplateEngine(MultiCodeResolver resolver, TPMPluginsClassLoader tpmPluginsClassLoader) {
         this.resolver = resolver;
         this.templateEngine = TemplateEngine.create(this.resolver,
                 Paths.get("jte-classes"),
-                ContentType.Html, TPMPluginsClassLoader);
+                ContentType.Html, tpmPluginsClassLoader);
     }
 
     private static void respondException(Response response, Exception e) {
@@ -65,14 +72,11 @@ public class MultiTemplateEngine {
 
         try {
             templateEngine.render(name, param, output);
-        }catch (ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new ClassCastException(e.getMessage());
         }
 
     }
-    private static final Logger log = LoggerFactory.getLogger(MultiTemplateEngine.class);
-
-    private HashSet<String> stringTemplates = new HashSet<>();
 
     public void render(String name, Object model, Response response) throws TemplateException {
         if (templateEngine == null) {
@@ -80,15 +84,12 @@ public class MultiTemplateEngine {
         }
         try {
             var output = new StringOutput();
-
-                    templateEngine.render(name, model, output);
-
-
+            templateEngine.render(name, model, output);
             response.addHeader("Content-type", "text/html");
             response.setResponseText(new TextNode(output.toString()));
             response.setStatusCode(200);
         } catch (Exception e) {
-            log.error("Error rendering {}",name, e);
+            log.error("Error rendering {}", name, e);
             respondException(response, e);
         }
     }

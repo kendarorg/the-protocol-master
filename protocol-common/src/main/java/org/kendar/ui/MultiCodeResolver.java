@@ -7,12 +7,19 @@ import org.kendar.di.annotations.TpmService;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Custom templates resolver to allow JTE finding the templates into included plugins
+ */
 @TpmService
 public class MultiCodeResolver implements CodeResolver {
     private final List<JteResolver> jteResolvers;
     private final ConcurrentHashMap<String, CodeResolver> engines = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Object> notEngines = new ConcurrentHashMap<>();
 
+    /**
+     * The JTEResolvers are simply a storage for the plugins classloaders
+     * @param resolvers
+     */
     public MultiCodeResolver(List<JteResolver> resolvers) {
         this.jteResolvers = resolvers;
     }
@@ -28,9 +35,11 @@ public class MultiCodeResolver implements CodeResolver {
 
     @Override
     public String resolveRequired(String name) throws TemplateNotFoundException {
+        // If found already who contains the template use it
         if (engines.containsKey(name)) {
             return engines.get(name).resolve(name);
         } else if (notEngines.containsKey(name)) {
+            //Error when not finding
             throw new TemplateNotFoundException(name + " not found");
         }
         String resolved = null;
@@ -42,11 +51,8 @@ public class MultiCodeResolver implements CodeResolver {
                 return resolved;
             }
         }
-        if (resolved == null) {
-            notEngines.put(name, name);
-            throw new TemplateNotFoundException(name + " not found");
-        }
-        return resolved;
+        notEngines.put(name, name);
+        throw new TemplateNotFoundException(name + " not found");
     }
 
     @Override
