@@ -1,6 +1,8 @@
 package org.kendar.apis;
 
+import org.kendar.plugins.base.TPMPluginFile;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.kendar.VersionChecker;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -11,6 +13,7 @@ import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.apis.dtos.PluginIndex;
 import org.kendar.apis.dtos.ProtocolIndex;
+import org.kendar.apis.dtos.StringKvp;
 import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
@@ -25,6 +28,7 @@ import org.kendar.plugins.base.ProtocolInstance;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
+import org.pf4j.PluginManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,13 +47,16 @@ public class ApiHandler implements FilteringClass {
     private final GlobalSettings settings;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final StorageRepository repository;
+    private final PluginManager pluginManager;
     private List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
     @TpmConstructor
-    public ApiHandler(GlobalSettings settings, List<GlobalPluginDescriptor> globalPlugins, StorageRepository repository) {
+    public ApiHandler(GlobalSettings settings, List<GlobalPluginDescriptor> globalPlugins,
+                      StorageRepository repository, PluginManager pluginManager) {
         this.settings = settings;
         this.globalPlugins = globalPlugins;
         this.repository = repository;
+        this.pluginManager = pluginManager;
     }
 
     @HttpMethodFilter(
@@ -75,12 +82,31 @@ public class ApiHandler implements FilteringClass {
     @TpmDoc(
             description = "Retrieve the status of the application",
             responses = @TpmResponse(
-                    body = String.class
+                    body = Ok.class
             ),
             tags = {"base/utils"})
     public boolean getStatus(Request reqp, Response resp) {
         respondJson(resp, new Ok());
         return true;
+    }
+
+    @HttpMethodFilter(
+            pathAddress = "/api/version",
+            method = "GET", id = "GET /api/version")
+    @TpmDoc(
+            description = "Retrieve the version of the application",
+            responses = @TpmResponse(
+                    body = StringKvp[].class
+            ),
+            tags = {"base/utils"})
+    public void getVersion(Request reqp, Response resp) {
+        var result = new ArrayList<StringKvp>();
+        result.add(new StringKvp("protocol-runner",VersionChecker.getTpmVersion()));
+        for(var plugin:pluginManager.getPlugins()) {
+            var pluginDescriptor = (TPMPluginFile)plugin.getPlugin();
+            result.add(new StringKvp(pluginDescriptor.getTpmPluginName(),pluginDescriptor.getTpmPluginVersion()));
+        }
+        respondJson(resp, result);
     }
 
     @HttpMethodFilter(

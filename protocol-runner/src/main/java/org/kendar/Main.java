@@ -104,6 +104,7 @@ public class Main {
         }
 
         pluginManager = new JarPluginManager(pathOfPluginsDir);
+        diService.register(pluginManager);
 
         pluginManager.loadPlugins();
         pluginManager.startPlugins();
