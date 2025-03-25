@@ -19,7 +19,6 @@ import org.kendar.utils.JsonMapper;
 import java.util.List;
 
 import static org.kendar.apis.ApiUtils.respondJson;
-import static org.kendar.apis.ApiUtils.respondOk;
 
 @HttpTypeFilter(blocking = true)
 public class DnsApis implements ProtocolApiHandler {
@@ -53,7 +52,7 @@ public class DnsApis implements ProtocolApiHandler {
             method = "POST", id = "POST /api/protocols/{#protocolInstanceId}/dns/registered")
     @TpmDoc(
             description = "Add/update dns registration",
-            requests = @TpmRequest(body = DnsMapping.class),
+            requests = @TpmRequest(body = DnsMapping[].class),
             responses = {@TpmResponse(
                     body = Ok.class
             ), @TpmResponse(
@@ -61,22 +60,19 @@ public class DnsApis implements ProtocolApiHandler {
             )},
             tags = {"plugins/dns/{#protocolInstanceId}"})
     public void updateDnsRegistered(Request reqp, Response resp) {
-        var data = mapper.deserialize(reqp.getRequestText().toString(), DnsMapping.class);
-        var somethingChanged = false;
-        for (var setting : settings.getRegistered()) {
-            if (setting.getName().equals(data.getName())) {
-                setting.setIp(data.getIp());
-                somethingChanged = true;
-                break;
+        var dataList = mapper.deserialize(reqp.getRequestText().toString(), DnsMapping[].class);
+        for(var data:dataList) {
+            var somethingChanged = false;
+            for (var setting : settings.getRegistered()) {
+                if (setting.getName().equals(data.getName())) {
+                    setting.setIp(data.getIp());
+                    somethingChanged = true;
+                    break;
+                }
             }
-            if (setting.getIp().equals(data.getIp())) {
-                setting.setName(data.getName());
-                somethingChanged = true;
-                break;
+            if (!somethingChanged) {
+                settings.getRegistered().add(data);
             }
-        }
-        if (!somethingChanged) {
-            settings.getRegistered().add(data);
         }
         protocol.clearCache();
 
@@ -98,9 +94,9 @@ public class DnsApis implements ProtocolApiHandler {
         var dnsName = reqp.getPathParameter("dnsName");
         var somethingChanged = false;
         List<DnsMapping> registered = settings.getRegistered();
-        for (int i = 0; i < registered.size(); i++) {
+        for (int i = registered.size() - 1; i >= 0; i--) {
             var setting = registered.get(i);
-            if (setting.getName().equalsIgnoreCase(dnsName)) {
+            if (setting.getName().equalsIgnoreCase(dnsName)||setting.getIp().equalsIgnoreCase(dnsName)) {
                 settings.getRegistered().remove(i);
                 somethingChanged = true;
                 break;
@@ -144,11 +140,11 @@ public class DnsApis implements ProtocolApiHandler {
     }
 
     @HttpMethodFilter(
-            pathAddress = "/api/protocols/{#protocolInstanceId}/dns/blocked/{dnsName}",
-            method = "POST", id = "POST /api/protocols/{#protocolInstanceId}/dns/blocked/{dnsName}")
+            pathAddress = "/api/protocols/{#protocolInstanceId}/dns/blocked",
+            method = "POST", id = "POST /api/protocols/{#protocolInstanceId}/dns/blocked")
     @TpmDoc(
             description = "Add/update dns blocked dns",
-            requests = @TpmRequest(body = DnsMapping.class),
+            requests = @TpmRequest(body = String[].class),
             responses = {@TpmResponse(
                     body = Ok.class
             ), @TpmResponse(
@@ -156,14 +152,20 @@ public class DnsApis implements ProtocolApiHandler {
             )},
             tags = {"plugins/dns/{#protocolInstanceId}"})
     public void updateDnsBlocked(Request reqp, Response resp) {
-        var dnsName = reqp.getPathParameter("dnsName");
-        for (var setting : settings.getBlocked()) {
-            if (setting.equals(dnsName)) {
-                respondOk(resp);
-                return;
+
+        var dataList = mapper.deserialize(reqp.getRequestText().toString(), String[].class);
+        for(var dnsName:dataList) {
+            var alreadyPresent = false;
+            for (var setting : settings.getBlocked()) {
+                if (setting.equalsIgnoreCase(dnsName)) {
+                    alreadyPresent = true;
+                    break;
+                }
+            }
+            if(!alreadyPresent){
+                settings.getBlocked().add(dnsName);
             }
         }
-        settings.getBlocked().add(dnsName);
         protocol.clearCache();
     }
 
