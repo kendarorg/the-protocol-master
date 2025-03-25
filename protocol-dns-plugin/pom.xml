@@ -33,7 +33,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>${project.artifactId}-${revision}</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                     <archive>
@@ -107,7 +107,7 @@
                                     <directory>${project.build.directory}</directory>
                                     <filtering>false</filtering>
                                     <includes>
-                                        <include>*.jar</include>
+                                        <include>protocol-dns-plugin.jar</include>
                                     </includes>
                                 </resource>
                             </resources>
