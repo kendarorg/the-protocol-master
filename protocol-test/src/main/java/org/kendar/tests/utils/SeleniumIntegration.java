@@ -121,10 +121,14 @@ public class SeleniumIntegration {
         if(version != null) {
             options.setBrowserVersion(version);
         }
+        if(!Files.exists(Path.of("target","selenium"))){
+            Files.createDirectory(Path.of("target","selenium"));
+        }
 
         options.setProxy(proxy);
         options.setAcceptInsecureCerts(true);
         options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--user-data-dir="+Path.of("target","selenium").toAbsolutePath().toString());
         //options.addArguments("--disable-dev-shm-usage");
         //options.addArguments("disable-infobars"); // disabling infobars
         //options.addArguments("--disable-extensions"); // disabling extensions
