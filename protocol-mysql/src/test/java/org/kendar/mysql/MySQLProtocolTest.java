@@ -12,7 +12,6 @@ public class MySQLProtocolTest extends MySqlBasicTest {
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();
-
     }
 
     @AfterAll
