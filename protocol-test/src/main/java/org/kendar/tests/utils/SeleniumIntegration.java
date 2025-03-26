@@ -94,7 +94,7 @@ public class SeleniumIntegration {
         var config = webDriverManager.config();
         var versionDetector = new VersionDetector(config, null);
         var optionalVersion = versionDetector.getBrowserVersionFromTheShell(
-                webDriverManager.getDriverManagerType().getBrowserNameLowerCase());
+                webDriverManager.getDriverManagerType().getBrowserNameLowerCase(),browserPath.get().toAbsolutePath().toString());
 
         if(optionalVersion.isPresent()) {
             Integer version = Integer.parseInt(optionalVersion.get());
