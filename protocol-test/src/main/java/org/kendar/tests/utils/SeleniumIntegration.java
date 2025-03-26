@@ -2,6 +2,7 @@ package org.kendar.tests.utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.github.bonigarcia.wdm.managers.ChromeDriverManager;
+import io.github.bonigarcia.wdm.managers.ChromiumDriverManager;
 import io.github.bonigarcia.wdm.versions.VersionDetector;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
@@ -60,21 +61,41 @@ public class SeleniumIntegration {
     }
 
     private String retrieveBrowserVersion() {
-        ChromeDriverManager.getInstance().setup();
-        var versionDetector = new VersionDetector(ChromeDriverManager.getInstance().config(), null);
-        var version = Integer.parseInt(versionDetector.getBrowserVersionFromTheShell("chrome").get());
-        var available = ChromeDriverManager.getInstance().getDriverVersions().stream().
-                map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
-        var matching = available.get(available.size() - 1);
-        if (available.stream().anyMatch(v -> v == (version))) {
-            matching = version;
+        try {
+            ChromeDriverManager.getInstance().setup();
+            var versionDetector = new VersionDetector(ChromeDriverManager.getInstance().config(), null);
+            var optionalVersion = versionDetector.getBrowserVersionFromTheShell("chrome");
+            if (optionalVersion.isEmpty()) {
+                optionalVersion = versionDetector.getBrowserVersionFromTheShell("chromium");
+            }
+            var version = Integer.parseInt(optionalVersion.get());
+            var available = ChromeDriverManager.getInstance().getDriverVersions().stream().
+                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
+            var matching = available.get(available.size() - 1);
+            if (available.stream().anyMatch(v -> v == (version))) {
+                matching = version;
+            }
+            return matching.toString();
+        }catch (Exception e) {
+            ChromiumDriverManager.getInstance().setup();
+            var versionDetector = new VersionDetector(ChromiumDriverManager.getInstance().config(), null);
+            var optionalVersion = versionDetector.getBrowserVersionFromTheShell("chrome");
+            if (optionalVersion.isEmpty()) {
+                optionalVersion = versionDetector.getBrowserVersionFromTheShell("chromium");
+            }
+            var version = Integer.parseInt(optionalVersion.get());
+            var available = ChromeDriverManager.getInstance().getDriverVersions().stream().
+                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
+            var matching = available.get(available.size() - 1);
+            if (available.stream().anyMatch(v -> v == (version))) {
+                matching = version;
+            }
+            return matching.toString();
         }
-        return matching.toString();
     }
 
     public void seleniumInitialized() throws Exception {
         windowHandles.clear();
-        //ChromeDriverManager.getInstance().setup();
         //var chromeExecutable = SeleniumBase.findchrome();
 
         Proxy proxy = new Proxy();
