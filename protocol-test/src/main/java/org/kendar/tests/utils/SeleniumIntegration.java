@@ -29,6 +29,7 @@ public class SeleniumIntegration {
     private final Map<String, String> windowHandles = new HashMap<>();
     private String currentTab;
     private int counter = 0;
+    private Path browserPath;
 
     public SeleniumIntegration(Path rootPath, String proxyHost, int proxyPort) {
         this.rootPath = rootPath;
@@ -75,12 +76,14 @@ public class SeleniumIntegration {
                 .getBrowserPath();
         WebDriverManager webDriverManager = null;
         if (browserPath.isPresent()) {
+            this.browserPath = browserPath.get();
             webDriverManager = ChromeDriverManager.getInstance();
             chromeNotChromium=true;
         }else {
             browserPath = WebDriverManager.chromiumdriver()
                     .getBrowserPath();
             if (browserPath.isPresent()) {
+                this.browserPath = browserPath.get();
                 webDriverManager = ChromiumDriverManager.getInstance();
                 chromeNotChromium=false;
             } else {
@@ -115,21 +118,19 @@ public class SeleniumIntegration {
         Proxy proxy = new Proxy();
         proxy.setHttpProxy(proxyHost + ":" + proxyPort);
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
-        //DesiredCapabilities desired = new DesiredCapabilities();
+
+
         var options = new ChromeOptions();
         var version = retrieveBrowserVersion();
         if(version != null) {
             options.setBrowserVersion(version);
         }
-        if(!Files.exists(Path.of("target","selenium"))){
-            Files.createDirectory(Path.of("target","selenium"));
-        }
 
+        options.setBinary(browserPath.toFile());
         options.setProxy(proxy);
         options.setAcceptInsecureCerts(true);
         options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--user-data-dir="+Path.of("target","selenium").toAbsolutePath().toString());
-        //options.addArguments("--disable-dev-shm-usage");
+         //options.addArguments("--disable-dev-shm-usage");
         //options.addArguments("disable-infobars"); // disabling infobars
         //options.addArguments("--disable-extensions"); // disabling extensions
         options.addArguments("--disable-gpu"); // applicable to windows os only
