@@ -91,6 +91,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>sample-plugins</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-dns-plugin</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
             <version>${jaxb.api.version}</version>
