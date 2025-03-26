@@ -69,8 +69,8 @@
         <dns.java.version>3.4.0</dns.java.version>
         <maven.jar.version>3.2.0</maven.jar.version>
         <maven.antrun.version>1.8</maven.antrun.version>
-        <selenium.version>4.14.1</selenium.version>
-        <webdrivermanager.version>5.5.3</webdrivermanager.version>
+        <selenium.version>4.30.0</selenium.version>
+        <webdrivermanager.version>6.0.0</webdrivermanager.version>
     </properties>
     <dependencies>
         <dependency>
