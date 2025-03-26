@@ -2,11 +2,10 @@ package org.kendar.tests.utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.github.bonigarcia.wdm.managers.ChromeDriverManager;
-import io.github.bonigarcia.wdm.managers.ChromiumDriverManager;
 import io.github.bonigarcia.wdm.versions.VersionDetector;
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
@@ -18,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SeleniumIntegration {
@@ -26,29 +26,9 @@ public class SeleniumIntegration {
     private final int proxyPort;
     private ChromeDriver driver;
     private JavascriptExecutor js;
-    private Map<String,String> windowHandles = new HashMap<>();
+    private final Map<String, String> windowHandles = new HashMap<>();
     private String currentTab;
-
-    public boolean navigateTo(String url) {
-        return this.navigateTo(url,true);
-    }
-
-    public boolean navigateTo(String url,boolean snapshot) {
-        var driver = (WebDriver) Utils.getCache("driver");
-        var current = driver.getCurrentUrl();
-        if (current.equalsIgnoreCase(url)) {
-            Sleeper.sleep(1000);
-            if(!getCurrentTab().equals("settings")) {
-                if(snapshot)takeSnapShot();
-            }
-            return true;
-        }
-        driver.get(url);
-        if(!getCurrentTab().equals("settings")) {
-            if(snapshot)takeSnapShot();
-        }
-        return false;
-    }
+    private int counter = 0;
 
     public SeleniumIntegration(Path rootPath, String proxyHost, int proxyPort) {
         this.rootPath = rootPath;
@@ -56,42 +36,60 @@ public class SeleniumIntegration {
         this.proxyPort = proxyPort;
     }
 
+    public boolean navigateTo(String url) {
+        return this.navigateTo(url, true);
+    }
+
+    public boolean navigateTo(String url, boolean snapshot) {
+        var driver = (WebDriver) Utils.getCache("driver");
+        var current = driver.getCurrentUrl();
+        if (current.equalsIgnoreCase(url)) {
+            Sleeper.sleep(1000);
+            if (!getCurrentTab().equals("settings")) {
+                if (snapshot) takeSnapShot();
+            }
+            return true;
+        }
+        driver.get(url);
+        if (!getCurrentTab().equals("settings")) {
+            if (snapshot) takeSnapShot();
+        }
+        return false;
+    }
+
     private void setupSize(ChromeDriver driver) {
         driver.manage().window().setSize(new Dimension(1366, 900));
     }
 
     private String retrieveBrowserVersion() {
-        try {
-            ChromeDriverManager.getInstance().setup();
-            var versionDetector = new VersionDetector(ChromeDriverManager.getInstance().config(), null);
-            var optionalVersion = versionDetector.getBrowserVersionFromTheShell("chrome");
-            if (optionalVersion.isEmpty()) {
-                optionalVersion = versionDetector.getBrowserVersionFromTheShell("chromium");
-            }
-            var version = Integer.parseInt(optionalVersion.get());
-            var available = ChromeDriverManager.getInstance().getDriverVersions().stream().
-                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
-            var matching = available.get(available.size() - 1);
-            if (available.stream().anyMatch(v -> v == (version))) {
-                matching = version;
-            }
-            return matching.toString();
-        }catch (Exception e) {
-            ChromiumDriverManager.getInstance().setup();
-            var versionDetector = new VersionDetector(ChromiumDriverManager.getInstance().config(), null);
-            var optionalVersion = versionDetector.getBrowserVersionFromTheShell("chrome");
-            if (optionalVersion.isEmpty()) {
-                optionalVersion = versionDetector.getBrowserVersionFromTheShell("chromium");
-            }
-            var version = Integer.parseInt(optionalVersion.get());
-            var available = ChromeDriverManager.getInstance().getDriverVersions().stream().
-                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
-            var matching = available.get(available.size() - 1);
-            if (available.stream().anyMatch(v -> v == (version))) {
-                matching = version;
-            }
-            return matching.toString();
+        Optional<Path> browserPath = WebDriverManager.chromedriver()
+                .getBrowserPath();
+        WebDriverManager webDriverManager = null;
+        if (browserPath.isPresent()) {
+            webDriverManager = ChromeDriverManager.getInstance();
         }
+        browserPath = WebDriverManager.chromiumdriver()
+                .getBrowserPath();
+        if (browserPath.isPresent()) {
+            webDriverManager = ChromeDriverManager.getInstance();
+        } else {
+            throw new RuntimeException("Chrome/chromium driver could not be setup");
+        }
+
+        var config = webDriverManager.config();
+        var versionDetector = new VersionDetector(config, null);
+        var optionalVersion = versionDetector.getBrowserVersionFromTheShell(
+                webDriverManager.getDriverManagerType().getBrowserNameLowerCase());
+
+        var version = Integer.parseInt(optionalVersion.get());
+        var available = webDriverManager.getDriverVersions().stream().
+                map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
+        var matching = available.get(available.size() - 1);
+        if (available.stream().anyMatch(v -> v == (version))) {
+            matching = version;
+        }
+        return matching.toString();
+
     }
 
     public void seleniumInitialized() throws Exception {
@@ -99,7 +97,7 @@ public class SeleniumIntegration {
         //var chromeExecutable = SeleniumBase.findchrome();
 
         Proxy proxy = new Proxy();
-        proxy.setHttpProxy(proxyHost+":"+proxyPort);
+        proxy.setHttpProxy(proxyHost + ":" + proxyPort);
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
         //DesiredCapabilities desired = new DesiredCapabilities();
         var options = new ChromeOptions();
@@ -114,7 +112,7 @@ public class SeleniumIntegration {
         options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
         options.addArguments("--no-sandbox"); // Bypass OS security model
         options.addArguments("--disk-cache-size=0");//Disable cache
-        if(System.getenv("HUMAN_DRIVEN") == null && System.getenv("RUN_VISIBLE")==null) {
+        if (System.getenv("HUMAN_DRIVEN") == null && System.getenv("RUN_VISIBLE") == null) {
             options.addArguments("--headless");//Disable cache
         }
 
@@ -130,34 +128,33 @@ public class SeleniumIntegration {
         //driver.manage().deleteAllCookies();
 
 
-        js = (JavascriptExecutor) driver;
+        js = driver;
         Utils.setCache("driver", driver);
         Utils.setCache("js", js);
         setupSize(driver);
-        windowHandles.put("main",driver.getWindowHandle());
-        currentTab="main";
+        windowHandles.put("main", driver.getWindowHandle());
+        currentTab = "main";
 
 
     }
 
     public void newTab(String id) {
         driver.switchTo().newWindow(WindowType.TAB);
-        windowHandles.put(id,driver.getWindowHandle());
-        currentTab=id;
+        windowHandles.put(id, driver.getWindowHandle());
+        currentTab = id;
     }
 
     public void switchToTab(String id) {
         driver.switchTo().window(windowHandles.get(id));
-        currentTab=id;
+        currentTab = id;
     }
 
     public void resettingDriver() throws Exception {
-        if(driver!=null)driver.quit();
+        if (driver != null) driver.quit();
         Utils.setCache("driver", null);
         Utils.setCache("js", null);
         seleniumInitialized();
     }
-
 
     public void quitSelenium() throws Exception {
         driver.quit();
@@ -167,12 +164,10 @@ public class SeleniumIntegration {
         takeMessageSnapshot("End of test");
     }
 
-    private int counter=0;
-
     public void takeSnapShot() {
 
         try {
-            if(driver.getCurrentUrl().startsWith("about:")) {
+            if (driver.getCurrentUrl().startsWith("about:")) {
                 return;
             }
             var dest = rootPath;
@@ -180,7 +175,7 @@ public class SeleniumIntegration {
                 rootPath.toFile().mkdirs();
             }
             counter++;
-            TakesScreenshot scrShot = ((TakesScreenshot) Utils.getCache("driver"));
+            TakesScreenshot scrShot = Utils.getCache("driver");
             File srcFile = scrShot.getScreenshotAs(OutputType.FILE);
             var destFilePath = Path.of(rootPath.toString(), "snap_" + String.format("%03d", counter) + ".png");
             File destFile = new File(destFilePath.toAbsolutePath().toString());
@@ -217,7 +212,7 @@ public class SeleniumIntegration {
             g2d.setFont(font);
             fm = g2d.getFontMetrics();
             g2d.setColor(Color.BLACK);
-            g2d.drawString(text, 0 + 5, 5 + fm.getAscent());
+            g2d.drawString(text, 5, 5 + fm.getAscent());
             g2d.dispose();
 
             ImageIO.write(img, "png", new File(destFilePath.toAbsolutePath().toString()));
