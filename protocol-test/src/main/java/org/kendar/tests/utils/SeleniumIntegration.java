@@ -5,6 +5,8 @@ import io.github.bonigarcia.wdm.managers.ChromeDriverManager;
 import io.github.bonigarcia.wdm.managers.ChromiumDriverManager;
 import io.github.bonigarcia.wdm.versions.VersionDetector;
 import org.apache.commons.io.FileUtils;
+import org.kendar.tests.dm.TpmChromeDriverManager;
+import org.kendar.tests.dm.TpmChromiumDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -120,39 +122,44 @@ public class SeleniumIntegration {
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
 
 
-        var options = new ChromeOptions();
+        ChromeOptions capabilities = null;
+        if(isChrome()) {
+            capabilities = (ChromeOptions)new TpmChromeDriverManager().retrieveCapabilities();
+        }else{
+            capabilities = (ChromeOptions)new TpmChromiumDriverManager().retrieveCapabilities();
+        }
         var version = retrieveBrowserVersion();
         if(version != null) {
-            options.setBrowserVersion(version);
+            capabilities.setBrowserVersion(version);
         }
 
-        options.setBinary(browserPath.toFile());
-        options.setProxy(proxy);
-        options.setAcceptInsecureCerts(true);
-        options.addArguments("--remote-allow-origins=*");
+        capabilities.setBinary(browserPath.toFile());
+        capabilities.setProxy(proxy);
+        capabilities.setAcceptInsecureCerts(true);
+        capabilities.addArguments("--remote-allow-origins=*");
          //options.addArguments("--disable-dev-shm-usage");
         //options.addArguments("disable-infobars"); // disabling infobars
         //options.addArguments("--disable-extensions"); // disabling extensions
-        options.addArguments("--disable-gpu"); // applicable to windows os only
-        options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
-        options.addArguments("--no-sandbox"); // Bypass OS security model
-        options.addArguments("--disk-cache-size=0");//Disable cache
+        capabilities.addArguments("--disable-gpu"); // applicable to windows os only
+        capabilities.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
+        capabilities.addArguments("--no-sandbox"); // Bypass OS security model
+        capabilities.addArguments("--disk-cache-size=0");//Disable cache
         if (System.getenv("HUMAN_DRIVEN") == null && System.getenv("RUN_VISIBLE") == null) {
-            options.addArguments("--headless");//Disable cache
+            capabilities.addArguments("--headless");//Disable cache
         }
 
 
         if(isChrome()) {
             driver = WebDriverManager
                     .chromedriver()
-                    .capabilities(options)
+                    .capabilities(capabilities)
                     .clearDriverCache()
                     .clearResolutionCache()
                     .create();
         }else{
             driver = WebDriverManager
                     .chromiumdriver()
-                    .capabilities(options)
+                    .capabilities(capabilities)
                     .clearDriverCache()
                     .clearResolutionCache()
                     .create();
