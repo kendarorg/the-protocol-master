@@ -7,8 +7,8 @@ import io.github.bonigarcia.wdm.versions.VersionDetector;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.chromium.ChromiumOptions;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -25,7 +25,7 @@ public class SeleniumIntegration {
     private final Path rootPath;
     private final String proxyHost;
     private final int proxyPort;
-    private ChromeDriver driver;
+    private WebDriver driver;
     private JavascriptExecutor js;
     private final Map<String, String> windowHandles = new HashMap<>();
     private String currentTab;
@@ -58,8 +58,17 @@ public class SeleniumIntegration {
         return false;
     }
 
-    private void setupSize(ChromeDriver driver) {
+    private void setupSize(WebDriver driver) {
         driver.manage().window().setSize(new Dimension(1366, 900));
+    }
+    private boolean chromeNotChromium = false;
+
+    public boolean isChrome(){
+        return chromeNotChromium;
+    }
+
+    public boolean isChromium(){
+        return  !chromeNotChromium;
     }
 
     private String retrieveBrowserVersion() {
@@ -68,11 +77,13 @@ public class SeleniumIntegration {
         WebDriverManager webDriverManager = null;
         if (browserPath.isPresent()) {
             webDriverManager = ChromeDriverManager.getInstance();
+            chromeNotChromium=true;
         }else {
             browserPath = WebDriverManager.chromiumdriver()
                     .getBrowserPath();
             if (browserPath.isPresent()) {
                 webDriverManager = ChromiumDriverManager.getInstance();
+                chromeNotChromium=false;
             } else {
                 throw new RuntimeException("Chrome/chromium driver could not be setup");
             }
@@ -102,7 +113,7 @@ public class SeleniumIntegration {
         proxy.setHttpProxy(proxyHost + ":" + proxyPort);
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
         //DesiredCapabilities desired = new DesiredCapabilities();
-        var options = new ChromeOptions();
+        ChromiumOptions options = new ChromeOptions();
         options.setBrowserVersion(retrieveBrowserVersion());
         options.setProxy(proxy);
         options.setAcceptInsecureCerts(true);
@@ -119,18 +130,27 @@ public class SeleniumIntegration {
         }
 
 
-        driver = (ChromeDriver) WebDriverManager
-                .chromedriver()
-                .capabilities(options)
-                .clearDriverCache()
-                .clearResolutionCache()
-                .create();
+        if(isChrome()) {
+            driver = WebDriverManager
+                    .chromedriver()
+                    .capabilities(options)
+                    .clearDriverCache()
+                    .clearResolutionCache()
+                    .create();
+        }else{
+            driver = WebDriverManager
+                    .chromiumdriver()
+                    .capabilities(options)
+                    .clearDriverCache()
+                    .clearResolutionCache()
+                    .create();
+        }
 
 
         //driver.manage().deleteAllCookies();
 
 
-        js = driver;
+        js = (JavascriptExecutor) driver;
         Utils.setCache("driver", driver);
         Utils.setCache("js", js);
         setupSize(driver);
