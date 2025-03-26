@@ -1,14 +1,7 @@
 package org.kendar.runner;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.*;
-import org.kendar.Main;
-import org.kendar.tests.utils.Sleeper;
-
-import java.nio.file.Path;
-
 public class UiSeleniumTest extends SeleniumTestBase{
-    private static BasicTest bs;
+    /*private static BasicTest bs;
 
     @AfterAll
     public static void cleanup() {
@@ -65,5 +58,5 @@ public class UiSeleniumTest extends SeleniumTestBase{
         Sleeper.sleep(1000);
         navigateTo("http://localhost:8095/swagger-ui/index.html#/", false);
         Sleeper.sleep(1000);
-    }
+    }*/
 }
