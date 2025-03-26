@@ -8,7 +8,6 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.chromium.ChromiumOptions;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -113,7 +112,7 @@ public class SeleniumIntegration {
         proxy.setHttpProxy(proxyHost + ":" + proxyPort);
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
         //DesiredCapabilities desired = new DesiredCapabilities();
-        ChromiumOptions options = new ChromeOptions();
+        var options = new ChromeOptions();
         options.setBrowserVersion(retrieveBrowserVersion());
         options.setProxy(proxy);
         options.setAcceptInsecureCerts(true);
