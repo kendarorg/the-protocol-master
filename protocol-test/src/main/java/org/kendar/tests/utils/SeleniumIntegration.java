@@ -93,14 +93,18 @@ public class SeleniumIntegration {
         var optionalVersion = versionDetector.getBrowserVersionFromTheShell(
                 webDriverManager.getDriverManagerType().getBrowserNameLowerCase());
 
-        var version = Integer.parseInt(optionalVersion.get());
-        var available = webDriverManager.getDriverVersions().stream().
-                map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
-        var matching = available.get(available.size() - 1);
-        if (available.stream().anyMatch(v -> v == (version))) {
-            matching = version;
+        if(optionalVersion.isPresent()) {
+            Integer version = Integer.parseInt(optionalVersion.get());
+            var available = webDriverManager.getDriverVersions().stream().
+                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
+            var matching = available.get(available.size() - 1);
+            if (available.stream().anyMatch(v -> v == (version))) {
+                matching = version;
+            }
+            return matching.toString();
+        }else{
+            return null;
         }
-        return matching.toString();
 
     }
 
@@ -113,7 +117,11 @@ public class SeleniumIntegration {
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
         //DesiredCapabilities desired = new DesiredCapabilities();
         var options = new ChromeOptions();
-        options.setBrowserVersion(retrieveBrowserVersion());
+        var version = retrieveBrowserVersion();
+        if(version != null) {
+            options.setBrowserVersion(version);
+        }
+
         options.setProxy(proxy);
         options.setAcceptInsecureCerts(true);
         options.addArguments("--remote-allow-origins=*");
