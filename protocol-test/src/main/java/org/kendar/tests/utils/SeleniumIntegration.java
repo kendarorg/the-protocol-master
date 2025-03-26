@@ -2,6 +2,7 @@ package org.kendar.tests.utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.github.bonigarcia.wdm.managers.ChromeDriverManager;
+import io.github.bonigarcia.wdm.managers.ChromiumDriverManager;
 import io.github.bonigarcia.wdm.versions.VersionDetector;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Dimension;
@@ -67,13 +68,14 @@ public class SeleniumIntegration {
         WebDriverManager webDriverManager = null;
         if (browserPath.isPresent()) {
             webDriverManager = ChromeDriverManager.getInstance();
-        }
-        browserPath = WebDriverManager.chromiumdriver()
-                .getBrowserPath();
-        if (browserPath.isPresent()) {
-            webDriverManager = ChromeDriverManager.getInstance();
-        } else {
-            throw new RuntimeException("Chrome/chromium driver could not be setup");
+        }else {
+            browserPath = WebDriverManager.chromiumdriver()
+                    .getBrowserPath();
+            if (browserPath.isPresent()) {
+                webDriverManager = ChromiumDriverManager.getInstance();
+            } else {
+                throw new RuntimeException("Chrome/chromium driver could not be setup");
+            }
         }
 
         var config = webDriverManager.config();
