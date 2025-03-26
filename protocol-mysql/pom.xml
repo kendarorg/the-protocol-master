@@ -11,11 +11,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons.lang3.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>${pl4j.version}</version>
@@ -52,6 +47,12 @@
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-test</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.17.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
