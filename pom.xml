@@ -13,15 +13,15 @@
         <module>protocol-postgres</module>
         <module>protocol-mongo</module>
         <module>protocol-mysql</module>
-        <module>protocol-runner</module>
         <module>protocol-amqp-091</module>
         <module>protocol-redis</module>
         <module>protocol-mqtt</module>
-        <module>jacoco</module>
         <module>protocol-http</module>
         <module>protocol-common-jdbc</module>
         <module>sample-plugins</module>
         <module>protocol-dns-plugin</module>
+        <module>protocol-runner</module>
+        <module>jacoco</module>
     </modules>
 
     <properties>

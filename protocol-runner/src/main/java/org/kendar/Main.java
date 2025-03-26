@@ -365,7 +365,7 @@ public class Main {
                     log.info("[SERVER][IN] Listening on *.:{} TPM Apis", ini.getApiPort());
                 }
             } catch (Exception e) {
-                log.error("Unable to start API serer", e);
+                log.error("Unable to start API server", e);
             }
             apiLatch.countDown();
         }).start();
