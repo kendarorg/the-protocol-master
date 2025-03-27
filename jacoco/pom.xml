@@ -193,6 +193,7 @@
                                         </classfiles>
                                     </structure>
                                     <html destdir="${basedir}/target/coverage-report/html"/>
+                                    <xml destfile="${basedir}/target/coverage-report/jacoco.xml"/>
                                 </report>
                             </target>
                         </configuration>
