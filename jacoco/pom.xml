@@ -99,7 +99,7 @@
                         <configuration>
                             <target name="report">
                                 <echo message="Generating JaCoCo Reports"/>
-                                <taskdef name="report"
+                                <taskdef  name="report"
                                          classname="org.jacoco.ant.ReportTask">
                                     <classpath
                                             path="**/*.jar"/>
@@ -192,7 +192,7 @@
                                             </fileset>
                                         </classfiles>
                                     </structure>
-                                    <html destdir="${basedir}/target/coverage-report/html"/>
+                                    <html destdir="${basedir}/target/coverage-report"/>
                                     <xml destfile="${basedir}/target/coverage-report/jacoco.xml"/>
                                 </report>
                             </target>
