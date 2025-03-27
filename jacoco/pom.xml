@@ -97,14 +97,12 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <target name="report">
+                            <target name="report"  >
                                 <echo message="Generating JaCoCo Reports"/>
-                                <taskdef  name="report"
-                                         classname="org.jacoco.ant.ReportTask">
-                                    <classpath
-                                            path="**/*.jar"/>
-                                </taskdef>
                                 <mkdir dir="${basedir}/target/coverage-report"/>
+                                <taskdef name="report"
+                                         classname="org.jacoco.ant.ReportTask">
+                                </taskdef>
                                 <report>
                                     <executiondata>
                                         <fileset dir="${basedir}/../protocol-amqp-091/target">
@@ -192,7 +190,9 @@
                                             </fileset>
                                         </classfiles>
                                     </structure>
+                                    <echo message="Generating Html"/>
                                     <html destdir="${basedir}/target/coverage-report"/>
+                                    <echo message="Generating Xml"/>
                                     <xml destfile="${basedir}/target/coverage-report/jacoco.xml"/>
                                 </report>
                             </target>
@@ -203,7 +203,7 @@
                     <dependency>
                         <groupId>org.jacoco</groupId>
                         <artifactId>org.jacoco.ant</artifactId>
-                        <version>0.8.2</version>
+                        <version>0.8.12</version>
                     </dependency>
                 </dependencies>
             </plugin>
