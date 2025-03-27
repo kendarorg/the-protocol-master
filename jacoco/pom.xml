@@ -192,7 +192,6 @@
                                     </structure>
                                     <echo message="Generating Html"/>
                                     <html destdir="${basedir}/target/coverage-report"/>
-                                    <echo message="Generating Xml"/>
                                     <xml destfile="${basedir}/target/coverage-report/jacoco.xml"/>
                                 </report>
                             </target>
