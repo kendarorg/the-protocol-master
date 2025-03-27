@@ -99,7 +99,7 @@ public class LogWriter {
                         }
                     }
                 }
-                Sleeper.sleep(1000);
+                TestSleeper.sleep(1000);
             } catch (Exception ex) {
 
             }

@@ -127,7 +127,7 @@ public class SeleniumTestBase extends ApiTestBase {
     }
 
     public static void waitPortAvailable(String service, int port) {
-        Sleeper.sleep(defaultTimeout, () -> {
+        TestSleeper.sleep(defaultTimeout, () -> {
             try {
                 getEnvironment().getServiceHost(service, port);
                 getEnvironment().getServicePort(service, port);
@@ -289,7 +289,7 @@ public class SeleniumTestBase extends ApiTestBase {
     }
 
     public boolean check(int timoutms, BooleanSupplier supplier) {
-        return Sleeper.sleepNoException(timoutms, supplier);
+        return TestSleeper.sleepNoException(timoutms, supplier);
     }
 
     public String getPageSource() {
@@ -314,7 +314,7 @@ public class SeleniumTestBase extends ApiTestBase {
 
     protected WebElement findElementByXPath(int timeoutms,WebElement from, String id) {
         var element = new ObjectContainer<WebElement>();
-        Sleeper.sleep(timeoutms, () -> {
+        TestSleeper.sleep(timeoutms, () -> {
             try {
                 element.setObject(from.findElement(By.xpath(id)));
                 return element.getObject() != null;
@@ -327,7 +327,7 @@ public class SeleniumTestBase extends ApiTestBase {
 
     protected WebElement findElementByXPath(int timeoutms, String id) {
         var element = new ObjectContainer<WebElement>();
-        Sleeper.sleep(timeoutms, () -> {
+        TestSleeper.sleep(timeoutms, () -> {
             try {
                 element.setObject(getDriver().findElement(By.xpath(id)));
                 return element.getObject() != null;
@@ -345,7 +345,7 @@ public class SeleniumTestBase extends ApiTestBase {
 
     protected WebElement findElementById(int timeoutms, String id) {
         var element = new ObjectContainer<WebElement>();
-        Sleeper.sleep(timeoutms, () -> {
+        TestSleeper.sleep(timeoutms, () -> {
             try {
                 element.setObject(getDriver().findElement(By.id(id)));
                 return element.getObject() != null;
@@ -360,7 +360,7 @@ public class SeleniumTestBase extends ApiTestBase {
         var element = findElementById(timeoutms, id);
         var done = new ObjectContainer<>(false);
 
-        Sleeper.sleep(timeoutms, () -> {
+        TestSleeper.sleep(timeoutms, () -> {
             var we = element;
             try {
                 we.click();
@@ -407,7 +407,7 @@ public class SeleniumTestBase extends ApiTestBase {
 
     public void newTab(String id) {
         getSelenium().newTab(id);
-        Sleeper.sleep(200);
+        TestSleeper.sleep(200);
     }
 
 
@@ -417,14 +417,14 @@ public class SeleniumTestBase extends ApiTestBase {
 
     public void switchToTab(String id) {
         getSelenium().switchToTab(id);
-        Sleeper.sleep(200);
+        TestSleeper.sleep(200);
     }
 
     public void executeScript(String script) {
         try {
             check(() -> !getPageSource().contains(script));
             ((JavascriptExecutor) getDriver()).executeScript(script);
-            Sleeper.sleep(200);
+            TestSleeper.sleep(200);
             takeSnapshot();
         } catch (Exception e) {
             System.out.println("Script execution failed");
@@ -440,12 +440,12 @@ public class SeleniumTestBase extends ApiTestBase {
             while(alert != null) {
                 try{
                     alert = driver.switchTo().alert();
-                    Sleeper.sleep(200);
+                    TestSleeper.sleep(200);
                 }catch (Exception e) {
                     alert = null;
                 }
             }
-            Sleeper.sleep(1000);
+            TestSleeper.sleep(1000);
         }
     }
 

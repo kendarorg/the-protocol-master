@@ -7,7 +7,7 @@ import java.util.function.BooleanSupplier;
  * No thread lock wait
  */
 @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-public class Sleeper {
+public class TestSleeper {
     /**
      * Runs a synchronized based wait mechanism instead of sleep
      *

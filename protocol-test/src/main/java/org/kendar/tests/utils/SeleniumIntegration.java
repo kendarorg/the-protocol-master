@@ -47,7 +47,7 @@ public class SeleniumIntegration {
         var driver = (WebDriver) Utils.getCache("driver");
         var current = driver.getCurrentUrl();
         if (current.equalsIgnoreCase(url)) {
-            Sleeper.sleep(1000);
+            TestSleeper.sleep(1000);
             if (!getCurrentTab().equals("settings")) {
                 if (snapshot) takeSnapShot();
             }
@@ -201,7 +201,7 @@ public class SeleniumIntegration {
         driver.quit();
         Utils.setCache("driver", null);
         Utils.setCache("js", null);
-        Sleeper.sleep(1000);
+        TestSleeper.sleep(1000);
         takeMessageSnapshot("End of test");
     }
 

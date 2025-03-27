@@ -92,7 +92,7 @@ SELECT(
                 </div>
                 <br>
                 <div class="input-group">
-                    <button type="button" class="btn btn-success"
+                    <button type="button" id="buttonSearchReport" class="btn btn-success"
                             onclick="searchReport()">
                         Search
                     </button>
