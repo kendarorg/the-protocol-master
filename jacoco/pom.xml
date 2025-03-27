@@ -190,7 +190,6 @@
                                             </fileset>
                                         </classfiles>
                                     </structure>
-                                    <echo message="Generating Html"/>
                                     <html destdir="${basedir}/target/coverage-report"/>
                                     <xml destfile="${basedir}/target/coverage-report/jacoco.xml"/>
                                 </report>
