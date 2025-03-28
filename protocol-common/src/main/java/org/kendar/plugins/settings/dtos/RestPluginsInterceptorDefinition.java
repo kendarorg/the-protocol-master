@@ -11,6 +11,16 @@ public class RestPluginsInterceptorDefinition {
     private ProtocolPhase phase;
     private boolean blockOnException = false;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private String name;
+
     public String getOutMatcher() {
         return outMatcher;
     }

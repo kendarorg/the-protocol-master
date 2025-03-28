@@ -35,12 +35,88 @@
     <div id="collapseSettingsError" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="headingSettingsError">
         <div class="panel-body">
+            <br>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th>Name</th>
+                    <th>Target</th>
+                    <th>Phase</th>
+                    <th>Input Type</th>
+                    <th>Input Matcher</th>
+                    <th>Output Type</th>
+                    <th>Output Matcher</th>
+                    <th></th>
+                </tr>
+                @for(var element : pluginSettings.getInterceptors())
+                    <tr>
+                        <td>${element.getName()}</td>
+                        <td>${element.getDestinationAddress()}</td>
+                        <td>${element.getPhase()}</td>
+                        <td>${element.getInputType()}</td>
+                        <td>${element.getInMatcher()}</td>
+                        <td>${element.getOutputType()}</td>
+                        <td>${element.getOutMatcher()}</td>
+
+                        <td>
+                            <button class="btn btn-danger" type="button"
+                                    onclick="removeInterceptor('${element.getName()}')">Remove
+                            </button>
+                        </td>
+                    </tr>
+                @endfor
+            </table>
+            <br>
+            <div class="input-group ">
+                <label for="name" class="control-label">Name</label>
+                <div>
+                    <input id="fileName" type="text"  class="form-control"/>
+                </div>
+            </div>
+            <div class="input-group ">
+                <label for="destinationAddress" class="control-label">Destination Address</label>
+                <div>
+                    <input id="destinationAddress" type="text"  class="form-control"/>
+                </div>
+            </div>
+            <div class="input-group ">
+                <label for="phase" class="control-label">Name</label>
+                <div>
+                    <input id="phase" type="text"  class="form-control"/>
+                </div>
+            </div>
+            <div class="input-group ">
+                <label for="inputType" class="control-label">Input Type</label>
+                <div>
+                    <input id="inputType" type="text"  class="form-control"/>
+                </div>
+            </div>
+            <div class="input-group ">
+                <label for="inputMatcher" class="control-label">Input Matcher</label>
+                <div>
+                    <input id="inputMatcher" type="text"  class="form-control"/>
+                </div>
+            </div>
+            <div class="input-group ">
+                <label for="outputType" class="control-label">Output Type</label>
+                <div>
+                    <input id="outputType" type="text"  class="form-control"/>
+                </div>
+            </div>
+            <div class="input-group ">
+                <label for="outputMatcher" class="control-label">Output Matcher</label>
+                <div>
+                    <input id="outputMatcher" type="text"  class="form-control"/>
+                </div>
+            </div>
+            <br>
             <div class="input-group">
-                <button class="btn btn-danger" type="button"
-                        onclick="updateData()">Upate settings
+                <button type="button" class="btn  btn-success"
+                        onclick="addInterceptor()">
+                    Insert
                 </button>
             </div>
             <br>
         </div>
     </div>
-</div>>
+
+</div>
