@@ -8,7 +8,7 @@
     <option name="PROGRAM_PARAMETERS" value="-cfg settings.json" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.kendar.*" />
+        <option name="PATTERN" value="org.kendar.utils.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

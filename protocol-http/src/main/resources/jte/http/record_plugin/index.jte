@@ -15,10 +15,10 @@
     function updateData() {
         var data = retrieveValues({
             active:${data.isActive()},
-            target: pluginTargets
+            target: pluginTargets,
+            ignoreTrivialCalls:true,
+            removeEtags:true
         });
-        data.ignoreTrivialCalls = document.getElementById("ignoreTrivialCalls").checked;
-        data.removeEtags = document.getElementById("removeEtags").checked;
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
             location.reload();
@@ -41,7 +41,7 @@
         <div class="panel-body">
             <div class="input-group">
                 <button class="btn btn-danger" type="button"
-                        onclick="updateData()">Upate settings
+                        onclick="updateData()">Update settings
                 </button>
             </div>
             <br>

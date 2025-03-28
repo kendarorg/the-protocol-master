@@ -1,5 +1,6 @@
 package org.kendar.command;
 
+import org.kendar.VersionChecker;
 import org.kendar.cli.CommandOption;
 import org.kendar.cli.CommandOptions;
 import org.kendar.di.DiService;
@@ -11,6 +12,8 @@ import org.kendar.utils.FileResourcesUtils;
 import org.kendar.utils.JsonMapper;
 
 import java.util.regex.Pattern;
+
+import static java.lang.System.exit;
 
 @TpmService
 public class ProtocolsRunner {
@@ -28,10 +31,17 @@ public class ProtocolsRunner {
                 "=======================\n" +
                         "= The Protocol Master =\n" +
                         "=======================\n" +
+                        "Version: "+ VersionChecker.getTpmVersion()+"\n"+
+                        "-----------------------\n" +
                         "If an environment variable exists " + TPM_REPLACE + "=a=b,c=d,e=f\n" +
                         "every occurrence of %a% in config file is replaced with \n" +
                         "b value and so on");
         coptions.withOptions(
+                CommandOption.of("version", "Show the version")
+                        .withCallback((s) -> {
+                            System.out.println(VersionChecker.getTpmVersion());
+                            exit(0);
+                        }),
                 CommandOption.of("un", "Unattended run (default false)")
                         .withLong("unattended")
                         .withCallback((s) -> settings.get().setUnattended(true)),

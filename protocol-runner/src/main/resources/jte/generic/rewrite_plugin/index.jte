@@ -20,9 +20,9 @@
         var filename = retrieveValue("fileName");
         var data = retrieveValues({
             toFind: null,
-            toReplace: null
+            toReplace: null,
+            regex:false
         });
-        data.regex = document.getElementById("regex").checked;
         sendData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/rewrite/' + filename, 'POST',
             JSON.stringify(data), 'application/json', () => {
                 location.reload()
@@ -34,9 +34,9 @@
         var data = retrieveValues({
             toFind: null,
             toReplace: null,
-            testTarget: null
+            testTarget: null,
+            regex:false
         });
-        data.regex = document.getElementById("regex").checked;
         sendData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/test', 'POST',
             JSON.stringify(data), 'application/json', (code, result) => {
                 alert(result);

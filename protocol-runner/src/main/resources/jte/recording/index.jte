@@ -11,7 +11,7 @@
 
                 <td>
                     @if(label.equalsIgnoreCase("index"))
-                        <span onclick="openById(${data.convert(e.get(label))})">[${data.convert(e.get(label))}]</span>
+                        <span id="row_index_${data.convert(e.get(label))}" onclick="openById(${data.convert(e.get(label))})">[${data.convert(e.get(label))}]</span>
                     @else
                         ${data.convert(e.get(label))}
                     @endif

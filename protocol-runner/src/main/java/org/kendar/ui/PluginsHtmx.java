@@ -54,7 +54,7 @@ public class PluginsHtmx implements FilteringClass {
         var model = new ProtocolStatusDto();
         var instances = (List<ProtocolInstance>) diService.
                 getNamedInstance("protocols", new ArrayList<ProtocolInstance>().getClass())
-                .stream().sorted(Comparator.comparing(ProtocolInstance::getProtocolInstanceId)).toList();
+                .stream().sorted(Comparator.comparing(ProtocolInstance::getInstanceId)).toList();
         for (var instance : instances) {
             if (instance == null) continue;
             var protocol = (NetworkProtoDescriptor) instance.getServer().getProtoDescriptor();
@@ -123,7 +123,7 @@ public class PluginsHtmx implements FilteringClass {
         var model = new SinglePluginDto();
         if (!instanceId.equalsIgnoreCase("global")) {
             var instances = (List<ProtocolInstance>) diService.getNamedInstance("protocols", new ArrayList<ProtocolInstance>().getClass());
-            var instance = instances.stream().filter(i -> i.getProtocolInstanceId().equalsIgnoreCase(instanceId)).findFirst().orElse(null);
+            var instance = instances.stream().filter(i -> i.getInstanceId().equalsIgnoreCase(instanceId)).findFirst().orElse(null);
             var plugin = instance.getPlugins().stream().filter(i -> i.getId().equalsIgnoreCase(pluginId)).findFirst().orElse(null);
             model.setId(plugin.getId());
             model.setInstanceId(instanceId);

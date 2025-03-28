@@ -7,6 +7,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.*;
+import org.kendar.utils.Sleeper;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -60,6 +61,7 @@ public class SimpleMongoTest extends MongoBasicTest {
         assertEquals("Ski Bloopers", doc.get("title").toString());
         assertNotNull(doc);
         assertNotNull(c);
+        Sleeper.sleep(500);
 
         var events = getEvents().stream().collect(Collectors.toList());
         assertEquals(3, events.size());

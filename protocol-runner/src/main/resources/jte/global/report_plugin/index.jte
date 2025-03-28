@@ -27,6 +27,29 @@
             })
         }
     }
+
+    function copyReport(){
+        var fieldsCount = +retrieveValue('fieldsCount');
+        var rowsCount = +retrieveValue('rowsCount');
+        var toSend = [];
+        var selected =0;
+        for(var i=0;i<rowsCount;i++) {
+            if (retrieveValue("row_" + i)) {
+                selected++;
+            }
+        }
+        for(var i=0;i<rowsCount;i++){
+            if(retrieveValue("row_"+i) || selected==0) {
+                var row = {};
+                for (var j = 0; j < fieldsCount; j++) {
+                    row[retrieveValue("label_" + j)] = retrieveValue("field_" + j + "_" + i);
+                }
+                toSend.push(row);
+            }
+        }
+
+        navigator.clipboard.writeText(JSON.stringify(toSend));
+    }
 </script>
 <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="headingReportData">
@@ -69,7 +92,7 @@ SELECT(
                 </div>
                 <br>
                 <div class="input-group">
-                    <button type="button" class="btn btn-success"
+                    <button type="button" id="buttonSearchReport" class="btn btn-success"
                             onclick="searchReport()">
                         Search
                     </button>
@@ -87,6 +110,11 @@ SELECT(
                     <button type="button" class="btn btn-success"
                             onclick="downloadReport('json')">
                         Download json
+                    </button>
+                    &nbsp;
+                    <button type="button" class="btn btn-success"
+                            onclick="copyReport()">
+                        Copy as json
                     </button>
                     &nbsp;
                     <button type="button" class="btn btn-danger"

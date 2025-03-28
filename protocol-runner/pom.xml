@@ -13,6 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <plugins.location>../target</plugins.location>
     </properties>
 
     <dependencies>
@@ -133,28 +134,6 @@
 
     <build>
         <plugins>
-
-            <!--            <plugin>-->
-            <!--                <groupId>gg.jte</groupId>-->
-            <!--                <artifactId>jte-maven-plugin</artifactId>-->
-            <!--                <version>${jte.version}</version>-->
-            <!--                <configuration>-->
-            <!--                    &lt;!&ndash; This is the directory where compiled templates are located. &ndash;&gt;-->
-            <!--                    <targetDirectory>${project.build.directory}/jte-classes</targetDirectory>-->
-            <!--                    &lt;!&ndash; This is the directory where your .jte files are located. &ndash;&gt;-->
-            <!--                    <sourceDirectory>${project.basedir}/src/main/resources/jte</sourceDirectory>-->
-            <!--                    <contentType>Html</contentType>-->
-            <!--                </configuration>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <phase>generate-sources</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>generate</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
-
             <!-- Set a compiler level -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -166,7 +145,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Assembly Plugin -->
+            <!-- Generate a runnable jar with all dependencies -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -194,6 +173,78 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.jar.version}</version>
+                <executions>
+                    <execution>
+                        <!--Store the jar with "neutral name" inside the global target folder
+                        with all dependencies-->
+                        <id>copy-jar-to-global-libs</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${plugins.location}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>protocol-runner.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!--Fill the fake sample data dir (global settings) with fake data-->
+                        <id>fill-fake-data</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${plugins.location}/data</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/test/resources/data</directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- To write the version of the jar directly inside it-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven.antrun.version}</version>
+                <executions>
+                    <execution>
+                        <id>setup-version</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo file="${project.build.sourceDirectory}/../resources/protocol_runner.version" append="false">
+                                    ${revision}
+                                </echo>
+                            </target>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

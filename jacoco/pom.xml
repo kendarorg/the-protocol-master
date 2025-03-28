@@ -97,14 +97,12 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <target name="report">
+                            <target name="report"  >
                                 <echo message="Generating JaCoCo Reports"/>
+                                <mkdir dir="${basedir}/target/coverage-report"/>
                                 <taskdef name="report"
                                          classname="org.jacoco.ant.ReportTask">
-                                    <classpath
-                                            path="**/*.jar"/>
                                 </taskdef>
-                                <mkdir dir="${basedir}/target/coverage-report"/>
                                 <report>
                                     <executiondata>
                                         <fileset dir="${basedir}/../protocol-amqp-091/target">
@@ -131,6 +129,9 @@
                                         <fileset dir="${basedir}/../protocol-redis/target">
                                             <include name="*.exec"/>
                                         </fileset>
+                                        <fileset dir="${basedir}/../protocol-dns-plugin/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
                                         <fileset dir="${basedir}/../protocol-runner/target">
                                             <include name="*.exec"/>
                                         </fileset>
@@ -140,33 +141,39 @@
                                     </executiondata>
                                     <structure name="Integration Tests Coverage Report">
                                         <sourcefiles encoding="UTF-8">
-                                            <dirset dir="${basedir}/../protocol-amqp-091">
-                                                <include name="**/src/main/java"/>
+                                            <dirset dir="${basedir}/../protocol-amqp-091/src/main/java">
+                                                <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-common">
-                                                <include name="**/src/main/java"/>
+                                            <dirset dir="${basedir}/../protocol-dns-plugin/src/main/java">
+                                                <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-mongo">
-                                                <include name="**/src/main/java"/>
+                                            <dirset dir="${basedir}/../protocol-common/src/main/java">
+                                                <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-mysql">
-                                                <include name="**/src/main/java"/>
+                                            <dirset dir="${basedir}/../protocol-mongo/src/main/java">
+                                                <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-postgres">
-                                                <include name="**/src/main/java"/>
+                                            <dirset dir="${basedir}/../protocol-mysql/src/main/java">
+                                                <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-runner">
-                                                <include name="**/src/main/java"/>
+                                            <dirset dir="${basedir}/../protocol-postgres/src/main/java">
+                                                <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-http">
-                                                <include name="**/src/main/java"/>
+                                            <dirset dir="${basedir}/../protocol-runner/src/main/java">
+                                                <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-common-jdbc">
-                                                <include name="**/src/main/java"/>
+                                            <dirset dir="${basedir}/../protocol-http/src/main/java">
+                                                <include name="**/*"/>
+                                            </dirset>
+                                            <dirset dir="${basedir}/../protocol-common-jdbc/src/main/java">
+                                                <include name="**/*"/>
                                             </dirset>
                                         </sourcefiles>
                                         <classfiles>
                                             <fileset dir="${basedir}/../protocol-amqp-091/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-dns-plugin/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-common/target/classes">
@@ -192,7 +199,8 @@
                                             </fileset>
                                         </classfiles>
                                     </structure>
-                                    <html destdir="${basedir}/target/coverage-report/html"/>
+                                    <html destdir="${basedir}/target/coverage-report"/>
+                                    <xml destfile="${basedir}/target/coverage-report/jacoco.xml"/>
                                 </report>
                             </target>
                         </configuration>
@@ -202,7 +210,7 @@
                     <dependency>
                         <groupId>org.jacoco</groupId>
                         <artifactId>org.jacoco.ant</artifactId>
-                        <version>0.8.2</version>
+                        <version>0.8.12</version>
                     </dependency>
                 </dependencies>
             </plugin>

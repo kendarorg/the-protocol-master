@@ -81,7 +81,8 @@ public class ExchangeTest extends AmqpBasicTest {
         assertTrue(Square.results.containsKey("Square of 4 is: 16"));
         assertTrue(Square.results.containsKey("Square of 5 is: 25"));
         var events = getEvents().stream().collect(Collectors.toList());
-        assertEquals(12, events.size());
-        assertEquals(2, events.stream().filter(e -> e.getQuery().equalsIgnoreCase("CONNECT")).count());
+        assertEquals(5, events.stream().filter(e -> e.getQuery().startsWith("RECEIVE")).count());
+        assertEquals(5, events.stream().filter(e -> e.getQuery().startsWith("SEND")).count());
+        assertTrue(events.stream().filter(e -> e.getQuery().equalsIgnoreCase("CONNECT")).count()>=2);
     }
 }

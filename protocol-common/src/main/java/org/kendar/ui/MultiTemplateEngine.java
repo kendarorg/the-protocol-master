@@ -9,25 +9,42 @@ import gg.jte.output.StringOutput;
 import org.kendar.apis.base.Response;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.utils.TPMPluginsClassLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Paths;
 import java.util.Map;
 
+/**
+ * Wraps the JTE template engine
+ */
 @TpmService
 public class MultiTemplateEngine {
 
+    private static final Logger log = LoggerFactory.getLogger(MultiTemplateEngine.class);
     private MultiCodeResolver resolver;
     private TemplateEngine templateEngine;
 
+    /**
+     * Constructor for testing
+     */
     public MultiTemplateEngine() {
 
     }
 
+    /**
+     * @param resolver              The code resolver
+     * @param tpmPluginsClassLoader The URLClassLoader
+     */
     @TpmConstructor
-    public MultiTemplateEngine(MultiCodeResolver resolver) {
+    public MultiTemplateEngine(MultiCodeResolver resolver, TPMPluginsClassLoader tpmPluginsClassLoader) {
         this.resolver = resolver;
-        this.templateEngine = TemplateEngine.create(this.resolver, ContentType.Html);
+        this.templateEngine = TemplateEngine.create(this.resolver,
+                Paths.get("jte-classes"),
+                ContentType.Html, tpmPluginsClassLoader);
     }
 
     private static void respondException(Response response, Exception e) {
@@ -52,7 +69,13 @@ public class MultiTemplateEngine {
         if (templateEngine == null) {
             return;
         }
-        templateEngine.render(name, param, output);
+
+        try {
+            templateEngine.render(name, param, output);
+        } catch (ClassCastException e) {
+            throw new ClassCastException(e.getMessage());
+        }
+
     }
 
     public void render(String name, Object model, Response response) throws TemplateException {
@@ -66,6 +89,7 @@ public class MultiTemplateEngine {
             response.setResponseText(new TextNode(output.toString()));
             response.setStatusCode(200);
         } catch (Exception e) {
+            log.error("Error rendering {}", name, e);
             respondException(response, e);
         }
     }

@@ -91,6 +91,14 @@ GROUPBY(tags.requestedDomain),
 ORDERBY(DESC(cnt))
 )`
 
+Or to use with the DNS protocol plugin
+
+`SELECT(
+    WHAT(name=tags.requestedDomain),
+GROUPBY(tags.requestedDomain),
+ORDERBY(DESC(cnt))
+)`
+
 Find all calls to specific host
 
 `SELECT(

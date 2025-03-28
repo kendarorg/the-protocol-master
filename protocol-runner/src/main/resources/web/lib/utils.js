@@ -6,6 +6,8 @@ function retrieveValue(id) {
     var el = document.getElementById(id);
     if (el.type === "number") {
         return +el.value;
+    }else if (el.type === "checkbox") {
+        return el.checked;
     }
     return el.value;
 }
@@ -14,6 +16,8 @@ function setValue(id, value) {
     var el = document.getElementById(id);
     if (el.type === "number") {
         el.value = +value;
+    } else if (el.type === "checkbox") {
+        el.checked = value === true || value==="true" || value>0;
     } else {
         el.value = value;
     }

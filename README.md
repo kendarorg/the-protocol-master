@@ -285,6 +285,7 @@ Http Protocol (http)
   rewrite             rewrite-plugin             Rewrite the requests sent to the server
   mock                mock-plugin                Mock certain service requests
   report              report-plugin              Send 'report' events to global report plugin
+    itp               ignoreTpm                  Do not send TPM calls reports, default true, so, ignore
   error               error-plugin               Inject specific errors
     msg               errorMessage               Error message
     pca               percentAction              Percent calls touched, default 50, meaning 50%
@@ -318,12 +319,12 @@ PostgreSQL protocol (postgres)
     max                                          Max milliseconds latency, default 0
     min                                          Min milliseconds latency, default 0
     pca               percentAction              Percent calls touched, default 50, meaning 50%
+  report              report-plugin              Send 'report' events to global report plugin
   replay              replay-plugin              Activate replaying calls
     rpc               respectCallDurations       Respect call durations, default false
     itc               ignoreTrivialCalls         Ignore Trivial Calls, default true
     bx                blockExternalCalls         Block external calls, default true
     rcs               resetConnectionsOnStartup  Reset all connections when starting, default false
-  report              report-plugin              Send 'report' events to global report plugin
   rewrite             rewrite-plugin             Rewrite the requests sent to the server
   network-error       network-error-plugin       Change random bytes in the response data
     pca               percentAction              Percent calls touched, default 50, meaning 50%

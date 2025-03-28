@@ -305,6 +305,7 @@ public class DiService {
             }
             return result;
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new DiException("Unable to instantiate " + clazz, e);
         }
     }

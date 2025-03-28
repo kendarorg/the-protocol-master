@@ -51,6 +51,15 @@
                 @endif
 
                 <!--
+                MAIN
+                -->
+                @if(currentPage.startsWith("protocols"))
+                    <li class="active"><a href="/protocols">Protocols</a></li>
+                @else
+                    <li><a href="/protocols">Protocols</a></li>
+                @endif
+
+                <!--
                 PLUGINS
                 -->
                 @if(currentPage.startsWith("plugins"))

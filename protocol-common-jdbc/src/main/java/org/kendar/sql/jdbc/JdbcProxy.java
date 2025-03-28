@@ -52,7 +52,7 @@ public abstract class JdbcProxy extends Proxy {
 
     public JdbcProxy(String driver, String connectionString, String forcedSchema, String login, String password) {
         super();
-        this.driver = driver;
+        this.driver = (driver!=null && !driver.isEmpty()) ? driver : getDefaultDriver();
         this.connectionString = connectionString;
         this.forcedSchema = forcedSchema;
         this.login = login;
@@ -404,7 +404,9 @@ public abstract class JdbcProxy extends Proxy {
     public void initialize() {
         if (replayer) return;
         try {
-            Class.forName(driver);
+            if(driver!=null && !driver.isEmpty()) {
+                Class.forName(driver);
+            }
         } catch (ClassNotFoundException e) {
             throw new ProxyException(e);
         }

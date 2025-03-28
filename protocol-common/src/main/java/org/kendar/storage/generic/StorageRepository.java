@@ -165,4 +165,5 @@ public abstract class StorageRepository implements Service {
 
     public abstract void clean();
 
+    public abstract boolean existsFile(String ...path);
 }

@@ -33,7 +33,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>${project.artifactId}-${revision}</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                     <archive>
@@ -73,8 +73,8 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven.jar.version}</version>
                 <executions>
+                    <!-- all dependencies loaded inside the Jar-->
                     <execution>
-                        <!-- package all dependencies in one-->
                         <id>copy-jar-dependencies-to-target</id>
                         <phase>package</phase>
                         <goals>
@@ -94,7 +94,9 @@
                     </execution>
 
                     <execution>
-                        <!-- copy on plugins -->
+
+                        <!--Store the jar with "neutral name" inside the global target folder
+                        with all dependencies-->
                         <id>copy-jar-to-global-libs</id>
                         <phase>install</phase>
                         <goals>
@@ -107,10 +109,32 @@
                                     <directory>${project.build.directory}</directory>
                                     <filtering>false</filtering>
                                     <includes>
-                                        <include>*.jar</include>
+                                        <include>sample-plugins.jar</include>
                                     </includes>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- To write the version of the jar directly inside it-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven.antrun.version}</version>
+                <executions>
+                    <execution>
+                        <id>setup-version</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo file="${project.build.sourceDirectory}/../resources/sample_plugins.version" append="false">
+                                    ${revision}
+                                </echo>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
