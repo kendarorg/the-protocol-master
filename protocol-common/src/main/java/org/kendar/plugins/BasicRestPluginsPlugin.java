@@ -17,16 +17,20 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.ExtraBeanUtils;
 import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBase<BasicRestPluginsPluginSettings> {
+    private static final Logger log = LoggerFactory.getLogger(BasicRestPluginsPlugin.class);
+    private final ConcurrentHashMap<ProtocolPhase, Map<String, List<RestPluginsInterceptor>>> interceptors = new ConcurrentHashMap<>();
+
     public BasicRestPluginsPlugin(JsonMapper mapper) {
         super(mapper);
     }
 
-    private ConcurrentHashMap<ProtocolPhase, Map<String,List<RestPluginsInterceptor>>> interceptors = new ConcurrentHashMap<>();
     @Override
     public Class<?> getSettingClass() {
         return BasicRestPluginsPluginSettings.class;
@@ -56,20 +60,19 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
     }
 
     private void reloadSettings() {
-        for(var item:getSettings().getInterceptors()){
-            if(!interceptors.containsKey(item.getPhase())){
-                interceptors.put(item.getPhase(),new HashMap<>());
+        for (var item : getSettings().getInterceptors()) {
+            if (!interceptors.containsKey(item.getPhase())) {
+                interceptors.put(item.getPhase(), new HashMap<>());
             }
             var interceptorForPhase = interceptors.get(item.getPhase());
-            var key = item.getInputType()+"."+item.getOutputType();
-            if(!interceptorForPhase.containsKey(key)){
-                interceptorForPhase.put(key,new ArrayList<>());
+            var key = item.getInputType() + "." + item.getOutputType();
+            if (!interceptorForPhase.containsKey(key)) {
+                interceptorForPhase.put(key, new ArrayList<>());
             }
             var interceptorForMessage = interceptorForPhase.get(key);
             interceptorForMessage.add(new RestPluginsInterceptor(item));
         }
     }
-
 
     @Override
     public String getId() {
@@ -78,30 +81,37 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
 
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         if (isActive()) {
-            if(!interceptors.containsKey(phase)){
+            if (!interceptors.containsKey(phase)) {
                 return false;
             }
             var possibleInterceptors = interceptors.get(phase);
-            var inMatch = in==null?"Object":in.getClass().getSimpleName();
-            var outMatch = in==null?"Object":out.getClass().getSimpleName();
-            var key = inMatch+"."+outMatch;
-            if(!possibleInterceptors.containsKey(key)){
+            var inMatch = in == null ? "Object" : in.getClass().getSimpleName();
+            var outMatch = in == null ? "Object" : out.getClass().getSimpleName();
+            var key = inMatch + "." + outMatch;
+            if (!possibleInterceptors.containsKey(key)) {
                 return false;
             }
             var inSerialized = mapper.serialize(in);
             var outSerialized = mapper.serialize(out);
-            for(var interceptor:possibleInterceptors.get(key)){
-                RestPluginsCallResult result = callInterceptor(interceptor,inSerialized,outSerialized);
-                if(result.isBlocking()){
-                    if(out!=null){
-                        var toReturn = mapper.deserialize(result.getMessage(),out.getClass());
-                        try {
-                            ExtraBeanUtils.copyProperties(out,toReturn);
-                        } catch (Exception e) {
-                            throw new PluginException("Unable to copy properties of "+out.getClass().getSimpleName(),e);
+
+            for (var interceptor : possibleInterceptors.get(key)) {
+                if (!matchMessage(interceptor, inSerialized, outSerialized)) {
+                    continue;
+                }
+                try {
+                    RestPluginsCallResult result = callInterceptor(interceptor, inSerialized, outSerialized);
+                    if (result.isBlocking()) {
+                        if (out != null) {
+                            var toReturn = mapper.deserialize(result.getMessage(), out.getClass());
+                            ExtraBeanUtils.copyProperties(out, toReturn);
                         }
+                        return true;
                     }
-                    return true;
+                } catch (Exception e) {
+                    log.error("Unable to execute interceptor", e);
+                    if (interceptor.isBlockOnException()) {
+                        throw new PluginException("Unable to copy properties of " + out.getClass().getSimpleName(), e);
+                    }
                 }
             }
         }
@@ -109,8 +119,8 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
     }
 
     private RestPluginsCallResult callInterceptor(RestPluginsInterceptor interceptor, String inSerialized, String outSerialized) {
-        try(var httpclient = HttpClients.createDefault()){
-            var restPluginCall = new RestPluginCall(interceptor,inSerialized,outSerialized);
+        try (var httpclient = HttpClients.createDefault()) {
+            var restPluginCall = new RestPluginCall(interceptor, inSerialized, outSerialized);
             var httpget = new HttpPost(interceptor.getTarget());
             var be = new ByteArrayEntity(mapper.serialize(restPluginCall).getBytes());
             httpget.setEntity(be);
@@ -124,8 +134,13 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
             }
             return mapper.deserialize(result, RestPluginsCallResult.class);
 
-        }catch (Exception e){
-            throw new PluginException("Unable to call interceptor "+interceptor.getTarget(),e);
+        } catch (Exception e) {
+            throw new PluginException("Unable to call interceptor " + interceptor.getTarget(), e);
         }
+    }
+
+
+    private boolean matchMessage(RestPluginsInterceptor interceptor, String inSerialized, String outSerialized) {
+        throw new RuntimeException("Not implemented yet");
     }
 }

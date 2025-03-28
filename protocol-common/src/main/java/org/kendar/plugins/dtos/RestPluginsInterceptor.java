@@ -7,6 +7,12 @@ public class RestPluginsInterceptor {
     private final ProtocolPhase phase;
     private final String inputType;
 
+    public boolean isBlockOnException() {
+        return blockOnException;
+    }
+
+    private final boolean blockOnException;
+
     public String getOutputType() {
         return outputType;
     }
@@ -32,5 +38,6 @@ public class RestPluginsInterceptor {
         this.phase = interceptorDefinition.getPhase();
         this.inputType = interceptorDefinition.getInputType();
         this.outputType = interceptorDefinition.getOutputType();
+        this.blockOnException = interceptorDefinition.isBlockOnException();
     }
 }

@@ -3,11 +3,29 @@ package org.kendar.plugins.settings.dtos;
 import org.kendar.plugins.base.ProtocolPhase;
 
 public class RestPluginsInterceptorDefinition {
-    private String messageMatcher;
+    private String inMatcher;
+    private String outMatcher;
     private String inputType;
     private String outputType;
     private String destinationAddress;
     private ProtocolPhase phase;
+    private boolean blockOnException = false;
+
+    public String getOutMatcher() {
+        return outMatcher;
+    }
+
+    public void setOutMatcher(String outMatcher) {
+        this.outMatcher = outMatcher;
+    }
+
+    public boolean isBlockOnException() {
+        return blockOnException;
+    }
+
+    public void setBlockOnException(boolean blockOnException) {
+        this.blockOnException = blockOnException;
+    }
 
     public ProtocolPhase getPhase() {
         return phase;
@@ -17,12 +35,12 @@ public class RestPluginsInterceptorDefinition {
         this.phase = phase;
     }
 
-    public String getMessageMatcher() {
-        return messageMatcher;
+    public String getInMatcher() {
+        return inMatcher;
     }
 
-    public void setMessageMatcher(String messageMatcher) {
-        this.messageMatcher = messageMatcher;
+    public void setInMatcher(String inMatcher) {
+        this.inMatcher = inMatcher;
     }
 
     public String getInputType() {
