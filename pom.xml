@@ -20,6 +20,7 @@
         <module>protocol-common-jdbc</module>
         <module>sample-plugins</module>
         <module>protocol-dns-plugin</module>
+        <module>rest-plugins-plugin</module>
         <module>protocol-runner</module>
         <module>jacoco</module>
     </modules>

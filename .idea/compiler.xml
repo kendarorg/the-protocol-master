@@ -6,6 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="rest-plugins-plugin" />
         <module name="protocol-common" />
         <module name="protocol-common-jdbc" />
         <module name="protocol-mongo" />
