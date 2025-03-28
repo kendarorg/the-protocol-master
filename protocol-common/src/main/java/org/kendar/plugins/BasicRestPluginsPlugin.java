@@ -95,7 +95,7 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
             var outSerialized = mapper.serialize(out);
 
             for (var interceptor : possibleInterceptors.get(key)) {
-                if (!matchMessage(interceptor, inSerialized, outSerialized)) {
+                if (!interceptor.matches(inSerialized, outSerialized)) {
                     continue;
                 }
                 try {
@@ -139,8 +139,4 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
         }
     }
 
-
-    private boolean matchMessage(RestPluginsInterceptor interceptor, String inSerialized, String outSerialized) {
-        throw new RuntimeException("Not implemented yet");
-    }
 }
