@@ -26,6 +26,7 @@
         }
       ],
       "plugins": {
+        "rest-plugins-plugin": {},
         "report-plugin": {
           "active": true
         },
@@ -44,6 +45,7 @@
       "timeout": 30,
       "connectionString": "tcp://192.168.56.2:26379",
       "plugins": {
+        "rest-plugins-plugin": {},
         "record-plugin": {
           "resetConnectionsOnStart": true
         },
@@ -71,6 +73,7 @@
       "timeout": 30,
       "connectionString": "jdbc:mysql://192.168.56.2:23306/db",
       "plugins": {
+        "rest-plugins-plugin": {},
         "network-error-plugin": {},
         "replay-plugin": {
         },
@@ -96,6 +99,7 @@
       "timeout": 30,
       "connectionString": "jdbc:mysql://localhost:3306",
       "plugins": {
+        "rest-plugins-plugin": {},
         "network-error-plugin": {},
         "replay-plugin": {
         },
@@ -121,6 +125,7 @@
       "timeout": 30,
       "connectionString": "tcp://localhost:1885",
       "plugins": {
+        "rest-plugins-plugin": {},
         "network-error-plugin": {},
         "publish-plugin": {
         },
@@ -152,6 +157,7 @@
         ]
       },
       "plugins": {
+        "rest-plugins-plugin": {},
         "latency-plugin": {
           "target": [
             "@(net-core-rest|localhost|127.0.0.1)\\/api/tasks.*"
@@ -211,6 +217,7 @@
       "timeout": 30,
       "connectionString": "tcp://192.168.56.2:25672",
       "plugins": {
+        "rest-plugins-plugin": {},
         "network-error-plugin": {},
         "publish-plugin": {
         },
@@ -235,6 +242,7 @@
       "timeout": 30,
       "connectionString": "tcp://192.168.56.2:26672",
       "plugins": {
+        "rest-plugins-plugin": {},
         "network-error-plugin": {},
         "publish-plugin": {
         },
