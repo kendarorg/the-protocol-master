@@ -1,6 +1,7 @@
 package org.kendar.plugins.dtos;
 
 import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.settings.dtos.RestPluginsInterceptor;
 
 public class RestPluginCall {
     private String inputType;
@@ -18,6 +19,22 @@ public class RestPluginCall {
         this.inputType = interceptor.getInputType();
         this.ouputType = interceptor.getOutputType();
         this.phase = interceptor.getPhase();
+    }
+
+    public String getInputType() {
+        return inputType;
+    }
+
+    public void setInputType(String inputType) {
+        this.inputType = inputType;
+    }
+
+    public String getOuputType() {
+        return ouputType;
+    }
+
+    public void setOuputType(String ouputType) {
+        this.ouputType = ouputType;
     }
 
     public ProtocolPhase getPhase() {

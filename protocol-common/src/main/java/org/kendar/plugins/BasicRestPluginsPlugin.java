@@ -9,8 +9,8 @@ import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.dtos.RestPluginCall;
 import org.kendar.plugins.dtos.RestPluginsCallResult;
-import org.kendar.plugins.dtos.RestPluginsInterceptor;
 import org.kendar.plugins.settings.BasicRestPluginsPluginSettings;
+import org.kendar.plugins.settings.dtos.RestPluginsInterceptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBase<BasicRestPluginsPluginSettings> {
     private static final Logger log = LoggerFactory.getLogger(BasicRestPluginsPlugin.class);
-    private final ConcurrentHashMap<ProtocolPhase, Map<String, List<RestPluginsInterceptor>>> interceptors = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<ProtocolPhase, Map<String, List<org.kendar.plugins.settings.dtos.RestPluginsInterceptor>>> interceptors = new ConcurrentHashMap<>();
 
     public BasicRestPluginsPlugin(JsonMapper mapper) {
         super(mapper);
@@ -70,7 +70,7 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
                 interceptorForPhase.put(key, new ArrayList<>());
             }
             var interceptorForMessage = interceptorForPhase.get(key);
-            interceptorForMessage.add(new RestPluginsInterceptor(item));
+            interceptorForMessage.add(item);
         }
     }
 
@@ -86,7 +86,7 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
             }
             var possibleInterceptors = interceptors.get(phase);
             var inMatch = in == null ? "Object" : in.getClass().getSimpleName();
-            var outMatch = in == null ? "Object" : out.getClass().getSimpleName();
+            var outMatch = out == null ? "Object" : out.getClass().getSimpleName();
             var key = inMatch + "." + outMatch;
             if (!possibleInterceptors.containsKey(key)) {
                 return false;
@@ -100,17 +100,28 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
                 }
                 try {
                     RestPluginsCallResult result = callInterceptor(interceptor, inSerialized, outSerialized);
-                    if (result.isBlocking()) {
-                        if (out != null) {
-                            var toReturn = mapper.deserialize(result.getMessage(), out.getClass());
-                            ExtraBeanUtils.copyProperties(out, toReturn);
+                    if(result.isWithError()) {
+                        if(result.getError() != null) {
+                            throw new PluginException(result.getError());
+                        }else{
+                            throw new PluginException("Error calling interceptor " + interceptor.getDestinationAddress());
                         }
-                        return true;
+
                     }
+                    if (out != null) {
+                        var toReturn = mapper.deserialize(result.getMessage(), out.getClass());
+                        try {
+                            ExtraBeanUtils.copyProperties(out, toReturn);
+                        } catch (Exception e) {
+                            log.error("Unable to copy properties", e);
+                            throw new PluginException("Unable to copy properties of " + out.getClass().getSimpleName(), e);
+                        }
+                    }
+                    return result.isBlocking();
                 } catch (Exception e) {
                     log.error("Unable to execute interceptor", e);
                     if (interceptor.isBlockOnException()) {
-                        throw new PluginException("Unable to copy properties of " + out.getClass().getSimpleName(), e);
+                        throw new PluginException("Unable to execute interceptor", e);
                     }
                 }
             }
@@ -121,7 +132,7 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
     private RestPluginsCallResult callInterceptor(RestPluginsInterceptor interceptor, String inSerialized, String outSerialized) {
         try (var httpclient = HttpClients.createDefault()) {
             var restPluginCall = new RestPluginCall(interceptor, inSerialized, outSerialized);
-            var httpget = new HttpPost(interceptor.getTarget());
+            var httpget = new HttpPost(interceptor.getDestinationAddress());
             var be = new ByteArrayEntity(mapper.serialize(restPluginCall).getBytes());
             httpget.setEntity(be);
             httpget.setHeader("Content-Type", "application/json");
@@ -132,10 +143,14 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
             while (sc.hasNext()) {
                 result += (sc.nextLine());
             }
-            return mapper.deserialize(result, RestPluginsCallResult.class);
+            var toReturn = mapper.deserialize(result, RestPluginsCallResult.class);
+            if(httpresponse.getStatusLine().getStatusCode() != 200) {
+                toReturn.setWithError(true);
+            }
+            return toReturn;
 
         } catch (Exception e) {
-            throw new PluginException("Unable to call interceptor " + interceptor.getTarget(), e);
+            throw new PluginException("Unable to call interceptor " + interceptor.getDestinationAddress(), e);
         }
     }
 

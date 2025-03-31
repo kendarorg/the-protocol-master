@@ -14,6 +14,13 @@
     function updateData() {
         var data = retrieveValues({
             active:${pluginSettings.isActive()},
+            name:null,
+            target:null,
+            inputType:null,
+            phase:null,
+            inputMatcher:null,
+            outputType:null,
+            outputMatcher:null
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
@@ -80,9 +87,15 @@
             </div>
             <div class="input-group ">
                 <label for="phase" class="control-label">Name</label>
-                <div>
-                    <input id="phase" type="text"  class="form-control"/>
-                </div>
+                <select id="contentType" class="form-control">
+                    <option value="NONE" selected>NONE</option>
+                    <option value="CONNECT">CONNECT</option>
+                    <option value="PRE_CALL">PRE_CALL</option>
+                    <option value="POST_CALL">POST_CALL</option>
+                    <option value="FINALIZE">FINALIZE</option>
+                    <option value="PRE_SOCKET_WRITE">PRE_SOCKET_WRITE</option>
+                    <option value="ASYNC_RESPONSE">ASYNC_RESPONSE</option>
+                </select>
             </div>
             <div class="input-group ">
                 <label for="inputType" class="control-label">Input Type</label>

@@ -1,19 +1,19 @@
 package org.kendar.plugins.settings;
 
-import org.kendar.plugins.settings.dtos.RestPluginsInterceptorDefinition;
+import org.kendar.plugins.settings.dtos.RestPluginsInterceptor;
 import org.kendar.settings.PluginSettings;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BasicRestPluginsPluginSettings extends PluginSettings {
-    private List<RestPluginsInterceptorDefinition> interceptors = new ArrayList<>();
+    private List<RestPluginsInterceptor> interceptors = new ArrayList<>();
 
-    public List<RestPluginsInterceptorDefinition> getInterceptors() {
+    public List<RestPluginsInterceptor> getInterceptors() {
         return interceptors;
     }
 
-    public void setInterceptors(List<RestPluginsInterceptorDefinition> interceptors) {
+    public void setInterceptors(List<RestPluginsInterceptor> interceptors) {
         this.interceptors = interceptors;
     }
 }

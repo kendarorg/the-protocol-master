@@ -2,14 +2,19 @@ package org.kendar.plugins.settings.dtos;
 
 import org.kendar.plugins.base.ProtocolPhase;
 
-public class RestPluginsInterceptorDefinition {
+import java.util.regex.Pattern;
+
+public class RestPluginsInterceptor {
     private String inMatcher;
     private String outMatcher;
-    private String inputType;
-    private String outputType;
+    private String inputType = "Object";
+    private String outputType = "Object";
     private String destinationAddress;
     private ProtocolPhase phase;
     private boolean blockOnException = false;
+    private Pattern outPattern = null;
+    private Pattern inPattern = null;
+    private boolean initialized = false;
 
     public String getName() {
         return name;
@@ -23,6 +28,39 @@ public class RestPluginsInterceptorDefinition {
 
     public String getOutMatcher() {
         return outMatcher;
+    }
+
+    private void initialize() {
+        if(initialized){
+            return;
+        }
+        if(getInMatcher()!=null){
+            if(getInMatcher().startsWith("@")){
+                this.inPattern = Pattern.compile(getInMatcher().substring(1));
+            }else{
+                this.inMatcher=getInMatcher();
+            }
+        }
+        if(getOutMatcher()!=null){
+            if(getOutMatcher().startsWith("@")){
+                this.outPattern = Pattern.compile(getInMatcher().substring(1));
+            }else{
+                this.outMatcher=getOutMatcher();
+            }
+        }
+        initialized = true;
+    }
+    public boolean matches(String in,String out) {
+        initialize();
+        if(inPattern!=null && !inPattern.matcher(in).matches())return false;
+        if(outPattern!=null && !outPattern.matcher(out).matches())return false;
+        if(inMatcher!=null && !inMatcher.isEmpty()){
+            if(in==null || !in.contains(inMatcher))return false;
+        }
+        if(outMatcher!=null && !outMatcher.isEmpty()){
+            if(out==null || !out.contains(outMatcher))return false;
+        }
+        return true;
     }
 
     public void setOutMatcher(String outMatcher) {
