@@ -23,6 +23,7 @@ import org.kendar.events.ReportDataEvent;
 import org.kendar.http.plugins.*;
 import org.kendar.http.plugins.settings.*;
 import org.kendar.plugins.settings.BasicMockPluginSettings;
+import org.kendar.plugins.settings.BasicRestPluginsPluginSettings;
 import org.kendar.plugins.settings.RewritePluginSettings;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -176,6 +177,9 @@ public class BasicTest {
         reportSettings.setActive(true);
         reportSettings.setIgnoreTpm(false);
         httpProtocolSettings.getPlugins().put("report-plugin", reportSettings);
+
+        var restPluginsPlugin = new BasicRestPluginsPluginSettings();
+        httpProtocolSettings.getPlugins().put("rest-plugins-plugin", restPluginsPlugin);
 
         var latencySettings = new HttpLatencyPluginSettings();
         httpProtocolSettings.getPlugins().put("latency-plugin", latencySettings);
