@@ -38,11 +38,11 @@ public class OptionalTemplate {
                     mte.render(genericTemplate, data, output);
                     return output.toString();
                 }
-                log.info("Not found template for {}", template);
+                log.debug("Not found template for {}", template);
                 return "";
             }
         } catch (TemplateNotFoundException e) {
-            log.info("Not found template for {} or {}", template, genericTemplate);
+            log.debug("Not found template for {} or {}", template, genericTemplate);
             return "";
         } catch (Exception e) {
             log.error("Error while generating template for {}", usedTemplate, e);
