@@ -108,7 +108,7 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
                         }
 
                     }
-                    if (out != null) {
+                    if (out != null && result.getMessage()!=null && !result.getMessage().isEmpty()) {
                         var toReturn = mapper.deserialize(result.getMessage(), out.getClass());
                         try {
                             ExtraBeanUtils.copyProperties(out, toReturn);

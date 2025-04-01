@@ -1,12 +1,19 @@
 package org.kendar.plugins.settings.dtos;
 
 import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.utils.JsonMapper;
+import org.kendar.utils.parser.SimpleParser;
+import org.kendar.utils.parser.Token;
 
 import java.util.regex.Pattern;
 
 public class RestPluginsInterceptor {
+    private static final SimpleParser parser = new SimpleParser();
+    private static final JsonMapper mapper = new JsonMapper();
     private String inMatcher;
     private String outMatcher;
+    private Token inToken;
+    private Token outToken;
     private String inputType = "Object";
     private String outputType = "Object";
     private String destinationAddress;
@@ -15,6 +22,8 @@ public class RestPluginsInterceptor {
     private Pattern outPattern = null;
     private Pattern inPattern = null;
     private boolean initialized = false;
+    private boolean specialInMatch = false;
+    private boolean specialOutMatch = false;
 
     public String getName() {
         return name;
@@ -36,14 +45,22 @@ public class RestPluginsInterceptor {
         }
         if(getInMatcher()!=null){
             if(getInMatcher().startsWith("@")){
+                specialInMatch=true;
                 this.inPattern = Pattern.compile(getInMatcher().substring(1));
+            }else if(getInMatcher().startsWith("!")){
+                specialInMatch=true;
+                this.inToken = parser.parse(getInMatcher().substring(1));
             }else{
                 this.inMatcher=getInMatcher();
             }
         }
         if(getOutMatcher()!=null){
             if(getOutMatcher().startsWith("@")){
-                this.outPattern = Pattern.compile(getInMatcher().substring(1));
+                specialOutMatch=true;
+                this.outPattern = Pattern.compile(getOutMatcher().substring(1));
+            }else if(getOutMatcher().startsWith("!")){
+                specialOutMatch=true;
+                this.outToken = parser.parse(getOutMatcher().substring(1));
             }else{
                 this.outMatcher=getOutMatcher();
             }
@@ -54,10 +71,17 @@ public class RestPluginsInterceptor {
         initialize();
         if(inPattern!=null && !inPattern.matcher(in).matches())return false;
         if(outPattern!=null && !outPattern.matcher(out).matches())return false;
-        if(inMatcher!=null && !inMatcher.isEmpty()){
+        if(inToken!=null){
+            if(in==null || !(boolean)parser.evaluate(inToken,mapper.toJsonNode(in)))return false;
+        }
+        if(outToken!=null){
+            if(out==null || !(boolean)parser.evaluate(outToken,mapper.toJsonNode(out)))return false;
+        }
+        if(inMatcher!=null && !inMatcher.isEmpty() && !specialInMatch){
             if(in==null || !in.contains(inMatcher))return false;
         }
-        if(outMatcher!=null && !outMatcher.isEmpty()){
+
+        if(outMatcher!=null && !outMatcher.isEmpty() && !specialOutMatch){
             if(out==null || !out.contains(outMatcher))return false;
         }
         return true;

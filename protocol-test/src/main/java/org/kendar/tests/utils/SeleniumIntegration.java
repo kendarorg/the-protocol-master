@@ -119,6 +119,7 @@ public class SeleniumIntegration {
 
         Proxy proxy = new Proxy();
         proxy.setHttpProxy(proxyHost + ":" + proxyPort);
+        proxy.setSslProxy(proxyHost + ":" + proxyPort);
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
 
 

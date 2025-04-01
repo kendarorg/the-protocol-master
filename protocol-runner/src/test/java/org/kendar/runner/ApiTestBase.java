@@ -12,6 +12,22 @@ import java.util.Scanner;
 
 public class ApiTestBase extends BasicTest {
 
+    public static <T> T getRequest(String target, CloseableHttpClient httpclient, Class<T> typeReference) throws IOException {
+        var httpget = new HttpGet(target);
+        var httpresponse = httpclient.execute(httpget);
+
+        var sc = new Scanner(httpresponse.getEntity().getContent());
+        var result = "";
+        while (sc.hasNext()) {
+            result += (sc.nextLine());
+        }
+        System.out.println(result);
+        if(typeReference==null)return null;
+        if(typeReference==String.class) {
+            return (T) result;
+        }
+        return mapper.deserialize(result, typeReference);
+    }
     public static <T> T getRequest(String target, CloseableHttpClient httpclient, TypeReference<T> typeReference) throws IOException {
         var httpget = new HttpGet(target);
         var httpresponse = httpclient.execute(httpget);
@@ -22,6 +38,7 @@ public class ApiTestBase extends BasicTest {
             result += (sc.nextLine());
         }
         System.out.println(result);
+        if(typeReference==null)return null;
         return mapper.deserialize(result, typeReference);
     }
 

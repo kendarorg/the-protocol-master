@@ -152,6 +152,18 @@
         ]
       },
       "plugins": {
+        "rest-plugins-plugin": {
+          "interceptors": [
+            {
+              "name": "test",
+              "phase": "POST_CALL",
+              "destinationAddress": "http://localhost:38878/test",
+              "inputType": "Request",
+              "outputType": "Response",
+              "inMatcher": "!CONTAINS(host,'www.google.com')"
+            }
+          ]
+        },
         "latency-plugin": {
           "target": [
             "@(net-core-rest|localhost|127.0.0.1)\\/api/tasks.*"
