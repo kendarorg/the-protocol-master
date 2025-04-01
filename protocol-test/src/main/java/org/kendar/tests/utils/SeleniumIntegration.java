@@ -133,6 +133,7 @@ public class SeleniumIntegration {
             capabilities.setBrowserVersion(version);
         }
 
+        capabilities.setAcceptInsecureCerts(true);
         capabilities.setBinary(browserPath.toFile());
         capabilities.setProxy(proxy);
         capabilities.setAcceptInsecureCerts(true);
