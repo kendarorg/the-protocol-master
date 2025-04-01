@@ -148,6 +148,7 @@ public class UiSeleniumTest extends SeleniumTestBase{
 
             navigateTo("https://www.google.com", false);
             Sleeper.sleep(1000);
+            alertWhenHumanDriven("Showing the bing logo :)");
             assertTrue(getDriver().getPageSource().contains("Bing_Fluent_Logo"));
         }finally {
             getRequest("http://localhost:8095/api/protocols/http-01/plugins/rest-plugins-plugin/stop", httpclient, String.class);
