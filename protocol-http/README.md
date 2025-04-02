@@ -167,6 +167,20 @@ When active send to the global report-plugin all request/response data
 * ignoreTpm: If should ignore calls to TPM APIs when reporting
 * ignore: List of ip/dns to ignore when reporting
 
+### rest-plugins-plugin
+
+This plugin is used to intercept protocol calls and forward the request to a REST API
+that will need to respond with the correct response data. Contains a list of "interceptors"
+definitions. For details on the implementation [here](../docs/rest-plugins-plugin.md)
+
+* name: The name of the interceptor
+* destinationAddress: The api to call (POST)
+* inputType: The expected input type (simple class name), Object for any
+* inMatcher: The matcher for the in content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from contains
+* outputType: The expected output type (simple class name), Object for any
+* outMatcher: The matcher for the out content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from contains
+* blockOnException: If there is an exception return the error and stop the filtering
+
 ## Documentation used
 
 * https://stackoverflow.com/questions/9357585/creating-a-java-proxy-server-that-accepts-https
