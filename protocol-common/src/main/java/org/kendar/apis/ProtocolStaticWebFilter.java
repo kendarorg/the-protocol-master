@@ -21,7 +21,7 @@ public abstract class ProtocolStaticWebFilter extends StaticWebFilter implements
         try {
             loadAllStuffs();
         } catch (IOException e) {
-            throw new ApiException("Unable to load data for protocol "+protocolInstanceId,e);
+            throw new ApiException("Unable to load data for protocol " + protocolInstanceId, e);
         }
     }
 

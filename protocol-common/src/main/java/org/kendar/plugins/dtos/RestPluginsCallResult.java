@@ -4,6 +4,7 @@ public class RestPluginsCallResult {
     private boolean blocking;
     private String message;
     private String error;
+    private boolean withError;
 
     public boolean isWithError() {
         return withError;
@@ -12,8 +13,6 @@ public class RestPluginsCallResult {
     public void setWithError(boolean withError) {
         this.withError = withError;
     }
-
-    private boolean withError;
 
     public boolean isBlocking() {
         return blocking;

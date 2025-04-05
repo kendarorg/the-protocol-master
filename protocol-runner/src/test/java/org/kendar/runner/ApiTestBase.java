@@ -22,12 +22,13 @@ public class ApiTestBase extends BasicTest {
             result += (sc.nextLine());
         }
         System.out.println(result);
-        if(typeReference==null)return null;
-        if(typeReference==String.class) {
+        if (typeReference == null) return null;
+        if (typeReference == String.class) {
             return (T) result;
         }
         return mapper.deserialize(result, typeReference);
     }
+
     public static <T> T getRequest(String target, CloseableHttpClient httpclient, TypeReference<T> typeReference) throws IOException {
         var httpget = new HttpGet(target);
         var httpresponse = httpclient.execute(httpget);
@@ -38,7 +39,7 @@ public class ApiTestBase extends BasicTest {
             result += (sc.nextLine());
         }
         System.out.println(result);
-        if(typeReference==null)return null;
+        if (typeReference == null) return null;
         return mapper.deserialize(result, typeReference);
     }
 

@@ -31,8 +31,8 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     private final JsonMapper mapper;
     private final SimpleParser simpleParser;
     private final MultiTemplateEngine resolversFactory;
-    private boolean active;
     private final AtomicInteger counter = new AtomicInteger(0);
+    private boolean active;
     private PluginSettings settings;
     private PluginFileManager storage;
 

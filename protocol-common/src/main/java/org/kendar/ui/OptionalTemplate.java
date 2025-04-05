@@ -29,7 +29,7 @@ public class OptionalTemplate {
             var mte = DiService.getThreadContext().getInstance(MultiTemplateEngine.class);
             var output = new StringOutput();
             try {
-                    mte.render(template, data, output);
+                mte.render(template, data, output);
 
                 return output.toString();
             } catch (TemplateNotFoundException e) {

@@ -1,7 +1,5 @@
 package org.testcontainers.containers.wait.strategy;
 
-import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
-
 public class FakeStrategy extends AbstractWaitStrategy {
     @Override
     protected void waitUntilReady() {

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @TpmService
 public class SimpleParser {
-    private static final ConcurrentHashMap<String,Token> tokensCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Token> tokensCache = new ConcurrentHashMap<>();
     private static final JsonMapper mapper = new JsonMapper();
     private static final Set<String> binaryOperator = Set.of("=", "<", ">", "+", "-", "*", "%", "/", "!");
     private static final Set<FunctionDefinition> functionDefinitions = Set.of(
@@ -71,7 +71,7 @@ public class SimpleParser {
     }
 
     public Token parse(String input) {
-        if(tokensCache.containsKey(input)) {
+        if (tokensCache.containsKey(input)) {
             return tokensCache.get(input);
         }
         var token = new Token(TokenType.BLOCK);

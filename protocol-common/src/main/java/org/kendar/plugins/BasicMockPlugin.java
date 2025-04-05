@@ -142,7 +142,7 @@ public abstract class BasicMockPlugin<T, K> extends ProtocolPluginDescriptorBase
             }
 
         } catch (Exception e) {
-            throw new PluginException("Unable to load mocks",e);
+            throw new PluginException("Unable to load mocks", e);
         }
     }
 

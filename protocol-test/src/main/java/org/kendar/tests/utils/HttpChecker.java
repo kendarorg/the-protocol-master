@@ -44,9 +44,9 @@ public class HttpChecker {
 
     public boolean run() throws Exception {
         LogWriter.info("Testing for %d seconds %s: ", seconds, url);
-        var result = TestSleeper.sleepNoException(seconds*1000L,()->{
+        var result = TestSleeper.sleepNoException(seconds * 1000L, () -> {
             if (proxyUrl != null) {
-                var proxy = new HttpHost("http",proxyUrl, proxyPort);
+                var proxy = new HttpHost("http", proxyUrl, proxyPort);
                 var routePlanner = new DefaultProxyRoutePlanner(proxy);
                 try (var httpclient = HttpClients.custom().setRoutePlanner(routePlanner).build()) {
                     var httpget = new HttpGet(url);
@@ -73,7 +73,7 @@ public class HttpChecker {
             }
             return false;
         });
-        if(!result) {
+        if (!result) {
             if (showError) {
                 LogWriter.errror("testing " + url);
             }

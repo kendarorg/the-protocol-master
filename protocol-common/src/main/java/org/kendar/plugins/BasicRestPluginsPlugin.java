@@ -100,15 +100,15 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
                 }
                 try {
                     RestPluginsCallResult result = callInterceptor(interceptor, inSerialized, outSerialized);
-                    if(result.isWithError()) {
-                        if(result.getError() != null) {
+                    if (result.isWithError()) {
+                        if (result.getError() != null) {
                             throw new PluginException(result.getError());
-                        }else{
+                        } else {
                             throw new PluginException("Error calling interceptor " + interceptor.getDestinationAddress());
                         }
 
                     }
-                    if (out != null && result.getMessage()!=null && !result.getMessage().isEmpty()) {
+                    if (out != null && result.getMessage() != null && !result.getMessage().isEmpty()) {
                         var toReturn = mapper.deserialize(result.getMessage(), out.getClass());
                         try {
                             ExtraBeanUtils.copyProperties(out, toReturn);
@@ -144,7 +144,7 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
                 result += (sc.nextLine());
             }
             var toReturn = mapper.deserialize(result, RestPluginsCallResult.class);
-            if(httpresponse.getStatusLine().getStatusCode() != 200) {
+            if (httpresponse.getStatusLine().getStatusCode() != 200) {
                 toReturn.setWithError(true);
             }
             return toReturn;

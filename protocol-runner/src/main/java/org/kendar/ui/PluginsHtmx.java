@@ -25,6 +25,7 @@ public class PluginsHtmx implements FilteringClass {
     private final JsonMapper mapper;
     private final MultiTemplateEngine resolversFactory;
     private final DiService diService;
+
     public PluginsHtmx(JsonMapper mapper, MultiTemplateEngine resolversFactory, DiService diService) {
         this.mapper = mapper;
         this.resolversFactory = resolversFactory;

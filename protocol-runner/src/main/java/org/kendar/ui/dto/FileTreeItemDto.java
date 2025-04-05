@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileTreeItemDto {
-    private boolean open;
     private final String path;
-
+    private boolean open;
     private List<FileTreeItemDto> children = new ArrayList<>();
     private boolean directory;
 
