@@ -14,8 +14,8 @@
     function updateData() {
         var data = retrieveValues({
             active:${data.isActive()},
-            ignoreTrivialCalls:true,
-            resetConnectionsOnStart:true
+            ignoreTrivialCalls: true,
+            resetConnectionsOnStart: true
         });
         data.ignoreTrivialCalls = document.getElementById("ignoreTrivialCalls").checked;
         data.resetConnectionsOnStart = document.getElementById("resetConnectionsOnStart").checked;

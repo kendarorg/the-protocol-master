@@ -25,7 +25,8 @@
                 !{
                     var f= fields.get(j);
                 }
-                <td>${data.convert(e.get(f))}<input type="hidden" id="field_${j}_${i}" value="${data.convert(e.get(f))}"></td>
+                <td>${data.convert(e.get(f))}<input type="hidden" id="field_${j}_${i}"
+                                                    value="${data.convert(e.get(f))}"></td>
             @endfor
         </tr>
     @endfor

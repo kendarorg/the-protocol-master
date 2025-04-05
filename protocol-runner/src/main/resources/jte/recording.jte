@@ -106,7 +106,7 @@ SELECT(
                         </div>
                         <br>
                         <div class="input-group">
-                            <button type="button"  id="buttonSearchRecording" class="btn btn-success"
+                            <button type="button" id="buttonSearchRecording" class="btn btn-success"
                                     onclick="searchRecording()">
                                 Search
                             </button>

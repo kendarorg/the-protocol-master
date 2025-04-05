@@ -16,8 +16,8 @@
         var data = retrieveValues({
             active:${data.isActive()},
             target: pluginTargets,
-            ignoreTrivialCalls:true,
-            removeEtags:true
+            ignoreTrivialCalls: true,
+            removeEtags: true
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {

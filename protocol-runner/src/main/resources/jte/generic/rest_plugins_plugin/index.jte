@@ -14,13 +14,13 @@
     function updateData() {
         var data = retrieveValues({
             active:${pluginSettings.isActive()},
-            name:null,
-            target:null,
-            inputType:null,
-            phase:null,
-            inputMatcher:null,
-            outputType:null,
-            outputMatcher:null
+            name: null,
+            target: null,
+            inputType: null,
+            phase: null,
+            inputMatcher: null,
+            outputType: null,
+            outputMatcher: null
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
@@ -76,13 +76,13 @@
             <div class="input-group ">
                 <label for="name" class="control-label">Name</label>
                 <div>
-                    <input id="fileName" type="text"  class="form-control"/>
+                    <input id="fileName" type="text" class="form-control"/>
                 </div>
             </div>
             <div class="input-group ">
                 <label for="destinationAddress" class="control-label">Destination Address</label>
                 <div>
-                    <input id="destinationAddress" type="text"  class="form-control"/>
+                    <input id="destinationAddress" type="text" class="form-control"/>
                 </div>
             </div>
             <div class="input-group ">
@@ -100,25 +100,25 @@
             <div class="input-group ">
                 <label for="inputType" class="control-label">Input Type</label>
                 <div>
-                    <input id="inputType" type="text"  class="form-control"/>
+                    <input id="inputType" type="text" class="form-control"/>
                 </div>
             </div>
             <div class="input-group ">
                 <label for="inputMatcher" class="control-label">Input Matcher</label>
                 <div>
-                    <input id="inputMatcher" type="text"  class="form-control"/>
+                    <input id="inputMatcher" type="text" class="form-control"/>
                 </div>
             </div>
             <div class="input-group ">
                 <label for="outputType" class="control-label">Output Type</label>
                 <div>
-                    <input id="outputType" type="text"  class="form-control"/>
+                    <input id="outputType" type="text" class="form-control"/>
                 </div>
             </div>
             <div class="input-group ">
                 <label for="outputMatcher" class="control-label">Output Matcher</label>
                 <div>
-                    <input id="outputMatcher" type="text"  class="form-control"/>
+                    <input id="outputMatcher" type="text" class="form-control"/>
                 </div>
             </div>
             <br>

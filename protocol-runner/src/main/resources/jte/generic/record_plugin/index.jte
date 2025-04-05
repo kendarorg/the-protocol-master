@@ -13,7 +13,7 @@
     function updateData() {
         var data = retrieveValues({
             active:${data.isActive()},
-            ignoreTrivialCalls:true
+            ignoreTrivialCalls: true
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {

@@ -28,18 +28,18 @@
         }
     }
 
-    function copyReport(){
+    function copyReport() {
         var fieldsCount = +retrieveValue('fieldsCount');
         var rowsCount = +retrieveValue('rowsCount');
         var toSend = [];
-        var selected =0;
-        for(var i=0;i<rowsCount;i++) {
+        var selected = 0;
+        for (var i = 0; i < rowsCount; i++) {
             if (retrieveValue("row_" + i)) {
                 selected++;
             }
         }
-        for(var i=0;i<rowsCount;i++){
-            if(retrieveValue("row_"+i) || selected==0) {
+        for (var i = 0; i < rowsCount; i++) {
+            if (retrieveValue("row_" + i) || selected == 0) {
                 var row = {};
                 for (var j = 0; j < fieldsCount; j++) {
                     row[retrieveValue("label_" + j)] = retrieveValue("field_" + j + "_" + i);

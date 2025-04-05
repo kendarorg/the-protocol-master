@@ -14,9 +14,9 @@
     function updateData${safeId.apply(protocol)}() {
         if (confirm("You will be restarting the application, are you sure?")) {
             var data = {
-                http:retrieveValue('http${safeId.apply(protocol)}'),
-                https:retrieveValue('https${safeId.apply(protocol)}'),
-                proxy:retrieveValue('proxy${safeId.apply(protocol)}')
+                http: retrieveValue('http${safeId.apply(protocol)}'),
+                https: retrieveValue('https${safeId.apply(protocol)}'),
+                proxy: retrieveValue('proxy${safeId.apply(protocol)}')
             };
             console.log(data);
             sendData('/api/protocols/${protocol.getProtocolInstanceId()}', 'POST', JSON.stringify(data), 'application/json', (status, response) => {
@@ -67,7 +67,8 @@
                            value="${protocol.getProxy()}">
                 </div>
             </div>
-            <br>            <div class="input-group">
+            <br>
+            <div class="input-group">
                 <button class="btn btn-danger" type="button"
                         onclick="updateData${safeId.apply(protocol)}()">Update settings
                 </button>

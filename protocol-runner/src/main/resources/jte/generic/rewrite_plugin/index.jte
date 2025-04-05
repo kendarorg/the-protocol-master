@@ -21,7 +21,7 @@
         var data = retrieveValues({
             toFind: null,
             toReplace: null,
-            regex:false
+            regex: false
         });
         sendData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/rewrite/' + filename, 'POST',
             JSON.stringify(data), 'application/json', () => {
@@ -35,7 +35,7 @@
             toFind: null,
             toReplace: null,
             testTarget: null,
-            regex:false
+            regex: false
         });
         sendData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/test', 'POST',
             JSON.stringify(data), 'application/json', (code, result) => {
