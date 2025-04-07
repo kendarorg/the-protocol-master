@@ -38,7 +38,7 @@ public class Execute extends PostgresState {
         }
         var parseMessage = (Parse) postgresContext.getValue(bindMessage.getStatement());
         parseMessage.getBinds().remove("PORTAL_" + portal);
-        var executor = new PostgresExecutor();
+        var executor = postgresContext.getExecutor();
 
 
         log.debug("[SERVER][STMTEXEC]: Max:{} Query:{}", maxRecords, parseMessage.getQuery());

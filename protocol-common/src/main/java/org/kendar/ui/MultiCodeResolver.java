@@ -15,9 +15,11 @@ public class MultiCodeResolver implements CodeResolver {
     private final List<JteResolver> jteResolvers;
     private final ConcurrentHashMap<String, CodeResolver> engines = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Object> notEngines = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> resolvedCache = new ConcurrentHashMap<>();
 
     /**
      * The JTEResolvers are simply a storage for the plugins classloaders
+     *
      * @param resolvers
      */
     public MultiCodeResolver(List<JteResolver> resolvers) {
@@ -35,9 +37,14 @@ public class MultiCodeResolver implements CodeResolver {
 
     @Override
     public String resolveRequired(String name) throws TemplateNotFoundException {
+        if (resolvedCache.containsKey(name)) {
+            return resolvedCache.get(name);
+        }
         // If found already who contains the template use it
         if (engines.containsKey(name)) {
-            return engines.get(name).resolve(name);
+            var result = engines.get(name).resolve(name);
+            resolvedCache.put(name, result);
+            return result;
         } else if (notEngines.containsKey(name)) {
             //Error when not finding
             throw new TemplateNotFoundException(name + " not found");
@@ -47,6 +54,7 @@ public class MultiCodeResolver implements CodeResolver {
             var resolver = jteResolver.getResolver();
             resolved = resolver.resolve(name);
             if (resolved != null) {
+                resolvedCache.put(name, resolved);
                 engines.put(name, resolver);
                 return resolved;
             }

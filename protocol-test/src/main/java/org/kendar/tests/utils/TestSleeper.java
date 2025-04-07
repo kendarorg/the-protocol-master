@@ -31,17 +31,18 @@ public class TestSleeper {
     }
 
     public static void sleep(long timeoutMillis, BooleanSupplier booleanSupplier) {
-        sleep(timeoutMillis,booleanSupplier,"Timeout reached");
+        sleep(timeoutMillis, booleanSupplier, "Timeout reached");
     }
-        @SuppressWarnings("CatchMayIgnoreException")
-    public static void sleep(long timeoutMillis, BooleanSupplier booleanSupplier,String errorMessage) {
+
+    @SuppressWarnings("CatchMayIgnoreException")
+    public static void sleep(long timeoutMillis, BooleanSupplier booleanSupplier, String errorMessage) {
         try {
             Object obj = new Object();
 
             var times = (int) timeoutMillis;
             var counter = 100;
-            if(times<=100)counter =2;
-            for (int i = 0; i < timeoutMillis; i+=counter) {
+            if (times <= 100) counter = 2;
+            for (int i = 0; i < timeoutMillis; i += counter) {
                 synchronized (obj) {
                     obj.wait(counter);
                 }

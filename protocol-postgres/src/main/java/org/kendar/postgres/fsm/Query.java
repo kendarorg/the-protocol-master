@@ -32,7 +32,7 @@ public class Query extends PostgresState {
         var postgresContext = (PostgresProtoContext) protoContext;
         var query = inputBuffer.getUtf8String();
         var fakePortalStatement = UUID.randomUUID().toString();
-        var executor = new PostgresExecutor();
+        var executor = postgresContext.getExecutor();
 
         var bindMessage = new Binding("STATEMENT_" + fakePortalStatement, "PORTAL_" + fakePortalStatement, new ArrayList<>(), new ArrayList<>());
         var parseMessage = new Parse("STATEMENT_" + fakePortalStatement, query, new ArrayList<>(), new ArrayList<>());

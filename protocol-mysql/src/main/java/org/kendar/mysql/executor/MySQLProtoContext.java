@@ -23,6 +23,7 @@ public class MySQLProtoContext extends NetworkProtoContext {
     private static final Logger log = LoggerFactory.getLogger(MySQLProtoContext.class);
     private int clientCapabilities;
     private int packetNumber = -1;
+    private MySQLExecutor executor;
 
     public MySQLProtoContext(ProtoDescriptor descriptor, int contextId) {
         super(descriptor, contextId);
@@ -79,5 +80,13 @@ public class MySQLProtoContext extends NetworkProtoContext {
         error.setSqlState("08S01");
         result.add(error);
         return result;
+    }
+
+    public void setExecutor(MySQLExecutor executor) {
+        this.executor = executor;
+    }
+
+    public MySQLExecutor getExecutor() {
+        return executor;
     }
 }

@@ -26,6 +26,8 @@ various languages and environments
 * Java/Spring/MySQL/MQTT
 * Intercept a phone with pre-setup VPN container
 
+![generic.png](docs/ui/generic.png)
+
 ### How it works
 
 It's simple it's a `multiprotocol` proxy on your box (or whatever you want)

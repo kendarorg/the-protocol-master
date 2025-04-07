@@ -238,7 +238,7 @@ public class Main {
         }, RestartEvent.class);
         EventsQueue.register("main", (e) -> {
             if (e.getSettings() != null) {
-                if(Files.exists(Path.of(e.getSettings()))) {
+                if (Files.exists(Path.of(e.getSettings()))) {
                     stopInternal();
                     changedSettings = e.getSettings();
                     terminateReceived = true;

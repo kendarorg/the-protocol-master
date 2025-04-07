@@ -39,19 +39,19 @@
         })
     }
 
-    function createNewRegistered${safeId.apply(protocol)}(){
+    function createNewRegistered${safeId.apply(protocol)}() {
         var name = retrieveValue('newRegistered${safeId.apply(protocol)}');
         var ip = retrieveValue('newRegisteredIp${safeId.apply(protocol)}');
-        if(ip===null||ip===""){
-            ip="127.0.0.1";
+        if (ip === null || ip === "") {
+            ip = "127.0.0.1";
         }
         var toSend = [
-            {name:name,ip:ip}
+            {name: name, ip: ip}
         ];
         saveRegistered(toSend);
     }
 
-    function createNewBlocked${safeId.apply(protocol)}(){
+    function createNewBlocked${safeId.apply(protocol)}() {
         var name = retrieveValue('newBlocked${safeId.apply(protocol)}');
         var toSend = [
             name
@@ -168,7 +168,8 @@
                 </div>
                 <button class="btn btn-default" type="button"
                         onclick="createNewRegistered${safeId.apply(protocol)}()">
-                    Create</button>
+                    Create
+                </button>
             </div>
             <br>
             <table class="table table-bordered table-striped">
@@ -199,7 +200,8 @@
                 </div>
                 <button class="btn btn-default" type="button"
                         onclick="createNewBlocked${safeId.apply(protocol)}()">
-                    Create</button>
+                    Create
+                </button>
             </div>
             <br>
             <table class="table table-bordered table-striped">

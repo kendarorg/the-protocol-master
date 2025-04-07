@@ -1,6 +1,7 @@
 package org.kendar.postgres.fsm;
 
 import org.kendar.iterators.IteratorOfLists;
+import org.kendar.postgres.executor.PostgresExecutor;
 import org.kendar.postgres.messages.ErrorResponse;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
@@ -26,6 +27,7 @@ public class PostgresProtoContext extends NetworkProtoContext {
     private final int pid;
     private final AtomicBoolean cancel = new AtomicBoolean(false);
     private List<Iterator<ProtoStep>> toSync = new ArrayList<>();
+    private PostgresExecutor executor;
 
     public PostgresProtoContext(ProtoDescriptor descriptor, int contextId) {
 
@@ -98,5 +100,13 @@ public class PostgresProtoContext extends NetworkProtoContext {
             cancel.set(false);
         }
         return result;
+    }
+
+    public void setExecutor(PostgresExecutor executor) {
+        this.executor = executor;
+    }
+
+    public PostgresExecutor getExecutor() {
+        return executor;
     }
 }

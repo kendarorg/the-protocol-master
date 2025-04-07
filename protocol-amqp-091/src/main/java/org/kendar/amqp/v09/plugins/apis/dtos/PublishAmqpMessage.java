@@ -7,6 +7,7 @@ public class PublishAmqpMessage {
     private int propertyFlag = -28664;
     private int deliveryMode = 1;
     private long deliveryTag = 1;
+
     public PublishAmqpMessage() {
 
     }

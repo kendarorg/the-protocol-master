@@ -82,6 +82,27 @@ public class DiService {
         return result;
     }
 
+    private static Constructor retrieveConstructor(Constructor<?>[] constructors) {
+        Constructor constructor = null;
+        if (constructors.length == 1) {
+            constructor = constructors[0];
+        } else {
+            for (var constr : constructors) {
+                if (null != constr.getAnnotation(TpmConstructor.class)) {
+                    if (constructor != null) {
+                        throw new DiException("Duplicate TpmConstructor constructor found");
+                    }
+                    constructor = constr;
+                }
+            }
+        }
+
+        if (constructor == null) {
+            throw new DiException("No TpmConstructor found");
+        }
+        return constructor;
+    }
+
     private void destroy() {
         for (var item : children) {
             try {
@@ -237,7 +258,6 @@ public class DiService {
         return getInstancesInternal(null, clazz, this, clazz, tags);
     }
 
-
     private Object createInstance(DiService context, Class<?> clazz, boolean transi) {
         try {
             if (!transi) {
@@ -308,27 +328,6 @@ public class DiService {
             log.error(e.getMessage(), e);
             throw new DiException("Unable to instantiate " + clazz, e);
         }
-    }
-
-    private static Constructor retrieveConstructor(Constructor<?>[] constructors) {
-        Constructor constructor = null;
-        if (constructors.length == 1) {
-            constructor = constructors[0];
-        } else {
-            for (var constr : constructors) {
-                if (null != constr.getAnnotation(TpmConstructor.class)) {
-                    if (constructor != null) {
-                        throw new DiException("Duplicate TpmConstructor constructor found");
-                    }
-                    constructor = constr;
-                }
-            }
-        }
-
-        if (constructor == null) {
-            throw new DiException("No TpmConstructor found");
-        }
-        return constructor;
     }
 
     private Object destroy(Object o) {

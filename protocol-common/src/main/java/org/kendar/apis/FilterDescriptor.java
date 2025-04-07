@@ -292,7 +292,7 @@ public class FilterDescriptor {
             pathPattern = pathPattern.replaceAll(
                     Pattern.quote("{#plugin}"),
                     Matcher.quoteReplacement(ppah.getPluginId()));
-        }else if (ProtocolApiHandler.class.isAssignableFrom(filterClass.getClass())) {
+        } else if (ProtocolApiHandler.class.isAssignableFrom(filterClass.getClass())) {
             var ppah = (ProtocolApiHandler) filterClass;
             pathPattern = pathPattern.replaceAll(
                     Pattern.quote("{#protocolInstanceId}"),

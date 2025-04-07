@@ -13,7 +13,7 @@
             active:${pluginSettings.isActive()},
             minMs: 0,
             maxMs: 0,
-            percentAction:0,
+            percentAction: 0,
             target: pluginTargets
         });
         console.log(data);

@@ -61,7 +61,7 @@ public class DnsApis implements ProtocolApiHandler {
             tags = {"plugins/dns/{#protocolInstanceId}"})
     public void updateDnsRegistered(Request reqp, Response resp) {
         var dataList = mapper.deserialize(reqp.getRequestText().toString(), DnsMapping[].class);
-        for(var data:dataList) {
+        for (var data : dataList) {
             var somethingChanged = false;
             for (var setting : settings.getRegistered()) {
                 if (setting.getName().equals(data.getName())) {
@@ -96,7 +96,7 @@ public class DnsApis implements ProtocolApiHandler {
         List<DnsMapping> registered = settings.getRegistered();
         for (int i = registered.size() - 1; i >= 0; i--) {
             var setting = registered.get(i);
-            if (setting.getName().equalsIgnoreCase(dnsName)||setting.getIp().equalsIgnoreCase(dnsName)) {
+            if (setting.getName().equalsIgnoreCase(dnsName) || setting.getIp().equalsIgnoreCase(dnsName)) {
                 settings.getRegistered().remove(i);
                 somethingChanged = true;
                 break;
@@ -119,9 +119,8 @@ public class DnsApis implements ProtocolApiHandler {
             )},
             tags = {"plugins/dns/{#protocolInstanceId}"})
     public void getDnsRegistered(Request reqp, Response resp) {
-        respondJson(resp,settings.getRegistered());
+        respondJson(resp, settings.getRegistered());
     }
-
 
 
     @HttpMethodFilter(
@@ -136,7 +135,7 @@ public class DnsApis implements ProtocolApiHandler {
             )},
             tags = {"plugins/dns/{#protocolInstanceId}"})
     public void getDnsBlocked(Request reqp, Response resp) {
-        respondJson(resp,settings.getBlocked());
+        respondJson(resp, settings.getBlocked());
     }
 
     @HttpMethodFilter(
@@ -154,7 +153,7 @@ public class DnsApis implements ProtocolApiHandler {
     public void updateDnsBlocked(Request reqp, Response resp) {
 
         var dataList = mapper.deserialize(reqp.getRequestText().toString(), String[].class);
-        for(var dnsName:dataList) {
+        for (var dnsName : dataList) {
             var alreadyPresent = false;
             for (var setting : settings.getBlocked()) {
                 if (setting.equalsIgnoreCase(dnsName)) {
@@ -162,7 +161,7 @@ public class DnsApis implements ProtocolApiHandler {
                     break;
                 }
             }
-            if(!alreadyPresent){
+            if (!alreadyPresent) {
                 settings.getBlocked().add(dnsName);
             }
         }

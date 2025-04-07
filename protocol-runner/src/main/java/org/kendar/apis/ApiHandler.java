@@ -1,6 +1,5 @@
 package org.kendar.apis;
 
-import org.kendar.plugins.base.TPMPluginFile;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.kendar.VersionChecker;
 import org.kendar.annotations.HttpMethodFilter;
@@ -25,6 +24,7 @@ import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
+import org.kendar.plugins.base.TPMPluginFile;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
@@ -101,10 +101,10 @@ public class ApiHandler implements FilteringClass {
             tags = {"base/utils"})
     public void getVersion(Request reqp, Response resp) {
         var result = new ArrayList<StringKvp>();
-        result.add(new StringKvp("protocol-runner",VersionChecker.getTpmVersion()));
-        for(var plugin:pluginManager.getPlugins()) {
-            var pluginDescriptor = (TPMPluginFile)plugin.getPlugin();
-            result.add(new StringKvp(pluginDescriptor.getTpmPluginName(),pluginDescriptor.getTpmPluginVersion()));
+        result.add(new StringKvp("protocol-runner", VersionChecker.getTpmVersion()));
+        for (var plugin : pluginManager.getPlugins()) {
+            var pluginDescriptor = (TPMPluginFile) plugin.getPlugin();
+            result.add(new StringKvp(pluginDescriptor.getTpmPluginName(), pluginDescriptor.getTpmPluginVersion()));
         }
         respondJson(resp, result);
     }
@@ -189,7 +189,7 @@ public class ApiHandler implements FilteringClass {
             protocolSettings.set(field.getKey(), field.getValue());
         }
         var serializedSettings = (ObjectNode) mapper.toJsonNode(settings);
-        ((ObjectNode)serializedSettings.get("protocols")).set(protocolInstanceId, protocolSettings);
+        ((ObjectNode) serializedSettings.get("protocols")).set(protocolInstanceId, protocolSettings);
 
         var stringSettings = mapper.serialize(serializedSettings);
         try {

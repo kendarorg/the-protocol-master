@@ -12,7 +12,7 @@
             active:${pluginSettings.isActive()},
             minMs: 0,
             maxMs: 0,
-            percentAction:0
+            percentAction: 0
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {

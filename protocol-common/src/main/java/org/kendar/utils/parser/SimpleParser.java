@@ -10,11 +10,13 @@ import org.kendar.utils.JsonMapper;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @TpmService
 public class SimpleParser {
+    private static final ConcurrentHashMap<String, Token> tokensCache = new ConcurrentHashMap<>();
     private static final JsonMapper mapper = new JsonMapper();
     private static final Set<String> binaryOperator = Set.of("=", "<", ">", "+", "-", "*", "%", "/", "!");
     private static final Set<FunctionDefinition> functionDefinitions = Set.of(
@@ -69,6 +71,9 @@ public class SimpleParser {
     }
 
     public Token parse(String input) {
+        if (tokensCache.containsKey(input)) {
+            return tokensCache.get(input);
+        }
         var token = new Token(TokenType.BLOCK);
         char[] charArray = input.toCharArray();
         var inString = false;
@@ -140,7 +145,7 @@ public class SimpleParser {
         if (token.type == TokenType.BLOCK && token.children.size() == 1 && token.children.get(0).value.equalsIgnoreCase("select")) {
             return token.children.get(0);
         }
-
+        tokensCache.put(input, token);
         return token;
     }
 

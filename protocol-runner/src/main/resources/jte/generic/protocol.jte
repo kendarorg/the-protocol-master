@@ -13,7 +13,7 @@
     function updateData${safeId.apply(protocol)}() {
         if (confirm("You will be restarting the application, are you sure?")) {
             var data = {
-                port:retrieveValue('port${safeId.apply(protocol)}')
+                port: retrieveValue('port${safeId.apply(protocol)}')
             };
             console.log(data);
             sendData('/api/protocols/${protocol.getProtocolInstanceId()}', 'POST', JSON.stringify(data), 'application/json', (status, response) => {

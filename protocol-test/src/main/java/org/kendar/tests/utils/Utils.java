@@ -20,7 +20,7 @@ public class Utils {
         return (T) cache.get(key.toLowerCase(Locale.ROOT));
     }
 
-    public static HashMap<String, Object> getCache(){
+    public static HashMap<String, Object> getCache() {
         return cache;
     }
 

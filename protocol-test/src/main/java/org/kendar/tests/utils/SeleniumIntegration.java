@@ -26,12 +26,13 @@ public class SeleniumIntegration {
     private final Path rootPath;
     private final String proxyHost;
     private final int proxyPort;
+    private final Map<String, String> windowHandles = new HashMap<>();
     private WebDriver driver;
     private JavascriptExecutor js;
-    private final Map<String, String> windowHandles = new HashMap<>();
     private String currentTab;
     private int counter = 0;
     private Path browserPath;
+    private boolean chromeNotChromium = false;
 
     public SeleniumIntegration(Path rootPath, String proxyHost, int proxyPort) {
         this.rootPath = rootPath;
@@ -63,14 +64,13 @@ public class SeleniumIntegration {
     private void setupSize(WebDriver driver) {
         driver.manage().window().setSize(new Dimension(1366, 900));
     }
-    private boolean chromeNotChromium = false;
 
-    public boolean isChrome(){
+    public boolean isChrome() {
         return chromeNotChromium;
     }
 
-    public boolean isChromium(){
-        return  !chromeNotChromium;
+    public boolean isChromium() {
+        return !chromeNotChromium;
     }
 
     private String retrieveBrowserVersion() {
@@ -80,14 +80,14 @@ public class SeleniumIntegration {
         if (browserPath.isPresent()) {
             this.browserPath = browserPath.get();
             webDriverManager = ChromeDriverManager.getInstance();
-            chromeNotChromium=true;
-        }else {
+            chromeNotChromium = true;
+        } else {
             browserPath = WebDriverManager.chromiumdriver()
                     .getBrowserPath();
             if (browserPath.isPresent()) {
                 this.browserPath = browserPath.get();
                 webDriverManager = ChromiumDriverManager.getInstance();
-                chromeNotChromium=false;
+                chromeNotChromium = false;
             } else {
                 throw new RuntimeException("Chrome/chromium driver could not be setup");
             }
@@ -96,9 +96,9 @@ public class SeleniumIntegration {
         var config = webDriverManager.config();
         var versionDetector = new VersionDetector(config, null);
         var optionalVersion = versionDetector.getBrowserVersionFromTheShell(
-                webDriverManager.getDriverManagerType().getBrowserNameLowerCase(),browserPath.get().toAbsolutePath().toString());
+                webDriverManager.getDriverManagerType().getBrowserNameLowerCase(), browserPath.get().toAbsolutePath().toString());
 
-        if(optionalVersion.isPresent()) {
+        if (optionalVersion.isPresent()) {
             Integer version = Integer.parseInt(optionalVersion.get());
             var available = webDriverManager.getDriverVersions().stream().
                     map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
@@ -107,7 +107,7 @@ public class SeleniumIntegration {
                 matching = version;
             }
             return matching.toString();
-        }else{
+        } else {
             return null;
         }
 
@@ -119,25 +119,27 @@ public class SeleniumIntegration {
 
         Proxy proxy = new Proxy();
         proxy.setHttpProxy(proxyHost + ":" + proxyPort);
+        proxy.setSslProxy(proxyHost + ":" + proxyPort);
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
 
 
         ChromeOptions capabilities = null;
-        if(isChrome()) {
-            capabilities = (ChromeOptions)new TpmChromeDriverManager().retrieveCapabilities();
-        }else{
-            capabilities = (ChromeOptions)new TpmChromiumDriverManager().retrieveCapabilities();
+        if (isChrome()) {
+            capabilities = (ChromeOptions) new TpmChromeDriverManager().retrieveCapabilities();
+        } else {
+            capabilities = (ChromeOptions) new TpmChromiumDriverManager().retrieveCapabilities();
         }
         var version = retrieveBrowserVersion();
-        if(version != null) {
+        if (version != null) {
             capabilities.setBrowserVersion(version);
         }
 
+        capabilities.setAcceptInsecureCerts(true);
         capabilities.setBinary(browserPath.toFile());
         capabilities.setProxy(proxy);
         capabilities.setAcceptInsecureCerts(true);
         capabilities.addArguments("--remote-allow-origins=*");
-         //options.addArguments("--disable-dev-shm-usage");
+        //options.addArguments("--disable-dev-shm-usage");
         //options.addArguments("disable-infobars"); // disabling infobars
         //options.addArguments("--disable-extensions"); // disabling extensions
         capabilities.addArguments("--disable-gpu"); // applicable to windows os only
@@ -149,14 +151,14 @@ public class SeleniumIntegration {
         }
 
 
-        if(isChrome()) {
+        if (isChrome()) {
             driver = WebDriverManager
                     .chromedriver()
                     .capabilities(capabilities)
                     .clearDriverCache()
                     .clearResolutionCache()
                     .create();
-        }else{
+        } else {
             driver = WebDriverManager
                     .chromiumdriver()
                     .capabilities(capabilities)

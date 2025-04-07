@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class DnsPlugin extends Plugin  implements TPMPluginFile {
+public class DnsPlugin extends Plugin implements TPMPluginFile {
 
     private static final Logger log = LoggerFactory.getLogger(DnsPlugin.class);
 
