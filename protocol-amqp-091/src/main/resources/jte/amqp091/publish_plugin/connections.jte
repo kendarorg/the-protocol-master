@@ -26,7 +26,15 @@
                 onclick="reloadConnections()">Reload
         </button>
         <div id="connectionChoice">
-            @for(var i=0;i<data.getConnections().size();i++)
+            <div class="radio">
+                <label>
+                    <input type="radio" name="connectionRadios"
+                           id="connectionRadios0"
+                           value='0_0'>
+                    ALL
+                </label>
+            </div>
+            @for(var i=1;i<=data.getConnections().size();i++)
                 <div class="radio">
                     <label>
                         <input type="radio" name="connectionRadios"

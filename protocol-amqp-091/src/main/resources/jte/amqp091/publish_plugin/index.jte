@@ -17,7 +17,9 @@
                     propertyFlag: null,
                     deliveryMode: null,
                     deliveryTag: null,
-                    body: null
+                    body: null,
+                    queue:null,
+                    exchange:null
                 });
             console.log("Sending");
             console.log(toSend);
@@ -60,6 +62,18 @@
             <div class="input-group">
                 <label for="appId" class="control-label">App Id</label>
                 <input id="appId" type="text" class="form-control"
+                       value="">
+            </div>
+
+            <div class="input-group">
+                <label for="queue" class="control-label">Queue</label>
+                <input id="queue" type="text" class="form-control"
+                       value="">
+            </div>
+
+            <div class="input-group">
+                <label for="exchange" class="control-label">Exchange</label>
+                <input id="exchange" type="text" class="form-control"
                        value="">
             </div>
             <div class="input-group">

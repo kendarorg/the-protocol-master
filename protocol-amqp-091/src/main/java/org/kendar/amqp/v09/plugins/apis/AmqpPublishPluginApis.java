@@ -10,6 +10,7 @@ import org.kendar.amqp.v09.plugins.AmqpPublishPlugin;
 import org.kendar.amqp.v09.plugins.apis.dtos.AmqpConnection;
 import org.kendar.amqp.v09.plugins.apis.dtos.AmqpConnections;
 import org.kendar.amqp.v09.plugins.apis.dtos.PublishAmqpMessage;
+import org.kendar.amqp.v09.plugins.apis.dtos.WhereToSend;
 import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
@@ -127,54 +128,85 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
             dataToSend = messageData.getBody().getBytes();
         }
 
+        for(var contextValue: pInstance.getContextsCache().entrySet()) {
+            if(connectionId!=0 && !contextValue.getKey().equals(connectionId)) {
+                continue;
+            }
+            var context = (AmqpProtoContext) contextValue.getValue();
 
-        var context = pInstance.getContextsCache().get(connectionId);
+            List<WhereToSend> basicConsumes = new ArrayList<>();
+            if(channelId!=0) {
+                basicConsumes = List.of (new WhereToSend((BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channelId),channelId));
+            }else{
+                for(var value:context.getKeys().stream().filter(val-> val.startsWith("BASIC_CONSUME_CH")).toList()){
+                    var channel = Integer.parseInt(value.replace("BASIC_CONSUME_CH_", ""));
+                    basicConsumes.add(new WhereToSend((BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel),channel));
+                }
+            }
+            //{id=1, channel=1, consumeOrigin='quotations|1|{}', consumerTag=None1, canPublish=true, consumeId=1, exchange='stock'}
+            for(var basicConsume: basicConsumes) {
+                var consumeId = basicConsume.getConsumeId();
+                var consumeOrigin = basicConsume.getConsumeOrigin();
+                channelId = basicConsume.getChannelId();
 
-        var basicConsume = (BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channelId);
-        var consumeId = basicConsume.getConsumeId();
-        var consumeOrigin = basicConsume.getConsumeOrigin();
-        var consumerTag = (String) context.getValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin());
-        if (consumerTag == null || consumerTag.isEmpty()) {
-            consumerTag = UUID.randomUUID().toString();
+                if(messageData.getQueue()!=null && !messageData.getQueue().isEmpty()) {
+                    if(!consumeOrigin.startsWith(messageData.getQueue()+"|")) {
+                        continue;
+                    }
+                }
+
+                var consumerTag = (String) context.getValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin());
+                if (consumerTag == null || consumerTag.isEmpty()) {
+                    consumerTag = UUID.randomUUID().toString();
+                }
+                var exchange = (String) context.getValue("EXCHANGE_CH_" + channelId);
+                if(messageData.getExchange()!=null && !messageData.getExchange().isEmpty()) {
+                    if(!exchange.equalsIgnoreCase(messageData.getExchange())) {
+                        continue;
+                    }
+                }
+                var routingKeys = (String) context.getValue("ROUTING_KEYS_CH_" + channelId);
+                var bd = new BasicDeliver();
+                bd.setChannel((short) channelId);
+                bd.setConsumeId(basicConsume.getConsumeId());
+                bd.setConsumerTag(consumerTag);
+                bd.setDeliveryTag(messageData.getDeliveryTag());
+                bd.setRedelivered(false);
+                bd.setExchange(exchange);
+                bd.setRoutingKey(routingKeys);
+                bd.setConsumeOrigin(consumeOrigin);
+                context.write(bd);
+
+
+                var hf = new HeaderFrame();
+                hf.setType((byte) 2);
+                hf.setClassId((short) 60);
+                hf.setWeight((short) 0);
+                hf.setChannel((short) channelId);
+                hf.setConsumeId(basicConsume.getConsumeId());
+                hf.setContentType(messageData.getContentType());
+                hf.setConsumeOrigin(consumeOrigin);
+                hf.setAppId(messageData.getAppId());
+                hf.setDeliveryMode(messageData.getDeliveryMode());
+                hf.setPropertyFlags(messageData.getPropertyFlag());
+
+                hf.setBodySize(dataToSend.length);
+                context.write(hf);
+
+                var bf = new BodyFrame();
+                bf.setChannel((short) channelId);
+                bf.setType((byte) 3);
+                bf.setConsumeId(basicConsume.getConsumeId());
+                bf.setConsumeOrigin(consumeOrigin);
+                ContentData content = new ContentData();
+                content.setBytes(dataToSend);
+                bf.setContent(content);
+                context.write(bf);
+            }
         }
-        var exchange = (String) context.getValue("EXCHANGE_CH_" + channelId);
-        var routingKeys = (String) context.getValue("ROUTING_KEYS_CH_" + channelId);
-        var bd = new BasicDeliver();
-        bd.setChannel((short) channelId);
-        bd.setConsumeId(basicConsume.getConsumeId());
-        bd.setConsumerTag(consumerTag);
-        bd.setDeliveryTag(messageData.getDeliveryTag());
-        bd.setRedelivered(false);
-        bd.setExchange(exchange);
-        bd.setRoutingKey(routingKeys);
-        bd.setConsumeOrigin(consumeOrigin);
-        context.write(bd);
 
 
-        var hf = new HeaderFrame();
-        hf.setType((byte) 2);
-        hf.setClassId((short) 60);
-        hf.setWeight((short) 0);
-        hf.setChannel((short) channelId);
-        hf.setConsumeId(basicConsume.getConsumeId());
-        hf.setContentType(messageData.getContentType());
-        hf.setConsumeOrigin(consumeOrigin);
-        hf.setAppId(messageData.getAppId());
-        hf.setDeliveryMode(messageData.getDeliveryMode());
-        hf.setPropertyFlags(messageData.getPropertyFlag());
 
-        hf.setBodySize(dataToSend.length);
-        context.write(hf);
-
-        var bf = new BodyFrame();
-        bf.setChannel((short) channelId);
-        bf.setType((byte) 3);
-        bf.setConsumeId(basicConsume.getConsumeId());
-        bf.setConsumeOrigin(consumeOrigin);
-        ContentData content = new ContentData();
-        content.setBytes(dataToSend);
-        bf.setContent(content);
-        context.write(bf);
     }
 
     @HttpMethodFilter(
