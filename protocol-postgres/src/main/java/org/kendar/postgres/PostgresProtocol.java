@@ -5,6 +5,7 @@ import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.base.BasePluginDescriptor;
+import org.kendar.postgres.executor.PostgresExecutor;
 import org.kendar.postgres.fsm.*;
 import org.kendar.postgres.fsm.events.PostgresPacket;
 import org.kendar.protocol.context.ProtoContext;
@@ -30,6 +31,8 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     private static final boolean IS_BIG_ENDIAN = true;
     private static final SqlStringParser parser = new SqlStringParser("$");
     private static DataTypesConverter dataTypesConverter;
+
+    private PostgresExecutor executor = new PostgresExecutor();
 
     static {
         try {
@@ -67,6 +70,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     @Override
     public ProtoContext createContext(ProtoDescriptor protoDescriptor, int contextId) {
         var result = new PostgresProtoContext(this, contextId);
+        result.setExecutor(this.executor);
         result.setValue("PARSER", parser);
         return result;
     }

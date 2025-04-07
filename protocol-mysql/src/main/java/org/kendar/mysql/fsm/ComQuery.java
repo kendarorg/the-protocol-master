@@ -33,7 +33,7 @@ public class ComQuery extends ProtoState {
 //        }
         var query = inputBuffer.getString(5);
         log.info("[SERVER][QUERY][2]: {}", query);
-        var executor = new MySQLExecutor();
+        var executor = context.getExecutor();
         return executor.executeText(context, query, new ArrayList<>(), true);
 
     }

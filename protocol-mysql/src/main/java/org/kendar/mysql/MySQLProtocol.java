@@ -3,6 +3,7 @@ package org.kendar.mysql;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
+import org.kendar.mysql.executor.MySQLExecutor;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.fsm.*;
 import org.kendar.mysql.fsm.events.CommandEvent;
@@ -27,6 +28,7 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
     private static final int PORT = 3306;
     private static final boolean IS_BIG_ENDIAN = true;
     private final int port;
+    private MySQLExecutor executor = new MySQLExecutor();
 
     @TpmConstructor
     public MySQLProtocol(GlobalSettings ini, MySqlProtocolSettings settings, MySQLProxy proxy,
@@ -34,6 +36,7 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
         super(ini, settings, proxy, plugins);
         this.port = settings.getPort();
         this.setTimeout(settings.getTimeoutSeconds());
+
     }
 
     public MySQLProtocol() {
@@ -65,6 +68,7 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
     protected ProtoContext createContext(ProtoDescriptor protoDescriptor,
                                          int contextId) {
         var result = new MySQLProtoContext(this, contextId);
+        result.setExecutor(this.executor);
         result.setValue("PARSER", parser);
         return result;
     }

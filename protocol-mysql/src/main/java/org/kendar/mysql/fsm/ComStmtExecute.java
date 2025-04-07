@@ -227,8 +227,7 @@ public class ComStmtExecute extends ProtoState {
                 }
             }
         }
-
-        var executor = new MySQLExecutor();
+        var executor = context.getExecutor();
         return executor.executeText(context, query, bindingParameters, false);
     }
 }
