@@ -4,6 +4,13 @@
             get: (searchParams, prop) => searchParams.get(prop),
         });
         let accordionPath = params.accordion;
+        if(accordionPath!==null || (typeof accordionPath !== "undefined")){
+            var panel = document.getElementById(accordionPath);
+            if(panel!=null){
+                openAccordion(accordionPath);
+                return;
+            }
+        }
 
         var panelStatus = getAccordionStatus();
         var propertyNames = Object.getOwnPropertyNames(panelStatus);
@@ -30,12 +37,7 @@
 
             }
         }
-        if(accordionPath!==null || (typeof accordionPath !== "undefined")){
-            var panel = document.getElementById(accordionPath);
-            if(panel!=null){
-                openAccordion(accordionPath);
-            }
-        }
+
     }
 
     setTimeout(function () {
