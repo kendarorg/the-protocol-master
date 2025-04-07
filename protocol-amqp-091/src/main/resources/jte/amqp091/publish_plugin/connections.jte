@@ -30,15 +30,15 @@
                 <label>
                     <input type="radio" name="connectionRadios"
                            id="connectionRadios0"
-                           value='0_0'>
+                           value='0_0' checked>
                     ALL
                 </label>
             </div>
-            @for(var i=1;i<=data.getConnections().size();i++)
+            @for(var i=0;i<data.getConnections().size();i++)
                 <div class="radio">
                     <label>
                         <input type="radio" name="connectionRadios"
-                               id="connectionRadios${i}"
+                               id="connectionRadios${i+1}"
                                value='${data.getConnections().get(i).getId()+"_"+data.getConnections().get(i).getChannel()}'>
                         ${data.getConnections().get(i).toString()}
                     </label>
