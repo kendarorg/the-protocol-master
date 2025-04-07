@@ -5,6 +5,9 @@ it within your preferred environment
 
 You write your server code, setup it on TPM and that's it
 
+An example is in `UiSeleniumTest::httpRestPluginsPlugin` where the server handler is
+into the `handleMessage` function. It simply replaces the Google logo with the Bing's one
+
 ## Your server
 
 * Create a REST api able to answer to POST request. e.g. 'http://host:91/callinterceptor'
