@@ -88,10 +88,17 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                         }
                     }
                 }
+
                 var ctx = context.getDescriptor().getContextsCache().get(consumeId);
                 var out = mapper.toJsonNode(item.getOutput());
                 var clazz = item.getOutputType();
                 ReturnMessage fr = null;
+                try {
+                    log.debug("Sending back response for {}:{}", item.getIndex(), mapper.serialize(out));
+                }catch (Exception e) {
+
+                }
+
                 switch (clazz) {
                     case "BasicDeliver":
                         var bd = mapper.deserialize(out, BasicDeliver.class);

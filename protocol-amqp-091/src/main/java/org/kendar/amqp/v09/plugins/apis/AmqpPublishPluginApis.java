@@ -25,10 +25,10 @@ import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ContentData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 
@@ -119,6 +119,8 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         doPublish(messageData, connectionId, channelId);
     }
 
+    private static final Logger log = LoggerFactory.getLogger(AmqpPublishPluginApis.class);
+
     public void doPublish(PublishAmqpMessage messageData, int connectionId, int channelId) {
         var pInstance = getDescriptor().getProtocolInstance();
         byte[] dataToSend;
@@ -127,7 +129,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         } else {
             dataToSend = messageData.getBody().getBytes();
         }
-
+        var consumerTags = new HashSet<String>();
         for(var contextValue: pInstance.getContextsCache().entrySet()) {
             if(connectionId!=0 && !contextValue.getKey().equals(connectionId)) {
                 continue;
@@ -140,9 +142,12 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
             }else{
                 for(var value:context.getKeys().stream().filter(val-> val.startsWith("BASIC_CONSUME_CH")).toList()){
                     var channel = Integer.parseInt(value.replace("BASIC_CONSUME_CH_", ""));
-                    basicConsumes.add(new WhereToSend((BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channel),channel));
+                    basicConsumes.add(new WhereToSend((BasicConsume) context.getValue(value),channel));
                 }
             }
+
+            //From most recents
+            Collections.reverse(basicConsumes);
             //{id=1, channel=1, consumeOrigin='quotations|1|{}', consumerTag=None1, canPublish=true, consumeId=1, exchange='stock'}
             for(var basicConsume: basicConsumes) {
                 var consumeId = basicConsume.getConsumeId();
@@ -158,6 +163,11 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                 var consumerTag = (String) context.getValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin());
                 if (consumerTag == null || consumerTag.isEmpty()) {
                     consumerTag = UUID.randomUUID().toString();
+                }else{
+                    if(consumerTags.contains(consumerTag)) {
+                        continue;
+                    }
+                    consumerTags.add(consumerTag);
                 }
                 var exchange = (String) context.getValue("EXCHANGE_CH_" + channelId);
                 if(messageData.getExchange()!=null && !messageData.getExchange().isEmpty()) {

@@ -9,6 +9,16 @@ public class ResponseItemQuery {
     private String caller;
     private long startAt;
 
+    @Override
+    public String toString() {
+        return "ResponseItemQuery{" +
+                "tags=" + tags +
+                ", used=" + used +
+                ", caller='" + caller + '\'' +
+                ", startAt=" + startAt +
+                '}';
+    }
+
     public HashSet<Integer> getUsed() {
         return used;
     }
