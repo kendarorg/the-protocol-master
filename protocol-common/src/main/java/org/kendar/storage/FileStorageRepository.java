@@ -196,6 +196,7 @@ public class FileStorageRepository extends StorageRepository {
                 }
 
                 currRepo.index = retrieveIndexFile(protocolInstanceId);
+                currRepo.index.sort(Comparator.comparing(CompactLine::getTimestamp));
                 if (!currRepo.index.isEmpty()) {
                     var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
                     var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);
@@ -385,6 +386,7 @@ public class FileStorageRepository extends StorageRepository {
             if (Files.exists(Path.of(targetDir, "scenario", indexFile))) {
                 Files.delete(Path.of(targetDir, "scenario", indexFile));
             }
+            repo.index.sort(Comparator.comparing(CompactLine::getTimestamp));
             setFileContent(Path.of(targetDir, "scenario", indexFile),
                     mapper.serializePretty(repo.index));
 
