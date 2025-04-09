@@ -183,7 +183,12 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
 
     @Override
     protected void handlePostActivation(boolean active) {
-        disconnectAll();
+        if(getSettings() instanceof BasicAysncReplayPluginSettings){
+            var bas = (BasicAysncReplayPluginSettings) this.getSettings();
+            if(bas.isResetConnectionsOnStart()){
+                disconnectAll();
+            }
+        }
     }
 
     protected void disconnectAll() {
