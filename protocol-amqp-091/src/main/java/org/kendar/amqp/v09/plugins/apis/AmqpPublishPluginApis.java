@@ -30,10 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static org.kendar.apis.ApiUtils.respondJson;
+import static org.kendar.apis.ApiUtils.*;
 
 @HttpTypeFilter()
 public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpPublishPlugin> {
+    private static final Logger log = LoggerFactory.getLogger(AmqpPublishPluginApis.class);
     private final MultiTemplateEngine resolversFactory;
 
     public AmqpPublishPluginApis(AmqpPublishPlugin descriptor, String id, String instanceId
@@ -116,12 +117,15 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         var connectionId = Integer.parseInt(request.getPathParameter("connectionId"));
         var channelId = Integer.parseInt(request.getPathParameter("channel"));
 
-        doPublish(messageData, connectionId, channelId);
+        var published = doPublish(messageData, connectionId, channelId);
+        if(published==0){
+            respondKo(response, "Publish failed");
+        }else{
+            respondOk(response);
+        }
     }
 
-    private static final Logger log = LoggerFactory.getLogger(AmqpPublishPluginApis.class);
-
-    public void doPublish(PublishAmqpMessage messageData, int connectionId, int channelId) {
+    public int doPublish(PublishAmqpMessage messageData, int connectionId, int channelId) {
         var pInstance = getDescriptor().getProtocolInstance();
         byte[] dataToSend;
         if (MimeChecker.isBinary(messageData.getContentType(), null)) {
@@ -130,91 +134,97 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
             dataToSend = messageData.getBody().getBytes();
         }
         var consumerTags = new HashSet<String>();
-        for(var contextValue: pInstance.getContextsCache().entrySet()) {
-            if(connectionId!=0 && !contextValue.getKey().equals(connectionId)) {
+        var written = 0;
+        for (var contextValue : pInstance.getContextsCache().entrySet()) {
+            if (connectionId != 0 && !contextValue.getKey().equals(connectionId)) {
                 continue;
             }
             var context = (AmqpProtoContext) contextValue.getValue();
 
             List<WhereToSend> basicConsumes = new ArrayList<>();
-            if(channelId!=0) {
-                basicConsumes = List.of (new WhereToSend((BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channelId),channelId));
-            }else{
-                for(var value:context.getKeys().stream().filter(val-> val.startsWith("BASIC_CONSUME_CH")).toList()){
+            if (channelId != 0) {
+                basicConsumes = List.of(new WhereToSend((BasicConsume) context.getValue("BASIC_CONSUME_CH_" + channelId), channelId));
+            } else {
+                for (var value : context.getKeys().stream().filter(val -> val.startsWith("BASIC_CONSUME_CH")).toList()) {
                     var channel = Integer.parseInt(value.replace("BASIC_CONSUME_CH_", ""));
-                    basicConsumes.add(new WhereToSend((BasicConsume) context.getValue(value),channel));
+                    basicConsumes.add(new WhereToSend((BasicConsume) context.getValue(value), channel));
                 }
             }
 
             //From most recents
             Collections.reverse(basicConsumes);
             //{id=1, channel=1, consumeOrigin='quotations|1|{}', consumerTag=None1, canPublish=true, consumeId=1, exchange='stock'}
-            for(var basicConsume: basicConsumes) {
-                var consumeId = basicConsume.getConsumeId();
-                var consumeOrigin = basicConsume.getConsumeOrigin();
-                channelId = basicConsume.getChannelId();
+            for (var basicConsume : basicConsumes) {
+                try {
+                    var consumeId = basicConsume.getConsumeId();
+                    var consumeOrigin = basicConsume.getConsumeOrigin();
+                    channelId = basicConsume.getChannelId();
 
-                if(messageData.getQueue()!=null && !messageData.getQueue().isEmpty()) {
-                    if(!consumeOrigin.startsWith(messageData.getQueue()+"|")) {
-                        continue;
+                    if (messageData.getQueue() != null && !messageData.getQueue().isEmpty()) {
+                        if (!consumeOrigin.startsWith(messageData.getQueue() + "|")) {
+                            continue;
+                        }
                     }
-                }
 
-                var consumerTag = (String) context.getValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin());
-                if (consumerTag == null || consumerTag.isEmpty()) {
-                    consumerTag = UUID.randomUUID().toString();
-                }else{
-                    if(consumerTags.contains(consumerTag)) {
-                        continue;
+                    var consumerTag = (String) context.getValue("BASIC_CONSUME_CT_" + basicConsume.getConsumeOrigin());
+                    if (consumerTag == null || consumerTag.isEmpty()) {
+                        consumerTag = UUID.randomUUID().toString();
+                    } else {
+                        if (consumerTags.contains(consumerTag)) {
+                            continue;
+                        }
+                        consumerTags.add(consumerTag);
                     }
-                    consumerTags.add(consumerTag);
-                }
-                var exchange = (String) context.getValue("EXCHANGE_CH_" + channelId);
-                if(messageData.getExchange()!=null && !messageData.getExchange().isEmpty()) {
-                    if(!exchange.equalsIgnoreCase(messageData.getExchange())) {
-                        continue;
+                    var exchange = (String) context.getValue("EXCHANGE_CH_" + channelId);
+                    if (messageData.getExchange() != null && !messageData.getExchange().isEmpty()) {
+                        if (!exchange.equalsIgnoreCase(messageData.getExchange())) {
+                            continue;
+                        }
                     }
+                    var routingKeys = (String) context.getValue("ROUTING_KEYS_CH_" + channelId);
+                    var bd = new BasicDeliver();
+                    bd.setChannel((short) channelId);
+                    bd.setConsumeId(basicConsume.getConsumeId());
+                    bd.setConsumerTag(consumerTag);
+                    bd.setDeliveryTag(messageData.getDeliveryTag());
+                    bd.setRedelivered(false);
+                    bd.setExchange(exchange);
+                    bd.setRoutingKey(routingKeys);
+                    bd.setConsumeOrigin(consumeOrigin);
+                    context.write(bd);
+
+
+                    var hf = new HeaderFrame();
+                    hf.setType((byte) 2);
+                    hf.setClassId((short) 60);
+                    hf.setWeight((short) 0);
+                    hf.setChannel((short) channelId);
+                    hf.setConsumeId(basicConsume.getConsumeId());
+                    hf.setContentType(messageData.getContentType());
+                    hf.setConsumeOrigin(consumeOrigin);
+                    hf.setAppId(messageData.getAppId());
+                    hf.setDeliveryMode(messageData.getDeliveryMode());
+                    hf.setPropertyFlags(messageData.getPropertyFlag());
+
+                    hf.setBodySize(dataToSend.length);
+                    context.write(hf);
+
+                    var bf = new BodyFrame();
+                    bf.setChannel((short) channelId);
+                    bf.setType((byte) 3);
+                    bf.setConsumeId(basicConsume.getConsumeId());
+                    bf.setConsumeOrigin(consumeOrigin);
+                    ContentData content = new ContentData();
+                    content.setBytes(dataToSend);
+                    bf.setContent(content);
+                    context.write(bf);
+                    written++;
+                } catch (Exception ex) {
+
                 }
-                var routingKeys = (String) context.getValue("ROUTING_KEYS_CH_" + channelId);
-                var bd = new BasicDeliver();
-                bd.setChannel((short) channelId);
-                bd.setConsumeId(basicConsume.getConsumeId());
-                bd.setConsumerTag(consumerTag);
-                bd.setDeliveryTag(messageData.getDeliveryTag());
-                bd.setRedelivered(false);
-                bd.setExchange(exchange);
-                bd.setRoutingKey(routingKeys);
-                bd.setConsumeOrigin(consumeOrigin);
-                context.write(bd);
-
-
-                var hf = new HeaderFrame();
-                hf.setType((byte) 2);
-                hf.setClassId((short) 60);
-                hf.setWeight((short) 0);
-                hf.setChannel((short) channelId);
-                hf.setConsumeId(basicConsume.getConsumeId());
-                hf.setContentType(messageData.getContentType());
-                hf.setConsumeOrigin(consumeOrigin);
-                hf.setAppId(messageData.getAppId());
-                hf.setDeliveryMode(messageData.getDeliveryMode());
-                hf.setPropertyFlags(messageData.getPropertyFlag());
-
-                hf.setBodySize(dataToSend.length);
-                context.write(hf);
-
-                var bf = new BodyFrame();
-                bf.setChannel((short) channelId);
-                bf.setType((byte) 3);
-                bf.setConsumeId(basicConsume.getConsumeId());
-                bf.setConsumeOrigin(consumeOrigin);
-                ContentData content = new ContentData();
-                content.setBytes(dataToSend);
-                bf.setContent(content);
-                context.write(bf);
             }
         }
-
+        return written;
 
 
     }
