@@ -66,6 +66,7 @@ public class RedisReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginS
                     }
                 }
             }
+            if(!isActive())return;
             var out = mapper.toJsonNode(item.getOutput());
             var type = item.getOutputType();
 

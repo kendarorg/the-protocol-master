@@ -106,6 +106,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                         }
                     }
                 }
+                if(!isActive())return;
 
 
                 var out = mapper.toJsonNode(item.getOutput());
