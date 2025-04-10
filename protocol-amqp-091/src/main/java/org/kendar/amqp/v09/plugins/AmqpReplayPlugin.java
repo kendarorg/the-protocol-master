@@ -9,6 +9,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.BasicReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
+import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
@@ -24,6 +25,7 @@ import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @TpmService(tags = "amqp091")
 public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSettings> {
@@ -34,10 +36,26 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
             "BasicConsume", "byte[]", "ConnectionStartOk", "ConnectionOpen",
             "ChannelOpen"
     );
+    private final ConcurrentHashMap<Integer, NetworkProtoContext> realConnectionToRecorded = new ConcurrentHashMap<>();
 
 
     public AmqpReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
+    }
+
+    private static boolean stringEquals(String proposedExchange, String exchange) {
+        if (proposedExchange == null) proposedExchange = "";
+        if (exchange == null) exchange = "";
+        return exchange.equalsIgnoreCase(proposedExchange);
+    }
+
+    @Override
+    protected void handleActivation(boolean active) {
+
+        if (this.isActive() != active) {
+            realConnectionToRecorded.clear();
+        }
+        super.handleActivation(active);
     }
 
     @Override
@@ -89,19 +107,29 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                     }
                 }
 
-                var ctx = context.getDescriptor().getContextsCache().get(consumeId);
+
                 var out = mapper.toJsonNode(item.getOutput());
                 var clazz = item.getOutputType();
+                if (clazz.equalsIgnoreCase("BasicDeliver")) {
+                    var bd = mapper.deserialize(out, BasicDeliver.class);
+                    if (!realConnectionToRecorded.containsKey(bd.getConsumeId())) {
+                        var ctx = (NetworkProtoContext) findConnection(bd.getExchange(), bd.getConsumeOrigin(), context);
+                        realConnectionToRecorded.put(bd.getConsumeId(), ctx);
+                    }
+                }
+
+
                 ReturnMessage fr = null;
                 try {
                     log.debug("Sending back response for {}:{}", item.getIndex(), mapper.serialize(out));
-                }catch (Exception e) {
+                } catch (Exception e) {
 
                 }
-
+                NetworkProtoContext ctx = null;
                 switch (clazz) {
                     case "BasicDeliver":
                         var bd = mapper.deserialize(out, BasicDeliver.class);
+                        ctx = realConnectionToRecorded.get(bd.getConsumeId());
                         var tag = (String) ctx.getValue("BASIC_CONSUME_CT_" + bd.getConsumeOrigin());
 
                         log.trace("BasicDeliver tag{}", tag);
@@ -111,13 +139,22 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                         fr = bd;
                         break;
                     case "HeaderFrame":
-                        fr = mapper.deserialize(out, HeaderFrame.class);
+                        var hf = mapper.deserialize(out, HeaderFrame.class);
+                        ctx = realConnectionToRecorded.get(hf.getConsumeId());
+                        fr = hf;
                         break;
                     case "BodyFrame":
-                        fr = mapper.deserialize(out, BodyFrame.class);
+                        var bf = mapper.deserialize(out, BodyFrame.class);
+                        ctx = realConnectionToRecorded.get(bf.getConsumeId());
+                        fr = bf;
                         break;
                     case "BasicCancel":
-                        fr = mapper.deserialize(out, BasicCancel.class);
+                        var bc = mapper.deserialize(out, BasicCancel.class);
+                        ctx = realConnectionToRecorded.get(bc.getConsumeId());
+                        if(ctx==null){
+                            ctx = (NetworkProtoContext) context.getDescriptor().getContextsCache().get(consumeId);
+                        }
+                        fr = bc;
                         break;
                 }
                 if (fr != null) {
@@ -128,6 +165,22 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                 }
             }
         }
+    }
+
+    private ProtoContext findConnection(String proposedExchange, String consumeOrigin, ProtoContext mainContext) {
+        for (var contextGeneric : mainContext.getDescriptor().getContextsCache().values()) {
+            var context = (NetworkProtoContext) contextGeneric;
+            for (var key : context.getKeys().stream().filter(val -> val.startsWith("BASIC_CONSUME_CH")).toList()) {
+                var basicConsume = (BasicConsume) context.getValue(key);
+                var channelId = basicConsume.getChannel();
+                var exchange = (String) context.getValue("EXCHANGE_CH_" + channelId);
+                if (stringEquals(proposedExchange, exchange) &&
+                        stringEquals(consumeOrigin, basicConsume.getConsumeOrigin())) {
+                    return context;
+                }
+            }
+        }
+        return null;
     }
 
     protected Map<String, String> getContextTags(ProtoContext context) {
