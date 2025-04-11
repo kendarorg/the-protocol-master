@@ -81,11 +81,13 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                     connection.setCanPublish(true);
                     connection.setConsumeOrigin(basicConsume.getConsumeOrigin());
                     connection.setConsumerTag(basicConsume.getConsumerTag());
+                    connection.setLastAccess(context.getLastAccess());
                 }
                 result.add(connection);
             }
         }
-        return result;
+        return result.stream().
+                sorted(Comparator.comparing(AmqpConnection::getLastAccess).reversed()).toList();
     }
 
     @HttpMethodFilter(

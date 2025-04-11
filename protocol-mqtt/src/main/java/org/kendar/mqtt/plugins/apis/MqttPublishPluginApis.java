@@ -27,7 +27,9 @@ import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ContentData;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 
@@ -60,7 +62,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
         respondJson(response, result);
     }
 
-    private ArrayList<MqttConnection> loadConnections() {
+    private List<MqttConnection> loadConnections() {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<MqttConnection>();
         for (var ccache : pInstance.getContextsCache().entrySet()) {
@@ -77,11 +79,13 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                 connection.setId(key);
                 connection.setQos(qos);
                 connection.setTopic(topic);
+                connection.setLastAccess(context.getLastAccess());
                 result.add(connection);
             }
 
         }
-        return result;
+        return result.stream().
+                sorted(Comparator.comparing(MqttConnection::getLastAccess).reversed()).toList();
     }
 
     @HttpMethodFilter(

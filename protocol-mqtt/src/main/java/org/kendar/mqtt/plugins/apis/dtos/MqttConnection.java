@@ -6,6 +6,7 @@ public class MqttConnection {
     private int qos = 0;
     private String topic;
     private Integer id;
+    private long lastAccess;
 
     @Override
     public String toString() {
@@ -50,5 +51,13 @@ public class MqttConnection {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public void setLastAccess(long lastAccess) {
+        this.lastAccess = lastAccess;
+    }
+
+    public long getLastAccess() {
+        return lastAccess;
     }
 }

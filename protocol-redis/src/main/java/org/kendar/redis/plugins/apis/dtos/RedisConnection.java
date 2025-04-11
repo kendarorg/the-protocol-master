@@ -5,6 +5,7 @@ import java.util.Objects;
 public class RedisConnection {
     private Integer id;
     private String subscription;
+    private long lastAccess;
 
     public Integer getId() {
         return id;
@@ -40,5 +41,13 @@ public class RedisConnection {
 
     public void setSubscription(String subscription) {
         this.subscription = subscription;
+    }
+
+    public void setLastAccess(long lastAccess) {
+        this.lastAccess = lastAccess;
+    }
+
+    public long getLastAccess() {
+        return lastAccess;
     }
 }

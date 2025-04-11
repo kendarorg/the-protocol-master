@@ -23,6 +23,7 @@ import org.kendar.redis.plugins.apis.dtos.RedisConnections;
 import org.kendar.ui.MultiTemplateEngine;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.kendar.apis.ApiUtils.respondJson;
@@ -58,7 +59,7 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
         respondJson(response, result);
     }
 
-    private ArrayList<RedisConnection> loadConnections() {
+    private List<RedisConnection> loadConnections() {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<RedisConnection>();
         for (var ccache : pInstance.getContextsCache().entrySet()) {
@@ -71,10 +72,12 @@ public class RedisPublishPluginApis extends ProtocolPluginApiHandlerDefault<Redi
             var connection = new RedisConnection();
             connection.setId(key);
             connection.setSubscription(subscription);
+            connection.setLastAccess(context.getLastAccess());
             result.add(connection);
 
         }
-        return result;
+        return result.stream().
+                sorted(Comparator.comparing(RedisConnection::getLastAccess).reversed()).toList();
     }
 
     @HttpMethodFilter(
