@@ -285,6 +285,7 @@ public class HttpSimpleTest extends BasicTest {
         var found200Warn = false;
         var found429 = false;
         for (var i = 0; i < 100; i++) {
+            Sleeper.sleep(5);
             var httpresponse = httpclient.execute(httpget);
             var sl = httpresponse.getStatusLine().toString().trim();
             var is200 = sl.equalsIgnoreCase("HTTP/1.1 200 OK");
