@@ -294,7 +294,10 @@ public class SimpleTest extends AmqpBasicTest {
         System.out.println("WAIT------------------------------------------------------------");
 
 
-        Sleeper.sleep(6000,()-> messages.size()!=3);
+        Sleeper.sleep(6000,()->{
+            System.out.println(messages.size());
+            return messages.size()==3;
+        });
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
