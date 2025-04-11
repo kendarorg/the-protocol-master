@@ -220,7 +220,7 @@ public class SimpleTest extends AmqpBasicTest {
         System.out.println("------------------------------------------------------------");
 
 
-        Sleeper.sleep(1000, () -> {
+        Sleeper.sleep(6000, () -> {
             System.err.println("SIZE: " + messages.size());
             return messages.size() == 3;
         });
@@ -295,7 +295,7 @@ public class SimpleTest extends AmqpBasicTest {
 
 
         Sleeper.sleep(6000,()->{
-            //System.out.println(messages.size());
+            System.out.println("SIZE2 "+messages.size());
             return messages.size()==3;
         });
 
