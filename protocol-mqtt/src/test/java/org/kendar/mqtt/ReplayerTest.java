@@ -58,7 +58,6 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
-        ;
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
@@ -110,7 +109,6 @@ public class ReplayerTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
-        ;
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
 
@@ -177,16 +175,15 @@ public class ReplayerTest {
 
             MqttConnectOptions options = new MqttConnectOptions();
             client.connect(options);
+            Sleeper.sleep(300, () -> client.isConnected());
+            setupCallBack(client);
 
-            if (client.isConnected()) {
-                setupCallBack(client);
+            client.subscribe(TOPIC_NAME, 2);
 
-                client.subscribe(TOPIC_NAME, 2);
+            MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
+            message.setQos(2);
+            client.publish(TOPIC_NAME, message);
 
-                MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
-                message.setQos(2);
-                client.publish(TOPIC_NAME, message);
-            }
             Sleeper.sleep(1000, () -> !messages.isEmpty());
             client.disconnect();
             client.close();
