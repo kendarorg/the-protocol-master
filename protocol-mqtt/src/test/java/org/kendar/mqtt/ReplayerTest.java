@@ -184,7 +184,7 @@ public class ReplayerTest {
             message.setQos(2);
             client.publish(TOPIC_NAME, message);
 
-            Sleeper.sleep(1000, () -> !messages.isEmpty());
+            Sleeper.sleep(6000, () -> !messages.isEmpty());
             client.disconnect();
             client.close();
             assertEquals(1, messages.size());

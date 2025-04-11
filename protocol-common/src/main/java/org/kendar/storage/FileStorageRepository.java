@@ -441,7 +441,7 @@ public class FileStorageRepository extends StorageRepository {
 
         log.debug("[CL<FF] loading responses {}", query.getStartAt());
         for (var item : ctx.index.stream()
-                .sorted(Comparator.comparingLong(CompactLine::getTimestamp)).
+                .sorted(Comparator.comparingLong(CompactLine::getIndex)).
                 filter(value -> value.getIndex() > query.getStartAt()).
                 toList()) {
             if (query.getUsed().contains((int) item.getIndex())) continue;

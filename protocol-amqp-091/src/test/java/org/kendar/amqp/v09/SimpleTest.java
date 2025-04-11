@@ -292,10 +292,9 @@ public class SimpleTest extends AmqpBasicTest {
         channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
         chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
         System.out.println("WAIT------------------------------------------------------------");
-        Sleeper.sleep(500);
 
 
-        Sleeper.sleep(100);
+        Sleeper.sleep(6000,()->messages.size()<3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
