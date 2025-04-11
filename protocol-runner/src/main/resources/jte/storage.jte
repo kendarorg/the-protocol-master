@@ -10,7 +10,7 @@
     function cleanStorage() {
         if (confirm("You want to remove ALL data?") == true) {
             getData("/api/global/storage", "DELETE", () => {
-                alert("All data deleted");
+                showAlert("All data deleted");
             })
         }
     }

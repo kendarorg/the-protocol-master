@@ -47,3 +47,101 @@ body.jw-modal-open {
     /* body overflow is hidden to hide main scrollbar when modal window is open */
     overflow: hidden;
 }
+
+/* For disappearibg messages */
+
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    z-index: 9999;
+}
+
+.notification {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideIn 0.3s ease-out forwards;
+    opacity: 0;
+    transform: translateX(30px);
+}
+
+.notification.success {
+    background-color: #27ae60;
+    color: white;
+    border-left: 5px solid #219652;
+}
+
+.notification.error {
+    background-color: #e74c3c;
+    color: white;
+    border-left: 5px solid #c0392b;
+}
+
+.notification.info {
+    background-color: #3498db;
+    color: white;
+    border-left: 5px solid #2980b9;
+}
+
+.notification.warning {
+    background-color: #f39c12;
+    color: white;
+    border-left: 5px solid #d35400;
+}
+
+.notification-content {
+    flex-grow: 1;
+}
+
+.notification-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    font-size: 0.9em;
+}
+
+.notification-close {
+    cursor: pointer;
+    padding: 0 5px;
+    font-size: 16px;
+    font-weight: bold;
+    opacity: 0.7;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+.notification.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}

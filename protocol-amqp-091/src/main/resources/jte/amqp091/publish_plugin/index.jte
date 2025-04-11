@@ -26,9 +26,7 @@
 
             sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status) => {
                 if (status == 200) {
-                    alert("Data Sent!");
-                } else {
-                    alert("Error sending data!")
+                    showAlert("Data Sent!");
                 }
 
             })

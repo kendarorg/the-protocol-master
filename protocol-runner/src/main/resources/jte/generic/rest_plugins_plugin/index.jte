@@ -24,7 +24,7 @@
         });
         console.log(data);
         sendData('/api/protocols/${data.getInstanceId()}/plugins/${data.getId()}/settings', 'PUT', JSON.stringify(data), 'application/json', (status, response) => {
-            location.reload();
+            if(status==200)location.reload();
         })
     }
 </script>

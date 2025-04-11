@@ -41,6 +41,10 @@
     }
 
     setTimeout(function () {
+        NotificationSystem.init();
         loadPanels();
+        handleHtmxResults();
     }, 500);
+
+
 </script>

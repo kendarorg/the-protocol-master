@@ -33,7 +33,7 @@
             })
             .catch(err => {
                 console.error('Failed to read clipboard contents: ', err);
-                alert("Invalid content! " + err);
+                showError("Invalid content! " + err);
             });
     }
 
@@ -68,9 +68,7 @@
         var path = "/api/protocols/${data.getInstanceId()}/plugins/mock-plugin/mocks/" + fileName;
         sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status, message) => {
             if (status == 200) {
-                alert("Data Sent!");
-            } else {
-                alert("Error sending data! " + message)
+                showAlert("Data Sent!");
             }
 
         })
