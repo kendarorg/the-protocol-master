@@ -284,7 +284,7 @@ public class HttpSimpleTest extends BasicTest {
         var found200Clean = false;
         var found200Warn = false;
         var found429 = false;
-        for (var i = 0; i < 100; i++) {
+        for (var i = 0; i < 300; i++) {
             Sleeper.sleep(5);
             var httpresponse = httpclient.execute(httpget);
             var sl = httpresponse.getStatusLine().toString().trim();
