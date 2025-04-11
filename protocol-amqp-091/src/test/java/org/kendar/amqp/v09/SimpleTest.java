@@ -296,7 +296,7 @@ public class SimpleTest extends AmqpBasicTest {
         channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
         chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
         System.out.println("WAIT------------------------------------------------------------");
-        Sleeper.sleep(100);
+        Sleeper.sleep(500);
 
         chanConsume.queueDelete(MAIN_QUEUE);
         channel.queueDelete(MAIN_QUEUE);
