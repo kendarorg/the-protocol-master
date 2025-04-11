@@ -295,7 +295,7 @@ public class SimpleTest extends AmqpBasicTest {
 
 
         Sleeper.sleep(6000,()->{
-            System.out.println(messages.size());
+            //System.out.println(messages.size());
             return messages.size()==3;
         });
 
