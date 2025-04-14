@@ -52,10 +52,18 @@ function sendData(path, verb, data, contentType, callback) {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (typeof callback === 'function') {
-                callback(xhr.status, xhr.response);
+                if(xhr.status==200 || callback.length>=1) {
+                    callback(xhr.status, xhr.response);
+                }else if(xhr.status==200){
+                    callback(xhr.status, xhr.response);
+                }
             }
             if (xhr.status != 200) {
-                console.error(xhr);
+                console.error(xhr.status+" "+xhr.response);
+                showNotification('error',"Error sending request",
+                    "Path: "+path+
+                    "\nContent Type: "+contentType+
+                    "\nVerb: "+verb)
             }
 
             // Request finished. Do processing here.
@@ -77,10 +85,17 @@ function getData(path, verb, callback) {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (typeof callback === 'function') {
-                callback(xhr.status, xhr.response);
+                if(xhr.status==200 || callback.length>=1) {
+                    callback(xhr.status, xhr.response);
+                }else if(xhr.status==200){
+                    callback(xhr.status, xhr.response);
+                }
             }
             if (xhr.status != 200) {
-                console.error(xhr);
+                console.error(xhr.status+" "+xhr.response);
+                showNotification('error',"Error sending no body request",
+                    "Path: "+path+
+                    "\nVerb: "+verb)
             }
         }
     };
@@ -252,7 +267,11 @@ function send_file(path, data, contentType, output, outputCode) {
                 output.innerHTML = xhr.response;
             }
             if (xhr.status != 200) {
-                console.error(xhr);
+                console.error(xhr.status+" "+xhr.response);
+                showNotification('error',"Error uploading file",
+                    "Path: "+path+
+                    "\nContent Type: "+contentType+
+                    "\nVerb: "+verb)
             }
             // Request finished. Do processing here.
         }
@@ -387,3 +406,127 @@ window.addEventListener('load', function () {
 function locationReload() {
     location.reload();
 }
+
+const NotificationSystem = {
+    container: document.getElementById('notification-container'),
+    timeout: 5000, // Default timeout 5 seconds
+
+    init() {
+        // Create container if it doesn't exist
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.className = 'notification-container';
+            document.body.appendChild(this.container);
+        }
+    },
+
+    show(type, title, message, timeout = this.timeout) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+
+        // Create content
+        const content = document.createElement('div');
+        content.className = 'notification-content';
+
+        // Add title if provided
+        if (title) {
+            const titleElement = document.createElement('div');
+            titleElement.className = 'notification-title';
+            titleElement.textContent = title;
+            content.appendChild(titleElement);
+        }
+
+        // Add message
+        if(message!=null) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'notification-message';
+            messageElement.textContent = message;
+            content.appendChild(messageElement);
+        }
+
+        // Add close button
+        const closeBtn = document.createElement('span');
+        closeBtn.className = 'notification-close';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', () => this.close(notification));
+
+        // Assemble notification
+        notification.appendChild(content);
+        notification.appendChild(closeBtn);
+
+        // Add to container
+        this.container.appendChild(notification);
+
+        // Set timeout for auto-close
+        if (timeout > 0) {
+            notification.timeoutId = setTimeout(() => {
+                this.close(notification);
+            }, timeout);
+        }
+
+        // Return notification element for potential further manipulation
+        return notification;
+    },
+
+    close(notification) {
+        // Clear timeout if exists
+        if (notification.timeoutId) {
+            clearTimeout(notification.timeoutId);
+        }
+
+        // Add fade-out animation
+        notification.classList.add('fade-out');
+
+        // Remove after animation completes
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 500); // Match duration of fadeOut animation
+    },
+
+    // Shorthand methods for common notification types
+    success(title, message, timeout) {
+        return this.show('success', title, message, timeout);
+    },
+
+    error(title, message, timeout) {
+        return this.show('error', title, message, timeout);
+    },
+
+    info(title, message, timeout) {
+        return this.show('info', title, message, timeout);
+    },
+
+    warning(title, message, timeout) {
+        return this.show('warning', title, message, timeout);
+    }
+};
+
+function showNotification(type, title, message) {
+    NotificationSystem.show(type, title, message);
+}
+
+function showAlert(title) {
+    NotificationSystem.show("info", "INFO", title);
+}
+
+function showError(title) {
+    NotificationSystem.show("error", "ERROR", title);
+}
+
+function handleHtmxResults(){
+    document.addEventListener('htmx:afterRequest', function(evt) {
+        if(evt.detail.xhr.status == 404){
+            /* Notify the user of a 404 Not Found response */
+            return showError("Error: Could Not Find Resource");
+        }
+        if (evt.detail.successful != true) {
+            /* Notify of an unexpected error, & print error to console */
+            showNotification("error","Unexpected Error",evt);
+            return console.error(evt);
+        }
+    });
+}
+

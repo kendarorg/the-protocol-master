@@ -30,10 +30,8 @@
         var path = "/api/protocols/${protocol.getProtocolInstanceId()}/dns/registered";
         sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status) => {
             if (status == 200) {
-                alert("Data Sent!");
-                location.reload();
-            } else {
-                alert("Error sending data!")
+                showAlert("Data Sent!");
+                setTimeout(()->location.reload(),2000);
             }
 
         })
@@ -61,10 +59,8 @@
         var path = "/api/protocols/${protocol.getProtocolInstanceId()}/dns/blocked";
         sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status) => {
             if (status == 200) {
-                alert("Data Sent!");
-                location.reload();
-            } else {
-                alert("Error sending data!")
+                showAlert("Data Sent!");
+                setTimeout(()->location.reload(),2000);
             }
 
         })
@@ -87,7 +83,7 @@
             })
             .catch(err => {
                 console.error('Failed to read clipboard contents: ', err);
-                alert("Invalid content! " + err);
+                showError("Invalid content! " + err);
             });
     }
 
@@ -99,7 +95,7 @@
             };
             console.log(data);
             sendData('/api/protocols/${protocol.getProtocolInstanceId()}', 'POST', JSON.stringify(data), 'application/json', (status, response) => {
-                location.reload();
+                if(status==200)location.reload();
             })
         }
     }

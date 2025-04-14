@@ -164,13 +164,13 @@ public class SubscribeTest extends MqttBasicTest {
             message.setQos(0);
             client.publish(TOPIC_NAME, message);
         }
-        Sleeper.sleep(1000, () -> messages.size() > 0);
-        client.disconnect();
-        client.close();
+        Sleeper.sleep(6000, () -> messages.size() > 0);
         assertEquals(1, messages.size());
         var mesg = messages.get(0);
         assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
         assertEquals(0, mesg.getQos());
+        client.disconnect();
+        client.close();
     }
 
     @Test

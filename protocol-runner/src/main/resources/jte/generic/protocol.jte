@@ -17,7 +17,7 @@
             };
             console.log(data);
             sendData('/api/protocols/${protocol.getProtocolInstanceId()}', 'POST', JSON.stringify(data), 'application/json', (status, response) => {
-                location.reload();
+                if(status==200)location.reload();
             })
         }
     }

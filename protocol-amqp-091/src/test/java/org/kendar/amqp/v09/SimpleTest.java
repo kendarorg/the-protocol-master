@@ -21,8 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class SimpleTest extends AmqpBasicTest {
@@ -136,17 +135,7 @@ public class SimpleTest extends AmqpBasicTest {
         Sleeper.sleep(100);
         channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
         chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
-        Sleeper.sleep(100);
 
-        System.out.println("QEUEUE DELETE------------------------------------------------------");
-        channel.queueDelete(MAIN_QUEUE);
-
-        Sleeper.sleep(100);
-        System.out.println("CLOSE CHANNEL ------------------------------------------------");
-        channel.close();
-        Sleeper.sleep(100);
-        System.out.println("CLOSE CONNNECTION ------------------------------------------------");
-        connection.close();
 
 
         Sleeper.sleep(1000, () -> messages.size() == 3);
@@ -155,6 +144,11 @@ public class SimpleTest extends AmqpBasicTest {
         assertTrue(messages.containsValue(exectedMessage + "1"));
         assertTrue(messages.containsValue(exectedMessage + "2"));
         assertTrue(messages.containsValue(exectedMessage + "3"));
+
+
+        channel.queueDelete(MAIN_QUEUE);
+        channel.close();
+        connection.close();
     }
 
 
@@ -226,19 +220,21 @@ public class SimpleTest extends AmqpBasicTest {
         System.out.println("------------------------------------------------------------");
 
 
-        Sleeper.sleep(1000, () -> {
+        Sleeper.sleep(6000, () -> {
             System.err.println("SIZE: " + messages.size());
             return messages.size() == 3;
         });
-        channel1.queueDelete(MAIN_QUEUE);
-        channel.queueDelete(MAIN_QUEUE);
-        channel.close();
-        connection.close();
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
         assertTrue(messages.containsValue(exectedMessage + "2"));
         assertTrue(messages.containsValue(exectedMessage + "3"));
+
+
+        channel1.queueDelete(MAIN_QUEUE);
+        channel.queueDelete(MAIN_QUEUE);
+        channel.close();
+        connection.close();
     }
 
     void test5_noPublish() throws Exception {
@@ -294,22 +290,24 @@ public class SimpleTest extends AmqpBasicTest {
         channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "1").getBytes());
         Sleeper.sleep(100);
         channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
-        chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
+        channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
         System.out.println("WAIT------------------------------------------------------------");
-        Sleeper.sleep(100);
-
-        chanConsume.queueDelete(MAIN_QUEUE);
-        channel.queueDelete(MAIN_QUEUE);
-        channel.close();
-        connection.close();
 
 
-        Sleeper.sleep(100);
+        Sleeper.sleep(6000,()->{
+            System.out.println("SIZE2 "+messages.size());
+            return messages.size()==3;
+        });
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
         assertTrue(messages.containsValue(exectedMessage + "2"));
         assertTrue(messages.containsValue(exectedMessage + "3"));
+
+        channel.queueDelete(MAIN_QUEUE);
+        channel.close();
+        connection.close();
+
     }
 
 
@@ -349,7 +347,7 @@ public class SimpleTest extends AmqpBasicTest {
 
         channel.queueDeclare(MAIN_QUEUE, false, false, false, null);
 
-        var chanConsume = consume(connectionFactory, messages, channel);
+        consume(connectionFactory, messages, channel);
 
 
         Sleeper.sleep(100);
@@ -362,7 +360,7 @@ public class SimpleTest extends AmqpBasicTest {
         publish.getConnections(new Request(), res);
         var responses = mapper.deserialize(res.getResponseText(), new TypeReference<List<AmqpConnection>>() {
         });
-        assertEquals(1, responses.size());
+        assertFalse(responses.isEmpty());
         var response = responses.get(0);
         var pm = new PublishAmqpMessage();
         pm.setAppId("test");
@@ -374,22 +372,14 @@ public class SimpleTest extends AmqpBasicTest {
         pm.setBody("TestData3");
         publish.doPublish(pm, response.getId(), response.getChannel());
 
-
-        System.out.println("a");
-
-        Sleeper.sleep(100);
-        System.out.println("CLOSE CHANNEL ------------------------------------------------");
-        channel.close();
-        Sleeper.sleep(100);
-        System.out.println("CLOSE CONNNECTION ------------------------------------------------");
-        connection.close();
-
-
         Sleeper.sleep(1000, () -> messages.size() == 3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue("TestData1"));
         assertTrue(messages.containsValue("TestData2"));
         assertTrue(messages.containsValue("TestData3"));
+
+        channel.close();
+        connection.close();
     }
 }

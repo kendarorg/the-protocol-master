@@ -43,6 +43,7 @@ public class SimpleTest extends MqttBasicTest {
 
     @AfterEach
     public void afterEach() {
+        Sleeper.sleep(500);
         try {
             afterClassBase();
         } catch (Exception ex) {

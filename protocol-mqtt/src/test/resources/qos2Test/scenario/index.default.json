@@ -1,12 +1,5 @@
 [
   {
-    "index": 5,
-    "type": "Disconnect",
-    "caller": "MQTT",
-    "durationMs": 1042,
-    "tags": {}
-  },
-  {
     "index": 1,
     "type": "Connect",
     "caller": "MQTT",
@@ -59,6 +52,14 @@
     "type": "PublishComp",
     "caller": "MQTT",
     "durationMs": 11,
+    "tags": {}
+  },
+
+  {
+    "index": 8,
+    "type": "Disconnect",
+    "caller": "MQTT",
+    "durationMs": 1042,
     "tags": {}
   }
 ]

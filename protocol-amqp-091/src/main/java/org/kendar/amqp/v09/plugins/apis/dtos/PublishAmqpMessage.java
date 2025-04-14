@@ -7,6 +7,24 @@ public class PublishAmqpMessage {
     private int propertyFlag = -28664;
     private int deliveryMode = 1;
     private long deliveryTag = 1;
+    private String queue = null;
+    private String exchange = null;
+
+    public String getExchange() {
+        return exchange;
+    }
+
+    public void setExchange(String exchange) {
+        this.exchange = exchange;
+    }
+
+    public String getQueue() {
+        return queue;
+    }
+
+    public void setQueue(String queue) {
+        this.queue = queue;
+    }
 
     public PublishAmqpMessage() {
 

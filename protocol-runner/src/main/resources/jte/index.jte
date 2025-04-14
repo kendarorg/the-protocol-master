@@ -16,7 +16,7 @@
     function terminate() {
         if (confirm("You want to terminate the process?") == true) {
             getData("/api/global/terminate", "GET", () => {
-                alert("Application terminated");
+                showAlert("Application terminated");
             })
         }
     }
@@ -24,7 +24,7 @@
     function restart() {
         if (confirm("You want to restart the process?") == true) {
             getData("/api/global/restart", "GET", () => {
-                alert("Application restarted");
+                showAlert("Application restarted");
             })
         }
     }

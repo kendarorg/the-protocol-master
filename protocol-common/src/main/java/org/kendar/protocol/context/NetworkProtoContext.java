@@ -380,4 +380,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
     protected boolean isConnected() {
         return client.isOpen() && connected;
     }
+
+    public List<String> getKeys() {
+        return values.keySet().stream().toList();
+    }
 }

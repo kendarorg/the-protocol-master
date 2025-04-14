@@ -59,11 +59,11 @@
         };
         sendData('/api/protocols/http/targets/verify', 'POST', JSON.stringify(toSend), 'application/json', (status, response) => {
             if (status == 200) {
-                alert("Pattern mathcing!");
+                showAlert("Pattern mathcing!");
             } else if (status == 404) {
-                alert("Pattern not mathcing!");
+                showError("Pattern not mathcing!");
             } else if (status == 500) {
-                alert("Error! " + response);
+                showError("Error! " + response);
             }
 
         })

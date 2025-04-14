@@ -22,8 +22,8 @@
     function deleteReports() {
         if (confirm("You want to delete all reports data?") == true) {
             getData("/api/global/plugins/report-plugin/report", "DELETE", () => {
-                alert("All cleaned up");
-                location.reload();
+                showAlert("All cleaned up");
+                setTimeout(()->location.reload(),2000);
             })
         }
     }

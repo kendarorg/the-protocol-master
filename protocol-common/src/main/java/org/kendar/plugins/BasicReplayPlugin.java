@@ -176,13 +176,19 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
         } catch (Exception e) {
             log.error("Error handling activation", e);
         }
+
         EventsQueue.send(new ReplayStatusEvent(active, getProtocol(), getId(), getInstanceId()));
     }
 
 
     @Override
     protected void handlePostActivation(boolean active) {
-        disconnectAll();
+        if(getSettings() instanceof BasicAysncReplayPluginSettings){
+            var bas = (BasicAysncReplayPluginSettings) this.getSettings();
+            if(bas.isResetConnectionsOnStart()){
+                disconnectAll();
+            }
+        }
     }
 
     protected void disconnectAll() {
@@ -281,8 +287,10 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
             //respQuery.getTags().putAll(getContextTags(pluginContext.getContext()));
+            log.debug("[XXX] Request query "+respQuery);
 
             var responses = repository.readResponsesFromScenario(getInstanceId(), respQuery);
+            responses.sort(Comparator.comparingLong(StorageItem::getTimestamp));
             var result = new ArrayList<StorageItem>();
             for (var response : responses) {
                 var idx = indexes.stream().filter(a -> a.getIndex() == response.getIndex()).findFirst();

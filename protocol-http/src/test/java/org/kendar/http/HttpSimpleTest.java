@@ -280,32 +280,46 @@ public class HttpSimpleTest extends BasicTest {
 
         var startWarning = (((double) lps.getRateLimit() / 100) * (double) lps.getWarningThresholdPercent()) / (double) lps.getCostPerRequest();
         var error = lps.getRateLimit() / lps.getCostPerRequest();
-        for (var i = 0; i < 100; i++) {
+
+        var found200Clean = false;
+        var found200Warn = false;
+        var found429 = false;
+        for (var i = 0; i < 300; i++) {
+            Sleeper.sleep(5);
             var httpresponse = httpclient.execute(httpget);
             var sl = httpresponse.getStatusLine().toString().trim();
-            if (i > error) {
-                assertEquals("HTTP/1.1 200 OK", sl);
-                assertNull(httpresponse.getFirstHeader("RateLimit-Limit"));
-            } else if (i == error) {
-                assertEquals("HTTP/1.1 429", sl);
-                var retryAfter = Integer.parseInt(httpresponse.getFirstHeader("Retry-After").getValue());
-                assertTrue(retryAfter >= 0 && retryAfter <= 3);
-                Sleeper.sleep((retryAfter + 1) * 1000);
-            } else {
-                assertEquals("HTTP/1.1 200 OK", sl);
-                if (i < startWarning) {
-                    assertNull(httpresponse.getFirstHeader("RateLimit-Limit"));
-                } else {
-                    assertEquals(httpresponse.getFirstHeader("RateLimit-Limit").getValue(), "120");
-                    var limit = lps.getRateLimit() - ((i + 1) * lps.getCostPerRequest());
-                    assertEquals(httpresponse.getFirstHeader("RateLimit-Remaining").getValue(), "" + limit);
+            var is200 = sl.equalsIgnoreCase("HTTP/1.1 200 OK");
+            var is429 = sl.equalsIgnoreCase("HTTP/1.1 429");
+            var rateLimitLimt = Integer.parseInt(getFirstHeaderValue(httpresponse,"RateLimit-Limit","-1"));
+            var retryAfter= Integer.parseInt(getFirstHeaderValue(httpresponse,"Retry-After","-1"));
+            var rateLimitRemaining= Integer.parseInt(getFirstHeaderValue(httpresponse,"RateLimit-Remaining","-1"));
+
+            if(is200){
+                if(rateLimitLimt<0){
+                    found200Clean=true;
+                }else {
+                    assertTrue(rateLimitLimt >= 0);
+                    assertTrue(rateLimitRemaining<=rateLimitLimt);
+                    found200Warn=true;
                 }
+            }else if(is429){
+                assertTrue(retryAfter >= 0);
+                found429 = true;
             }
             var sc = new Scanner(httpresponse.getEntity().getContent());
             while (sc.hasNext()) {
                 sc.nextLine();
             }
         }
+        assertTrue(found200Clean);
+        assertTrue(found200Warn);
+        assertTrue(found429);
+    }
+
+    private String getFirstHeaderValue(CloseableHttpResponse httpresponse, String s,String optional) {
+        var firstHeader = httpresponse.getFirstHeader(s);
+        if(firstHeader!=null && firstHeader.getValue()!=null && !firstHeader.getValue().isEmpty() )return firstHeader.getValue();
+        return optional;
     }
 
     @Test

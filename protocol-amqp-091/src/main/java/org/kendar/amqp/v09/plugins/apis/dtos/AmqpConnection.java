@@ -12,6 +12,7 @@ public class AmqpConnection {
     private boolean canPublish;
     private int consumeId;
     private String exchange;
+    private long lastAccess;
 
     @Override
     public boolean equals(Object o) {
@@ -96,5 +97,13 @@ public class AmqpConnection {
 
     public void setExchange(String exchange) {
         this.exchange = exchange;
+    }
+
+    public void setLastAccess(long lastAccess) {
+        this.lastAccess = lastAccess;
+    }
+
+    public long getLastAccess() {
+        return lastAccess;
     }
 }

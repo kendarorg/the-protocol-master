@@ -17,16 +17,16 @@
                     propertyFlag: null,
                     deliveryMode: null,
                     deliveryTag: null,
-                    body: null
+                    body: null,
+                    queue:null,
+                    exchange:null
                 });
             console.log("Sending");
             console.log(toSend);
 
             sendData(path, 'POST', JSON.stringify(toSend), 'application/json', (status) => {
                 if (status == 200) {
-                    alert("Data Sent!");
-                } else {
-                    alert("Error sending data!")
+                    showAlert("Data Sent!");
                 }
 
             })
@@ -60,6 +60,18 @@
             <div class="input-group">
                 <label for="appId" class="control-label">App Id</label>
                 <input id="appId" type="text" class="form-control"
+                       value="">
+            </div>
+
+            <div class="input-group">
+                <label for="queue" class="control-label">Queue</label>
+                <input id="queue" type="text" class="form-control"
+                       value="">
+            </div>
+
+            <div class="input-group">
+                <label for="exchange" class="control-label">Exchange</label>
+                <input id="exchange" type="text" class="form-control"
                        value="">
             </div>
             <div class="input-group">

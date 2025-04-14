@@ -39,7 +39,7 @@
         });
         sendData('/api/protocols/${data.getInstanceId()}/plugins/rewrite-plugin/test', 'POST',
             JSON.stringify(data), 'application/json', (code, result) => {
-                alert(result);
+               showNotification("info","Result",result);
             })
     }
 

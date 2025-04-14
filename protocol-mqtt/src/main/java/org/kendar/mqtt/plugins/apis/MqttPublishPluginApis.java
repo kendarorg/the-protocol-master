@@ -27,7 +27,9 @@ import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.ContentData;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.kendar.apis.ApiUtils.respondJson;
 
@@ -60,7 +62,7 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
         respondJson(response, result);
     }
 
-    private ArrayList<MqttConnection> loadConnections() {
+    private List<MqttConnection> loadConnections() {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<MqttConnection>();
         for (var ccache : pInstance.getContextsCache().entrySet()) {
@@ -77,11 +79,13 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                 connection.setId(key);
                 connection.setQos(qos);
                 connection.setTopic(topic);
+                connection.setLastAccess(context.getLastAccess());
                 result.add(connection);
             }
 
         }
-        return result;
+        return result.stream().
+                sorted(Comparator.comparing(MqttConnection::getLastAccess).reversed()).toList();
     }
 
     @HttpMethodFilter(
@@ -128,60 +132,64 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
         var sentData = false;
 
         for (var contxtKvp : pInstance.getContextsCache().entrySet()) {
-            var context = (MqttContext) contxtKvp.getValue();
-            var topics = (HashSet<String>) context.getValue("TOPICS");
-            if (topics == null) continue;
-            var topicAvailable = topics.stream().filter(t -> t.endsWith("|" + topic)).findFirst();
-            if (connectionId != -1 && connectionId != contxtKvp.getKey()) {
-                continue;
-            }
-            if (topicAvailable.isEmpty()) {
-                continue;
-            }
-            sentData = true;
-            var packetIdentifier = (short) context.packetToUse();
-            var message = new Publish();
-            message.setPacketIdentifier(packetIdentifier);
-            message.setFixedHeader(MqttFixedHeader.PUBLISH);
-            message.setTopicName(topic);
+            try {
+                var context = (MqttContext) contxtKvp.getValue();
+                var topics = (HashSet<String>) context.getValue("TOPICS");
+                if (topics == null) continue;
+                var topicAvailable = topics.stream().filter(t -> t.endsWith("|" + topic)).findFirst();
+                if (connectionId != -1 && connectionId != contxtKvp.getKey()) {
+                    continue;
+                }
+                if (topicAvailable.isEmpty()) {
+                    continue;
+                }
+                sentData = true;
+                var packetIdentifier = (short) context.packetToUse();
+                var message = new Publish();
+                message.setPacketIdentifier(packetIdentifier);
+                message.setFixedHeader(MqttFixedHeader.PUBLISH);
+                message.setTopicName(topic);
 
 
-            var splitTopic = topicAvailable.get().split("\\|", 2);
-            var qos = Integer.parseInt(splitTopic[0]);
-            message.setQos(qos);
-            ContentData content = new ContentData();
-            content.setBytes(dataToSend);
-            message.setPayload(content);
-            var realFlag = 48;
-            if (qos == 1)
-                realFlag = 50;
-            if (qos == 2)
-                realFlag = 52;
-            //00110000
-            message.setFullFlag((byte) realFlag);
-            message.setFixedHeader(MqttFixedHeader.PUBLISH);
-            message.setProtocolVersion(context.getProtocolVersion());
-            message.asProxy();
+                var splitTopic = topicAvailable.get().split("\\|", 2);
+                var qos = Integer.parseInt(splitTopic[0]);
+                message.setQos(qos);
+                ContentData content = new ContentData();
+                content.setBytes(dataToSend);
+                message.setPayload(content);
+                var realFlag = 48;
+                if (qos == 1)
+                    realFlag = 50;
+                if (qos == 2)
+                    realFlag = 52;
+                //00110000
+                message.setFullFlag((byte) realFlag);
+                message.setFixedHeader(MqttFixedHeader.PUBLISH);
+                message.setProtocolVersion(context.getProtocolVersion());
+                message.asProxy();
 
-            if (qos == 2) {
-                //should expect pubrec
-                var pubRel = new PublishRel();
-                pubRel.setPacketIdentifier(packetIdentifier);
-                pubRel.setProtocolVersion(context.getProtocolVersion());
-                pubRel.setFullFlag((byte) 98);
-                pubRel.setFixedHeader(MqttFixedHeader.PUBREL);
-                pubRel.setReasonCode((byte) 0);
-                getDescriptor().expectPubRec(context, pubRel);
-            } else if (qos == 1) {
-                //should expect pubrec
-                var pubRel = new PublishAck();
-                pubRel.setPacketIdentifier(packetIdentifier);
-                pubRel.setProtocolVersion(context.getProtocolVersion());
-                pubRel.setFixedHeader(MqttFixedHeader.PUBREL);
-                pubRel.setReasonCode((byte) 0);
-                getDescriptor().expectPubAck(context, pubRel);
+                if (qos == 2) {
+                    //should expect pubrec
+                    var pubRel = new PublishRel();
+                    pubRel.setPacketIdentifier(packetIdentifier);
+                    pubRel.setProtocolVersion(context.getProtocolVersion());
+                    pubRel.setFullFlag((byte) 98);
+                    pubRel.setFixedHeader(MqttFixedHeader.PUBREL);
+                    pubRel.setReasonCode((byte) 0);
+                    getDescriptor().expectPubRec(context, pubRel);
+                } else if (qos == 1) {
+                    //should expect pubrec
+                    var pubRel = new PublishAck();
+                    pubRel.setPacketIdentifier(packetIdentifier);
+                    pubRel.setProtocolVersion(context.getProtocolVersion());
+                    pubRel.setFixedHeader(MqttFixedHeader.PUBREL);
+                    pubRel.setReasonCode((byte) 0);
+                    getDescriptor().expectPubAck(context, pubRel);
+                }
+                context.write(message);
+            }catch (Exception ex){
+
             }
-            context.write(message);
         }
         if (!sentData) {
             throw new PluginException("No existing topic to send to");
