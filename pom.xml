@@ -45,7 +45,6 @@
         <compiler.plugin.version>3.13.0</compiler.plugin.version>
         <antrun.plugin.version>3.1.0</antrun.plugin.version>
         <aircompressor.version>3.2</aircompressor.version>
-        <reflection.version>0.10.2</reflection.version>
         <logback.version>1.4.8</logback.version>
         <sl4j.version>2.0.7</sl4j.version>
         <jte.version>3.1.16</jte.version>

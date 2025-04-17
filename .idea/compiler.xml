@@ -7,26 +7,26 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="protocol-common" />
+        <module name="protocol-common-jdbc" />
+        <module name="protocol-mongo" />
+        <module name="jacoco" />
+        <module name="protocol-test" />
+        <module name="protocol-dns-plugin" />
+        <module name="protocol-postgres" />
+        <module name="sample-plugins" />
+        <module name="protocol-mysql" />
+        <module name="protocol-http" />
+        <module name="protocol-runner" />
+        <module name="protocol-mqtt" />
+        <module name="protocol-redis" />
+        <module name="protocol-amqp-091" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="jacoco" target="17" />
-      <module name="protocol-amqp-091" target="17" />
       <module name="protocol-amqp-100" target="11" />
-      <module name="protocol-common-jdbc" target="17" />
-      <module name="protocol-dns-plugin" target="17" />
-      <module name="protocol-http" target="17" />
       <module name="protocol-kafka" target="11" />
-      <module name="protocol-mongo" target="17" />
-      <module name="protocol-mqtt" target="17" />
-      <module name="protocol-mysql" target="17" />
-      <module name="protocol-postgres" target="17" />
-      <module name="protocol-redis" target="17" />
-      <module name="protocol-runner" target="17" />
-      <module name="protocol-test" target="17" />
       <module name="protocol-todo" target="1.5" />
       <module name="rest-plugins-plugin" target="17" />
-      <module name="sample-plugins" target="17" />
       <module name="todo" target="1.5" />
     </bytecodeTargetLevel>
   </component>
