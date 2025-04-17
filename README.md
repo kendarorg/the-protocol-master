@@ -101,7 +101,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Custom transparent proxy (all)
 * Translate postgres and MySQL to any Jdbc supported db like Oracle!
 * Plugin-based architecture
-* Custom maven repository on [https://repo.maven.apache.org](https://repo.maven.apache.org/maven2/org/kendar/)
+* Include from maven central: [https://repo.maven.apache.org](https://repo.maven.apache.org/maven2/org/kendar/)
 * More than 70% Test coverage, more than 550 tests
 * Environment-based dynamic settings (see TPM_REPLACE)
 * Support for full "test scenario" with embedded encryption (for GDPR purposes)
