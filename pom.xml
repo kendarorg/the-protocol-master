@@ -221,8 +221,8 @@
             <id>deploy</id>
             <modules>
                 <module>protocol-common</module>
-                <!--                <module>protocol-common-jdbc</module>-->
-                <!--                <module>protocol-dns-plugin</module>-->
+                <module>protocol-common-jdbc</module>
+                <module>protocol-dns-plugin</module>
             </modules>
             <build>
                 <plugins>
@@ -234,7 +234,7 @@
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
-                                <phase>verify</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>jar-no-fork</goal>
                                 </goals>
@@ -290,11 +290,12 @@
                         <executions>
                             <execution>
                                 <id>createJavadocs</id>
-                                <phase>verify</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
-                            </execution></executions>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
