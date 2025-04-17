@@ -8,7 +8,9 @@
     </parent>
 
     <artifactId>protocol-mongo</artifactId>
-
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.pf4j</groupId>

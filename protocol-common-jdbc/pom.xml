@@ -46,5 +46,25 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <name>TPM-Proxy common library-JDBC</name>
+    <description>
+        This is the container for the common functionalities
+        needed to build a TPM-Proxy plugin that communicates
+        with external servers via JDBC
+    </description>
+    <url>https://www.github.com/kendarorg/the-protocol-master</url>
+    <developers>
+        <developer>
+            <id>kendarorg</id>
+            <name>Enrico Da Ros</name>
+            <email>github@kendar.org</email>
+        </developer>
+    </developers>
 
+    <scm>
+        <connection>scm:git:git://github.com/kendarorg/the-protocol-master.git</connection>
+        <developerConnection>scm:git:git://github.com/kendarorg/the-protocol-master.git</developerConnection>
+        <url>https://www.github.com/kendarorg/the-protocol-master</url>
+        <tag>HEAD</tag>
+    </scm>
 </project>

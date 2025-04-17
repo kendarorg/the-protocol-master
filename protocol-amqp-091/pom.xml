@@ -6,7 +6,9 @@
         <artifactId>protocol-master</artifactId>
         <version>${revision}</version>
     </parent>
-
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
     <artifactId>protocol-amqp-091</artifactId>
     <dependencies>
         <dependency>

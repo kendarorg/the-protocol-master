@@ -181,4 +181,24 @@
     </dependencies>
 
 
+    <name>TPM-Proxy DNS plugin</name>
+    <description>
+        Plugin tp handle DNS calls in TPM-Proxy
+    </description>
+    <url>https://www.github.com/kendarorg/the-protocol-master</url>
+
+    <developers>
+        <developer>
+            <id>kendarorg</id>
+            <name>Enrico Da Ros</name>
+            <email>github@kendar.org</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/kendarorg/the-protocol-master.git</connection>
+        <developerConnection>scm:git:git://github.com/kendarorg/the-protocol-master.git</developerConnection>
+        <url>https://www.github.com/kendarorg/the-protocol-master</url>
+        <tag>HEAD</tag>
+    </scm>
 </project>

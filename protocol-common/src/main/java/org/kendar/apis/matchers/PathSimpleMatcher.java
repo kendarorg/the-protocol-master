@@ -3,6 +3,7 @@ package org.kendar.apis.matchers;
 import org.kendar.apis.base.Request;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PathSimpleMatcher {
@@ -31,6 +32,7 @@ public class PathSimpleMatcher {
     }
 
     public boolean matches(Request req) {
+        var pathParams = new HashMap<String, String>();
         if (pathSimpleMatchers != null && !pathSimpleMatchers.isEmpty()) {
             var explPath = req.getPath().split("/");
             if (pathSimpleMatchers.size() != explPath.length) return false;
@@ -39,10 +41,13 @@ public class PathSimpleMatcher {
                 var partPath = explPath[i];
                 if (partTemplate.startsWith("*")) {
                     partTemplate = partTemplate.substring(1);
-                    req.addPathParameter(partTemplate, partPath);
+                    pathParams.put(partTemplate, partPath);
                 } else if (!partTemplate.equalsIgnoreCase(partPath)) {
                     return false;
                 }
+            }
+            for(var item : pathParams.entrySet()) {
+                req.addPathParameter(item.getKey(), item.getValue());
             }
             return true;
         }

@@ -9,9 +9,8 @@
         <version>${revision}</version>
     </parent>
     <artifactId>protocol-redis</artifactId>
-
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <dependencies>
