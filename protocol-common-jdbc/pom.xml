@@ -39,12 +39,6 @@
             <artifactId>protocol-common</artifactId>
             <version>${revision}</version>
         </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-test</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <name>TPM-Proxy common library-JDBC</name>
     <description>

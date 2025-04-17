@@ -71,26 +71,6 @@
         </dependency>
     </dependencies>
     <repositories>
-
-        <!--<repository>
-            <id>kendar</id>
-            <name>Kendar Repository</name>
-            <url>https://maven.kendar.org/maven2/releases</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>kendar2</id>
-            <name>Kendar Repository2</name>
-            <url>https://maven.kendar.org/maven2/snapshots</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>-->
         <repository>
             <id>central2</id>
             <name>Central Repository2</name>
@@ -173,25 +153,6 @@
             <url>https://central.sonatype.com</url>
         </repository>
     </distributionManagement>
-    <!--    <distributionManagement>-->
-    <!--        <repository>-->
-    <!--            <id>github</id>-->
-    <!--            <name>github</name>-->
-    <!--            <url>https://maven.pkg.github.com/kendarorg/the-protocol-master</url>-->
-    <!--        </repository>-->
-    <!--    </distributionManagement>-->
-
-    <!--    <distributionManagement>-->
-    <!--        <repository>-->
-    <!--            <id>releases.ftp</id>-->
-    <!--            <url>ftp://maven.kendar.org/maven2/releases</url>-->
-    <!--        </repository>-->
-    <!--        <snapshotRepository>-->
-    <!--            <id>snapshots.ftp</id>-->
-    <!--            <url>ftp://maven.kendar.org/maven2/snapshots</url>-->
-    <!--            <uniqueVersion>false</uniqueVersion>-->
-    <!--        </snapshotRepository>-->
-    <!--    </distributionManagement>-->
     <profiles>
         <profile>
             <id>dev</id>
