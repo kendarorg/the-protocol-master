@@ -43,11 +43,11 @@ public class RedisConnection {
         this.subscription = subscription;
     }
 
-    public void setLastAccess(long lastAccess) {
-        this.lastAccess = lastAccess;
-    }
-
     public long getLastAccess() {
         return lastAccess;
+    }
+
+    public void setLastAccess(long lastAccess) {
+        this.lastAccess = lastAccess;
     }
 }

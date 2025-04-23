@@ -106,7 +106,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                         }
                     }
                 }
-                if(!isActive())return;
+                if (!isActive()) return;
 
 
                 var out = mapper.toJsonNode(item.getOutput());
@@ -152,7 +152,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                     case "BasicCancel":
                         var bc = mapper.deserialize(out, BasicCancel.class);
                         ctx = realConnectionToRecorded.get(bc.getConsumeId());
-                        if(ctx==null){
+                        if (ctx == null) {
                             ctx = (NetworkProtoContext) context.getDescriptor().getContextsCache().get(consumeId);
                         }
                         fr = bc;

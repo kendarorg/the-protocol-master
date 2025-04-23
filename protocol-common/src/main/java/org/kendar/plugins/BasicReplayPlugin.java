@@ -183,9 +183,9 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
 
     @Override
     protected void handlePostActivation(boolean active) {
-        if(getSettings() instanceof BasicAysncReplayPluginSettings){
+        if (getSettings() instanceof BasicAysncReplayPluginSettings) {
             var bas = (BasicAysncReplayPluginSettings) this.getSettings();
-            if(bas.isResetConnectionsOnStart()){
+            if (bas.isResetConnectionsOnStart()) {
                 disconnectAll();
             }
         }
@@ -287,7 +287,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
             //respQuery.getTags().putAll(getContextTags(pluginContext.getContext()));
-            log.debug("[XXX] Request query "+respQuery);
+            log.debug("[XXX] Request query " + respQuery);
 
             var responses = repository.readResponsesFromScenario(getInstanceId(), respQuery);
             responses.sort(Comparator.comparingLong(StorageItem::getTimestamp));
