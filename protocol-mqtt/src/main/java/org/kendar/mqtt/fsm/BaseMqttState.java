@@ -18,7 +18,7 @@ public abstract class BaseMqttState extends ProtoState implements
     private byte fullFlag;
     private MqttFixedHeader fixedHeader;
     @JsonIgnore
-    private boolean proxyed;
+    private boolean proxied;
 
 
     public BaseMqttState() {
@@ -41,12 +41,12 @@ public abstract class BaseMqttState extends ProtoState implements
         this.protocolVersion = protocolVersion;
     }
 
-    public boolean isProxyed() {
-        return proxyed;
+    public boolean isProxied() {
+        return proxied;
     }
 
     public BaseMqttState asProxy() {
-        this.proxyed = true;
+        this.proxied = true;
         return this;
     }
 

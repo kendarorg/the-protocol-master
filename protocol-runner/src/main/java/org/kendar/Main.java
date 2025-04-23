@@ -48,7 +48,6 @@ import static java.lang.System.exit;
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static ConcurrentHashMap<String, TcpServer> protocolServersCache;
-    private static JarPluginManager pluginManager;
     private static HttpServer apiServer;
     private static DiService diService;
     private static boolean terminateReceived = false;
@@ -103,7 +102,7 @@ public class Main {
             Files.createDirectories(pathOfPluginsDir);
         }
 
-        pluginManager = new JarPluginManager(pathOfPluginsDir);
+        JarPluginManager pluginManager = new JarPluginManager(pathOfPluginsDir);
         diService.register(pluginManager);
 
         pluginManager.loadPlugins();

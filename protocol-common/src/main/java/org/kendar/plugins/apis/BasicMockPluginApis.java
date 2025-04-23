@@ -45,7 +45,7 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
                     description = "Retrieve all the mock ids"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
-    public boolean listAllMocks(Request reqp, Response resp) {
+    public boolean listAllMocks(Request req, Response resp) {
 
         var result = new ArrayList<>(getDescriptor().getMocks().keySet());
         respondJson(resp, result);
@@ -53,29 +53,29 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
     }
 
     @HttpMethodFilter(
-            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/mocks/{mockfile}",
-            method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/mocks/{mockfile}")
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/mocks/{mock}",
+            method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/mocks/{mock}")
     @TpmDoc(
             description = "Retrieve the mock file",
-            path = {@PathParameter(key = "mockfile")},
+            path = {@PathParameter(key = "mock")},
             responses = @TpmResponse(
                     body = MockStorage.class,
                     description = "Retrieve the mock file"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
-    public boolean getSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("mockfile");
-        var result = getDescriptor().getMocks().get(mockfile);
+    public boolean getSingleMock(Request req, Response resp) {
+        var mock = req.getPathParameter("mock");
+        var result = getDescriptor().getMocks().get(mock);
         respondJson(resp, result);
         return true;
     }
 
     @HttpMethodFilter(
-            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/mocks/{mockfile}",
-            method = "POST", id = "POST /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/mocks/{mockfile}")
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/mocks/{mock}",
+            method = "POST", id = "POST /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/mocks/{mock}")
     @TpmDoc(
             description = "Update/insert the mock file",
-            path = {@PathParameter(key = "mockfile")},
+            path = {@PathParameter(key = "mock")},
             requests = @TpmRequest(body = MockStorage.class),
             responses = {@TpmResponse(
                     body = Ok.class
@@ -85,19 +85,19 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
-    public void putSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("mockfile");
-        var inputData = reqp.getRequestText().toString();
+    public void putSingleMock(Request req, Response resp) {
+        var mock = req.getPathParameter("mock");
+        var inputData = req.getRequestText().toString();
         var data = mapper.deserialize(inputData, MockStorage.class);
         var mocks = (Map<String, MockStorage>) getDescriptor().getMocks();
 
         for (var kvp : mocks.entrySet()) {
-            if (kvp.getValue().getIndex() == data.getIndex() && !kvp.getKey().equals(mockfile)) {
+            if (kvp.getValue().getIndex() == data.getIndex() && !kvp.getKey().equals(mock)) {
                 respondKo(resp, "Duplicate index " + data.getIndex());
                 return;
             }
         }
-        storage.writeFile(mockfile, inputData);
+        storage.writeFile(mock, inputData);
         getDescriptor().reloadData();
         respondOk(resp);
     }
@@ -116,9 +116,9 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
-    public boolean delSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("mock");
-        storage.deleteFile(mockfile);
+    public boolean delSingleMock(Request req, Response resp) {
+        var mock = req.getPathParameter("mock");
+        storage.deleteFile(mock);
         getDescriptor().reloadData();
         respondOk(resp);
         return true;
@@ -127,8 +127,8 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
     @HttpMethodFilter(
             pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/file/{id}",
             method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/{id}")
-    public void retrieveFile(Request reqp, Response response) {
-        var fileId = reqp.getPathParameter("id");
+    public void retrieveFile(Request req, Response response) {
+        var fileId = req.getPathParameter("id");
         var file = storage.readFile(fileId);
         if (file == null) {
             file = mapper.serialize(new MockStorage());

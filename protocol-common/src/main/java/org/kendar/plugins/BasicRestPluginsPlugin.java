@@ -132,19 +132,19 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
     private RestPluginsCallResult callInterceptor(RestPluginsInterceptor interceptor, String inSerialized, String outSerialized) {
         try (var httpclient = HttpClients.createDefault()) {
             var restPluginCall = new RestPluginCall(interceptor, inSerialized, outSerialized);
-            var httpget = new HttpPost(interceptor.getDestinationAddress());
+            var httpPost = new HttpPost(interceptor.getDestinationAddress());
             var be = new ByteArrayEntity(mapper.serialize(restPluginCall).getBytes());
-            httpget.setEntity(be);
-            httpget.setHeader("Content-Type", "application/json");
-            var httpresponse = httpclient.execute(httpget);
+            httpPost.setEntity(be);
+            httpPost.setHeader("Content-Type", "application/json");
+            var httpResponse = httpclient.execute(httpPost);
 
-            var sc = new Scanner(httpresponse.getEntity().getContent());
-            var result = "";
+            var sc = new Scanner(httpResponse.getEntity().getContent());
+            StringBuilder result = new StringBuilder();
             while (sc.hasNext()) {
-                result += (sc.nextLine());
+                result.append(sc.nextLine());
             }
-            var toReturn = mapper.deserialize(result, RestPluginsCallResult.class);
-            if (httpresponse.getStatusLine().getStatusCode() != 200) {
+            var toReturn = mapper.deserialize(result.toString(), RestPluginsCallResult.class);
+            if (httpResponse.getStatusLine().getStatusCode() != 200) {
                 toReturn.setWithError(true);
             }
             return toReturn;

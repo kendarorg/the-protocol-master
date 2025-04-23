@@ -41,9 +41,9 @@ public class DnsRunnable implements Callable<List<String>> {
             var records = lookup.run();
             if (records != null) {
                 for (org.xbill.DNS.Record record : records) {
-                    String realip = ((ARecord) records[0]).getAddress().getHostAddress();
-                    log.debug("Resolved with {} for {}: {}", requestedServer, requestedDomain, realip);
-                    result.add(realip);
+                    String realIp = ((ARecord) records[0]).getAddress().getHostAddress();
+                    log.debug("Resolved with {} for {}: {}", requestedServer, requestedDomain, realIp);
+                    result.add(realIp);
 
                 }
             }

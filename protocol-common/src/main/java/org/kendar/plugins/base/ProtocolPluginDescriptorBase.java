@@ -119,7 +119,7 @@ public abstract class ProtocolPluginDescriptorBase<W extends PluginSettings> imp
     }
 
     public boolean isActive() {
-        if(getSettings()!=null) {
+        if (getSettings() != null) {
             return active && getSettings().isActive();
         }
         return active;

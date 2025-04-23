@@ -12,6 +12,7 @@ import org.kendar.protocol.messages.ProtoStep;
 
 import java.util.Iterator;
 
+@SuppressWarnings("UnusedAssignment")
 public class Auth extends MySQLProtoState {
     public Auth(Class<?>... messages) {
         super(messages);

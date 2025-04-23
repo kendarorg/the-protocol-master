@@ -18,7 +18,6 @@ import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.GlobalPluginDescriptor;
 import org.kendar.plugins.base.ProtocolInstance;
-import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
@@ -39,15 +38,13 @@ import static org.kendar.apis.ApiUtils.*;
 public class ApiStorageOnlyHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(ApiStorageOnlyHandler.class);
-    private final GlobalSettings settings;
     private final StorageRepository storage;
     private final SimpleParser simpleParser;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
 
-    public ApiStorageOnlyHandler(GlobalSettings settings, StorageRepository storage, SimpleParser simpleParser) {
-        this.settings = settings;
+    public ApiStorageOnlyHandler( StorageRepository storage, SimpleParser simpleParser) {
         this.storage = storage;
         this.simpleParser = simpleParser;
     }
@@ -68,7 +65,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean handleDownload(Request reqp, Response resp) {
+    public boolean handleDownload(Request req, Response resp) {
         try {
             var data = storage.readAsZip();
             respondFile(resp, data, ConstantsMime.ZIP, "storage.zip");
@@ -91,7 +88,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean cleanUp(Request reqp, Response resp) {
+    public boolean cleanUp(Request req, Response resp) {
         try {
             storage.clean();
             respondOk(resp);
@@ -117,15 +114,15 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean handleUpload(Request reqp, Response resp) {
+    public boolean handleUpload(Request req, Response resp) {
 
         try {
 
             byte[] inputData;
-            if (reqp.getRequestText() instanceof BinaryNode) {
-                inputData = ((BinaryNode) reqp.getRequestText()).binaryValue();
+            if (req.getRequestText() instanceof BinaryNode) {
+                inputData = ((BinaryNode) req.getRequestText()).binaryValue();
             } else {
-                inputData = reqp.getRequestText().textValue().getBytes();
+                inputData = req.getRequestText().textValue().getBytes();
             }
             storage.writeZip(inputData);
             storage.initialize();
@@ -164,15 +161,15 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean getIndexs(Request reqp, Response resp) {
+    public boolean getIndexes(Request req, Response resp) {
 
-        var tpmqlstring = reqp.getQuery("tpmql");
+        var tpmqlstring = req.getQuery("tpmql");
         Token tpmql = null;
         if (tpmqlstring != null && !tpmqlstring.isEmpty()) {
             tpmql = simpleParser.parse(tpmqlstring);
         }
         try {
-            var maxLengthStr = reqp.getQuery("maxLength");
+            var maxLengthStr = req.getQuery("maxLength");
             if (maxLengthStr == null) {
                 maxLengthStr = "100";
             }
@@ -182,7 +179,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
             for (var item : data) {
                 var api = mapper.deserialize(mapper.serialize(item), CompactLineApi.class);
                 if (api.getFullItemId() != null && !api.getFullItemId().isEmpty()) {
-                    var itemId = reqp.buildUrlNoQuery().replace("/index", "/item") + "/" + api.getFullItemId();
+                    var itemId = req.buildUrlNoQuery().replace("/index", "/item") + "/" + api.getFullItemId();
                     api.setFullItemAddress(itemId);
                 }
                 if (tpmql != null) {
@@ -218,9 +215,9 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean getItems(Request reqp, Response resp) {
+    public boolean getItems(Request req, Response resp) {
 
-        var tpmqlstring = reqp.getQuery("tpmql");
+        var tpmqlstring = req.getQuery("tpmql");
         Token tpmql = null;
         if (tpmqlstring != null && !tpmqlstring.isEmpty()) {
             tpmql = simpleParser.parse(tpmqlstring);
@@ -236,7 +233,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                 }
                 var api = mapper.deserialize(mapper.serialize(optIndex), CompactLineApi.class);
                 if (api.getFullItemId() != null && !api.getFullItemId().isEmpty()) {
-                    var theItemId = reqp.buildUrlNoQuery() + "/" + api.getFullItemId();
+                    var theItemId = req.buildUrlNoQuery() + "/" + api.getFullItemId();
                     api.setFullItemAddress(theItemId);
                 }
                 sai.setIndex(api);
@@ -276,19 +273,19 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean getSingleItem(Request reqp, Response resp) {
+    public boolean getSingleItem(Request req, Response resp) {
 
         var result = new StorageAndIndex();
 
         try {
-            var instanceId = reqp.getPathParameter("protocol");
-            var itemId = Long.parseLong(reqp.getPathParameter("index"));
+            var instanceId = req.getPathParameter("protocol");
+            var itemId = Long.parseLong(req.getPathParameter("index"));
             result.setItem(storage.readFromScenarioById(instanceId, itemId));
             var optIndex = storage.getAllIndexes(-1).stream().filter(a -> a.getIndex() == itemId).findFirst();
             if (optIndex.isPresent()) {
                 var api = mapper.deserialize(mapper.serialize(optIndex.get()), CompactLineApi.class);
                 if (api.getFullItemId() != null && !api.getFullItemId().isEmpty()) {
-                    var theItemId = reqp.buildUrlNoQuery() + "/" + api.getFullItemId();
+                    var theItemId = req.buildUrlNoQuery() + "/" + api.getFullItemId();
                     api.setFullItemAddress(theItemId);
                 }
                 result.setIndex(api);
@@ -320,13 +317,13 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean changeSingleItem(Request reqp, Response resp) {
+    public boolean changeSingleItem(Request req, Response resp) {
 
-        var request = mapper.deserialize(reqp.getRequestText().toString(), StorageAndIndex.class);
+        var request = mapper.deserialize(req.getRequestText().toString(), StorageAndIndex.class);
 
         try {
-            var instanceId = reqp.getPathParameter("protocol");
-            var itemId = Long.parseLong(reqp.getPathParameter("index"));
+            var instanceId = req.getPathParameter("protocol");
+            var itemId = Long.parseLong(req.getPathParameter("index"));
             var optIndex = storage.getAllIndexes(-1).stream().filter(a -> a.getIndex() == itemId).findFirst();
             if (optIndex.isPresent()) {
                 var indexItem = optIndex.get();
@@ -361,12 +358,12 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean deleteSingleItem(Request reqp, Response resp) {
+    public boolean deleteSingleItem(Request req, Response resp) {
 
 
         try {
-            var instanceId = reqp.getPathParameter("protocol");
-            var itemId = Long.parseLong(reqp.getPathParameter("index"));
+            var instanceId = req.getPathParameter("protocol");
+            var itemId = Long.parseLong(req.getPathParameter("index"));
             storage.deleteRecording(instanceId, itemId);
         } catch (Exception ex) {
             respondKo(resp, ex);

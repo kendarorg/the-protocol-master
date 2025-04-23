@@ -32,12 +32,12 @@ public class ApiUtils {
         respondKo(resp, error.getMessage());
     }
 
-    public static void respondJson(Response resp, Object toSerialiez) {
+    public static void respondJson(Response resp, Object toSerialize) {
         resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
-        if (toSerialiez instanceof String) {
-            resp.setResponseText(new TextNode((String) toSerialiez));
+        if (toSerialize instanceof String) {
+            resp.setResponseText(new TextNode((String) toSerialize));
         } else {
-            resp.setResponseText(mapper.toJsonNode(toSerialiez));
+            resp.setResponseText(mapper.toJsonNode(toSerialize));
         }
     }
 

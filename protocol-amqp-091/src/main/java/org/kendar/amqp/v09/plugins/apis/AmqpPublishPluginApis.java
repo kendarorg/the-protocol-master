@@ -66,9 +66,9 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
     private List<AmqpConnection> loadConnections() {
         var pInstance = getDescriptor().getProtocolInstance();
         var result = new ArrayList<AmqpConnection>();
-        for (var ccache : pInstance.getContextsCache().entrySet()) {
-            var key = ccache.getKey();
-            var context = (AmqpProtoContext) ccache.getValue();
+        for (var cache : pInstance.getContextsCache().entrySet()) {
+            var key = cache.getKey();
+            var context = (AmqpProtoContext) cache.getValue();
             for (var channel : context.getChannels()) {
 
                 var connection = new AmqpConnection();
@@ -120,9 +120,9 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         var channelId = Integer.parseInt(request.getPathParameter("channel"));
 
         var published = doPublish(messageData, connectionId, channelId);
-        if(published==0){
+        if (published == 0) {
             respondKo(response, "Publish failed");
-        }else{
+        } else {
             respondOk(response);
         }
     }
@@ -153,7 +153,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                 }
             }
 
-            //From most recents
+            //From most recent
             Collections.reverse(basicConsumes);
             //{id=1, channel=1, consumeOrigin='quotations|1|{}', consumerTag=None1, canPublish=true, consumeId=1, exchange='stock'}
             for (var basicConsume : basicConsumes) {
@@ -221,7 +221,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                     bf.setContent(content);
                     context.write(bf);
                     written++;
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
 
                 }
             }

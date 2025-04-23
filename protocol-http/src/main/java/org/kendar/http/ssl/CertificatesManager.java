@@ -280,7 +280,7 @@ public class CertificatesManager {
                                                GeneratedCert issuer,
                                                List<String> childDomains) throws Exception {
 
-        // Generate the key-pair with the official Java API's
+        // Generate the key-pair with the official Java APIs
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         KeyPair certKeyPair = keyGen.generateKeyPair();
         X500Name name = new X500Name(cnName);
@@ -337,12 +337,12 @@ public class CertificatesManager {
             builder.addExtension(Extension.subjectAlternativeName, false, new GeneralNames(generalNames));
         }
         if (issuer != null) {
-            byte[] extvalue =
+            byte[] extValue =
                     //issuer.certificate.getExtensionValue(Extension.authorityKeyIdentifier.getId());
                     issuer.certificate.getExtensionValue(Extension.subjectKeyIdentifier.getId());
-            if (extvalue != null) {
+            if (extValue != null) {
                 byte[] filteredByteArray =
-                        Arrays.copyOfRange(extvalue, extvalue.length - 20, extvalue.length);
+                        Arrays.copyOfRange(extValue, extValue.length - 20, extValue.length);
 
                 AuthorityKeyIdentifier authorityKeyIdentifier =
                         new AuthorityKeyIdentifier(filteredByteArray);

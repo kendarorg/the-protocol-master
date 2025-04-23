@@ -44,7 +44,7 @@ public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basi
                     description = "Retrieve all the rewrite ids"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/rewrite-plugin"})
-    public boolean listAllMocks(Request reqp, Response resp) {
+    public boolean listAllMocks(Request req, Response resp) {
 
         var result = storage.listFiles();
         respondJson(resp, result);
@@ -62,9 +62,9 @@ public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basi
                     description = "Retrieve the rewrite file"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/rewrite-plugin"})
-    public boolean getSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("rewrite");
-        var result = mapper.deserialize(storage.readFile(mockfile), ReplacerItem.class);
+    public boolean getSingleMock(Request req, Response resp) {
+        var rewrite = req.getPathParameter("rewrite");
+        var result = mapper.deserialize(storage.readFile(rewrite), ReplacerItem.class);
         respondJson(resp, result);
         return true;
     }
@@ -84,11 +84,11 @@ public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basi
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/rewrite-plugin"})
-    public boolean putSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("rewrite");
-        var inputData = reqp.getRequestText().toString();
+    public boolean putSingleMock(Request req, Response resp) {
+        var rewrite = req.getPathParameter("rewrite");
+        var inputData = req.getRequestText().toString();
         mapper.deserialize(inputData, MockStorage.class);
-        storage.writeFile(mockfile, inputData);
+        storage.writeFile(rewrite, inputData);
         respondOk(resp);
         return true;
     }
@@ -109,9 +109,9 @@ public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basi
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/rewrite-plugin"})
-    public void testReplacement(Request reqp, Response resp) {
+    public void testReplacement(Request req, Response resp) {
         try {
-            var data = reqp.getRequestText().toString();
+            var data = req.getRequestText().toString();
             var toCheck = mapper.deserialize(data, TestReplacerItem.class);
             var instance = new ReplacerItemInstance(toCheck, false);
             var result = instance.run(toCheck.getTestTarget());
@@ -139,9 +139,9 @@ public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basi
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/rewrite-plugin"})
-    public boolean delSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("rewrite");
-        storage.deleteFile(mockfile);
+    public boolean delSingleMock(Request req, Response resp) {
+        var rewrite = req.getPathParameter("rewrite");
+        storage.deleteFile(rewrite);
         respondOk(resp);
         return true;
     }
@@ -149,8 +149,8 @@ public class BasicRewritePluginApis extends ProtocolPluginApiHandlerDefault<Basi
     @HttpMethodFilter(
             pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/file/{id}",
             method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/{id}")
-    public void retrieveFile(Request reqp, Response response) {
-        var fileId = reqp.getPathParameter("id");
+    public void retrieveFile(Request req, Response response) {
+        var fileId = req.getPathParameter("id");
         var file = storage.readFile(fileId);
         if (file == null) {
             file = mapper.serialize(new ReplacerItem());

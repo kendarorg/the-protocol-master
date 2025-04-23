@@ -46,7 +46,7 @@ public class PathSimpleMatcher {
                     return false;
                 }
             }
-            for(var item : pathParams.entrySet()) {
+            for (var item : pathParams.entrySet()) {
                 req.addPathParameter(item.getKey(), item.getValue());
             }
             return true;

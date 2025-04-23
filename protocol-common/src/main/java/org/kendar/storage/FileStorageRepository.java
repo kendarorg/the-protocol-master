@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 @TpmService(tags = "storage_file")
 public class FileStorageRepository extends StorageRepository {
     protected static final JsonMapper mapper = new JsonMapper();
@@ -657,11 +658,12 @@ public class FileStorageRepository extends StorageRepository {
     @Override
     public void deleteFile(String... path) {
         var realPath = buildRealPath(path) + ".json";
+        var rp = Path.of(realPath);
         try {
-            if (!Files.exists(Path.of(realPath))) {
+            if (!Files.exists(rp)) {
                 return;
             }
-            Files.deleteIfExists(Path.of(realPath));
+            Files.deleteIfExists(rp);
         } catch (IOException e) {
             throw new TPMException(e);
         }
@@ -669,11 +671,12 @@ public class FileStorageRepository extends StorageRepository {
 
     public String readFile(String... path) {
         var realPath = buildRealPath(path) + ".json";
+        var rp = Path.of(realPath);
         try {
-            if (!Files.exists(Path.of(realPath))) {
+            if (!Files.exists(rp)) {
                 return null;
             }
-            return getFileContent(Path.of(realPath));
+            return getFileContent(rp);
         } catch (IOException e) {
             throw new TPMException(e);
         }

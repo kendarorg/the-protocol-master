@@ -5,7 +5,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.kendar.mqtt.plugins.MqttReplayPlugin;
-import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncReplayPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
@@ -57,7 +57,7 @@ public class ReplayerTest {
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
+        var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAsyncReplayPluginSettings());
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
@@ -108,7 +108,7 @@ public class ReplayerTest {
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
+        var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAsyncReplayPluginSettings());
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
 
@@ -158,7 +158,7 @@ public class ReplayerTest {
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncReplayPluginSettings());
+        var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAsyncReplayPluginSettings());
         proxy.setPluginHandlers(List.of(pl));
         pl.setActive(true);
         baseProtocol.setProxy(proxy);

@@ -66,7 +66,6 @@ public class ServerImpl {
     private final String protocol;
     private final boolean https;
     private final ContextList contexts;
-    private final InetSocketAddress address;
     private final ServerSocketChannel schan;
     private final Selector selector;
     private final SelectionKey listenerKey;
@@ -92,7 +91,6 @@ public class ServerImpl {
         this.log = System.getLogger("com.sun.net.httpserver");
         ServerConfig.checkLegacyProperties(log);
         https = protocol.equalsIgnoreCase("https");
-        this.address = addr;
         contexts = new ContextList();
         schan = ServerSocketChannel.open();
         if (addr != null) {
@@ -232,7 +230,7 @@ public class ServerImpl {
         terminating = true;
         try {
             schan.close();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         selector.wakeup();
         long latest = System.currentTimeMillis() + delay * 1000L;
@@ -369,7 +367,7 @@ public class ServerImpl {
         Thread.yield();
         try {
             Thread.sleep(200);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
     }
 
@@ -676,7 +674,7 @@ public class ServerImpl {
             }
             try {
                 selector.close();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
 

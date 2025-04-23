@@ -5,7 +5,6 @@ import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.apis.FilteringClass;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
-import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.storage.CompactLine;
 import org.kendar.storage.StorageItem;
@@ -28,16 +27,14 @@ import static org.kendar.plugins.GlobalReportPlugin.padLeftZeros;
 public class RecordingHtmx implements FilteringClass {
     private final JsonMapper mapper;
     private final MultiTemplateEngine resolversFactory;
-    private final DiService diService;
     private final StorageRepository storage;
     private final SimpleParser simpleParser;
 
     public RecordingHtmx(JsonMapper mapper, MultiTemplateEngine resolversFactory,
-                         DiService diService, StorageRepository storage,
+                         StorageRepository storage,
                          SimpleParser simpleParser) {
         this.mapper = mapper;
         this.resolversFactory = resolversFactory;
-        this.diService = diService;
         this.storage = storage;
         this.simpleParser = simpleParser;
     }

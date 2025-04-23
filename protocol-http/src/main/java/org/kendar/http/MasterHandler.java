@@ -189,7 +189,7 @@ public class MasterHandler implements HttpHandler {
             handleException(httpExchange, response, rex);
             try {
                 httpExchange.close();
-            } catch (Exception exx) {
+            } catch (Exception ignored) {
             }
         } finally {
             try {

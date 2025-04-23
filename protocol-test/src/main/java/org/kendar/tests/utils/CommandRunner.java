@@ -2,6 +2,7 @@ package org.kendar.tests.utils;
 
 import java.nio.file.Path;
 
+@SuppressWarnings("ThrowablePrintedToSystemOut")
 public class CommandRunner {
     private final String path;
     private final String[] commands;
@@ -23,20 +24,16 @@ public class CommandRunner {
             pb.command(commands);
             var process = pb.start();
             System.out.println("Running " + String.join(" ", commands));
+            //                    outConsumer.accept(a, process);
+            //                    if (maxLines.get() <= 0) return;
+            //                    maxLines.decrementAndGet();
+            //LogWriter.writeProcess(a);
             StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(),
-                    (a) -> {
-//                    outConsumer.accept(a, process);
-//                    if (maxLines.get() <= 0) return;
-//                    maxLines.decrementAndGet();
-                        //LogWriter.writeProcess(a);
-                        System.out.println(a);
-                    });
+                    System.out::println);
+            //LogWriter.writeProcess(a);
+            //errorConsumer.accept(a, process);
             StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(),
-                    (a) -> {
-                        //LogWriter.writeProcess(a);
-                        //errorConsumer.accept(a, process);
-                        System.err.println(a);
-                    });
+                    System.err::println);
 
             new Thread(outputGobbler).start();
             new Thread(errorGobbler).start();

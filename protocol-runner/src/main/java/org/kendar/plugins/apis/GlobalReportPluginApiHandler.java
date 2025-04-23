@@ -24,6 +24,7 @@ import java.util.List;
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
+@SuppressWarnings("StringConcatenationInsideStringBufferAppend")
 @HttpTypeFilter()
 public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     private static final JsonMapper mapper = new JsonMapper();

@@ -68,7 +68,7 @@ public class FixedLengthOutputStream extends FilterOutputStream {
                 if (!is.isClosed()) {
                     try {
                         is.close();
-                    } catch (IOException var3) {
+                    } catch (IOException ignored) {
                     }
                 }
 

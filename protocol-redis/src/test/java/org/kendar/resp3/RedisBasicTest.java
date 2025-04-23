@@ -5,7 +5,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncRecordPluginSettings;
 import org.kendar.plugins.settings.LatencyPluginSettings;
 import org.kendar.plugins.settings.NetworkErrorPluginSettings;
 import org.kendar.redis.Resp3Protocol;
@@ -80,7 +80,7 @@ public class RedisBasicTest {
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
         var mapper = new JsonMapper();
-        var pl = new RedisRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+        var pl = new RedisRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAsyncRecordPluginSettings());
 
         var rep = new RedisReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         errorPlugin = new RedisNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));

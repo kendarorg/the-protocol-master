@@ -5,7 +5,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.WriteItemEvent;
 import org.kendar.plugins.BasicRecordPlugin;
-import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.redis.fsm.Resp3Response;
 import org.kendar.redis.fsm.events.Resp3Message;
@@ -20,7 +20,7 @@ import org.kendar.utils.parser.SimpleParser;
 import java.util.Map;
 
 @TpmService(tags = "redis")
-public class RedisRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginSettings> {
+public class RedisRecordPlugin extends BasicRecordPlugin<BasicAsyncRecordPluginSettings> {
     public RedisRecordPlugin(JsonMapper mapper, StorageRepository storage,
                              MultiTemplateEngine resolversFactory, SimpleParser parser) {
         super(mapper, storage, resolversFactory, parser);
@@ -45,7 +45,7 @@ public class RedisRecordPlugin extends BasicRecordPlugin<BasicAysncRecordPluginS
 
     @Override
     public Class<?> getSettingClass() {
-        return BasicAysncRecordPluginSettings.class;
+        return BasicAsyncRecordPluginSettings.class;
     }
 
     @Override

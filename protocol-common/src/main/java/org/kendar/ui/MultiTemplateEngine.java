@@ -25,7 +25,6 @@ import java.util.Map;
 public class MultiTemplateEngine {
 
     private static final Logger log = LoggerFactory.getLogger(MultiTemplateEngine.class);
-    private MultiCodeResolver resolver;
     private TemplateEngine templateEngine;
 
     /**
@@ -41,8 +40,7 @@ public class MultiTemplateEngine {
      */
     @TpmConstructor
     public MultiTemplateEngine(MultiCodeResolver resolver, TPMPluginsClassLoader tpmPluginsClassLoader) {
-        this.resolver = resolver;
-        this.templateEngine = TemplateEngine.create(this.resolver,
+        this.templateEngine = TemplateEngine.create(resolver,
                 Paths.get("jte-classes"),
                 ContentType.Html, tpmPluginsClassLoader);
     }

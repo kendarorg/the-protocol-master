@@ -41,7 +41,6 @@ import java.util.logging.Level;
 @TpmService(tags = "http")
 public class HttpProtocol extends NetworkProtoDescriptor {
     private static final Logger log = LoggerFactory.getLogger(HttpProtocol.class);
-    private final GlobalSettings globalSettings;
     private final List<BasePluginDescriptor> plugins;
     private final HttpProtocolSettings settings;
     private ProxyServer proxy;
@@ -53,7 +52,6 @@ public class HttpProtocol extends NetworkProtoDescriptor {
     @TpmConstructor
     public HttpProtocol(GlobalSettings ini, HttpProtocolSettings settings,
                         @TpmNamed(tags = "http") List<BasePluginDescriptor> plugins) {
-        this.globalSettings = ini;
         this.settings = settings;
         for (var i = plugins.size() - 1; i >= 0; i--) {
             var plugin = plugins.get(i);

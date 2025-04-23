@@ -8,7 +8,7 @@ import org.kendar.amqp.v09.messages.methods.basic.BasicDeliver;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.exceptions.PluginException;
 import org.kendar.plugins.BasicReplayPlugin;
-import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncReplayPluginSettings;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @TpmService(tags = "amqp091")
-public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSettings> {
+public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAsyncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(AmqpReplayPlugin.class);
     private static final List<String> repeatableItems = Arrays.asList(
@@ -60,7 +60,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
 
     @Override
     public Class<?> getSettingClass() {
-        return BasicAysncReplayPluginSettings.class;
+        return BasicAsyncReplayPluginSettings.class;
     }
 
     @Override
@@ -74,14 +74,14 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
     }
 
     @Override
-    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread, LineToRead lineToRead) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toRead, LineToRead lineToRead) {
         if (outObj == null) return;
-        if (toread == null) return;
+        if (toRead == null) return;
         var out = mapper.toJsonNode(outObj);
 
-        var result = mapper.deserialize(out, toread.getClass());
+        var result = mapper.deserialize(out, toRead.getClass());
         try {
-            ExtraBeanUtils.copyProperties(toread, result, "Reserved1", "consumerTag");
+            ExtraBeanUtils.copyProperties(toRead, result, "Reserved1", "consumerTag");
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new PluginException(e);
         }
@@ -106,7 +106,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                         }
                     }
                 }
-                if(!isActive())return;
+                if (!isActive()) return;
 
 
                 var out = mapper.toJsonNode(item.getOutput());
@@ -123,7 +123,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                 ReturnMessage fr = null;
                 try {
                     log.debug("Sending back response for {}:{}", item.getIndex(), mapper.serialize(out));
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
                 NetworkProtoContext ctx = null;
@@ -152,7 +152,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                     case "BasicCancel":
                         var bc = mapper.deserialize(out, BasicCancel.class);
                         ctx = realConnectionToRecorded.get(bc.getConsumeId());
-                        if(ctx==null){
+                        if (ctx == null) {
                             ctx = (NetworkProtoContext) context.getDescriptor().getContextsCache().get(consumeId);
                         }
                         fr = bc;

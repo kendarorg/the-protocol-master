@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.plugins.MqttReplayPlugin;
-import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncReplayPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
@@ -90,7 +90,7 @@ public class ReplayerNotBlocking extends MqttBasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var settings = new BasicAysncReplayPluginSettings();
+        var settings = new BasicAsyncReplayPluginSettings();
         settings.setBlockExternal(false);
         var pl = new MqttReplayPlugin(new JsonMapper(), storage).initialize(gs, new ByteProtocolSettingsWithLogin(), settings);
         proxy.setPluginHandlers(List.of(pl));

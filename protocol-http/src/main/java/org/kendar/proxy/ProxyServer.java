@@ -52,7 +52,7 @@ public class ProxyServer {
 
         try {
             serverSocket.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -70,10 +70,10 @@ public class ProxyServer {
                         executor.submit(() -> new ProxyServerHandler(executor, lambdasocket,
                                 httpRedirect, httpsRedirect, dnsResolver, ignore).run());
                     }
-                } catch (IOException e) {
+                } catch (IOException ignored) {
 
                 }
-            } catch (IOException e) {
+            } catch (IOException ignored) {
 
             }
         }).start();

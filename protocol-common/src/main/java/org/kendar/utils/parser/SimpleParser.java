@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"BigDecimalMethodWithoutRoundingCalled", "StringConcatenationInLoop"})
 @TpmService
 public class SimpleParser {
     private static final ConcurrentHashMap<String, Token> tokensCache = new ConcurrentHashMap<>();
@@ -669,6 +670,7 @@ public class SimpleParser {
         return resultArray;
     }
 
+    @SuppressWarnings("Java8MapApi")
     private void buildGroupWithProjection(Token what, Token group, ArrayNode resultArray, HashMap<String, List<JsonNode>> mapGroup) {
         var avgFields = new HashSet<String>();
         for (var groupItems : mapGroup.values()) {

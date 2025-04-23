@@ -4,7 +4,6 @@ import org.kendar.buffers.BBufferUtils;
 import org.kendar.exceptions.TPMProtocolException;
 import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CommandType;
-import org.kendar.mysql.executor.MySQLExecutor;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.fsm.events.CommandEvent;
 import org.kendar.protocol.messages.ProtoStep;

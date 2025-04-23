@@ -49,7 +49,7 @@ public class BasicRecordPluginApis extends ProtocolPluginApiHandlerDefault<Basic
                     description = "Retrieve all the record ids"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public boolean listAllFiles(Request reqp, Response resp) {
+    public boolean listAllFiles(Request req, Response resp) {
 
         var result = storage.listFiles();
         respondJson(resp, result);
@@ -67,9 +67,9 @@ public class BasicRecordPluginApis extends ProtocolPluginApiHandlerDefault<Basic
                     description = "Retrieve the record file"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public void getSingleFile(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("record");
-        respondJson(resp, new RecordItemFile(getProtocolInstanceId(), storage.getRepository().readFile("scenario", mockfile), mockfile));
+    public void getSingleFile(Request req, Response resp) {
+        var record = req.getPathParameter("record");
+        respondJson(resp, new RecordItemFile(getProtocolInstanceId(), storage.getRepository().readFile("scenario", record), record));
     }
 
     @HttpMethodFilter(
@@ -87,10 +87,10 @@ public class BasicRecordPluginApis extends ProtocolPluginApiHandlerDefault<Basic
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public void putSingleFile(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("record");
-        var inputData = reqp.getRequestText().toString();
-        storage.getRepository().writeFile(inputData, "scenario", mockfile);
+    public void putSingleFile(Request req, Response resp) {
+        var record = req.getPathParameter("record");
+        var inputData = req.getRequestText().toString();
+        storage.getRepository().writeFile(inputData, "scenario", record);
         respondOk(resp);
     }
 
@@ -108,17 +108,17 @@ public class BasicRecordPluginApis extends ProtocolPluginApiHandlerDefault<Basic
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public void delSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("record");
-        storage.getRepository().deleteFile("scenario", mockfile);
+    public void delSingleMock(Request req, Response resp) {
+        var record = req.getPathParameter("record");
+        storage.getRepository().deleteFile("scenario", record);
         respondOk(resp);
     }
 
     @HttpMethodFilter(
             pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/file/{id}",
             method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/{id}")
-    public void retrieveFile(Request reqp, Response response) {
-        var fileId = reqp.getPathParameter("id");
+    public void retrieveFile(Request req, Response response) {
+        var fileId = req.getPathParameter("id");
         var file = storage.getRepository().readFile("scenario", fileId);
         if (file == null) {
             file = "{}";
@@ -131,8 +131,8 @@ public class BasicRecordPluginApis extends ProtocolPluginApiHandlerDefault<Basic
     @HttpMethodFilter(
             pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/file",
             method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/file")
-    public void retrieveFiles(Request reqp, Response response) {
-        var tpmqlstring = reqp.getQuery("tpmql");
+    public void retrieveFiles(Request req, Response response) {
+        var tpmqlstring = req.getQuery("tpmql");
         Token tpmql = null;
         if (tpmqlstring != null && !tpmqlstring.isEmpty()) {
             tpmql = parser.parse(tpmqlstring);

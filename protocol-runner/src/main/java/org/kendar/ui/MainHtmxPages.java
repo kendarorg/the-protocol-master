@@ -8,19 +8,16 @@ import org.kendar.apis.base.Response;
 import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.settings.GlobalSettings;
-import org.kendar.utils.JsonMapper;
 
 @TpmService
 @HttpTypeFilter(
         blocking = true)
 public class MainHtmxPages implements FilteringClass {
 
-    private final JsonMapper mapper;
     private final MultiTemplateEngine resolversFactory;
     private final DiService diService;
 
-    public MainHtmxPages(JsonMapper mapper, MultiTemplateEngine resolversFactory, DiService diService) {
-        this.mapper = mapper;
+    public MainHtmxPages( MultiTemplateEngine resolversFactory, DiService diService) {
         this.resolversFactory = resolversFactory;
         this.diService = diService;
     }
