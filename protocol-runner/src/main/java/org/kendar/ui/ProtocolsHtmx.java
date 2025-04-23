@@ -35,7 +35,7 @@ public class ProtocolsHtmx implements FilteringClass {
     public void retrieve(Request request, Response response) {
         var data = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.settings.GlobalSettings.class);
         var sortedProtocol = data.getProtocols().entrySet().stream().
-                sorted(java.util.Comparator.comparing(java.util.Map.Entry::getKey)).
+                sorted(java.util.Map.Entry.comparingByKey()).
                 map(s -> data.getProtocolForKey(s.getKey())).toList();
 
         resolversFactory.render("protocols.jte", sortedProtocol, response);
@@ -48,7 +48,7 @@ public class ProtocolsHtmx implements FilteringClass {
     public void storeProtocolSetting(Request request, Response response) {
         var data = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.settings.GlobalSettings.class);
         var sortedProtocol = data.getProtocols().entrySet().stream().
-                sorted(java.util.Comparator.comparing(java.util.Map.Entry::getKey)).
+                sorted(java.util.Map.Entry.comparingByKey()).
                 map(s -> data.getProtocolForKey(s.getKey())).toList();
 
         resolversFactory.render("protocols.jte", sortedProtocol, response);

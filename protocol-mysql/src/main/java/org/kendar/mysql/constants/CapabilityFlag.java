@@ -79,6 +79,7 @@ public enum CapabilityFlag {
         return isFlagSet(source, flag.getCode());
     }
 
+    @SuppressWarnings("UnusedAssignment")
     public static int setFlag(int source, int flag) {
         return source |= flag;
     }

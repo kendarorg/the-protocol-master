@@ -49,7 +49,7 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
     private static final int PORT = 5672;
     final AtomicBoolean running = new AtomicBoolean(true);
     private final Logger log = LoggerFactory.getLogger(AmqpProtocol.class);
-    private int port = PORT;
+    private int port;
     private TimerInstance timer;
 
     @TpmConstructor

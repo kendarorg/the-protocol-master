@@ -20,8 +20,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+@SuppressWarnings({"ThrowablePrintedToSystemOut", "ResultOfMethodCallIgnored"})
 public class SeleniumIntegration {
     private final Path rootPath;
     private final String proxyHost;
@@ -99,11 +99,11 @@ public class SeleniumIntegration {
                 webDriverManager.getDriverManagerType().getBrowserNameLowerCase(), browserPath.get().toAbsolutePath().toString());
 
         if (optionalVersion.isPresent()) {
-            Integer version = Integer.parseInt(optionalVersion.get());
+            var version = Integer.parseInt(optionalVersion.get());
             var available = webDriverManager.getDriverVersions().stream().
-                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
+                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().toList();
             var matching = available.get(available.size() - 1);
-            if (available.stream().anyMatch(v -> v == (version))) {
+            if (available.stream().anyMatch(v -> v.equals(version))) {
                 matching = version;
             }
             return matching.toString();

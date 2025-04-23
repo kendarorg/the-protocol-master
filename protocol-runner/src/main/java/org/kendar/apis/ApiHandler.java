@@ -48,7 +48,7 @@ public class ApiHandler implements FilteringClass {
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
     private final StorageRepository repository;
     private final PluginManager pluginManager;
-    private List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
+    private List<GlobalPluginDescriptor> globalPlugins;
 
     @TpmConstructor
     public ApiHandler(GlobalSettings settings, List<GlobalPluginDescriptor> globalPlugins,
@@ -181,6 +181,9 @@ public class ApiHandler implements FilteringClass {
         var protocolInstanceId = reqp.getPathParameter("instanceId");
         var instance = instances.stream().filter(p -> p.getInstanceId().equals(protocolInstanceId))
                 .findFirst();
+        if(instance.isEmpty()){
+            throw new RuntimeException("Missing instance");
+        }
         var protocolSettings = (ObjectNode) mapper.toJsonNode(instance.get().getSettings());
         var inputData = (ObjectNode) mapper.toJsonNode(reqp.getRequestText().toString());
         var iterator = inputData.fields();

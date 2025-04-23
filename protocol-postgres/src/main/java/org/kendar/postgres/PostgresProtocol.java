@@ -44,7 +44,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     }
 
     private final int port;
-    private PostgresExecutor executor = new PostgresExecutor();
+    private final PostgresExecutor executor = new PostgresExecutor();
 
     @TpmConstructor
     public PostgresProtocol(GlobalSettings ini, PostgresProtocolSettings settings, PostgresProxy proxy,

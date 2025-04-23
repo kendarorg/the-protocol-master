@@ -86,7 +86,7 @@ public class RestPluginsInterceptor {
         }
 
         if (outMatcher != null && !outMatcher.isEmpty() && !specialOutMatch) {
-            if (out == null || !out.contains(outMatcher)) return false;
+            return out != null && out.contains(outMatcher);
         }
         return true;
     }

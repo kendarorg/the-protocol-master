@@ -287,7 +287,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
             //respQuery.getTags().putAll(getContextTags(pluginContext.getContext()));
-            log.debug("[XXX] Request query " + respQuery);
+            log.debug("[XXX] Request query {}", respQuery);
 
             var responses = repository.readResponsesFromScenario(getInstanceId(), respQuery);
             responses.sort(Comparator.comparingLong(StorageItem::getTimestamp));

@@ -139,11 +139,11 @@ public abstract class BasicRestPluginsPlugin extends ProtocolPluginDescriptorBas
             var httpresponse = httpclient.execute(httpget);
 
             var sc = new Scanner(httpresponse.getEntity().getContent());
-            var result = "";
+            StringBuilder result = new StringBuilder();
             while (sc.hasNext()) {
-                result += (sc.nextLine());
+                result.append(sc.nextLine());
             }
-            var toReturn = mapper.deserialize(result, RestPluginsCallResult.class);
+            var toReturn = mapper.deserialize(result.toString(), RestPluginsCallResult.class);
             if (httpresponse.getStatusLine().getStatusCode() != 200) {
                 toReturn.setWithError(true);
             }

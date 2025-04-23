@@ -443,6 +443,7 @@ public abstract class JdbcProxy extends Proxy {
         }
     }
 
+    @SuppressWarnings("MagicConstant")
     public void setIsolation(ProtoContext protoContext, int transactionIsolation) {
         if (replayer) return;
         try {

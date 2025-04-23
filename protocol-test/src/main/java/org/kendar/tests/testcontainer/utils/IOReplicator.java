@@ -2,6 +2,7 @@ package org.kendar.tests.testcontainer.utils;
 
 import java.io.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class IOReplicator {
     private final OutputStream stdin;
     private final InputStream stdout;

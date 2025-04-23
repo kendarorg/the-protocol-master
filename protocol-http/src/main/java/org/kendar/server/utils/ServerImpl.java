@@ -232,7 +232,7 @@ public class ServerImpl {
         terminating = true;
         try {
             schan.close();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         selector.wakeup();
         long latest = System.currentTimeMillis() + delay * 1000L;
@@ -369,7 +369,7 @@ public class ServerImpl {
         Thread.yield();
         try {
             Thread.sleep(200);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
     }
 
@@ -676,7 +676,7 @@ public class ServerImpl {
             }
             try {
                 selector.close();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
 

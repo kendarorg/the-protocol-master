@@ -123,7 +123,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                 ReturnMessage fr = null;
                 try {
                     log.debug("Sending back response for {}:{}", item.getIndex(), mapper.serialize(out));
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
                 NetworkProtoContext ctx = null;

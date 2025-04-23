@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@SuppressWarnings("InstantiatingObjectToGetClassObject")
 @TpmService
 @HttpTypeFilter(
         blocking = true)

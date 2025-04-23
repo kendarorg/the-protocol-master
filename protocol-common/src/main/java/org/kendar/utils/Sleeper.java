@@ -71,7 +71,7 @@ public class Sleeper {
                 }
             }
 
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
 
         }
         if (!silent) {

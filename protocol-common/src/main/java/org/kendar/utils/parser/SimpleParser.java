@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"BigDecimalMethodWithoutRoundingCalled", "StringConcatenationInLoop"})
 @TpmService
 public class SimpleParser {
     private static final ConcurrentHashMap<String, Token> tokensCache = new ConcurrentHashMap<>();

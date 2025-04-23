@@ -161,7 +161,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                 }
             });
             th.start();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -310,11 +310,11 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                     var inPort = indp.getPort();
                     executorService.submit(() -> resolveAll(inAddress, inPort, socket, inCopy));
 
-                } catch (InterruptedIOException e) {
+                } catch (InterruptedIOException ignored) {
 
                 }
             }
-        } catch (SocketException ex) {
+        } catch (SocketException ignored) {
         } catch (Exception ex) {
             log.error("Error running udp thread", ex);
         }
@@ -346,7 +346,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                     }
                 });
             }
-        } catch (SocketException ex) {
+        } catch (SocketException ignored) {
 
         } catch (Exception ex) {
             log.error("Error running tcp thread", ex);
@@ -375,12 +375,12 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         }
         try {
             tcpSocket.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         try {
             udpSocket.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         dnsRunning = false;

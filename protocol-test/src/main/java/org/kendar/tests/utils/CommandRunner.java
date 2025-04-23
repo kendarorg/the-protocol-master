@@ -2,6 +2,7 @@ package org.kendar.tests.utils;
 
 import java.nio.file.Path;
 
+@SuppressWarnings("ThrowablePrintedToSystemOut")
 public class CommandRunner {
     private final String path;
     private final String[] commands;

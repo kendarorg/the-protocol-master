@@ -221,7 +221,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                     bf.setContent(content);
                     context.write(bf);
                     written++;
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
 
                 }
             }
