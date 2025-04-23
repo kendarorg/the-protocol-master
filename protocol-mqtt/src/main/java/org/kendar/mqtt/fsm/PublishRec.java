@@ -45,7 +45,7 @@ public class PublishRec extends BasePropertiesMqttState implements ReturnMessage
             publishRec.setReasonCode(bb.get());
             readProperties(publishRec, bb);
         }
-        if (isProxyed()) {
+        if (isProxied()) {
             var proxy = (MqttProxy) context.getProxy();
             var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 

@@ -6,7 +6,7 @@
     var protocolSettings = globalSettings.getProtocolForKey(data.getInstanceId());
     var storage = org.kendar.di.DiService.getThreadContext().getInstance(org.kendar.storage.generic.StorageRepository.class);
     var files = storage.listFiles("scenario").stream().filter(f->f.endsWith("."+protocolSettings.getProtocolInstanceId())).toList();
-    var pluginSettings = (org.kendar.plugins.settings.BasicAysncRecordPluginSettings)protocolSettings.getPlugin(data.getId(),org.kendar.plugins.settings.BasicAysncRecordPluginSettings.class);
+    var pluginSettings = (org.kendar.plugins.settings.BasicAsyncRecordPluginSettings)protocolSettings.getPlugin(data.getId(),org.kendar.plugins.settings.BasicAsyncRecordPluginSettings.class);
 }
 
 <script type="text/javascript">

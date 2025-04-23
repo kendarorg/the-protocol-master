@@ -3,6 +3,7 @@ package org.kendar.mysql.constants;
 /**
  * Created by zcg on 2017/3/31.
  */
+@SuppressWarnings("SpellCheckingInspection")
 public enum CapabilityFlag {
 
     CLIENT_LONG_PASSWORD(0x0001, "Use the improved version of Old Password Authentication. Assumed to be set since 4.1.1."),

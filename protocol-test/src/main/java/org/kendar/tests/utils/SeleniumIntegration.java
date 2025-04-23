@@ -28,7 +28,6 @@ public class SeleniumIntegration {
     private final int proxyPort;
     private final Map<String, String> windowHandles = new HashMap<>();
     private WebDriver driver;
-    private JavascriptExecutor js;
     private String currentTab;
     private int counter = 0;
     private Path browserPath;
@@ -171,9 +170,8 @@ public class SeleniumIntegration {
         //driver.manage().deleteAllCookies();
 
 
-        js = (JavascriptExecutor) driver;
         Utils.setCache("driver", driver);
-        Utils.setCache("js", js);
+        Utils.setCache("js", driver);
         setupSize(driver);
         windowHandles.put("main", driver.getWindowHandle());
         currentTab = "main";

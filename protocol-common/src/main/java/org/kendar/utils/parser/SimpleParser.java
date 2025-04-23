@@ -670,6 +670,7 @@ public class SimpleParser {
         return resultArray;
     }
 
+    @SuppressWarnings("Java8MapApi")
     private void buildGroupWithProjection(Token what, Token group, ArrayNode resultArray, HashMap<String, List<JsonNode>> mapGroup) {
         var avgFields = new HashSet<String>();
         for (var groupItems : mapGroup.values()) {

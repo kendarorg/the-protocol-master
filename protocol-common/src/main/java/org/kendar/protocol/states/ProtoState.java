@@ -27,7 +27,6 @@ public abstract class ProtoState {
      * List of handled messages types
      */
     private final Set<Class<?>> messages;
-    private ProtoDescriptor descriptor;
     /**
      * The id of the state (unique for each protocol instance)
      */
@@ -131,7 +130,6 @@ public abstract class ProtoState {
     }
 
     public void setProtoDescriptor(ProtoDescriptor descriptor) {
-        this.descriptor = descriptor;
         this.uuid = descriptor.getCounterString("PROTO_STATE_COUNTER");
     }
 

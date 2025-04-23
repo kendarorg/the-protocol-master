@@ -66,7 +66,6 @@ public class ServerImpl {
     private final String protocol;
     private final boolean https;
     private final ContextList contexts;
-    private final InetSocketAddress address;
     private final ServerSocketChannel schan;
     private final Selector selector;
     private final SelectionKey listenerKey;
@@ -92,7 +91,6 @@ public class ServerImpl {
         this.log = System.getLogger("com.sun.net.httpserver");
         ServerConfig.checkLegacyProperties(log);
         https = protocol.equalsIgnoreCase("https");
-        this.address = addr;
         contexts = new ContextList();
         schan = ServerSocketChannel.open();
         if (addr != null) {

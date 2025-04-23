@@ -7,7 +7,7 @@ import org.kendar.events.StartPlayEvent;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
-import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncReplayPluginSettings;
 import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
@@ -17,7 +17,6 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.CompactLine;
-import org.kendar.storage.PluginFileManager;
 import org.kendar.storage.StorageItem;
 import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
@@ -58,7 +57,6 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
      * Repeatable lines (connections etc)
      */
     private final List<CompactLine> repeatable = new ArrayList<>();
-    private PluginFileManager storage;
 
     public BasicReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper);
@@ -90,7 +88,6 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
     @Override
     public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
         super.initialize(global, protocol, pluginSetting);
-        storage = repository.buildPluginFileManager(getInstanceId(), getId());
         return this;
     }
 
@@ -119,7 +116,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
      * Handle all the messages recorded previously
      *
      * @param pluginContext The execution context
-     * @param protocolPhase The current exection phase
+     * @param protocolPhase The current execution phase
      * @param in            The input item. When Object means anything
      * @param out           The output item. When Object means anything
      * @return True when should block further executions
@@ -183,8 +180,8 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
 
     @Override
     protected void handlePostActivation(boolean active) {
-        if (getSettings() instanceof BasicAysncReplayPluginSettings) {
-            var bas = (BasicAysncReplayPluginSettings) this.getSettings();
+        if (getSettings() instanceof BasicAsyncReplayPluginSettings) {
+            var bas = (BasicAsyncReplayPluginSettings) this.getSettings();
             if (bas.isResetConnectionsOnStart()) {
                 disconnectAll();
             }
@@ -193,8 +190,8 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
 
     protected void disconnectAll() {
         var pi = getProtocolInstance();
-        if (pi != null && BasicAysncReplayPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
-            var settings = (BasicAysncReplayPluginSettings) getSettings();
+        if (pi != null && BasicAsyncReplayPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
+            var settings = (BasicAsyncReplayPluginSettings) getSettings();
             if (settings.isResetConnectionsOnStart()) {
                 for (var contextKvp : pi.getContextsCache().entrySet()) {
                     try {
@@ -311,9 +308,9 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
             if (!result.isEmpty()) {
                 ((NetworkProtoContext) pluginContext.getContext()).addResponse(() ->
                 {
-                    var sleepint = result.get(0).getTimestamp() - timeStamp;
-                    if (sleepint > 0) {
-                        Sleeper.sleep(sleepint);
+                    var sleepInt = result.get(0).getTimestamp() - timeStamp;
+                    if (sleepInt > 0) {
+                        Sleeper.sleep(sleepInt);
                     }
                     sendBackResponses(pluginContext.getContext(), result);
                 });
@@ -372,7 +369,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
     }
 
     /**
-     * Operation to modify the message before sending it back to clien
+     * Operation to modify the message before sending it back to client
      *
      * @param lineToRead
      * @return
@@ -396,7 +393,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
     }
 
     /**
-     * HAndle the send without responses
+     * Handle the send without responses
      *
      * @param pluginContext
      * @param in

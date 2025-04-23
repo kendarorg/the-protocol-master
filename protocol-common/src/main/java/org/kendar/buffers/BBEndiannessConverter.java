@@ -1,7 +1,7 @@
 package org.kendar.buffers;
 
 /**
- * Utility to change endiannes on 2/4/8 bytes long items
+ * Utility to change endianness on 2/4/8 bytes long items
  */
 public class BBEndiannessConverter {
     public static byte[] swap8Bytes(byte[] bytes) {

@@ -11,7 +11,7 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mqtt.plugins.*;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncRecordPluginSettings;
 import org.kendar.plugins.settings.LatencyPluginSettings;
 import org.kendar.plugins.settings.NetworkErrorPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
@@ -123,7 +123,7 @@ public class MqttBasicTest {
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var pls = new BasicAysncRecordPluginSettings();
+        var pls = new BasicAsyncRecordPluginSettings();
         pls.setResetConnectionsOnStart(false);
         var mapper = new JsonMapper();
         var pl = new MqttRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(),

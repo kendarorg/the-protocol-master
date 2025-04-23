@@ -5,22 +5,17 @@ import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.apis.FilteringClass;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
-import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmService;
-import org.kendar.utils.JsonMapper;
 
 @TpmService
 @HttpTypeFilter(
         blocking = true)
 public class ProtocolsHtmx implements FilteringClass {
 
-    private final DiService diService;
-    private final JsonMapper mapper;
     private final MultiTemplateEngine resolversFactory;
 
-    public ProtocolsHtmx(DiService diService, JsonMapper mapper, MultiTemplateEngine resolversFactory) {
-        this.diService = diService;
-        this.mapper = mapper;
+    public ProtocolsHtmx( MultiTemplateEngine resolversFactory) {
+
         this.resolversFactory = resolversFactory;
     }
 

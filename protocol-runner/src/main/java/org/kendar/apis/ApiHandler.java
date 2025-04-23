@@ -46,16 +46,14 @@ public class ApiHandler implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private final GlobalSettings settings;
     private final ConcurrentLinkedQueue<ProtocolInstance> instances = new ConcurrentLinkedQueue<>();
-    private final StorageRepository repository;
     private final PluginManager pluginManager;
     private List<GlobalPluginDescriptor> globalPlugins;
 
     @TpmConstructor
     public ApiHandler(GlobalSettings settings, List<GlobalPluginDescriptor> globalPlugins,
-                      StorageRepository repository, PluginManager pluginManager) {
+                      PluginManager pluginManager) {
         this.settings = settings;
         this.globalPlugins = globalPlugins;
-        this.repository = repository;
         this.pluginManager = pluginManager;
     }
 
@@ -69,7 +67,7 @@ public class ApiHandler implements FilteringClass {
                     description = "List of protocols"
             ),
             tags = {"base/utils"})
-    public void getProtocols(Request reqp, Response resp) {
+    public void getProtocols(Request req, Response resp) {
         var result = instances.stream().map(p -> new
                         ProtocolIndex(p.getInstanceId(), p.getProtocol())).
                 collect(Collectors.toList());
@@ -85,7 +83,7 @@ public class ApiHandler implements FilteringClass {
                     body = Ok.class
             ),
             tags = {"base/utils"})
-    public boolean getStatus(Request reqp, Response resp) {
+    public boolean getStatus(Request req, Response resp) {
         respondJson(resp, new Ok());
         return true;
     }
@@ -99,7 +97,7 @@ public class ApiHandler implements FilteringClass {
                     body = StringKvp[].class
             ),
             tags = {"base/utils"})
-    public void getVersion(Request reqp, Response resp) {
+    public void getVersion(Request req, Response resp) {
         var result = new ArrayList<StringKvp>();
         result.add(new StringKvp("protocol-runner", VersionChecker.getTpmVersion()));
         for (var plugin : pluginManager.getPlugins()) {
@@ -118,7 +116,7 @@ public class ApiHandler implements FilteringClass {
                     body = String.class
             ),
             tags = {"base/utils"})
-    public boolean getSettings(Request reqp, Response resp) {
+    public boolean getSettings(Request req, Response resp) {
         respondJson(resp, settings);
         return true;
     }
@@ -133,7 +131,7 @@ public class ApiHandler implements FilteringClass {
                     description = "List of global plugins"
             ),
             tags = {"plugins/global"})
-    public void getGlobalPlugins(Request reqp, Response resp) {
+    public void getGlobalPlugins(Request req, Response resp) {
         var result = globalPlugins.stream().map(p -> new
                         PluginIndex(p.getId(), p.isActive())).
                 collect(Collectors.toList());
@@ -150,8 +148,8 @@ public class ApiHandler implements FilteringClass {
                     body = PluginIndex[].class
             ),
             tags = {"plugins/protocols"})
-    public void getProtocolPlugins(Request reqp, Response resp) {
-        var protocolInstanceId = reqp.getPathParameter("id");
+    public void getProtocolPlugins(Request req, Response resp) {
+        var protocolInstanceId = req.getPathParameter("id");
         var instance = instances.stream().filter(p -> p.getInstanceId().equals(protocolInstanceId))
                 .findFirst();
         if (instance.isEmpty()) {
@@ -177,15 +175,15 @@ public class ApiHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"plugins/protocols"})
-    public void updateProtocolPlugins(Request reqp, Response resp) {
-        var protocolInstanceId = reqp.getPathParameter("instanceId");
+    public void updateProtocolPlugins(Request req, Response resp) {
+        var protocolInstanceId = req.getPathParameter("instanceId");
         var instance = instances.stream().filter(p -> p.getInstanceId().equals(protocolInstanceId))
                 .findFirst();
         if(instance.isEmpty()){
             throw new RuntimeException("Missing instance");
         }
         var protocolSettings = (ObjectNode) mapper.toJsonNode(instance.get().getSettings());
-        var inputData = (ObjectNode) mapper.toJsonNode(reqp.getRequestText().toString());
+        var inputData = (ObjectNode) mapper.toJsonNode(req.getRequestText().toString());
         var iterator = inputData.fields();
         while (iterator.hasNext()) {
             var field = iterator.next();
@@ -216,7 +214,7 @@ public class ApiHandler implements FilteringClass {
                     body = Ok.class
             ),
             tags = {"base/utils"})
-    public void restart(Request reqp, Response resp) {
+    public void restart(Request req, Response resp) {
         try {
             respondOk(resp);
         } finally {
@@ -237,7 +235,7 @@ public class ApiHandler implements FilteringClass {
                     body = Ok.class
             ),
             tags = {"base/utils"})
-    public void terminate(Request reqp, Response resp) {
+    public void terminate(Request req, Response resp) {
         try {
             respondOk(resp);
         } finally {
@@ -276,9 +274,9 @@ public class ApiHandler implements FilteringClass {
                     description = "In case of errors"
             )},
             tags = {"plugins/protocols"})
-    public boolean actionOnAllPlugins(Request reqp, Response resp) {
-        var plugin = reqp.getPathParameter("plugin");
-        var action = reqp.getPathParameter("action");
+    public boolean actionOnAllPlugins(Request req, Response resp) {
+        var plugin = req.getPathParameter("plugin");
+        var action = req.getPathParameter("action");
 
         for (var instance : instances) {
             var pluginInstance = instance.getPlugins().stream().filter(p ->

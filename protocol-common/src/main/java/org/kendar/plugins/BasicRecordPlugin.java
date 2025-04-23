@@ -7,7 +7,7 @@ import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
-import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncRecordPluginSettings;
 import org.kendar.plugins.settings.BasicRecordPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
@@ -181,8 +181,8 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     @Override
     protected void handlePostActivation(boolean active) {
-        if (getSettings() instanceof BasicAysncRecordPluginSettings) {
-            var bas = (BasicAysncRecordPluginSettings) this.getSettings();
+        if (getSettings() instanceof BasicAsyncRecordPluginSettings) {
+            var bas = (BasicAsyncRecordPluginSettings) this.getSettings();
             if (bas.isResetConnectionsOnStart()) {
                 disconnectAll();
             }
@@ -191,8 +191,8 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     private void disconnectAll() {
         var pi = getProtocolInstance();
-        if (pi != null && BasicAysncRecordPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
-            var settings = (BasicAysncRecordPluginSettings) getSettings();
+        if (pi != null && BasicAsyncRecordPluginSettings.class.isAssignableFrom(getSettings().getClass())) {
+            var settings = (BasicAsyncRecordPluginSettings) getSettings();
             if (settings.isResetConnectionsOnStart()) {
                 for (var contextKvp : pi.getContextsCache().entrySet()) {
                     try {

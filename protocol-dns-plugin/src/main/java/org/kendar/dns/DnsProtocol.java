@@ -34,6 +34,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private static final int UDP_SIZE = 512;
     private final Map<ProtocolPhase, List<PluginHandler>> pluginHandlers = new HashMap<>();
     private final DnsProtocolSettings settings;
+    // TODO Handle DNS Chained servers
     private final List<String> dnsServers = new ArrayList<>();
     private final ExecutorService executorService = Executors.newFixedThreadPool(20);
     private final Map<String, List<String>> cached = new ConcurrentHashMap<>();

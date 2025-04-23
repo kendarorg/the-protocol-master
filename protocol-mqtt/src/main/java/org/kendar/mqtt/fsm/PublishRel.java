@@ -51,7 +51,7 @@ public class PublishRel extends BasePropertiesMqttState implements ReturnMessage
         var proxy = (MqttProxy) context.getProxy();
         var connection = ((ProxyConnection) event.getContext().getValue("CONNECTION"));
 
-        if (isProxyed()) {
+        if (isProxied()) {
             return iteratorOfList(publishRel);
         } else {
             var pubComp = new PublishComp();

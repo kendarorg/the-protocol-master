@@ -225,27 +225,23 @@ public abstract class BaseRequesterImpl implements BaseRequester {
     }
 
 
-    private HttpRequestBase createFullRequest(Request request, String stringAdress) throws Exception {
-        //var partialAddress= new URI(stringAdress).toString();
-        //.skip(3).collect(Collectors.toList()));
-
-        //var fullAddress =
+    private HttpRequestBase createFullRequest(Request request, String stringAddress) throws Exception {
         if (request.getMethod().equalsIgnoreCase("POST")) {
-            return new HttpPost(stringAdress);
+            return new HttpPost(stringAddress);
         } else if (request.getMethod().equalsIgnoreCase("PUT")) {
-            return new HttpPut(stringAdress);
+            return new HttpPut(stringAddress);
         } else if (request.getMethod().equalsIgnoreCase("PATCH")) {
-            return new HttpPatch(stringAdress);
+            return new HttpPatch(stringAddress);
         } else if (request.getMethod().equalsIgnoreCase("GET")) {
-            return new HttpGet(stringAdress);
+            return new HttpGet(stringAddress);
         } else if (request.getMethod().equalsIgnoreCase("DELETE")) {
-            return new HttpDelete(stringAdress);
+            return new HttpDelete(stringAddress);
         } else if (request.getMethod().equalsIgnoreCase("HEAD")) {
-            return new HttpHead(stringAdress);
+            return new HttpHead(stringAddress);
         } else if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
-            return new HttpOptions(stringAdress);
+            return new HttpOptions(stringAddress);
         } else if (request.getMethod().equalsIgnoreCase("TRACE")) {
-            return new HttpTrace(stringAdress);
+            return new HttpTrace(stringAddress);
         } else {
             log.error("Missing http method {} on {}", request.getMethod(), request.buildUrl());
             throw new Exception("Missing http method " + request.getMethod() + " on " + request.buildUrl());

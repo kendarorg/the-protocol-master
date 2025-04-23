@@ -5,21 +5,17 @@ import java.io.*;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class IOReplicator {
     private final OutputStream stdin;
-    private final InputStream stdout;
-    private final InputStream stderr;
     private final Process process;
-    private final BufferedReader reader;
     private final BufferedWriter writer;
-    private final BufferedReader error;
 
     public IOReplicator(Process process) {
         stdin = process.getOutputStream();
-        stdout = process.getInputStream();
-        stderr = process.getErrorStream();
+        InputStream stdout = process.getInputStream();
+        InputStream stderr = process.getErrorStream();
         this.process = process;
-        reader = new BufferedReader(new InputStreamReader(stdout));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stdout));
         writer = new BufferedWriter(new OutputStreamWriter(stdin));
-        error = new BufferedReader(new InputStreamReader(stderr));
+        BufferedReader error = new BufferedReader(new InputStreamReader(stderr));
     }
 
     public String showData() {
