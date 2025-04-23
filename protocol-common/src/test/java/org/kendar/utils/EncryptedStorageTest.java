@@ -21,7 +21,7 @@ public class EncryptedStorageTest {
         var resultpath = Path.of("target", "EncryptedStorageTest", "testEncryptedStorage", "instance", "plugin", "file.json");
         var target = new EncryptedStorageRepository(repopath) {
             @Override
-            protected String getEncriptionKey() {
+            protected String getEncryptionKey() {
                 return "testEncryptedStorage";
             }
         };

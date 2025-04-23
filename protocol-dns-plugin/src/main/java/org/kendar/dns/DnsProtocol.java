@@ -68,8 +68,8 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             Matcher ipPatternMatcher = ipPattern.matcher(childDns);
             if (!ipPatternMatcher.matches()) {
                 try {
-                    var chilDnsIp = InetAddress.getByName(childDns);
-                    this.dnsServers.add(chilDnsIp.getHostAddress());
+                    var childDnsIp = InetAddress.getByName(childDns);
+                    this.dnsServers.add(childDnsIp.getHostAddress());
                 } catch (UnknownHostException e) {
                     log.error("Unable to resolve IP address for DNS {}", childDns, e);
                 }
@@ -204,14 +204,14 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         }
 
 
-        var splitted = requestedDomain.split("\\.");
+        var splitDomain = requestedDomain.split("\\.");
         var containsAtLeastOneInternal = false;
         var endsWith = false;
         var isUpperCase = requestedDomain.toUpperCase(Locale.ROOT).equals(requestedDomain);
-        if (splitted.length >= 3) {
-            var occurr = (splitted[splitted.length - 2] + "." + splitted[splitted.length - 1]).toLowerCase(Locale.ROOT);
-            containsAtLeastOneInternal = countOccurrencesOf(requestedDomain.toLowerCase(Locale.ROOT), "." + occurr + ".") >= 1;
-            endsWith = requestedDomain.toLowerCase(Locale.ROOT).endsWith("." + occurr);
+        if (splitDomain.length >= 3) {
+            var mainDnsName = (splitDomain[splitDomain.length - 2] + "." + splitDomain[splitDomain.length - 1]).toLowerCase(Locale.ROOT);
+            containsAtLeastOneInternal = countOccurrencesOf(requestedDomain.toLowerCase(Locale.ROOT), "." + mainDnsName + ".") >= 1;
+            endsWith = requestedDomain.toLowerCase(Locale.ROOT).endsWith("." + mainDnsName);
         }
         response.addRecord(request.getQuestion(), Section.QUESTION);
 
@@ -343,7 +343,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                         clientSocket.close();
 
                     } catch (IOException e) {
-                        log.error("ERror reading from DNS tcp stream", e);
+                        log.error("Error reading from DNS tcp stream", e);
                     }
                 });
             }

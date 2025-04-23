@@ -62,14 +62,14 @@ public class EncryptedStorageRepository extends FileStorageRepository {
     }
 
     private Encryptor getEncryptor() {
-        var encryptionKey = getEncriptionKey();
+        var encryptionKey = getEncryptionKey();
         if (encryptionKey != null && !encryptionKey.isEmpty()) {
             return new Encryptor(encryptionKey.getBytes(StandardCharsets.UTF_8));
         }
         return null;
     }
 
-    protected String getEncriptionKey() {
+    protected String getEncryptionKey() {
         if (this.password != null && !this.password.isEmpty()) {
             return this.password;
         }
