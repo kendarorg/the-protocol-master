@@ -7,25 +7,9 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>protocol-common</module>
-        <module>protocol-test</module>
-        <module>protocol-postgres</module>
-        <module>protocol-mongo</module>
-        <module>protocol-mysql</module>
-        <module>protocol-amqp-091</module>
-        <module>protocol-redis</module>
-        <module>protocol-mqtt</module>
-        <module>protocol-http</module>
-        <module>protocol-common-jdbc</module>
-        <module>sample-plugins</module>
-        <module>protocol-dns-plugin</module>
-        <module>protocol-runner</module>
-        <module>jacoco</module>
-    </modules>
 
     <properties>
-        <revision>4.3.1</revision>
+        <revision>4.3.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
@@ -61,7 +45,6 @@
         <compiler.plugin.version>3.13.0</compiler.plugin.version>
         <antrun.plugin.version>3.1.0</antrun.plugin.version>
         <aircompressor.version>3.2</aircompressor.version>
-        <reflection.version>0.10.2</reflection.version>
         <logback.version>1.4.8</logback.version>
         <sl4j.version>2.0.7</sl4j.version>
         <jte.version>3.1.16</jte.version>
@@ -88,26 +71,6 @@
         </dependency>
     </dependencies>
     <repositories>
-
-        <!--<repository>
-            <id>kendar</id>
-            <name>Kendar Repository</name>
-            <url>https://maven.kendar.org/maven2/releases</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>kendar2</id>
-            <name>Kendar Repository2</name>
-            <url>https://maven.kendar.org/maven2/snapshots</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>-->
         <repository>
             <id>central2</id>
             <name>Central Repository2</name>
@@ -138,6 +101,7 @@
                 <version>3.5.1</version>
             </extension>
         </extensions>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -170,18 +134,177 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.version}</version>
+                <configuration>
+                    <source>${maven.compiler.target}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
         </plugins>
-    </build>
 
+    </build>
     <distributionManagement>
         <repository>
-            <id>releases.ftp</id>
-            <url>ftp://maven.kendar.org/maven2/releases</url>
+            <id>central</id>
+            <name>central</name>
+            <url>https://central.sonatype.com</url>
         </repository>
-        <snapshotRepository>
-            <id>snapshots.ftp</id>
-            <url>ftp://maven.kendar.org/maven2/snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
     </distributionManagement>
+    <profiles>
+        <profile>
+            <id>dev</id>
+
+            <modules>
+                <module>protocol-test</module>
+                <module>protocol-postgres</module>
+                <module>protocol-mongo</module>
+                <module>protocol-mysql</module>
+                <module>protocol-amqp-091</module>
+                <module>protocol-redis</module>
+                <module>protocol-mqtt</module>
+                <module>protocol-http</module>
+                <module>sample-plugins</module>
+                <module>protocol-common</module>
+                <module>protocol-common-jdbc</module>
+                <module>protocol-dns-plugin</module>
+                <module>protocol-runner</module>
+                <module>jacoco</module>
+            </modules>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>deploy</id>
+            <modules>
+                <module>protocol-common</module>
+                <module>protocol-common-jdbc</module>
+                <module>protocol-dns-plugin</module>
+            </modules>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>flatten-maven-plugin</artifactId>
+                        <version>1.2.5</version>
+                        <configuration>
+                            <pomElements>
+                                <name>keep</name>
+                                <description>keep</description>
+                                <scm>keep</scm>
+                                <url>keep</url>
+                                <developers>keep</developers>
+                            </pomElements>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>flatten</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>flatten</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>flatten.clean</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.11.2</version>
+                        <configuration>
+                            <doclint>-missing</doclint>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>createJavadocs</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>https://raw.githubusercontent.com/kendarorg/the-protocol-master/refs/heads/main/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>kendarorg</id>
+            <name>Enrico Da Ros</name>
+            <email>github@kendar.org</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/kendarorg/the-protocol-master.git</connection>
+        <developerConnection>scm:git:git://github.com/kendarorg/the-protocol-master.git</developerConnection>
+        <url>https://www.github.com/kendarorg/the-protocol-master</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <name>TPM-Proxy main pom</name>
+    <description>
+        Base pom for TPM-Proxy
+    </description>
+    <url>https://www.github.com/kendarorg/the-protocol-master</url>
+
+
 </project>

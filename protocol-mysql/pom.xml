@@ -7,6 +7,9 @@
         <version>${revision}</version>
     </parent>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
     <artifactId>protocol-mysql</artifactId>
     <dependencies>
 

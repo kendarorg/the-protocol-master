@@ -40,3 +40,4 @@ jte-classes
 /extensions.idx
 /plugins/
 /protocol-runner/extensions.idx
+.flattened-pom.xml
