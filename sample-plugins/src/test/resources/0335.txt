@@ -1,0 +1,2 @@
+curl --output 0335.enc --url "https://sc-u13-01.scws-content.net/hls/20/e/c5/ec5c81c4-6760-4f37-9048-d47b5e887e10/video/480p/0335-0125.ts?token=qwrddMiIfS3x7DqT-Qm_tA&expires=1757254705"
+openssl aes-128-cbc -d -K b20782cbc32a7843e7691d55950c9a6a -iv 43A6D967D5C17290D98322F5C8F6660B -in 0335.enc -out 0335.ts

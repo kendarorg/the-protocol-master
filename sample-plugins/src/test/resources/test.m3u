@@ -1,0 +1,7 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="La_Une" tvg-name="La Une HD" tvg-shift="1" radio="false" tvg-logo="../logo/La_Une.png" group-title="TV",La Une HD
+http://panel.globepremium.com:8000/live/xxx/yyy/84.ts
+#EXTINF:-1 tvg-id="La_Deux" tvg-name="La Deux HD" tvg-shift="2" radio="false" tvg-logo="../logo/La_Deux.png" group-title="TV",La Deux HD
+http://panel.globepremium.com:8000/live/xxx/yyy/85.ts
+#EXTINF:-1 tvg-id="RTL_TVI" tvg-name="RTL TVI HD" tvg-shift="3" radio="false" tvg-logo="../logo/RTL_TVI.png" group-title="TV",RTL TVI HD
+http://panel.globepremium.com:8000/live/xxx/yyy/719.ts
