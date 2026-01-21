@@ -10,7 +10,7 @@ PROXYED CONNETION STRING!!!
 
 ## Configuration
 
-* protocol: redis (this is mandatory)
+* protocol: mysql (this is mandatory)
 * port: the port on which the proxy will listen
 * login: the -real- login to use to connect to the real server
 * password: the -real- password to use to connect to the real server
