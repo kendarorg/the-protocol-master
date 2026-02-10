@@ -14,6 +14,19 @@ supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091, DNS ..
 
 Effortlessly and with zero budget
 
+
+### Notes for macOs Users
+
+Should set the following on your .zprofile see [here](https://github.com/testcontainers/testcontainers-rs/pull/800): 
+
+```
+export DOCKER_DEFAULT_PLATFORM=linux/arm64v8
+export TESTCONTAINERS_RYUK_DISABLED=true
+export DOCKER_HOST=tcp://localhost:2375
+```
+
+Check [here](https://podman-desktop.io/docs/migrating-from-docker/using-the-docker_host-environment-variable) for Podman
+
 ### Get Started
 
 Look at "[The Protocol Master Samples](https://github.com/kendarorg/the-protocol-master-samples)" repository to create

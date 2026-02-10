@@ -78,7 +78,7 @@ public class PostgresSqlImage extends BaseImage<PostgresSqlImage, PostgreSQLCont
     @Override
     protected void preStart() {
 
-        container = new PostgreSQLContainer(DockerImageName.parse("postgres:15-alpine"));
+        container = new PostgreSQLContainer(DockerImageName.parse("postgres:15.15"));
         container.setEnv(Arrays.asList("POSTGRES_USER=root", "POSTGRES_PASSWORD=test"));
     }
 
