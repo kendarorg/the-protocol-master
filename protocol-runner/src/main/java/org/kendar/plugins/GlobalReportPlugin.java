@@ -175,4 +175,11 @@ public class GlobalReportPlugin implements GlobalPluginDescriptor {
     public void setSettings(PluginSettings settings) {
         this.settings = settings;
     }
+
+    public void clear() {
+        List<String> listFiles = storage.listFiles();
+        for (String item : listFiles) {
+            storage.deleteFile(item);
+        }
+    }
 }

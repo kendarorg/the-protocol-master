@@ -101,8 +101,13 @@ public class MultiRecordReplayTest extends BasicTest {
         var recordingConfig = Path.of("target", "multiRecording", "recording.json").toAbsolutePath();
         Files.writeString(recordingConfig, recordingSettings);
 
+
+
         System.out.println("STARTING ==============================================");
         startAndHandleUnexpectedErrors("-cfg", recordingConfig.toString());
+
+        var cleanReport = new HttpGet("http://127.0.0.1:9127/api/global/plugins/report-plugin/clean");
+        var httpresponse = httpclient.execute(cleanReport);
         System.out.println("RECORDING ==============================================");
 
 
@@ -123,7 +128,8 @@ public class MultiRecordReplayTest extends BasicTest {
         });
 
 
-        var httpresponse = httpclient.execute(httpget);
+
+         httpresponse = httpclient.execute(httpget);
         var sc = new Scanner(httpresponse.getEntity().getContent());
 
         //Printing the status line
@@ -157,7 +163,7 @@ public class MultiRecordReplayTest extends BasicTest {
         var data = mapper.deserialize(content.toString(), GlobalReport.class);
 
         assertEquals(14, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("postgres")).count());
-        assertEquals(1, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("http")).count());
+        assertEquals(2, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("http")).count());
         assertEquals(1, data.getEvents().stream().filter(e -> e.getProtocol().equalsIgnoreCase("dns")).count());
 
 

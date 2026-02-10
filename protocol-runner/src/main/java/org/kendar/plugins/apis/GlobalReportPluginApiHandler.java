@@ -47,7 +47,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     @TpmDoc(
             description = "Handle the global report plugin actions start,stop,status,download",
             path = @PathParameter(key = "action",
-                    allowedValues = {"start", "stop", "status", "download"}),
+                    allowedValues = {"start", "stop", "status", "download","clean"}),
             responses = {
                     @TpmResponse(
                             body = Ok.class
@@ -74,6 +74,10 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
             return true;
         } else if ("stop".equalsIgnoreCase(action)) {
             plugin.setActive(false);
+            respondOk(resp);
+            return true;
+        } else if ("clean".equalsIgnoreCase(action)) {
+            plugin.clear();
             respondOk(resp);
             return true;
         } else if ("status".equalsIgnoreCase(action)) {
