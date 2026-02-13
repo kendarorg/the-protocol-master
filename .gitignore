@@ -41,3 +41,4 @@ jte-classes
 /plugins/
 /protocol-runner/extensions.idx
 .flattened-pom.xml
+/.idea/copilot.data.migration.ask2agent.xml
