@@ -23,6 +23,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="mysql-verifier-plugin" target="17" />
       <module name="protocol-amqp-100" target="11" />
       <module name="protocol-kafka" target="11" />
       <module name="protocol-todo" target="1.5" />

@@ -41,7 +41,7 @@ public class TcpServer {
     /**
      * Listener socket
      */
-    private AsynchronousServerSocketChannel server;
+    private AbstractAsynchronousServerSocketChannel server;
     private boolean callDurationTimes;
 
     public TcpServer(NetworkProtoDescriptor protoDescriptor) {
@@ -142,13 +142,14 @@ public class TcpServer {
         protoDescriptor.cleanCounters();
         protoDescriptor.start();
 
-        try (AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group)) {
+        try (AsynchronousServerSocketChannel src = AsynchronousServerSocketChannel.open(group)) {
+            var server = new AsynchronousServerPlainSocketChannel(src);
             this.server = server;
             //Setup buffer and listening
 
-            server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
-            server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-            server.bind(new InetSocketAddress(protoDescriptor.getPort()));
+            this.server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
+            this.server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+            this.server.bind(new InetSocketAddress(protoDescriptor.getPort()));
             log.info("[CL>TP][IN] Listening on {}:{} {}", HOST, protoDescriptor.getPort(), protoDescriptor.getClass().getSimpleName());
 
             while (true) {
