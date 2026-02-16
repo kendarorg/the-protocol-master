@@ -17,7 +17,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+//SSL Stuffs
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.util.SelfSignedCertificate;
+
+import javax.net.ssl.SSLEngine;
+import java.io.File;
+
 public class NettyServer implements Server {
+
+    public void enableTls(File certificateFile, File privateKeyFile) {
+        this.tlsEnabled = true;
+        this.certificateFile = certificateFile;
+        this.privateKeyFile = privateKeyFile;
+    }
+
+    public void enableSelfSignedTls() {
+        this.tlsEnabled = true;
+        this.useSelfSignedCertificate = true;
+    }
+
+    private boolean tlsEnabled = false;
+    private File certificateFile;
+    private File privateKeyFile;
+    private boolean useSelfSignedCertificate = false;
+    private SslContext sslContext;
 
     private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
     private static final String HOST = "*";
@@ -75,6 +101,27 @@ public class NettyServer implements Server {
         protoDescriptor.start();
 
         try {
+
+            if (tlsEnabled) {
+                try {
+                    if (useSelfSignedCertificate) {
+                        SelfSignedCertificate ssc = new SelfSignedCertificate();
+                        sslContext = SslContextBuilder
+                                .forServer(ssc.certificate(), ssc.privateKey())
+                                .build();
+                    } else {
+                        sslContext = SslContextBuilder
+                                .forServer(certificateFile, privateKeyFile)
+                                .build();
+                    }
+
+                    log.info("TLS enabled for server on port {}", protoDescriptor.getPort());
+
+                } catch (Exception e) {
+                    throw new TPMException("Failed to initialize TLS", e);
+                }
+            }
+
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -83,6 +130,14 @@ public class NettyServer implements Server {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
+
+                            if (tlsEnabled && sslContext != null) {
+                                SSLEngine sslEngine = sslContext.newEngine(ch.alloc());
+                                sslEngine.setUseClientMode(false);
+
+                                ch.pipeline().addFirst("ssl", new SslHandler(sslEngine));
+                            }
+
                             ch.pipeline().addLast(new ServerHandler());
                         }
                     });

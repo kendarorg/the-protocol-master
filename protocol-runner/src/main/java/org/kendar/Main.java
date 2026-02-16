@@ -35,6 +35,7 @@ import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -304,10 +305,15 @@ public class Main {
 
                         var baseProtocol = localDiService.getInstance(NetworkProtoDescriptor.class, protocol.getProtocol());
                         baseProtocol.initialize();
-                        //NETTY LIFE
+                        //NETTY LIFE TODO-80
                         //var ps = new TcpServer(baseProtocol);
+
                         var ps = new NettyServer(baseProtocol);
                         ps.setOnStart(() -> DiService.setThreadContext(localDiService));
+                        /*ps.enableTls(
+                                new File("server.crt"),
+                                new File("server.key")
+                        ); or server.enableSelfSignedTls();*/
                         ps.start();
 
                         protocolServersCache.put(item.getKey(), ps);
