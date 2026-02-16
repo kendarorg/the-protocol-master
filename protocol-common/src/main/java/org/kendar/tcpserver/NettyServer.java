@@ -1,0 +1,200 @@
+package org.kendar.tcpserver;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.kendar.events.EventsQueue;
+import org.kendar.exceptions.TPMException;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
+import org.kendar.protocol.descriptor.ProtoDescriptor;
+import org.kendar.protocol.events.BytesEvent;
+import org.kendar.utils.Sleeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
+public class NettyServer implements Server {
+
+    private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
+    private static final String HOST = "*";
+
+    private final NetworkProtoDescriptor protoDescriptor;
+
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+    private Channel serverChannel;
+
+    protected Runnable onStart;
+    protected Runnable onStop;
+
+    private boolean callDurationTimes;
+
+    public NettyServer(NetworkProtoDescriptor protoDescriptor) {
+        this.protoDescriptor = protoDescriptor;
+    }
+
+    public void setOnStart(Runnable onStart) {
+        this.onStart = onStart;
+    }
+
+    public void setOnStop(Runnable onStop) {
+        this.onStop = onStop;
+    }
+
+    public ProtoDescriptor getProtoDescriptor() {
+        return protoDescriptor;
+    }
+
+    public void useCallDurationTimes(boolean callDurationTimes) {
+        this.callDurationTimes = callDurationTimes;
+    }
+
+    public boolean isRunning() {
+        return serverChannel != null && serverChannel.isActive();
+    }
+
+    public void start() {
+        if (protoDescriptor.isWrapper()) {
+            try {
+                protoDescriptor.cleanCounters();
+                protoDescriptor.start();
+            } catch (Exception e) {
+                throw new TPMException(e);
+            }
+            return;
+        }
+
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
+
+        protoDescriptor.cleanCounters();
+        protoDescriptor.start();
+
+        try {
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_REUSEADDR, true)
+                    .childOption(ChannelOption.SO_RCVBUF, 4096)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) {
+                            ch.pipeline().addLast(new ServerHandler());
+                        }
+                    });
+
+            ChannelFuture future = bootstrap.bind(protoDescriptor.getPort()).sync();
+            serverChannel = future.channel();
+
+            log.info("[CL>TP][IN] Listening on {}:{} {}",
+                    HOST,
+                    protoDescriptor.getPort(),
+                    protoDescriptor.getClass().getSimpleName());
+
+            if (onStart != null) {
+                onStart.run();
+            }
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TPMException(e);
+        }
+    }
+
+    public void stop() {
+        try {
+            if (serverChannel != null) {
+                serverChannel.close().sync();
+            }
+
+            if (workerGroup != null) {
+                workerGroup.shutdownGracefully();
+            }
+
+            if (bossGroup != null) {
+                bossGroup.shutdownGracefully();
+            }
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TPMException(e);
+        } finally {
+            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
+                protoDescriptor.terminate();
+                Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
+            }
+
+            if (onStop != null) {
+                onStop.run();
+            }
+        }
+    }
+
+    private class ServerHandler extends ChannelInboundHandlerAdapter {
+
+        private NetworkProtoContext context;
+        private int contextId;
+
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
+            contextId = protoDescriptor.getCounter("CONTEXT_ID");
+
+            try (final MDC.MDCCloseable mdc =
+                         MDC.putCloseable("connection", String.valueOf(contextId))) {
+
+                log.trace("[CL>TP] Accepted connection from {}",
+                        ctx.channel().remoteAddress());
+
+                context = (NetworkProtoContext)
+                        protoDescriptor.buildContext(new NettyServerChannel(ctx.channel()), contextId);
+
+                if (protoDescriptor.sendImmediateGreeting()) {
+                    context.sendGreetings();
+                }
+            }
+        }
+
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) {
+
+            ByteBuf in = (ByteBuf) msg;
+
+            try (final MDC.MDCCloseable mdc =
+                         MDC.putCloseable("connection", String.valueOf(contextId))) {
+
+                int readable = in.readableBytes();
+                if (readable > 0) {
+
+                    byte[] bytes = new byte[readable];
+                    in.readBytes(bytes);
+
+                    log.debug("[CL>TP][RX]: Received bytes: {}", bytes.length);
+
+                    var bb = context.buildBuffer();
+                    context.setUseCallDurationTimes(callDurationTimes);
+                    bb.write(bytes);
+
+                    context.send(new BytesEvent(context, null, bb));
+                }
+
+            } catch (Exception ex) {
+                context.handleExceptionInternal(ex);
+                throw ex;
+            } finally {
+                in.release();
+            }
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+            log.trace("Connection failed", cause);
+            ctx.close();
+        }
+    }
+}
+

@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
 /**
  * Multithreaded asynchronous server
  */
-public class TcpServer {
+public class TcpServer implements Server{
     private static final int WAIT_TIMEOUT_MS = 30000;
     /**
      * Default host
@@ -41,7 +41,7 @@ public class TcpServer {
     /**
      * Listener socket
      */
-    private AbstractAsynchronousServerSocketChannel server;
+    private AsynchronousServerSocketChannel server;
     private boolean callDurationTimes;
 
     public TcpServer(NetworkProtoDescriptor protoDescriptor) {
@@ -142,14 +142,13 @@ public class TcpServer {
         protoDescriptor.cleanCounters();
         protoDescriptor.start();
 
-        try (AsynchronousServerSocketChannel src = AsynchronousServerSocketChannel.open(group)) {
-            var server = new AsynchronousServerPlainSocketChannel(src);
+        try (AsynchronousServerSocketChannel server = AsynchronousServerSocketChannel.open(group)) {
             this.server = server;
             //Setup buffer and listening
 
-            this.server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
-            this.server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-            this.server.bind(new InetSocketAddress(protoDescriptor.getPort()));
+            server.setOption(StandardSocketOptions.SO_RCVBUF, 4096);
+            server.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+            server.bind(new InetSocketAddress(protoDescriptor.getPort()));
             log.info("[CL>TP][IN] Listening on {}:{} {}", HOST, protoDescriptor.getPort(), protoDescriptor.getClass().getSimpleName());
 
             while (true) {

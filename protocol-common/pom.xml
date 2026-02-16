@@ -234,6 +234,11 @@
             <artifactId>jackson-dataformat-smile</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
     </dependencies>
 
     <name>TPM-Proxy common library</name>

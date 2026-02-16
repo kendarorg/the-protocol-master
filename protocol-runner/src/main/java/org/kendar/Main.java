@@ -26,6 +26,8 @@ import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.*;
 import org.pf4j.ExtensionPoint;
@@ -47,7 +49,7 @@ import static java.lang.System.exit;
 @SuppressWarnings("ThrowablePrintedToSystemOut")
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
-    private static ConcurrentHashMap<String, TcpServer> protocolServersCache;
+    private static ConcurrentHashMap<String, Server> protocolServersCache;
     private static JarPluginManager pluginManager;
     private static HttpServer apiServer;
     private static DiService diService;
@@ -220,7 +222,13 @@ public class Main {
 
     public static boolean isRunning() {
         if (protocolServersCache == null) return false;
-        return protocolServersCache.values().stream().anyMatch(TcpServer::isRunning) && running;
+        var someRunning = false;
+        for (var server : protocolServersCache.values()) {
+            if (server.isRunning()) {
+                someRunning = true;
+            }
+        }
+        return someRunning && running;
     }
 
 
@@ -296,7 +304,9 @@ public class Main {
 
                         var baseProtocol = localDiService.getInstance(NetworkProtoDescriptor.class, protocol.getProtocol());
                         baseProtocol.initialize();
-                        var ps = new TcpServer(baseProtocol);
+                        //NETTY LIFE
+                        //var ps = new TcpServer(baseProtocol);
+                        var ps = new NettyServer(baseProtocol);
                         ps.setOnStart(() -> DiService.setThreadContext(localDiService));
                         ps.start();
 
