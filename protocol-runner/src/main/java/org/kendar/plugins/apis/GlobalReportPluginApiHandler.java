@@ -24,6 +24,7 @@ import java.util.List;
 import static org.kendar.apis.ApiUtils.respondJson;
 import static org.kendar.apis.ApiUtils.respondOk;
 
+@SuppressWarnings("RegExpRedundantEscape")
 @HttpTypeFilter()
 public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     private static final JsonMapper mapper = new JsonMapper();
@@ -160,14 +161,10 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
                     var fieldValue = row.get(fields.get(fieldIndex));
                     sb.append(",");
                     if (fieldValue.isTextual()) {
-                        sb.append("\"" +
-                                fieldValue.asText().replaceAll("\\\"", "\\\\\"") +
-                                "\"");
+                        sb.append("\"").append(fieldValue.asText().replaceAll("\\\"", "\\\\\"")).append("\"");
                     } else if (fieldValue.isObject()
                             || fieldValue.isArray()) {
-                        sb.append("\"" +
-                                fieldValue.toString().replaceAll("\\\"", "\\\\\"") +
-                                "\"");
+                        sb.append("\"").append(fieldValue.toString().replaceAll("\\\"", "\\\\\"")).append("\"");
                     } else {
                         sb.append(result.convert(fieldValue));
                     }

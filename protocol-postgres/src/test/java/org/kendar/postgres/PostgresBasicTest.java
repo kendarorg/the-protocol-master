@@ -45,7 +45,7 @@ public class PostgresBasicTest {
     protected static PostgresProtocol baseProtocol;
     protected static StorageRepository storage;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {

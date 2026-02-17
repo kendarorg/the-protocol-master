@@ -28,12 +28,14 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@SuppressWarnings("rawtypes")
 public class AmqpBasicTest {
     protected static final int FAKE_PORT = 5682;
     protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
@@ -42,7 +44,7 @@ public class AmqpBasicTest {
     protected static ProtocolPluginDescriptor publishPlugin;
     protected static ProtocolPluginDescriptor recordPlugin;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
     protected JsonMapper mapper = new JsonMapper();
 
@@ -128,6 +130,6 @@ public class AmqpBasicTest {
     }
 
     public List<ReportDataEvent> getEvents() {
-        return events.stream().collect(Collectors.toList());
+        return new ArrayList<>(events);
     }
 }

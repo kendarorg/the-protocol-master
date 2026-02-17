@@ -20,17 +20,6 @@ public class SimpleTest extends MqttBasicTest {
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/exit/";
 
-    @BeforeAll
-    public static void beforeClass() throws IOException {
-
-
-    }
-
-    @AfterAll
-    public static void afterClass() throws Exception {
-
-    }
-
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
         try {
@@ -68,7 +57,7 @@ public class SimpleTest extends MqttBasicTest {
         message.setQos(2);
         message.setRetained(true);
         publisher.publish(TOPIC_NAME, message);
-        Sleeper.sleep(2000, () -> moquetteMessages.size() > 0);
+        Sleeper.sleep(2000, () -> !moquetteMessages.isEmpty());
         publisher.disconnect();
         assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);
@@ -93,7 +82,7 @@ public class SimpleTest extends MqttBasicTest {
         message.setQos(1);
         message.setRetained(true);
         publisher.publish(TOPIC_NAME, message);
-        Sleeper.sleep(1000, () -> moquetteMessages.size() > 0);
+        Sleeper.sleep(1000, () -> !moquetteMessages.isEmpty());
         publisher.disconnect();
         assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);
@@ -117,7 +106,7 @@ public class SimpleTest extends MqttBasicTest {
         message.setQos(0);
         message.setRetained(true);
         publisher.publish(TOPIC_NAME, message);
-        Sleeper.sleep(1000, () -> moquetteMessages.size() > 0);
+        Sleeper.sleep(1000, () -> !moquetteMessages.isEmpty());
         publisher.disconnect();
         assertEquals(1, moquetteMessages.size());
         var founded = moquetteMessages.get(0);

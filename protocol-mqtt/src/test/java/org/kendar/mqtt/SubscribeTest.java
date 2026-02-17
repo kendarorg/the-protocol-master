@@ -25,18 +25,8 @@ public class SubscribeTest extends MqttBasicTest {
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/subscribe/";
     private static final List<MqttMessage> messages = new ArrayList<>();
-    private static JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = new JsonMapper();
 
-    @BeforeAll
-    public static void beforeClass() throws IOException {
-
-
-    }
-
-    @AfterAll
-    public static void afterClass() throws Exception {
-
-    }
 
     private static void setupCallBack(MqttClient client) {
         messages.clear();
@@ -103,7 +93,7 @@ public class SubscribeTest extends MqttBasicTest {
         } else {
             throw new RuntimeException("NOT CONNETED");
         }
-        Sleeper.sleep(7000, () -> messages.size() > 0);
+        Sleeper.sleep(7000, () -> !messages.isEmpty());
         client.disconnect();
         client.close();
         assertEquals(1, messages.size());
@@ -137,7 +127,7 @@ public class SubscribeTest extends MqttBasicTest {
             message.setQos(1);
             client.publish(TOPIC_NAME, message);
         }
-        Sleeper.sleep(1000, () -> messages.size() > 0);
+        Sleeper.sleep(1000, () -> !messages.isEmpty());
         client.disconnect();
         client.close();
         assertEquals(1, messages.size());
@@ -164,7 +154,7 @@ public class SubscribeTest extends MqttBasicTest {
             message.setQos(0);
             client.publish(TOPIC_NAME, message);
         }
-        Sleeper.sleep(6000, () -> messages.size() > 0);
+        Sleeper.sleep(6000, () -> !messages.isEmpty());
         assertEquals(1, messages.size());
         var mesg = messages.get(0);
         assertEquals(MESSAGE_CONTENT, new String(mesg.getPayload()));
@@ -211,7 +201,7 @@ public class SubscribeTest extends MqttBasicTest {
         } else {
             throw new RuntimeException("NOT CONNETED");
         }
-        Sleeper.sleep(7000, () -> messages.size() > 0);
+        Sleeper.sleep(7000, () -> !messages.isEmpty());
         client.disconnect();
         client.close();
         assertEquals(1, messages.size());
@@ -265,7 +255,7 @@ public class SubscribeTest extends MqttBasicTest {
         } else {
             throw new RuntimeException("NOT CONNETED");
         }
-        Sleeper.sleep(7000, () -> messages.size() > 0);
+        Sleeper.sleep(7000, () -> !messages.isEmpty());
         client.disconnect();
         client.close();
         assertEquals(1, messages.size());
@@ -320,7 +310,7 @@ public class SubscribeTest extends MqttBasicTest {
         } else {
             throw new RuntimeException("NOT CONNETED");
         }
-        Sleeper.sleep(7000, () -> messages.size() > 0);
+        Sleeper.sleep(7000, () -> !messages.isEmpty());
         client.disconnect();
         client.close();
         assertEquals(1, messages.size());

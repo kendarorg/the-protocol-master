@@ -7,6 +7,7 @@ import com.rabbitmq.client.DeliverCallback;
 
 import java.nio.charset.StandardCharsets;
 
+@SuppressWarnings("ThrowablePrintedToSystemOut")
 public class Queue {
     private static final String HOST = "localhost";
     private Channel channel;

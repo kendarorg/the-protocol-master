@@ -44,7 +44,7 @@ public class MongoBasicTest {
     protected static final int FAKE_PORT = 27077;
     protected static MongoDbImage mongoContainer;
     protected static TcpServer protocolServer;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor errorPlugin;
     private static ProtocolPluginDescriptor latencyPlugin;
 

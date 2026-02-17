@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BasicRestPluginsTest {
-    private JsonMapper mapper = new JsonMapper();
+    private final JsonMapper mapper = new JsonMapper();
     private BasicRestPluginsPlugin target;
     private BasicRestPluginsPluginSettings targetSettings;
     private HttpServer server;

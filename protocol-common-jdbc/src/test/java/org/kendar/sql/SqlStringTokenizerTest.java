@@ -63,7 +63,7 @@ public class SqlStringTokenizerTest {
         var prev = "";
         for (var c : test.toCharArray()) {
             if (c == ',') {
-                if (prev.length() > 0) {
+                if (!prev.isEmpty()) {
                     result.add(prev);
                 }
                 result.add(",");
@@ -72,7 +72,7 @@ public class SqlStringTokenizerTest {
                 prev += c;
             }
         }
-        if (prev.length() > 0) {
+        if (!prev.isEmpty()) {
             result.add(prev);
         }
         System.out.println(result);

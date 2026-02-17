@@ -3,7 +3,6 @@ package org.kendar.postgres.fsm;
 import org.kendar.buffers.BBuffer;
 import org.kendar.postgres.dtos.Binding;
 import org.kendar.postgres.dtos.Parse;
-import org.kendar.postgres.executor.PostgresExecutor;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.ProtoStep;
 import org.slf4j.Logger;

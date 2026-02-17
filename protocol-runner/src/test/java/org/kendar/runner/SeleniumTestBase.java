@@ -35,8 +35,8 @@ public class SeleniumTestBase extends ApiTestBase {
     private static ComposeContainer environment;
     private static String tpmHost;
     private static HashMap<String, Integer> toWaitFor;
-    private static int defaultTimeout = 5000;
-    private static ConcurrentLinkedQueue logs = new ConcurrentLinkedQueue();
+    private static final int defaultTimeout = 5000;
+    private static final ConcurrentLinkedQueue logs = new ConcurrentLinkedQueue();
     private Path storage;
     private SeleniumIntegration selenium;
     private WebDriver driver;
@@ -360,9 +360,8 @@ public class SeleniumTestBase extends ApiTestBase {
         var done = new ObjectContainer<>(false);
 
         TestSleeper.sleep(timeoutms, () -> {
-            var we = element;
             try {
-                we.click();
+                element.click();
                 done.setObject(true);
                 return true;
             } catch (Exception e) {
@@ -370,8 +369,7 @@ public class SeleniumTestBase extends ApiTestBase {
             }
         });
         if (!done.getObject()) {
-            var we = element;
-            we.click();
+            element.click();
             return true;
         } else {
             return true;

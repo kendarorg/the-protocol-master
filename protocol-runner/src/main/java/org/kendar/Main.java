@@ -28,14 +28,12 @@ import org.kendar.settings.ProtocolSettings;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.Server;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.*;
 import org.pf4j.ExtensionPoint;
 import org.pf4j.JarPluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -47,7 +45,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static java.lang.System.exit;
 
-@SuppressWarnings("ThrowablePrintedToSystemOut")
+@SuppressWarnings({"ThrowablePrintedToSystemOut", "rawtypes"})
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static ConcurrentHashMap<String, Server> protocolServersCache;

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaggedContext extends ProtoContext {
-    private List<ReturnMessage> result = new ArrayList<>();
+    private final List<ReturnMessage> result = new ArrayList<>();
 
     public TaggedContext(ProtoDescriptor descriptor, ClientServerChannel client,
                          int contextId) {

@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("SqlSourceToSinkFlow")
 public class QueryTranslationTest extends PostgresBasicTest {
 
     @BeforeAll
@@ -38,11 +39,6 @@ public class QueryTranslationTest extends PostgresBasicTest {
                 Arguments.of(true, "SELECT \r\n ([0-9]+) AS TEST", "SELECT \r\n $1+2 AS TEST", "SELECT \n 1 AS TEST", "3"),
                 Arguments.of(true, "SELECT \r\n ([0-9]+) AS TEST", "SELECT \r\n 2 AS TEST", "SELECT \n 1 AS TEST", "2")
         );
-    }
-
-    @BeforeEach
-    public void beforeEach(TestInfo testInfo) {
-
     }
 
     @AfterEach

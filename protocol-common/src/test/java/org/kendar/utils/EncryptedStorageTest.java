@@ -28,7 +28,7 @@ public class EncryptedStorageTest {
         var index = new StorageFileIndex("instance", "plugin", "file");
         var sf = new StorageFile(index, "test");
         target.writePluginFile(sf);
-        System.out.println(sf.toString());
+        System.out.println(sf);
         var written = Files.readAllBytes(resultpath);
         var prologue = "ENCRYPTED".getBytes(StandardCharsets.UTF_8);
         for (int i = 0; i < prologue.length; i++) {

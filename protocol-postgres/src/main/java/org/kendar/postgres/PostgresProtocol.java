@@ -32,7 +32,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     private static final SqlStringParser parser = new SqlStringParser("$");
     private static DataTypesConverter dataTypesConverter;
 
-    private PostgresExecutor executor = new PostgresExecutor();
+    private final PostgresExecutor executor = new PostgresExecutor();
 
     static {
         try {

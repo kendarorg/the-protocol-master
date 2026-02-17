@@ -44,7 +44,7 @@ public class MySqlBasicTest {
     protected static TcpServer protocolServer;
     protected static MySQLProtocol baseProtocol;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {

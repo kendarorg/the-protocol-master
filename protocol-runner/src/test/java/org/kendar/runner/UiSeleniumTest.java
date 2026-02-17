@@ -118,7 +118,7 @@ public class UiSeleniumTest extends SeleniumTestBase {
         var response = mapper.deserialize(call.getOutput(), Response.class);
         try {
             var content = response.getResponseText().textValue();
-            if (content.length() > 0 && pattern.matcher(content).find()) {
+            if (!content.isEmpty() && pattern.matcher(content).find()) {
                 content = content.replaceAll(REGEXP, quoteReplacement(
                         "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c" +
                                 "/Bing_Fluent_Logo.svg/120px-Bing_Fluent_Logo.svg.png"));

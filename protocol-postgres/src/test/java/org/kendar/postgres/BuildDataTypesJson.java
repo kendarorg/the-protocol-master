@@ -53,14 +53,6 @@ public class BuildDataTypesJson extends PostgresBasicTest {
         return resu;
     }
 
-    @BeforeEach
-    public void beforeEach(TestInfo testInfo) {
-    }
-
-    @AfterEach
-    public void afterEach() {
-    }
-
     //@Test
     void loadDbInfo() throws SQLException, ClassNotFoundException, JsonProcessingException {
         var c = getRealConnection();

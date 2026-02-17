@@ -6,7 +6,6 @@ import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.Sleeper;
 import org.postgresql.util.PSQLException;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.Date;
@@ -14,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("SqlNoDataSourceInspection")
 public class StandardProtocolsTest extends BasicTest {
 
 
@@ -26,11 +26,6 @@ public class StandardProtocolsTest extends BasicTest {
     @AfterAll
     public static void afterClass() throws Exception {
         afterClassBase();
-    }
-
-    @BeforeEach
-    public void beforeEach() throws IOException {
-
     }
 
     @AfterEach
@@ -233,7 +228,7 @@ public class StandardProtocolsTest extends BasicTest {
             stmt = c.createStatement();
             var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_GG;");
             while (resultset.next()) {
-
+                //NOOP
             }
         } catch (Exception ex) {
             Sleeper.sleep(100);

@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 import static org.apache.http.entity.ContentType.IMAGE_JPEG;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("UastIncorrectHttpHeaderInspection")
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class HttpSimpleTest extends BasicTest {
 
@@ -52,8 +53,7 @@ public class HttpSimpleTest extends BasicTest {
         try {
 
 
-            var entity = new ByteArrayEntity(buildBytesData());
-            return entity;
+            return new ByteArrayEntity(buildBytesData());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

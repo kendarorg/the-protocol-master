@@ -237,10 +237,6 @@ public class SimpleTest extends AmqpBasicTest {
         connection.close();
     }
 
-    void test5_noPublish() throws Exception {
-
-    }
-
     @Test
     void test2_differentChannelAndConnection() throws Exception {
         var messages = new ConcurrentHashMap<Integer, String>();

@@ -31,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MultiRecordReplayTest extends BasicTest {
 
     private static SimpleHttpServer simpleServer;
-    private static String POSTGRES_PORT = "5631";
-    private static String HTTP_PORT = "12080";
-    private static String HTTPS_PORT = "12443";
-    private static String PROXY_PORT = "1281";
-    private static int SIMPLE_SERVER_HTTP_PORT = 18080;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    private AtomicBoolean runTheServer = new AtomicBoolean(true);
+    private static final String POSTGRES_PORT = "5631";
+    private static final String HTTP_PORT = "12080";
+    private static final String HTTPS_PORT = "12443";
+    private static final String PROXY_PORT = "1281";
+    private static final int SIMPLE_SERVER_HTTP_PORT = 18080;
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private final AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     @BeforeAll
     public static void beforeClass() throws IOException {
