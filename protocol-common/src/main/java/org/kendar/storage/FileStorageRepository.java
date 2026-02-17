@@ -183,8 +183,11 @@ public class FileStorageRepository extends StorageRepository {
             if (currRepo == null) {
                 currRepo = new ProtocolRepo();
             }
-            if (!currRepo.initialized) {
-
+            if (!currRepo.initialized ||
+                    currRepo.index==null|| currRepo.index.isEmpty() ||
+                    currRepo.inMemoryDb.isEmpty()) {
+                currRepo.index=null;
+                currRepo.inMemoryDb .clear();
                 for (var item : readAllItems(protocolInstanceId)) {
                     if (item == null) continue;
                     if (item.getType() == null) continue;

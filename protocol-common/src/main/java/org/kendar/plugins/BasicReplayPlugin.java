@@ -151,7 +151,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
                 if (active) {
                     var repeatableMessageTypes = repeatableItems();
                     EventsQueue.send(new StartPlayEvent(getInstanceId()));
-                    Sleeper.sleep(1000, () -> this.repository.getIndexes(getInstanceId()) != null);
+                    Sleeper.sleep(2000, () -> this.repository.getIndexes(getInstanceId()) != null);
                     var toCleanIndexes = new ArrayList<>(this.repository.getIndexes(getInstanceId()));
                     var fromHereTheyAreNotResponses = false;
                     indexes.clear();

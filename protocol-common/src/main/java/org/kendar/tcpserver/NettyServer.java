@@ -164,31 +164,49 @@ public class NettyServer implements Server {
     }
 
     public void stop() {
-        try {
-            if (serverChannel != null) {
-                serverChannel.close().sync();
-            }
-
-            if (workerGroup != null) {
-                workerGroup.shutdownGracefully();
-            }
-
-            if (bossGroup != null) {
-                bossGroup.shutdownGracefully();
-            }
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new TPMException(e);
-        } finally {
+        if (protoDescriptor.isWrapper()) {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
                 protoDescriptor.terminate();
                 Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
             }
 
-            if (onStop != null) {
-                onStop.run();
+
+
+        }else {
+            try {
+                if (serverChannel != null) {
+                    serverChannel.close().sync();
+                }
+
+                if (workerGroup != null) {
+                    workerGroup.shutdownGracefully();
+                }
+
+                if (bossGroup != null) {
+                    bossGroup.shutdownGracefully();
+                }
+
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
+                    protoDescriptor.terminate();
+                    Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new TPMException(e);
+            } finally {
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
+                    var proxy = protoDescriptor.getProxy();
+                    if (proxy != null) {
+                        proxy.terminateFilters();
+                    }
+
+                }
+                Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
             }
+        }
+
+        if (onStop != null) {
+            onStop.run();
         }
     }
 

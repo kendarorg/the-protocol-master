@@ -75,12 +75,24 @@ public class MultiRecordReplayTest extends BasicTest {
         events.clear();
     }
 
+    public static void deleteAllFiles(Path root) throws IOException {
+        Files.walk(root)
+                .filter(Files::isRegularFile)   // only files
+                .forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to delete: " + path, e);
+                    }
+                });
+    }
 
     @Test
     void testRecordingReplaying() throws Exception {
         var targetDir = Path.of("target", "multiRecording").toFile();
         targetDir.mkdir();
-        for (var f : targetDir.listFiles()) f.delete();
+        //for (var f : targetDir.listFiles()) f.delete();
+        deleteAllFiles(targetDir.toPath());
         var proxy = new HttpHost("localhost", Integer.parseInt(PROXY_PORT), "http");
         var routePlanner = new DefaultProxyRoutePlanner(proxy);
         var httpclient = HttpClients.custom().setRoutePlanner(routePlanner).build();
@@ -96,8 +108,8 @@ public class MultiRecordReplayTest extends BasicTest {
         recordingSettings = recordingSettings.replace("{postgresPassword}", postgresContainer.getPassword());
         recordingSettings = recordingSettings.replace("{postgresConnection}", postgresContainer.getJdbcUrl());
         recordingSettings = recordingSettings.replace("{dataDir}", Path.of("target", "multiRecording").toAbsolutePath().toString().replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")));
-        recordingSettings = recordingSettings.replaceAll(Pattern.quote("{recordActive}"), "true");
-        recordingSettings = recordingSettings.replaceAll(Pattern.quote("{replayActive}"), "false");
+        recordingSettings = recordingSettings.replace("{recordActive}", "true");
+        recordingSettings = recordingSettings.replace("{replayActive}", "false");
         var recordingConfig = Path.of("target", "multiRecording", "recording.json").toAbsolutePath();
         Files.writeString(recordingConfig, recordingSettings);
 
@@ -183,8 +195,8 @@ public class MultiRecordReplayTest extends BasicTest {
         replaySettings = replaySettings.replace("{postgresPassword}", "");
         replaySettings = replaySettings.replace("{postgresConnection}", "");
         replaySettings = replaySettings.replace("{dataDir}", Path.of("target", "multiRecording").toAbsolutePath().toString().replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")));
-        replaySettings = replaySettings.replaceAll(Pattern.quote("{recordActive}"), "false");
-        replaySettings = replaySettings.replaceAll(Pattern.quote("{replayActive}"), "true");
+        replaySettings = replaySettings.replace("{recordActive}", "false");
+        replaySettings = replaySettings.replace("{replayActive}", "true");
         var replayConfig = Path.of("target", "multiRecording", "replaying.json").toAbsolutePath();
         Files.writeString(replayConfig, replaySettings);
 
