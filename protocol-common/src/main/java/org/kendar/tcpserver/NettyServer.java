@@ -80,6 +80,9 @@ public class NettyServer implements Server {
     }
 
     public boolean isRunning() {
+        if (protoDescriptor.isWrapper()) {
+            return protoDescriptor.isWrapperRunning();
+        }
         return serverChannel != null && serverChannel.isActive();
     }
 

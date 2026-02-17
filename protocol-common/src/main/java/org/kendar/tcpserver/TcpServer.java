@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
@@ -93,6 +94,16 @@ public class TcpServer implements Server{
 
     public ProtoDescriptor getProtoDescriptor() {
         return protoDescriptor;
+    }
+
+    @Override
+    public void enableTls(File certificateFile, File privateKeyFile) {
+
+    }
+
+    @Override
+    public void enableSelfSignedTls() {
+
     }
 
     /**
