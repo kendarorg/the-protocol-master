@@ -30,7 +30,6 @@ public class EventsQueue {
     }
 
     public static void send(TpmEvent event) {
-        log.error("Sending event {}", event.getClass().getSimpleName());
         size.incrementAndGet();
         getInstance().items.add(event);
     }
@@ -94,7 +93,6 @@ public class EventsQueue {
                 }
                 var item = items.poll();
                 while (item != null) {
-                    log.error("Handling event {}", item.getClass().getSimpleName());
                     try {
                         handle(item);
                     } catch (Exception e) {
