@@ -18,12 +18,28 @@ PROXYED CONNETION STRING!!!
 * timeoutSeconds: the timeout to drop the connections
 * forceSchema: the force is called in case the jdbc driver does not allow setting the schema from connection string
 * force3BytesOkPacketInfo: default to false. For some client (like python peewee) this should be set to true
+* useTls: it true the proxy will try to upgrade the connection to TLS.
 
 Uses the following phases
 
 * PRE_CALL (Before calling the real server)
 * POST_CALL
 * PRE_SOCKET_WRITE (Before sending data to the client)
+
+### Notes on connecting to the proxy
+
+When using the proxy the connection will be established with the proxy configuration. If you want to forward real login and password
+to the original server you should add to the connection string the following. This is for Jdbc connector 8.2 check your driver
+documentation for the correct syntax.
+
+* allowCleartextPasswords=true
+* sslMode=REQUIRED
+
+The connection data will be stored in the context as
+
+* userid
+* database
+* password
 
 ## Plugins
 

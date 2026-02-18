@@ -4,10 +4,10 @@ import org.junit.jupiter.api.*;
 import org.kendar.utils.Sleeper;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.Statement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("SqlNoDataSourceInspection")
 public class MySQLSSLProtocolTest extends MySqlBasicTest {
@@ -114,6 +114,26 @@ public class MySQLSSLProtocolTest extends MySqlBasicTest {
         c.close();
 
         assertTrue(runned);
+    }
+
+
+
+    @Test
+    void simpleProxyTestChangingWithWrongUser() throws Exception {
+
+        var runned = false;
+        Connection c;
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        //?sslMode=REQUIRED
+        Throwable thrown = null;
+        try {
+            DriverManager
+                    .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?allowCleartextPasswords=true&sslMode=REQUIRED", FAKE_PORT),
+                            "rootWrong", "test");
+        }catch (Exception ex){
+            thrown=ex;
+        }
+        assertNotNull(thrown);
     }
 
 

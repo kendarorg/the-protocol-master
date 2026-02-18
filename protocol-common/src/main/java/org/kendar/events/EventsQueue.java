@@ -108,6 +108,7 @@ public class EventsQueue {
 
     public void handle(TpmEvent event) {
         var eventName = event.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+        log.error(eventName);
         if (!eventHandlers.containsKey(eventName) &&
                 !commandHandlers.containsKey(eventName)) return;
         var handlers = eventHandlers.get(eventName);

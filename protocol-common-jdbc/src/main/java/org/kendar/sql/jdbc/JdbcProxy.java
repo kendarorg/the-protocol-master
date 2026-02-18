@@ -25,11 +25,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class JdbcProxy extends Proxy {
     private static final Logger log = LoggerFactory.getLogger(JdbcProxy.class);
-    private final String driver;
-    private final String connectionString;
-    private final String forcedSchema;
-    private final String login;
-    private final String password;
+    private String driver;
+    private String connectionString;
+    private String forcedSchema;
+    private String login;
+    private String password;
 
     public JdbcProxy(JdbcProtocolSettings settings) {
         super();
@@ -57,8 +57,8 @@ public abstract class JdbcProxy extends Proxy {
         this.forcedSchema = forcedSchema;
         this.login = login;
         this.password = password;
-
     }
+
 
     private static ParametrizedStatement buildParametrizedStatement(String query,
                                                                     List<BindingParameter> parameterValues,

@@ -1,5 +1,6 @@
 package org.kendar.mysql.fsm;
 
+import org.kendar.events.EventsQueue;
 import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CapabilityFlag;
@@ -7,6 +8,8 @@ import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.constants.StatusFlag;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.messages.OkPacket;
+import org.kendar.mysql.plugins.MysqlConnect;
+import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.SSLHandshake;
@@ -61,6 +64,7 @@ public class Auth extends MySQLProtoState {
         toSend.setPacketNumber(packetIndex + 1);
         toSend.setCapabilities(CapabilityFlag.getFakeServerCapabilities());
         toSend.setStatusFlags(StatusFlag.SERVER_STATUS_AUTOCOMMIT.getCode());
+        EventsQueue.getInstance().handle(new MysqlConnect(protocContext));
         return iteratorOfList(toSend);
     }
 
