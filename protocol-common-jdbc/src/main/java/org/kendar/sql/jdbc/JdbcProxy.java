@@ -6,6 +6,7 @@ import org.kendar.iterators.QueryResultIterator;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
@@ -414,6 +415,9 @@ public abstract class JdbcProxy extends Proxy {
     }
 
     public void doConnect(ProtoContext protoContext){
+        if(!((NetworkProtoDescriptor)protoContext.getDescriptor()).hasProxy()){
+            return;
+        }
         if(protoContext.getValue("CONNECTION",null)==null){
 
             long start = System.currentTimeMillis();
