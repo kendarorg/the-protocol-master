@@ -27,6 +27,7 @@ public class ReplayerTest {
     void showWarnings() throws Exception {
 
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
+
         var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver");
 
         var storage = new FileStorageRepository(Path.of("src",
@@ -48,7 +49,7 @@ public class ReplayerTest {
         Connection c;
         Class.forName("com.mysql.cj.jdbc.Driver");
         c = DriverManager
-                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?useSSL=false", FAKE_PORT),
                         "root", "test");
 
         var runned = false;
@@ -90,7 +91,7 @@ public class ReplayerTest {
 
 
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",
-                String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
+                String.format("jdbc:mysql://127.0.0.1:%d?useSSL=false", FAKE_PORT),
                 "test", "test",
                 "org.hibernate.dialect.MySQLDialect",
                 CompanyJpa.class);

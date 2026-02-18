@@ -1,5 +1,7 @@
 package org.kendar.protocol.descriptor;
 
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.ssl.SslContext;
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
 import org.kendar.exceptions.TPMException;
@@ -29,6 +31,8 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
      * Whether should use the proxy
      */
     private boolean proxy;
+    private SslContext sslContext;
+    private SocketChannel channel;
 
     public NetworkProtoDescriptor() {
 
@@ -160,5 +164,21 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
 
     public Map<String, Integer> getPorts() {
         return Map.of("main", getPort());
+    }
+
+    public void setSslContext(SslContext sslContext) {
+        this.sslContext = sslContext;
+    }
+
+    public SslContext getSslContext() {
+        return sslContext;
+    }
+
+    public void setChannel(SocketChannel channel) {
+        this.channel = channel;
+    }
+
+    public SocketChannel getChannel() {
+        return channel;
     }
 }

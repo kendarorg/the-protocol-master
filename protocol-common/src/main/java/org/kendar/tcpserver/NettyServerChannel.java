@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -16,12 +17,17 @@ import java.util.concurrent.Future;
 public class NettyServerChannel implements ClientServerChannel {
 
     private final Channel channel;
+    private final ChannelHandlerContext ctx;
     private volatile boolean closed = false;
 
-    public NettyServerChannel(Channel channel) {
+    public NettyServerChannel(Channel channel, ChannelHandlerContext ctx) {
         this.channel = Objects.requireNonNull(channel);
+        this.ctx = ctx;
     }
 
+    public ChannelHandlerContext getChannelHandlerContext() {
+        return ctx;
+    }
 
     public SocketAddress getRemoteAddress() {
         return channel.remoteAddress();
@@ -37,6 +43,9 @@ public class NettyServerChannel implements ClientServerChannel {
     @Override
     public Future<Integer> write(ByteBuffer response) {
 
+        if (response.get(0) == 0x17) {
+            System.out.println();
+        }
         if (closed || !channel.isActive()) {
             return CompletableFuture.completedFuture(0);
         }

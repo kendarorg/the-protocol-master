@@ -114,7 +114,6 @@ public class MultiRecordReplayTest extends BasicTest {
         Files.writeString(recordingConfig, recordingSettings);
 
 
-
         System.out.println("STARTING ==============================================");
         startAndHandleUnexpectedErrors("-cfg", recordingConfig.toString());
 
@@ -140,8 +139,7 @@ public class MultiRecordReplayTest extends BasicTest {
         });
 
 
-
-         httpresponse = httpclient.execute(httpget);
+        httpresponse = httpclient.execute(httpget);
         var sc = new Scanner(httpresponse.getEntity().getContent());
 
         //Printing the status line

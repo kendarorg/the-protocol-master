@@ -17,6 +17,8 @@ import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.MysqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
@@ -41,7 +43,7 @@ public class MySqlBasicTest {
 
     protected static final int FAKE_PORT = 3310;
     protected static MysqlImage mysqlContainer;
-    protected static TcpServer protocolServer;
+    protected static Server protocolServer;
     protected static MySQLProtocol baseProtocol;
     protected static ProtocolPluginDescriptor errorPlugin;
     private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
@@ -60,6 +62,10 @@ public class MySqlBasicTest {
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
+        beforeEachBaseSSL(testInfo, false);
+    }
+
+    public static void beforeEachBaseSSL(TestInfo testInfo, boolean ssl) {
         baseProtocol = new MySQLProtocol(FAKE_PORT);
         var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl(), null,
@@ -112,8 +118,10 @@ public class MySqlBasicTest {
             events.add(r);
         }, ReportDataEvent.class);
         baseProtocol.setProxy(proxy);
+        var mysqlSettings = (MySqlProtocolSettings) baseProtocol.getSettings();
+        mysqlSettings.setUseTls(ssl);
         baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
@@ -195,8 +203,20 @@ public class MySqlBasicTest {
     protected static Connection getProxyConnection() throws ClassNotFoundException, SQLException {
         Connection c;
         Class.forName("com.mysql.cj.jdbc.Driver");
+        //?sslMode=REQUIRED
         c = DriverManager
-                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?useSSL=false", FAKE_PORT),
+                        "root", "test");
+        assertNotNull(c);
+        return c;
+    }
+
+    protected static Connection getProxyConnectionSsl() throws ClassNotFoundException, SQLException {
+        Connection c;
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        //?sslMode=REQUIRED
+        c = DriverManager
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?useSSL=true&requireSSL=true&verifyServerCertificate=false", FAKE_PORT),
                         "root", "test");
         assertNotNull(c);
         return c;
@@ -206,7 +226,7 @@ public class MySqlBasicTest {
         Connection c;
         Class.forName("com.mysql.cj.jdbc.Driver");
         c = DriverManager
-                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d/?useServerPrepStmts=true", FAKE_PORT),
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d/?useServerPrepStmts=true&useSSL=false", FAKE_PORT),
                         "root", "test");
         assertNotNull(c);
         return c;

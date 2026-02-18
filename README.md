@@ -14,10 +14,9 @@ supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091, DNS ..
 
 Effortlessly and with zero budget
 
-
 ### Notes for macOs Users
 
-Should set the following on your .zprofile see [here](https://github.com/testcontainers/testcontainers-rs/pull/800): 
+Should set the following on your .zprofile see [here](https://github.com/testcontainers/testcontainers-rs/pull/800):
 
 ```
 export DOCKER_DEFAULT_PLATFORM=linux/arm64v8

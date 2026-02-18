@@ -48,7 +48,7 @@ public class GlobalReportPluginApiHandler implements BasePluginApiHandler {
     @TpmDoc(
             description = "Handle the global report plugin actions start,stop,status,download",
             path = @PathParameter(key = "action",
-                    allowedValues = {"start", "stop", "status", "download","clean"}),
+                    allowedValues = {"start", "stop", "status", "download", "clean"}),
             responses = {
                     @TpmResponse(
                             body = Ok.class

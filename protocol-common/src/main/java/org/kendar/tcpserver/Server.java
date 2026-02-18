@@ -12,8 +12,10 @@ public interface Server {
     void setOnStart(Runnable onStart);
 
     void start();
+
     ProtoDescriptor getProtoDescriptor();
 
     void enableTls(File certificateFile, File privateKeyFile);
+
     void enableSelfSignedTls();
 }

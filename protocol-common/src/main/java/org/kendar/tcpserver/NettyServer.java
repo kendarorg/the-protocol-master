@@ -40,7 +40,7 @@ public class NettyServer implements Server {
     private boolean tlsEnabled = false;
     private File certificateFile;
     private File privateKeyFile;
-    private boolean useSelfSignedCertificate = false;
+    private boolean useSelfSignedCertificate = true;
     private SslContext sslContext;
 
     private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
@@ -103,24 +103,24 @@ public class NettyServer implements Server {
 
         try {
 
-            if (tlsEnabled) {
-                try {
-                    if (useSelfSignedCertificate) {
-                        SelfSignedCertificate ssc = new SelfSignedCertificate();
-                        sslContext = SslContextBuilder
-                                .forServer(ssc.certificate(), ssc.privateKey())
-                                .build();
-                    } else {
-                        sslContext = SslContextBuilder
-                                .forServer(certificateFile, privateKeyFile)
-                                .build();
-                    }
-
-                    log.info("TLS enabled for server on port {}", protoDescriptor.getPort());
-
-                } catch (Exception e) {
-                    throw new TPMException("Failed to initialize TLS", e);
+            try {
+                if (useSelfSignedCertificate) {
+                    //TODO 80-tls-support
+                    SelfSignedCertificate ssc = new SelfSignedCertificate();
+                    sslContext = SslContextBuilder
+                            .forServer(ssc.certificate(), ssc.privateKey())
+                            .build();
+                } else {
+                    sslContext = SslContextBuilder
+                            .forServer(certificateFile, privateKeyFile)
+                            .build();
                 }
+                protoDescriptor.setSslContext(sslContext);
+
+                log.info("TLS enabled for server on port {}", protoDescriptor.getPort());
+
+            } catch (Exception e) {
+                throw new TPMException("Failed to initialize TLS", e);
             }
 
             ServerBootstrap bootstrap = new ServerBootstrap();
@@ -131,7 +131,6 @@ public class NettyServer implements Server {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
-
                             if (tlsEnabled && sslContext != null) {
                                 SSLEngine sslEngine = sslContext.newEngine(ch.alloc());
                                 sslEngine.setUseClientMode(false);
@@ -169,8 +168,7 @@ public class NettyServer implements Server {
             }
 
 
-
-        }else {
+        } else {
             try {
                 if (serverChannel != null) {
                     serverChannel.close().sync();
@@ -208,7 +206,7 @@ public class NettyServer implements Server {
         }
     }
 
-    private class ServerHandler extends ChannelInboundHandlerAdapter {
+    public class ServerHandler extends ChannelInboundHandlerAdapter {
 
         private NetworkProtoContext context;
         private int contextId;
@@ -225,7 +223,7 @@ public class NettyServer implements Server {
                         ctx.channel().remoteAddress());
 
                 context = (NetworkProtoContext)
-                        protoDescriptor.buildContext(new NettyServerChannel(ctx.channel()), contextId);
+                        protoDescriptor.buildContext(new NettyServerChannel(ctx.channel(), ctx), contextId);
 
                 if (protoDescriptor.sendImmediateGreeting()) {
                     context.sendGreetings();
@@ -235,7 +233,6 @@ public class NettyServer implements Server {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
-
             ByteBuf in = (ByteBuf) msg;
 
             try (final MDC.MDCCloseable mdc =

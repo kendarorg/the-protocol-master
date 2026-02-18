@@ -60,6 +60,11 @@
             <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-jdk15to18</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>${pl4j.version}</version>

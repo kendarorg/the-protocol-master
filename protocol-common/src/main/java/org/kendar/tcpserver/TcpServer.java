@@ -25,7 +25,7 @@ import java.util.concurrent.Future;
 /**
  * Multithreaded asynchronous server
  */
-public class TcpServer implements Server{
+public class TcpServer implements Server {
     private static final int WAIT_TIMEOUT_MS = 30000;
     /**
      * Default host

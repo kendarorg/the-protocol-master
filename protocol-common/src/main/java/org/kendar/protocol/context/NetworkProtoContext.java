@@ -60,6 +60,10 @@ public abstract class NetworkProtoContext extends ProtoContext {
         super(descriptor, contextId);
     }
 
+    public ClientServerChannel getClient() {
+        return client;
+    }
+
     /**
      * If no data continue, else missing handler!
      *

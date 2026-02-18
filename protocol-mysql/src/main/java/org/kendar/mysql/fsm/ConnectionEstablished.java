@@ -1,6 +1,5 @@
 package org.kendar.mysql.fsm;
 
-import org.kendar.mysql.constants.CapabilityFlag;
 import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.executor.MySQLProtoContext;
 import org.kendar.mysql.messages.Handshake;
@@ -29,11 +28,13 @@ public class ConnectionEstablished extends ProtoState {
         gp.setPacketNumber(protocContext.getPacketNumber());
         gp.setServerVersion("8.1.0");
         gp.setThreadId(protocContext.getNewPid());
-        gp.setServerCapabilities((short) CapabilityFlag.unsetFlag(0xFFFF, CapabilityFlag.CLIENT_SSL.getCode()));
+        gp.setServerCapabilities((short) 0xFFFF);
+        //gp.setServerCapabilities((short) CapabilityFlag.unsetFlag(0xFFFF, CapabilityFlag.CLIENT_SSL.getCode()));
+
         gp.setServerLanguage(Language.UTF8_GENERAL_CI);
         gp.setServerStatus((short) SERVER_STATUS_AUTOCOMMIT.getCode());
         gp.setExtendedServerCapabilities((short) 0xC27F);
-        gp.setAuthenticationPlugin("mysql_native_password");
+        gp.setAuthenticationPlugin("mysql_cleartext_plugin");
         return iteratorOfList(gp);
     }
 

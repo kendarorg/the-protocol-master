@@ -195,13 +195,40 @@ public abstract class ProtoContext {
      */
     public Future<Boolean> send(ProtocolEvent event) {
         lastAccess.set(getNow());
-        return executorService.submit(() -> {
+        var result = reactToEvent(event);
+        return new CompletableFuture<>() {
+            @Override
+            public boolean cancel(boolean mayInterruptIfRunning) {
+                return false;
+            }
+
+            @Override
+            public boolean isCancelled() {
+                return false;
+            }
+
+            @Override
+            public boolean isDone() {
+                return true;
+            }
+
+            @Override
+            public Boolean get() throws InterruptedException, ExecutionException {
+                return result;
+            }
+
+            @Override
+            public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+                return result;
+            }
+        };
+        /*return executorService.submit(() -> {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
                 synchronized (sendLock) {
                     return reactToEvent(event);
                 }
             }
-        });
+        });*/
     }
 
     /**

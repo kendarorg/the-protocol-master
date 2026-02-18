@@ -1,6 +1,7 @@
 package org.kendar.mysql;
 
 import org.junit.jupiter.api.*;
+import org.kendar.utils.Sleeper;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -9,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("SqlNoDataSourceInspection")
-public class MySQLProtocolTest extends MySqlBasicTest {
+public class MySQLSSLProtocolTest extends MySqlBasicTest {
     @BeforeAll
     public static void beforeClass() {
         beforeClassBase();
@@ -22,7 +23,8 @@ public class MySQLProtocolTest extends MySqlBasicTest {
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
-        beforeEachBase(testInfo);
+        beforeEachBaseSSL(testInfo, true);
+        Sleeper.sleep(1000);
     }
 
     @AfterEach
@@ -36,7 +38,7 @@ public class MySQLProtocolTest extends MySqlBasicTest {
         var runned = false;
 
 
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSsl();
 
 
         var stmt = c.createStatement();
@@ -86,7 +88,7 @@ public class MySQLProtocolTest extends MySqlBasicTest {
     void simpleProxyTest() throws Exception {
 
         var runned = false;
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSsl();
         Statement stmt;
         stmt = c.createStatement();
         stmt.executeUpdate("CREATE TABLE COMPANY_2 " +
@@ -121,7 +123,7 @@ public class MySQLProtocolTest extends MySqlBasicTest {
         var runned = false;
 
 
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSsl();
 
 
         var stmt = c.createStatement();

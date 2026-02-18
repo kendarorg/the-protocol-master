@@ -29,7 +29,7 @@ public class Auth extends MySQLProtoState {
         inputBuffer.getBytes(23);
         var userName = inputBuffer.getString();
         byte[] password = null;
-        String database ="";
+        String database = "";
         String clientPluginName;
         var authResponseLength = 0;
         if (CapabilityFlag.isFlagSet(clientFlag, CapabilityFlag.CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA)) {
@@ -44,7 +44,7 @@ public class Auth extends MySQLProtoState {
         if (CapabilityFlag.isFlagSet(clientFlag, CapabilityFlag.CLIENT_PLUGIN_AUTH)) {
             clientPluginName = inputBuffer.getString();
         }
-        var fullThing = userName+" "+new String(password)+" "+database;
+        var fullThing = userName + " " + new String(password) + " " + database;
         System.out.println(fullThing);
         protocContext.setValue("userid", userName);
         protocContext.setValue("database", database);

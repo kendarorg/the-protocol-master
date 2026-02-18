@@ -13,6 +13,7 @@ import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.NetworkWait;
+import org.kendar.protocol.states.SSLHandshake;
 import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
@@ -77,6 +78,10 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
     protected void initializeProtocol() {
         initialize(new ProtoStateSequence(
                 new ConnectionEstablished(BytesEvent.class),
+                new ProtoStateSequence(
+                        new SSLRequest(BytesEvent.class).asOptional()
+                        , new SSLHandshake(BytesEvent.class).asOptional()
+                ),
                 new Auth(BytesEvent.class),
                 new ProtoStateWhile(
                         new NetworkWait(BytesEvent.class).asOptional()

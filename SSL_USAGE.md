@@ -1,4 +1,5 @@
-You use this wrapper exactly like a normal `AsynchronousServerSocketChannel` — except the TLS handshake is completed **before** you receive the connection.
+You use this wrapper exactly like a normal `AsynchronousServerSocketChannel` — except the TLS handshake is completed *
+*before** you receive the connection.
 
 Below is a practical, production-style example of how to wire it up and use it correctly.
 
@@ -165,7 +166,7 @@ curl -k https://localhost:8443
 It correctly handles:
 
 | Problem                       | Solved? |
-| ----------------------------- | ------- |
+|-------------------------------|---------|
 | TLS 1.3 handshake transitions | ✅       |
 | FINISHED skipped state        | ✅       |
 | BUFFER_UNDERFLOW              | ✅       |

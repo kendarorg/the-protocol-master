@@ -26,6 +26,7 @@ public class MySQLProtoContext extends NetworkProtoContext {
     private MySQLExecutor executor;
 
     public MySQLProtoContext(ProtoDescriptor descriptor, int contextId) {
+
         super(descriptor, contextId);
     }
 
