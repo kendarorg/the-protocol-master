@@ -1,6 +1,6 @@
 # MySQL Protocol
 
-You can directly use the "proxy" as a normal mysql backend
+You can directly use the "proxy" as a normal mysql backend. It supports TLS natively.
 
 ```
 VERY IMPORTANT!! IF YOU USE THE DB NAME INTO YOUR APPLICATION
@@ -25,21 +25,6 @@ Uses the following phases
 * PRE_CALL (Before calling the real server)
 * POST_CALL
 * PRE_SOCKET_WRITE (Before sending data to the client)
-
-### Notes on connecting to the proxy
-
-When using the proxy the connection will be established with the proxy configuration. If you want to forward real login and password
-to the original server you should add to the connection string the following. This is for Jdbc connector 8.2 check your driver
-documentation for the correct syntax.
-
-* allowCleartextPasswords=true
-* sslMode=REQUIRED
-
-The connection data will be stored in the context as
-
-* userid
-* database
-* password
 
 ## Plugins
 
@@ -161,9 +146,23 @@ definitions. For details on the implementation [here](../docs/rest-plugins-plugi
   from contains
 * blockOnException: If there is an exception return the error and stop the filtering
 
+## mysql-forwarder
+
+Using this plugin is possible to forward the real user, password to the target database. The connection is rebuilt
+when logging in. The protocol must be set to "useTls" and the connection string must contain the following. 
+This is for Jdbc connector 8.2 check your driver documentation for the correct syntax.
+
+* allowCleartextPasswords=true
+* sslMode=REQUIRED
+
+The connection data will be stored in the context as follows and never logged:
+
+* userid
+* database
+* password
+
 ## Missing features
 
-* Real authentication (always allowed)
 * `Multi-Resultset`
 * Replication Protocol
 * Commands
@@ -217,7 +216,7 @@ Testing in python with [PyMySQL](https://github.com/PyMySQL) I noticed that the
 OkPacket is request to have -at least- 7 bytes as payload, then added an empty
 info array...
 
-### Data types mess
+### Data types mess (really messy not messages!)
 
 This happens only on binary protocol and -real- prepared statements (that are
 used extensively by ODBC and .NET drivers)

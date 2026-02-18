@@ -4,17 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b21b0ffe-21f1-4bbb-bf15-8b58aecdaf36" name="Changes" comment="full async not for mysql">
-      <change afterPath="$PROJECT_DIR$/protocol-mysql/src/main/java/org/kendar/mysql/plugins/MySqlForwarderPlugin.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocol-mysql/src/main/java/org/kendar/mysql/plugins/MySqlForwarderPluginSettings.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/protocol-mysql/src/main/java/org/kendar/mysql/plugins/MysqlConnect.java" afterDir="false" />
+    <list default="true" id="b21b0ffe-21f1-4bbb-bf15-8b58aecdaf36" name="Changes" comment="Added forwarder plugin">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-common-jdbc/src/main/java/org/kendar/sql/jdbc/JdbcProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-common-jdbc/src/main/java/org/kendar/sql/jdbc/JdbcProxy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-common/src/main/java/org/kendar/events/EventsQueue.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-common/src/main/java/org/kendar/events/EventsQueue.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SSL.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SSL_USAGE.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/protocol-mysql/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-mysql/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-mysql/src/main/java/org/kendar/mysql/fsm/Auth.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-mysql/src/main/java/org/kendar/mysql/fsm/Auth.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-mysql/src/test/java/org/kendar/mysql/MySQLSSLProtocolTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-mysql/src/test/java/org/kendar/mysql/MySQLSSLProtocolTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-mysql/src/test/java/org/kendar/mysql/MySqlBasicTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-mysql/src/test/java/org/kendar/mysql/MySqlBasicTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -222,7 +217,7 @@
       <option name="presentableId" value="Default" />
       <updated>1771328403817</updated>
       <workItem from="1771328404904" duration="3255000" />
-      <workItem from="1771334561614" duration="33124000" />
+      <workItem from="1771334561614" duration="33761000" />
     </task>
     <task id="LOCAL-00001" summary="Reformat and imports">
       <option name="closed" value="true" />
@@ -304,7 +299,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771420752539</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Added forwarder plugin">
+      <option name="closed" value="true" />
+      <created>1771425447594</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1771425447594</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -315,7 +318,8 @@
     <MESSAGE value="Reformat and imports" />
     <MESSAGE value="Some small fix" />
     <MESSAGE value="full async not for mysql" />
-    <option name="LAST_COMMIT_MESSAGE" value="full async not for mysql" />
+    <MESSAGE value="Added forwarder plugin" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added forwarder plugin" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

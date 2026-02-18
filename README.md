@@ -96,7 +96,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Native protocol for (and all compatibles):
     * anything that goes through http/https
     * postgres
-    * mysql
+    * mysql (and all mysql compatible like mariadb) with SSL support
     * mongoDB
     * redis 3,redis 2
     * mqtt
@@ -140,6 +140,7 @@ If you want to go on the specific functions by protocol:
     * Simple authentication (could add an "auth provider")
 * [MySQL](protocol-mysql/README.md)
     * Support for cached queries and stored procedures
+    * Possibility of using the real users passwords
     * Simple authentication (could add an "auth provider")
 * [MongoDB](protocol-mongo/README.md)
     * Basic authentication
