@@ -46,3 +46,4 @@ jte-classes
 
 # Put either here or in .idea/.gitignore
 /.idea/*.*
+/.idea/

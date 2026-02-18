@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b21b0ffe-21f1-4bbb-bf15-8b58aecdaf36" name="Changes" comment="Some small fix">
+    <list default="true" id="b21b0ffe-21f1-4bbb-bf15-8b58aecdaf36" name="Changes" comment="full async not for mysql">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-amqp-091/src/test/java/org/kendar/amqp/v09/ReplayerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-amqp-091/src/test/java/org/kendar/amqp/v09/ReplayerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-common/src/main/java/org/kendar/protocol/context/ProtoContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-common/src/main/java/org/kendar/protocol/context/ProtoContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-mysql/src/main/java/org/kendar/mysql/executor/MySQLProtoContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-mysql/src/main/java/org/kendar/mysql/executor/MySQLProtoContext.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,7 +74,8 @@
     "JUnit.JpaTest.executor": "Run",
     "JUnit.MySQLProtocolTest.executor": "Run",
     "JUnit.MySQLProtocolTest.simpleProxyTest.executor": "Run",
-    "JUnit.MySQLSSLProtocolTest.executor": "Run",
+    "JUnit.MySQLSSLProtocolTest.executor": "Debug",
+    "JUnit.MySQLSSLProtocolTest.proxyTestTransactions.executor": "Debug",
     "JUnit.ReplayerTest.executor": "Run",
     "JUnit.ReplayerTest.test2_differentChannelAndConnection.executor": "Run",
     "JUnit.StandardProtocolsTest.executor": "Run",
@@ -106,11 +105,34 @@
       <recent name="org.kendar.mysql" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ReplayerTest.test2_differentChannelAndConnection">
-    <configuration name="All in protocol-amqp-091" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="protocol-amqp-091" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
+  <component name="RunManager" selected="JUnit.MySQLSSLProtocolTest.proxyTestTransactions">
+    <configuration name="MySQLSSLProtocolTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="protocol-mysql" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.kendar.mysql.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.kendar.mysql" />
+      <option name="MAIN_CLASS_NAME" value="org.kendar.mysql.MySQLSSLProtocolTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MySQLSSLProtocolTest.proxyTestTransactions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="protocol-mysql" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.kendar.mysql.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.kendar.mysql" />
+      <option name="MAIN_CLASS_NAME" value="org.kendar.mysql.MySQLSSLProtocolTest" />
+      <option name="METHOD_NAME" value="proxyTestTransactions" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -147,21 +169,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StandardProtocolsTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="protocol-runner" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.kendar.runner.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.kendar.runner" />
-      <option name="MAIN_CLASS_NAME" value="org.kendar.runner.StandardProtocolsTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="java in protocol-amqp-091" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="protocol-amqp-091" />
       <option name="TEST_OBJECT" value="directory" />
@@ -178,11 +185,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.MySQLSSLProtocolTest.proxyTestTransactions" />
+        <item itemvalue="JUnit.MySQLSSLProtocolTest" />
         <item itemvalue="JUnit.ReplayerTest.test2_differentChannelAndConnection" />
         <item itemvalue="JUnit.java in protocol-amqp-091" />
         <item itemvalue="JUnit.ReplayerTest" />
-        <item itemvalue="JUnit.All in protocol-amqp-091" />
-        <item itemvalue="JUnit.StandardProtocolsTest" />
       </list>
     </recent_temporary>
   </component>
@@ -202,7 +209,7 @@
       <option name="presentableId" value="Default" />
       <updated>1771328403817</updated>
       <workItem from="1771328404904" duration="3255000" />
-      <workItem from="1771334561614" duration="24657000" />
+      <workItem from="1771334561614" duration="28581000" />
     </task>
     <task id="LOCAL-00001" summary="Reformat and imports">
       <option name="closed" value="true" />
@@ -228,7 +235,47 @@
       <option name="project" value="LOCAL" />
       <updated>1771414669031</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="full async not for mysql">
+      <option name="closed" value="true" />
+      <created>1771415690666</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1771415690666</updated>
+    </task>
+    <task id="LOCAL-00005" summary="full async not for mysql">
+      <option name="closed" value="true" />
+      <created>1771420592153</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1771420592153</updated>
+    </task>
+    <task id="LOCAL-00006" summary="full async not for mysql">
+      <option name="closed" value="true" />
+      <created>1771420653949</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1771420653949</updated>
+    </task>
+    <task id="LOCAL-00007" summary="full async not for mysql">
+      <option name="closed" value="true" />
+      <created>1771420668262</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1771420668262</updated>
+    </task>
+    <task id="LOCAL-00008" summary="full async not for mysql">
+      <option name="closed" value="true" />
+      <created>1771420687987</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1771420687987</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -238,7 +285,8 @@
     <MESSAGE value="Working for mysql" />
     <MESSAGE value="Reformat and imports" />
     <MESSAGE value="Some small fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some small fix" />
+    <MESSAGE value="full async not for mysql" />
+    <option name="LAST_COMMIT_MESSAGE" value="full async not for mysql" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -263,8 +311,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/protocol-mysql/src/main/java/org/kendar/mysql/fsm/Auth.java</url>
-          <line>52</line>
-          <option name="timeStamp" value="53" />
+          <line>56</line>
+          <option name="timeStamp" value="63" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
