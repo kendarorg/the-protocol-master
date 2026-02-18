@@ -16,6 +16,7 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +96,14 @@ public class NettyServer implements Server {
             return;
         }
 
+        var settings = protoDescriptor.getSettings();
+        if(ByteProtocolSettings.class.isAssignableFrom(settings.getClass())){
+            var byteSettings = (ByteProtocolSettings) settings;
+            if(byteSettings.isStartWithTls()){
+                enableSelfSignedTls();
+            }
+        }
+
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup();
 
@@ -105,8 +114,7 @@ public class NettyServer implements Server {
 
             try {
                 if (useSelfSignedCertificate) {
-                    //TODO 80-tls-support
-                    SelfSignedCertificate ssc = new SelfSignedCertificate();
+                    var ssc = new SelfSignedCertificate();
                     sslContext = SslContextBuilder
                             .forServer(ssc.certificate(), ssc.privateKey())
                             .build();

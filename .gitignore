@@ -42,3 +42,10 @@ jte-classes
 /protocol-runner/extensions.idx
 .flattened-pom.xml
 /.idea/copilot.data.migration.ask2agent.xml
+
+
+# Put either here or in .idea/.gitignore
+.idea/**/tasks.xml
+.idea/**/aws.xml              # if AWS Toolkit installed
+.idea/**/contentModel.xml     # generated
+.idea/**/caches/              # 2024+ versions
