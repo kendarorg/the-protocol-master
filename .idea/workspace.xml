@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b21b0ffe-21f1-4bbb-bf15-8b58aecdaf36" name="Changes" comment="Reformat and imports">
-      <change beforePath="$PROJECT_DIR$/protocol-common/src/main/java/org/kendar/settings/ByteProtocolSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-common/src/main/java/org/kendar/settings/ByteProtocolSettings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol-common/src/main/java/org/kendar/tcpserver/NettyServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/protocol-common/src/main/java/org/kendar/tcpserver/NettyServer.java" afterDir="false" />
+    <list default="true" id="b21b0ffe-21f1-4bbb-bf15-8b58aecdaf36" name="Changes" comment="Some small fix">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,10 +58,20 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JUnit.All in protocol-amqp-091.executor": "Run",
+    "JUnit.All in protocol-common-jdbc.executor": "Run",
+    "JUnit.All in protocol-common.executor": "Run",
+    "JUnit.All in protocol-dns-plugin.executor": "Run",
+    "JUnit.All in protocol-http.executor": "Run",
+    "JUnit.All in protocol-mongo.executor": "Run",
+    "JUnit.All in protocol-mqtt.executor": "Run",
+    "JUnit.All in protocol-mysql.executor": "Run",
+    "JUnit.All in protocol-postgres.executor": "Run",
     "JUnit.JpaTest.executor": "Run",
     "JUnit.MySQLProtocolTest.executor": "Run",
     "JUnit.MySQLProtocolTest.simpleProxyTest.executor": "Run",
     "JUnit.MySQLSSLProtocolTest.executor": "Run",
+    "JUnit.ReplayerTest.test2_differentChannelAndConnection.executor": "Run",
     "JUnit.java in protocol-mysql.executor": "Run",
     "Maven.protocol-master [clean,install].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
@@ -88,74 +97,50 @@
       <recent name="org.kendar.mysql" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.MySQLSSLProtocolTest">
-    <configuration name="JpaTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="protocol-mysql" />
+  <component name="RunManager" selected="JUnit.StandardProtocolsTest">
+    <configuration name="All in protocol-postgres" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="protocol-postgres" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in protocol-redis" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="protocol-redis" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in protocol-runner (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="protocol-runner" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in protocol-runner" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="protocol-runner" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StandardProtocolsTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="protocol-runner" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.kendar.mysql.*" />
+          <option name="PATTERN" value="org.kendar.runner.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="org.kendar.mysql" />
-      <option name="MAIN_CLASS_NAME" value="org.kendar.mysql.JpaTest" />
+      <option name="PACKAGE_NAME" value="org.kendar.runner" />
+      <option name="MAIN_CLASS_NAME" value="org.kendar.runner.StandardProtocolsTest" />
       <option name="TEST_OBJECT" value="class" />
-      <dir value="$PROJECT_DIR$/protocol-mysql/src/test/java" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MySQLProtocolTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="protocol-mysql" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.kendar.mysql.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.kendar.mysql" />
-      <option name="MAIN_CLASS_NAME" value="org.kendar.mysql.MySQLProtocolTest" />
-      <option name="METHOD_NAME" value="simpleProxyTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MySQLProtocolTest.simpleProxyTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="protocol-mysql" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.kendar.mysql.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.kendar.mysql" />
-      <option name="MAIN_CLASS_NAME" value="org.kendar.mysql.MySQLProtocolTest" />
-      <option name="METHOD_NAME" value="simpleProxyTest" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MySQLSSLProtocolTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="protocol-mysql" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.kendar.mysql.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.kendar.mysql" />
-      <option name="MAIN_CLASS_NAME" value="org.kendar.mysql.MySQLSSLProtocolTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="java in protocol-mysql" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="protocol-mysql" />
-      <option name="TEST_OBJECT" value="directory" />
-      <dir value="$PROJECT_DIR$/protocol-mysql/src/test/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -168,11 +153,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.MySQLSSLProtocolTest" />
-        <item itemvalue="JUnit.JpaTest" />
-        <item itemvalue="JUnit.java in protocol-mysql" />
-        <item itemvalue="JUnit.MySQLProtocolTest" />
-        <item itemvalue="JUnit.MySQLProtocolTest.simpleProxyTest" />
+        <item itemvalue="JUnit.StandardProtocolsTest" />
+        <item itemvalue="JUnit.All in protocol-runner (1)" />
+        <item itemvalue="JUnit.All in protocol-runner" />
+        <item itemvalue="JUnit.All in protocol-redis" />
+        <item itemvalue="JUnit.All in protocol-postgres" />
       </list>
     </recent_temporary>
   </component>
@@ -192,7 +177,7 @@
       <option name="presentableId" value="Default" />
       <updated>1771328403817</updated>
       <workItem from="1771328404904" duration="3255000" />
-      <workItem from="1771334561614" duration="22898000" />
+      <workItem from="1771334561614" duration="23538000" />
     </task>
     <task id="LOCAL-00001" summary="Reformat and imports">
       <option name="closed" value="true" />
@@ -202,7 +187,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771413384356</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Some small fix">
+      <option name="closed" value="true" />
+      <created>1771413909418</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1771413909418</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,7 +204,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Working for mysql" />
     <MESSAGE value="Reformat and imports" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reformat and imports" />
+    <MESSAGE value="Some small fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Some small fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

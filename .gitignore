@@ -49,3 +49,4 @@ jte-classes
 .idea/**/aws.xml              # if AWS Toolkit installed
 .idea/**/contentModel.xml     # generated
 .idea/**/caches/              # 2024+ versions
+,idea/**/workspace.xml         # contains local history, should not be shared
