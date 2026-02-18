@@ -32,6 +32,10 @@ import static org.kendar.protocol.descriptor.ProtoDescriptor.getNow;
  */
 public abstract class ProtoContext {
 
+    public boolean sendTotallyAsync(){
+        return true;
+    }
+
     /**
      * The executor to run asynchronously the system
      */
@@ -195,6 +199,15 @@ public abstract class ProtoContext {
      */
     public Future<Boolean> send(ProtocolEvent event) {
         lastAccess.set(getNow());
+        if(sendTotallyAsync()){
+            return executorService.submit(() -> {
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
+                    synchronized (sendLock) {
+                        return reactToEvent(event);
+                    }
+                }
+            });
+        }
         var result = reactToEvent(event);
         return new CompletableFuture<>() {
             @Override
@@ -222,13 +235,6 @@ public abstract class ProtoContext {
                 return result;
             }
         };
-        /*return executorService.submit(() -> {
-            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
-                synchronized (sendLock) {
-                    return reactToEvent(event);
-                }
-            }
-        });*/
     }
 
     /**

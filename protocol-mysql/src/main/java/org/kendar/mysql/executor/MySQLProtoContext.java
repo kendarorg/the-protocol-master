@@ -25,6 +25,15 @@ public class MySQLProtoContext extends NetworkProtoContext {
     private int packetNumber = -1;
     private MySQLExecutor executor;
 
+    /**
+     * False to handle SSL upgrade
+     * @return
+     */
+    @Override
+    public boolean sendTotallyAsync(){
+        return false;
+    }
+
     public MySQLProtoContext(ProtoDescriptor descriptor, int contextId) {
 
         super(descriptor, contextId);
