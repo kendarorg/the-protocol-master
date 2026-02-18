@@ -69,7 +69,8 @@ public class MySQLProtoContext extends NetworkProtoContext {
     public void disconnect(Object connection) {
 
         super.disconnect(connection);
-        var conn = getValue("CONNECTION");
+        var conn = getValue("CONNECTION",null);
+        if(conn==null)return;
         var c = ((Connection) ((ProxyConnection) conn).getConnection());
         try {
             if (c != null && !c.isValid(1)) {

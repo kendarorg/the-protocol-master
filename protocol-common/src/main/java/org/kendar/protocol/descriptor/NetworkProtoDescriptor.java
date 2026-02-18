@@ -141,12 +141,16 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
     public ProtoContext buildContext(ClientServerChannel client, int contextId) {
         var context = (NetworkProtoContext) createContext(this, contextId);
         context.setClient(client);
-        if (hasProxy()) {
+        if (hasProxy() && !isLateConnect()) {
             var conn = proxyInstance.connect(context);
             context.setValue("CONNECTION", conn);
             context.setProxy(proxyInstance);
         }
         return context;
+    }
+
+    public boolean isLateConnect(){
+        return false;
     }
 
     /**

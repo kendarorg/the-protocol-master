@@ -1,5 +1,6 @@
 package org.kendar.mysql;
 
+import org.kendar.JdbcProtocol;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
@@ -23,7 +24,7 @@ import org.kendar.sql.parser.SqlStringParser;
 import java.util.List;
 
 @TpmService(tags = "mysql")
-public class MySQLProtocol extends NetworkProtoDescriptor {
+public class MySQLProtocol extends JdbcProtocol {
 
     private static final SqlStringParser parser = new SqlStringParser("?");
     private static final int PORT = 3306;
@@ -45,6 +46,7 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
     }
 
     public MySQLProtocol(int port) {
+        super(port);
         this.port = port;
         setSettings(new MySqlProtocolSettings());
     }

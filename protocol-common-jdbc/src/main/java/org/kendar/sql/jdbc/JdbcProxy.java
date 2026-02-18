@@ -1,5 +1,6 @@
 package org.kendar.sql.jdbc;
 
+import org.kendar.JdbcProtocol;
 import org.kendar.exceptions.ProxyException;
 import org.kendar.iterators.QueryResultIterator;
 import org.kendar.plugins.base.ProtocolPhase;
@@ -412,10 +413,24 @@ public abstract class JdbcProxy extends Proxy {
         }
     }
 
+    public void doConnect(ProtoContext protoContext){
+        if(protoContext.getValue("CONNECTION",null)==null){
+
+            long start = System.currentTimeMillis();
+            var pluginContext = new PluginContext("JDBC", "QUERY", start, protoContext);
+            for (var plugin : getPluginHandlers(ProtocolPhase.CONNECT, null, null)) {
+                if(plugin.handle(pluginContext, ProtocolPhase.CONNECT, null, null)){
+                    return;
+                }
+            }
+            protoContext.setValue("CONNECTION",connect((NetworkProtoContext)protoContext ));
+        }
+    }
 
     public void executeBegin(ProtoContext protoContext) {
         if (replayer) return;
         try {
+            doConnect(protoContext);
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setAutoCommit(false);
         } catch (SQLException e) {
@@ -426,6 +441,7 @@ public abstract class JdbcProxy extends Proxy {
     public void executeCommit(ProtoContext protoContext) {
         if (replayer) return;
         try {
+            doConnect(protoContext);
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setAutoCommit(true);
         } catch (SQLException e) {
@@ -436,6 +452,7 @@ public abstract class JdbcProxy extends Proxy {
     public void executeRollback(ProtoContext protoContext) {
         if (replayer) return;
         try {
+            doConnect(protoContext);
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.rollback();
         } catch (SQLException e) {
@@ -446,6 +463,7 @@ public abstract class JdbcProxy extends Proxy {
     public void setIsolation(ProtoContext protoContext, int transactionIsolation) {
         if (replayer) return;
         try {
+            doConnect(protoContext);
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setTransactionIsolation(transactionIsolation);
         } catch (SQLException e) {
