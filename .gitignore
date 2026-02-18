@@ -24,6 +24,7 @@ bin/
 
 ### VS Code ###
 .vscode/
+.ai/
 
 ### Mac OS ###
 .DS_Store
