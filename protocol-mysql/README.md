@@ -146,7 +146,7 @@ definitions. For details on the implementation [here](../docs/rest-plugins-plugi
   from contains
 * blockOnException: If there is an exception return the error and stop the filtering
 
-## mysql-forwarder
+## mysql-rewrite
 
 Using this plugin is possible to forward the real user, password to the target database. The connection is rebuilt
 when logging in. The protocol must be set to "useTls" and the connection string must contain the following. 

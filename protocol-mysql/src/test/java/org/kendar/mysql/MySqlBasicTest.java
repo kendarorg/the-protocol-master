@@ -101,7 +101,7 @@ public class MySqlBasicTest {
         var mapper = new JsonMapper();
         errorPlugin = new MySqlNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin = new MySqlLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
-        forwarderPlugin = new MySqlForwarderPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        forwarderPlugin = new MySqlForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
 
 
         var pl = new MySqlRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());

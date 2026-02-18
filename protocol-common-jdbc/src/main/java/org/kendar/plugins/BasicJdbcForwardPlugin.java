@@ -1,14 +1,12 @@
-package org.kendar.mysql.plugins;
+package org.kendar.plugins;
 
-import org.kendar.di.annotations.TpmService;
 import org.kendar.events.EventsQueue;
-import org.kendar.plugins.BasicLatencyPlugin;
+import org.kendar.events.JdbcConnect;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
-import org.kendar.plugins.settings.LatencyPluginSettings;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
-import org.kendar.settings.PluginSettings;
+import org.kendar.settings.JdbcRewritePluginSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -16,31 +14,48 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.kendar.plugins.base.ProtocolPhase.*;
+import static org.kendar.plugins.base.ProtocolPhase.NONE;
 
-@TpmService(tags = "mysql")
-public class MySqlForwarderPlugin extends ProtocolPluginDescriptorBase<PluginSettings> {
+public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBase<JdbcRewritePluginSettings> {
     private static Object lock = new Object();
-    private static ConcurrentHashMap<String,Boolean> activeProfiles = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, BasicJdbcForwardPlugin> activeProfiles = new ConcurrentHashMap<>();
     private static AtomicBoolean registered = new AtomicBoolean(false);
-    public MySqlForwarderPlugin(JsonMapper mapper) {
+    public BasicJdbcForwardPlugin(JsonMapper mapper) {
         super(mapper);
         if(registered.get())return;
         synchronized (lock){
             if(registered.get())return;
             registered.set(true);
-            EventsQueue.register(UUID.randomUUID().toString(), MySqlForwarderPlugin::handleConnect, MysqlConnect.class);
+            EventsQueue.register(UUID.randomUUID().toString(), BasicJdbcForwardPlugin::handleConnect, JdbcConnect.class);
         }
     }
 
-    private static void handleConnect(MysqlConnect e) {
+    private AtomicReference<List<JdbcForwardMatcher>> matchers = new AtomicReference<>(new ArrayList<>());
+    @Override
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
+        matchers.set(setupMatches(getSettings().getMappings()));
+        return true;
+    }
+
+    private List<JdbcForwardMatcher> setupMatches(HashMap<String, String> mappings) {
+        var result = new ArrayList<JdbcForwardMatcher>();
+        for(var item:mappings.entrySet()){
+            result.add(new JdbcForwardMatcher(item.getKey(),item.getValue()));
+        }
+        return result;
+    }
+    
+    public List<JdbcForwardMatcher> getMatchers(){
+        return this.matchers.get();
+    }
+
+    private static void handleConnect(JdbcConnect e) {
         var ctx = e.getProtoContext();
         var instanceId = ctx.getDescriptor().getSettings().getProtocolInstanceId();
         if(instanceId==null)instanceId="default";
@@ -57,6 +72,9 @@ public class MySqlForwarderPlugin extends ProtocolPluginDescriptorBase<PluginSet
             }
 
             try {
+                var pluginInstance = activeProfiles.get(instanceId);
+                var mathchersList  = pluginInstance.matchers.get();
+                
                 var uri = new URI(connectionString.substring(5));
                 var newConnectionString = "jdbc:" + uri.getScheme() + "://" + uri.getHost();
                 if (uri.getPort() > 0) {
@@ -67,8 +85,16 @@ public class MySqlForwarderPlugin extends ProtocolPluginDescriptorBase<PluginSet
                     newConnectionString += "/" + database;
                 } else if (uri.getPath().length() > 1) {
                     newConnectionString += "/" + uri.getPath().substring(1);
-                    ;
                 }
+
+                String matched = null;
+                for(var i=0;i<mathchersList.size();i++){
+                    var matcher = mathchersList.get(i);
+                    matched = matcher.match(newConnectionString );
+                    if(matched!=null)break;
+                }
+                if(matched==null)return;
+                newConnectionString = matched;
 
                 var params = parseQuery(uri.getQuery());
                 var entrySet = params.entrySet();
@@ -93,7 +119,7 @@ public class MySqlForwarderPlugin extends ProtocolPluginDescriptorBase<PluginSet
         }
     }
 
-    private static final Logger log = LoggerFactory.getLogger(MySqlForwarderPlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicJdbcForwardPlugin.class);
 
     private static Map<String, String> parseQuery(String query) {
         Map<String, String> map = new HashMap<>();
@@ -109,7 +135,7 @@ public class MySqlForwarderPlugin extends ProtocolPluginDescriptorBase<PluginSet
     @Override
     protected void handleActivation(boolean active) {
         if(active){
-            activeProfiles.put(getInstanceId(),true);
+            activeProfiles.put(getInstanceId(),this);
         }else{
             activeProfiles.remove(getInstanceId());
         }
@@ -120,14 +146,10 @@ public class MySqlForwarderPlugin extends ProtocolPluginDescriptorBase<PluginSet
         return List.of(NONE);
     }
 
-    @Override
-    public String getProtocol() {
-        return "mysql";
-    }
 
     @Override
     public String getId() {
-        return "mysql-forwarder";
+        return "jdbc-forward";
     }
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
         return false;
