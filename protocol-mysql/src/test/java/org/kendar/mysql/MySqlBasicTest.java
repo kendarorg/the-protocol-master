@@ -216,7 +216,7 @@ public class MySqlBasicTest {
         Class.forName("com.mysql.cj.jdbc.Driver");
         //?sslMode=REQUIRED
         c = DriverManager
-                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?useSSL=true&requireSSL=true&verifyServerCertificate=false", FAKE_PORT),
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?allowCleartextPasswords=true&sslMode=REQUIRED", FAKE_PORT),
                         "root", "test");
         assertNotNull(c);
         return c;

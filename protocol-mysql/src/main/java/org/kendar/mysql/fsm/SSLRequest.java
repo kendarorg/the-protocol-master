@@ -46,5 +46,5 @@ public class SSLRequest extends MySQLProtoState {
         return false;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(SSLHandshake.class);
+    private static final Logger log = LoggerFactory.getLogger(SSLRequest.class);
 }
