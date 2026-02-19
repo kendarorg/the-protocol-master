@@ -155,7 +155,8 @@ This is for Jdbc connector 8.2 check your driver documentation for the correct s
 * allowCleartextPasswords=true
 * sslMode=REQUIRED
 
-The connection data will be stored in the context as follows and never logged:
+The connection data will be stored in the context as follows and never logged. 
+The password is removed once used to connect to the real database.
 
 * userid
 * database
