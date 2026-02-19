@@ -17,6 +17,8 @@ import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.PostgresSqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
@@ -41,7 +43,7 @@ public class PostgresBasicTest {
 
     protected static final int FAKE_PORT = 5431;
     protected static PostgresSqlImage postgresContainer;
-    protected static TcpServer protocolServer;
+    protected static Server protocolServer;
     protected static PostgresProtocol baseProtocol;
     protected static StorageRepository storage;
     protected static ProtocolPluginDescriptor errorPlugin;
@@ -117,13 +119,16 @@ public class PostgresBasicTest {
         rep.setActive(true);
         proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin));
         pl.setActive(true);
+
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
 
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
-        protocolServer = new TcpServer(baseProtocol);
+        var mysqlSettings = (PostgresProtocolSettings) baseProtocol.getSettings();
+        mysqlSettings.setUseTls(false);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());

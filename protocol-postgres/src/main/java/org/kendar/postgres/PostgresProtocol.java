@@ -63,6 +63,7 @@ public class PostgresProtocol extends JdbcProtocol {
     public PostgresProtocol(int port) {
         super(port);
         this.port = port;
+        setSettings(new PostgresProtocolSettings());
     }
 
     public static DataTypesConverter getDataTypesConverter() {

@@ -41,6 +41,7 @@ public class StartupMessage extends ProtoState {
         }
         var pidValue = pid.getPid();
         var length = inputBuffer.getInt(0);
+        var data = inputBuffer.getBytes(8, length - 8);
 
         inputBuffer.truncate(length);
 

@@ -95,16 +95,17 @@ public class MySqlBasicTest {
                 }
             }
         }
+        var mapper = new JsonMapper();
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var mapper = new JsonMapper();
         errorPlugin = new MySqlNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin = new MySqlLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
         forwarderPlugin = new MySqlForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
 
 
-        var pl = new MySqlRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+        var pl = new MySqlRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser())
+                .initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
         var pl1 = new MySqlMockPlugin(mapper, storage, new MultiTemplateEngine());
         var global = new GlobalSettings();
