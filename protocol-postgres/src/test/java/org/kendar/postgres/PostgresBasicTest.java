@@ -71,6 +71,10 @@ public class PostgresBasicTest {
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
+        beforeEachBaseSSL(testInfo, false);
+    }
+
+    public static void beforeEachBaseSSL(TestInfo testInfo, boolean ssl) {
 
         baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new PostgresProxy("org.postgresql.Driver",
@@ -127,7 +131,7 @@ public class PostgresBasicTest {
             events.add(r);
         }, ReportDataEvent.class);
         var mysqlSettings = (PostgresProtocolSettings) baseProtocol.getSettings();
-        mysqlSettings.setUseTls(false);
+        mysqlSettings.setUseTls(ssl);
         protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
@@ -146,6 +150,17 @@ public class PostgresBasicTest {
     }
 
     protected static Connection getProxyConnection() throws ClassNotFoundException, SQLException {
+        Connection c;
+        Class.forName("org.postgresql.Driver");
+        c = DriverManager
+                .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test", FAKE_PORT),//?ssl=false
+                        "root", "test");
+        assertNotNull(c);
+        return c;
+    }
+
+
+    protected static Connection getProxyConnectionSSL() throws ClassNotFoundException, SQLException {
         Connection c;
         Class.forName("org.postgresql.Driver");
         c = DriverManager
