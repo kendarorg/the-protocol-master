@@ -5,6 +5,7 @@
     var safeId = new java.util.function.Function<org.kendar.settings.ProtocolSettings,String>(){
             @Override
             public String apply(org.kendar.settings.ProtocolSettings protocolSettings) {
+                //if(protocolSettings.getProtocolInstanceId()==null)return protocolSettings.getProtocol();
                 return protocolSettings.getProtocolInstanceId().replaceAll("-","");
             }
         };

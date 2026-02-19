@@ -1,12 +1,15 @@
 package org.kendar.plugins;
 
+import org.kendar.apis.JdbcForwardApi;
 import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginApiHandler;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.settings.JdbcRewritePluginSettings;
 import org.kendar.sql.jdbc.JdbcProxy;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +28,6 @@ public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBas
     //private static AtomicBoolean registered = new AtomicBoolean(false);
     public BasicJdbcForwardPlugin(JsonMapper mapper) {
         super(mapper);
-        /*if(registered.get())return;
-        synchronized (lock){
-            if(registered.get())return;
-            registered.set(true);
-            EventsQueue.register(UUID.randomUUID().toString(), BasicJdbcForwardPlugin::handleConnect, JdbcConnect.class);
-        }*/
     }
 
     private AtomicReference<List<JdbcForwardMatcher>> matchers = new AtomicReference<>(new ArrayList<>());
@@ -221,5 +218,12 @@ public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBas
             throw new RuntimeException("Error connecting to database",ex);
         }
         return true;
+    }
+
+
+
+    @Override
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new JdbcForwardApi(this, getId(), getInstanceId()));
     }
 }

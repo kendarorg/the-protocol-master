@@ -4,12 +4,14 @@ import org.kendar.annotations.HttpMethodFilter;
 import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.annotations.TpmDoc;
 import org.kendar.annotations.multi.PathParameter;
+import org.kendar.annotations.multi.QueryString;
 import org.kendar.annotations.multi.TpmRequest;
 import org.kendar.annotations.multi.TpmResponse;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.di.DiService;
 import org.kendar.plugins.BasicJdbcForwardPlugin;
+import org.kendar.plugins.JdbcForwardMatcher;
 import org.kendar.plugins.apis.Ko;
 import org.kendar.plugins.apis.Ok;
 import org.kendar.plugins.base.ProtocolPluginApiHandlerDefault;
@@ -26,14 +28,9 @@ import static org.kendar.apis.ApiUtils.respondOk;
 
 @HttpTypeFilter()
 public class JdbcForwardApi extends ProtocolPluginApiHandlerDefault<BasicJdbcForwardPlugin> {
-    private final PluginFileManager storage;
-    private final MultiTemplateEngine resolversFactory;
 
-    public JdbcForwardApi(BasicJdbcForwardPlugin descriptor, String id, String instanceId,
-                          PluginFileManager storage, MultiTemplateEngine resolversFactory) {
+    public JdbcForwardApi(BasicJdbcForwardPlugin descriptor, String id, String instanceId) {
         super(descriptor, id, instanceId);
-        this.storage = storage;
-        this.resolversFactory = resolversFactory;
     }
 
     @HttpMethodFilter(
@@ -45,7 +42,7 @@ public class JdbcForwardApi extends ProtocolPluginApiHandlerDefault<BasicJdbcFor
                     body = JdbcForwardDto[].class,
                     description = "Retrieve all the forwards"
             ),
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}/jdbc-forward"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/jdbc-forward-plugin"})
     public boolean listAllForwardsd(Request reqp, Response resp) {
         var result = getDescriptor().getMatchers().stream().map(m -> new JdbcForwardDto(m.getId(),m.getOriSource(), m.getOriTarget())).toList();
         respondJson(resp, result);
@@ -66,7 +63,7 @@ public class JdbcForwardApi extends ProtocolPluginApiHandlerDefault<BasicJdbcFor
                     code = 500,
                     body = Ko.class
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}/jdbc-forward"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/jdbc-forward-plugin"})
     public void putSingleForward(Request reqp, Response resp) {
         var pluginInstance = getDescriptor();
         var id = reqp.getPathParameter("id");
@@ -111,7 +108,7 @@ public class JdbcForwardApi extends ProtocolPluginApiHandlerDefault<BasicJdbcFor
                     code = 500,
                     body = Ko.class
             )},
-            tags = {"plugins/{#protocol}/{#protocolInstanceId}/jdbc-forward"})
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/jdbc-forward-plugin"})
     public void delSingleForward(Request reqp, Response resp) {
         var pluginInstance = getDescriptor();
         var id = reqp.getPathParameter("id");
@@ -133,5 +130,31 @@ public class JdbcForwardApi extends ProtocolPluginApiHandlerDefault<BasicJdbcFor
         pfk.getPlugins().put(pluginInstance.getId(), settings);
         ppdb.setSettings(settings);
         respondOk(resp);
+    }
+
+
+    @HttpMethodFilter(
+            pathAddress = "/api/protocols/{#protocolInstanceId}/plugins/{#plugin}/test",
+            method = "GET", id = "GET /api/protocols/{#protocolInstanceId}/plugins/{#plugin}/test")
+    @TpmDoc(
+            description = "TestParamsMatching",
+            query = {
+                    @QueryString(key="source", description = "Input to test"),
+                    @QueryString(key="target", description = "Replace to test"),
+                    @QueryString(key="data", description = "What to test")
+},
+            responses = @TpmResponse(
+                    body = String.class,
+                    description = "Test the current forward"
+            ),
+            tags = {"plugins/{#protocol}/{#protocolInstanceId}/jdbc-forward-plugin"})
+    public boolean testParams(Request reqp, Response resp) {
+        var source = reqp.getQuery("source");
+        var target = reqp.getQuery("target");
+        var data = reqp.getQuery("data");
+        var parse = new JdbcForwardMatcher(source, target);
+        var result = parse.match(data);
+        respondJson(resp, result);
+        return true;
     }
 }

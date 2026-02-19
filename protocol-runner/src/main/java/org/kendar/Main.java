@@ -114,10 +114,13 @@ public class Main {
         // Retrieve all the Jar URLs
         var jarUrls = new HashSet<String>();
         for (var plugin : pluginManager.getPlugins()) {
+            jarUrls.add(plugin.getPluginPath().toUri().toURL().toString());
+            var cl = plugin.getPluginClassLoader();
+            classLoaders.put(cl.toString(), cl);
             for (var ec : pluginManager.getExtensionClasses(ExtensionPoint.class, plugin.getPluginId())) {
-                var cl = ec.getClassLoader();
-                jarUrls.add(plugin.getPluginPath().toUri().toURL().toString());
-                classLoaders.put(cl.toString(), cl);
+                //var cl = ec.getClassLoader();
+                //jarUrls.add(plugin.getPluginPath().toUri().toURL().toString());
+                //classLoaders.put(cl.toString(), cl);
                 diService.bind(ec);
             }
         }
@@ -314,7 +317,7 @@ public class Main {
                         ); or server.enableSelfSignedTls();*/
                         ps.start();
 
-                        protocolServersCache.put(item.getKey(), ps);
+                        protocolServersCache.put(item.getKey(), (Server)ps);
 
                         var pi = new ProtocolInstance(item.getKey(),
                                 protocolServersCache.get(item.getKey()),

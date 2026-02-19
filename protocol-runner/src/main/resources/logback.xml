@@ -10,6 +10,8 @@
     <logger name="com.github" level="ERROR"/>
     <logger name="org.testcontainers" level="ERROR"/>
     <logger name="org.kendar" level="DEBUG"/>
+    <logger name="java.nio" level="ERROR"/>
+    <logger name="io.netty" level="ERROR"/>
     <logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="OFF"/>
 
     <root level="DEBUG">

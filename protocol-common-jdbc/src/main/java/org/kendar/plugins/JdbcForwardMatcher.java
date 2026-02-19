@@ -16,7 +16,7 @@ public class JdbcForwardMatcher {
         this.id= org.kendar.utils.Md5Tester.calculateMd5(source+target);
         this.oriSource =source;
         this.oriTarget = target;
-        this.source = Pattern.compile(source.substring(1));
+        this.source = Pattern.compile(source);
         this.target = target;
     }
 
