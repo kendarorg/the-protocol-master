@@ -16,6 +16,7 @@ import java.sql.DriverManager;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.kendar.plugins.base.ProtocolPhase.CONNECT;
 import static org.kendar.plugins.base.ProtocolPhase.NONE;
 
 public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBase<JdbcRewritePluginSettings> {
@@ -131,10 +132,27 @@ public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBas
 
     @Override
     public List<ProtocolPhase> getPhases() {
-        return List.of(NONE);
+        return List.of(CONNECT);
     }
 
-
+    public static boolean isValidHumanText(String s) {
+        if (s == null || s.isEmpty()) return false;
+        if (containsReplacementChar(s)) return false;
+        if (hasInvalidControlChars(s)) return false;
+        return true;
+    }
+    public static boolean containsReplacementChar(String s) {
+        return s.contains("\uFFFD");
+    }
+    public static boolean hasInvalidControlChars(String s) {
+        for (char c : s.toCharArray()) {
+            if (Character.isISOControl(c) &&
+                    c != '\n' && c != '\r' && c != '\t') {
+                return true;
+            }
+        }
+        return false;
+    }
     @Override
     public String getId() {
         return "jdbc-forward";
@@ -148,6 +166,9 @@ public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBas
         var userid = ctx.getValue("userid","");
         var database = ctx.getValue("database","");
         var password = ctx.getValue("password","");
+        if(!isValidHumanText(password)){
+            return false;
+        }
         var connectionString = jdbcProxy.getConnectionString();
         if(password.trim().isEmpty() || userid.trim().isEmpty()){
             return false;
@@ -174,8 +195,9 @@ public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBas
                 matched = matcher.match(newConnectionString );
                 if(matched!=null)break;
             }
-            if(matched==null)return false;
-            newConnectionString = matched;
+            if(matched!=null) {
+                newConnectionString = matched;
+            }
 
             var params = parseQuery(uri.getQuery());
             var entrySet = params.entrySet();

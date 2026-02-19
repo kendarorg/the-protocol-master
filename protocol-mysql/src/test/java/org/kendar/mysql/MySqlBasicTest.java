@@ -113,9 +113,9 @@ public class MySqlBasicTest {
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new MySqlReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
+        forwarderPlugin.setActive(true);
         proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin,forwarderPlugin));
 
-        forwarderPlugin.setActive(true);
         pl.setActive(true);
         EventsQueue.register("recorder", (r) -> {
             events.add(r);

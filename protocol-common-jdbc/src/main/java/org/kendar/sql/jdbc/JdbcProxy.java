@@ -422,8 +422,8 @@ public abstract class JdbcProxy extends Proxy {
 
             long start = System.currentTimeMillis();
             var pluginContext = new PluginContext("JDBC", "QUERY", start, protoContext);
-            for (var plugin : getPluginHandlers(ProtocolPhase.CONNECT, null, null)) {
-                if(plugin.handle(pluginContext, ProtocolPhase.CONNECT, null, null)){
+            for (var plugin : getPluginHandlers(ProtocolPhase.CONNECT, new Object(), new Object())) {
+                if(plugin.handle(pluginContext, ProtocolPhase.CONNECT, new Object(), new Object())){
                     return;
                 }
             }

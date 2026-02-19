@@ -66,6 +66,6 @@ public class JpaTest extends MySqlBasicTest {
         var events = getEvents().stream().collect(Collectors.toList());
         assertTrue(events.size() >= 7);
         var evt = events.get(0);
-        assertEquals("mysql", evt.getProtocol());
+        assertEquals("mysql", evt.getProtocol(),"Protocol was "+evt.getProtocol());
     }
 }

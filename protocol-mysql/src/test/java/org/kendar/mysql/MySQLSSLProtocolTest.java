@@ -127,9 +127,18 @@ public class MySQLSSLProtocolTest extends MySqlBasicTest {
         //?sslMode=REQUIRED
         Throwable thrown = null;
         try {
-            DriverManager
+            c = DriverManager
                     .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?allowCleartextPasswords=true&sslMode=REQUIRED", FAKE_PORT),
                             "rootWrong", "test");
+            Statement stmt;
+            stmt = c.createStatement();
+            stmt.executeUpdate("CREATE TABLE COMPANY_2 " +
+                    "(ID INT PRIMARY KEY NOT NULL," +
+                    " DENOMINATION TEXT NOT NULL, " +
+                    " AGE INT NOT NULL, " +
+                    " ADDRESS CHAR(50), " +
+                    " SALARY REAL)");
+            stmt.close();
         }catch (Exception ex){
             thrown=ex;
         }

@@ -72,7 +72,7 @@ public class SSLHandshake extends ProtoState {
         event.getContext().setValue("SSL", true);
         var context = (NetworkProtoContext) event.getContext();
         var client = (NettyServerChannel) context.getClient();
-        var sslContext = context.getProxy().getProtocol().getSslContext();
+        var sslContext = context.getSslContext();
         var ctx = client.getChannelHandlerContext();
         var pipeline = ctx.pipeline();
 
