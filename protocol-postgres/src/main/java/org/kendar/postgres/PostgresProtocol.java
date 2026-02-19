@@ -87,6 +87,7 @@ public class PostgresProtocol extends JdbcProtocol {
                 new ProtoStateSequence(
                         new SSLRequest(BytesEvent.class).asOptional(),
                         new StartupMessage(BytesEvent.class),
+                        new PasswordMessage(PostgresPacket.class).asOptional(),
                         new ProtoStateWhile(
                                 new ProtoStateSwitchCase(
                                         new Query(PostgresPacket.class),

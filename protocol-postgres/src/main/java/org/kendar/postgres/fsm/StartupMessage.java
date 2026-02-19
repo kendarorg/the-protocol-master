@@ -9,12 +9,13 @@ import org.kendar.postgres.messages.ReadyForQuery;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 
 import java.util.Iterator;
 
 public class StartupMessage extends ProtoState {
     public static final byte[] STARTUP_MESSAGE_MARKER = BBufferUtils.toByteArray(0x00, 0x03, 0x00, 0x00);
-    private static final int FIXED_SECRET = 5678;
+    public static final int FIXED_SECRET = 5678;
 
     public StartupMessage(Class<?>... messages) {
         super(messages);
@@ -42,6 +43,14 @@ public class StartupMessage extends ProtoState {
         var length = inputBuffer.getInt(0);
 
         inputBuffer.truncate(length);
+
+        var jdbcSettings = (JdbcProtocolSettings) event.getContext().getDescriptor().getSettings();
+        if(jdbcSettings.isUseTls()){
+            return iteratorOfList(
+                    new AuthenticationOk(3)
+            );
+        }
+
         return iteratorOfList(
                 new AuthenticationOk(),
                 new ParameterStatus("server_version", "15"),

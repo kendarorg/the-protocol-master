@@ -6,6 +6,8 @@ import org.kendar.postgres.messages.NoticeReponse;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.protocol.states.SSLHandshake;
+import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 
 import java.util.Iterator;
 
@@ -31,10 +33,13 @@ public class SSLRequest extends ProtoState {
             pid = new ProcessId(postgresContext.getPid());
             protoContext.setValue("PG_PID", pid);
         }
-        var pidValue = pid.getPid();
 
         inputBuffer.truncate(8);
+        var jdbcSettings = (JdbcProtocolSettings) event.getContext().getDescriptor().getSettings();
+        if(jdbcSettings.isUseTls()) {
+            SSLHandshake.initializeSslUpdate(event);
+            return iteratorOfList(new NoticeReponse((byte) 'S'));
+        }
         return iteratorOfList(new NoticeReponse());
-
     }
 }
