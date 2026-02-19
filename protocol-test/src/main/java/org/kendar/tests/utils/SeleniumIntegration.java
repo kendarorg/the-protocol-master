@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -47,6 +48,10 @@ public class SeleniumIntegration {
     }
 
     public boolean navigateTo(String url, boolean snapshot) {
+        return this.navigateTo(url, snapshot, -1);
+    }
+    public boolean navigateTo(String url, boolean snapshot,int timeout) {
+
         var driver = (WebDriver) Utils.getCache("driver");
         var current = driver.getCurrentUrl();
         if (current.equalsIgnoreCase(url)) {
@@ -56,7 +61,11 @@ public class SeleniumIntegration {
             }
             return true;
         }
-        driver.get(url);
+        if(timeout==-1) {
+            driver.get(url);
+        }else{
+            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(timeout));
+        }
         if (!getCurrentTab().equals("settings")) {
             if (snapshot) takeSnapShot();
         }
@@ -151,6 +160,7 @@ public class SeleniumIntegration {
         if (System.getenv("HUMAN_DRIVEN") == null && System.getenv("RUN_VISIBLE") == null) {
             capabilities.addArguments("--headless");//Disable cache
         }
+        //capabilities.setPageLoadStrategy(PageLoadStrategy.EAGER);
 
 
         if (isChrome()) {

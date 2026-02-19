@@ -4,10 +4,12 @@ import org.kendar.plugins.cli.BasicPluginCli;
 import org.kendar.settings.JdbcRewritePluginSettings;
 import org.kendar.settings.PluginSettings;
 
+import java.util.ArrayList;
+
 public class BasicJdbcForwardPluginCli extends BasicPluginCli {
     @Override
     protected String getPluginName() {
-        return "jdbc-forward";
+        return "jdbc-forward-plugin";
     }
 
     @Override
@@ -15,6 +17,11 @@ public class BasicJdbcForwardPluginCli extends BasicPluginCli {
         return "Forward requests to specific host/db";
     }
 
+    @Override
+    protected CommandOption[] buildPluginOptions(PluginSettings settings) {
+        var options = new ArrayList<CommandOption>();
+        return options.toArray(new CommandOption[0]);
+    }
 
     @Override
     protected PluginSettings buildPluginSettings() {

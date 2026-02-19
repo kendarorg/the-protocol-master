@@ -155,7 +155,7 @@ public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBas
     }
     @Override
     public String getId() {
-        return "jdbc-forward";
+        return "jdbc-forward-plugin";
     }
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
 

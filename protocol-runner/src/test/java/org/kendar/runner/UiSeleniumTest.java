@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.*;
 import org.kendar.Main;
+import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
 import org.kendar.plugins.dtos.RestPluginCall;
 import org.kendar.plugins.dtos.RestPluginsCallResult;
@@ -25,9 +26,11 @@ import static java.util.regex.Matcher.quoteReplacement;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UiSeleniumTest extends SeleniumTestBase {
-    private static final String REGEXP = "/images/branding/[_a-zA-Z0-9]+/[_a-zA-Z0-9]+/[_a-zA-Z0-9]+\\.png";
+    private static final String DOODLE = "/logos/doodle/[&\\?_a-zA-Z0-9/\\-\\.]+";
+    private static final String REGEXP = "/images/branding/[&\\?_a-zA-Z0-9/\\-\\.]+";
     private static BasicTest bs;
     private final Pattern pattern = Pattern.compile(".*" + REGEXP + ".*");
+    private final Pattern doodle = Pattern.compile(".*" + DOODLE + ".*");
     private HttpServer server;
 
     @AfterAll
@@ -112,20 +115,21 @@ public class UiSeleniumTest extends SeleniumTestBase {
         while ((i = ios.read()) != -1) {
             sb.append((char) i);
         }
+
+
         var result = new RestPluginsCallResult();
 
         var call = mapper.deserialize(sb.toString(), RestPluginCall.class);
+        var request = mapper.deserialize(call.getInput(), Request.class);
         var response = mapper.deserialize(call.getOutput(), Response.class);
         try {
-            var content = response.getResponseText().textValue();
-            if (!content.isEmpty() && pattern.matcher(content).find()) {
-                content = content.replaceAll(REGEXP, quoteReplacement(
-                        "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c" +
-                                "/Bing_Fluent_Logo.svg/120px-Bing_Fluent_Logo.svg.png"));
-                response.setResponseText(new TextNode(content));
+            if(request.getHost().equalsIgnoreCase("www.google.com")){
+                response.setResponseText(new TextNode("YOU HAVE BEEN HACKED"));
+
             }
             result.setBlocking(true);
             result.setMessage(mapper.serialize(response));
+
         } catch (Exception ex) {
             result.setBlocking(false);
             result.setWithError(true);
@@ -146,10 +150,10 @@ public class UiSeleniumTest extends SeleniumTestBase {
         try {
             getRequest("http://localhost:8095/api/protocols/http-01/plugins/rest-plugins-plugin/start", httpclient, String.class);
 
-            navigateTo("https://www.google.com", false);
+            navigateTo("https://www.google.com", false,5);
             Sleeper.sleep(1000);
-            alertWhenHumanDriven("Showing the bing logo :)");
-            assertTrue(getDriver().getPageSource().contains("Bing_Fluent_Logo"));
+            alertWhenHumanDriven("Showing totally another page :)");
+            assertTrue(getDriver().getPageSource().contains("YOU HAVE BEEN HACKED"));
         } finally {
             getRequest("http://localhost:8095/api/protocols/http-01/plugins/rest-plugins-plugin/stop", httpclient, String.class);
         }

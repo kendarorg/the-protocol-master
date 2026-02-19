@@ -283,6 +283,10 @@ public class SeleniumTestBase extends ApiTestBase {
         return getSelenium().navigateTo(url, snapshot);
     }
 
+    public boolean navigateTo(String url, boolean snapshot,int timeout) {
+        return getSelenium().navigateTo(url, snapshot);
+    }
+
     public boolean check(BooleanSupplier supplier) {
         return check(defaultTimeout, supplier);
     }
