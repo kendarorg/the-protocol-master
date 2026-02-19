@@ -4,12 +4,12 @@ import org.junit.jupiter.api.*;
 import org.kendar.utils.Sleeper;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PostgresSslProtocolTest extends PostgresBasicTest {
 
@@ -40,7 +40,7 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
         var runned = false;
 
 
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSSL();
 
 
         var stmt = c.createStatement();
@@ -92,7 +92,7 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
         var runned = false;
 
 
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSSL();
         Statement stmt;
 
 
@@ -140,7 +140,7 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
             Connection c;
             Statement stmt;
             try {
-                c = getProxyConnection();
+                c = getProxyConnectionSSL();
 
                 stmt = c.createStatement();
                 stmt.executeUpdate("CREATE TABLE COMPANY_3 " +
@@ -183,7 +183,7 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
         var runned = false;
 
 
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSSL();
 
 
         var stmt = c.createStatement();
@@ -221,7 +221,7 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
     @Test
     void testCancel() throws Exception {
 
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSSL();
         Statement stmt;
 
         //ResultSet resultSet;
@@ -254,7 +254,7 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
         var runned = false;
 
 
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSSL();
 
 
         var stmt = c.createStatement();
@@ -286,12 +286,39 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
     }
 
     @Test
+    void simpleProxyTestChangingWithWrongUser() throws Exception {
+
+        var runned = false;
+        Connection c;
+        Class.forName("org.postgresql.Driver");
+        //?sslMode=REQUIRED
+        Throwable thrown = null;
+        try {
+            c = DriverManager
+                    .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test?sslmode=require", FAKE_PORT),
+                            "rootWrong", "test");
+            Statement stmt;
+            stmt = c.createStatement();
+            stmt.executeUpdate("CREATE TABLE COMPANY_2 " +
+                    "(ID INT PRIMARY KEY NOT NULL," +
+                    " DENOMINATION TEXT NOT NULL, " +
+                    " AGE INT NOT NULL, " +
+                    " ADDRESS CHAR(50), " +
+                    " SALARY REAL)");
+            stmt.close();
+        }catch (Exception ex){
+            thrown=ex;
+        }
+        assertNotNull(thrown);
+    }
+
+    @Test
     void testWeirdQuery() throws Exception {
 
         var runned = false;
 
 
-        Connection c = getProxyConnection();
+        Connection c = getProxyConnectionSSL();
 
 
         var stmt = c.createStatement();

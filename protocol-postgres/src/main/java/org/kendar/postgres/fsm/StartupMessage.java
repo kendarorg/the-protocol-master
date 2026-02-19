@@ -85,23 +85,23 @@ public class StartupMessage extends ProtoState {
 
         inputBuffer.truncate(length);
         postgresContext.setValue("database", dataMap.get("database"));
-        postgresContext.setValue("user", dataMap.get("user"));
+        postgresContext.setValue("userid", dataMap.get("user"));
         var jdbcSettings = (JdbcProtocolSettings) event.getContext().getDescriptor().getSettings();
+
+        var toSend = new ArrayList<ReturnMessage>();
         if(jdbcSettings.isUseTls()){
             postgresContext.setValue("SERVER_PARAMETERS", parameterStatus);
-            return iteratorOfList(
-                    new AuthenticationOk(3)
-            );
+            return iteratorOfList(new AuthenticationOk(3));
+        }else {
+            toSend.add(new AuthenticationOk());
         }
-        var toSend = new ArrayList<ReturnMessage>();
-        toSend.add(new AuthenticationOk());
         for(var ps:parameterStatus.values()){
             toSend.add(ps);
         }
         toSend.add(new BackendKeyData(pidValue, FIXED_SECRET));
         toSend.add(new ReadyForQuery(protoContext.getValue("TRANSACTION", false)));
 
-        return iteratorOfList(toSend.toArray(new ReturnMessage[]{}));
+        return iteratorOfList(toSend);
     }
 
 

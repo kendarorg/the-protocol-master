@@ -49,6 +49,7 @@ public class PostgresBasicTest {
     protected static ProtocolPluginDescriptor errorPlugin;
     private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
+    private static ProtocolPluginDescriptor forwarderPlugin;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -114,6 +115,7 @@ public class PostgresBasicTest {
         var pl1 = new PostgresMockPlugin(mapper, storage, new MultiTemplateEngine());
         errorPlugin = new PostgresNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin = new PostgresLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
+        forwarderPlugin = new PostgresForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
 
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
@@ -121,7 +123,8 @@ public class PostgresBasicTest {
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new PostgresReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin));
+        forwarderPlugin.setActive(true);
+        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin,forwarderPlugin));
         pl.setActive(true);
 
         baseProtocol.setProxy(proxy);
@@ -154,7 +157,7 @@ public class PostgresBasicTest {
         Class.forName("org.postgresql.Driver");
         c = DriverManager
                 .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test", FAKE_PORT),//?ssl=false
-                        "root", "test");
+                        "test", "test");
         assertNotNull(c);
         return c;
     }
@@ -164,8 +167,8 @@ public class PostgresBasicTest {
         Connection c;
         Class.forName("org.postgresql.Driver");
         c = DriverManager
-                .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test", FAKE_PORT),//?ssl=false
-                        "root", "test");
+                .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test?sslmode=require", FAKE_PORT),//?ssl=false
+                        "test", "test");
         assertNotNull(c);
         return c;
     }

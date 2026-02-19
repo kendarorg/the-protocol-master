@@ -6,6 +6,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
@@ -117,10 +118,18 @@ public class NettyServer implements Server {
                     var ssc = new SelfSignedCertificate();
                     sslContext = SslContextBuilder
                             .forServer(ssc.certificate(), ssc.privateKey())
+
+//                            .protocols("TLSv1.3")
+//                            .clientAuth(ClientAuth.NONE)
+                            .protocols("TLSv1", "TLSv1.1", "TLSv1.2","TLSv1.3")
                             .build();
                 } else {
                     sslContext = SslContextBuilder
                             .forServer(certificateFile, privateKeyFile)
+
+//                            .protocols("TLSv1.3")
+//                            .clientAuth(ClientAuth.NONE)
+                            .protocols("TLSv1", "TLSv1.1", "TLSv1.2","TLSv1.3")
                             .build();
                 }
                 protoDescriptor.setSslContext(sslContext);

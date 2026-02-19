@@ -17,6 +17,6 @@ public class AuthenticationOk implements NetworkReturnMessage {
     public void write(BBuffer resultBuffer) {
         resultBuffer.write((byte) 'R');
         resultBuffer.writeInt(8);
-        resultBuffer.writeInt(0);
+        resultBuffer.writeInt(authValue);
     }
 }

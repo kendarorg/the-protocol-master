@@ -16,7 +16,15 @@ connection even with Oracle or SQLServer
   be even another db!!
 * timeoutSeconds: the timeout to drop the connections
 * forceSchema: the force is called in case the jdbc driver does not allow setting the schema from connection string
+* useTls: it true the proxy will try to upgrade the connection to TLS.
 
+Uses the following phases
+
+* CONNECT (Before connecting to the real server)
+* PRE_CALL (Before calling the real server)
+* POST_CALL
+* PRE_SOCKET_WRITE (Before sending data to the client)
+* 
 ## Plugins
 
 ### record-plugin
@@ -115,6 +123,18 @@ definitions. For details on the implementation [here](../docs/rest-plugins-plugi
 * outMatcher: The matcher for the out content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from contains
 * blockOnException: If there is an exception return the error and stop the filtering
 
+## jdbc-rewrite
+
+Using this plugin is possible to forward the real user, password to the target database. The connection is rebuilt
+when logging in. 
+
+The connection data will be stored in the context as follows and never logged.
+The password is removed once used to connect to the real database.
+
+* userid
+* database
+* password
+* 
 ### Connect to different servers
 
 Leveraging on rewrite and mock plugin it is possible to connect to any kind of db

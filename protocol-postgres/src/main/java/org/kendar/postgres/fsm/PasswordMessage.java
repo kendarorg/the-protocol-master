@@ -33,11 +33,12 @@ public class PasswordMessage extends PostgresState {
     @Override
     protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, NetworkProtoContext context) {
         var protoContext = (PostgresProtoContext) context;
-        var length = inputBuffer.getInt(0);
-        var data = inputBuffer.getBytes(8, length - 8);
-        var dataMap = readNullTerminatedStrings(data);
-        //protoContext.setValue("password", password);
-        //TODO 80-tls test with ssl and verify it's working
+        //var p = inputBuffer.get();
+        //var length = inputBuffer.getInt(0);
+        inputBuffer.setPosition(5);
+        var data =  new String(inputBuffer.getRemaining());
+        data = data.substring(0,data.length()-1);
+        protoContext.setValue("password", data);
 
         var pid = (ProcessId) protoContext.getValue("PG_PID");
         if (pid == null) {

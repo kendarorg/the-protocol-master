@@ -12,10 +12,7 @@ import org.kendar.utils.JsonMapper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -128,6 +125,10 @@ public abstract class ProtoState {
      */
     public static Iterator<ProtoStep> iteratorOfList(ReturnMessage... msg) {
         return Arrays.stream(msg).map(a -> (ProtoStep) () -> a).toList().iterator();
+    }
+
+    public static Iterator<ProtoStep> iteratorOfList(List<ReturnMessage> msg) {
+        return msg.stream().map(a -> (ProtoStep) () -> a).toList().iterator();
     }
 
     public void setProtoDescriptor(ProtoDescriptor descriptor) {

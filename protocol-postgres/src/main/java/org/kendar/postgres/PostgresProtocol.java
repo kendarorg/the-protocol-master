@@ -13,6 +13,7 @@ import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.states.SSLHandshake;
 import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
@@ -86,7 +87,10 @@ public class PostgresProtocol extends JdbcProtocol {
         addInterruptState(new PostgresPacketTranslator(BytesEvent.class));
         initialize(
                 new ProtoStateSequence(
-                        new SSLRequest(BytesEvent.class).asOptional(),
+                        new ProtoStateSequence(
+                                new SSLRequest(BytesEvent.class).asOptional(),
+                                new SSLHandshake(BytesEvent.class).asOptional()
+                        ),
                         new StartupMessage(BytesEvent.class),
                         new PasswordMessage(PostgresPacket.class).asOptional(),
                         new ProtoStateWhile(

@@ -5,6 +5,7 @@ import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.exceptions.FailedStateException;
 import org.kendar.exceptions.TPMException;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
+import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;

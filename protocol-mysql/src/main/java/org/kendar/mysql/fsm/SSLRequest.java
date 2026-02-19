@@ -26,6 +26,7 @@ public class SSLRequest extends MySQLProtoState {
         var isSsl = CapabilityFlag.isFlagSet(clientCapabilities, CapabilityFlag.CLIENT_SSL.getCode());
 
         if (isSsl) {
+            event.getContext().setValue("SSL", true);
             SSLHandshake.initializeSslUpdate(event);
         }
 

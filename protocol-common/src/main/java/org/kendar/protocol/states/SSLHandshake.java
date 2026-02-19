@@ -1,6 +1,10 @@
 package org.kendar.protocol.states;
 
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.logging.ByteBufFormat;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.BytesEvent;
@@ -70,16 +74,26 @@ public class SSLHandshake extends ProtoState {
 
     public static void initializeSslUpdate(BytesEvent event) {
         event.getContext().setValue("SSL", true);
+
         var context = (NetworkProtoContext) event.getContext();
         var client = (NettyServerChannel) context.getClient();
         var sslContext = context.getSslContext();
         var ctx = client.getChannelHandlerContext();
         var pipeline = ctx.pipeline();
+        event.getContext().getValue("START_TLS", true);
+
 
         var sslHandler = sslContext.newHandler(ctx.alloc());
 
+
         pipeline.addFirst(sslHandler);
+
+        //pipeline.addFirst("logger", new LoggingHandler(LogLevel.DEBUG, ByteBufFormat.HEX_DUMP));
+        //pipeline.removeLast();
+        //pipeline.addLast(new ChannelInboundHandlerAdapter() {});
         sslHandler.handshakeFuture().addListener(future -> {
+            event.getContext().setValue("START_SSL_NEGOTIATION", false);
+            event.getContext().setValue("START_TLS", false);
             if (future.isSuccess()) {
                 log.debug("TLS handshake completed");
             } else {
@@ -116,15 +130,22 @@ public class SSLHandshake extends ProtoState {
     }
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
-
+        if(event.getContext().getValue("INITALIZE_SSL_HANDSHAKE", false)){
+            initializeSslUpdate(event);
+        }
+        event.getContext().setValue("BYPASS_CONVERTERS", false);
+        event.getContext().setValue("INITALIZE_SSL_HANDSHAKE", false);
         log.debug("TLS handshake");
         var context = (NetworkProtoContext) event.getContext();
         var client = (NettyServerChannel) context.getClient();
         var ctx = client.getChannelHandlerContext();
         var pipeline = ctx.pipeline();
         event.getBuffer().setPosition(0);
-        var tlsBuf = Unpooled.wrappedBuffer(event.getBuffer().toArray());
+        var data =event.getBuffer().toArray();
+        var tlsBuf = Unpooled.wrappedBuffer(data);
         pipeline.fireChannelRead(tlsBuf);
+        var res = event.getBuffer().size();
+        event.getBuffer().truncate(res);
 
         return iteratorOfList();
     }

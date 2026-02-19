@@ -22,6 +22,7 @@ PROXYED CONNETION STRING!!!
 
 Uses the following phases
 
+* CONNECT (Before connecting to the real server)
 * PRE_CALL (Before calling the real server)
 * POST_CALL
 * PRE_SOCKET_WRITE (Before sending data to the client)
@@ -146,7 +147,7 @@ definitions. For details on the implementation [here](../docs/rest-plugins-plugi
   from contains
 * blockOnException: If there is an exception return the error and stop the filtering
 
-## mysql-rewrite
+## jdbc-rewrite
 
 Using this plugin is possible to forward the real user, password to the target database. The connection is rebuilt
 when logging in. The protocol must be set to "useTls" and the connection string must contain the following. 

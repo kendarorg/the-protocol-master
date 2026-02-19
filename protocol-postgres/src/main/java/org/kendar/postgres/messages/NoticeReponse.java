@@ -1,6 +1,7 @@
 package org.kendar.postgres.messages;
 
 import org.kendar.buffers.BBuffer;
+import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
 
 public class NoticeReponse implements NetworkReturnMessage {
