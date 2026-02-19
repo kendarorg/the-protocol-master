@@ -24,7 +24,7 @@ Uses the following phases
 * PRE_CALL (Before calling the real server)
 * POST_CALL
 * PRE_SOCKET_WRITE (Before sending data to the client)
-* 
+
 ## Plugins
 
 ### record-plugin
