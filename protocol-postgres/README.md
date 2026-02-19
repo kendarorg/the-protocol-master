@@ -134,7 +134,8 @@ The password is removed once used to connect to the real database.
 * userid
 * database
 * password
-* 
+
+
 ### Connect to different servers
 
 Leveraging on rewrite and mock plugin it is possible to connect to any kind of db
