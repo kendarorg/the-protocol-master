@@ -62,9 +62,9 @@ public class JpaTest extends MySqlBasicTest {
         });
 
         assertTrue(atomicBoolean.get());
-
+        Sleeper.sleep(500);
         var events = getEvents().stream().collect(Collectors.toList());
-        assertTrue(events.size() >= 7);
+        assertTrue(events.size() >= 7, "Events were "+events.size());
         var evt = events.get(0);
         assertEquals("mysql", evt.getProtocol(),"Protocol was "+evt.getProtocol());
     }

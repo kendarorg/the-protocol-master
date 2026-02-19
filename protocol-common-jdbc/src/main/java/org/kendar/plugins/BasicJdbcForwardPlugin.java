@@ -166,6 +166,7 @@ public abstract class BasicJdbcForwardPlugin extends ProtocolPluginDescriptorBas
         var userid = ctx.getValue("userid","");
         var database = ctx.getValue("database","");
         var password = ctx.getValue("password","");
+        ctx.setValue("password", "");
         if(!isValidHumanText(password)){
             return false;
         }
