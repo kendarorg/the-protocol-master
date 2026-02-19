@@ -125,7 +125,9 @@ public class NettyServer implements Server {
                 }
                 protoDescriptor.setSslContext(sslContext);
 
-                log.info("TLS enabled for server on port {}", protoDescriptor.getPort());
+                if(tlsEnabled) {
+                    log.info("TLS enabled for server on port {}", protoDescriptor.getPort());
+                }
 
             } catch (Exception e) {
                 throw new TPMException("Failed to initialize TLS", e);
