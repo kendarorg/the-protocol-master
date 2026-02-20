@@ -195,7 +195,7 @@ public class BBuffer {
 
     public byte[] getBytes(int position, int length) {
         var dst = new byte[length];
-        length = Math.min(length, bytes.length - position);
+        //length = Math.min(length, bytes.length - position);
         System.arraycopy(bytes, position, dst, 0, length);
         return dst;
     }
