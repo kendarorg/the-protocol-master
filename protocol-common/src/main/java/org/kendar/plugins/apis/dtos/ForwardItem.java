@@ -1,16 +1,16 @@
-package org.kendar.apis.dto;
+package org.kendar.plugins.apis.dtos;
 
-public class JdbcForwardDto {
+public class ForwardItem {
     private String id;
     private String source;
     private String target;
-    public JdbcForwardDto(String id, String source, String target){
+    public ForwardItem(String id, String source, String target){
         this.id = id;
 
         this.source = source;
         this.target = target;
     }
-    public JdbcForwardDto(){
+    public ForwardItem(){
 
     }
 

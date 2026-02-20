@@ -28,10 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class JdbcProxy extends Proxy {
     private static final Logger log = LoggerFactory.getLogger(JdbcProxy.class);
     private String driver;
-    private String connectionString;
     private String forcedSchema;
-    private String login;
-    private String password;
 
     public JdbcProxy(JdbcProtocolSettings settings) {
         super();
@@ -40,10 +37,10 @@ public abstract class JdbcProxy extends Proxy {
             localDriver = getDefaultDriver();
         }
         this.driver = localDriver;
-        this.connectionString = settings.getConnectionString();
+        this.setConnectionString(settings.getConnectionString());
+        this.setLogin(settings.getLogin());
+        this.setPassword(settings.getPassword());
         this.forcedSchema = settings.getForceSchema();
-        this.login = settings.getLogin();
-        this.password = settings.getPassword();
     }
 
     public JdbcProxy(String driver) {
@@ -55,10 +52,10 @@ public abstract class JdbcProxy extends Proxy {
     public JdbcProxy(String driver, String connectionString, String forcedSchema, String login, String password) {
         super();
         this.driver = (driver != null && !driver.isEmpty()) ? driver : getDefaultDriver();
-        this.connectionString = connectionString;
         this.forcedSchema = forcedSchema;
-        this.login = login;
-        this.password = password;
+        this.setConnectionString(connectionString);
+        this.setLogin(login);
+        this.setPassword(password);
     }
 
 
@@ -204,17 +201,6 @@ public abstract class JdbcProxy extends Proxy {
         return driver;
     }
 
-    public String getConnectionString() {
-        return connectionString;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 
     public QueryResultIterator<List<String>> iterateThroughRecSet(final ResultSet resultSet,
                                                                   AtomicLong maxRecordsAtomic,
@@ -421,7 +407,7 @@ public abstract class JdbcProxy extends Proxy {
         if(protoContext.getValue("CONNECTION",null)==null){
 
             long start = System.currentTimeMillis();
-            var pluginContext = new PluginContext("JDBC", "QUERY", start, protoContext);
+            var pluginContext = new PluginContext("JDBC", "CONNECT", start, protoContext);
             for (var plugin : getPluginHandlers(ProtocolPhase.CONNECT, new Object(), new Object())) {
                 if(plugin.handle(pluginContext, ProtocolPhase.CONNECT, new Object(), new Object())){
                     return;

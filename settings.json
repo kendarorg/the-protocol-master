@@ -79,7 +79,7 @@
         },
         "record-plugin": {
         },
-        "jdbc-forward-plugin": {
+        "forward-plugin": {
         },
         "mock-plugin": {
           "active": false
@@ -113,7 +113,7 @@
         "rewrite-plugin": {
           "active": false
         },
-        "jdbc-forward-plugin": {
+        "forward-plugin": {
         },
         "latency-plugin": {
           "minMs": 50,

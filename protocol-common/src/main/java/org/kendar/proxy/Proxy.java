@@ -19,6 +19,9 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("rawtypes")
 public abstract class Proxy {
+    private String connectionString;
+    private String login;
+    private String password;
     private final Map<String, Map<ProtocolPhase, List<PluginHandler>>> allowedPlugins = new ConcurrentHashMap<>();
     private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
     protected boolean replayer;
@@ -158,5 +161,29 @@ public abstract class Proxy {
                 }
             }
         }
+    }
+
+    public String getConnectionString() {
+        return connectionString;
+    }
+
+    public void setConnectionString(String connectionString) {
+        this.connectionString = connectionString;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

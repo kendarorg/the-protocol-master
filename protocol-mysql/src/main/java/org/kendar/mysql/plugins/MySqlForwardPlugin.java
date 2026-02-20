@@ -1,14 +1,11 @@
 package org.kendar.mysql.plugins;
 
 import org.kendar.di.annotations.TpmService;
-import org.kendar.plugins.BasicJdbcForwardPlugin;
-import org.kendar.plugins.JdbcRewritePlugin;
-import org.kendar.storage.generic.StorageRepository;
-import org.kendar.ui.MultiTemplateEngine;
+import org.kendar.plugins.BasicForwardPlugin;
 import org.kendar.utils.JsonMapper;
 
 @TpmService(tags = "mysql")
-public class MySqlForwardPlugin extends BasicJdbcForwardPlugin {
+public class MySqlForwardPlugin extends BasicForwardPlugin {
 
 
     public MySqlForwardPlugin(JsonMapper mapper) {
