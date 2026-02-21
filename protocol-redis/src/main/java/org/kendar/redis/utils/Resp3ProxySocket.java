@@ -6,6 +6,7 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.proxy.NettyProxySocket;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.NetworkProxySplitterState;
 import org.kendar.redis.fsm.GenericFrame;
@@ -19,12 +20,12 @@ import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.util.List;
 
-public class Resp3ProxySocket extends NetworkProxySocket {
+public class Resp3ProxySocket extends NettyProxySocket {
     private static final Logger log = LoggerFactory.getLogger(Resp3ProxySocket.class.getName());
     private final Resp3MessageTranslator translator = new Resp3MessageTranslator().asProxy();
 
-    public Resp3ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
-        super(context, inetSocketAddress, group);
+    public Resp3ProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress,AsynchronousChannelGroup group) {
+        super(context, inetSocketAddress,group);
     }
 
     @Override

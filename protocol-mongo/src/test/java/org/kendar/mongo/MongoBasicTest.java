@@ -145,7 +145,7 @@ public class MongoBasicTest {
 //                .build();
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(
-                        "mongodb://frappa:password@localhost:" + FAKE_PORT + "/?" +
+                        "mongodb://thelogin:password@localhost:" + FAKE_PORT + "/?" +
                                 "retryWrites=false&retryReads=false&tls=false" +
                                 "&ssl=false&authMechanism=PLAIN"))
                 //.serverApi(serverApi)

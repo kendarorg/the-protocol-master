@@ -15,7 +15,8 @@ import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.utils.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
+import java.util.*;
+
 
 public class CmdSaslStart extends StandardOpMsgCommand {
 
@@ -37,6 +38,22 @@ public class CmdSaslStart extends StandardOpMsgCommand {
         }
     }
 
+    public static List<String> readNullTerminatedStrings(byte[] data) {
+        var result = new ArrayList<String>();
+        int start = 0;
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] == 0) {
+                if (i > start) { // avoid empty trailing \0
+                    String s = new String(data, start, i - start, StandardCharsets.UTF_8);
+                    result.add(s);
+                }
+                start = i + 1;
+            }
+        }
+
+        return result;
+    }
+
     @Override
     protected Iterator<ProtoStep> executeInternal(OpMsgRequest event) {
 
@@ -48,39 +65,70 @@ public class CmdSaslStart extends StandardOpMsgCommand {
 
             var bd = BsonDocument.parse(event.getData().getSections().get(0).getDocuments().get(0));
             var binaryData = bd.getBinary("payload").getData();
-            var pl = new String(binaryData);
-            var spl = pl.split(",");
-            for (var sl : spl) {
-                var slspl = sl.split("=");
-                if (slspl.length == 2 && slspl[0].equalsIgnoreCase("n")) {
-                    login = slspl[1];
-                } else if (slspl.length == 2 && slspl[0].equalsIgnoreCase("r")) {
-                    nonce = slspl[1];
-                }
+            var mechanism = bd.getString("mechanism").getValue();
+
+            switch (mechanism) {
+                case "SCRAM-SHA-256":
+                case "SCRAM-SHA-1":
+                    return handleScramAuthentication(event, binaryData, protoContext, nonce);
+                case "MONGODB-X509":
+                    return handleX509Authentication(event, binaryData, protoContext, nonce);
+                case "PLAIN":
+                    return handlePlainAuthentication(event, binaryData, protoContext, nonce);
+                case "GSSAPI":
+                    return handleGssApiAuthentication(event, binaryData, protoContext, nonce);
+                default:
+                    throw new TPMProtocolException("Unsupported mechanism: " + mechanism);
             }
-
-            var newPayload =// GS2_HEADER +
-                    "r=" + nonce + "," +
-                            "s=QUI=," +
-                            "i=" + MINIMUM_ITERATION_COUNT;
-
-            var resultMap = new Document();
-            var convid = protoContext.getReqResId();
-            resultMap.put("conversationId", convid);
-            resultMap.put("done", true);
-            resultMap.put("payload", newPayload.getBytes(StandardCharsets.UTF_8));
-            resultMap.put("ok", true);
-
-            protoContext.setValue("CONVERSATION_ID", convid);
-
-            var json = resultMap.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-            var toSend = new OpMsgContent(0, protoContext.getReqResId(), event.getData().getRequestId());
-            OpMsgSection section = new OpMsgSection();
-            section.getDocuments().add(json);
-            toSend.getSections().add(section);
-            return iteratorOfList(toSend);
         } catch (Exception ex) {
             throw new TPMProtocolException(ex);
         }
+    }
+
+    private Iterator<ProtoStep> handleScramAuthentication(OpMsgRequest event, byte[] binaryData, MongoProtoContext protoContext, String nonce) {
+        return null;
+    }
+
+    private Iterator<ProtoStep> handleGssApiAuthentication(OpMsgRequest event, byte[] binaryData, MongoProtoContext protoContext, String nonce) {
+        var toSend = generateSuccessMessage(event, protoContext, nonce);
+        return iteratorOfList(toSend);
+    }
+
+    private Iterator<ProtoStep> handleX509Authentication(OpMsgRequest event, byte[] binaryData, MongoProtoContext protoContext, String nonce) {
+        var toSend = generateSuccessMessage(event, protoContext, nonce);
+        return iteratorOfList(toSend);
+    }
+
+    private static Iterator<ProtoStep> handlePlainAuthentication(OpMsgRequest event, byte[] binaryData, MongoProtoContext protoContext, String nonce) {
+        var result = readNullTerminatedStrings(binaryData);
+        if(result.size()==3) {
+            protoContext.setValue("userid", result.get(0));
+            protoContext.setValue("password", result.get(2));
+        }
+        var toSend = generateSuccessMessage(event, protoContext, nonce);
+        return iteratorOfList(toSend);
+    }
+
+    private static OpMsgContent generateSuccessMessage(OpMsgRequest event, MongoProtoContext protoContext, String nonce) {
+        var newPayload =// GS2_HEADER +
+                "r=" + nonce + "," +
+                        "s=QUI=," +
+                        "i=" + MINIMUM_ITERATION_COUNT;
+
+        var resultMap = new Document();
+        var convid = protoContext.getReqResId();
+        resultMap.put("conversationId", convid);
+        resultMap.put("done", true);
+        resultMap.put("payload", newPayload.getBytes(StandardCharsets.UTF_8));
+        resultMap.put("ok", true);
+
+        protoContext.setValue("CONVERSATION_ID", convid);
+
+        var json = resultMap.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
+        var toSend = new OpMsgContent(0, protoContext.getReqResId(), event.getData().getRequestId());
+        OpMsgSection section = new OpMsgSection();
+        section.getDocuments().add(json);
+        toSend.getSections().add(section);
+        return toSend;
     }
 }

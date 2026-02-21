@@ -19,6 +19,7 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.Stop;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.Proxy;
+import org.kendar.proxy.WireProxySocket;
 import org.kendar.tcpserver.ClientServerChannel;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -104,8 +105,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
     public void disconnect(Object connection) {
         try {
             disconnected = true;
-            if (connection != null && NetworkProxySocket.class.isAssignableFrom(connection.getClass())) {
-                ((NetworkProxySocket) connection).close();
+            if (connection != null && WireProxySocket.class.isAssignableFrom(connection.getClass())) {
+                ((WireProxySocket) connection).close();
             }
             if (client != null) client.close();
         } catch (IOException e) {
