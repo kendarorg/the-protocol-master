@@ -8,6 +8,7 @@ import java.sql.Statement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("SqlNoDataSourceInspection")
 public class MySQLProtocolTest extends MySqlBasicTest {
     @BeforeAll
     public static void beforeClass() {

@@ -1,0 +1,336 @@
+package org.kendar.postgres;
+
+import org.junit.jupiter.api.*;
+import org.kendar.utils.Sleeper;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class PostgresSslProtocolTest extends PostgresBasicTest {
+
+    @BeforeAll
+    public static void beforeClass() {
+        beforeClassBase();
+
+    }
+
+    @AfterAll
+    public static void afterClass() throws Exception {
+        afterClassBase();
+    }
+
+    @BeforeEach
+    public void beforeEach(TestInfo testInfo) {
+        beforeEachBaseSSL(testInfo,true);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        afterEachBase();
+    }
+
+    @Test
+    void proxyTestTransactions() throws Exception {
+
+        var runned = false;
+
+
+        Connection c = getProxyConnectionSSL();
+
+
+        var stmt = c.createStatement();
+        stmt.executeUpdate("CREATE TABLE COMPANY_1 " +
+                "(ID INT PRIMARY KEY NOT NULL," +
+                " DENOMINATION TEXT NOT NULL, " +
+                " AGE INT NOT NULL, " +
+                " ADDRESS CHAR(50), " +
+                " SALARY REAL)");
+        stmt.close();
+
+
+        c.setAutoCommit(false);
+        c.beginRequest();
+        stmt = c.createStatement();
+        stmt.executeUpdate("INSERT INTO COMPANY_1 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
+        stmt.close();
+
+        c.setAutoCommit(true);
+
+        c.setAutoCommit(false);
+        c.beginRequest();
+        stmt = c.createStatement();
+        stmt.executeUpdate("INSERT INTO COMPANY_1 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (12,'other', 42, 'Ping Road 22', 25000.7);");
+        stmt.close();
+
+        c.rollback();
+        c.setAutoCommit(true);
+        stmt = c.createStatement();
+        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_1;");
+        while (resultset.next()) {
+            assertEquals("Test Ltd", resultset.getString("DENOMINATION"));
+            runned = true;
+        }
+
+        resultset.close();
+        stmt.close();
+        c.close();
+
+        assertTrue(runned);
+    }
+
+
+    @Test
+    void simpleProxyTest() throws Exception {
+
+        var runned = false;
+
+
+        Connection c = getProxyConnectionSSL();
+        Statement stmt;
+
+
+        stmt = c.createStatement();
+        stmt.executeUpdate("CREATE TABLE COMPANY_2 " +
+                "(ID INT PRIMARY KEY NOT NULL," +
+                " DENOMINATION TEXT NOT NULL, " +
+                " AGE INT NOT NULL, " +
+                " ADDRESS CHAR(50), " +
+                " SALARY REAL)");
+        stmt.close();
+
+        stmt = c.createStatement();
+        stmt.executeUpdate("INSERT INTO COMPANY_2 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
+        stmt.close();
+
+        stmt = c.createStatement();
+        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_2;");
+        while (resultset.next()) {
+            assertEquals("Test Ltd", resultset.getString("DENOMINATION"));
+            runned = true;
+        }
+
+
+        resultset.close();
+        stmt.close();
+        c.close();
+
+        assertTrue(runned);
+
+
+    }
+
+
+    @Test
+    void preparedStatementTest() throws Exception {
+
+        var runned = false;
+
+
+        try {
+            Sleeper.sleep(5000, () -> protocolServer.isRunning());
+
+            Connection c;
+            Statement stmt;
+            try {
+                c = getProxyConnectionSSL();
+
+                stmt = c.createStatement();
+                stmt.executeUpdate("CREATE TABLE COMPANY_3 " +
+                        "(ID INT PRIMARY KEY NOT NULL," +
+                        " DENOMINATION TEXT NOT NULL, " +
+                        " AGE INT NOT NULL, " +
+                        " ADDRESS CHAR(50), " +
+                        " SALARY REAL)");
+                stmt.close();
+
+                stmt = c.createStatement();
+                stmt.executeUpdate("INSERT INTO COMPANY_3 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                        "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
+                stmt.close();
+                var pstmt = c.prepareStatement("SELECT DENOMINATION FROM COMPANY_3 WHERE ID=? AND DENOMINATION=?;");
+                pstmt.setInt(1, 10);
+                pstmt.setString(2, "Test Ltd");
+                var resultset = pstmt.executeQuery();
+                while (resultset.next()) {
+                    assertEquals("Test Ltd", resultset.getString("DENOMINATION"));
+                    runned = true;
+                }
+
+                resultset.close();
+                stmt.close();
+                c.close();
+            } catch (Exception e) {
+                System.err.println(e.getClass().getName() + ": " + e.getMessage());
+                //System.exit(0);
+            }
+        } catch (Exception ex) {
+            //ex.printStackTrace();
+        }
+        assertTrue(runned);
+    }
+
+    @Test
+    void proxyTestSp() throws Exception {
+
+        var runned = false;
+
+
+        Connection c = getProxyConnectionSSL();
+
+
+        var stmt = c.createStatement();
+        stmt.executeUpdate("CREATE TABLE COMPANY_SP " +
+                "(ID INT PRIMARY KEY NOT NULL," +
+                " DENOMINATION TEXT NOT NULL, " +
+                " AGE INT NOT NULL, " +
+                " ADDRESS CHAR(50), " +
+                " SALARY REAL)");
+        stmt.close();
+
+
+        var pstmt = c.prepareStatement("INSERT INTO COMPANY_SP (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (10,?, 42, 'Ping Road 22', 25000.7);");
+        pstmt.setString(1, "Test Ltd");
+        pstmt.execute();
+        stmt.close();
+
+        pstmt = c.prepareStatement("SELECT DENOMINATION FROM COMPANY_SP WHERE ID=?;");
+        pstmt.setInt(1, 10);
+        var resultset = pstmt.executeQuery();
+        while (resultset.next()) {
+            assertEquals("Test Ltd", resultset.getString("DENOMINATION"));
+            runned = true;
+        }
+
+        resultset.close();
+        stmt.close();
+        c.close();
+
+        assertTrue(runned);
+    }
+
+
+    @Test
+    void testCancel() throws Exception {
+
+        Connection c = getProxyConnectionSSL();
+        Statement stmt;
+
+        //ResultSet resultSet;
+        AtomicInteger counter = new AtomicInteger(0);
+        stmt = c.createStatement();
+        new Thread(() -> {
+            try {
+                stmt.execute(
+                        "SELECT *,pg_sleep(1) as sleep from generate_series(1,10)");
+                var resultSet = stmt.getResultSet();
+                while (resultSet.next()) {
+                    counter.incrementAndGet();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        Sleeper.sleep(3000);
+        stmt.cancel();
+        stmt.close();
+        c.close();
+        assertEquals(0, counter.get());
+
+    }
+
+    @Test
+    void testErrors() throws Exception {
+
+        var runned = false;
+
+
+        Connection c = getProxyConnectionSSL();
+
+
+        var stmt = c.createStatement();
+        stmt.executeUpdate("CREATE TABLE COMPANY_Q " +
+                "(ID INT PRIMARY KEY NOT NULL," +
+                " DENOMINATION TEXT NOT NULL, " +
+                " AGE INT NOT NULL, " +
+                " ADDRESS CHAR(50), " +
+                " SALARY REAL)");
+        stmt.close();
+
+        var thrown = false;
+        try {
+            var sstmt = c.createStatement();
+            sstmt.executeUpdate("INSERT INTO WETHEAVER (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                    "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
+            sstmt.close();
+        } catch (SQLException ex) {
+            assertEquals("58000", ex.getSQLState());
+            thrown = true;
+        }
+        assertTrue(thrown);
+        stmt = c.createStatement();
+        stmt.executeUpdate("INSERT INTO COMPANY_Q (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
+        stmt.close();
+        c.close();
+
+    }
+
+    @Test
+    void simpleProxyTestChangingWithWrongUser() throws Exception {
+
+        var runned = false;
+        Connection c;
+        Class.forName("org.postgresql.Driver");
+        //?sslMode=REQUIRED
+        Throwable thrown = null;
+        try {
+            c = DriverManager
+                    .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test?sslmode=require", FAKE_PORT),
+                            "rootWrong", "test");
+            Statement stmt;
+            stmt = c.createStatement();
+            stmt.executeUpdate("CREATE TABLE COMPANY_2 " +
+                    "(ID INT PRIMARY KEY NOT NULL," +
+                    " DENOMINATION TEXT NOT NULL, " +
+                    " AGE INT NOT NULL, " +
+                    " ADDRESS CHAR(50), " +
+                    " SALARY REAL)");
+            stmt.close();
+        }catch (Exception ex){
+            thrown=ex;
+        }
+        assertNotNull(thrown);
+    }
+
+    @Test
+    void testWeirdQuery() throws Exception {
+
+        var runned = false;
+
+
+        Connection c = getProxyConnectionSSL();
+
+
+        var stmt = c.createStatement();
+        stmt.execute(
+                "SELECT current_setting('server_version_num')::int/100 as version;");
+        var resultSet = stmt.getResultSet();
+        while (resultSet.next()) {
+            System.out.println(resultSet.getString(1));
+        }
+        resultSet.close();
+        stmt.close();
+        c.close();
+
+    }
+}

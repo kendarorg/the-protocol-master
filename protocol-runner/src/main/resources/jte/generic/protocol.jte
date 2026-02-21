@@ -1,10 +1,18 @@
+@import org.kendar.settings.ByteProtocolSettings
 @param org.kendar.settings.ProtocolSettings protocolSettings
 
+
 !{
-    var protocol = (org.kendar.settings.ByteProtocolSettings)protocolSettings;
+    var protocol = protocolSettings;
+    ByteProtocolSettings byteProtocol=null;
+    if(ByteProtocolSettings.class.isAssignableFrom(protocol.getClass())){
+
+        byteProtocol = (ByteProtocolSettings)protocol;
+    }
     var safeId = new java.util.function.Function<org.kendar.settings.ProtocolSettings,String>(){
             @Override
             public String apply(org.kendar.settings.ProtocolSettings protocolSettings) {
+                //if(protocolSettings.getProtocolInstanceId()==null)return protocolSettings.getProtocol();
                 return protocolSettings.getProtocolInstanceId().replaceAll("-","");
             }
         };
@@ -38,14 +46,17 @@
          aria-labelledby="headingProtocol${safeId.apply(protocol)}">
         <div class="panel-body">
 
-
+            @if(byteProtocol!=null)
             <div class="input-group">
                 <label for="port${safeId.apply(protocol)}" class="control-label">Listening port</label>
                 <div>
                     <input id="port${safeId.apply(protocol)}" type="number" class="form-control"
-                           value="${protocol.getPort()}">
+                           value="${byteProtocol.getPort()}">
                 </div>
             </div>
+            @else
+                <input type="hidden" id="port${safeId.apply(protocol)}" value="0">
+            @endif
             <br>
             <div class="input-group">
                 <button class="btn btn-danger" type="button"

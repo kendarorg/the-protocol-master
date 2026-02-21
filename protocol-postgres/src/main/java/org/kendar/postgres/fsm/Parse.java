@@ -7,6 +7,7 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.sql.jdbc.JdbcProxy;
 import org.kendar.sql.parser.SqlStringParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,8 @@ public class Parse extends PostgresState {
     }
 
     private static void inferMetadataIfPossible(ProtoContext protoContext, String query, short paramsCount, ArrayList<JDBCType> concreteTypes, ArrayList<Integer> oids) {
+        var proxy = (JdbcProxy)((NetworkProtoContext)protoContext).getProxy();
+        proxy.doConnect(protoContext);
         var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
         try {
             var parser = (SqlStringParser) protoContext.getValue("PARSER");

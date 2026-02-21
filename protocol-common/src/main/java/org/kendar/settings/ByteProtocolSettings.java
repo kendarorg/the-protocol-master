@@ -4,6 +4,7 @@ public class ByteProtocolSettings extends ProtocolSettings {
     private int port;
     private String connectionString;
     private int timeoutSeconds = 30;
+    private boolean startWithTls = false;
 
     public int getTimeoutSeconds() {
         return timeoutSeconds;
@@ -27,5 +28,13 @@ public class ByteProtocolSettings extends ProtocolSettings {
 
     public void setConnectionString(String connectionString) {
         this.connectionString = connectionString;
+    }
+
+    public boolean isStartWithTls() {
+        return startWithTls;
+    }
+
+    public void setStartWithTls(boolean startWithTls) {
+        this.startWithTls = startWithTls;
     }
 }

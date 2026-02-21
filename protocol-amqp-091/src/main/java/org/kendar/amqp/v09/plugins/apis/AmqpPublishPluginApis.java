@@ -120,9 +120,9 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
         var channelId = Integer.parseInt(request.getPathParameter("channel"));
 
         var published = doPublish(messageData, connectionId, channelId);
-        if(published==0){
+        if (published == 0) {
             respondKo(response, "Publish failed");
-        }else{
+        } else {
             respondOk(response);
         }
     }

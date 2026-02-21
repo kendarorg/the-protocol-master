@@ -1,6 +1,8 @@
 package org.kendar.postgres;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -19,6 +21,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("SqlSourceToSinkFlow")
 public class QueryTranslationTest extends PostgresBasicTest {
 
     @BeforeAll
@@ -38,11 +41,6 @@ public class QueryTranslationTest extends PostgresBasicTest {
                 Arguments.of(true, "SELECT \r\n ([0-9]+) AS TEST", "SELECT \r\n $1+2 AS TEST", "SELECT \n 1 AS TEST", "3"),
                 Arguments.of(true, "SELECT \r\n ([0-9]+) AS TEST", "SELECT \r\n 2 AS TEST", "SELECT \n 1 AS TEST", "2")
         );
-    }
-
-    @BeforeEach
-    public void beforeEach(TestInfo testInfo) {
-
     }
 
     @AfterEach

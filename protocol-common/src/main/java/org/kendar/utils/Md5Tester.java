@@ -1,4 +1,4 @@
-package org.kendar.http.utils;
+package org.kendar.utils;
 
 
 import org.kendar.exceptions.TPMException;

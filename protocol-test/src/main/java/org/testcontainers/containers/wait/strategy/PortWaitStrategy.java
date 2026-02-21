@@ -20,14 +20,14 @@ public class PortWaitStrategy extends AbstractWaitStrategy {
 
     @Override
     protected void waitUntilReady() {
-        System.out.println(String.format("Liveness check ports of %s starting.",
-                waitStrategyTarget.getContainerInfo().getName()));
+        System.out.printf("Liveness check ports of %s starting.%n",
+                waitStrategyTarget.getContainerInfo().getName());
         final Set<Integer> externalLivenessCheckPorts;
         if (this.ports == null || this.ports.length == 0) {
             externalLivenessCheckPorts = getLivenessCheckPorts();
             if (externalLivenessCheckPorts.isEmpty()) {
-                System.out.println(String.format("Liveness check ports of %s is empty. Not waiting.",
-                        waitStrategyTarget.getContainerInfo().getName()));
+                System.out.printf("Liveness check ports of %s is empty. Not waiting.%n",
+                        waitStrategyTarget.getContainerInfo().getName());
                 return;
             }
         } else {
@@ -58,20 +58,20 @@ public class PortWaitStrategy extends AbstractWaitStrategy {
                             () -> {
                                 Instant now = Instant.now();
                                 Boolean result = internalCheck.call();
-                                System.out.println(String.format("Internal port check %s for %s in %dms",
+                                System.out.printf("Internal port check %s for %s in %dms%n",
                                         Boolean.TRUE.equals(result) ? "passed" : "failed",
                                         String.join(",", internalPorts.stream().map(Object::toString).toList()),
-                                        Duration.between(now, Instant.now()).toMillis()));
+                                        Duration.between(now, Instant.now()).toMillis());
                                 blocking.set(result);
                                 return result;
                             },
                             // Polling
                             () -> {
-                                System.out.println(String.format(
-                                        "External port check started for %s mapped as %s",
+                                System.out.printf(
+                                        "External port check started for %s mapped as %s%n",
                                         String.join(",", internalPorts.stream().map(Object::toString).toList()),
                                         String.join(",", externalLivenessCheckPorts.stream().map(Object::toString).toList())
-                                ));
+                                );
                                 Instant now = Instant.now();
                                 Awaitility
                                         .await()
@@ -83,12 +83,12 @@ public class PortWaitStrategy extends AbstractWaitStrategy {
                                         .forever()
                                         .until(externalCheck);
 
-                                System.out.println(String.format(
-                                        "External port check passed for %s mapped as %s in %dms",
+                                System.out.printf(
+                                        "External port check passed for %s mapped as %s in %dms%n",
                                         String.join(",", internalPorts.stream().map(Object::toString).toList()),
                                         String.join(",", externalLivenessCheckPorts.stream().map(Object::toString).toList()),
                                         Duration.between(now, Instant.now()).toMillis()
-                                ));
+                                );
                                 polling.set(true);
                                 return true;
                             }

@@ -6,7 +6,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.exceptions.ProxyException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
-import org.kendar.proxy.NetworkProxySocket;
+import org.kendar.proxy.WireProxySocket;
 import org.kendar.redis.utils.Resp3ProxySocket;
 import org.kendar.settings.ByteProtocolSettings;
 
@@ -23,18 +23,24 @@ public class Resp3Proxy extends NetworkProxy {
 
     @TpmConstructor
     public Resp3Proxy(@TpmNamed(tags = "redis") ByteProtocolSettings settings) {
-        super(settings.getConnectionString(), null, null);
+        super(settings.getConnectionString(), null, null,settings.isStartWithTls());
     }
 
     public Resp3Proxy(String connectionString, String userId, String password) {
         super(connectionString, userId, password);
     }
 
+    public Resp3Proxy(String connectionString, String userId, String password,boolean startWithTls) {
+        super(connectionString, userId, password,startWithTls);
+    }
+
     @Override
-    protected NetworkProxySocket buildProxyConnection(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+    protected WireProxySocket buildProxyConnection(NetworkProtoContext context,
+                                                   InetSocketAddress inetSocketAddress,
+                                                   AsynchronousChannelGroup group) {
         try {
             return new Resp3ProxySocket(context,
-                    new InetSocketAddress(InetAddress.getByName(host), port), group);
+                    new InetSocketAddress(InetAddress.getByName(host), port),group);
         } catch (UnknownHostException e) {
             throw new ProxyException(e);
         }

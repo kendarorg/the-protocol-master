@@ -92,11 +92,12 @@ public class Handshake extends MySQLReturnMessage {
         resultBuffer.writeUB4(
                 threadId);
         resultBuffer.write(new byte[]{'B', 'W', 'p', 'M', 'm', 'a', '}', 's', 0x00});
+        //resultBuffer.write(new byte[]{0x00, 0x00, 0x00, 0x00, 0x00 ,0x00,0x00, 0x00, 0x00});
         resultBuffer.writeUB2(serverCapabilities);
         resultBuffer.write((byte) serverLanguage.getValue());
         resultBuffer.writeUB2(serverStatus);
         resultBuffer.writeUB2(extendedServerCapabilities);
-        resultBuffer.write((byte) authenticationPlugin.length());
+        resultBuffer.write((byte) 0x15);
         resultBuffer.write(RESERVED_FILL);
         resultBuffer.write(new byte[]{'H', 'N', '.', '9', 't', ']', 'V', 'w', 's', '[', 'N', 'V', 0x00});
         resultBuffer.write(authenticationPlugin.getBytes(StandardCharsets.US_ASCII));

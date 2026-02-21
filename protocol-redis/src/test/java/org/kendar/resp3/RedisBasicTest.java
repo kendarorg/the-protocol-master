@@ -42,7 +42,7 @@ public class RedisBasicTest {
     protected static RedisImage redisImage;
     protected static TcpServer protocolServer;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBase() {

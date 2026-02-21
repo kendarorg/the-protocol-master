@@ -84,7 +84,7 @@ public class MqttReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                         }
                     }
                 }
-                if(!isActive())return;
+                if (!isActive()) return;
                 var ctx = context.getDescriptor().getContextsCache().get(consumeId);
                 var out = mapper.toJsonNode(item.getOutput());
                 var clazz = item.getOutputType();

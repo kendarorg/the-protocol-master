@@ -1,10 +1,12 @@
 package org.kendar.sql.jdbc;
 
+import org.kendar.JdbcProtocol;
 import org.kendar.exceptions.ProxyException;
 import org.kendar.iterators.QueryResultIterator;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
@@ -25,11 +27,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class JdbcProxy extends Proxy {
     private static final Logger log = LoggerFactory.getLogger(JdbcProxy.class);
-    private final String driver;
-    private final String connectionString;
-    private final String forcedSchema;
-    private final String login;
-    private final String password;
+    private String driver;
+    private String forcedSchema;
 
     public JdbcProxy(JdbcProtocolSettings settings) {
         super();
@@ -38,10 +37,10 @@ public abstract class JdbcProxy extends Proxy {
             localDriver = getDefaultDriver();
         }
         this.driver = localDriver;
-        this.connectionString = settings.getConnectionString();
+        this.setConnectionString(settings.getConnectionString());
+        this.setLogin(settings.getLogin());
+        this.setPassword(settings.getPassword());
         this.forcedSchema = settings.getForceSchema();
-        this.login = settings.getLogin();
-        this.password = settings.getPassword();
     }
 
     public JdbcProxy(String driver) {
@@ -53,12 +52,12 @@ public abstract class JdbcProxy extends Proxy {
     public JdbcProxy(String driver, String connectionString, String forcedSchema, String login, String password) {
         super();
         this.driver = (driver != null && !driver.isEmpty()) ? driver : getDefaultDriver();
-        this.connectionString = connectionString;
         this.forcedSchema = forcedSchema;
-        this.login = login;
-        this.password = password;
-
+        this.setConnectionString(connectionString);
+        this.setLogin(login);
+        this.setPassword(password);
     }
+
 
     private static ParametrizedStatement buildParametrizedStatement(String query,
                                                                     List<BindingParameter> parameterValues,
@@ -202,17 +201,6 @@ public abstract class JdbcProxy extends Proxy {
         return driver;
     }
 
-    public String getConnectionString() {
-        return connectionString;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 
     public QueryResultIterator<List<String>> iterateThroughRecSet(final ResultSet resultSet,
                                                                   AtomicLong maxRecordsAtomic,
@@ -412,10 +400,27 @@ public abstract class JdbcProxy extends Proxy {
         }
     }
 
+    public void doConnect(ProtoContext protoContext){
+        if(!((NetworkProtoDescriptor)protoContext.getDescriptor()).hasProxy()){
+            return;
+        }
+        if(protoContext.getValue("CONNECTION",null)==null){
+
+            long start = System.currentTimeMillis();
+            var pluginContext = new PluginContext("JDBC", "CONNECT", start, protoContext);
+            for (var plugin : getPluginHandlers(ProtocolPhase.CONNECT, new Object(), new Object())) {
+                if(plugin.handle(pluginContext, ProtocolPhase.CONNECT, new Object(), new Object())){
+                    return;
+                }
+            }
+            protoContext.setValue("CONNECTION",connect((NetworkProtoContext)protoContext ));
+        }
+    }
 
     public void executeBegin(ProtoContext protoContext) {
         if (replayer) return;
         try {
+            doConnect(protoContext);
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setAutoCommit(false);
         } catch (SQLException e) {
@@ -426,6 +431,7 @@ public abstract class JdbcProxy extends Proxy {
     public void executeCommit(ProtoContext protoContext) {
         if (replayer) return;
         try {
+            doConnect(protoContext);
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setAutoCommit(true);
         } catch (SQLException e) {
@@ -436,6 +442,7 @@ public abstract class JdbcProxy extends Proxy {
     public void executeRollback(ProtoContext protoContext) {
         if (replayer) return;
         try {
+            doConnect(protoContext);
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.rollback();
         } catch (SQLException e) {
@@ -446,6 +453,7 @@ public abstract class JdbcProxy extends Proxy {
     public void setIsolation(ProtoContext protoContext, int transactionIsolation) {
         if (replayer) return;
         try {
+            doConnect(protoContext);
             var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
             c.setTransactionIsolation(transactionIsolation);
         } catch (SQLException e) {

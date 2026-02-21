@@ -11,9 +11,7 @@
         <module name="protocol-mongo" />
         <module name="jacoco" />
         <module name="protocol-test" />
-        <module name="protocol-dns-plugin" />
         <module name="protocol-postgres" />
-        <module name="sample-plugins" />
         <module name="protocol-mysql" />
         <module name="protocol-http" />
         <module name="protocol-runner" />
@@ -21,13 +19,14 @@
         <module name="protocol-redis" />
         <module name="protocol-amqp-091" />
       </profile>
+      <profile name="Annotation profile for TPM-Proxy main pom" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processor name="org.pf4j.processor.ExtensionAnnotationProcessor" />
+        <module name="protocol-dns-plugin" />
+        <module name="sample-plugins" />
+      </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="protocol-amqp-100" target="11" />
-      <module name="protocol-kafka" target="11" />
-      <module name="protocol-todo" target="1.5" />
-      <module name="rest-plugins-plugin" target="17" />
-      <module name="todo" target="1.5" />
-    </bytecodeTargetLevel>
   </component>
 </project>

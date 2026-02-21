@@ -1,5 +1,6 @@
 package org.kendar.postgres.fsm;
 
+import io.netty.buffer.Unpooled;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.postgres.fsm.events.PostgresPacket;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -7,6 +8,7 @@ import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.InterruptProtoState;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.tcpserver.NettyServerChannel;
 
 import java.util.Iterator;
 
@@ -19,6 +21,7 @@ public class PostgresPacketTranslator extends ProtoState implements InterruptPro
     }
 
     public boolean canRun(BytesEvent event) {
+
         var inputBuffer = event.getBuffer();
         if (inputBuffer.size() < 5) {
             return false;
@@ -27,7 +30,9 @@ public class PostgresPacketTranslator extends ProtoState implements InterruptPro
         if (inputBuffer.size() >= 8) {
             var marker = inputBuffer.getInt(4);
             if (marker == 80877102) return false; //Cancel Message
-            if (inputBuffer.contains(SSL_MESSAGE_MARKER, 4)) return false; //SSL Request
+            if (inputBuffer.contains(SSL_MESSAGE_MARKER, 4)) {
+                return false; //SSL Request
+            }
             if (inputBuffer.contains(STARTUP_MESSAGE_MARKER, 4)) return false; //Startup Message
         }
 

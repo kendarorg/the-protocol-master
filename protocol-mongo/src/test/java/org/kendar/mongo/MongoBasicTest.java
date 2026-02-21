@@ -44,7 +44,7 @@ public class MongoBasicTest {
     protected static final int FAKE_PORT = 27077;
     protected static MongoDbImage mongoContainer;
     protected static TcpServer protocolServer;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor errorPlugin;
     private static ProtocolPluginDescriptor latencyPlugin;
 
@@ -145,7 +145,7 @@ public class MongoBasicTest {
 //                .build();
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(
-                        "mongodb://frappa:password@localhost:" + FAKE_PORT + "/?" +
+                        "mongodb://thelogin:password@localhost:" + FAKE_PORT + "/?" +
                                 "retryWrites=false&retryReads=false&tls=false" +
                                 "&ssl=false&authMechanism=PLAIN"))
                 //.serverApi(serverApi)

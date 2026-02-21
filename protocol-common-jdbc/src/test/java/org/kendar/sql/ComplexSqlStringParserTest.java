@@ -81,9 +81,8 @@ public class ComplexSqlStringParserTest {
 
     @Test
     void testSpCreationParsing() {
-        var sp = SP_EXAMPLE;
         var target = new SqlStringParser("$");
-        var result = target.parseString(sp);
+        var result = target.parseString(SP_EXAMPLE);
         assertEquals(12, result.size());
         var i = -1;
         assertEquals("create or replace procedure transfer(\n" +

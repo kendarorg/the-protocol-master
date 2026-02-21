@@ -11,7 +11,7 @@ public class ListUser {
     public ListUser(List<ListOfInterface> items) {
 
         this.items = items;
-        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+        System.out.println(this + " " + Thread.currentThread().getId());
     }
 
     @Override

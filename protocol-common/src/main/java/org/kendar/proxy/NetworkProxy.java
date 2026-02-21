@@ -8,6 +8,8 @@ import org.kendar.protocol.messages.NetworkReturnMessage;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.utils.JsonMapper;
+import org.kendar.utils.Sleeper;
+import tlschannel.async.AsynchronousTlsChannelGroup;
 
 import java.io.IOException;
 import java.net.*;
@@ -24,6 +26,7 @@ public abstract class NetworkProxy extends Proxy {
     protected String host;
     protected ExecutorService executor;
     protected AsynchronousChannelGroup group;
+    private boolean ssl = false;
 
     public NetworkProxy() {
         super();
@@ -31,7 +34,12 @@ public abstract class NetworkProxy extends Proxy {
     }
 
     public NetworkProxy(String connectionString, String userId, String password) {
+        this(connectionString,userId,password,false);
+    }
+
+    public NetworkProxy(String connectionString, String userId, String password,boolean ssl) {
         super();
+        this.ssl = ssl;
         try {
             this.connectionString = connectionString;
             if (connectionString != null && !connectionString.isEmpty()) {
@@ -89,13 +97,6 @@ public abstract class NetworkProxy extends Proxy {
     public ProxyConnection connect(NetworkProtoContext context) {
 
         try {
-            @SuppressWarnings("resource")
-            var connection = new Socket();
-            connection.setSoTimeout(60 * 1000);
-            connection.setKeepAlive(true);
-            connection.setTcpNoDelay(true);
-            connection.connect(new InetSocketAddress(InetAddress.getByName(host), port));
-
             return new ProxyConnection(buildProxyConnection(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group));
         } catch (IOException e) {
@@ -111,7 +112,7 @@ public abstract class NetworkProxy extends Proxy {
      * @param group
      * @return
      */
-    protected abstract NetworkProxySocket buildProxyConnection(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group);
+    protected abstract WireProxySocket buildProxyConnection(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group);
 
     @Override
     public void initialize() {
@@ -137,7 +138,7 @@ public abstract class NetworkProxy extends Proxy {
             }
         }
 
-        var sock = (NetworkProxySocket) connection.getConnection();
+        var sock = (WireProxySocket) connection.getConnection();
         if (sock == null) {
             return;
         }
@@ -194,7 +195,7 @@ public abstract class NetworkProxy extends Proxy {
             }
         }
 
-        var sock = (NetworkProxySocket) connection.getConnection();
+        var sock = (WireProxySocket) connection.getConnection();
         if (sock == null) {
             return null;
         }
@@ -245,11 +246,12 @@ public abstract class NetworkProxy extends Proxy {
             }
         }
 
-        var sock = (NetworkProxySocket) connection.getConnection();
+        var sock = (WireProxySocket) connection.getConnection();
         if (sock == null) {
             return toRead;
         }
         sock.write(of);
+        Sleeper.sleep(1000);
         sock.read(toRead, optional);
 
         for (var plugin : getPluginHandlers(ProtocolPhase.POST_CALL, of, toRead)) {

@@ -9,7 +9,7 @@ public class NamedDependency {
 
     public NamedDependency(@TpmNamed("simpleNamed") NamedBase named) {
         this.named = named;
-        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+        System.out.println(this + " " + Thread.currentThread().getId());
     }
 
     @Override

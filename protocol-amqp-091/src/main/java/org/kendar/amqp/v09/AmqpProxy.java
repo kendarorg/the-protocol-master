@@ -7,7 +7,7 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.exceptions.ProxyException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
-import org.kendar.proxy.NetworkProxySocket;
+import org.kendar.proxy.WireProxySocket;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 
 import java.net.InetAddress;
@@ -20,7 +20,12 @@ public class AmqpProxy extends NetworkProxy {
 
     @TpmConstructor
     public AmqpProxy(@TpmNamed(tags = "amqp091") ByteProtocolSettingsWithLogin settings) {
-        super(settings.getConnectionString(), settings.getLogin(), settings.getPassword());
+        super(settings.getConnectionString(), settings.getLogin(), settings.getPassword(),
+                settings.isStartWithTls());
+    }
+
+    public AmqpProxy(String connectionString, String userId, String password, boolean startWithTls) {
+        super(connectionString, userId, password,startWithTls);
     }
 
     public AmqpProxy(String connectionString, String userId, String password) {
@@ -32,10 +37,12 @@ public class AmqpProxy extends NetworkProxy {
     }
 
     @Override
-    protected NetworkProxySocket buildProxyConnection(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+    protected WireProxySocket buildProxyConnection(NetworkProtoContext context,
+                                                   InetSocketAddress inetSocketAddress,
+                                                   AsynchronousChannelGroup group) {
         try {
             return new AmqpProxySocket(context,
-                    new InetSocketAddress(InetAddress.getByName(host), port), group);
+                    new InetSocketAddress(InetAddress.getByName(host), port),group);
         } catch (UnknownHostException e) {
             throw new ProxyException(e);
         }

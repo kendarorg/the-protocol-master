@@ -181,9 +181,9 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     @Override
     protected void handlePostActivation(boolean active) {
-        if(getSettings() instanceof BasicAysncRecordPluginSettings){
+        if (getSettings() instanceof BasicAysncRecordPluginSettings) {
             var bas = (BasicAysncRecordPluginSettings) this.getSettings();
-            if(bas.isResetConnectionsOnStart()){
+            if (bas.isResetConnectionsOnStart()) {
                 disconnectAll();
             }
         }

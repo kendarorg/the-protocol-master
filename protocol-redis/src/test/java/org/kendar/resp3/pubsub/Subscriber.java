@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Subscriber extends JedisPubSub {
 
-    private static Logger log = LoggerFactory.getLogger(Subscriber.class);
+    private static final Logger log = LoggerFactory.getLogger(Subscriber.class);
     public ConcurrentHashMap<String, String> results = new ConcurrentHashMap<>();
 
     @Override

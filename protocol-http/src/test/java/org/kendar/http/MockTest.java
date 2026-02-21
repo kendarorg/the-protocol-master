@@ -10,6 +10,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings({"UastIncorrectHttpHeaderInspection", "DataFlowIssue"})
 public class MockTest extends BasicTest {
     @BeforeAll
     public static void beforeClass() throws Exception {
@@ -22,7 +23,7 @@ public class MockTest extends BasicTest {
         try {
             afterClassBase();
         } catch (Exception ex) {
-
+            ex.printStackTrace();
         }
     }
 

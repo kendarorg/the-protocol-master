@@ -4,7 +4,6 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.iterators.IteratorOfLists;
 import org.kendar.postgres.dtos.Binding;
 import org.kendar.postgres.dtos.Parse;
-import org.kendar.postgres.executor.PostgresExecutor;
 import org.kendar.postgres.messages.ReadyForQuery;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.ProtoStep;

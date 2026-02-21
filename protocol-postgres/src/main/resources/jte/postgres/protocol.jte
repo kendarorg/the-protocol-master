@@ -19,6 +19,7 @@
             var data = {
                 port: retrieveValue('port${safeId.apply(protocol)}'),
                 forceSchema: retrieveValue('forceSchema${safeId.apply(protocol)}'),
+                useTls: retrieveValue('useTls${safeId.apply(protocol)}'),
                 driver: retrieveValue('driver${safeId.apply(protocol)}')
             };
             console.log(data);
@@ -68,6 +69,19 @@
                 <div>
                     <input id="driver${safeId.apply(protocol)}" type="text" class="form-control"
                            value="${protocol.getDriver()}">
+                </div>
+            </div>
+            <br>
+            <div class="input-group">
+                <div class="checkbox">
+                    <label>
+                        @if(protocol.isUseTls())
+                            <input id="useTls{safeId.apply(protocol)}" type="checkbox" checked>
+                        @else
+                            <input id="useTls{safeId.apply(protocol)}" type="checkbox">
+                        @endif
+                        Allow upgrading to TLS connection
+                    </label>
                 </div>
             </div>
             <br>

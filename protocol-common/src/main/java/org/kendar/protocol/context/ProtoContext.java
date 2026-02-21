@@ -5,6 +5,7 @@ import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.exceptions.FailedStateException;
 import org.kendar.exceptions.TPMException;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
+import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -31,6 +32,10 @@ import static org.kendar.protocol.descriptor.ProtoDescriptor.getNow;
  * Instance of a protocol definition
  */
 public abstract class ProtoContext {
+
+    public boolean sendTotallyAsync(){
+        return true;
+    }
 
     /**
      * The executor to run asynchronously the system
@@ -195,13 +200,42 @@ public abstract class ProtoContext {
      */
     public Future<Boolean> send(ProtocolEvent event) {
         lastAccess.set(getNow());
-        return executorService.submit(() -> {
-            try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
-                synchronized (sendLock) {
-                    return reactToEvent(event);
+        if(sendTotallyAsync()){
+            return executorService.submit(() -> {
+                try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
+                    synchronized (sendLock) {
+                        return reactToEvent(event);
+                    }
                 }
+            });
+        }
+        var result = reactToEvent(event);
+        return new CompletableFuture<>() {
+            @Override
+            public boolean cancel(boolean mayInterruptIfRunning) {
+                return false;
             }
-        });
+
+            @Override
+            public boolean isCancelled() {
+                return false;
+            }
+
+            @Override
+            public boolean isDone() {
+                return true;
+            }
+
+            @Override
+            public Boolean get() throws InterruptedException, ExecutionException {
+                return result;
+            }
+
+            @Override
+            public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+                return result;
+            }
+        };
     }
 
     /**

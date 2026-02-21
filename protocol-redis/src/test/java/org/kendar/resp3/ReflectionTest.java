@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class ReflectionTest {
-    private Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
+    private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
 
     @Test
     void testReflection() {

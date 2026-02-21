@@ -20,6 +20,7 @@
                 port: retrieveValue('port${safeId.apply(protocol)}'),
                 force3BytesOkPacketInfo: retrieveValue('force3BytesOkPacketInfo${safeId.apply(protocol)}'),
                 forceSchema: retrieveValue('forceSchema${safeId.apply(protocol)}'),
+                useTls: retrieveValue('useTls${safeId.apply(protocol)}'),
                 driver: retrieveValue('driver${safeId.apply(protocol)}')
             };
             console.log(data);
@@ -81,6 +82,19 @@
                             <input id="force3BytesOkPacketInfo${safeId.apply(protocol)}" type="checkbox">
                         @endif
                         Force length of OkPacket to 7bytes
+                    </label>
+                </div>
+            </div>
+            <br>
+            <div class="input-group">
+                <div class="checkbox">
+                    <label>
+                        @if(protocol.isUseTls())
+                            <input id="useTls{safeId.apply(protocol)}" type="checkbox" checked>
+                        @else
+                            <input id="useTls{safeId.apply(protocol)}" type="checkbox">
+                        @endif
+                        Allow upgrading to TLS connection
                     </label>
                 </div>
             </div>

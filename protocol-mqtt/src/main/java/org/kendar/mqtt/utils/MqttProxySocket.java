@@ -9,6 +9,7 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.proxy.NettyProxySocket;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.NetworkProxySplitterState;
 
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MqttProxySocket extends NetworkProxySocket {
+public class MqttProxySocket extends NettyProxySocket {
     private final MqttPacketTranslator translator = new MqttPacketTranslator().asProxy();
     private final List<ProtoState> states = new ArrayList<>(
             Collections.singletonList(

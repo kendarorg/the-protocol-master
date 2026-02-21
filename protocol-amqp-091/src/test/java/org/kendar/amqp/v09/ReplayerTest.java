@@ -126,15 +126,20 @@ public class ReplayerTest {
             channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
             chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
             System.out.println("WAIT------------------------------------------------------------");
-            Sleeper.sleep(100);
+            Sleeper.sleep(500);
 
-            chanConsume.queueDelete(MAIN_QUEUE);
-            channel.queueDelete(MAIN_QUEUE);
-            channel.close();
+            if(chanConsume.isOpen()) {
+                chanConsume.queueDelete(MAIN_QUEUE);
+            }
+            if(channel.isOpen()) {
+                channel.queueDelete(MAIN_QUEUE);
+                channel.close();
+            }
             connection.close();
 
 
-            Sleeper.sleep(1000, () -> messages.size() == 3);
+            Sleeper.sleepNoException(1000, () -> messages.size() == 3);
+            assertEquals(3, messages.size());
 
             assertEquals(3, messages.size());
             assertTrue(messages.containsValue(exectedMessage + "1"));

@@ -17,6 +17,8 @@ import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.PostgresSqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
@@ -41,12 +43,13 @@ public class PostgresBasicTest {
 
     protected static final int FAKE_PORT = 5431;
     protected static PostgresSqlImage postgresContainer;
-    protected static TcpServer protocolServer;
+    protected static Server protocolServer;
     protected static PostgresProtocol baseProtocol;
     protected static StorageRepository storage;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
+    private static ProtocolPluginDescriptor forwarderPlugin;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -69,6 +72,10 @@ public class PostgresBasicTest {
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
+        beforeEachBaseSSL(testInfo, false);
+    }
+
+    public static void beforeEachBaseSSL(TestInfo testInfo, boolean ssl) {
 
         baseProtocol = new PostgresProtocol(FAKE_PORT);
         var proxy = new PostgresProxy("org.postgresql.Driver",
@@ -108,6 +115,7 @@ public class PostgresBasicTest {
         var pl1 = new PostgresMockPlugin(mapper, storage, new MultiTemplateEngine());
         errorPlugin = new PostgresNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin = new PostgresLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
+        forwarderPlugin = new PostgresForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
 
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
@@ -115,15 +123,19 @@ public class PostgresBasicTest {
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new PostgresReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin));
+        forwarderPlugin.setActive(true);
+        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin,forwarderPlugin));
         pl.setActive(true);
+
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
 
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
-        protocolServer = new TcpServer(baseProtocol);
+        var mysqlSettings = (PostgresProtocolSettings) baseProtocol.getSettings();
+        mysqlSettings.setUseTls(ssl);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
@@ -145,7 +157,18 @@ public class PostgresBasicTest {
         Class.forName("org.postgresql.Driver");
         c = DriverManager
                 .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test", FAKE_PORT),//?ssl=false
-                        "root", "test");
+                        "test", "test");
+        assertNotNull(c);
+        return c;
+    }
+
+
+    protected static Connection getProxyConnectionSSL() throws ClassNotFoundException, SQLException {
+        Connection c;
+        Class.forName("org.postgresql.Driver");
+        c = DriverManager
+                .getConnection(String.format("jdbc:postgresql://127.0.0.1:%d/test?sslmode=require", FAKE_PORT),//?ssl=false
+                        "test", "test");
         assertNotNull(c);
         return c;
     }

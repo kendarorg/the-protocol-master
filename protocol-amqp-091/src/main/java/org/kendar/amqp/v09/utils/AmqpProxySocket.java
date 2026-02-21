@@ -12,6 +12,7 @@ import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.states.ProtoState;
+import org.kendar.proxy.NettyProxySocket;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.NetworkProxySplitterState;
 
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AmqpProxySocket extends NetworkProxySocket {
+public class AmqpProxySocket extends NettyProxySocket {
     private final List<ProtoState> states = new ArrayList<>(Arrays.asList(
             new BasicDeliver(),
             new BasicCancel().asProxy(),
@@ -35,8 +36,8 @@ public class AmqpProxySocket extends NetworkProxySocket {
             new BasicReturn().asProxy(),
             new BasicGetEmpty().asProxy()));
 
-    public AmqpProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
-        super(context, inetSocketAddress, group);
+    public AmqpProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress,AsynchronousChannelGroup group) {
+        super(context, inetSocketAddress,group);
     }
 
     @Override

@@ -12,8 +12,23 @@ public class DnsPlugin extends Plugin implements TPMPluginFile {
     private static final Logger log = LoggerFactory.getLogger(DnsPlugin.class);
 
     @Override
+    public void start() {
+        log.info("DnsPlugin.start()");
+    }
+
+    @Override
+    public void stop() {
+        log.info("DnsPlugin.stop()");
+    }
+
+    @Override
+    public void delete() {
+        log.info("DnsPlugin.delete()");
+    }
+
+    @Override
     public String getTpmPluginName() {
-        return "sample-plugins";
+        return "protocol-dns-plugin";
     }
 
     @Override

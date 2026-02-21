@@ -17,7 +17,7 @@ public class UserOfIntTpl implements GenericUserOf {
     public UserOfIntTpl(List<TemplateInterface<Integer>> template) {
 
         this.template = template;
-        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+        System.out.println(this + " " + Thread.currentThread().getId());
     }
 
     @Override

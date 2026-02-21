@@ -148,6 +148,8 @@
         "cname": "C=US,O=Local Development,CN=local.org",
         "hosts": [
           "*.google.com",
+          "*.gstatic.com",
+          "*.googleapis.com",
           "www.google.com"
         ]
       },

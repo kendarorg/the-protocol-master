@@ -23,6 +23,8 @@ import org.kendar.mongo.dtos.OpReplyContent;
 import org.kendar.mongo.fsm.MongoProtoContext;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.context.ProtoContext;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
@@ -53,6 +55,23 @@ public class MongoProxy extends Proxy {
 
     public MongoProxy() {
 
+    }
+
+    public void doConnect(ProtoContext protoContext){
+        if(!((NetworkProtoDescriptor)protoContext.getDescriptor()).hasProxy()){
+            return;
+        }
+        if(protoContext.getValue("CONNECTION",null)==null){
+
+            long start = System.currentTimeMillis();
+            var pluginContext = new PluginContext("MONGODB", "CONNECT", start, protoContext);
+            for (var plugin : getPluginHandlers(ProtocolPhase.CONNECT, new Object(), new Object())) {
+                if(plugin.handle(pluginContext, ProtocolPhase.CONNECT, new Object(), new Object())){
+                    return;
+                }
+            }
+            protoContext.setValue("CONNECTION",connect((NetworkProtoContext)protoContext ));
+        }
     }
 
     @Override

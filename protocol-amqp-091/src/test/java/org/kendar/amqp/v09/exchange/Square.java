@@ -3,15 +3,16 @@ package org.kendar.amqp.v09.exchange;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Square {
     public static ConcurrentHashMap<String, String> results = new ConcurrentHashMap<>();
-    private static String QUEUE_NAME = "square";
-    private static String EXCHANGE_NAME = "myExchange";
-    private static String KEY_NAME = "key";
+    private static final String QUEUE_NAME = "square";
+    private static final String EXCHANGE_NAME = "myExchange";
+    private static final String KEY_NAME = "key";
     DeliverCallback findSquare = (consumerTag, delivery) -> {
-        String message = new String(delivery.getBody(), "UTF-8");
+        String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
         int number = Integer.parseInt(message);
         int squareNumber = number * number;
         results.put("Square of " + message + " is: " + squareNumber, "");

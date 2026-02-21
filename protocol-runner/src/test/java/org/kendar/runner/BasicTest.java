@@ -52,16 +52,14 @@ public class BasicTest {
     }
 
     protected void startAndHandleUnexpectedErrors(String... availableArgs) {
-        AtomicReference exception = new AtomicReference(null);
+        var exception = new AtomicReference<Throwable>(null);
         var serverThread = new Thread(() -> {
             try {
                 var args = availableArgs;
                 if (Arrays.stream(args).noneMatch((a -> a.equalsIgnoreCase("-unattended")))) {
                     var newArgs = new String[args.length + 1];
                     newArgs[0] = "-unattended";
-                    for (int i = 0; i < args.length; i++) {
-                        newArgs[i + 1] = args[i];
-                    }
+                    System.arraycopy(args, 0, newArgs, 1, args.length);
                     args = newArgs;
                 }
                 Main.execute(args);
