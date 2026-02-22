@@ -5,7 +5,6 @@ import org.kendar.settings.ByteProtocolSettingsWithLogin;
 public class JdbcProtocolSettings extends ByteProtocolSettingsWithLogin {
     private String forceSchema;
     private String driver;
-    private boolean useTls = false;
 
     public String getDriver() {
         return driver;
@@ -24,11 +23,4 @@ public class JdbcProtocolSettings extends ByteProtocolSettingsWithLogin {
     }
 
 
-    public boolean isUseTls() {
-        return useTls;
-    }
-
-    public void setUseTls(boolean useTls) {
-        this.useTls = useTls;
-    }
 }

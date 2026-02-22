@@ -11,6 +11,7 @@
     <logger name="org.testcontainers" level="ERROR"/>
     <logger name="org.kendar" level="DEBUG"/>
     <logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="OFF"/>
+    <logger name="io.netty" level="ERROR"/>
 
     <root level="ERROR">
         <appender-ref ref="stdout"/>

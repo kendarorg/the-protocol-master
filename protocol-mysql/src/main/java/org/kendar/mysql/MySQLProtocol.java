@@ -48,7 +48,9 @@ public class MySQLProtocol extends JdbcProtocol {
     public MySQLProtocol(int port) {
         super(port);
         this.port = port;
-        setSettings(new MySqlProtocolSettings());
+        var pp = new MySqlProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
     @Override

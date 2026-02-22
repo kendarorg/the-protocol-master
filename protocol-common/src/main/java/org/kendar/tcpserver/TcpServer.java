@@ -49,10 +49,6 @@ public class TcpServer implements Server {
         this.protoDescriptor = protoDescriptor;
     }
 
-    private int getWaitTimeoutMs() {
-        return WAIT_TIMEOUT_MS;
-    }
-
     /**
      * Stop the server
      */
@@ -104,6 +100,19 @@ public class TcpServer implements Server {
     @Override
     public void enableSelfSignedTls() {
 
+    }
+
+    public void useCallDurationTimes(boolean callDurationTimes) {
+
+        this.callDurationTimes = callDurationTimes;
+    }
+
+    public boolean isRunning() {
+        if (protoDescriptor.isWrapper()) {
+            return protoDescriptor.isWrapperRunning();
+        }
+        if (this.server == null) return false;
+        return this.server.isOpen();
     }
 
     /**
@@ -235,16 +244,8 @@ public class TcpServer implements Server {
         }
     }
 
-    public boolean isRunning() {
-        if (protoDescriptor.isWrapper()) {
-            return protoDescriptor.isWrapperRunning();
-        }
-        if (this.server == null) return false;
-        return this.server.isOpen();
+    private int getWaitTimeoutMs() {
+        return WAIT_TIMEOUT_MS;
     }
 
-    public void useCallDurationTimes(boolean callDurationTimes) {
-
-        this.callDurationTimes = callDurationTimes;
-    }
 }

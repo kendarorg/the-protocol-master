@@ -6,7 +6,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
@@ -28,157 +27,30 @@ import java.io.File;
 
 public class NettyServer implements Server {
 
-    public void enableTls(File certificateFile, File privateKeyFile) {
-        this.tlsEnabled = true;
-        this.certificateFile = certificateFile;
-        this.privateKeyFile = privateKeyFile;
-    }
-
-    public void enableSelfSignedTls() {
-        this.tlsEnabled = true;
-        this.useSelfSignedCertificate = true;
-    }
-
+    private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
+    private static final String HOST = "*";
+    private final NetworkProtoDescriptor protoDescriptor;
+    protected Runnable onStart;
+    protected Runnable onStop;
     private boolean tlsEnabled = false;
+    private boolean tlsEnabledFromStart = false;
     private File certificateFile;
     private File privateKeyFile;
     private boolean useSelfSignedCertificate = true;
     private SslContext sslContext;
-
-    private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
-    private static final String HOST = "*";
-
-    private final NetworkProtoDescriptor protoDescriptor;
-
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
-
-    protected Runnable onStart;
-    protected Runnable onStop;
-
     private boolean callDurationTimes;
-
     public NettyServer(NetworkProtoDescriptor protoDescriptor) {
         this.protoDescriptor = protoDescriptor;
     }
 
-    public void setOnStart(Runnable onStart) {
-        this.onStart = onStart;
-    }
 
-    public void setOnStop(Runnable onStop) {
-        this.onStop = onStop;
-    }
 
-    public ProtoDescriptor getProtoDescriptor() {
-        return protoDescriptor;
-    }
-
-    public void useCallDurationTimes(boolean callDurationTimes) {
-        this.callDurationTimes = callDurationTimes;
-    }
-
-    public boolean isRunning() {
-        if (protoDescriptor.isWrapper()) {
-            return protoDescriptor.isWrapperRunning();
-        }
-        return serverChannel != null && serverChannel.isActive();
-    }
-
-    public void start() {
-        if (protoDescriptor.isWrapper()) {
-            try {
-                protoDescriptor.cleanCounters();
-                protoDescriptor.start();
-            } catch (Exception e) {
-                throw new TPMException(e);
-            }
-            return;
-        }
-
-        var settings = protoDescriptor.getSettings();
-        if(ByteProtocolSettings.class.isAssignableFrom(settings.getClass())){
-            var byteSettings = (ByteProtocolSettings) settings;
-            if(byteSettings.isStartWithTls()){
-                enableSelfSignedTls();
-            }
-        }
-
-        bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup();
-
-        protoDescriptor.cleanCounters();
-        protoDescriptor.start();
-
-        try {
-
-            try {
-                if (useSelfSignedCertificate) {
-                    var ssc = new SelfSignedCertificate();
-                    sslContext = SslContextBuilder
-                            .forServer(ssc.certificate(), ssc.privateKey())
-
-//                            .protocols("TLSv1.3")
-//                            .clientAuth(ClientAuth.NONE)
-                            .protocols("TLSv1", "TLSv1.1", "TLSv1.2","TLSv1.3")
-                            .build();
-                } else {
-                    sslContext = SslContextBuilder
-                            .forServer(certificateFile, privateKeyFile)
-
-//                            .protocols("TLSv1.3")
-//                            .clientAuth(ClientAuth.NONE)
-                            .protocols("TLSv1", "TLSv1.1", "TLSv1.2","TLSv1.3")
-                            .build();
-                }
-                protoDescriptor.setSslContext(sslContext);
-
-                if(tlsEnabled) {
-                    log.info("TLS enabled for server on port {}", protoDescriptor.getPort());
-                }
-
-            } catch (Exception e) {
-                throw new TPMException("Failed to initialize TLS", e);
-            }
-
-            ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_REUSEADDR, true)
-                    .childOption(ChannelOption.SO_RCVBUF, 4096)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) {
-                            if (tlsEnabled && sslContext != null) {
-                                SSLEngine sslEngine = sslContext.newEngine(ch.alloc());
-                                sslEngine.setUseClientMode(false);
-
-                                ch.pipeline().addFirst("ssl", new SslHandler(sslEngine));
-                            }
-
-                            ch.pipeline().addLast(new ServerHandler());
-                        }
-                    });
-
-            ChannelFuture future = bootstrap.bind(protoDescriptor.getPort()).sync();
-            serverChannel = future.channel();
-
-            log.info("[CL>TP][IN] Listening on {}:{} {}",
-                    HOST,
-                    protoDescriptor.getPort(),
-                    protoDescriptor.getClass().getSimpleName());
-
-            if (onStart != null) {
-                onStart.run();
-            }
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new TPMException(e);
-        }
-    }
-
+    /**
+     * Stop the server
+     */
     public void stop() {
         if (protoDescriptor.isWrapper()) {
             try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
@@ -224,6 +96,142 @@ public class NettyServer implements Server {
             onStop.run();
         }
     }
+
+    public void setOnStart(Runnable onStart) {
+        this.onStart = onStart;
+    }
+
+    public void setOnStop(Runnable onStop) {
+        this.onStop = onStop;
+    }
+
+    public ProtoDescriptor getProtoDescriptor() {
+        return protoDescriptor;
+    }
+
+    @Override
+    public void enableTls(File certificateFile, File privateKeyFile) {
+        this.tlsEnabled = true;
+        this.certificateFile = certificateFile;
+        this.privateKeyFile = privateKeyFile;
+    }
+
+    @Override
+    public void enableSelfSignedTls() {
+        this.tlsEnabled = true;
+        this.useSelfSignedCertificate = true;
+    }
+
+    public void useCallDurationTimes(boolean callDurationTimes) {
+        this.callDurationTimes = callDurationTimes;
+    }
+
+    public boolean isRunning() {
+        if (protoDescriptor.isWrapper()) {
+            return protoDescriptor.isWrapperRunning();
+        }
+        return serverChannel != null && serverChannel.isActive();
+    }
+
+    /**
+     * Start the server
+     */
+    public void start() {
+        if (protoDescriptor.isWrapper()) {
+            try {
+                protoDescriptor.cleanCounters();
+                protoDescriptor.start();
+            } catch (Exception e) {
+                throw new TPMException(e);
+            }
+            return;
+        }
+
+        var settings = protoDescriptor.getSettings();
+        if (ByteProtocolSettings.class.isAssignableFrom(settings.getClass())) {
+            var byteSettings = (ByteProtocolSettings) settings;
+            if (byteSettings.isStartWithTls()) {
+                enableSelfSignedTls();
+            }
+        }
+
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
+
+        protoDescriptor.cleanCounters();
+        protoDescriptor.start();
+
+        try {
+            this.tlsEnabled =this.protoDescriptor.getSettings().isUseTls();
+            this.tlsEnabledFromStart = this.protoDescriptor.getSettings().isUseTlsFromStart();
+            if(tlsEnabled) {
+                try {
+                    if (useSelfSignedCertificate) {
+                        var ssc = new SelfSignedCertificate();
+                        sslContext = SslContextBuilder
+                                .forServer(ssc.certificate(), ssc.privateKey())
+
+//                            .protocols("TLSv1.3")
+//                            .clientAuth(ClientAuth.NONE)
+                                .protocols("TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3")
+                                .build();
+                    } else {
+                        sslContext = SslContextBuilder
+                                .forServer(certificateFile, privateKeyFile)
+
+//                            .protocols("TLSv1.3")
+//                            .clientAuth(ClientAuth.NONE)
+                                .protocols("TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3")
+                                .build();
+                    }
+                    protoDescriptor.setSslContext(sslContext);
+
+                    if (tlsEnabled) {
+                        log.info("TLS enabled for server on port {}", protoDescriptor.getPort());
+                    }
+                }catch (Exception e) {
+                        throw new TPMException("Failed to initialize TLS", e);
+                    }
+
+            }
+
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_REUSEADDR, true)
+                    .childOption(ChannelOption.SO_RCVBUF, 4096)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) {
+                            if (tlsEnabled && sslContext != null && tlsEnabledFromStart) {
+                                SSLEngine sslEngine = sslContext.newEngine(ch.alloc());
+                                sslEngine.setUseClientMode(false);
+
+                                ch.pipeline().addFirst("ssl", new SslHandler(sslEngine));
+                            }
+
+                            ch.pipeline().addLast(new ServerHandler());
+                        }
+                    });
+
+            ChannelFuture future = bootstrap.bind(protoDescriptor.getPort()).sync();
+            serverChannel = future.channel();
+
+            log.info("[CL>TP][IN] Listening on {}:{} {}",
+                    HOST,
+                    protoDescriptor.getPort(),
+                    protoDescriptor.getClass().getSimpleName());
+
+            if (onStart != null) {
+                onStart.run();
+            }
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TPMException(e);
+        }
+    }
+
 
     public class ServerHandler extends ChannelInboundHandlerAdapter {
 

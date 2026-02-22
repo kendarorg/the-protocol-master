@@ -9,6 +9,7 @@ import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -89,7 +90,7 @@ public class ReplayerNotBlockingTest extends MqttBasicTest {
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
         pl.setActive(true);
 
         try {

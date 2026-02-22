@@ -59,6 +59,9 @@ public class PostgresProtocol extends JdbcProtocol {
 
     public PostgresProtocol() {
         this(PORT);
+        var pp = new PostgresProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
     public PostgresProtocol(int port) {

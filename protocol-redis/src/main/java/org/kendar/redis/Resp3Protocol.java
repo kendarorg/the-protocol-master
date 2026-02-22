@@ -36,6 +36,9 @@ public class Resp3Protocol extends NetworkProtoDescriptor {
 
     public Resp3Protocol(int port) {
         this.port = port;
+        var pp = new RedisProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
 

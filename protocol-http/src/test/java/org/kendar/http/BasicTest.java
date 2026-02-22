@@ -30,6 +30,8 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
@@ -49,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BasicTest {
 
-    protected static TcpServer protocolServer;
+    protected static Server protocolServer;
     protected static HttpProtocol baseProtocol;
     static int FAKE_PORT_HTTP = 8087;
     static int FAKE_PORT_HTTPS = 8487;
@@ -204,7 +206,7 @@ public class BasicTest {
         baseProtocol.initialize();
         EventsQueue.register("recorder", events::add, ReportDataEvent.class);
         baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
 
         protocolServer.start();

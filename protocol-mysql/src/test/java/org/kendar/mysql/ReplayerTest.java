@@ -7,6 +7,7 @@ import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.JsonMapper;
@@ -42,7 +43,7 @@ public class ReplayerTest {
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, protocolServer::isRunning);
@@ -84,7 +85,7 @@ public class ReplayerTest {
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, protocolServer::isRunning);

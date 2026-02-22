@@ -48,6 +48,9 @@ public class MongoProtocol extends NetworkProtoDescriptor {
 
     public MongoProtocol(int port) {
         this.port = port;
+        var pp = new MongoProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
     public MongoProtocol() {

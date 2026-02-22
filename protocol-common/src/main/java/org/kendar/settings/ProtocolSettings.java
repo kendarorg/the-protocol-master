@@ -53,4 +53,21 @@ public class ProtocolSettings {
         return result;
     }
 
+    private boolean useTlsFromStart = false;
+    private boolean useTls = false;
+    public boolean isUseTls() {
+        return useTls;
+    }
+
+    public void setUseTls(boolean useTls) {
+        this.useTls = useTls;
+    }
+
+    public boolean isUseTlsFromStart() {
+        return useTlsFromStart;
+    }
+
+    public void setUseTlsFromStart(boolean useTlsFromStart) {
+        this.useTlsFromStart = useTlsFromStart;
+    }
 }

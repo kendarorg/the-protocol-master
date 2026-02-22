@@ -20,6 +20,8 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.RedisImage;
 import org.kendar.tests.testcontainer.utils.Utils;
@@ -40,7 +42,7 @@ public class RedisBasicTest {
 
     protected static final int FAKE_PORT = 6389;
     protected static RedisImage redisImage;
-    protected static TcpServer protocolServer;
+    protected static Server protocolServer;
     protected static ProtocolPluginDescriptor errorPlugin;
     private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
@@ -94,7 +96,7 @@ public class RedisBasicTest {
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());

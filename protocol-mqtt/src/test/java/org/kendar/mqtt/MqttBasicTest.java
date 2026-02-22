@@ -20,6 +20,7 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
@@ -41,7 +42,7 @@ public class MqttBasicTest {
     protected static final int FAKE_PORT = 1884;
     protected static List<InterceptPublishMessage> moquetteMessages = new ArrayList<>();
     //protected static RabbitMqImage rabbitContainer;
-    protected static TcpServer protocolServer;
+    protected static org.kendar.tcpserver.Server protocolServer;
     protected static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static MqttPublishPlugin publishPlugin;
     protected static ProtocolPluginDescriptor errorPlugin;
@@ -140,7 +141,7 @@ public class MqttBasicTest {
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());

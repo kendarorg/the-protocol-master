@@ -181,7 +181,7 @@ public class MySqlBasicTest {
         proxy.setPluginHandlers(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());

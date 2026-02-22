@@ -6,6 +6,7 @@
         </encoder>
     </appender>
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <logger name="io.netty" level="ERROR"/>
 
 
     <root level="ERROR">

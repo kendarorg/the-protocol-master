@@ -92,7 +92,9 @@ public abstract class NettyProxySocket extends BaseProxySocket{
                     });
 
             // Connect and wait for channel
-            ChannelFuture future = bootstrap.connect(inetSocketAddress.getHostName(), inetSocketAddress.getPort()).sync();
+            ChannelFuture future = bootstrap.connect(
+                    inetSocketAddress.getAddress().getHostAddress()
+                    , inetSocketAddress.getPort()).sync();
             channel = future.channel();
 
         } catch (Exception e) {
@@ -104,8 +106,12 @@ public abstract class NettyProxySocket extends BaseProxySocket{
     public void write(BBuffer buffer) {
         context.setActive();
         buffer.setPosition(0);
-        Sleeper.sleepNoException(1000, channel::isOpen);
-        channel.writeAndFlush(Unpooled.wrappedBuffer(buffer.getAll()));
+        Sleeper.sleepNoException(1000, channel::isWritable);
+        try {
+            channel.writeAndFlush(Unpooled.wrappedBuffer(buffer.getAll())).sync();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void close() {

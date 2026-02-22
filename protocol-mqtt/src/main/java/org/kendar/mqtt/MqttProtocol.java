@@ -40,6 +40,9 @@ public class MqttProtocol extends NetworkProtoDescriptor {
 
     public MqttProtocol(int port) {
         this.port = port;
+        var pp = new MqttProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
     @Override
