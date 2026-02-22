@@ -92,7 +92,7 @@ public class SimpleTest extends AmqpBasicTest {
     void test0_sameChannel() throws Exception {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
-        ConnectionFactory connectionFactory = new ConnectionFactory();
+        ConnectionFactory connectionFactory = getConnectionFactory();
         var cs = "amqp://localhost:" + FAKE_PORT;
         //cs = rabbitContainer.getConnectionString();
         Sleeper.sleep(100);
@@ -137,7 +137,7 @@ public class SimpleTest extends AmqpBasicTest {
         chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
 
 
-        Sleeper.sleep(1000, () -> messages.size() == 3);
+        Sleeper.sleepNoException(1000, () -> messages.size() == 3);
 
         assertEquals(3, messages.size());
         assertTrue(messages.containsValue(exectedMessage + "1"));
@@ -164,7 +164,7 @@ public class SimpleTest extends AmqpBasicTest {
     void test4_diffChannelSameConnection() throws Exception {
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
-        ConnectionFactory connectionFactory = new ConnectionFactory();
+        ConnectionFactory connectionFactory = getConnectionFactory();
         // connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;
         //var realCs = new URI(rabbitContainer.getConnectionString());
@@ -242,7 +242,7 @@ public class SimpleTest extends AmqpBasicTest {
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
 
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
-        ConnectionFactory connectionFactory = new ConnectionFactory();
+        ConnectionFactory connectionFactory = getConnectionFactory();
         // connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;
         var realCs = new URI(rabbitContainer.getConnectionString());
@@ -308,7 +308,7 @@ public class SimpleTest extends AmqpBasicTest {
 
     @Test
     void test3_openConnection() throws Exception {
-        ConnectionFactory connectionFactory = new ConnectionFactory();
+        ConnectionFactory connectionFactory = getConnectionFactory();
         connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
         connectionFactory.setUri(cs);
@@ -326,7 +326,7 @@ public class SimpleTest extends AmqpBasicTest {
         //recordPlugin.setActive(false);
         var messages = new ConcurrentHashMap<Integer, String>();
         String exectedMessage = DEFAULT_MESSAGE_CONTENT;
-        ConnectionFactory connectionFactory = new ConnectionFactory();
+        ConnectionFactory connectionFactory = getConnectionFactory();
         var cs = "amqp://localhost:" + FAKE_PORT;
         //cs = rabbitContainer.getConnectionString();
         Sleeper.sleep(100);

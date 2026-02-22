@@ -83,7 +83,7 @@ public class SpecialErrorsTest extends AmqpBasicTest {
         assertThrows(Exception.class, () -> {
             var messages = new ConcurrentHashMap<Integer, String>();
             String exectedMessage = DEFAULT_MESSAGE_CONTENT;
-            ConnectionFactory connectionFactory = new ConnectionFactory();
+            ConnectionFactory connectionFactory = getConnectionFactory();
             var cs = "amqp://localhost:" + FAKE_PORT;
             //cs = rabbitContainer.getConnectionString();
             Sleeper.sleep(100);

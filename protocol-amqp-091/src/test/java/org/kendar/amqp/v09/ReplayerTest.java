@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.kendar.amqp.v09.AmqpBasicTest.getConnectionFactory;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class ReplayerTest {
@@ -84,7 +85,7 @@ public class ReplayerTest {
         Sleeper.sleep(5000, protocolServer::isRunning);
         try {
 
-            ConnectionFactory connectionFactory = new ConnectionFactory();
+            ConnectionFactory connectionFactory = getConnectionFactory();
             connectionFactory.enableHostnameVerification();
             var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
             connectionFactory.setUri(cs);
@@ -173,7 +174,7 @@ public class ReplayerTest {
         protocolServer.start();
         try {
             Sleeper.sleep(5000, protocolServer::isRunning);
-            ConnectionFactory connectionFactory = new ConnectionFactory();
+            ConnectionFactory connectionFactory = getConnectionFactory();
             connectionFactory.enableHostnameVerification();
             var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
             connectionFactory.setUri(cs);
@@ -224,7 +225,7 @@ public class ReplayerTest {
         try {
             Sleeper.sleep(5000, protocolServer::isRunning);
 
-            ConnectionFactory connectionFactory = new ConnectionFactory();
+            ConnectionFactory connectionFactory = getConnectionFactory();
             connectionFactory.enableHostnameVerification();
             var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
             connectionFactory.setUri(cs);

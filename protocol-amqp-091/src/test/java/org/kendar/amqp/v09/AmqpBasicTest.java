@@ -61,7 +61,8 @@ public class AmqpBasicTest {
 
         Sleeper.sleep(60000, () -> {
             try {
-                ConnectionFactory connectionFactory = new ConnectionFactory();
+                ConnectionFactory connectionFactory = getConnectionFactory();
+                connectionFactory.setAutomaticRecoveryEnabled(false);
                 connectionFactory.setUri(rabbitContainer.getConnectionString());
                 connectionFactory.setPassword(rabbitContainer.getAdminPassword());
                 var connection = connectionFactory.newConnection();
@@ -72,6 +73,12 @@ public class AmqpBasicTest {
             }
         });
 
+    }
+
+    public static ConnectionFactory getConnectionFactory() {
+        var result = new ConnectionFactory();
+        result.setAutomaticRecoveryEnabled(false);
+        return result;
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
