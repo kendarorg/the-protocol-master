@@ -11,6 +11,7 @@ import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.ProxyException;
 import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.NetworkReturnMessage;
@@ -42,7 +43,6 @@ public abstract class NettyProxySocket extends BaseProxySocket{
     private static final Logger log = LoggerFactory.getLogger(NettyProxySocket.class);
 
 
-    private static NioEventLoopGroup nioEventLoopGroup = new NioEventLoopGroup();
     private final Bootstrap bootstrap;
     private final Channel channel;
 
@@ -50,7 +50,7 @@ public abstract class NettyProxySocket extends BaseProxySocket{
         this.context = context;
         try {
             var sslContext = context.getSslContext();
-
+            var nioEventLoopGroup = ((NetworkProtoDescriptor)context.getDescriptor()).getGroup();
             BBuffer tempBuffer = context.buildBuffer();
             bootstrap = new Bootstrap();
             bootstrap.group(nioEventLoopGroup)

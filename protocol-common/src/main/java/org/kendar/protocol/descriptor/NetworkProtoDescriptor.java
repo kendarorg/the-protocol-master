@@ -1,5 +1,6 @@
 package org.kendar.protocol.descriptor;
 
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
 import org.kendar.buffers.BBuffer;
@@ -33,6 +34,7 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
     private boolean proxy;
     private SslContext sslContext;
     private SocketChannel channel;
+    private NioEventLoopGroup nioEventLoopGroup;
 
     public NetworkProtoDescriptor() {
 
@@ -189,5 +191,13 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
 
     public SocketChannel getChannel() {
         return channel;
+    }
+
+    public void setGroup(NioEventLoopGroup nioEventLoopGroup) {
+        this.nioEventLoopGroup = nioEventLoopGroup;
+    }
+
+    public NioEventLoopGroup getGroup() {
+        return nioEventLoopGroup;
     }
 }

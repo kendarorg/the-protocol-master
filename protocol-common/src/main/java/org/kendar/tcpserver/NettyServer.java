@@ -77,6 +77,7 @@ public class NettyServer implements Server {
                     protoDescriptor.terminate();
                     Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
                 }
+                //this.nioEventLoopGroup.shutdownGracefully();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new TPMException(e);
@@ -133,6 +134,7 @@ public class NettyServer implements Server {
         return serverChannel != null && serverChannel.isActive();
     }
 
+    private NioEventLoopGroup nioEventLoopGroup;
     /**
      * Start the server
      */
@@ -147,6 +149,8 @@ public class NettyServer implements Server {
             return;
         }
 
+        this.nioEventLoopGroup = new NioEventLoopGroup();
+        protoDescriptor.setGroup(nioEventLoopGroup);
         var settings = protoDescriptor.getSettings();
         if (ByteProtocolSettings.class.isAssignableFrom(settings.getClass())) {
             var byteSettings = (ByteProtocolSettings) settings;
