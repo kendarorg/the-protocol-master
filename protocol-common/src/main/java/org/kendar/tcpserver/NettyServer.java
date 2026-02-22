@@ -255,6 +255,8 @@ public class NettyServer implements Server {
                 if (protoDescriptor.sendImmediateGreeting()) {
                     context.sendGreetings();
                 }
+            }catch (Exception ex){
+                log.error("Error creating context",ex);
             }
         }
 

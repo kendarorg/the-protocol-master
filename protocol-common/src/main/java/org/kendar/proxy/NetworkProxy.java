@@ -97,6 +97,9 @@ public abstract class NetworkProxy extends Proxy {
     public ProxyConnection connect(NetworkProtoContext context) {
 
         try {
+            if(port==0){
+                return new ProxyConnection(null);
+            }
             return new ProxyConnection(buildProxyConnection(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group));
         } catch (IOException e) {
