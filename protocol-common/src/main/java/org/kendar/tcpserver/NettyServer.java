@@ -79,7 +79,7 @@ public class NettyServer implements Server {
                 }
                 this.nioEventLoopGroup.shutdownGracefully();
                 this.bossGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
-                this.workerGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS):
+                this.workerGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new TPMException(e);
