@@ -14,6 +14,8 @@ supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091, DNS ..
 
 Effortlessly and with zero budget
 
+PS For the tests to run you need to be able to run a privileged container
+
 ### Notes for macOs Users
 
 The only way i have seen to run testcontainers on macOs supporting networks, linked containers
