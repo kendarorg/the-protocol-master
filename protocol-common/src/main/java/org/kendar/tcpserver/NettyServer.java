@@ -78,8 +78,8 @@ public class NettyServer implements Server {
                     Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
                 }
                 this.nioEventLoopGroup.shutdownGracefully();
-                this.bossGroup.shutdownGracefully();
-                this.workerGroup.shutdownGracefully();
+                this.bossGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
+                this.workerGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS):
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new TPMException(e);
