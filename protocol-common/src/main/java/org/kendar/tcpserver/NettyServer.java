@@ -62,25 +62,25 @@ public class NettyServer implements Server {
         } else {
             try {
                 if (serverChannel != null) {
-                    serverChannel.close().sync();
+                    serverChannel.close().syncUninterruptibly();
                 }
 
                 if (workerGroup != null) {
-                    workerGroup.shutdownGracefully();
+                    workerGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
                 }
 
                 if (bossGroup != null) {
-                    bossGroup.shutdownGracefully();
+                    this.bossGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
                 }
 
                 try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", "0")) {
                     protoDescriptor.terminate();
                     Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
                 }
-                this.nioEventLoopGroup.shutdownGracefully();
-                this.bossGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
-                this.workerGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
+                this.nioEventLoopGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
+
+
+            } catch (Exception e) {
                 Thread.currentThread().interrupt();
                 throw new TPMException(e);
             } finally {
