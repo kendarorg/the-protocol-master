@@ -11,6 +11,7 @@
     <logger name="com.github" level="ERROR"/>
     <logger name="org.kendar.amqp.v09.utils" level="INFO"/>
     <logger name="org.testcontainers" level="ERROR"/>
+    <logger name="io.netty" level="ERROR"/>
     <!--    <logger name="org.kendar.redis.utils.Resp3ProxySocket" level="TRACE"/>-->
 
     <root level="ERROR">

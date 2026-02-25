@@ -83,8 +83,7 @@ public class HttpRunnerTest extends BasicTest {
         };
         startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000, () -> {
-            var res = listening(8087) && listening(8487) && listening(9999);
-            return res;
+            return listening(8087) && listening(8487) && listening(9999);
         });
 
         var proxy = new HttpHost("localhost", FAKE_PORT_PROXY, "http");
@@ -119,8 +118,7 @@ public class HttpRunnerTest extends BasicTest {
         };
         startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000, () -> {
-            var res = listening(8087) && listening(8487) && listening(9999);
-            return res;
+            return listening(8087) && listening(8487) && listening(9999);
         });
 
         final var sslContext = new SSLContextBuilder()
@@ -162,8 +160,7 @@ public class HttpRunnerTest extends BasicTest {
         };
         startAndHandleUnexpectedErrors(args);
         Sleeper.sleep(1000, () -> {
-            var res = listening(12080) && listening(12443) && listening(12081);
-            return res;
+            return listening(12080) && listening(12443) && listening(12081);
         });
 
         final var sslContext = new SSLContextBuilder()

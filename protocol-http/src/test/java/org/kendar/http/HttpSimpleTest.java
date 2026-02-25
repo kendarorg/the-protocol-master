@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 import static org.apache.http.entity.ContentType.IMAGE_JPEG;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("UastIncorrectHttpHeaderInspection")
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class HttpSimpleTest extends BasicTest {
 
@@ -52,8 +53,7 @@ public class HttpSimpleTest extends BasicTest {
         try {
 
 
-            var entity = new ByteArrayEntity(buildBytesData());
-            return entity;
+            return new ByteArrayEntity(buildBytesData());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -290,19 +290,19 @@ public class HttpSimpleTest extends BasicTest {
             var sl = httpresponse.getStatusLine().toString().trim();
             var is200 = sl.equalsIgnoreCase("HTTP/1.1 200 OK");
             var is429 = sl.equalsIgnoreCase("HTTP/1.1 429");
-            var rateLimitLimt = Integer.parseInt(getFirstHeaderValue(httpresponse,"RateLimit-Limit","-1"));
-            var retryAfter= Integer.parseInt(getFirstHeaderValue(httpresponse,"Retry-After","-1"));
-            var rateLimitRemaining= Integer.parseInt(getFirstHeaderValue(httpresponse,"RateLimit-Remaining","-1"));
+            var rateLimitLimt = Integer.parseInt(getFirstHeaderValue(httpresponse, "RateLimit-Limit", "-1"));
+            var retryAfter = Integer.parseInt(getFirstHeaderValue(httpresponse, "Retry-After", "-1"));
+            var rateLimitRemaining = Integer.parseInt(getFirstHeaderValue(httpresponse, "RateLimit-Remaining", "-1"));
 
-            if(is200){
-                if(rateLimitLimt<0){
-                    found200Clean=true;
-                }else {
+            if (is200) {
+                if (rateLimitLimt < 0) {
+                    found200Clean = true;
+                } else {
                     assertTrue(rateLimitLimt >= 0);
-                    assertTrue(rateLimitRemaining<=rateLimitLimt);
-                    found200Warn=true;
+                    assertTrue(rateLimitRemaining <= rateLimitLimt);
+                    found200Warn = true;
                 }
-            }else if(is429){
+            } else if (is429) {
                 assertTrue(retryAfter >= 0);
                 found429 = true;
             }
@@ -316,9 +316,10 @@ public class HttpSimpleTest extends BasicTest {
         assertTrue(found429);
     }
 
-    private String getFirstHeaderValue(CloseableHttpResponse httpresponse, String s,String optional) {
+    private String getFirstHeaderValue(CloseableHttpResponse httpresponse, String s, String optional) {
         var firstHeader = httpresponse.getFirstHeader(s);
-        if(firstHeader!=null && firstHeader.getValue()!=null && !firstHeader.getValue().isEmpty() )return firstHeader.getValue();
+        if (firstHeader != null && firstHeader.getValue() != null && !firstHeader.getValue().isEmpty())
+            return firstHeader.getValue();
         return optional;
     }
 

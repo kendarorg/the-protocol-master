@@ -31,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MultiRecordReplayTest extends BasicTest {
 
     private static SimpleHttpServer simpleServer;
-    private static String POSTGRES_PORT = "5631";
-    private static String HTTP_PORT = "12080";
-    private static String HTTPS_PORT = "12443";
-    private static String PROXY_PORT = "1281";
-    private static int SIMPLE_SERVER_HTTP_PORT = 18080;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
-    private AtomicBoolean runTheServer = new AtomicBoolean(true);
+    private static final String POSTGRES_PORT = "5631";
+    private static final String HTTP_PORT = "12080";
+    private static final String HTTPS_PORT = "12443";
+    private static final String PROXY_PORT = "1281";
+    private static final int SIMPLE_SERVER_HTTP_PORT = 18080;
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private final AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     @BeforeAll
     public static void beforeClass() throws IOException {
@@ -75,12 +75,24 @@ public class MultiRecordReplayTest extends BasicTest {
         events.clear();
     }
 
+    public static void deleteAllFiles(Path root) throws IOException {
+        Files.walk(root)
+                .filter(Files::isRegularFile)   // only files
+                .forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to delete: " + path, e);
+                    }
+                });
+    }
 
     @Test
     void testRecordingReplaying() throws Exception {
         var targetDir = Path.of("target", "multiRecording").toFile();
         targetDir.mkdir();
-        for (var f : targetDir.listFiles()) f.delete();
+        //for (var f : targetDir.listFiles()) f.delete();
+        deleteAllFiles(targetDir.toPath());
         var proxy = new HttpHost("localhost", Integer.parseInt(PROXY_PORT), "http");
         var routePlanner = new DefaultProxyRoutePlanner(proxy);
         var httpclient = HttpClients.custom().setRoutePlanner(routePlanner).build();
@@ -96,11 +108,10 @@ public class MultiRecordReplayTest extends BasicTest {
         recordingSettings = recordingSettings.replace("{postgresPassword}", postgresContainer.getPassword());
         recordingSettings = recordingSettings.replace("{postgresConnection}", postgresContainer.getJdbcUrl());
         recordingSettings = recordingSettings.replace("{dataDir}", Path.of("target", "multiRecording").toAbsolutePath().toString().replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")));
-        recordingSettings = recordingSettings.replaceAll(Pattern.quote("{recordActive}"), "true");
-        recordingSettings = recordingSettings.replaceAll(Pattern.quote("{replayActive}"), "false");
+        recordingSettings = recordingSettings.replace("{recordActive}", "true");
+        recordingSettings = recordingSettings.replace("{replayActive}", "false");
         var recordingConfig = Path.of("target", "multiRecording", "recording.json").toAbsolutePath();
         Files.writeString(recordingConfig, recordingSettings);
-
 
 
         System.out.println("STARTING ==============================================");
@@ -128,8 +139,7 @@ public class MultiRecordReplayTest extends BasicTest {
         });
 
 
-
-         httpresponse = httpclient.execute(httpget);
+        httpresponse = httpclient.execute(httpget);
         var sc = new Scanner(httpresponse.getEntity().getContent());
 
         //Printing the status line
@@ -183,8 +193,8 @@ public class MultiRecordReplayTest extends BasicTest {
         replaySettings = replaySettings.replace("{postgresPassword}", "");
         replaySettings = replaySettings.replace("{postgresConnection}", "");
         replaySettings = replaySettings.replace("{dataDir}", Path.of("target", "multiRecording").toAbsolutePath().toString().replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")));
-        replaySettings = replaySettings.replaceAll(Pattern.quote("{recordActive}"), "false");
-        replaySettings = replaySettings.replaceAll(Pattern.quote("{replayActive}"), "true");
+        replaySettings = replaySettings.replace("{recordActive}", "false");
+        replaySettings = replaySettings.replace("{replayActive}", "true");
         var replayConfig = Path.of("target", "multiRecording", "replaying.json").toAbsolutePath();
         Files.writeString(replayConfig, replaySettings);
 

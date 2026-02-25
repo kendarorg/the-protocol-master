@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
@@ -24,7 +25,7 @@ import java.util.concurrent.Future;
 /**
  * Multithreaded asynchronous server
  */
-public class TcpServer {
+public class TcpServer implements Server {
     private static final int WAIT_TIMEOUT_MS = 30000;
     /**
      * Default host
@@ -46,10 +47,6 @@ public class TcpServer {
 
     public TcpServer(NetworkProtoDescriptor protoDescriptor) {
         this.protoDescriptor = protoDescriptor;
-    }
-
-    private int getWaitTimeoutMs() {
-        return WAIT_TIMEOUT_MS;
     }
 
     /**
@@ -93,6 +90,29 @@ public class TcpServer {
 
     public ProtoDescriptor getProtoDescriptor() {
         return protoDescriptor;
+    }
+
+    @Override
+    public void enableTls(File certificateFile, File privateKeyFile) {
+
+    }
+
+    @Override
+    public void enableSelfSignedTls() {
+
+    }
+
+    public void useCallDurationTimes(boolean callDurationTimes) {
+
+        this.callDurationTimes = callDurationTimes;
+    }
+
+    public boolean isRunning() {
+        if (protoDescriptor.isWrapper()) {
+            return protoDescriptor.isWrapperRunning();
+        }
+        if (this.server == null) return false;
+        return this.server.isOpen();
     }
 
     /**
@@ -224,16 +244,8 @@ public class TcpServer {
         }
     }
 
-    public boolean isRunning() {
-        if (protoDescriptor.isWrapper()) {
-            return protoDescriptor.isWrapperRunning();
-        }
-        if (this.server == null) return false;
-        return this.server.isOpen();
+    private int getWaitTimeoutMs() {
+        return WAIT_TIMEOUT_MS;
     }
 
-    public void useCallDurationTimes(boolean callDurationTimes) {
-
-        this.callDurationTimes = callDurationTimes;
-    }
 }

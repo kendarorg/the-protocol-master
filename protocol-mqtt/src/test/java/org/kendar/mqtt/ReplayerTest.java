@@ -9,9 +9,11 @@ import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.N;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -62,7 +64,7 @@ public class ReplayerTest {
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
         try {
 
             protocolServer.start();
@@ -114,7 +116,7 @@ public class ReplayerTest {
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         try {
@@ -163,7 +165,7 @@ public class ReplayerTest {
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         try {
             protocolServer.start();

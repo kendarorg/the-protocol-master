@@ -16,6 +16,7 @@ into the `handleMessage` function. It simply replaces the Google logo with the B
 * Respond with the output, error and blocking flags as needed
 
 ### Request
+
 * The request will be in the following format
 
 ```
@@ -30,8 +31,10 @@ into the `handleMessage` function. It simply replaces the Google logo with the B
 
 Where
 
-* inputType: The simple class name of the input object, Object for any (included null). For DB calls can use `JdbcCall`, for Http/s `Request`
-* outputType: The simple class name of the output object, Object for any (included null). For DB calls can use `SelectResult`, for Http/s `Response`
+* inputType: The simple class name of the input object, Object for any (included null). For DB calls can use `JdbcCall`,
+  for Http/s `Request`
+* outputType: The simple class name of the output object, Object for any (included null). For DB calls can use
+  `SelectResult`, for Http/s `Response`
 * phase: the protocol phase
 
 ### Response
@@ -86,10 +89,10 @@ Just set in the settings file the relative interceptor where
 * destinationAddress: The API to call
 * inputType: `Request`
 * outputType: `Response`
-* inMatcher: The matcher for the input content, can be a 
-  * regexp, prepend `@`
-  * [tpmQl](tpmql.md), prepend `!`
-  * contains, just the string that should be founded
+* inMatcher: The matcher for the input content, can be a
+    * regexp, prepend `@`
+    * [tpmQl](tpmql.md), prepend `!`
+    * contains, just the string that should be founded
 
 If you need it exists even the outputMatcher that follows the same rules
 

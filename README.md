@@ -14,18 +14,10 @@ supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091, DNS ..
 
 Effortlessly and with zero budget
 
-
 ### Notes for macOs Users
 
-Should set the following on your .zprofile see [here](https://github.com/testcontainers/testcontainers-rs/pull/800): 
-
-```
-export DOCKER_DEFAULT_PLATFORM=linux/arm64v8
-export TESTCONTAINERS_RYUK_DISABLED=true
-export DOCKER_HOST=tcp://localhost:2375
-```
-
-Check [here](https://podman-desktop.io/docs/migrating-from-docker/using-the-docker_host-environment-variable) for Podman
+The only way i have seen to run testcontainers on macOs supporting networks, linked containers
+and docker in docker is to use or an external docker server or [OrbStack](https://orbstack.dev/).
 
 ### Get Started
 
@@ -97,7 +89,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
 * Native protocol for (and all compatibles):
     * anything that goes through http/https
     * postgres
-    * mysql
+    * mysql (and all mysql compatible like mariadb) with SSL support
     * mongoDB
     * redis 3,redis 2
     * mqtt
@@ -141,6 +133,7 @@ If you want to go on the specific functions by protocol:
     * Simple authentication (could add an "auth provider")
 * [MySQL](protocol-mysql/README.md)
     * Support for cached queries and stored procedures
+    * Possibility of using the real users passwords
     * Simple authentication (could add an "auth provider")
 * [MongoDB](protocol-mongo/README.md)
     * Basic authentication

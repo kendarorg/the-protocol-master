@@ -6,7 +6,6 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 
 import java.util.List;
 
@@ -41,11 +40,16 @@ public class MySqlCommandLineHandler extends NetworkProtocolCommandLineHandler {
     @Override
     protected List<CommandOption> prepareCustomOptions(GlobalSettings globalSettings, ProtocolSettings genericSettings) {
         var options = super.prepareCustomOptions(globalSettings, genericSettings);
-        var settings = (JdbcProtocolSettings) genericSettings;
+        var settings = (MySqlProtocolSettings) genericSettings;
         options.add(CommandOption.of("js", "Force schema name")
                 .withLong("schema")
                 .withMandatoryParameter()
                 .withCallback(settings::setForceSchema));
+        options.add(CommandOption.of("tls", "Enable TLS for MySQL connection")
+                .withLong("useTls")
+                .withCallback(s -> {
+                    settings.setUseTls(true);
+                }));
         return options;
     }
 }

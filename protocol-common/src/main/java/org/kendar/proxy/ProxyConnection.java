@@ -8,6 +8,7 @@ public class ProxyConnection {
     private final Object connection;
 
     public ProxyConnection(Object connection) {
+
         this.connection = connection;
     }
 

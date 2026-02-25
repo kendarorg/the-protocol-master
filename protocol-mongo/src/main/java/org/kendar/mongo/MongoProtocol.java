@@ -12,6 +12,7 @@ import org.kendar.mongo.fsm.events.OpMsgRequest;
 import org.kendar.mongo.fsm.events.OpQueryRequest;
 import org.kendar.mongo.fsm.msg.CmdGeneric;
 import org.kendar.mongo.fsm.msg.CmdHello;
+import org.kendar.mongo.fsm.msg.CmdSaslContinue;
 import org.kendar.mongo.fsm.msg.CmdSaslStart;
 import org.kendar.mongo.fsm.query.QueryHello;
 import org.kendar.plugins.base.BasePluginDescriptor;
@@ -40,8 +41,16 @@ public class MongoProtocol extends NetworkProtoDescriptor {
         this.setTimeout(settings.getTimeoutSeconds());
     }
 
+    @Override
+    public boolean isLateConnect(){
+        return true;
+    }
+
     public MongoProtocol(int port) {
         this.port = port;
+        var pp = new MongoProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
     public MongoProtocol() {
@@ -61,7 +70,10 @@ public class MongoProtocol extends NetworkProtoDescriptor {
                                         new ProtoStateSwitchCase(
                                                 new CmdGeneric(OpMsgRequest.class),
                                                 new CmdHello(OpMsgRequest.class),
-                                                new CmdSaslStart(OpMsgRequest.class)
+                                                new CmdSaslStart(OpMsgRequest.class),
+                                                new ProtoStateWhile(
+                                                        new CmdSaslContinue(OpMsgRequest.class).asOptional()
+                                                )
                                         )
                                 ),
                                 new ProtoStateSequence(

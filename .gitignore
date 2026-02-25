@@ -24,6 +24,8 @@ bin/
 
 ### VS Code ###
 .vscode/
+.ai/
+.idea/
 
 ### Mac OS ###
 .DS_Store
@@ -41,3 +43,9 @@ jte-classes
 /plugins/
 /protocol-runner/extensions.idx
 .flattened-pom.xml
+/.idea/copilot.data.migration.ask2agent.xml
+
+
+# Put either here or in .idea/.gitignore
+/.idea/*.*
+/.idea/

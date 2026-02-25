@@ -2,7 +2,7 @@ package org.kendar.plugins.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.kendar.settings.ProtocolSettings;
-import org.kendar.tcpserver.TcpServer;
+import org.kendar.tcpserver.Server;
 
 import java.util.List;
 
@@ -10,13 +10,13 @@ public class ProtocolInstance {
     @JsonIgnore
     private final String protocolInstanceId;
     @JsonIgnore
-    private final TcpServer server;
+    private final Server server;
     private final List<ProtocolPluginDescriptor> plugins;
     private final ProtocolSettings settings;
     private final String protocol;
 
     public ProtocolInstance(String protocolInstanceId,
-                            TcpServer server,
+                            Server server,
                             List<ProtocolPluginDescriptor> plugins,
                             ProtocolSettings settings) {
 
@@ -35,7 +35,7 @@ public class ProtocolInstance {
         return protocolInstanceId;
     }
 
-    public TcpServer getServer() {
+    public Server getServer() {
         return server;
     }
 

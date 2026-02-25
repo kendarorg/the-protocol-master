@@ -8,7 +8,7 @@ public class ListOne implements ListOfInterface {
     private boolean postConstruct = false;
 
     public ListOne() {
-        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+        System.out.println(this + " " + Thread.currentThread().getId());
     }
 
     public boolean isPostConstruct() {
@@ -23,6 +23,6 @@ public class ListOne implements ListOfInterface {
     @TpmPostConstruct
     public void postConstruct() {
         postConstruct = true;
-        System.out.println("Post construct " + this.toString() + " " + Thread.currentThread().getId());
+        System.out.println("Post construct " + this + " " + Thread.currentThread().getId());
     }
 }

@@ -1,6 +1,6 @@
 # MySQL Protocol
 
-You can directly use the "proxy" as a normal mysql backend
+You can directly use the "proxy" as a normal mysql backend. It supports TLS natively.
 
 ```
 VERY IMPORTANT!! IF YOU USE THE DB NAME INTO YOUR APPLICATION
@@ -18,9 +18,11 @@ PROXYED CONNETION STRING!!!
 * timeoutSeconds: the timeout to drop the connections
 * forceSchema: the force is called in case the jdbc driver does not allow setting the schema from connection string
 * force3BytesOkPacketInfo: default to false. For some client (like python peewee) this should be set to true
+* useTls: it true the proxy will try to upgrade the connection to TLS.
 
 Uses the following phases
 
+* CONNECT (Before connecting to the real server)
 * PRE_CALL (Before calling the real server)
 * POST_CALL
 * PRE_SOCKET_WRITE (Before sending data to the client)
@@ -138,14 +140,31 @@ definitions. For details on the implementation [here](../docs/rest-plugins-plugi
 * name: The name of the interceptor
 * destinationAddress: The api to call (POST)
 * inputType: The expected input type (simple class name), Object for any
-* inMatcher: The matcher for the in content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from contains
+* inMatcher: The matcher for the in content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from
+  contains
 * outputType: The expected output type (simple class name), Object for any
-* outMatcher: The matcher for the out content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from contains
+* outMatcher: The matcher for the out content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string
+  from contains
 * blockOnException: If there is an exception return the error and stop the filtering
+
+## jdbc-rewrite
+
+Using this plugin is possible to forward the real user, password to the target database. The connection is rebuilt
+when logging in. The protocol must be set to "useTls" and the connection string must contain the following. 
+This is for Jdbc connector 8.2 check your driver documentation for the correct syntax.
+
+* allowCleartextPasswords=true
+* sslMode=REQUIRED
+
+The connection data will be stored in the context as follows and never logged. 
+The password is removed once used to connect to the real database.
+
+* userid
+* database
+* password
 
 ## Missing features
 
-* Real authentication (always allowed)
 * `Multi-Resultset`
 * Replication Protocol
 * Commands
@@ -199,7 +218,7 @@ Testing in python with [PyMySQL](https://github.com/PyMySQL) I noticed that the
 OkPacket is request to have -at least- 7 bytes as payload, then added an empty
 info array...
 
-### Data types mess
+### Data types mess (really messy not messages!)
 
 This happens only on binary protocol and -real- prepared statements (that are
 used extensively by ODBC and .NET drivers)

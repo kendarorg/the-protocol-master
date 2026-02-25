@@ -16,6 +16,8 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.RabbitMqImage;
 import org.kendar.tests.testcontainer.utils.Utils;
@@ -28,21 +30,22 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@SuppressWarnings("rawtypes")
 public class AmqpBasicTest {
     protected static final int FAKE_PORT = 5682;
     protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
     protected static RabbitMqImage rabbitContainer;
-    protected static TcpServer protocolServer;
+    protected static Server protocolServer;
     protected static ProtocolPluginDescriptor publishPlugin;
     protected static ProtocolPluginDescriptor recordPlugin;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
     protected JsonMapper mapper = new JsonMapper();
 
@@ -58,7 +61,8 @@ public class AmqpBasicTest {
 
         Sleeper.sleep(60000, () -> {
             try {
-                ConnectionFactory connectionFactory = new ConnectionFactory();
+                ConnectionFactory connectionFactory = getConnectionFactory();
+                connectionFactory.setAutomaticRecoveryEnabled(false);
                 connectionFactory.setUri(rabbitContainer.getConnectionString());
                 connectionFactory.setPassword(rabbitContainer.getAdminPassword());
                 var connection = connectionFactory.newConnection();
@@ -69,6 +73,12 @@ public class AmqpBasicTest {
             }
         });
 
+    }
+
+    public static ConnectionFactory getConnectionFactory() {
+        var result = new ConnectionFactory();
+        result.setAutomaticRecoveryEnabled(false);
+        return result;
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
@@ -107,7 +117,7 @@ public class AmqpBasicTest {
             events.add(r);
         }, ReportDataEvent.class);
 
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
 
@@ -128,6 +138,6 @@ public class AmqpBasicTest {
     }
 
     public List<ReportDataEvent> getEvents() {
-        return events.stream().collect(Collectors.toList());
+        return new ArrayList<>(events);
     }
 }

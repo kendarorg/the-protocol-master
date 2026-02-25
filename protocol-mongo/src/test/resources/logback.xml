@@ -10,6 +10,7 @@
     <logger name="org.kendar" level="DEBUG"/>
     <logger name="com.github" level="ERROR"/>
     <logger name="org.testcontainers" level="ERROR"/>
+    <logger name="io.netty" level="ERROR"/>
 
     <root level="ERROR">
         <appender-ref ref="stdout"/>

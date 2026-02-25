@@ -1,6 +1,7 @@
 package org.kendar.postgres;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.kendar.JdbcProtocol;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
@@ -12,6 +13,7 @@ import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
+import org.kendar.protocol.states.SSLHandshake;
 import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
@@ -25,14 +27,14 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @TpmService(tags = "postgres")
-public class PostgresProtocol extends NetworkProtoDescriptor {
+public class PostgresProtocol extends JdbcProtocol {
     private static final Logger log = LoggerFactory.getLogger(PostgresProtocol.class);
     private static final int PORT = 5432;
     private static final boolean IS_BIG_ENDIAN = true;
     private static final SqlStringParser parser = new SqlStringParser("$");
     private static DataTypesConverter dataTypesConverter;
 
-    private PostgresExecutor executor = new PostgresExecutor();
+    private final PostgresExecutor executor = new PostgresExecutor();
 
     static {
         try {
@@ -57,10 +59,15 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
 
     public PostgresProtocol() {
         this(PORT);
+        var pp = new PostgresProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
     public PostgresProtocol(int port) {
+        super(port);
         this.port = port;
+        setSettings(new PostgresProtocolSettings());
     }
 
     public static DataTypesConverter getDataTypesConverter() {
@@ -83,8 +90,12 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
         addInterruptState(new PostgresPacketTranslator(BytesEvent.class));
         initialize(
                 new ProtoStateSequence(
-                        new SSLRequest(BytesEvent.class).asOptional(),
+                        new ProtoStateSequence(
+                                new SSLRequest(BytesEvent.class).asOptional(),
+                                new SSLHandshake(BytesEvent.class).asOptional()
+                        ),
                         new StartupMessage(BytesEvent.class),
+                        new PasswordMessage(PostgresPacket.class).asOptional(),
                         new ProtoStateWhile(
                                 new ProtoStateSwitchCase(
                                         new Query(PostgresPacket.class),

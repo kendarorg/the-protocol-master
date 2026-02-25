@@ -23,6 +23,8 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.MongoDbImage;
 import org.kendar.tests.testcontainer.utils.Utils;
@@ -43,8 +45,8 @@ public class MongoBasicTest {
 
     protected static final int FAKE_PORT = 27077;
     protected static MongoDbImage mongoContainer;
-    protected static TcpServer protocolServer;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    protected static Server protocolServer;
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor errorPlugin;
     private static ProtocolPluginDescriptor latencyPlugin;
 
@@ -111,7 +113,7 @@ public class MongoBasicTest {
             events.add(r);
         }, ReportDataEvent.class);
         baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
@@ -145,7 +147,7 @@ public class MongoBasicTest {
 //                .build();
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(
-                        "mongodb://frappa:password@localhost:" + FAKE_PORT + "/?" +
+                        "mongodb://thelogin:password@localhost:" + FAKE_PORT + "/?" +
                                 "retryWrites=false&retryReads=false&tls=false" +
                                 "&ssl=false&authMechanism=PLAIN"))
                 //.serverApi(serverApi)

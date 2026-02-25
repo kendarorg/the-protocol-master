@@ -5,8 +5,8 @@ import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.constants.ErrorCode;
 import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.constants.StatusFlag;
-import org.kendar.mysql.messages.Error;
 import org.kendar.mysql.messages.*;
+import org.kendar.mysql.messages.Error;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -238,6 +238,8 @@ public class MySQLExecutor {
     }
 
     private Iterator<ProtoStep> executeQuery(int maxRecords, SqlParseResult parsed, MySQLProtoContext protoContext, String parse, String operation, List<BindingParameter> parameterValues, boolean text) throws SQLException {
+        var proxy = (JdbcProxy)protoContext.getProxy();
+        proxy.doConnect(protoContext);
         var connection = protoContext.getValue("CONNECTION");
         if (maxRecords == 0) {
             maxRecords = Integer.MAX_VALUE;
@@ -330,6 +332,8 @@ public class MySQLExecutor {
     @SuppressWarnings("SqlSourceToSinkFlow")
     public Iterator<ProtoStep> prepareStatement(MySQLProtoContext protoContext, String query) {
         parser = (SqlStringParser) protoContext.getValue("PARSER");
+        var proxy = (JdbcProxy)protoContext.getProxy();
+        proxy.doConnect(protoContext);
         var result = new ArrayList<ReturnMessage>();
         var connection = protoContext.getValue("CONNECTION");
         var c = ((Connection) ((ProxyConnection) connection).getConnection());

@@ -78,16 +78,18 @@ Introduce random latency. Not applicable to async calls
 
 ### rest-plugins-plugin
 
-This plugin is used to intercept protocol calls and forward the request to a REST API 
+This plugin is used to intercept protocol calls and forward the request to a REST API
 that will need to respond with the correct response data. Contains a list of "interceptors"
 definitions. For details on the implementation [here](../docs/rest-plugins-plugin.md)
 
 * name: The name of the interceptor
 * destinationAddress: The api to call (POST)
 * inputType: The expected input type (simple class name), Object for any
-* inMatcher: The matcher for the in content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from contains 
+* inMatcher: The matcher for the in content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from
+  contains
 * outputType: The expected output type (simple class name), Object for any
-* outMatcher: The matcher for the out content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string from contains
+* outMatcher: The matcher for the out content, `@` for Java regexp, `!` for [tpmql](../docs/tpmql.md), generic string
+  from contains
 * blockOnException: If there is an exception return the error and stop the filtering
 
 ## Documentation used

@@ -9,6 +9,7 @@ import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -19,22 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("RedundantThrows")
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class ReplayerNotBlocking extends MqttBasicTest {
+public class ReplayerNotBlockingTest extends MqttBasicTest {
 
     public static final String MESSAGE_CONTENT = "Hello World!!";
     public static final String TOPIC_NAME = "/subscribe/";
     private static final List<MqttMessage> messages = new ArrayList<>();
 
-    @BeforeAll
-    public static void beforeClass() throws IOException {
-
-    }
-
-    @AfterAll
-    public static void afterClass() throws Exception {
-
-    }
 
     private static void setupCallBack(MqttClient client) {
         messages.clear();
@@ -97,7 +90,7 @@ public class ReplayerNotBlocking extends MqttBasicTest {
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
         pl.setActive(true);
 
         try {

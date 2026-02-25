@@ -10,6 +10,7 @@ import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -24,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.kendar.amqp.v09.AmqpBasicTest.getConnectionFactory;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class ReplayerTest {
@@ -77,13 +79,13 @@ public class ReplayerTest {
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, protocolServer::isRunning);
         try {
 
-            ConnectionFactory connectionFactory = new ConnectionFactory();
+            ConnectionFactory connectionFactory = getConnectionFactory();
             connectionFactory.enableHostnameVerification();
             var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
             connectionFactory.setUri(cs);
@@ -126,15 +128,20 @@ public class ReplayerTest {
             channel.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "2").getBytes());
             chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
             System.out.println("WAIT------------------------------------------------------------");
-            Sleeper.sleep(100);
+            Sleeper.sleep(500);
 
-            chanConsume.queueDelete(MAIN_QUEUE);
-            channel.queueDelete(MAIN_QUEUE);
-            channel.close();
+            if(chanConsume.isOpen()) {
+                chanConsume.queueDelete(MAIN_QUEUE);
+            }
+            if(channel.isOpen()) {
+                channel.queueDelete(MAIN_QUEUE);
+                channel.close();
+            }
             connection.close();
 
 
-            Sleeper.sleep(1000, () -> messages.size() == 3);
+            Sleeper.sleepNoException(1000, () -> messages.size() == 3);
+            assertEquals(3, messages.size());
 
             assertEquals(3, messages.size());
             assertTrue(messages.containsValue(exectedMessage + "1"));
@@ -162,12 +169,12 @@ public class ReplayerTest {
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         try {
             Sleeper.sleep(5000, protocolServer::isRunning);
-            ConnectionFactory connectionFactory = new ConnectionFactory();
+            ConnectionFactory connectionFactory = getConnectionFactory();
             connectionFactory.enableHostnameVerification();
             var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
             connectionFactory.setUri(cs);
@@ -212,13 +219,13 @@ public class ReplayerTest {
 
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         try {
             Sleeper.sleep(5000, protocolServer::isRunning);
 
-            ConnectionFactory connectionFactory = new ConnectionFactory();
+            ConnectionFactory connectionFactory = getConnectionFactory();
             connectionFactory.enableHostnameVerification();
             var cs = "amqp://localhost:" + FAKE_PORT;//rabbitContainer.getConnectionString();
             connectionFactory.setUri(cs);

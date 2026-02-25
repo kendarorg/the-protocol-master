@@ -153,7 +153,6 @@ public class TaggedFsmTest {
         assertTrue(context.sendSync(new TaggedEvent(context, null, "A1", "LEV1", "1.2")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B1", "LEV1", "1.1")));
         assertTrue(context.sendSync(new TaggedEvent(context, null, "B1", "LEV1", "1.2")));
-        ;
 
         //Start on wrong tag
         assertThrows(RuntimeException.class, () -> context.sendSync(new TaggedEvent(context, null, "A2", "LEV2", "2.1")));

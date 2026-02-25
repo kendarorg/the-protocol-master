@@ -9,7 +9,7 @@
 
 
     <properties>
-        <revision>4.3.2</revision>
+        <revision>4.3.3</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
@@ -30,11 +30,10 @@
         <commons.io.version>2.7</commons.io.version>
         <commons.lang3.version>3.17.0</commons.lang3.version>
         <commons.text.version>1.10.0</commons.text.version>
-        <pl4j.version>3.12.1</pl4j.version>
+        <pl4j.version>3.15.0</pl4j.version>
         <jaxb.api.version>2.3.0</jaxb.api.version>
         <apache.http.version>4.5.13</apache.http.version>
         <json.schema.validator.version>1.0.66</json.schema.validator.version>
-        <pl4j.version>3.12.1</pl4j.version>
         <bouncycastle.version>1.68</bouncycastle.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
         <guava.version>31.1-jre</guava.version>
@@ -52,10 +51,22 @@
         <dns.java.version>3.4.0</dns.java.version>
         <maven.jar.version>3.2.0</maven.jar.version>
         <maven.antrun.version>1.8</maven.antrun.version>
-        <selenium.version>4.30.0</selenium.version>
-        <webdrivermanager.version>6.0.0</webdrivermanager.version>
+        <selenium.version>4.40.0</selenium.version>
+        <webdrivermanager.version>6.3.3</webdrivermanager.version>
         <commons.lang.version>2.6</commons.lang.version>
+        <netty.version>4.2.10.Final</netty.version>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.2.10.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

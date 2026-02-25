@@ -1,5 +1,6 @@
 package org.kendar.mysql;
 
+import org.kendar.JdbcProtocol;
 import org.kendar.di.annotations.TpmConstructor;
 import org.kendar.di.annotations.TpmNamed;
 import org.kendar.di.annotations.TpmService;
@@ -13,6 +14,7 @@ import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.NetworkWait;
+import org.kendar.protocol.states.SSLHandshake;
 import org.kendar.protocol.states.special.ProtoStateSequence;
 import org.kendar.protocol.states.special.ProtoStateSwitchCase;
 import org.kendar.protocol.states.special.ProtoStateWhile;
@@ -22,13 +24,13 @@ import org.kendar.sql.parser.SqlStringParser;
 import java.util.List;
 
 @TpmService(tags = "mysql")
-public class MySQLProtocol extends NetworkProtoDescriptor {
+public class MySQLProtocol extends JdbcProtocol {
 
     private static final SqlStringParser parser = new SqlStringParser("?");
     private static final int PORT = 3306;
     private static final boolean IS_BIG_ENDIAN = true;
     private final int port;
-    private MySQLExecutor executor = new MySQLExecutor();
+    private final MySQLExecutor executor = new MySQLExecutor();
 
     @TpmConstructor
     public MySQLProtocol(GlobalSettings ini, MySqlProtocolSettings settings, MySQLProxy proxy,
@@ -44,8 +46,11 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
     }
 
     public MySQLProtocol(int port) {
+        super(port);
         this.port = port;
-        setSettings(new MySqlProtocolSettings());
+        var pp = new MySqlProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
     @Override
@@ -77,6 +82,10 @@ public class MySQLProtocol extends NetworkProtoDescriptor {
     protected void initializeProtocol() {
         initialize(new ProtoStateSequence(
                 new ConnectionEstablished(BytesEvent.class),
+                new ProtoStateSequence(
+                        new SSLRequest(BytesEvent.class).asOptional()
+                        , new SSLHandshake(BytesEvent.class).asOptional()
+                ),
                 new Auth(BytesEvent.class),
                 new ProtoStateWhile(
                         new NetworkWait(BytesEvent.class).asOptional()

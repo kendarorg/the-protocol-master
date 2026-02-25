@@ -5,7 +5,7 @@ import org.kendar.di.annotations.TpmService;
 @TpmService
 public class TestImpl implements TestInterface {
     public TestImpl() {
-        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+        System.out.println(this + " " + Thread.currentThread().getId());
     }
 
     @Override

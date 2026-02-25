@@ -1,0 +1,167 @@
+package org.kendar.plugins;
+
+import org.kendar.plugins.apis.BasicForwardApi;
+import org.kendar.plugins.base.ProtocolPhase;
+import org.kendar.plugins.base.ProtocolPluginApiHandler;
+import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
+import org.kendar.plugins.settings.BasicForwardPluginSettings;
+import org.kendar.plugins.settings.dtos.ForwardMatcher;
+import org.kendar.protocol.context.NetworkProtoContext;
+import org.kendar.proxy.PluginContext;
+import org.kendar.proxy.Proxy;
+import org.kendar.proxy.ProxyConnection;
+import org.kendar.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.sql.DriverManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.kendar.plugins.base.ProtocolPhase.CONNECT;
+
+public abstract class BasicForwardPlugin extends ProtocolPluginDescriptorBase<BasicForwardPluginSettings> {
+    ///private static Object lock = new Object();
+    //private static ConcurrentHashMap<String, BasicForwardPlugin> activeProfiles = new ConcurrentHashMap<>();
+    //private static AtomicBoolean registered = new AtomicBoolean(false);
+    public BasicForwardPlugin(JsonMapper mapper) {
+        super(mapper);
+    }
+
+    private AtomicReference<List<ForwardMatcher>> matchers = new AtomicReference<>(new ArrayList<>());
+    @Override
+    protected boolean handleSettingsChanged() {
+        if (getSettings() == null) return false;
+        matchers.set(setupMatches(getSettings().getMappings()));
+        return true;
+    }
+
+    private List<ForwardMatcher> setupMatches(HashMap<String, String> mappings) {
+        var result = new ArrayList<ForwardMatcher>();
+        for(var item:mappings.entrySet()){
+            result.add(new ForwardMatcher(item.getKey(),item.getValue()));
+        }
+        return result;
+    }
+    
+    public List<ForwardMatcher> getMatchers(){
+        return this.matchers.get();
+    }
+
+    private static final Logger log = LoggerFactory.getLogger(BasicForwardPlugin.class);
+
+    private static Map<String, String> parseQuery(String query) {
+        Map<String, String> map = new HashMap<>();
+        if (query == null) return map;
+
+        for (String pair : query.split("&")) {
+            String[] parts = pair.split("=");
+            map.put(parts[0], parts.length > 1 ? parts[1] : "");
+        }
+        return map;
+    }
+
+    @Override
+    public List<ProtocolPhase> getPhases() {
+        return List.of(CONNECT);
+    }
+
+    public static boolean isValidHumanText(String s) {
+        if (s == null || s.isEmpty()) return false;
+        if (containsReplacementChar(s)) return false;
+        if (hasInvalidControlChars(s)) return false;
+        return true;
+    }
+    public static boolean containsReplacementChar(String s) {
+        return s.contains("\uFFFD");
+    }
+    public static boolean hasInvalidControlChars(String s) {
+        for (char c : s.toCharArray()) {
+            if (Character.isISOControl(c) &&
+                    c != '\n' && c != '\r' && c != '\t') {
+                return true;
+            }
+        }
+        return false;
+    }
+    @Override
+    public String getId() {
+        return "forward-plugin";
+    }
+    public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
+
+        var ctx = (NetworkProtoContext)pluginContext.getContext();
+        var jdbcProxy = (Proxy)ctx.getProxy();
+
+
+        var userid = ctx.getValue("userid","");
+        var database = ctx.getValue("database","");
+        var password = ctx.getValue("password","");
+        ctx.setValue("password", "");
+        if(!isValidHumanText(password)){
+            return false;
+        }
+        var connectionString = jdbcProxy.getConnectionString();
+        if(password.trim().isEmpty() || userid.trim().isEmpty()){
+            return false;
+        }
+
+        try {
+            var mathchersList  = matchers.get();
+
+            var uri = new URI(connectionString.substring(5));
+            var newConnectionString = "jdbc:" + uri.getScheme() + "://" + uri.getHost();
+            if (uri.getPort() > 0) {
+                newConnectionString += ":" + uri.getPort();
+            }
+            var originalDatabase = uri.getPath().substring(1);
+            if (!database.isEmpty()) {
+                newConnectionString += "/" + database;
+            } else if (uri.getPath().length() > 1) {
+                newConnectionString += "/" + uri.getPath().substring(1);
+            }
+
+            String matched = null;
+            for(var i=0;i<mathchersList.size();i++){
+                var matcher = mathchersList.get(i);
+                matched = matcher.match(newConnectionString );
+                if(matched!=null)break;
+            }
+            if(matched!=null) {
+                newConnectionString = matched;
+            }
+
+            var params = parseQuery(uri.getQuery());
+            var entrySet = params.entrySet();
+            for (var entry : entrySet) {
+                if (entry.getKey().equalsIgnoreCase("user") || entry.getKey().equalsIgnoreCase("password")) {
+                    params.remove(entry.getKey());
+                } else {
+                    newConnectionString += (newConnectionString.contains("?") ? "&" : "?") + entry.getKey() + "=" + entry.getValue();
+                }
+            }
+
+            var connection = DriverManager.
+                    getConnection(newConnectionString, userid, password);
+            log.error("Override connection String " +newConnectionString);
+            var conn = new ProxyConnection(connection);
+            ctx.setValue("CONNECTION", conn);
+        }catch (Exception ex){
+            ctx.setValue("CONNECTION", null);
+            log.error("Error connecting to database",ex);
+            throw new RuntimeException("Error connecting to database",ex);
+        }
+        return true;
+    }
+
+
+
+    @Override
+    protected List<ProtocolPluginApiHandler> buildApiHandler() {
+        return List.of(new BasicForwardApi(this, getId(), getInstanceId()));
+    }
+}

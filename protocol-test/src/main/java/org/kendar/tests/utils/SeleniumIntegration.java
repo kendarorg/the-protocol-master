@@ -7,8 +7,8 @@ import io.github.bonigarcia.wdm.versions.VersionDetector;
 import org.apache.commons.io.FileUtils;
 import org.kendar.tests.dm.TpmChromeDriverManager;
 import org.kendar.tests.dm.TpmChromiumDriverManager;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.*;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import javax.imageio.ImageIO;
@@ -17,11 +17,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("ThrowablePrintedToSystemOut")
 public class SeleniumIntegration {
     private final Path rootPath;
     private final String proxyHost;
@@ -45,6 +48,10 @@ public class SeleniumIntegration {
     }
 
     public boolean navigateTo(String url, boolean snapshot) {
+        return this.navigateTo(url, snapshot, -1);
+    }
+    public boolean navigateTo(String url, boolean snapshot,int timeout) {
+
         var driver = (WebDriver) Utils.getCache("driver");
         var current = driver.getCurrentUrl();
         if (current.equalsIgnoreCase(url)) {
@@ -54,7 +61,11 @@ public class SeleniumIntegration {
             }
             return true;
         }
-        driver.get(url);
+        if(timeout==-1) {
+            driver.get(url);
+        }else{
+            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(timeout));
+        }
         if (!getCurrentTab().equals("settings")) {
             if (snapshot) takeSnapShot();
         }
@@ -103,7 +114,7 @@ public class SeleniumIntegration {
             var available = webDriverManager.getDriverVersions().stream().
                     map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
             var matching = available.get(available.size() - 1);
-            if (available.stream().anyMatch(v -> v == (version))) {
+            if (available.stream().anyMatch(v -> Objects.equals(v, version))) {
                 matching = version;
             }
             return matching.toString();
@@ -149,6 +160,7 @@ public class SeleniumIntegration {
         if (System.getenv("HUMAN_DRIVEN") == null && System.getenv("RUN_VISIBLE") == null) {
             capabilities.addArguments("--headless");//Disable cache
         }
+        //capabilities.setPageLoadStrategy(PageLoadStrategy.EAGER);
 
 
         if (isChrome()) {
@@ -213,8 +225,7 @@ public class SeleniumIntegration {
             if (driver.getCurrentUrl().startsWith("about:")) {
                 return;
             }
-            var dest = rootPath;
-            if (!Files.exists(dest)) {
+            if (!Files.exists(rootPath)) {
                 rootPath.toFile().mkdirs();
             }
             counter++;
@@ -231,8 +242,7 @@ public class SeleniumIntegration {
 
     public void takeMessageSnapshot(String text) {
         try {
-            var dest = rootPath;
-            if (!Files.exists(dest)) {
+            if (!Files.exists(rootPath)) {
                 rootPath.toFile().mkdirs();
             }
 

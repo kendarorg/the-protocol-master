@@ -23,11 +23,12 @@ import org.kendar.utils.parser.SimpleParser;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReplayRecordFilters {
 
-    private ConcurrentLinkedQueue<TpmEvent> events = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TpmEvent> events = new ConcurrentLinkedQueue<>();
 
     @Test
     void testtarget() {
@@ -62,13 +63,13 @@ public class ReplayRecordFilters {
             in.setHost("test_sites");
             rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
             Sleeper.sleep(10);
-            assertTrue(events.size() == 1);
+            assertEquals(1, events.size());
             events.clear();
 
             in.setHost("www.sara.com");
             rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
             Sleeper.sleep(10);
-            assertTrue(events.size() == 1);
+            assertEquals(1, events.size());
             events.clear();
 
             in.setHost("www.wetheaver.microsofto.com");
@@ -81,7 +82,7 @@ public class ReplayRecordFilters {
             in.setHost("www.wetheaver.microsof.com");
             rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
             Sleeper.sleep(10);
-            assertTrue(events.size() == 0);
+            assertTrue(events.isEmpty());
             events.clear();
         } finally {
 
@@ -91,7 +92,7 @@ public class ReplayRecordFilters {
 
     @Test
     void testReplaySites() {
-        var matched = new ChangeableReference<Boolean>(false);
+        var matched = new ChangeableReference<>(false);
         var rwPlugin = new HttpReplayPlugin(new JsonMapper(), new NullStorageRepository()) {
             @Override
             public boolean isActive() {

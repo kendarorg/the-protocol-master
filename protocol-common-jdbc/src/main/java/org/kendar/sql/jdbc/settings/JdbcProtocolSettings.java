@@ -21,4 +21,6 @@ public class JdbcProtocolSettings extends ByteProtocolSettingsWithLogin {
     public void setForceSchema(String forceSchema) {
         this.forceSchema = forceSchema;
     }
+
+
 }

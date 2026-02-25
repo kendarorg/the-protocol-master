@@ -17,6 +17,8 @@ import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.MysqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
@@ -41,11 +43,12 @@ public class MySqlBasicTest {
 
     protected static final int FAKE_PORT = 3310;
     protected static MysqlImage mysqlContainer;
-    protected static TcpServer protocolServer;
+    protected static Server protocolServer;
     protected static MySQLProtocol baseProtocol;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
+    private static ProtocolPluginDescriptor forwarderPlugin;
 
     public static void beforeClassBase() {
         var dockerHost = Utils.getDockerHost();
@@ -60,6 +63,10 @@ public class MySqlBasicTest {
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
+        beforeEachBaseSSL(testInfo, false);
+    }
+
+    public static void beforeEachBaseSSL(TestInfo testInfo, boolean ssl) {
         baseProtocol = new MySQLProtocol(FAKE_PORT);
         var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver",
                 mysqlContainer.getJdbcUrl(), null,
@@ -88,14 +95,17 @@ public class MySqlBasicTest {
                 }
             }
         }
+        var mapper = new JsonMapper();
         storage.initialize();
         var gs = new GlobalSettings();
         //gs.putService("storage", storage);
-        var mapper = new JsonMapper();
         errorPlugin = new MySqlNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin = new MySqlLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
+        forwarderPlugin = new MySqlForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
 
-        var pl = new MySqlRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser()).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
+
+        var pl = new MySqlRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser())
+                .initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicRecordPluginSettings());
 
         var pl1 = new MySqlMockPlugin(mapper, storage, new MultiTemplateEngine());
         var global = new GlobalSettings();
@@ -104,16 +114,18 @@ public class MySqlBasicTest {
         pl1.initialize(global, new JdbcProtocolSettings(), mockPluginSettings);
         var rep = new MySqlReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin));
-
+        forwarderPlugin.setActive(true);
+        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin,forwarderPlugin));
 
         pl.setActive(true);
         EventsQueue.register("recorder", (r) -> {
             events.add(r);
         }, ReportDataEvent.class);
         baseProtocol.setProxy(proxy);
+        var mysqlSettings = (MySqlProtocolSettings) baseProtocol.getSettings();
+        mysqlSettings.setUseTls(ssl);
         baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
@@ -169,7 +181,7 @@ public class MySqlBasicTest {
         proxy.setPluginHandlers(List.of(pl, pl1));
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
@@ -195,8 +207,20 @@ public class MySqlBasicTest {
     protected static Connection getProxyConnection() throws ClassNotFoundException, SQLException {
         Connection c;
         Class.forName("com.mysql.cj.jdbc.Driver");
+        //?sslMode=REQUIRED
         c = DriverManager
-                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?useSSL=false", FAKE_PORT),
+                        "root", "test");
+        assertNotNull(c);
+        return c;
+    }
+
+    protected static Connection getProxyConnectionSsl() throws ClassNotFoundException, SQLException {
+        Connection c;
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        //?sslMode=REQUIRED
+        c = DriverManager
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?allowCleartextPasswords=true&sslMode=REQUIRED", FAKE_PORT),
                         "root", "test");
         assertNotNull(c);
         return c;
@@ -206,7 +230,7 @@ public class MySqlBasicTest {
         Connection c;
         Class.forName("com.mysql.cj.jdbc.Driver");
         c = DriverManager
-                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d/?useServerPrepStmts=true", FAKE_PORT),
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d/?useServerPrepStmts=true&useSSL=false", FAKE_PORT),
                         "root", "test");
         assertNotNull(c);
         return c;

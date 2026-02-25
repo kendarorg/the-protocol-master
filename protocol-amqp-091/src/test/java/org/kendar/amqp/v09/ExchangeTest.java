@@ -49,7 +49,7 @@ public class ExchangeTest extends AmqpBasicTest {
 
     @Test
     void testExchange() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
-        ConnectionFactory connectionFactory = new ConnectionFactory();
+        ConnectionFactory connectionFactory = getConnectionFactory();
         var cs = "amqp://localhost:" + FAKE_PORT;
         //cs = rabbitContainer.getConnectionString();
         Sleeper.sleep(100);

@@ -7,6 +7,7 @@ import org.kendar.plugins.settings.BasicReplayPluginSettings;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
+import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.JsonMapper;
@@ -27,6 +28,7 @@ public class ReplayerTest {
     void showWarnings() throws Exception {
 
         var baseProtocol = new MySQLProtocol(FAKE_PORT);
+
         var proxy = new MySQLProxy("com.mysql.cj.jdbc.Driver");
 
         var storage = new FileStorageRepository(Path.of("src",
@@ -41,14 +43,14 @@ public class ReplayerTest {
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, protocolServer::isRunning);
         Connection c;
         Class.forName("com.mysql.cj.jdbc.Driver");
         c = DriverManager
-                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
+                .getConnection(String.format("jdbc:mysql://127.0.0.1:%d?useSSL=false", FAKE_PORT),
                         "root", "test");
 
         var runned = false;
@@ -83,14 +85,14 @@ public class ReplayerTest {
         pl.setActive(true);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
-        var protocolServer = new TcpServer(baseProtocol);
+        var protocolServer = new NettyServer(baseProtocol);
 
         protocolServer.start();
         Sleeper.sleep(5000, protocolServer::isRunning);
 
 
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",
-                String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
+                String.format("jdbc:mysql://127.0.0.1:%d?useSSL=false", FAKE_PORT),
                 "test", "test",
                 "org.hibernate.dialect.MySQLDialect",
                 CompanyJpa.class);

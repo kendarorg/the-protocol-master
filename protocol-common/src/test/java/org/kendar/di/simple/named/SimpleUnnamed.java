@@ -10,7 +10,7 @@ public class SimpleUnnamed implements NamedBase {
 
     public SimpleUnnamed(@TpmNamed("test") String test) {
         this.test = test;
-        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+        System.out.println(this + " " + Thread.currentThread().getId());
     }
 
     @Override

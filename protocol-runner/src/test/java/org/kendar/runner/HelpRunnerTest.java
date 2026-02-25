@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HelpRunner {
+public class HelpRunnerTest {
     private ByteArrayOutputStream myOut;
     private PrintStream oriOut;
 
@@ -55,7 +55,6 @@ public class HelpRunner {
         Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
-        ;
         assertTrue(standardOutput.contains("http"));
     }
 
@@ -72,7 +71,6 @@ public class HelpRunner {
         Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
-        ;
         assertTrue(standardOutput.contains("mysql"));
     }
 
@@ -89,7 +87,6 @@ public class HelpRunner {
         Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
-        ;
         assertTrue(standardOutput.contains("postgres"));
     }
 
@@ -155,7 +152,6 @@ public class HelpRunner {
         Main.execute(args);
         final String standardOutput = getOut();
         System.out.println(standardOutput);
-        ;
         assertTrue(standardOutput.contains("mongodb"));
     }
 }

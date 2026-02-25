@@ -38,7 +38,7 @@ public class JpaTest extends MySqlBasicTest {
     void simpleJpaTest() throws Exception {
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
         HibernateSessionFactory.initialize("com.mysql.cj.jdbc.Driver",
-                String.format("jdbc:mysql://127.0.0.1:%d", FAKE_PORT),
+                String.format("jdbc:mysql://127.0.0.1:%d?useSSL=false", FAKE_PORT),
                 mysqlContainer.getUserId(), mysqlContainer.getPassword(),
                 "org.hibernate.dialect.MySQL8Dialect",
                 CompanyJpa.class);
@@ -62,10 +62,10 @@ public class JpaTest extends MySqlBasicTest {
         });
 
         assertTrue(atomicBoolean.get());
-
+        Sleeper.sleep(500);
         var events = getEvents().stream().collect(Collectors.toList());
-        assertTrue(events.size() >= 7);
+        assertTrue(events.size() >= 7, "Events were "+events.size());
         var evt = events.get(0);
-        assertEquals("mysql", evt.getProtocol());
+        assertEquals("mysql", evt.getProtocol(),"Protocol was "+evt.getProtocol());
     }
 }

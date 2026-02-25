@@ -2,7 +2,7 @@ package org.kendar.di.simple.reg;
 
 public class RegisteredItem {
     public RegisteredItem() {
-        System.out.println(this.toString() + " " + Thread.currentThread().getId());
+        System.out.println(this + " " + Thread.currentThread().getId());
     }
 
     @Override

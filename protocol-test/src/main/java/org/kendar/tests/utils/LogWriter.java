@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@SuppressWarnings("ThrowablePrintedToSystemOut")
 public class LogWriter {
 
     private static final Path path;
@@ -28,7 +29,7 @@ public class LogWriter {
                 Files.writeString(path, "STARTING");
             }
         } catch (IOException e) {
-
+            //NOOP
         }
         logWriter = new Thread(LogWriter::writeLogs);
         logWriter.start();
@@ -67,7 +68,7 @@ public class LogWriter {
         try {
             logs.put(data);
         } catch (InterruptedException e) {
-
+            //NOOP
         }
     }
 
@@ -101,7 +102,7 @@ public class LogWriter {
                 }
                 TestSleeper.sleep(1000);
             } catch (Exception ex) {
-
+                //NOOP
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.kendar.protocol.context;
 
+import io.netty.handler.ssl.SslContext;
 import org.kendar.buffers.BBuffer;
 import org.kendar.buffers.BBufferEndianness;
 import org.kendar.exceptions.AskMoreDataException;
@@ -18,6 +19,7 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.Stop;
 import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.Proxy;
+import org.kendar.proxy.WireProxySocket;
 import org.kendar.tcpserver.ClientServerChannel;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
@@ -37,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 public abstract class NetworkProtoContext extends ProtoContext {
     private static final Logger log = LoggerFactory.getLogger(NetworkProtoContext.class);
     private final List<Runnable> runnables = new ArrayList<>();
+    private SslContext sslContext;
     /**
      * If had sent the greeting message (to send data immediately after connection without further ado)
      */
@@ -58,6 +61,12 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
         super(descriptor, contextId);
+
+        this.sslContext =((NetworkProtoDescriptor)descriptor).getSslContext();
+    }
+
+    public ClientServerChannel getClient() {
+        return client;
     }
 
     /**
@@ -96,8 +105,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
     public void disconnect(Object connection) {
         try {
             disconnected = true;
-            if (connection != null && NetworkProxySocket.class.isAssignableFrom(connection.getClass())) {
-                ((NetworkProxySocket) connection).close();
+            if (connection != null && WireProxySocket.class.isAssignableFrom(connection.getClass())) {
+                ((WireProxySocket) connection).close();
             }
             if (client != null) client.close();
         } catch (IOException e) {
@@ -383,5 +392,13 @@ public abstract class NetworkProtoContext extends ProtoContext {
 
     public List<String> getKeys() {
         return values.keySet().stream().toList();
+    }
+
+    public SslContext getSslContext() {
+        return sslContext;
+    }
+
+    public void setSslContext(SslContext sslContext) {
+        this.sslContext= sslContext;
     }
 }

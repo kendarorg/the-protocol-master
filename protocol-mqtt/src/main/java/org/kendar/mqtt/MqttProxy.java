@@ -7,7 +7,7 @@ import org.kendar.exceptions.ProxyException;
 import org.kendar.mqtt.utils.MqttProxySocket;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.NetworkProxy;
-import org.kendar.proxy.NetworkProxySocket;
+import org.kendar.proxy.WireProxySocket;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,19 +24,22 @@ public class MqttProxy extends NetworkProxy {
 
     @TpmConstructor
     public MqttProxy(@TpmNamed(tags = "mqtt") ByteProtocolSettingsWithLogin settings) {
-        super(settings.getConnectionString(), settings.getLogin(), settings.getPassword());
-    }
-
-    public MqttProxy() {
-        super();
+        super(settings.getConnectionString(), settings.getLogin(), settings.getPassword(),settings.isStartWithTls());
     }
 
     public MqttProxy(String connectionString, String userId, String password) {
         super(connectionString, userId, password);
     }
+    public MqttProxy() {
+        super();
+    }
+
+    public MqttProxy(String connectionString, String userId, String password,boolean startWithTls) {
+        super(connectionString, userId, password,startWithTls);
+    }
 
     @Override
-    protected NetworkProxySocket buildProxyConnection(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+    protected WireProxySocket buildProxyConnection(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
         try {
             return new MqttProxySocket(context,
                     new InetSocketAddress(InetAddress.getByName(host), port), group);

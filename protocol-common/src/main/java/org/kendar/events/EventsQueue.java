@@ -93,7 +93,6 @@ public class EventsQueue {
                 }
                 var item = items.poll();
                 while (item != null) {
-
                     try {
                         handle(item);
                     } catch (Exception e) {
@@ -109,6 +108,7 @@ public class EventsQueue {
 
     public void handle(TpmEvent event) {
         var eventName = event.getClass().getSimpleName().toLowerCase(Locale.ROOT);
+
         if (!eventHandlers.containsKey(eventName) &&
                 !commandHandlers.containsKey(eventName)) return;
         var handlers = eventHandlers.get(eventName);

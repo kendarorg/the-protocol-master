@@ -10,10 +10,13 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings({"SqlSourceToSinkFlow", "SqlNoDataSourceInspection"})
 public class DataTypesTest extends MySqlBasicTest {
     @BeforeAll
     public static void beforeClass() {
@@ -33,8 +36,7 @@ public class DataTypesTest extends MySqlBasicTest {
                         && m.getParameterTypes()[0] == int.class).
                 findFirst().get();
         mt.setAccessible(true);
-        var ob = mt.invoke(result, 1);
-        return ob;
+        return mt.invoke(result, 1);
     }
 
     private static void setValue(String functionName, Object expected, PreparedStatement pstmt) throws IllegalAccessException, InvocationTargetException, InvocationTargetException {
@@ -142,8 +144,8 @@ public class DataTypesTest extends MySqlBasicTest {
         assertTrue(result.next());
         var ob = getValue(functionName, result, pstmt);
         if (ob.getClass().isArray() && !(ob instanceof String)) {
-            var obl = Arrays.asList(ob);
-            var exl = Arrays.asList(expected);
+            var obl = List.of(ob);
+            var exl = Collections.singletonList(expected);
             assertArrayEquals(exl.toArray(), obl.toArray());
         } else {
             assertEquals(expected.toString(), ob.toString());

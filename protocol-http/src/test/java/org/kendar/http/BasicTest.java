@@ -30,6 +30,8 @@ import org.kendar.settings.PluginSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
+import org.kendar.tcpserver.NettyServer;
+import org.kendar.tcpserver.Server;
 import org.kendar.tcpserver.TcpServer;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
@@ -44,19 +46,18 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BasicTest {
 
-    protected static TcpServer protocolServer;
+    protected static Server protocolServer;
     protected static HttpProtocol baseProtocol;
     static int FAKE_PORT_HTTP = 8087;
     static int FAKE_PORT_HTTPS = 8487;
     static int FAKE_PORT_PROXY = 9999;
     private static SimpleHttpServer simpleServer;
-    private static ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected GlobalSettings globalSettings;
     protected HttpProtocolSettings httpProtocolSettings;
 
@@ -70,8 +71,7 @@ public class BasicTest {
     protected static CloseableHttpClient createHttpClient(HttpClientBuilder custom) {
         var proxy = new HttpHost("localhost", FAKE_PORT_PROXY, "http");
         var routePlanner = new DefaultProxyRoutePlanner(proxy);
-        var httpclient = custom.setRoutePlanner(routePlanner).build();
-        return httpclient;
+        return custom.setRoutePlanner(routePlanner).build();
     }
 
     protected static String getContentString(HttpResponse httpresponse) {
@@ -108,7 +108,7 @@ public class BasicTest {
                 .loadTrustMaterial(null, (x509CertChain, authType) -> true)
                 .build();
 
-        var httpclient = createHttpClient(HttpClients.custom()
+        return createHttpClient(HttpClients.custom()
                 .setSSLContext(sslContext)
                 .setConnectionManager(
                         new PoolingHttpClientConnectionManager(
@@ -118,7 +118,6 @@ public class BasicTest {
                                                 NoopHostnameVerifier.INSTANCE))
                                         .build()
                         )));
-        return httpclient;
     }
 
     public static void afterClassBase() throws Exception {
@@ -205,11 +204,9 @@ public class BasicTest {
                 new HttpMockPlugin(mapper, storage, new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, mockSettings),
                 new HttpRewritePlugin(mapper, storage, new MultiTemplateEngine()).initialize(globalSettings, httpProtocolSettings, rewriteSettings))));
         baseProtocol.initialize();
-        EventsQueue.register("recorder", (r) -> {
-            events.add(r);
-        }, ReportDataEvent.class);
+        EventsQueue.register("recorder", events::add, ReportDataEvent.class);
         baseProtocol.initialize();
-        protocolServer = new TcpServer(baseProtocol);
+        protocolServer = new NettyServer(baseProtocol);
 
 
         protocolServer.start();
@@ -217,7 +214,7 @@ public class BasicTest {
     }
 
     public List<ReportDataEvent> getEvents() {
-        return events.stream().collect(Collectors.toList());
+        return new ArrayList<>(events);
     }
 
     public void afterEachBase() {

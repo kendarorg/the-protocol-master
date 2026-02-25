@@ -62,6 +62,9 @@ public class AmqpProtocol extends NetworkProtoDescriptor {
 
     public AmqpProtocol(int port) {
         this.port = port;
+        var pp = new AmqpProtocolSettings();
+        pp.setPort(port);
+        setSettings(pp);
     }
 
     @Override

@@ -16,7 +16,7 @@
         <plugins.location>../target/plugins</plugins.location>
         <maven.jar.version>3.2.0</maven.jar.version>
         <!-- Override below properties in each plugin's pom.xml -->
-        <plugin.id>dns-protocol-plugin</plugin.id>
+        <plugin.id>protocol-dns-plugin</plugin.id>
         <plugin.class>org.kendar.dns.DnsPlugin</plugin.class>
         <plugin.version>1.0.0</plugin.version>
         <plugin.provider/>
@@ -25,6 +25,15 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessors>
+                        <annotationProcessor>org.pf4j.processor.ExtensionAnnotationProcessor</annotationProcessor>
+                    </annotationProcessors>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -131,7 +140,8 @@
                         </goals>
                         <configuration>
                             <target>
-                                <echo file="${project.build.sourceDirectory}/../resources/protocol_dns_plugin.version" append="false">
+                                <echo file="${project.build.sourceDirectory}/../resources/protocol_dns_plugin.version"
+                                      append="false">
                                     ${revision}
                                 </echo>
                             </target>

@@ -1,7 +1,8 @@
 package org.kendar.postgres;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.kendar.sql.jdbc.DataTypeDescriptor;
 import org.kendar.sql.jdbc.utils.DataTypesBuilder;
 import org.kendar.utils.JsonMapper;
@@ -51,14 +52,6 @@ public class BuildDataTypesJson extends PostgresBasicTest {
 
 
         return resu;
-    }
-
-    @BeforeEach
-    public void beforeEach(TestInfo testInfo) {
-    }
-
-    @AfterEach
-    public void afterEach() {
     }
 
     //@Test

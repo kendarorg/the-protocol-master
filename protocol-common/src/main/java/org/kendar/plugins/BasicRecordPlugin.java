@@ -181,9 +181,9 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
 
     @Override
     protected void handlePostActivation(boolean active) {
-        if(getSettings() instanceof BasicAysncRecordPluginSettings){
+        if (getSettings() instanceof BasicAysncRecordPluginSettings) {
             var bas = (BasicAysncRecordPluginSettings) this.getSettings();
-            if(bas.isResetConnectionsOnStart()){
+            if (bas.isResetConnectionsOnStart()) {
                 disconnectAll();
             }
         }
@@ -198,8 +198,10 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
                     try {
                         var context = contextKvp.getValue();
                         var contextConnection = context.getValue("CONNECTION");
-                        context.disconnect(((ProxyConnection) contextConnection).getConnection());
-                        context.setValue("CONNECTION", null);
+                        if(contextConnection!=null) {
+                            context.disconnect(((ProxyConnection) contextConnection).getConnection());
+                            context.setValue("CONNECTION", null);
+                        }
                     } catch (Exception e) {
                         log.debug("Error disconnecting {}", contextKvp.getKey(), e);
                     }

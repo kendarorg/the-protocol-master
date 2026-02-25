@@ -31,4 +31,13 @@ public class NullEntity extends AbstractHttpEntity implements Cloneable {
     public boolean isStreaming() {
         return false;
     }
+
+    @Override
+    public NullEntity clone() {
+        try {
+            return (NullEntity) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }
