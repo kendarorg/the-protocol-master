@@ -137,7 +137,6 @@ public class SimpleTest extends AmqpBasicTest {
         chanConsume.basicPublish("", MAIN_QUEUE, props, (exectedMessage + "3").getBytes());
 
 
-
         Sleeper.sleep(1000, () -> messages.size() == 3);
 
         assertEquals(3, messages.size());
@@ -294,9 +293,9 @@ public class SimpleTest extends AmqpBasicTest {
         System.out.println("WAIT------------------------------------------------------------");
 
 
-        Sleeper.sleep(6000,()->{
-            System.out.println("SIZE2 "+messages.size());
-            return messages.size()==3;
+        Sleeper.sleep(6000, () -> {
+            System.out.println("SIZE2 " + messages.size());
+            return messages.size() == 3;
         });
 
         assertEquals(3, messages.size());

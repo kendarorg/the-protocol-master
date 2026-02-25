@@ -27,7 +27,7 @@ public class ChunkedInputStream extends LeftOverInputStream {
         int len = 0;
         for (int i = 0; i < nchars; i++) {
             char c = arr[i];
-            int val = 0;
+            int val;
             if (c >= '0' && c <= '9') {
                 val = c - '0';
             } else if (c >= 'a' && c <= 'f') {

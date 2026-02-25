@@ -10,6 +10,10 @@ public class PublishAmqpMessage {
     private String queue = null;
     private String exchange = null;
 
+    public PublishAmqpMessage() {
+
+    }
+
     public String getExchange() {
         return exchange;
     }
@@ -24,10 +28,6 @@ public class PublishAmqpMessage {
 
     public void setQueue(String queue) {
         this.queue = queue;
-    }
-
-    public PublishAmqpMessage() {
-
     }
 
     public int getPropertyFlag() {

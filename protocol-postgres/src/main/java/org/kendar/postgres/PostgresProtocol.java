@@ -32,8 +32,6 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     private static final SqlStringParser parser = new SqlStringParser("$");
     private static DataTypesConverter dataTypesConverter;
 
-    private PostgresExecutor executor = new PostgresExecutor();
-
     static {
         try {
             String text = new String(PostgresProtocol.class.getResourceAsStream("/postgresdtt.json")
@@ -46,6 +44,7 @@ public class PostgresProtocol extends NetworkProtoDescriptor {
     }
 
     private final int port;
+    private final PostgresExecutor executor = new PostgresExecutor();
 
     @TpmConstructor
     public PostgresProtocol(GlobalSettings ini, PostgresProtocolSettings settings, PostgresProxy proxy,

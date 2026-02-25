@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
 public class SwaggerApi implements FilteringClass {
     private static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(SwaggerApi.class);
-    private final String localAddress;
     private final List<SwaggerEnricher> enrichers;
     private final FiltersConfiguration filtersConfiguration;
     private final int port;
@@ -57,7 +56,6 @@ public class SwaggerApi implements FilteringClass {
 
         this.filtersConfiguration = filtersConfiguration;
         this.port = settings.getApiPort();
-        this.localAddress = "localhost";
         this.enrichers = enrichers;
     }
 
@@ -127,7 +125,7 @@ public class SwaggerApi implements FilteringClass {
             resp.setResponseText(mapper.toJsonNode(Json.mapper().writeValueAsString(rebuilt)));
             resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
 
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
 
         }
     }

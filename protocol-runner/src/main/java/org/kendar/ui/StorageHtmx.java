@@ -5,27 +5,21 @@ import org.kendar.annotations.HttpTypeFilter;
 import org.kendar.apis.FilteringClass;
 import org.kendar.apis.base.Request;
 import org.kendar.apis.base.Response;
-import org.kendar.di.DiService;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.ui.dto.FileItemDto;
 import org.kendar.ui.dto.FileTreeItemDto;
-import org.kendar.utils.JsonMapper;
 
 @TpmService
 @HttpTypeFilter(
         blocking = true)
 public class StorageHtmx implements FilteringClass {
-    private final JsonMapper mapper;
     private final MultiTemplateEngine resolversFactory;
-    private final DiService diService;
     private final StorageRepository repository;
 
-    public StorageHtmx(JsonMapper mapper, MultiTemplateEngine resolversFactory,
-                       DiService diService, StorageRepository repository) {
-        this.mapper = mapper;
+    public StorageHtmx(MultiTemplateEngine resolversFactory,
+                       StorageRepository repository) {
         this.resolversFactory = resolversFactory;
-        this.diService = diService;
         this.repository = repository;
     }
 

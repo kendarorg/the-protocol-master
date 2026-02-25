@@ -102,11 +102,11 @@ public class PostgresProtoContext extends NetworkProtoContext {
         return result;
     }
 
-    public void setExecutor(PostgresExecutor executor) {
-        this.executor = executor;
-    }
-
     public PostgresExecutor getExecutor() {
         return executor;
+    }
+
+    public void setExecutor(PostgresExecutor executor) {
+        this.executor = executor;
     }
 }

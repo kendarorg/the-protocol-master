@@ -1,6 +1,6 @@
 package org.kendar.plugins.settings;
 
-public class BasicAysncRecordPluginSettings extends BasicRecordPluginSettings {
+public class BasicAsyncReplayPluginSettings extends BasicReplayPluginSettings {
     private boolean resetConnectionsOnStart = true;
 
     public boolean isResetConnectionsOnStart() {

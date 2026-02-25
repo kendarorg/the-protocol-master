@@ -16,7 +16,7 @@ public class TPMPluginsClassLoader extends URLClassLoader {
     /**
      * Keep track of where the classes are
      */
-    private ConcurrentHashMap<String, ClassLoader> classLoaderMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ClassLoader> classLoaderMap = new ConcurrentHashMap<>();
 
     /**
      * Constructor
@@ -53,7 +53,7 @@ public class TPMPluginsClassLoader extends URLClassLoader {
                 result = classLoader.loadClass(name);
                 classLoaderMap.put(name, classLoader);
                 return result;
-            } catch (Exception e) {
+            } catch (Exception ignored) {
 
             }
         }
@@ -62,7 +62,7 @@ public class TPMPluginsClassLoader extends URLClassLoader {
             result = getParent().loadClass(name);
             classLoaderMap.put(name, this.getParent());
             return result;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         // If nothing found go for the standard URLClassLoader

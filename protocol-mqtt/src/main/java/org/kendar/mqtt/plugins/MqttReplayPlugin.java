@@ -6,7 +6,7 @@ import org.kendar.exceptions.PluginException;
 import org.kendar.mqtt.fsm.ConnectAck;
 import org.kendar.mqtt.fsm.Publish;
 import org.kendar.plugins.BasicReplayPlugin;
-import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
+import org.kendar.plugins.settings.BasicAsyncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.proxy.PluginContext;
@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 @TpmService(tags = "mqtt")
-public class MqttReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSettings> {
+public class MqttReplayPlugin extends BasicReplayPlugin<BasicAsyncReplayPluginSettings> {
     protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(MqttReplayPlugin.class);
     private static final List<String> repeatableItems = Arrays.asList(
@@ -38,7 +38,7 @@ public class MqttReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
 
     @Override
     public Class<?> getSettingClass() {
-        return BasicAysncReplayPluginSettings.class;
+        return BasicAsyncReplayPluginSettings.class;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class MqttReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                         }
                     }
                 }
-                if(!isActive())return;
+                if (!isActive()) return;
                 var ctx = context.getDescriptor().getContextsCache().get(consumeId);
                 var out = mapper.toJsonNode(item.getOutput());
                 var clazz = item.getOutputType();

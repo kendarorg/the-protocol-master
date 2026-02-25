@@ -82,11 +82,11 @@ public class MySQLProtoContext extends NetworkProtoContext {
         return result;
     }
 
-    public void setExecutor(MySQLExecutor executor) {
-        this.executor = executor;
-    }
-
     public MySQLExecutor getExecutor() {
         return executor;
+    }
+
+    public void setExecutor(MySQLExecutor executor) {
+        this.executor = executor;
     }
 }

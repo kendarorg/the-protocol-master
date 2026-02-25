@@ -29,6 +29,7 @@ import java.util.Map;
 /**
  * @author mycat
  */
+@SuppressWarnings("SpellCheckingInspection")
 public enum ErrorCode {
 
     // mycat error code

@@ -41,7 +41,7 @@ public class UndefLengthOutputStream extends FilterOutputStream {
         if (!is.isClosed()) {
             try {
                 is.close();
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
         }
         WriteFinishedEvent e = new WriteFinishedEvent(t);

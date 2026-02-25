@@ -34,6 +34,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
     private static final int UDP_SIZE = 512;
     private final Map<ProtocolPhase, List<PluginHandler>> pluginHandlers = new HashMap<>();
     private final DnsProtocolSettings settings;
+    // TODO Handle DNS Chained servers
     private final List<String> dnsServers = new ArrayList<>();
     private final ExecutorService executorService = Executors.newFixedThreadPool(20);
     private final Map<String, List<String>> cached = new ConcurrentHashMap<>();
@@ -67,8 +68,8 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
             Matcher ipPatternMatcher = ipPattern.matcher(childDns);
             if (!ipPatternMatcher.matches()) {
                 try {
-                    var chilDnsIp = InetAddress.getByName(childDns);
-                    this.dnsServers.add(chilDnsIp.getHostAddress());
+                    var childDnsIp = InetAddress.getByName(childDns);
+                    this.dnsServers.add(childDnsIp.getHostAddress());
                 } catch (UnknownHostException e) {
                     log.error("Unable to resolve IP address for DNS {}", childDns, e);
                 }
@@ -161,7 +162,7 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                 }
             });
             th.start();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -203,14 +204,14 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         }
 
 
-        var splitted = requestedDomain.split("\\.");
+        var splitDomain = requestedDomain.split("\\.");
         var containsAtLeastOneInternal = false;
         var endsWith = false;
         var isUpperCase = requestedDomain.toUpperCase(Locale.ROOT).equals(requestedDomain);
-        if (splitted.length >= 3) {
-            var occurr = (splitted[splitted.length - 2] + "." + splitted[splitted.length - 1]).toLowerCase(Locale.ROOT);
-            containsAtLeastOneInternal = countOccurrencesOf(requestedDomain.toLowerCase(Locale.ROOT), "." + occurr + ".") >= 1;
-            endsWith = requestedDomain.toLowerCase(Locale.ROOT).endsWith("." + occurr);
+        if (splitDomain.length >= 3) {
+            var mainDnsName = (splitDomain[splitDomain.length - 2] + "." + splitDomain[splitDomain.length - 1]).toLowerCase(Locale.ROOT);
+            containsAtLeastOneInternal = countOccurrencesOf(requestedDomain.toLowerCase(Locale.ROOT), "." + mainDnsName + ".") >= 1;
+            endsWith = requestedDomain.toLowerCase(Locale.ROOT).endsWith("." + mainDnsName);
         }
         response.addRecord(request.getQuestion(), Section.QUESTION);
 
@@ -310,11 +311,11 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                     var inPort = indp.getPort();
                     executorService.submit(() -> resolveAll(inAddress, inPort, socket, inCopy));
 
-                } catch (InterruptedIOException e) {
+                } catch (InterruptedIOException ignored) {
 
                 }
             }
-        } catch (SocketException ex) {
+        } catch (SocketException ignored) {
         } catch (Exception ex) {
             log.error("Error running udp thread", ex);
         }
@@ -342,11 +343,11 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
                         clientSocket.close();
 
                     } catch (IOException e) {
-                        log.error("ERror reading from DNS tcp stream", e);
+                        log.error("Error reading from DNS tcp stream", e);
                     }
                 });
             }
-        } catch (SocketException ex) {
+        } catch (SocketException ignored) {
 
         } catch (Exception ex) {
             log.error("Error running tcp thread", ex);
@@ -375,12 +376,12 @@ public class DnsProtocol extends NetworkProtoDescriptor implements ExtensionPoin
         }
         try {
             tcpSocket.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         try {
             udpSocket.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         dnsRunning = false;

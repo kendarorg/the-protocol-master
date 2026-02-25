@@ -20,15 +20,14 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+@SuppressWarnings({"ThrowablePrintedToSystemOut", "ResultOfMethodCallIgnored"})
 public class SeleniumIntegration {
     private final Path rootPath;
     private final String proxyHost;
     private final int proxyPort;
     private final Map<String, String> windowHandles = new HashMap<>();
     private WebDriver driver;
-    private JavascriptExecutor js;
     private String currentTab;
     private int counter = 0;
     private Path browserPath;
@@ -99,11 +98,11 @@ public class SeleniumIntegration {
                 webDriverManager.getDriverManagerType().getBrowserNameLowerCase(), browserPath.get().toAbsolutePath().toString());
 
         if (optionalVersion.isPresent()) {
-            Integer version = Integer.parseInt(optionalVersion.get());
+            var version = Integer.parseInt(optionalVersion.get());
             var available = webDriverManager.getDriverVersions().stream().
-                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().collect(Collectors.toList());
+                    map(v -> Integer.parseInt(v.split("\\.")[0])).sorted().distinct().toList();
             var matching = available.get(available.size() - 1);
-            if (available.stream().anyMatch(v -> v == (version))) {
+            if (available.stream().anyMatch(v -> v.equals(version))) {
                 matching = version;
             }
             return matching.toString();
@@ -171,9 +170,8 @@ public class SeleniumIntegration {
         //driver.manage().deleteAllCookies();
 
 
-        js = (JavascriptExecutor) driver;
         Utils.setCache("driver", driver);
-        Utils.setCache("js", js);
+        Utils.setCache("js", driver);
         setupSize(driver);
         windowHandles.put("main", driver.getWindowHandle());
         currentTab = "main";

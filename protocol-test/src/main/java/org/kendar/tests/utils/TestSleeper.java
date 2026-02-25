@@ -74,7 +74,7 @@ public class TestSleeper {
                 }
             }
 
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
 
         }
         if (!silent) {
