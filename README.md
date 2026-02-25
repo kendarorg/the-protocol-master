@@ -16,15 +16,8 @@ Effortlessly and with zero budget
 
 ### Notes for macOs Users
 
-Should set the following on your .zprofile see [here](https://github.com/testcontainers/testcontainers-rs/pull/800):
-
-```
-export DOCKER_DEFAULT_PLATFORM=linux/arm64v8
-export TESTCONTAINERS_RYUK_DISABLED=true
-export DOCKER_HOST=tcp://localhost:2375
-```
-
-Check [here](https://podman-desktop.io/docs/migrating-from-docker/using-the-docker_host-environment-variable) for Podman
+The only way i have seen to run testcontainers on macOs supporting networks, linked containers
+and docker in docker is to use or an external docker server or [OrbStack](https://orbstack.dev/).
 
 ### Get Started
 
