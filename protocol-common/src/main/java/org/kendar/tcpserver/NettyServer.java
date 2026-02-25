@@ -77,7 +77,7 @@ public class NettyServer implements Server {
                     protoDescriptor.terminate();
                     Sleeper.sleepNoException(1000, EventsQueue::isEmpty, true);
                 }
-                this.nioEventLoopGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
+                //this.nioEventLoopGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS);
 
 
             } catch (Exception e) {
