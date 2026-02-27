@@ -13,51 +13,6 @@
     <artifactId>jacoco</artifactId>
     <dependencies>
 
-        <!--<dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-mongo</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-common</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-common-jdbc</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-runner</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-postgres</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-amqp-091</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-mysql</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-redis</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-http</artifactId>
-            <version>${revision}</version>
-        </dependency>-->
     </dependencies>
 
 

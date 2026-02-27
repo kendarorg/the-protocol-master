@@ -6,27 +6,23 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="protocol-common" />
-        <module name="protocol-common-jdbc" />
-        <module name="protocol-mongo" />
-        <module name="jacoco" />
-        <module name="protocol-test" />
-        <module name="protocol-postgres" />
-        <module name="protocol-mysql" />
-        <module name="protocol-http" />
         <module name="protocol-runner" />
-        <module name="protocol-mqtt" />
-        <module name="protocol-redis" />
-        <module name="protocol-amqp-091" />
-      </profile>
-      <profile name="Annotation profile for TPM-Proxy main pom" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processor name="org.pf4j.processor.ExtensionAnnotationProcessor" />
-        <module name="protocol-dns-plugin" />
-        <module name="sample-plugins" />
+        <module name="protocol-test" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="jacoco" target="17" />
+      <module name="protocol-amqp-091" target="17" />
+      <module name="protocol-common" target="17" />
+      <module name="protocol-common-jdbc" target="17" />
+      <module name="protocol-dns-plugin" target="17" />
+      <module name="protocol-http" target="17" />
+      <module name="protocol-mongo" target="17" />
+      <module name="protocol-mqtt" target="17" />
+      <module name="protocol-mysql" target="17" />
+      <module name="protocol-postgres" target="17" />
+      <module name="protocol-redis" target="17" />
+      <module name="sample-plugins" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

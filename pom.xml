@@ -191,9 +191,19 @@
         <profile>
             <id>deploy</id>
             <modules>
+                <module>protocol-test</module>
+                <module>protocol-postgres</module>
+                <module>protocol-mongo</module>
+                <module>protocol-mysql</module>
+                <module>protocol-amqp-091</module>
+                <module>protocol-redis</module>
+                <module>protocol-mqtt</module>
+                <module>protocol-http</module>
+                <module>sample-plugins</module>
                 <module>protocol-common</module>
                 <module>protocol-common-jdbc</module>
                 <module>protocol-dns-plugin</module>
+                <module>protocol-runner</module>
             </modules>
             <build>
                 <plugins>
