@@ -146,6 +146,37 @@ Add to the pom.xml:
 ### Required Metadata
 
 ```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.11.2</version>
+            <configuration>
+                <doclint>-missing</doclint>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>createJavadocs</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.7.0</version>
+            <extensions>true</extensions>
+            <configuration>
+                <publishingServerId>central</publishingServerId>
+
+            </configuration>
+        </plugin>
+  </plugins>
+</build>
 <groupId>com.mycompany</groupId>
 <artifactId>my-library</artifactId>
 <version>1.0.0</version>
@@ -180,16 +211,19 @@ Add to the pom.xml:
 To avoid the deploy for certain packages
 
 ```xml
-    <build>
-   <plugins>
-      <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-deploy-plugin</artifactId>
-         <configuration>
-            <skip>true</skip>
-         </configuration>
-      </plugin>
-   </plugins>
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>injected-central-publishing</id>
+                    <phase>none</phase>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
 </build>
 ```
 

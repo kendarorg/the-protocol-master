@@ -13,7 +13,7 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <central-publish.skip>true</central-publish.skip>
+        
     </properties>
 
     <dependencies>
@@ -124,5 +124,18 @@
             <version>${apache.http.version}</version>
         </dependency>
     </dependencies>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>injected-central-publishing</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

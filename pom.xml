@@ -229,6 +229,7 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
+
                         </configuration>
                     </plugin>
                     <plugin>
