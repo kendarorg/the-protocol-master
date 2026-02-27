@@ -124,5 +124,23 @@
             <version>${apache.http.version}</version>
         </dependency>
     </dependencies>
+    <name>TPM-Proxy HTTP/S protocol</name>
+    <description>
+        TPM-Proxy HTTP/S protocol
+    </description>
+    <url>https://www.github.com/kendarorg/the-protocol-master</url>
+    <developers>
+        <developer>
+            <id>kendarorg</id>
+            <name>Enrico Da Ros</name>
+            <email>github@kendar.org</email>
+        </developer>
+    </developers>
 
+    <scm>
+        <connection>scm:git:git://github.com/kendarorg/the-protocol-master.git</connection>
+        <developerConnection>scm:git:git://github.com/kendarorg/the-protocol-master.git</developerConnection>
+        <url>https://www.github.com/kendarorg/the-protocol-master</url>
+        <tag>HEAD</tag>
+    </scm>
 </project>
