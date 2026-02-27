@@ -9,6 +9,7 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <central-publish.skip>true</central-publish.skip>
     </properties>
     <artifactId>jacoco</artifactId>
     <dependencies>
