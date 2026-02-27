@@ -16,7 +16,7 @@ Effortlessly and with zero budget
 
 PS For the tests to run you need to be able to run a privileged container
 
-### Notes for macOs Users
+### Notes for MacOs Users
 
 The only way i have seen to run testcontainers on macOs supporting networks, linked containers
 and docker in docker is to use or an external docker server or [OrbStack](https://orbstack.dev/).
