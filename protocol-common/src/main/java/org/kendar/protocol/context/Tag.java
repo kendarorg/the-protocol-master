@@ -24,7 +24,7 @@ public class Tag {
      */
     public static List<Tag> of(String... kvp) {
         var result = new ArrayList<Tag>();
-        for (var i = 0; i < (kvp.length / 2); i += 2) {
+        for (var i = 0; i < kvp.length; i += 2) {
             result.add(new Tag(kvp[i], kvp[i + 1]));
         }
         return result;
