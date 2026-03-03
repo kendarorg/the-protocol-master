@@ -6,16 +6,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="protocol-common" />
-        <module name="protocol-common-jdbc" />
-        <module name="protocol-mongo" />
-        <module name="jacoco" />
-        <module name="protocol-test" />
         <module name="protocol-postgres" />
+        <module name="protocol-common" />
         <module name="protocol-mysql" />
+        <module name="protocol-common-jdbc" />
         <module name="protocol-http" />
         <module name="protocol-runner" />
         <module name="protocol-mqtt" />
+        <module name="protocol-mongo" />
+        <module name="protocol-test" />
         <module name="protocol-redis" />
         <module name="protocol-amqp-091" />
       </profile>
@@ -28,5 +27,8 @@
         <module name="sample-plugins" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="jacoco" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

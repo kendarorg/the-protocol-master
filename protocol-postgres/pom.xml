@@ -9,6 +9,7 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <central-publish.skip>true</central-publish.skip>
     </properties>
     <artifactId>protocol-postgres</artifactId>
     <dependencies>
@@ -52,4 +53,24 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <name>TPM-Proxy POSTGRES protocol</name>
+    <description>
+        TPM-Proxy POSTGRES protocol
+    </description>
+    <url>https://www.github.com/kendarorg/the-protocol-master</url>
+    <developers>
+        <developer>
+            <id>kendarorg</id>
+            <name>Enrico Da Ros</name>
+            <email>github@kendar.org</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/kendarorg/the-protocol-master.git</connection>
+        <developerConnection>scm:git:git://github.com/kendarorg/the-protocol-master.git</developerConnection>
+        <url>https://www.github.com/kendarorg/the-protocol-master</url>
+        <tag>HEAD</tag>
+    </scm>
 </project>

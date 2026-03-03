@@ -10,6 +10,7 @@
     <artifactId>protocol-mongo</artifactId>
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <central-publish.skip>true</central-publish.skip>
     </properties>
     <dependencies>
         <dependency>
@@ -62,4 +63,26 @@
             <version>${zstd.version}</version>
         </dependency>
     </dependencies>
+
+    <name>TPM-Proxy MONGODB protocol</name>
+    <description>
+        TPM-Proxy MONGODB protocol
+    </description>
+    <url>https://www.github.com/kendarorg/the-protocol-master</url>
+    <developers>
+        <developer>
+            <id>kendarorg</id>
+            <name>Enrico Da Ros</name>
+            <email>github@kendar.org</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/kendarorg/the-protocol-master.git</connection>
+        <developerConnection>scm:git:git://github.com/kendarorg/the-protocol-master.git</developerConnection>
+        <url>https://www.github.com/kendarorg/the-protocol-master</url>
+        <tag>HEAD</tag>
+    </scm>
+
+
 </project>

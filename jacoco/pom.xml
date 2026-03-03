@@ -9,55 +9,11 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <central-publish.skip>true</central-publish.skip>
     </properties>
     <artifactId>jacoco</artifactId>
     <dependencies>
 
-        <!--<dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-mongo</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-common</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-common-jdbc</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-runner</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-postgres</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-amqp-091</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-mysql</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-redis</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kendar.protocol</groupId>
-            <artifactId>protocol-http</artifactId>
-            <version>${revision}</version>
-        </dependency>-->
     </dependencies>
 
 
@@ -217,6 +173,17 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>injected-central-publishing</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
         </plugins>
     </build>
 </project>
