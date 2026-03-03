@@ -75,6 +75,7 @@ public abstract class ProtoContext {
      */
     private ProtoState currentState;
     private boolean useCallDurationTimes;
+
     public ProtoContext(ProtoDescriptor descriptor, int contextId) {
         this.contextId = contextId;
         this.descriptor = descriptor;

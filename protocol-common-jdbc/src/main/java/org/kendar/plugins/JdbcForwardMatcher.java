@@ -3,11 +3,11 @@ package org.kendar.plugins;
 import java.util.regex.Pattern;
 
 public class JdbcForwardMatcher {
+    private final Pattern source;
+    private final String target;
     private String id;
     private String oriSource;
     private String oriTarget;
-    private Pattern source;
-    private String target;
 
     //source: jdbc:mysql://([a-ZA-Z0-9_\\-]+)/([a-ZA-Z0-9_\\-]+)[\\?]{0-1}([.]*)
     //source: jdbc:mysql://([a-ZA-Z0-9_\\.\\-]+):3306/volagratis[\\?]{0-1}([.]*)

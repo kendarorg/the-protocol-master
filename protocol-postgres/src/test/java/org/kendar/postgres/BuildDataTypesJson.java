@@ -22,8 +22,8 @@ public class BuildDataTypesJson extends PostgresBasicTest {
     public static void afterClass() throws Exception {
         try {
             afterClassBase();
-        } catch (Exception ex) {
-
+        } catch (Exception ignored) {
+            //NOOP
         }
     }
 
@@ -47,7 +47,8 @@ public class BuildDataTypesJson extends PostgresBasicTest {
                 dtd.setDbSpecificId(oid);
                 resu.add(dtd);
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
+            //NOOP
         }
 
 

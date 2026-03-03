@@ -53,7 +53,7 @@ public class DiTest {
     void testGenericSpecificParameterImplementation() {
         var result = diService.getInstance(UserOfStringTpl.class);
         assertNotNull(result);
-        assertTrue(result.getTemplate() instanceof ImplOfString);
+        assertInstanceOf(ImplOfString.class, result.getTemplate());
         var singleton = diService.getInstance(UserOfStringTpl.class);
         assertSame(singleton, result);
 
@@ -81,22 +81,22 @@ public class DiTest {
     void namedWithString() {
         diService.registerNamed("test", "value");
         var res = diService.getInstance(SimpleUnnamed.class);
-        assertEquals(res.getTest(), "value");
+        assertEquals("value", res.getTest());
     }
 
     @Test
     void namedObject() {
         diService.registerNamed("test", "value");
         var res = diService.getInstance(NamedDependency.class);
-        assertTrue(res.named instanceof SimpleNamed);
-        assertEquals(res.named.getTest(), "value");
+        assertInstanceOf(SimpleNamed.class, res.named);
+        assertEquals("value", res.named.getTest());
     }
 
 
     @Test
     void childContext() {
         diService.registerNamed("test", "value");
-        var storage = new AtomicReference<Object>();
+        var storage = new AtomicReference<>();
         var childContext = new AtomicReference<DiService>();
         new Thread(() -> {
 
@@ -109,8 +109,8 @@ public class DiTest {
         var threadThing = (NamedDependency) storage.get();
         var outerInstance = diService.getInstance(NamedDependency.class);
 
-        assertEquals(threadThing.named.getTest(), "other");
-        assertEquals(outerInstance.named.getTest(), "value");
+        assertEquals("other", threadThing.named.getTest());
+        assertEquals("value", outerInstance.named.getTest());
         DiService.threadsClean();
         assertThrows(RuntimeException.class, () -> childContext.get().getInstance(NamedDependency.class));
     }
@@ -120,7 +120,7 @@ public class DiTest {
     void childContextNotOverriden() {
         diService.registerNamed("test", "value");
         var bases = diService.getInstances(NamedBase.class);
-        var storage = new AtomicReference<Object>();
+        var storage = new AtomicReference<>();
         new Thread(() -> {
             diService.createChildScope(TpmScopeType.THREAD);
             DiService.getThreadContext().registerNamed("test", "other");

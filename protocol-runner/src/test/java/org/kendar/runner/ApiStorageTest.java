@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ApiTestStorage extends ApiTestBase {
+public class ApiStorageTest extends ApiTestBase {
     private static BasicTest bs;
 
     @AfterAll
@@ -28,7 +28,8 @@ public class ApiTestStorage extends ApiTestBase {
     public static void setup() {
         try {
             Main.stop();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
+            //NOOP
         }
         Sleeper.sleep(1000);
         var args = new String[]{

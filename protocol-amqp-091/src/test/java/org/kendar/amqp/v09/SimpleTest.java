@@ -167,8 +167,6 @@ public class SimpleTest extends AmqpBasicTest {
         ConnectionFactory connectionFactory = getConnectionFactory();
         // connectionFactory.enableHostnameVerification();
         var cs = "amqp://localhost:" + FAKE_PORT;
-        //var realCs = new URI(rabbitContainer.getConnectionString());
-        //cs = rabbitContainer.getConnectionString();
         Sleeper.sleep(100);
 
         connectionFactory.setUri(cs);

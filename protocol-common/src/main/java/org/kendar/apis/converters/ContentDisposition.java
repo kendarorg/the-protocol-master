@@ -389,7 +389,7 @@ public class ContentDisposition {
     /**
      * Return the value of the {@literal size} parameter, or {@code null} if not defined.
      *
-     * @deprecated since 5.2.3 as per https://tools.ietf.org/html/rfc6266#appendix-B RFC
+     * @deprecated since 5.2.3 as per <a href="https://tools.ietf.org/html/rfc6266#appendix-B">...</a> RFC
      * 6266, Appendix B, to be removed in a future release.
      */
     @Deprecated
@@ -401,7 +401,7 @@ public class ContentDisposition {
     /**
      * Return the value of the {@literal creation-date} parameter, or {@code null} if not defined.
      *
-     * @deprecated since 5.2.3 as per https://tools.ietf.org/html/rfc6266#appendix-B RFC
+     * @deprecated since 5.2.3 as per <a href="https://tools.ietf.org/html/rfc6266#appendix-B">...</a> RFC
      * 6266, Appendix B, to be removed in a future release.
      */
     @Deprecated
@@ -413,7 +413,7 @@ public class ContentDisposition {
     /**
      * Return the value of the {@literal modification-date} parameter, or {@code null} if not defined.
      *
-     * @deprecated since 5.2.3 as per https://tools.ietf.org/html/rfc6266#appendix-B RFC
+     * @deprecated since 5.2.3 as per <a href="https://tools.ietf.org/html/rfc6266#appendix-B">...</a> RFC
      * 6266, Appendix B, to be removed in a future release.
      */
     @Deprecated
@@ -438,7 +438,7 @@ public class ContentDisposition {
     /**
      * Return the value of the {@literal read-date} parameter, or {@code null} if not defined.
      *
-     * @deprecated since 5.2.3 as per https://tools.ietf.org/html/rfc6266#appendix-B RFC
+     * @deprecated since 5.2.3 as per <a href="https://tools.ietf.org/html/rfc6266#appendix-B">...</a> RFC
      * 6266, Appendix B, to be removed in a future release.
      */
     @Deprecated
@@ -517,7 +517,7 @@ public class ContentDisposition {
          * Only the US-ASCII, UTF-8 and ISO-8859-1 charsets are supported.
          *
          * <p><strong>Note:</strong> Do not use this for a {@code "multipart/form-data"} requests as per
-         * <a link="<a href="https://tools.ietf.org/html/rfc7578#section-4.2 https://tools.ietf.org/html/rfc7578#section-4.2 RFC 7578, Section 4.2 and also
+         * <a link="<a href="<a href="https://tools.ietf.org/html/rfc7578#section-4.2">...</a> <a href="https://tools.ietf.org/html/rfc7578#section-4.2">...</a> RFC 7578, Section 4.2 and also
          * RFC 5987 itself mentions it does not apply to multipart requests.
          */
         Builder filename(String filename, String charset);
@@ -525,7 +525,7 @@ public class ContentDisposition {
         /**
          * Set the value of the {@literal size} parameter.
          *
-         * @deprecated since 5.2.3 as per https://tools.ietf.org/html/rfc6266#appendix-B RFC
+         * @deprecated since 5.2.3 as per <a href="https://tools.ietf.org/html/rfc6266#appendix-B">...</a> RFC
          * 6266, Appendix B, to be removed in a future release.
          */
         @Deprecated
@@ -534,7 +534,7 @@ public class ContentDisposition {
         /**
          * Set the value of the {@literal creation-date} parameter.
          *
-         * @deprecated since 5.2.3 as per https://tools.ietf.org/html/rfc6266#appendix-B RFC
+         * @deprecated since 5.2.3 as per <a href="https://tools.ietf.org/html/rfc6266#appendix-B">...</a> RFC
          * 6266, Appendix B, to be removed in a future release.
          */
         @Deprecated
@@ -543,7 +543,7 @@ public class ContentDisposition {
         /**
          * Set the value of the {@literal modification-date} parameter.
          *
-         * @deprecated since 5.2.3 as per https://tools.ietf.org/html/rfc6266#appendix-B>RFC
+         * @deprecated since 5.2.3 as per <a href="https://tools.ietf.org/html/rfc6266#appendix-B">...</a>>RFC
          * 6266, Appendix B, to be removed in a future release.
          */
         @Deprecated
@@ -552,7 +552,7 @@ public class ContentDisposition {
         /**
          * Set the value of the {@literal read-date} parameter.
          *
-         * @deprecated since 5.2.3 as per https://tools.ietf.org/html/rfc6266#appendix-B RFC
+         * @deprecated since 5.2.3 as per <a href="https://tools.ietf.org/html/rfc6266#appendix-B">...</a> RFC
          * 6266, Appendix B, to be removed in a future release.
          */
         @Deprecated

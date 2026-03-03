@@ -32,7 +32,8 @@ public class ApiTest extends ApiTestBase {
     public static void setup() {
         try {
             Main.stop();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
+            //NOOP
         }
         var args = new String[]{
 
@@ -118,7 +119,7 @@ public class ApiTest extends ApiTestBase {
             assertTrue(status.isActive());
         }
         for (var protocol : protocols) {
-            okResult = getRequest("http://localhost:5005/api/protocols/" + protocol.getId() + "/plugins/record-plugin/stop", httpclient, new TypeReference<Ok>() {
+            okResult = getRequest("http://localhost:5005/api/protocols/" + protocol.getId() + "/plugins/record-plugin/stop", httpclient, new TypeReference<>() {
             });
             assertEquals("OK", okResult.getResult());
         }

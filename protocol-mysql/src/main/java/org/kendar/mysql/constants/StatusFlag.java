@@ -1,7 +1,7 @@
 package org.kendar.mysql.constants;
 
 /**
- * https://dev.mysql.com/doc/internals/en/status-flags.html
+ * <a href="https://dev.mysql.com/doc/internals/en/status-flags.html">...</a>
  * <p>
  * <pre>
  * The status flags are a bit-field.

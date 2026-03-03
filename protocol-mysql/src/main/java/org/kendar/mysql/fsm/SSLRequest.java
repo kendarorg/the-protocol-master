@@ -1,6 +1,5 @@
 package org.kendar.mysql.fsm;
 
-import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CapabilityFlag;
 import org.kendar.protocol.events.BytesEvent;
@@ -37,7 +36,7 @@ public class SSLRequest extends MySQLProtoState {
 
     @Override
     public boolean canRun(BytesEvent event) {
-        var useTls = ((MySqlProtocolSettings) event.getContext().getDescriptor().getSettings()).isUseTls();
+        var useTls = event.getContext().getDescriptor().getSettings().isUseTls();
         if (!useTls) {
             return false;
         }

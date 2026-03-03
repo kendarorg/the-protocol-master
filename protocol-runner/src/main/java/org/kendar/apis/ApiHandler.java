@@ -85,9 +85,8 @@ public class ApiHandler implements FilteringClass {
                     body = Ok.class
             ),
             tags = {"base/utils"})
-    public boolean getStatus(Request reqp, Response resp) {
+    public void getStatus(Request reqp, Response resp) {
         respondJson(resp, new Ok());
-        return true;
     }
 
     @HttpMethodFilter(
@@ -118,9 +117,8 @@ public class ApiHandler implements FilteringClass {
                     body = String.class
             ),
             tags = {"base/utils"})
-    public boolean getSettings(Request reqp, Response resp) {
+    public void getSettings(Request reqp, Response resp) {
         respondJson(resp, settings);
-        return true;
     }
 
     @HttpMethodFilter(
@@ -273,7 +271,7 @@ public class ApiHandler implements FilteringClass {
                     description = "In case of errors"
             )},
             tags = {"plugins/protocols"})
-    public boolean actionOnAllPlugins(Request reqp, Response resp) {
+    public void actionOnAllPlugins(Request reqp, Response resp) {
         var plugin = reqp.getPathParameter("plugin");
         var action = reqp.getPathParameter("action");
 
@@ -288,7 +286,6 @@ public class ApiHandler implements FilteringClass {
             }
         }
         respondOk(resp);
-        return true;
     }
 
 

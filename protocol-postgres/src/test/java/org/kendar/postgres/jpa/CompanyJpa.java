@@ -2,6 +2,7 @@ package org.kendar.postgres.jpa;
 
 import javax.persistence.*;
 
+@SuppressWarnings("JpaDataSourceORMInspection")
 @Entity()
 @Table(name = "COMPANY_JPA")
 public class CompanyJpa {

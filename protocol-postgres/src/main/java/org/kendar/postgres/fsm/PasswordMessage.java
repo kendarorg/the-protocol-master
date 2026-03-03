@@ -31,8 +31,6 @@ public class PasswordMessage extends PostgresState {
     @Override
     protected Iterator<ProtoStep> executeStandardMessage(BBuffer inputBuffer, NetworkProtoContext context) {
         var protoContext = (PostgresProtoContext) context;
-        //var p = inputBuffer.get();
-        //var length = inputBuffer.getInt(0);
         inputBuffer.setPosition(5);
         var data = new String(inputBuffer.getRemaining());
         data = data.substring(0, data.length() - 1);

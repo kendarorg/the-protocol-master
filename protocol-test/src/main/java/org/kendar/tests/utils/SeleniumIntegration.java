@@ -151,9 +151,6 @@ public class SeleniumIntegration {
         capabilities.setProxy(proxy);
         capabilities.setAcceptInsecureCerts(true);
         capabilities.addArguments("--remote-allow-origins=*");
-        //options.addArguments("--disable-dev-shm-usage");
-        //options.addArguments("disable-infobars"); // disabling infobars
-        //options.addArguments("--disable-extensions"); // disabling extensions
         capabilities.addArguments("--disable-gpu"); // applicable to windows os only
         capabilities.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
         capabilities.addArguments("--no-sandbox"); // Bypass OS security model

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public class ExtractTypeTest {
 
     public static List<String> getAllMatches(String text, String regex) {
-        List<String> matches = new ArrayList<String>();
+        List<String> matches = new ArrayList<>();
         var m = Pattern.compile("(?=(" + regex + "))").matcher(text);
         while (m.find()) {
             matches.add(m.group(1));

@@ -8,7 +8,6 @@ import org.kendar.plugins.settings.BasicForwardPluginSettings;
 import org.kendar.plugins.settings.dtos.ForwardMatcher;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.PluginContext;
-import org.kendar.proxy.Proxy;
 import org.kendar.proxy.ProxyConnection;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
@@ -26,11 +25,8 @@ import static org.kendar.plugins.base.ProtocolPhase.CONNECT;
 
 public abstract class BasicForwardPlugin extends ProtocolPluginDescriptorBase<BasicForwardPluginSettings> {
     private static final Logger log = LoggerFactory.getLogger(BasicForwardPlugin.class);
-    private AtomicReference<List<ForwardMatcher>> matchers = new AtomicReference<>(new ArrayList<>());
+    private final AtomicReference<List<ForwardMatcher>> matchers = new AtomicReference<>(new ArrayList<>());
 
-    /// private static Object lock = new Object();
-    //private static ConcurrentHashMap<String, BasicForwardPlugin> activeProfiles = new ConcurrentHashMap<>();
-    //private static AtomicBoolean registered = new AtomicBoolean(false);
     public BasicForwardPlugin(JsonMapper mapper) {
         super(mapper);
     }
@@ -99,7 +95,7 @@ public abstract class BasicForwardPlugin extends ProtocolPluginDescriptorBase<Ba
     public boolean handle(PluginContext pluginContext, ProtocolPhase phase, Object in, Object out) {
 
         var ctx = (NetworkProtoContext) pluginContext.getContext();
-        var jdbcProxy = (Proxy) ctx.getProxy();
+        var jdbcProxy = ctx.getProxy();
 
 
         var userid = ctx.getValue("userid", "");
@@ -151,7 +147,7 @@ public abstract class BasicForwardPlugin extends ProtocolPluginDescriptorBase<Ba
 
             var connection = DriverManager.
                     getConnection(newConnectionString, userid, password);
-            log.error("Override connection String " + newConnectionString);
+            log.error("Override connection String {}", newConnectionString);
             var conn = new ProxyConnection(connection);
             ctx.setValue("CONNECTION", conn);
         } catch (Exception ex) {

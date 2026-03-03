@@ -53,6 +53,7 @@ public class UiTest extends ApiTestBase {
         assertTrue(actual.contains("redis-01"));
         assertTrue(actual.contains("mysql-01"));
         assertTrue(actual.contains("mqtt-01"));
+
         assertTrue(actual.contains("postgres-01"));
         assertTrue(actual.contains("amqp091-01"));
         assertTrue(actual.contains("mongodb-01"));
@@ -94,12 +95,4 @@ public class UiTest extends ApiTestBase {
 
     }
 
-//    @Test
-//    void globalApiTest() throws Exception {
-//
-//        var httpclient = HttpClients.createDefault();
-//        var data = Files.readAllBytes(Path.of("src", "test", "resources", "testcontent_enc.zip"));
-//        var okResult = postRequest("http://localhost:5005/api/global/storage", httpclient, data, new TypeReference<Ok>() {
-//        }, "application/zip");
-//    }
 }

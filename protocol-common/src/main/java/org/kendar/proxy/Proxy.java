@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 /**
  * Base proxy implementation
  *
- * @param <T>
  */
 @SuppressWarnings("rawtypes")
 public abstract class Proxy {

@@ -179,9 +179,6 @@ public class SubscribeTest extends MqttBasicTest {
             Sleeper.sleep(500);
             System.out.println("========================");
 
-            /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
-            message.setQos(2);
-            client.publish(TOPIC_NAME, message);*/
             var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
                     a -> a instanceof MqttPublishPluginApis
             ).findFirst().get();
@@ -233,9 +230,6 @@ public class SubscribeTest extends MqttBasicTest {
             Sleeper.sleep(500);
             System.out.println("========================");
 
-            /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
-            message.setQos(2);
-            client.publish(TOPIC_NAME, message);*/
             var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
                     a -> a instanceof MqttPublishPluginApis
             ).findFirst().get();
@@ -288,9 +282,6 @@ public class SubscribeTest extends MqttBasicTest {
             Sleeper.sleep(500);
             System.out.println("========================");
 
-            /*MqttMessage message = new MqttMessage(MESSAGE_CONTENT.getBytes());
-            message.setQos(2);
-            client.publish(TOPIC_NAME, message);*/
             var publish = (MqttPublishPluginApis) publishPlugin.getApiHandler().stream().filter(
                     a -> a instanceof MqttPublishPluginApis
             ).findFirst().get();

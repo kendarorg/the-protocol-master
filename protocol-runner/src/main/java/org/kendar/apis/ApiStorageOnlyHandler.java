@@ -68,14 +68,13 @@ public class ApiStorageOnlyHandler implements FilteringClass {
                     body = Ko.class
             )},
             tags = {"base/storage"})
-    public boolean handleDownload(Request reqp, Response resp) {
+    public void handleDownload(Request reqp, Response resp) {
         try {
             var data = storage.readAsZip();
             respondFile(resp, data, ConstantsMime.ZIP, "storage.zip");
         } catch (Exception ex) {
             respondKo(resp, ex);
         }
-        return true;
     }
 
     @HttpMethodFilter(

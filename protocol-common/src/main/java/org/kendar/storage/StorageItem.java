@@ -5,8 +5,6 @@ import org.kendar.utils.JsonMapper;
 /**
  * Storage item
  *
- * @param <I>
- * @param <O>
  */
 public class StorageItem {
     protected static final JsonMapper mapper = new JsonMapper();

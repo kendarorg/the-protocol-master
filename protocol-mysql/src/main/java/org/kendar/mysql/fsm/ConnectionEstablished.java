@@ -1,6 +1,5 @@
 package org.kendar.mysql.fsm;
 
-import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.constants.CapabilityFlag;
 import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.executor.MySQLProtoContext;
@@ -31,7 +30,7 @@ public class ConnectionEstablished extends ProtoState {
         gp.setServerVersion("8.1.0");
         gp.setThreadId(protocContext.getNewPid());
         gp.setServerCapabilities((short) 0xFFFF);
-        var useTls = ((MySqlProtocolSettings) event.getContext().getDescriptor().getSettings()).isUseTls();
+        var useTls = event.getContext().getDescriptor().getSettings().isUseTls();
         if (!useTls) {
             gp.setServerCapabilities((short) CapabilityFlag.unsetFlag(0xFFFF, CapabilityFlag.CLIENT_SSL.getCode()));
             gp.setAuthenticationPlugin("mysql_native_password");

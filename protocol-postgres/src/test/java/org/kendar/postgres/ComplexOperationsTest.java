@@ -213,14 +213,11 @@ public class ComplexOperationsTest extends PostgresBasicTest {
 
         stmt = c.prepareStatement("select * from hello_3(?)");
         ((PreparedStatement) stmt).setString(1, "pippo");
-        // ((PreparedStatement)stmt).setString(2,null);
-        //((PreparedStatement)stmt).setString(2,"");
         var res = ((PreparedStatement) stmt).executeQuery();
         while (res.next()) {
             System.out.println(res.getString(1));
             System.out.println(res.getString(2));
         }
-        //}
 
         stmt.close();
         c.close();

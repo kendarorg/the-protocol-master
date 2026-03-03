@@ -129,9 +129,6 @@ public class MongoBasicTest {
     }
 
     protected static MongoClient getProxyConnection() {
-//        var serverApi = ServerApi.builder()
-//                .version(ServerApiVersion.V1)
-//                .build();
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(
                         "mongodb://localhost:" + FAKE_PORT + "/?retryWrites=false&retryReads=false&tls=false&ssl=false"))
@@ -141,9 +138,6 @@ public class MongoBasicTest {
     }
 
     protected static MongoClient getProxyConnectionAuth() {
-//        var serverApi = ServerApi.builder()
-//                .version(ServerApiVersion.V1)
-//                .build();
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(
                         "mongodb://thelogin:password@localhost:" + FAKE_PORT + "/?" +
@@ -167,12 +161,8 @@ public class MongoBasicTest {
     }
 
     protected static MongoClient getRealConnection() {
-//        var serverApi = ServerApi.builder()
-//                .version(ServerApiVersion.V1)
-//                .build();
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(mongoContainer.getConnectionString()))
-                //.serverApi(serverApi)
                 .build();
         return MongoClients.create(settings);
     }

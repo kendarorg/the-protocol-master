@@ -39,7 +39,7 @@ public class DataTypesTest extends PostgresBasicTest {
         return mt.invoke(result, 1);
     }
 
-    private static void setValue(String functionName, Object expected, PreparedStatement pstmt) throws IllegalAccessException, InvocationTargetException, InvocationTargetException {
+    private static void setValue(String functionName, Object expected, PreparedStatement pstmt) throws IllegalAccessException, InvocationTargetException {
         var mt = Arrays.stream(pstmt.getClass().getMethods()).
                 filter(m -> m.getName().equalsIgnoreCase("set" + functionName)
                         && m.getParameterCount() == 2

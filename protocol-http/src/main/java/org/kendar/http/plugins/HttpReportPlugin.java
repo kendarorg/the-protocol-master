@@ -34,7 +34,8 @@ public class HttpReportPlugin extends BasicReportPlugin<HttpReportPluginSettings
         try {
             var data = supplier.get();
             toFill.add(data);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
+            //NOOP
         }
     }
 

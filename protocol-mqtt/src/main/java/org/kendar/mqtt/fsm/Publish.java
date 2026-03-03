@@ -13,7 +13,7 @@ import org.kendar.utils.ContentData;
 import java.util.Iterator;
 
 /**
- * https://www.emqx.com/en/blog/mqtt-5-0-control-packets-02-publish-puback
+ * <a href="https://www.emqx.com/en/blog/mqtt-5-0-control-packets-02-publish-puback">...</a>
  */
 public class Publish extends BasePropertiesMqttState {
     private String topicName;

@@ -119,7 +119,6 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
      * Handle all the messages recorded previously
      *
      * @param pluginContext The execution context
-     * @param protocolPhase The current exection phase
      * @param in            The input item. When Object means anything
      * @param out           The output item. When Object means anything
      * @return True when should block further executions
@@ -287,7 +286,7 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
             respQuery.setUsed(completedOutIndexes);
             respQuery.setStartAt(afterIndex);
             //respQuery.getTags().putAll(getContextTags(pluginContext.getContext()));
-            log.debug("[XXX] Request query " + respQuery);
+            log.debug("[XXX] Request query {}", respQuery);
 
             var responses = repository.readResponsesFromScenario(getInstanceId(), respQuery);
             responses.sort(Comparator.comparingLong(StorageItem::getTimestamp));

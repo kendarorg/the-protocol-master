@@ -84,7 +84,7 @@ public class SeleniumTestBase extends ApiTestBase {
 
     protected static void startContainers() {
         for (var item : toWaitFor.entrySet()) {
-            environment.withLogConsumer(item.getKey(), new Consumer<OutputFrame>() {
+            environment.withLogConsumer(item.getKey(), new Consumer<>() {
                 @Override
                 public void accept(OutputFrame outputFrame) {
                     var data = outputFrame.getUtf8StringWithoutLineEnding();
@@ -453,20 +453,6 @@ public class SeleniumTestBase extends ApiTestBase {
     protected void cleanBrowserCache() {
         navigateTo("about:blank");
         getSelenium().clearStatus();
-//        //driver.manage().deleteAllCookies();
-//
-//
-//        var currentTab = getCurrentTab();
-//        if(!existsTab("settings")) {
-//            newTab("settings");
-//        }else{
-//            switchToTab("settings");
-//        }
-//        driver.get("chrome://settings/clearBrowserData");
-//        driver.findElement(By.xpath("//settings-ui")).sendKeys(Keys.ENTER);
-//        Sleeper.sleep(500);
-//        navigateTo("about:blank");
-//        switchToTab(currentTab);
 
     }
 

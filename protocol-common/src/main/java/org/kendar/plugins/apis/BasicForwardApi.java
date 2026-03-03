@@ -39,7 +39,7 @@ public class BasicForwardApi extends ProtocolPluginApiHandlerDefault<BasicForwar
                     description = "Retrieve all the forwards"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/forward-plugin"})
-    public boolean listAllForwardsd(Request reqp, Response resp) {
+    public boolean listAllForwards(Request reqp, Response resp) {
         var result = getDescriptor().getMatchers().stream().map(m -> new ForwardItem(m.getId(), m.getOriSource(), m.getOriTarget())).toList();
         respondJson(resp, result);
         return true;
@@ -72,7 +72,7 @@ public class BasicForwardApi extends ProtocolPluginApiHandlerDefault<BasicForwar
                         m.getId().equalsIgnoreCase(id))).findFirst();
 
         var settings = pluginInstance.getSettings();
-        var ppdb = (BasicForwardPlugin) pluginInstance;
+        var ppdb = pluginInstance;
 
         if (matchingId.isPresent()) {
             matchingId.get().setSource(data.getSource());
@@ -118,7 +118,7 @@ public class BasicForwardApi extends ProtocolPluginApiHandlerDefault<BasicForwar
         });
 
         var settings = pluginInstance.getSettings();
-        var ppdb = (BasicForwardPlugin) pluginInstance;
+        var ppdb = pluginInstance;
         settings.setMappings(newData);
 
         var globalSettings = DiService.getThreadContext().getInstance(GlobalSettings.class);

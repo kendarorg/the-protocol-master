@@ -84,9 +84,6 @@ public class SSLHandshake extends ProtoState {
 
         pipeline.addFirst(sslHandler);
 
-        //pipeline.addFirst("logger", new LoggingHandler(LogLevel.DEBUG, ByteBufFormat.HEX_DUMP));
-        //pipeline.removeLast();
-        //pipeline.addLast(new ChannelInboundHandlerAdapter() {});
         sslHandler.handshakeFuture().addListener(future -> {
             event.getContext().setValue("START_SSL_NEGOTIATION", false);
             event.getContext().setValue("START_TLS", false);

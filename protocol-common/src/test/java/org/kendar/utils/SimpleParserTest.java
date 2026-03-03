@@ -122,15 +122,6 @@ public class SimpleParserTest {
     }
 
 
-//    @Test
-//    void evaluateComplex() {
-//        var target = new SimpleParser();
-//        var result = target.parse("OR(a=='test',AND(b==c,d=='e',CONCAT('f','g',h)),TRUE)");
-//        var testClass = new SimpleClass("test", "b","b", "e", "h");
-//        var jsonMapper = new JsonMapper();
-//        target.evaluate(result,jsonMapper.toJsonNode(testClass));
-//    }
-
     @Test
     void evaluate() {
         var target = new SimpleParser();

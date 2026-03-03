@@ -187,7 +187,8 @@ public class MqttPublishPluginApis extends ProtocolPluginApiHandlerDefault<MqttP
                     getDescriptor().expectPubAck(context, pubRel);
                 }
                 context.write(message);
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
+                //NOOP
 
             }
         }

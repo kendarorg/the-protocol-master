@@ -80,7 +80,8 @@ public class Resp3Subscribe extends ProtoState implements NetworkReturnMessage {
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
+            //NOOP
 
         }
 

@@ -49,9 +49,6 @@ public class MqttBasicTest {
     private static ProtocolPluginDescriptor latencyPlugin;
 
     public static void beforeClassBaseInternalIntercept() throws IOException {
-        //LoggerBuilder.setLevel(Logger.ROOT_LOGGER_NAME, Level.DEBUG);
-        //var classpathLoader = new ClasspathResourceLoader();
-        //final var classPathConfig = new ResourceLoaderConfig(classpathLoader);
         var classpathLoader = new FileResourceLoader(new File("moquette.conf"));
         final var classPathConfig = new ResourceLoaderConfig(classpathLoader);
 
@@ -65,16 +62,6 @@ public class MqttBasicTest {
             mqttBroker.stopServer();
             System.out.println("Broker stopped");
         }));
-//
-//        var dockerHost = Utils.getDockerHost();
-//        assertNotNull(dockerHost);
-//        var network = Network.newNetwork();
-//        rabbitContainer = new RabbitMqImage();
-//        rabbitContainer
-//                .withNetwork(network)
-//                .waitingForPort(5672)
-//                .start();
-
 
     }
 
@@ -173,11 +160,6 @@ public class MqttBasicTest {
             System.out.println("Received on topic: [" + msg.getTopicName() + "] content: [" + decodedPayload + "] qos:[" + msg.getQos() + "]");
             moquetteMessages.add(msg);
         }
-
-//        @Override
-//        public void onSessionLoopError(Throwable error) {
-//            System.out.println("Session event loop reported error: " + error);
-//        }
     }
 
 }

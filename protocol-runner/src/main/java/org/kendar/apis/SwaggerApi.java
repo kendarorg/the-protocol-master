@@ -127,8 +127,8 @@ public class SwaggerApi implements FilteringClass {
             resp.setResponseText(mapper.toJsonNode(Json.mapper().writeValueAsString(rebuilt)));
             resp.addHeader(ConstantsHeader.CONTENT_TYPE, ConstantsMime.JSON);
 
-        } catch (Exception ex) {
-
+        } catch (Exception ignored) {
+            //NOOP
         }
     }
 

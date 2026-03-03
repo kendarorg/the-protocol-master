@@ -74,7 +74,8 @@ public class TestSleeper {
                 }
             }
 
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
+            //NOOP
 
         }
         if (!silent) {

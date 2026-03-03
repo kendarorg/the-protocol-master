@@ -26,7 +26,7 @@ Maven Central requires that you control the namespace you're publishing under.
 Example:
 
 | Domain          | Group ID        |
-| --------------- | --------------- |
+|-----------------|-----------------|
 | `mycompany.com` | `com.mycompany` |
 | `example.org`   | `org.example`   |
 

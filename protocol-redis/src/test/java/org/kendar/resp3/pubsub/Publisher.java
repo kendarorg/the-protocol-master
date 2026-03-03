@@ -19,9 +19,7 @@ public class Publisher {
     }
 
     public void start(String... data) {
-        //log.info("Type your message (quit for terminate)");
 
-        //BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         for (var line : data) {
             System.out.println("Sending " + line);
             publisherJedis.publish(channel, line);

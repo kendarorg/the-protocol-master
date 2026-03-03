@@ -122,7 +122,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
                 ((WireProxySocket) connection).close();
             }
             if (client != null) client.close();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
+            //NOOP
 
         }
     }
@@ -140,7 +141,8 @@ public abstract class NetworkProtoContext extends ProtoContext {
                 try {
                     client.close();
                     client = null;
-                } catch (IOException e) {
+                } catch (IOException ignored) {
+                    //NOOP
 
                 }
             }

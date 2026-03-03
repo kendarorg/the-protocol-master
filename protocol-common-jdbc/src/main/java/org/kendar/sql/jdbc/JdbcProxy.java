@@ -26,8 +26,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class JdbcProxy extends Proxy {
     private static final Logger log = LoggerFactory.getLogger(JdbcProxy.class);
-    private String driver;
-    private String forcedSchema;
+    private final String driver;
+    private final String forcedSchema;
 
     public JdbcProxy(JdbcProtocolSettings settings) {
         super();

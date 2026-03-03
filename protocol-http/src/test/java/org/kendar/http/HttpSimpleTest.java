@@ -71,7 +71,8 @@ public class HttpSimpleTest extends BasicTest {
     public static void afterClass() {
         try {
             afterClassBase();
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
+            //NOOP
 
         }
     }
@@ -385,7 +386,7 @@ public class HttpSimpleTest extends BasicTest {
                 if (i < startWarning) {
                     assertNull(httpresponse.getFirstHeader("RateLimit-Limit"));
                 } else {
-                    assertEquals(httpresponse.getFirstHeader("RateLimit-Limit").getValue(), "120");
+                    assertEquals("120", httpresponse.getFirstHeader("RateLimit-Limit").getValue());
                     var limit = lps.getRateLimit() - ((i + 1) * lps.getCostPerRequest());
                     assertEquals(httpresponse.getFirstHeader("RateLimit-Remaining").getValue(), "" + limit);
                 }

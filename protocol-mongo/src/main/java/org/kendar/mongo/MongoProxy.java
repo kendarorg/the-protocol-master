@@ -236,8 +236,6 @@ public class MongoProxy extends Proxy {
         resultMap.put("ok", 1.0);
         //resultMap.put("saslSupportedMechs", List.of("PLAIN"));
         var json = resultMap.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        //var toSend = new OpReplyContent(8, protoContext.getReqResId(), lsatOp.getRequestId());
-        //var out2 = new OpReplyContent();
         out.setFlags(8);
         out.setRequestId(protoContext.getReqResId());
         out.setResponseId(lsatOp.getRequestId());

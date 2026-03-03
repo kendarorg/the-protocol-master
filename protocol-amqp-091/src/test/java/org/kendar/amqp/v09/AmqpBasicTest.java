@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SuppressWarnings("rawtypes")
 public class AmqpBasicTest {
     protected static final int FAKE_PORT = 5682;
-    protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
+    protected static final Logger log = LoggerFactory.getLogger(AmqpBasicTest.class);
     private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static RabbitMqImage rabbitContainer;
     protected static Server protocolServer;

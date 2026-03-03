@@ -26,7 +26,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ReplayRecordFilters {
+public class ReplayRecordFiltersTest {
 
     private final ConcurrentLinkedQueue<TpmEvent> events = new ConcurrentLinkedQueue<>();
 
@@ -75,7 +75,7 @@ public class ReplayRecordFilters {
             in.setHost("www.wetheaver.microsofto.com");
             rwPlugin.handle(pc, ProtocolPhase.POST_CALL, in, null);
             Sleeper.sleep(10);
-            assertTrue(events.size() == 1);
+            assertEquals(1, events.size());
             events.clear();
 
 

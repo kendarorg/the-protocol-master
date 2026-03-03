@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 /**
- * Created for http://stackoverflow.com/q/16351413/1266906.
+ * Created for <a href="http://stackoverflow.com/q/16351413/1266906">...</a>.
  */
 public class ProxyServer {
     public final HashSet<String> ignore = new HashSet<>();
@@ -52,7 +52,8 @@ public class ProxyServer {
 
         try {
             serverSocket.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
+            //NOOP
 
         }
     }
@@ -70,10 +71,12 @@ public class ProxyServer {
                         executor.submit(() -> new ProxyServerHandler(executor, lambdasocket,
                                 httpRedirect, httpsRedirect, dnsResolver, ignore).run());
                     }
-                } catch (IOException e) {
+                } catch (IOException ignored) {
+                    //NOOP
 
                 }
-            } catch (IOException e) {
+            } catch (IOException ignored) {
+                //NOOP
 
             }
         }).start();

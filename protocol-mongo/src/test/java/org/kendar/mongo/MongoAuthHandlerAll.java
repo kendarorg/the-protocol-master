@@ -19,11 +19,10 @@ public class MongoAuthHandlerAll {
     private final int iterations;
     private final byte[] storedKey;
     private final byte[] serverKey;
-
+    private final int conversationId = 1;
     private String mechanism;
     private String clientFirstBare;
     private String serverFirst;
-    private int conversationId = 1;
 
     public MongoAuthHandlerAll(
             SynchronousQueue<JSONObject> inbound,

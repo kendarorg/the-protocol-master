@@ -41,8 +41,6 @@ public class SSLRequest extends ProtoState {
         var jdbcSettings = (JdbcProtocolSettings) event.getContext().getDescriptor().getSettings();
         if (jdbcSettings.isUseTls()) {
             event.getContext().setValue("SSL", true);
-            //event.getContext().setValue("BYPASS_CONVERTERS", true);
-            //event.getContext().setValue("INITALIZE_SSL_HANDSHAKE", true);
             var context = (NetworkProtoContext) event.getContext();
             var client = (NettyServerChannel) context.getClient();
             var sslContext = context.getSslContext();

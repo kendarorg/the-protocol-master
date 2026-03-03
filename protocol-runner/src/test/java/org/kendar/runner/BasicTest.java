@@ -72,7 +72,7 @@ public class BasicTest {
         serverThread.start();
         while (!Main.isRunning()) {
             if (exception.get() != null) {
-                throw new RuntimeException((Throwable) exception.get());
+                throw new RuntimeException(exception.get());
             }
             Sleeper.sleep(10);
         }

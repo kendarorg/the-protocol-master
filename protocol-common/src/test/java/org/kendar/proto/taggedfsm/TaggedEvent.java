@@ -12,7 +12,7 @@ public class TaggedEvent extends ProtocolEvent {
     public TaggedEvent(ProtoContext context, Class<?> prevState, String data, String... tagsKvp) {
         super(context, prevState);
         this.data = data;
-        this.setTags(new ArrayList<Tag>());
+        this.setTags(new ArrayList<>());
         for (var i = 0; i < tagsKvp.length - 1; i += 2) {
             var key = tagsKvp[i];
             var value = tagsKvp[i + 1];

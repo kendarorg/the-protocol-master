@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * According to https://redis.io/docs/latest/develop/reference/protocol-spec
+ * According to <a href="https://redis.io/docs/latest/develop/reference/protocol-spec">...</a>
  */
 public class ParserTest {
     @Test
@@ -27,7 +27,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = "-This is a fancy error\r\n";
         var result = target.parse(data);
-        assertTrue(result instanceof RespError);
+        assertInstanceOf(RespError.class, result);
         assertEquals("This is a fancy error", ((RespError) result).getMsg());
         assertEquals("ERR", ((RespError) result).getType());
     }
@@ -37,7 +37,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = "-ERR unknown command 'asdf'\r\n";
         var result = target.parse(data);
-        assertTrue(result instanceof RespError);
+        assertInstanceOf(RespError.class, result);
         assertEquals("unknown command 'asdf'", ((RespError) result).getMsg());
         assertEquals("ERR", ((RespError) result).getType());
     }
@@ -47,7 +47,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = "-UNKNOWN unknown command 'asdf'\r\n";
         var result = target.parse(data);
-        assertTrue(result instanceof RespError);
+        assertInstanceOf(RespError.class, result);
         assertEquals("unknown command 'asdf'", ((RespError) result).getMsg());
         assertEquals("UNKNOWN", ((RespError) result).getType());
     }
@@ -156,7 +156,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = ",1.29e-1\r\n";
         var result = (double) target.parse(data);
-        assertEquals(result, 0.129, 0.0001);
+        assertEquals(0.129, result, 0.0001);
     }
 
     @Test
@@ -164,7 +164,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = ",-1.29e-1\r\n";
         var result = (double) target.parse(data);
-        assertEquals(result, -0.129, 0.0001);
+        assertEquals(-0.129, result, 0.0001);
     }
 
 
@@ -173,7 +173,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = ",+1.29\r\n";
         var result = (double) target.parse(data);
-        assertEquals(result, 1.29, 0.0001);
+        assertEquals(1.29, result, 0.0001);
     }
 
     @Test
@@ -181,7 +181,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = ",10\r\n";
         var result = (double) target.parse(data);
-        assertEquals(result, 10, 0.0001);
+        assertEquals(10, result, 0.0001);
     }
 
     @Test
@@ -189,7 +189,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = ",inf\r\n";
         var result = (double) target.parse(data);
-        assertEquals(result, Double.POSITIVE_INFINITY, 0.0001);
+        assertEquals(Double.POSITIVE_INFINITY, result, 0.0001);
     }
 
 
@@ -198,7 +198,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = ",-inf\r\n";
         var result = (double) target.parse(data);
-        assertEquals(result, Double.NEGATIVE_INFINITY, 0.0001);
+        assertEquals(Double.NEGATIVE_INFINITY, result, 0.0001);
     }
 
 
@@ -207,7 +207,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = ",nan\r\n";
         var result = (double) target.parse(data);
-        assertEquals(result, Float.NaN, 0.0001);
+        assertEquals(Float.NaN, result, 0.0001);
     }
 
     @Test
@@ -242,7 +242,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = "!21\r\nSYNTAX invalid syntax\r\n";
         var result = target.parse(data);
-        assertTrue(result instanceof RespError);
+        assertInstanceOf(RespError.class, result);
         assertEquals("invalid syntax", ((RespError) result).getMsg());
         assertEquals("SYNTAX", ((RespError) result).getType());
     }
@@ -252,7 +252,7 @@ public class ParserTest {
         var target = new Resp3Parser();
         var data = "=15\r\ntxt:Some string\r\n";
         var result = target.parse(data);
-        assertTrue(result instanceof RespVerbatimString);
+        assertInstanceOf(RespVerbatimString.class, result);
         assertEquals("Some string", ((RespVerbatimString) result).getMsg());
         assertEquals("txt", ((RespVerbatimString) result).getType());
     }

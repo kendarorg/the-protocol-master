@@ -33,7 +33,8 @@ public class ApiEncryptedStorageTest extends ApiTestBase {
     public static void setup() {
         try {
             Main.stop();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
+            //NOOP
         }
 
         var args = new String[]{

@@ -99,8 +99,8 @@ public abstract class StaticWebFilter implements FilteringClass {
     }
 
     /**
-     * If it finds the path accept it, if needed handles the redirect http://xx
-     * http://xx to http://xx/index.html
+     * If it finds the path accept it, if needed handles the redirect <a href="http://xx">...</a>
+     * <a href="http://xx">...</a> to <a href="http://xx/index.html">...</a>
      *
      * @param response
      * @param realPath
