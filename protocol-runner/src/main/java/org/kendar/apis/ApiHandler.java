@@ -38,7 +38,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import static org.kendar.apis.ApiUtils.*;
+import static org.kendar.apis.ApiUtils.respondJson;
+import static org.kendar.apis.ApiUtils.respondOk;
 
 @TpmService
 @HttpTypeFilter()
@@ -179,7 +180,7 @@ public class ApiHandler implements FilteringClass {
         var protocolInstanceId = req.getPathParameter("instanceId");
         var instance = instances.stream().filter(p -> p.getInstanceId().equals(protocolInstanceId))
                 .findFirst();
-        if(instance.isEmpty()){
+        if (instance.isEmpty()) {
             throw new RuntimeException("Missing instance");
         }
         var protocolSettings = (ObjectNode) mapper.toJsonNode(instance.get().getSettings());

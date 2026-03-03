@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MySqlPrepStatementTest extends MySqlBasicTest {

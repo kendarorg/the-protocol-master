@@ -10,8 +10,6 @@ import org.kendar.utils.JsonMapper;
 
 import java.util.Iterator;
 
-import static org.kendar.protocol.states.ProtoState.iteratorOfRunnable;
-
 public class ProxyedBehaviour {
     protected static final JsonMapper mapper = new JsonMapper();
 

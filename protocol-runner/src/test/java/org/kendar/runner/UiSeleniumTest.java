@@ -22,7 +22,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Pattern;
 
 import static java.util.regex.Matcher.quoteReplacement;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UiSeleniumTest extends SeleniumTestBase {
     private static final String REGEXP = "/images/branding/[_a-zA-Z0-9]+/[_a-zA-Z0-9]+/[_a-zA-Z0-9]+\\.png";

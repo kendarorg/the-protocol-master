@@ -131,7 +131,8 @@
                         </goals>
                         <configuration>
                             <target>
-                                <echo file="${project.build.sourceDirectory}/../resources/protocol_dns_plugin.version" append="false">
+                                <echo file="${project.build.sourceDirectory}/../resources/protocol_dns_plugin.version"
+                                      append="false">
                                     ${revision}
                                 </echo>
                             </target>

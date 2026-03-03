@@ -6,7 +6,7 @@ function retrieveValue(id) {
     var el = document.getElementById(id);
     if (el.type === "number") {
         return +el.value;
-    }else if (el.type === "checkbox") {
+    } else if (el.type === "checkbox") {
         return el.checked;
     }
     return el.value;
@@ -17,7 +17,7 @@ function setValue(id, value) {
     if (el.type === "number") {
         el.value = +value;
     } else if (el.type === "checkbox") {
-        el.checked = value === true || value==="true" || value>0;
+        el.checked = value === true || value === "true" || value > 0;
     } else {
         el.value = value;
     }
@@ -52,18 +52,18 @@ function sendData(path, verb, data, contentType, callback) {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (typeof callback === 'function') {
-                if(xhr.status==200 || callback.length>=1) {
+                if (xhr.status == 200 || callback.length >= 1) {
                     callback(xhr.status, xhr.response);
-                }else if(xhr.status==200){
+                } else if (xhr.status == 200) {
                     callback(xhr.status, xhr.response);
                 }
             }
             if (xhr.status != 200) {
-                console.error(xhr.status+" "+xhr.response);
-                showNotification('error',"Error sending request",
-                    "Path: "+path+
-                    "\nContent Type: "+contentType+
-                    "\nVerb: "+verb)
+                console.error(xhr.status + " " + xhr.response);
+                showNotification('error', "Error sending request",
+                    "Path: " + path +
+                    "\nContent Type: " + contentType +
+                    "\nVerb: " + verb)
             }
 
             // Request finished. Do processing here.
@@ -85,17 +85,17 @@ function getData(path, verb, callback) {
         // Call a function when the state changes.
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (typeof callback === 'function') {
-                if(xhr.status==200 || callback.length>=1) {
+                if (xhr.status == 200 || callback.length >= 1) {
                     callback(xhr.status, xhr.response);
-                }else if(xhr.status==200){
+                } else if (xhr.status == 200) {
                     callback(xhr.status, xhr.response);
                 }
             }
             if (xhr.status != 200) {
-                console.error(xhr.status+" "+xhr.response);
-                showNotification('error',"Error sending no body request",
-                    "Path: "+path+
-                    "\nVerb: "+verb)
+                console.error(xhr.status + " " + xhr.response);
+                showNotification('error', "Error sending no body request",
+                    "Path: " + path +
+                    "\nVerb: " + verb)
             }
         }
     };
@@ -267,11 +267,11 @@ function send_file(path, data, contentType, output, outputCode) {
                 output.innerHTML = xhr.response;
             }
             if (xhr.status != 200) {
-                console.error(xhr.status+" "+xhr.response);
-                showNotification('error',"Error uploading file",
-                    "Path: "+path+
-                    "\nContent Type: "+contentType+
-                    "\nVerb: "+verb)
+                console.error(xhr.status + " " + xhr.response);
+                showNotification('error', "Error uploading file",
+                    "Path: " + path +
+                    "\nContent Type: " + contentType +
+                    "\nVerb: " + verb)
             }
             // Request finished. Do processing here.
         }
@@ -438,7 +438,7 @@ const NotificationSystem = {
         }
 
         // Add message
-        if(message!=null) {
+        if (message != null) {
             const messageElement = document.createElement('div');
             messageElement.className = 'notification-message';
             messageElement.textContent = message;
@@ -516,15 +516,15 @@ function showError(title) {
     NotificationSystem.show("error", "ERROR", title);
 }
 
-function handleHtmxResults(){
-    document.addEventListener('htmx:afterRequest', function(evt) {
-        if(evt.detail.xhr.status == 404){
+function handleHtmxResults() {
+    document.addEventListener('htmx:afterRequest', function (evt) {
+        if (evt.detail.xhr.status == 404) {
             /* Notify the user of a 404 Not Found response */
             return showError("Error: Could Not Find Resource");
         }
         if (evt.detail.successful != true) {
             /* Notify of an unexpected error, & print error to console */
-            showNotification("error","Unexpected Error",evt);
+            showNotification("error", "Unexpected Error", evt);
             return console.error(evt);
         }
     });

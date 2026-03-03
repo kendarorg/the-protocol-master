@@ -7,7 +7,6 @@ import io.github.bonigarcia.wdm.versions.VersionDetector;
 import org.apache.commons.io.FileUtils;
 import org.kendar.tests.dm.TpmChromeDriverManager;
 import org.kendar.tests.dm.TpmChromiumDriverManager;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 

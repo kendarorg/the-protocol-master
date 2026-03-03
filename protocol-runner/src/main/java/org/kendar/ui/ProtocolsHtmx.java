@@ -14,7 +14,7 @@ public class ProtocolsHtmx implements FilteringClass {
 
     private final MultiTemplateEngine resolversFactory;
 
-    public ProtocolsHtmx( MultiTemplateEngine resolversFactory) {
+    public ProtocolsHtmx(MultiTemplateEngine resolversFactory) {
 
         this.resolversFactory = resolversFactory;
     }

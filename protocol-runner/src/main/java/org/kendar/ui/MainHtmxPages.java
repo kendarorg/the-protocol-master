@@ -17,7 +17,7 @@ public class MainHtmxPages implements FilteringClass {
     private final MultiTemplateEngine resolversFactory;
     private final DiService diService;
 
-    public MainHtmxPages( MultiTemplateEngine resolversFactory, DiService diService) {
+    public MainHtmxPages(MultiTemplateEngine resolversFactory, DiService diService) {
         this.resolversFactory = resolversFactory;
         this.diService = diService;
     }

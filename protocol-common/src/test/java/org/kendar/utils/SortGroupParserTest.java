@@ -9,7 +9,6 @@ import org.kendar.utils.parser.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SortGroupParserTest {
     private static final JsonMapper mapper = new JsonMapper();

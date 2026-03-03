@@ -44,7 +44,7 @@ public class ApiStorageOnlyHandler implements FilteringClass {
     private final List<GlobalPluginDescriptor> globalPlugins = new ArrayList<>();
 
 
-    public ApiStorageOnlyHandler( StorageRepository storage, SimpleParser simpleParser) {
+    public ApiStorageOnlyHandler(StorageRepository storage, SimpleParser simpleParser) {
         this.storage = storage;
         this.simpleParser = simpleParser;
     }

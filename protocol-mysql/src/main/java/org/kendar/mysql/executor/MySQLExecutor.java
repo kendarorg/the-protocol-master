@@ -5,7 +5,6 @@ import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.constants.ErrorCode;
 import org.kendar.mysql.constants.Language;
 import org.kendar.mysql.constants.StatusFlag;
-import org.kendar.mysql.messages.Error;
 import org.kendar.mysql.messages.*;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.protocol.messages.ProtoStep;

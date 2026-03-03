@@ -8,8 +8,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class HelpRunner {
     private ByteArrayOutputStream myOut;
     private PrintStream oriOut;

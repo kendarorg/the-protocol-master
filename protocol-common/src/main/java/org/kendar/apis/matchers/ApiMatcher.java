@@ -96,7 +96,7 @@ public class ApiMatcher implements FilterMatcher, PathMatcher, HostMatcher {
             return true;
         }
         return !pathSimpleMatchers.notMatch(req.getPath(),
-                        this.pathAddress);
+                this.pathAddress);
     }
 
 

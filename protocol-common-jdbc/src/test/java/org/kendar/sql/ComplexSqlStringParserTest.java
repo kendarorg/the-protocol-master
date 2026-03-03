@@ -5,8 +5,6 @@ import org.kendar.sql.parser.SqlParseResult;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class ComplexSqlStringParserTest {
 
     final static String SP_EXAMPLE = "create or replace procedure transfer(\n" +

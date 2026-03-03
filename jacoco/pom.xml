@@ -100,7 +100,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <target name="report"  >
+                            <target name="report">
                                 <echo message="Generating JaCoCo Reports"/>
                                 <mkdir dir="${basedir}/target/coverage-report"/>
                                 <taskdef name="report"

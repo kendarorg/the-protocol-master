@@ -28,9 +28,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class HttpRunnerTest extends BasicTest {
     static int FAKE_PORT_HTTP = 8087;
     static int FAKE_PORT_HTTPS = 8487;

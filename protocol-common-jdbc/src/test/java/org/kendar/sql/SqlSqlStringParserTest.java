@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.sql.parser.SqlStringType;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class SqlSqlStringParserTest {
 
     @Test

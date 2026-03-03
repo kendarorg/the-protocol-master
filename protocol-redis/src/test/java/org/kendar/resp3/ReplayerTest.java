@@ -20,9 +20,6 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class ReplayerTest {
 
     public static final String CHANNEL_NAME = "commonChannel";

@@ -241,7 +241,8 @@
                         </goals>
                         <configuration>
                             <target>
-                                <echo file="${project.build.sourceDirectory}/../resources/protocol_runner.version" append="false">
+                                <echo file="${project.build.sourceDirectory}/../resources/protocol_runner.version"
+                                      append="false">
                                     ${revision}
                                 </echo>
                             </target>

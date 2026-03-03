@@ -6,7 +6,7 @@ import org.kendar.utils.parser.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SimpleParserTest {
     @Test
