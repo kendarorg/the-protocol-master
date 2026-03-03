@@ -26,7 +26,7 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
-        beforeEachBaseSSL(testInfo,true);
+        beforeEachBaseSSL(testInfo, true);
     }
 
     @AfterEach
@@ -306,8 +306,8 @@ public class PostgresSslProtocolTest extends PostgresBasicTest {
                     " ADDRESS CHAR(50), " +
                     " SALARY REAL)");
             stmt.close();
-        }catch (Exception ex){
-            thrown=ex;
+        } catch (Exception ex) {
+            thrown = ex;
         }
         assertNotNull(thrown);
     }

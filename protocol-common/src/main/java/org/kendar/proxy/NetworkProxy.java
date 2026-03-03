@@ -9,10 +9,12 @@ import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
-import tlschannel.async.AsynchronousTlsChannelGroup;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,10 +36,10 @@ public abstract class NetworkProxy extends Proxy {
     }
 
     public NetworkProxy(String connectionString, String userId, String password) {
-        this(connectionString,userId,password,false);
+        this(connectionString, userId, password, false);
     }
 
-    public NetworkProxy(String connectionString, String userId, String password,boolean ssl) {
+    public NetworkProxy(String connectionString, String userId, String password, boolean ssl) {
         super();
         this.ssl = ssl;
         try {
@@ -97,7 +99,7 @@ public abstract class NetworkProxy extends Proxy {
     public ProxyConnection connect(NetworkProtoContext context) {
 
         try {
-            if(port==0){
+            if (port == 0) {
                 return new ProxyConnection(null);
             }
             return new ProxyConnection(buildProxyConnection(context,

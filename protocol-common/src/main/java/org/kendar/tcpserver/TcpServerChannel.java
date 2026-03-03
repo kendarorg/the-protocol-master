@@ -32,15 +32,15 @@ public class TcpServerChannel implements ClientServerChannel {
         closed = true;
         try {
             this.client.shutdownInput();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         try {
             this.client.shutdownOutput();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         try {
             this.client.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 

@@ -18,7 +18,6 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.Server;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.RabbitMqImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.ui.MultiTemplateEngine;
@@ -40,12 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class AmqpBasicTest {
     protected static final int FAKE_PORT = 5682;
     protected static final Logger log = LoggerFactory.getLogger(FileStorageRepository.class);
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static RabbitMqImage rabbitContainer;
     protected static Server protocolServer;
     protected static ProtocolPluginDescriptor publishPlugin;
     protected static ProtocolPluginDescriptor recordPlugin;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
     protected JsonMapper mapper = new JsonMapper();
 

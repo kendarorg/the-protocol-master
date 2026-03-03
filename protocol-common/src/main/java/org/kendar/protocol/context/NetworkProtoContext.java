@@ -17,7 +17,6 @@ import org.kendar.protocol.messages.ReturnMessage;
 import org.kendar.protocol.states.NullState;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.Stop;
-import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.Proxy;
 import org.kendar.proxy.WireProxySocket;
 import org.kendar.tcpserver.ClientServerChannel;
@@ -62,11 +61,7 @@ public abstract class NetworkProtoContext extends ProtoContext {
     public NetworkProtoContext(ProtoDescriptor descriptor, int contextId) {
         super(descriptor, contextId);
 
-        this.sslContext =((NetworkProtoDescriptor)descriptor).getSslContext();
-    }
-
-    public ClientServerChannel getClient() {
-        return client;
+        this.sslContext = ((NetworkProtoDescriptor) descriptor).getSslContext();
     }
 
     /**
@@ -91,6 +86,24 @@ public abstract class NetworkProtoContext extends ProtoContext {
         }
         log.error("[SERVER][??] Unknown command: {}", message);
         throw new UnknownCommandException("Unknown command issued: " + message);
+    }
+
+    public ClientServerChannel getClient() {
+        return client;
+    }
+
+    /**
+     * Internal, used only by the network protocol descriptor
+     *
+     * @param client
+     */
+    public void setClient(ClientServerChannel client) {
+        if (this.client == null) {
+            this.client = client;
+        } else {
+            log.error("[SERVER] Cannot reassign channel");
+            throw new ConnectionExeception("Cannot reassign channel");
+        }
     }
 
     public List<Runnable> getRunnables() {
@@ -179,20 +192,6 @@ public abstract class NetworkProtoContext extends ProtoContext {
             }
             updateLastAccess();
         });
-    }
-
-    /**
-     * Internal, used only by the network protocol descriptor
-     *
-     * @param client
-     */
-    public void setClient(ClientServerChannel client) {
-        if (this.client == null) {
-            this.client = client;
-        } else {
-            log.error("[SERVER] Cannot reassign channel");
-            throw new ConnectionExeception("Cannot reassign channel");
-        }
     }
 
     /**
@@ -399,6 +398,6 @@ public abstract class NetworkProtoContext extends ProtoContext {
     }
 
     public void setSslContext(SslContext sslContext) {
-        this.sslContext= sslContext;
+        this.sslContext = sslContext;
     }
 }

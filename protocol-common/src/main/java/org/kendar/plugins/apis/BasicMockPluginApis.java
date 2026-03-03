@@ -45,7 +45,7 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
                     description = "Retrieve all the mock ids"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
-    public boolean listAllMocks(Request reqp, Response resp) {
+    public boolean listAllMocks(Request req, Response resp) {
 
         var result = new ArrayList<>(getDescriptor().getMocks().keySet());
         respondJson(resp, result);
@@ -63,8 +63,8 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
                     description = "Retrieve the mock file"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
-    public boolean getSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("mockfile");
+    public boolean getSingleMock(Request req, Response resp) {
+        var mockfile = req.getPathParameter("mockfile");
         var result = getDescriptor().getMocks().get(mockfile);
         respondJson(resp, result);
         return true;
@@ -85,9 +85,9 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
-    public void putSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("mockfile");
-        var inputData = reqp.getRequestText().toString();
+    public void putSingleMock(Request req, Response resp) {
+        var mockfile = req.getPathParameter("mockfile");
+        var inputData = req.getRequestText().toString();
         var data = mapper.deserialize(inputData, MockStorage.class);
         var mocks = (Map<String, MockStorage>) getDescriptor().getMocks();
 
@@ -116,8 +116,8 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
                     body = Ko.class
             )},
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/mock-plugin"})
-    public boolean delSingleMock(Request reqp, Response resp) {
-        var mockfile = reqp.getPathParameter("mock");
+    public boolean delSingleMock(Request req, Response resp) {
+        var mockfile = req.getPathParameter("mock");
         storage.deleteFile(mockfile);
         getDescriptor().reloadData();
         respondOk(resp);
@@ -127,8 +127,8 @@ public class BasicMockPluginApis extends ProtocolPluginApiHandlerDefault<BasicMo
     @HttpMethodFilter(
             pathAddress = "/protocols/{#protocolInstanceId}/plugins/{#plugin}/file/{id}",
             method = "GET", id = "GET /protocols/{#protocolInstanceId}/plugins/{#plugin}/{id}")
-    public void retrieveFile(Request reqp, Response response) {
-        var fileId = reqp.getPathParameter("id");
+    public void retrieveFile(Request req, Response response) {
+        var fileId = req.getPathParameter("id");
         var file = storage.readFile(fileId);
         if (file == null) {
             file = mapper.serialize(new MockStorage());

@@ -26,24 +26,15 @@ public class StartupMessage extends ProtoState {
         super(messages);
     }
 
-    public boolean canRun(BytesEvent event) {
-        var inputBuffer = event.getBuffer();
-        if (inputBuffer.size() == 0) return false;
-        var hasStartup = inputBuffer.contains(STARTUP_MESSAGE_MARKER, 4);
-        var length = inputBuffer.getInt(0);
-        return hasStartup && inputBuffer.size() == length;
-
-    }
-
-    public static Map<String,String> readNullTerminatedStrings(byte[] data) {
-        var result = new HashMap<String,String>();
+    public static Map<String, String> readNullTerminatedStrings(byte[] data) {
+        var result = new HashMap<String, String>();
         int start = 0;
         String prev = null;
         for (int i = 0; i < data.length; i++) {
             if (data[i] == 0) {
                 if (i > start) { // avoid empty trailing \0
                     String s = new String(data, start, i - start, StandardCharsets.UTF_8);
-                    if(prev==null){
+                    if (prev == null) {
                         prev = s;
                     } else {
                         result.put(prev, s);
@@ -55,6 +46,15 @@ public class StartupMessage extends ProtoState {
         }
 
         return result;
+    }
+
+    public boolean canRun(BytesEvent event) {
+        var inputBuffer = event.getBuffer();
+        if (inputBuffer.size() == 0) return false;
+        var hasStartup = inputBuffer.contains(STARTUP_MESSAGE_MARKER, 4);
+        var length = inputBuffer.getInt(0);
+        return hasStartup && inputBuffer.size() == length;
+
     }
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
@@ -70,17 +70,17 @@ public class StartupMessage extends ProtoState {
         var length = inputBuffer.getInt(0);
         var data = inputBuffer.getBytes(8, length - 8);
         var dataMap = readNullTerminatedStrings(data);
-        var parameterStatus = new HashMap<String,ParameterStatus>();
-        parameterStatus.put("server_version",new ParameterStatus("server_version", "15"));
-        parameterStatus.put("server_type",new ParameterStatus("server_type", "JANUS"));
-        parameterStatus.put("client_encoding",new ParameterStatus("client_encoding", "UTF8"));
-        parameterStatus.put("DateStyle",new ParameterStatus("DateStyle", "ISO, YMD"));
-        parameterStatus.put("TimeZone",new ParameterStatus("TimeZone", "CET"));
-        parameterStatus.put("is_superuser",new ParameterStatus("is_superuser", "on"));
-        parameterStatus.put("integer_datetimes",new ParameterStatus("integer_datetimes", "on"));
+        var parameterStatus = new HashMap<String, ParameterStatus>();
+        parameterStatus.put("server_version", new ParameterStatus("server_version", "15"));
+        parameterStatus.put("server_type", new ParameterStatus("server_type", "JANUS"));
+        parameterStatus.put("client_encoding", new ParameterStatus("client_encoding", "UTF8"));
+        parameterStatus.put("DateStyle", new ParameterStatus("DateStyle", "ISO, YMD"));
+        parameterStatus.put("TimeZone", new ParameterStatus("TimeZone", "CET"));
+        parameterStatus.put("is_superuser", new ParameterStatus("is_superuser", "on"));
+        parameterStatus.put("integer_datetimes", new ParameterStatus("integer_datetimes", "on"));
 
-        for(var dm:dataMap.entrySet()){
-            parameterStatus.put(dm.getKey(),new ParameterStatus(dm.getKey(),dm.getValue()));
+        for (var dm : dataMap.entrySet()) {
+            parameterStatus.put(dm.getKey(), new ParameterStatus(dm.getKey(), dm.getValue()));
         }
 
         inputBuffer.truncate(length);
@@ -89,13 +89,13 @@ public class StartupMessage extends ProtoState {
         var jdbcSettings = (JdbcProtocolSettings) event.getContext().getDescriptor().getSettings();
 
         var toSend = new ArrayList<ReturnMessage>();
-        if(jdbcSettings.isUseTls()){
+        if (jdbcSettings.isUseTls()) {
             postgresContext.setValue("SERVER_PARAMETERS", parameterStatus);
             return iteratorOfList(new AuthenticationOk(3));
-        }else {
+        } else {
             toSend.add(new AuthenticationOk());
         }
-        for(var ps:parameterStatus.values()){
+        for (var ps : parameterStatus.values()) {
             toSend.add(ps);
         }
         toSend.add(new BackendKeyData(pidValue, FIXED_SECRET));

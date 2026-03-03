@@ -4,13 +4,15 @@ public class ForwardItem {
     private String id;
     private String source;
     private String target;
-    public ForwardItem(String id, String source, String target){
+
+    public ForwardItem(String id, String source, String target) {
         this.id = id;
 
         this.source = source;
         this.target = target;
     }
-    public ForwardItem(){
+
+    public ForwardItem() {
 
     }
 

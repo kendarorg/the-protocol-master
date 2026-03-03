@@ -1,13 +1,13 @@
 package org.kendar.mongo;
 
+import org.json.JSONObject;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.concurrent.SynchronousQueue;
-
-import org.json.JSONObject;
 
 public class MongoAuthHandlerAll {
 
@@ -39,6 +39,45 @@ public class MongoAuthHandlerAll {
         this.iterations = iterations;
         this.storedKey = storedKey;
         this.serverKey = serverKey;
+    }
+
+    // ===== Helpers =====
+    private static byte[] hmac(byte[] key, String msg) throws Exception {
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(new SecretKeySpec(key, "HmacSHA256"));
+        return mac.doFinal(msg.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static byte[] sha(byte[] in) throws Exception {
+        return MessageDigest.getInstance("SHA-256").digest(in);
+    }
+
+    private static byte[] hash(byte[] in) throws Exception {
+        return MessageDigest.getInstance("SHA-256").digest(in);
+    }
+
+    private static byte[] xor(byte[] a, byte[] b) {
+        byte[] out = new byte[a.length];
+        for (int i = 0; i < a.length; i++) out[i] = (byte) (a[i] ^ b[i]);
+        return out;
+    }
+
+    private static String extractNonce(String msg) {
+        for (String p : msg.split(",")) {
+            if (p.startsWith("r=")) return p.substring(2);
+        }
+        throw new IllegalArgumentException("No nonce");
+    }
+
+    private static String extractProof(String msg) {
+        for (String p : msg.split(",")) {
+            if (p.startsWith("p=")) return p.substring(2);
+        }
+        throw new IllegalArgumentException("No proof");
+    }
+
+    private static String randomNonce() {
+        return Long.toHexString(Double.doubleToLongBits(Math.random()));
     }
 
     public void run() throws Exception {
@@ -173,44 +212,5 @@ public class MongoAuthHandlerAll {
                 .put("conversationId", conversationId)
                 .put("done", true)
                 .put("ok", 1);
-    }
-
-    // ===== Helpers =====
-    private static byte[] hmac(byte[] key, String msg) throws Exception {
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(new SecretKeySpec(key, "HmacSHA256"));
-        return mac.doFinal(msg.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private static byte[] sha(byte[] in) throws Exception {
-        return MessageDigest.getInstance("SHA-256").digest(in);
-    }
-
-    private static byte[] hash(byte[] in) throws Exception {
-        return MessageDigest.getInstance("SHA-256").digest(in);
-    }
-
-    private static byte[] xor(byte[] a, byte[] b) {
-        byte[] out = new byte[a.length];
-        for (int i = 0; i < a.length; i++) out[i] = (byte) (a[i] ^ b[i]);
-        return out;
-    }
-
-    private static String extractNonce(String msg) {
-        for (String p : msg.split(",")) {
-            if (p.startsWith("r=")) return p.substring(2);
-        }
-        throw new IllegalArgumentException("No nonce");
-    }
-
-    private static String extractProof(String msg) {
-        for (String p : msg.split(",")) {
-            if (p.startsWith("p=")) return p.substring(2);
-        }
-        throw new IllegalArgumentException("No proof");
-    }
-
-    private static String randomNonce() {
-        return Long.toHexString(Double.doubleToLongBits(Math.random()));
     }
 }

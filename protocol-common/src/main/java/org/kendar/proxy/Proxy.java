@@ -19,12 +19,12 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("rawtypes")
 public abstract class Proxy {
-    private String connectionString;
-    private String login;
-    private String password;
     private final Map<String, Map<ProtocolPhase, List<PluginHandler>>> allowedPlugins = new ConcurrentHashMap<>();
     private final Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
     protected boolean replayer;
+    private String connectionString;
+    private String login;
+    private String password;
     /**
      * Descriptor (of course network like)
      */

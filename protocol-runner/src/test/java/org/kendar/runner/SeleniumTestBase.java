@@ -30,13 +30,13 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public class SeleniumTestBase extends ApiTestBase {
+    private static final int defaultTimeout = 5000;
+    private static final ConcurrentLinkedQueue logs = new ConcurrentLinkedQueue();
     private static Path root;
     private static Path projectRoot;
     private static ComposeContainer environment;
     private static String tpmHost;
     private static HashMap<String, Integer> toWaitFor;
-    private static final int defaultTimeout = 5000;
-    private static final ConcurrentLinkedQueue logs = new ConcurrentLinkedQueue();
     private Path storage;
     private SeleniumIntegration selenium;
     private WebDriver driver;
@@ -283,7 +283,7 @@ public class SeleniumTestBase extends ApiTestBase {
         return getSelenium().navigateTo(url, snapshot);
     }
 
-    public boolean navigateTo(String url, boolean snapshot,int timeout) {
+    public boolean navigateTo(String url, boolean snapshot, int timeout) {
         return getSelenium().navigateTo(url, snapshot);
     }
 

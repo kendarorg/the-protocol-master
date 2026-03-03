@@ -150,13 +150,13 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
             context.setValue("CONNECTION", conn);
 
         }
-        if(hasProxy()){
+        if (hasProxy()) {
             context.setProxy(proxyInstance);
         }
         return context;
     }
 
-    public boolean isLateConnect(){
+    public boolean isLateConnect() {
         return false;
     }
 
@@ -177,27 +177,27 @@ public abstract class NetworkProtoDescriptor extends ProtoDescriptor {
         return Map.of("main", getPort());
     }
 
-    public void setSslContext(SslContext sslContext) {
-        this.sslContext = sslContext;
-    }
-
     public SslContext getSslContext() {
         return sslContext;
     }
 
-    public void setChannel(SocketChannel channel) {
-        this.channel = channel;
+    public void setSslContext(SslContext sslContext) {
+        this.sslContext = sslContext;
     }
 
     public SocketChannel getChannel() {
         return channel;
     }
 
-    public void setGroup(NioEventLoopGroup nioEventLoopGroup) {
-        this.nioEventLoopGroup = nioEventLoopGroup;
+    public void setChannel(SocketChannel channel) {
+        this.channel = channel;
     }
 
     public NioEventLoopGroup getGroup() {
         return nioEventLoopGroup;
+    }
+
+    public void setGroup(NioEventLoopGroup nioEventLoopGroup) {
+        this.nioEventLoopGroup = nioEventLoopGroup;
     }
 }

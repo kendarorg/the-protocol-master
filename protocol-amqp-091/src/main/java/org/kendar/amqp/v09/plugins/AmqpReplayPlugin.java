@@ -74,14 +74,14 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
     }
 
     @Override
-    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toread, LineToRead lineToRead) {
+    protected void buildState(PluginContext pluginContext, ProtoContext context, Object in, Object outObj, Object toRead, LineToRead lineToRead) {
         if (outObj == null) return;
-        if (toread == null) return;
+        if (toRead == null) return;
         var out = mapper.toJsonNode(outObj);
 
-        var result = mapper.deserialize(out, toread.getClass());
+        var result = mapper.deserialize(out, toRead.getClass());
         try {
-            ExtraBeanUtils.copyProperties(toread, result, "Reserved1", "consumerTag");
+            ExtraBeanUtils.copyProperties(toRead, result, "Reserved1", "consumerTag");
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new PluginException(e);
         }
@@ -123,7 +123,7 @@ public class AmqpReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSe
                 ReturnMessage fr = null;
                 try {
                     log.debug("Sending back response for {}:{}", item.getIndex(), mapper.serialize(out));
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
                 NetworkProtoContext ctx = null;

@@ -57,20 +57,20 @@ public class MongoProxy extends Proxy {
 
     }
 
-    public void doConnect(ProtoContext protoContext){
-        if(!((NetworkProtoDescriptor)protoContext.getDescriptor()).hasProxy()){
+    public void doConnect(ProtoContext protoContext) {
+        if (!((NetworkProtoDescriptor) protoContext.getDescriptor()).hasProxy()) {
             return;
         }
-        if(protoContext.getValue("CONNECTION",null)==null){
+        if (protoContext.getValue("CONNECTION", null) == null) {
 
             long start = System.currentTimeMillis();
             var pluginContext = new PluginContext("MONGODB", "CONNECT", start, protoContext);
             for (var plugin : getPluginHandlers(ProtocolPhase.CONNECT, new Object(), new Object())) {
-                if(plugin.handle(pluginContext, ProtocolPhase.CONNECT, new Object(), new Object())){
+                if (plugin.handle(pluginContext, ProtocolPhase.CONNECT, new Object(), new Object())) {
                     return;
                 }
             }
-            protoContext.setValue("CONNECTION",connect((NetworkProtoContext)protoContext ));
+            protoContext.setValue("CONNECTION", connect((NetworkProtoContext) protoContext));
         }
     }
 

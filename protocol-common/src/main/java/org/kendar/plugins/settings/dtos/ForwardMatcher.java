@@ -13,8 +13,8 @@ public class ForwardMatcher {
     //source: jdbc:mysql://([a-ZA-Z0-9_\\.\\-]+):3306/volagratis[\\?]{0-1}([.]*)
     //dest  : jdbc:mysql://rds-volagratis/volagratis?$2&blah=true
     public ForwardMatcher(String source, String target) {
-        this.id= org.kendar.utils.Md5Tester.calculateMd5(source+target);
-        this.oriSource =source;
+        this.id = org.kendar.utils.Md5Tester.calculateMd5(source + target);
+        this.oriSource = source;
         this.oriTarget = target;
         this.source = Pattern.compile(source);
         this.target = target;
@@ -22,7 +22,7 @@ public class ForwardMatcher {
 
     public String match(String rec) {
         var matcher = source.matcher(rec);
-        if(matcher.matches()){
+        if (matcher.matches()) {
             return matcher.replaceAll(target);
         }
         return null;

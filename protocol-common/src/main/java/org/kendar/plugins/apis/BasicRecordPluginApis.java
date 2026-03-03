@@ -49,7 +49,7 @@ public class BasicRecordPluginApis extends ProtocolPluginApiHandlerDefault<Basic
                     description = "Retrieve all the record ids"
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/record-plugin"})
-    public boolean listAllFiles(Request reqp, Response resp) {
+    public boolean listAllFiles(Request req, Response resp) {
 
         var result = storage.listFiles();
         respondJson(resp, result);

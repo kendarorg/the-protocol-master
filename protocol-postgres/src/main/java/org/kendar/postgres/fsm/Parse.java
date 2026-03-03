@@ -27,7 +27,7 @@ public class Parse extends PostgresState {
     }
 
     private static void inferMetadataIfPossible(ProtoContext protoContext, String query, short paramsCount, ArrayList<JDBCType> concreteTypes, ArrayList<Integer> oids) {
-        var proxy = (JdbcProxy)((NetworkProtoContext)protoContext).getProxy();
+        var proxy = (JdbcProxy) ((NetworkProtoContext) protoContext).getProxy();
         proxy.doConnect(protoContext);
         var c = ((Connection) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
         try {

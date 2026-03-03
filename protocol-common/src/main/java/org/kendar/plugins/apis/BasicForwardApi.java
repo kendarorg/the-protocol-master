@@ -40,7 +40,7 @@ public class BasicForwardApi extends ProtocolPluginApiHandlerDefault<BasicForwar
             ),
             tags = {"plugins/{#protocol}/{#protocolInstanceId}/forward-plugin"})
     public boolean listAllForwardsd(Request reqp, Response resp) {
-        var result = getDescriptor().getMatchers().stream().map(m -> new ForwardItem(m.getId(),m.getOriSource(), m.getOriTarget())).toList();
+        var result = getDescriptor().getMatchers().stream().map(m -> new ForwardItem(m.getId(), m.getOriSource(), m.getOriTarget())).toList();
         respondJson(resp, result);
         return true;
     }
@@ -67,9 +67,9 @@ public class BasicForwardApi extends ProtocolPluginApiHandlerDefault<BasicForwar
         var data = mapper.deserialize(inputData, ForwardItem.class);
         var forwards = new ArrayList<>(getDescriptor().getMatchers().stream().map(m -> new ForwardItem(m.getId(), m.getOriSource(), m.getOriTarget())).toList());
         var matchingId = forwards.stream().filter(m -> (
-                data.getSource().equalsIgnoreCase(m.getSource())||
-                data.getTarget().equalsIgnoreCase(m.getTarget())||
-         m.getId().equalsIgnoreCase(id))).findFirst();
+                data.getSource().equalsIgnoreCase(m.getSource()) ||
+                        data.getTarget().equalsIgnoreCase(m.getTarget()) ||
+                        m.getId().equalsIgnoreCase(id))).findFirst();
 
         var settings = pluginInstance.getSettings();
         var ppdb = (BasicForwardPlugin) pluginInstance;
@@ -110,10 +110,10 @@ public class BasicForwardApi extends ProtocolPluginApiHandlerDefault<BasicForwar
         var id = reqp.getPathParameter("id");
 
         var forwards = new ArrayList<>(getDescriptor().getMatchers().stream().map(m -> new ForwardItem(m.getId(), m.getOriSource(), m.getOriTarget())).toList());
-        var newData = new HashMap<String,String>();
-        forwards.forEach(m->{
-            if(!m.getId().equalsIgnoreCase(id)){
-                newData.put(m.getSource(),m.getTarget());
+        var newData = new HashMap<String, String>();
+        forwards.forEach(m -> {
+            if (!m.getId().equalsIgnoreCase(id)) {
+                newData.put(m.getSource(), m.getTarget());
             }
         });
 
@@ -135,10 +135,10 @@ public class BasicForwardApi extends ProtocolPluginApiHandlerDefault<BasicForwar
     @TpmDoc(
             description = "TestParamsMatching",
             query = {
-                    @QueryString(key="source", description = "Input to test"),
-                    @QueryString(key="target", description = "Replace to test"),
-                    @QueryString(key="data", description = "What to test")
-},
+                    @QueryString(key = "source", description = "Input to test"),
+                    @QueryString(key = "target", description = "Replace to test"),
+                    @QueryString(key = "data", description = "What to test")
+            },
             responses = @TpmResponse(
                     body = String.class,
                     description = "Test the current forward"

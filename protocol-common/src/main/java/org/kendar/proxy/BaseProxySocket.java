@@ -20,16 +20,16 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Semaphore;
 
-public abstract class BaseProxySocket  implements WireProxySocket{
+public abstract class BaseProxySocket implements WireProxySocket {
+    protected static final JsonMapper mapper = new JsonMapper();
     private static final Logger log = LoggerFactory.getLogger(BaseProxySocket.class);
     protected final Semaphore semaphore = new Semaphore(1);
     protected final Semaphore readSemaphore = new Semaphore(1);
     protected final List<BytesEvent> received = new ArrayList<>();
-    protected  NetworkProtoContext context;
-    protected static final JsonMapper mapper = new JsonMapper();
     protected final ConcurrentLinkedDeque<BytesEvent> inputQueue = new ConcurrentLinkedDeque<>();
+    protected NetworkProtoContext context;
 
-    protected void onRead(BBuffer tempBuffer,byte[] byteArray){
+    protected void onRead(BBuffer tempBuffer, byte[] byteArray) {
         Iterator<ProtoStep> stepsToInvoke;
         ProtoState possible;
         var bb = new BBuffer();
@@ -166,8 +166,8 @@ public abstract class BaseProxySocket  implements WireProxySocket{
         log.debug("[CL<TP][EX]: Founded: {}", protoState.getClass().getSimpleName());
         return returnMessage;
     }
-    protected abstract List<? extends ProtocolEvent> buildPossibleEvents(NetworkProtoContext context, BBuffer buffer);
 
+    protected abstract List<? extends ProtocolEvent> buildPossibleEvents(NetworkProtoContext context, BBuffer buffer);
 
 
     public void write(ReturnMessage rm, BBuffer buffer) {
@@ -179,9 +179,14 @@ public abstract class BaseProxySocket  implements WireProxySocket{
         write(buffer);
         log.debug("[TP>SR][TX]: Forwarding {}", returnMessage.getClass().getSimpleName());
     }
+
     public abstract boolean isConnected();
+
     public abstract void close();
+
     public abstract void write(BBuffer buffer);
+
     protected abstract List<ProtoState> availableStates();
+
     protected abstract NetworkProxySplitterState getStateToRetrieveOneSingleMessage();
 }

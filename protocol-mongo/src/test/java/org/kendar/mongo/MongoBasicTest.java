@@ -25,7 +25,6 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.Server;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.MongoDbImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.ui.MultiTemplateEngine;
@@ -44,9 +43,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class MongoBasicTest {
 
     protected static final int FAKE_PORT = 27077;
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static MongoDbImage mongoContainer;
     protected static Server protocolServer;
-    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor errorPlugin;
     private static ProtocolPluginDescriptor latencyPlugin;
 

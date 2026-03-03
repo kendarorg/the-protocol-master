@@ -238,7 +238,7 @@ public class MySQLExecutor {
     }
 
     private Iterator<ProtoStep> executeQuery(int maxRecords, SqlParseResult parsed, MySQLProtoContext protoContext, String parse, String operation, List<BindingParameter> parameterValues, boolean text) throws SQLException {
-        var proxy = (JdbcProxy)protoContext.getProxy();
+        var proxy = (JdbcProxy) protoContext.getProxy();
         proxy.doConnect(protoContext);
         var connection = protoContext.getValue("CONNECTION");
         if (maxRecords == 0) {
@@ -332,7 +332,7 @@ public class MySQLExecutor {
     @SuppressWarnings("SqlSourceToSinkFlow")
     public Iterator<ProtoStep> prepareStatement(MySQLProtoContext protoContext, String query) {
         parser = (SqlStringParser) protoContext.getValue("PARSER");
-        var proxy = (JdbcProxy)protoContext.getProxy();
+        var proxy = (JdbcProxy) protoContext.getProxy();
         proxy.doConnect(protoContext);
         var result = new ArrayList<ReturnMessage>();
         var connection = protoContext.getValue("CONNECTION");

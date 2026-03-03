@@ -10,7 +10,6 @@ import org.kendar.mysql.fsm.*;
 import org.kendar.mysql.fsm.events.CommandEvent;
 import org.kendar.plugins.base.BasePluginDescriptor;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.NetworkWait;

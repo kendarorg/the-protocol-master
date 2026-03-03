@@ -15,7 +15,9 @@ import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.utils.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 public class CmdSaslStart extends StandardOpMsgCommand {
@@ -26,16 +28,6 @@ public class CmdSaslStart extends StandardOpMsgCommand {
 
     public CmdSaslStart(Class<?>... events) {
         super(events);
-    }
-
-    @Override
-    protected boolean canRun(String identifier, String doc) {
-        try {
-            var jsonTree = mapper.toJsonNode(doc);
-            return jsonTree.get("saslStart") != null;
-        } catch (Exception ex) {
-            return false;
-        }
     }
 
     public static List<String> readNullTerminatedStrings(byte[] data) {
@@ -52,6 +44,49 @@ public class CmdSaslStart extends StandardOpMsgCommand {
         }
 
         return result;
+    }
+
+    private static Iterator<ProtoStep> handlePlainAuthentication(OpMsgRequest event, byte[] binaryData, MongoProtoContext protoContext, String nonce) {
+        var result = readNullTerminatedStrings(binaryData);
+        if (result.size() == 3) {
+            protoContext.setValue("userid", result.get(0));
+            protoContext.setValue("password", result.get(2));
+        }
+        var toSend = generateSuccessMessage(event, protoContext, nonce);
+        return iteratorOfList(toSend);
+    }
+
+    private static OpMsgContent generateSuccessMessage(OpMsgRequest event, MongoProtoContext protoContext, String nonce) {
+        var newPayload =// GS2_HEADER +
+                "r=" + nonce + "," +
+                        "s=QUI=," +
+                        "i=" + MINIMUM_ITERATION_COUNT;
+
+        var resultMap = new Document();
+        var convid = protoContext.getReqResId();
+        resultMap.put("conversationId", convid);
+        resultMap.put("done", true);
+        resultMap.put("payload", newPayload.getBytes(StandardCharsets.UTF_8));
+        resultMap.put("ok", true);
+
+        protoContext.setValue("CONVERSATION_ID", convid);
+
+        var json = resultMap.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
+        var toSend = new OpMsgContent(0, protoContext.getReqResId(), event.getData().getRequestId());
+        OpMsgSection section = new OpMsgSection();
+        section.getDocuments().add(json);
+        toSend.getSections().add(section);
+        return toSend;
+    }
+
+    @Override
+    protected boolean canRun(String identifier, String doc) {
+        try {
+            var jsonTree = mapper.toJsonNode(doc);
+            return jsonTree.get("saslStart") != null;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     @Override
@@ -97,38 +132,5 @@ public class CmdSaslStart extends StandardOpMsgCommand {
     private Iterator<ProtoStep> handleX509Authentication(OpMsgRequest event, byte[] binaryData, MongoProtoContext protoContext, String nonce) {
         var toSend = generateSuccessMessage(event, protoContext, nonce);
         return iteratorOfList(toSend);
-    }
-
-    private static Iterator<ProtoStep> handlePlainAuthentication(OpMsgRequest event, byte[] binaryData, MongoProtoContext protoContext, String nonce) {
-        var result = readNullTerminatedStrings(binaryData);
-        if(result.size()==3) {
-            protoContext.setValue("userid", result.get(0));
-            protoContext.setValue("password", result.get(2));
-        }
-        var toSend = generateSuccessMessage(event, protoContext, nonce);
-        return iteratorOfList(toSend);
-    }
-
-    private static OpMsgContent generateSuccessMessage(OpMsgRequest event, MongoProtoContext protoContext, String nonce) {
-        var newPayload =// GS2_HEADER +
-                "r=" + nonce + "," +
-                        "s=QUI=," +
-                        "i=" + MINIMUM_ITERATION_COUNT;
-
-        var resultMap = new Document();
-        var convid = protoContext.getReqResId();
-        resultMap.put("conversationId", convid);
-        resultMap.put("done", true);
-        resultMap.put("payload", newPayload.getBytes(StandardCharsets.UTF_8));
-        resultMap.put("ok", true);
-
-        protoContext.setValue("CONVERSATION_ID", convid);
-
-        var json = resultMap.toJson(JsonWriterSettings.builder().outputMode(JsonMode.EXTENDED).build());
-        var toSend = new OpMsgContent(0, protoContext.getReqResId(), event.getData().getRequestId());
-        OpMsgSection section = new OpMsgSection();
-        section.getDocuments().add(json);
-        toSend.getSections().add(section);
-        return toSend;
     }
 }

@@ -41,11 +41,6 @@ public class MongoProtocol extends NetworkProtoDescriptor {
         this.setTimeout(settings.getTimeoutSeconds());
     }
 
-    @Override
-    public boolean isLateConnect(){
-        return true;
-    }
-
     public MongoProtocol(int port) {
         this.port = port;
         var pp = new MongoProtocolSettings();
@@ -55,6 +50,11 @@ public class MongoProtocol extends NetworkProtoDescriptor {
 
     public MongoProtocol() {
         this(PORT);
+    }
+
+    @Override
+    public boolean isLateConnect() {
+        return true;
     }
 
     @Override

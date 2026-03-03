@@ -24,14 +24,14 @@ public class BBuffer {
         StringBuilder hex = new StringBuilder();
 
         // Iterating through each byte in the array
-        var endof = 0;
+        var endOf = 0;
         for (byte i : byteArray) {
             hex.append("0x").append(String.format("%02X", i)).append(" ");
-            if (endof == 16) {
+            if (endOf == 16) {
                 hex.append("\n");
-                endof = 0;
+                endOf = 0;
             } else {
-                endof++;
+                endOf++;
             }
         }
 
@@ -195,7 +195,6 @@ public class BBuffer {
 
     public byte[] getBytes(int position, int length) {
         var dst = new byte[length];
-        //length = Math.min(length, bytes.length - position);
         System.arraycopy(bytes, position, dst, 0, length);
         return dst;
     }

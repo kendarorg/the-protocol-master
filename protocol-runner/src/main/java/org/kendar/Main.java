@@ -317,7 +317,7 @@ public class Main {
                         ); or server.enableSelfSignedTls();*/
                         ps.start();
 
-                        protocolServersCache.put(item.getKey(), (Server)ps);
+                        protocolServersCache.put(item.getKey(), (Server) ps);
 
                         var pi = new ProtocolInstance(item.getKey(),
                                 protocolServersCache.get(item.getKey()),

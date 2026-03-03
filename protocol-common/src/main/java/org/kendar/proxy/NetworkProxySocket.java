@@ -3,13 +3,6 @@ package org.kendar.proxy;
 import org.kendar.buffers.BBuffer;
 import org.kendar.exceptions.ProxyException;
 import org.kendar.protocol.context.NetworkProtoContext;
-import org.kendar.protocol.events.BytesEvent;
-import org.kendar.protocol.events.ProtocolEvent;
-import org.kendar.protocol.messages.NetworkReturnMessage;
-import org.kendar.protocol.messages.ProtoStep;
-import org.kendar.protocol.messages.ReturnMessage;
-import org.kendar.protocol.states.ProtoState;
-import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +15,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public abstract class NetworkProxySocket extends BaseProxySocket{
+public abstract class NetworkProxySocket extends BaseProxySocket {
     private static final Logger log = LoggerFactory.getLogger(NetworkProxySocket.class);
 
     private final AsynchronousSocketChannel channel;
@@ -62,7 +50,7 @@ public abstract class NetworkProxySocket extends BaseProxySocket{
                                     //FLW02 RETRIEVE THE DATA
                                     var byteArray = new byte[attachment.remaining()];
                                     attachment.get(byteArray);
-                                    onRead(tempBuffer,byteArray);
+                                    onRead(tempBuffer, byteArray);
                                 }
 
                                 attachment.clear();

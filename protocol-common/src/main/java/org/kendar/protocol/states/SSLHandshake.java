@@ -1,10 +1,6 @@
 package org.kendar.protocol.states;
 
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.logging.ByteBufFormat;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.BytesEvent;
@@ -130,7 +126,7 @@ public class SSLHandshake extends ProtoState {
     }
 
     public Iterator<ProtoStep> execute(BytesEvent event) {
-        if(event.getContext().getValue("INITALIZE_SSL_HANDSHAKE", false)){
+        if (event.getContext().getValue("INITALIZE_SSL_HANDSHAKE", false)) {
             initializeSslUpdate(event);
         }
         event.getContext().setValue("BYPASS_CONVERTERS", false);
@@ -141,7 +137,7 @@ public class SSLHandshake extends ProtoState {
         var ctx = client.getChannelHandlerContext();
         var pipeline = ctx.pipeline();
         event.getBuffer().setPosition(0);
-        var data =event.getBuffer().toArray();
+        var data = event.getBuffer().toArray();
         var tlsBuf = Unpooled.wrappedBuffer(data);
         pipeline.fireChannelRead(tlsBuf);
         var res = event.getBuffer().size();

@@ -5,7 +5,6 @@ import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.exceptions.FailedStateException;
 import org.kendar.exceptions.TPMException;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
-import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
@@ -32,10 +31,6 @@ import static org.kendar.protocol.descriptor.ProtoDescriptor.getNow;
  * Instance of a protocol definition
  */
 public abstract class ProtoContext {
-
-    public boolean sendTotallyAsync(){
-        return true;
-    }
 
     /**
      * The executor to run asynchronously the system
@@ -80,7 +75,6 @@ public abstract class ProtoContext {
      */
     private ProtoState currentState;
     private boolean useCallDurationTimes;
-
     public ProtoContext(ProtoDescriptor descriptor, int contextId) {
         this.contextId = contextId;
         this.descriptor = descriptor;
@@ -129,6 +123,10 @@ public abstract class ProtoContext {
             result = new FailedState("Unable to run event", candidate, event);
         }
         return result;
+    }
+
+    public boolean sendTotallyAsync() {
+        return true;
     }
 
     public long getLastAccess() {
@@ -200,7 +198,7 @@ public abstract class ProtoContext {
      */
     public Future<Boolean> send(ProtocolEvent event) {
         lastAccess.set(getNow());
-        if(sendTotallyAsync()){
+        if (sendTotallyAsync()) {
             return executorService.submit(() -> {
                 try (final MDC.MDCCloseable mdc = MDC.putCloseable("connection", contextId + "")) {
                     synchronized (sendLock) {

@@ -32,7 +32,6 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.Server;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
@@ -51,13 +50,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BasicTest {
 
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static Server protocolServer;
     protected static HttpProtocol baseProtocol;
     static int FAKE_PORT_HTTP = 8087;
     static int FAKE_PORT_HTTPS = 8487;
     static int FAKE_PORT_PROXY = 9999;
     private static SimpleHttpServer simpleServer;
-    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected GlobalSettings globalSettings;
     protected HttpProtocolSettings httpProtocolSettings;
 

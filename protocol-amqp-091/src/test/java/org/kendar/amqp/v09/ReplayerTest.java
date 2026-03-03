@@ -11,7 +11,6 @@ import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.NettyServer;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 
@@ -130,10 +129,10 @@ public class ReplayerTest {
             System.out.println("WAIT------------------------------------------------------------");
             Sleeper.sleep(500);
 
-            if(chanConsume.isOpen()) {
+            if (chanConsume.isOpen()) {
                 chanConsume.queueDelete(MAIN_QUEUE);
             }
-            if(channel.isOpen()) {
+            if (channel.isOpen()) {
                 channel.queueDelete(MAIN_QUEUE);
                 channel.close();
             }

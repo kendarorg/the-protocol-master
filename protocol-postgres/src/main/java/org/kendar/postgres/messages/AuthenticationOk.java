@@ -10,9 +10,10 @@ public class AuthenticationOk implements NetworkReturnMessage {
         this.authValue = authValue;
     }
 
-    public AuthenticationOk(){
+    public AuthenticationOk() {
         this.authValue = 0;
     }
+
     @Override
     public void write(BBuffer resultBuffer) {
         resultBuffer.write((byte) 'R');

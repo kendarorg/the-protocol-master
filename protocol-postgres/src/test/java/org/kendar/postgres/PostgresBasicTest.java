@@ -19,7 +19,6 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.Server;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.PostgresSqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.ui.MultiTemplateEngine;
@@ -42,12 +41,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class PostgresBasicTest {
 
     protected static final int FAKE_PORT = 5431;
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static PostgresSqlImage postgresContainer;
     protected static Server protocolServer;
     protected static PostgresProtocol baseProtocol;
     protected static StorageRepository storage;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
     private static ProtocolPluginDescriptor forwarderPlugin;
 
@@ -124,7 +123,7 @@ public class PostgresBasicTest {
         var rep = new PostgresReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         forwarderPlugin.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin,forwarderPlugin));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin, forwarderPlugin));
         pl.setActive(true);
 
         baseProtocol.setProxy(proxy);

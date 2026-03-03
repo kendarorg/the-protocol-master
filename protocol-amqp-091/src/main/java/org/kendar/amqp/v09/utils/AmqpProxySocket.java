@@ -13,7 +13,6 @@ import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.NettyProxySocket;
-import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.NetworkProxySplitterState;
 
 import java.net.InetSocketAddress;
@@ -36,8 +35,8 @@ public class AmqpProxySocket extends NettyProxySocket {
             new BasicReturn().asProxy(),
             new BasicGetEmpty().asProxy()));
 
-    public AmqpProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress,AsynchronousChannelGroup group) {
-        super(context, inetSocketAddress,group);
+    public AmqpProxySocket(NetworkProtoContext context, InetSocketAddress inetSocketAddress, AsynchronousChannelGroup group) {
+        super(context, inetSocketAddress, group);
     }
 
     @Override

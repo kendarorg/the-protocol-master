@@ -24,18 +24,19 @@ public class MqttProxy extends NetworkProxy {
 
     @TpmConstructor
     public MqttProxy(@TpmNamed(tags = "mqtt") ByteProtocolSettingsWithLogin settings) {
-        super(settings.getConnectionString(), settings.getLogin(), settings.getPassword(),settings.isStartWithTls());
+        super(settings.getConnectionString(), settings.getLogin(), settings.getPassword(), settings.isStartWithTls());
     }
 
     public MqttProxy(String connectionString, String userId, String password) {
         super(connectionString, userId, password);
     }
+
     public MqttProxy() {
         super();
     }
 
-    public MqttProxy(String connectionString, String userId, String password,boolean startWithTls) {
-        super(connectionString, userId, password,startWithTls);
+    public MqttProxy(String connectionString, String userId, String password, boolean startWithTls) {
+        super(connectionString, userId, password, startWithTls);
     }
 
     @Override

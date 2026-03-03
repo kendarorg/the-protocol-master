@@ -8,7 +8,6 @@ import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.tcpserver.NettyServer;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.jpa.HibernateSessionFactory;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;

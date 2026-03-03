@@ -198,7 +198,7 @@ public abstract class BasicRecordPlugin<W extends BasicRecordPluginSettings> ext
                     try {
                         var context = contextKvp.getValue();
                         var contextConnection = context.getValue("CONNECTION");
-                        if(contextConnection!=null) {
+                        if (contextConnection != null) {
                             context.disconnect(((ProxyConnection) contextConnection).getConnection());
                             context.setValue("CONNECTION", null);
                         }

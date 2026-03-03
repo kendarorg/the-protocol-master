@@ -11,12 +11,8 @@ import org.kendar.protocol.states.ProtoState;
 import org.kendar.protocol.states.SSLHandshake;
 import org.kendar.sql.jdbc.settings.JdbcProtocolSettings;
 import org.kendar.tcpserver.NettyServerChannel;
-import org.kendar.utils.Sleeper;
 
-import java.util.EventListener;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SSLRequest extends ProtoState {
     public static final byte[] SSL_MESSAGE_MARKER = BBufferUtils.toByteArray(0x04, 0xd2, 0x16, 0x2f);
@@ -43,7 +39,7 @@ public class SSLRequest extends ProtoState {
 
         inputBuffer.truncate(8);
         var jdbcSettings = (JdbcProtocolSettings) event.getContext().getDescriptor().getSettings();
-        if(jdbcSettings.isUseTls()) {
+        if (jdbcSettings.isUseTls()) {
             event.getContext().setValue("SSL", true);
             //event.getContext().setValue("BYPASS_CONVERTERS", true);
             //event.getContext().setValue("INITALIZE_SSL_HANDSHAKE", true);

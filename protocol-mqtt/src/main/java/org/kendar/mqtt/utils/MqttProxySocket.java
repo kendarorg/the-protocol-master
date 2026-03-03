@@ -10,7 +10,6 @@ import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.events.ProtocolEvent;
 import org.kendar.protocol.states.ProtoState;
 import org.kendar.proxy.NettyProxySocket;
-import org.kendar.proxy.NetworkProxySocket;
 import org.kendar.proxy.NetworkProxySplitterState;
 
 import java.net.InetSocketAddress;

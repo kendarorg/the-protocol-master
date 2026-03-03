@@ -9,14 +9,12 @@ import org.kendar.postgres.messages.ReadyForQuery;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.messages.ReturnMessage;
-import org.kendar.protocol.states.ProtoState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import static org.kendar.postgres.fsm.StartupMessage.FIXED_SECRET;
-import static org.kendar.postgres.fsm.StartupMessage.readNullTerminatedStrings;
 
 public class PasswordMessage extends PostgresState {
 
@@ -36,8 +34,8 @@ public class PasswordMessage extends PostgresState {
         //var p = inputBuffer.get();
         //var length = inputBuffer.getInt(0);
         inputBuffer.setPosition(5);
-        var data =  new String(inputBuffer.getRemaining());
-        data = data.substring(0,data.length()-1);
+        var data = new String(inputBuffer.getRemaining());
+        data = data.substring(0, data.length() - 1);
         protoContext.setValue("password", data);
 
         var pid = (ProcessId) protoContext.getValue("PG_PID");

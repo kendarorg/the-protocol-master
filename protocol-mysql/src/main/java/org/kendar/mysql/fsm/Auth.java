@@ -1,6 +1,5 @@
 package org.kendar.mysql.fsm;
 
-import org.kendar.events.EventsQueue;
 import org.kendar.mysql.MySqlProtocolSettings;
 import org.kendar.mysql.buffers.MySQLBBuffer;
 import org.kendar.mysql.constants.CapabilityFlag;
@@ -17,8 +16,18 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class Auth extends MySQLProtoState {
+    private static final Logger log = LoggerFactory.getLogger(Auth.class);
+
     public Auth(Class<?>... messages) {
         super(messages);
+    }
+
+    public static byte[] untilZero(byte[] input) {
+        int i = 0;
+        while (i < input.length && input[i] != 0) {
+            i++;
+        }
+        return Arrays.copyOfRange(input, 0, i);
     }
 
     @Override
@@ -34,7 +43,7 @@ public class Auth extends MySQLProtoState {
         var userName = inputBuffer.getString();
         byte[] password = new byte[]{};
         String database = "";
-        String clientPluginName="";
+        String clientPluginName = "";
         var authResponseLength = 0;
         if (CapabilityFlag.isFlagSet(clientFlag, CapabilityFlag.CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA)) {
             password = inputBuffer.readBytesWithLength();
@@ -49,7 +58,7 @@ public class Auth extends MySQLProtoState {
             clientPluginName = inputBuffer.getString();
         }
         password = untilZero(password);
-        var fullThing = clientPluginName+"|"+userName + "|" + new String(password) + "|" + database;
+        var fullThing = clientPluginName + "|" + userName + "|" + new String(password) + "|" + database;
 
         protocContext.setValue("userid", userName);
         protocContext.setValue("database", database);
@@ -64,14 +73,4 @@ public class Auth extends MySQLProtoState {
         //EventsQueue.getInstance().handle(new JdbcConnect(protocContext));
         return iteratorOfList(toSend);
     }
-
-    public static byte[] untilZero(byte[] input) {
-        int i = 0;
-        while (i < input.length && input[i] != 0) {
-            i++;
-        }
-        return Arrays.copyOfRange(input, 0, i);
-    }
-
-    private static final Logger log = LoggerFactory.getLogger(Auth.class);
 }

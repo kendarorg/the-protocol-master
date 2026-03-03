@@ -25,18 +25,19 @@ public class MySQLProtoContext extends NetworkProtoContext {
     private int packetNumber = -1;
     private MySQLExecutor executor;
 
-    /**
-     * False to handle SSL upgrade
-     * @return
-     */
-    @Override
-    public boolean sendTotallyAsync(){
-        return false;
-    }
-
     public MySQLProtoContext(ProtoDescriptor descriptor, int contextId) {
 
         super(descriptor, contextId);
+    }
+
+    /**
+     * False to handle SSL upgrade
+     *
+     * @return
+     */
+    @Override
+    public boolean sendTotallyAsync() {
+        return false;
     }
 
     public int getClientCapabilities() {
@@ -69,8 +70,8 @@ public class MySQLProtoContext extends NetworkProtoContext {
     public void disconnect(Object connection) {
 
         super.disconnect(connection);
-        var conn = getValue("CONNECTION",null);
-        if(conn==null)return;
+        var conn = getValue("CONNECTION", null);
+        if (conn == null) return;
         var c = ((Connection) ((ProxyConnection) conn).getConnection());
         try {
             if (c != null && !c.isValid(1)) {
@@ -93,11 +94,11 @@ public class MySQLProtoContext extends NetworkProtoContext {
         return result;
     }
 
-    public void setExecutor(MySQLExecutor executor) {
-        this.executor = executor;
-    }
-
     public MySQLExecutor getExecutor() {
         return executor;
+    }
+
+    public void setExecutor(MySQLExecutor executor) {
+        this.executor = executor;
     }
 }

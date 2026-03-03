@@ -117,7 +117,6 @@ public class MySQLSSLProtocolTest extends MySqlBasicTest {
     }
 
 
-
     @Test
     void simpleProxyTestChangingWithWrongUser() throws Exception {
 
@@ -139,8 +138,8 @@ public class MySQLSSLProtocolTest extends MySqlBasicTest {
                     " ADDRESS CHAR(50), " +
                     " SALARY REAL)");
             stmt.close();
-        }catch (Exception ex){
-            thrown=ex;
+        } catch (Exception ex) {
+            thrown = ex;
         }
         assertNotNull(thrown);
     }

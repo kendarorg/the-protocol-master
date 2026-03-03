@@ -1,5 +1,5 @@
 package org.kendar.tcpserver;
-import java.util.concurrent.TimeUnit;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -24,6 +24,7 @@ import org.slf4j.MDC;
 
 import javax.net.ssl.SSLEngine;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 public class NettyServer implements Server {
 
@@ -42,11 +43,12 @@ public class NettyServer implements Server {
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
     private boolean callDurationTimes;
+    private NioEventLoopGroup nioEventLoopGroup;
+
+
     public NettyServer(NetworkProtoDescriptor protoDescriptor) {
         this.protoDescriptor = protoDescriptor;
     }
-
-
 
     /**
      * Stop the server
@@ -136,7 +138,6 @@ public class NettyServer implements Server {
         return serverChannel != null && serverChannel.isActive();
     }
 
-    private NioEventLoopGroup nioEventLoopGroup;
     /**
      * Start the server
      */
@@ -168,9 +169,9 @@ public class NettyServer implements Server {
         protoDescriptor.start();
 
         try {
-            this.tlsEnabled =this.protoDescriptor.getSettings().isUseTls();
+            this.tlsEnabled = this.protoDescriptor.getSettings().isUseTls();
             this.tlsEnabledFromStart = this.protoDescriptor.getSettings().isUseTlsFromStart();
-            if(tlsEnabled) {
+            if (tlsEnabled) {
                 try {
                     if (useSelfSignedCertificate) {
                         var ssc = new SelfSignedCertificate();
@@ -195,9 +196,9 @@ public class NettyServer implements Server {
                     if (tlsEnabled) {
                         log.info("TLS enabled for server on port {}", protoDescriptor.getPort());
                     }
-                }catch (Exception e) {
-                        throw new TPMException("Failed to initialize TLS", e);
-                    }
+                } catch (Exception e) {
+                    throw new TPMException("Failed to initialize TLS", e);
+                }
 
             }
 
@@ -261,8 +262,8 @@ public class NettyServer implements Server {
                 if (protoDescriptor.sendImmediateGreeting()) {
                     context.sendGreetings();
                 }
-            }catch (Exception ex){
-                log.error("Error creating context",ex);
+            } catch (Exception ex) {
+                log.error("Error creating context", ex);
             }
         }
 

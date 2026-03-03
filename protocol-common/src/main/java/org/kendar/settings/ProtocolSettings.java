@@ -12,6 +12,8 @@ public class ProtocolSettings {
     @JsonIgnore
     private String protocolInstanceId;
     private Map<String, Object> plugins = new HashMap<>();
+    private boolean useTlsFromStart = false;
+    private boolean useTls = false;
 
     public String getProtocolInstanceId() {
         return protocolInstanceId;
@@ -53,8 +55,6 @@ public class ProtocolSettings {
         return result;
     }
 
-    private boolean useTlsFromStart = false;
-    private boolean useTls = false;
     public boolean isUseTls() {
         return useTls;
     }

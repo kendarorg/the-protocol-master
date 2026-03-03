@@ -25,7 +25,7 @@ public class AmqpProxy extends NetworkProxy {
     }
 
     public AmqpProxy(String connectionString, String userId, String password, boolean startWithTls) {
-        super(connectionString, userId, password,startWithTls);
+        super(connectionString, userId, password, startWithTls);
     }
 
     public AmqpProxy(String connectionString, String userId, String password) {
@@ -42,7 +42,7 @@ public class AmqpProxy extends NetworkProxy {
                                                    AsynchronousChannelGroup group) {
         try {
             return new AmqpProxySocket(context,
-                    new InetSocketAddress(InetAddress.getByName(host), port),group);
+                    new InetSocketAddress(InetAddress.getByName(host), port), group);
         } catch (UnknownHostException e) {
             throw new ProxyException(e);
         }

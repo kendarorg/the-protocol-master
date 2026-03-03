@@ -7,10 +7,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Square {
-    public static ConcurrentHashMap<String, String> results = new ConcurrentHashMap<>();
     private static final String QUEUE_NAME = "square";
     private static final String EXCHANGE_NAME = "myExchange";
     private static final String KEY_NAME = "key";
+    public static ConcurrentHashMap<String, String> results = new ConcurrentHashMap<>();
     DeliverCallback findSquare = (consumerTag, delivery) -> {
         String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
         int number = Integer.parseInt(message);

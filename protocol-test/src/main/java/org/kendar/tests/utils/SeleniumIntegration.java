@@ -50,7 +50,8 @@ public class SeleniumIntegration {
     public boolean navigateTo(String url, boolean snapshot) {
         return this.navigateTo(url, snapshot, -1);
     }
-    public boolean navigateTo(String url, boolean snapshot,int timeout) {
+
+    public boolean navigateTo(String url, boolean snapshot, int timeout) {
 
         var driver = (WebDriver) Utils.getCache("driver");
         var current = driver.getCurrentUrl();
@@ -61,9 +62,9 @@ public class SeleniumIntegration {
             }
             return true;
         }
-        if(timeout==-1) {
+        if (timeout == -1) {
             driver.get(url);
-        }else{
+        } else {
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(timeout));
         }
         if (!getCurrentTab().equals("settings")) {

@@ -222,7 +222,7 @@ public class PostgresExecutor {
 
     private ExecutorResult executeQuery(int maxRecords, SqlParseResult parsed, NetworkProtoContext protoContext, Binding binding,
                                         ArrayList<JDBCType> concreteTypes, String operation) throws SQLException {
-        var proxy = (JdbcProxy)protoContext.getProxy();
+        var proxy = (JdbcProxy) protoContext.getProxy();
         proxy.doConnect(protoContext);
         var connection = protoContext.getValue("CONNECTION");
         var originalMaxRecords = maxRecords;

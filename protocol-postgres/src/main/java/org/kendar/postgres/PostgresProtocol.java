@@ -10,7 +10,6 @@ import org.kendar.postgres.executor.PostgresExecutor;
 import org.kendar.postgres.fsm.*;
 import org.kendar.postgres.fsm.events.PostgresPacket;
 import org.kendar.protocol.context.ProtoContext;
-import org.kendar.protocol.descriptor.NetworkProtoDescriptor;
 import org.kendar.protocol.descriptor.ProtoDescriptor;
 import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.states.SSLHandshake;
@@ -34,8 +33,6 @@ public class PostgresProtocol extends JdbcProtocol {
     private static final SqlStringParser parser = new SqlStringParser("$");
     private static DataTypesConverter dataTypesConverter;
 
-    private final PostgresExecutor executor = new PostgresExecutor();
-
     static {
         try {
             String text = new String(PostgresProtocol.class.getResourceAsStream("/postgresdtt.json")
@@ -47,6 +44,7 @@ public class PostgresProtocol extends JdbcProtocol {
         }
     }
 
+    private final PostgresExecutor executor = new PostgresExecutor();
     private final int port;
 
     @TpmConstructor

@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 
 public class SSLRequest extends MySQLProtoState {
+    private static final Logger log = LoggerFactory.getLogger(SSLRequest.class);
+
     public SSLRequest(Class<BytesEvent> bytesEventClass) {
         super(bytesEventClass);
     }
@@ -46,6 +48,4 @@ public class SSLRequest extends MySQLProtoState {
         }
         return false;
     }
-
-    private static final Logger log = LoggerFactory.getLogger(SSLRequest.class);
 }

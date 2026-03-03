@@ -19,7 +19,6 @@ import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.Server;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.tests.testcontainer.images.MysqlImage;
 import org.kendar.tests.testcontainer.utils.Utils;
 import org.kendar.ui.MultiTemplateEngine;
@@ -42,11 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class MySqlBasicTest {
 
     protected static final int FAKE_PORT = 3310;
+    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     protected static MysqlImage mysqlContainer;
     protected static Server protocolServer;
     protected static MySQLProtocol baseProtocol;
     protected static ProtocolPluginDescriptor errorPlugin;
-    private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
     private static ProtocolPluginDescriptor latencyPlugin;
     private static ProtocolPluginDescriptor forwarderPlugin;
 
@@ -115,7 +114,7 @@ public class MySqlBasicTest {
         var rep = new MySqlReportPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
         rep.setActive(true);
         forwarderPlugin.setActive(true);
-        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin,forwarderPlugin));
+        proxy.setPluginHandlers(List.of(pl, pl1, rep, errorPlugin, latencyPlugin, forwarderPlugin));
 
         pl.setActive(true);
         EventsQueue.register("recorder", (r) -> {

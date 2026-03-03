@@ -153,7 +153,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                 }
             }
 
-            //From most recents
+            //From most recent
             Collections.reverse(basicConsumes);
             //{id=1, channel=1, consumeOrigin='quotations|1|{}', consumerTag=None1, canPublish=true, consumeId=1, exchange='stock'}
             for (var basicConsume : basicConsumes) {
@@ -221,7 +221,7 @@ public class AmqpPublishPluginApis extends ProtocolPluginApiHandlerDefault<AmqpP
                     bf.setContent(content);
                     context.write(bf);
                     written++;
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
 
                 }
             }

@@ -22,7 +22,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Pattern;
 
-import static java.util.regex.Matcher.quoteReplacement;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UiSeleniumTest extends SeleniumTestBase {
@@ -123,7 +122,7 @@ public class UiSeleniumTest extends SeleniumTestBase {
         var request = mapper.deserialize(call.getInput(), Request.class);
         var response = mapper.deserialize(call.getOutput(), Response.class);
         try {
-            if(request.getHost().equalsIgnoreCase("www.google.com")){
+            if (request.getHost().equalsIgnoreCase("www.google.com")) {
                 response.setResponseText(new TextNode("YOU HAVE BEEN HACKED"));
 
             }
@@ -150,7 +149,7 @@ public class UiSeleniumTest extends SeleniumTestBase {
         try {
             getRequest("http://localhost:8095/api/protocols/http-01/plugins/rest-plugins-plugin/start", httpclient, String.class);
 
-            navigateTo("https://www.google.com", false,5);
+            navigateTo("https://www.google.com", false, 5);
             Sleeper.sleep(1000);
             alertWhenHumanDriven("Showing totally another page :)");
             assertTrue(getDriver().getPageSource().contains("YOU HAVE BEEN HACKED"));

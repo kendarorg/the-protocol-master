@@ -53,11 +53,11 @@ public class MqttConnection {
         this.topic = topic;
     }
 
-    public void setLastAccess(long lastAccess) {
-        this.lastAccess = lastAccess;
-    }
-
     public long getLastAccess() {
         return lastAccess;
+    }
+
+    public void setLastAccess(long lastAccess) {
+        this.lastAccess = lastAccess;
     }
 }

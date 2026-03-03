@@ -11,7 +11,6 @@ import org.kendar.settings.ByteProtocolSettings;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.storage.FileStorageRepository;
 import org.kendar.tcpserver.NettyServer;
-import org.kendar.tcpserver.TcpServer;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
 import redis.clients.jedis.Jedis;

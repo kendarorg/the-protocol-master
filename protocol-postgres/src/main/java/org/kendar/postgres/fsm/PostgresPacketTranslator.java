@@ -1,6 +1,5 @@
 package org.kendar.postgres.fsm;
 
-import io.netty.buffer.Unpooled;
 import org.kendar.exceptions.AskMoreDataException;
 import org.kendar.postgres.fsm.events.PostgresPacket;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -8,7 +7,6 @@ import org.kendar.protocol.events.BytesEvent;
 import org.kendar.protocol.messages.ProtoStep;
 import org.kendar.protocol.states.InterruptProtoState;
 import org.kendar.protocol.states.ProtoState;
-import org.kendar.tcpserver.NettyServerChannel;
 
 import java.util.Iterator;
 

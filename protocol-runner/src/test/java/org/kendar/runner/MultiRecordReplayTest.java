@@ -30,13 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultiRecordReplayTest extends BasicTest {
 
-    private static SimpleHttpServer simpleServer;
     private static final String POSTGRES_PORT = "5631";
     private static final String HTTP_PORT = "12080";
     private static final String HTTPS_PORT = "12443";
     private static final String PROXY_PORT = "1281";
     private static final int SIMPLE_SERVER_HTTP_PORT = 18080;
     private static final ConcurrentLinkedQueue<ReportDataEvent> events = new ConcurrentLinkedQueue<>();
+    private static SimpleHttpServer simpleServer;
     private final AtomicBoolean runTheServer = new AtomicBoolean(true);
 
     @BeforeAll
@@ -51,6 +51,18 @@ public class MultiRecordReplayTest extends BasicTest {
     public static void afterClass() throws Exception {
         afterClassBase();
         simpleServer.stop();
+    }
+
+    public static void deleteAllFiles(Path root) throws IOException {
+        Files.walk(root)
+                .filter(Files::isRegularFile)   // only files
+                .forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to delete: " + path, e);
+                    }
+                });
     }
 
     public List<ReportDataEvent> getEvents() {
@@ -73,18 +85,6 @@ public class MultiRecordReplayTest extends BasicTest {
         Main.stop();
         Sleeper.sleep(100);
         events.clear();
-    }
-
-    public static void deleteAllFiles(Path root) throws IOException {
-        Files.walk(root)
-                .filter(Files::isRegularFile)   // only files
-                .forEach(path -> {
-                    try {
-                        Files.delete(path);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to delete: " + path, e);
-                    }
-                });
     }
 
     @Test

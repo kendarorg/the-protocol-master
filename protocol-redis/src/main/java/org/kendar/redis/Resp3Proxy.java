@@ -23,15 +23,15 @@ public class Resp3Proxy extends NetworkProxy {
 
     @TpmConstructor
     public Resp3Proxy(@TpmNamed(tags = "redis") ByteProtocolSettings settings) {
-        super(settings.getConnectionString(), null, null,settings.isStartWithTls());
+        super(settings.getConnectionString(), null, null, settings.isStartWithTls());
     }
 
     public Resp3Proxy(String connectionString, String userId, String password) {
         super(connectionString, userId, password);
     }
 
-    public Resp3Proxy(String connectionString, String userId, String password,boolean startWithTls) {
-        super(connectionString, userId, password,startWithTls);
+    public Resp3Proxy(String connectionString, String userId, String password, boolean startWithTls) {
+        super(connectionString, userId, password, startWithTls);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class Resp3Proxy extends NetworkProxy {
                                                    AsynchronousChannelGroup group) {
         try {
             return new Resp3ProxySocket(context,
-                    new InetSocketAddress(InetAddress.getByName(host), port),group);
+                    new InetSocketAddress(InetAddress.getByName(host), port), group);
         } catch (UnknownHostException e) {
             throw new ProxyException(e);
         }

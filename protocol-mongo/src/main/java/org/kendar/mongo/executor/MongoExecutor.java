@@ -31,7 +31,7 @@ public class MongoExecutor {
     }
 
     public OpMsgContent runGenericOpMsg(MongoProtoContext protoContext, OpMsgContent data, Class<?> prevState) {
-        var proxy = (MongoProxy)protoContext.getProxy();
+        var proxy = (MongoProxy) protoContext.getProxy();
         proxy.doConnect(protoContext);
         var mongoClient = ((MongoClient) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
         var mongoProxy = (MongoProxy) protoContext.getProxy();
@@ -40,7 +40,7 @@ public class MongoExecutor {
     }
 
     public OpMsgContent runHelloOpMsg(MongoProtoContext protoContext, OpMsgContent lsatOp, Class<?> prevState) throws JsonProcessingException {
-        var proxy = (MongoProxy)protoContext.getProxy();
+        var proxy = (MongoProxy) protoContext.getProxy();
         proxy.doConnect(protoContext);
         var mongoClient = ((MongoClient) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
         var mongoProxy = (MongoProxy) protoContext.getProxy();
@@ -49,7 +49,7 @@ public class MongoExecutor {
     }
 
     public OpReplyContent runHelloOpQuery(MongoProtoContext protoContext, OpQueryContent lsatOp, Class<?> prevState) {
-        var proxy = (MongoProxy)protoContext.getProxy();
+        var proxy = (MongoProxy) protoContext.getProxy();
         proxy.doConnect(protoContext);
         var mongoClient = ((MongoClient) ((ProxyConnection) protoContext.getValue("CONNECTION")).getConnection());
         var mongoProxy = (MongoProxy) protoContext.getProxy();
