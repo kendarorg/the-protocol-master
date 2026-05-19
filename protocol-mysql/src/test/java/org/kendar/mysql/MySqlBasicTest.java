@@ -6,10 +6,7 @@ import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.mysql.plugins.*;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.settings.BasicMockPluginSettings;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
-import org.kendar.plugins.settings.LatencyPluginSettings;
-import org.kendar.plugins.settings.NetworkErrorPluginSettings;
+import org.kendar.plugins.settings.*;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.PluginSettings;
@@ -100,7 +97,7 @@ public class MySqlBasicTest {
         //gs.putService("storage", storage);
         errorPlugin = new MySqlNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin = new MySqlLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
-        forwarderPlugin = new MySqlForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        forwarderPlugin = new MySqlForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicForwardPluginSettings());
 
 
         var pl = new MySqlRecordPlugin(mapper, storage, new MultiTemplateEngine(), new SimpleParser())

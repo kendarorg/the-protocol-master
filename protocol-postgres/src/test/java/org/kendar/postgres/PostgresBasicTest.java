@@ -5,10 +5,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.kendar.events.EventsQueue;
 import org.kendar.events.ReportDataEvent;
 import org.kendar.plugins.base.ProtocolPluginDescriptor;
-import org.kendar.plugins.settings.BasicMockPluginSettings;
-import org.kendar.plugins.settings.BasicRecordPluginSettings;
-import org.kendar.plugins.settings.LatencyPluginSettings;
-import org.kendar.plugins.settings.NetworkErrorPluginSettings;
+import org.kendar.plugins.settings.*;
 import org.kendar.postgres.plugins.*;
 import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
@@ -114,7 +111,7 @@ public class PostgresBasicTest {
         var pl1 = new PostgresMockPlugin(mapper, storage, new MultiTemplateEngine());
         errorPlugin = new PostgresNetErrorPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new NetworkErrorPluginSettings().withPercentAction(100));
         latencyPlugin = new PostgresLatencyPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new LatencyPluginSettings().withMinMax(500, 1000).withPercentAction(100));
-        forwarderPlugin = new PostgresForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new PluginSettings());
+        forwarderPlugin = new PostgresForwardPlugin(mapper).initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicForwardPluginSettings());
 
         var mockPluginSettings = new BasicMockPluginSettings();
         var global = new GlobalSettings();
