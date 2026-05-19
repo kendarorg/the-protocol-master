@@ -42,6 +42,11 @@ public abstract class BasicForwardPlugin extends ProtocolPluginDescriptorBase<Ba
         return map;
     }
 
+    @Override
+    public Class<?> getSettingClass() {
+        return BasicForwardPluginSettings.class;
+    }
+
     public static boolean isValidHumanText(String s) {
         if (s == null || s.isEmpty()) return false;
         if (containsReplacementChar(s)) return false;
