@@ -3,12 +3,16 @@ package org.kendar.plugins;
 import org.kendar.plugins.apis.BasicForwardApi;
 import org.kendar.plugins.base.ProtocolPhase;
 import org.kendar.plugins.base.ProtocolPluginApiHandler;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
 import org.kendar.plugins.base.ProtocolPluginDescriptorBase;
 import org.kendar.plugins.settings.BasicForwardPluginSettings;
 import org.kendar.plugins.settings.dtos.ForwardMatcher;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
+import org.kendar.settings.GlobalSettings;
+import org.kendar.settings.PluginSettings;
+import org.kendar.settings.ProtocolSettings;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +77,13 @@ public abstract class BasicForwardPlugin extends ProtocolPluginDescriptorBase<Ba
         if (getSettings() == null) return false;
         matchers.set(setupMatches(getSettings().getMappings()));
         return true;
+    }
+
+    @Override
+    public ProtocolPluginDescriptor initialize(GlobalSettings global, ProtocolSettings protocol, PluginSettings pluginSetting) {
+        super.initialize(global, protocol, pluginSetting);
+        handleSettingsChanged();
+        return this;
     }
 
     private List<ForwardMatcher> setupMatches(HashMap<String, String> mappings) {
