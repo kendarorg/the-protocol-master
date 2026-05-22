@@ -28,5 +28,8 @@
         <module name="sample-plugins" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="tpm-mysql-limiter-plugin" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
