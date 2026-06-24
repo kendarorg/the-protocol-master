@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>${revision}</version>
+        <version>4.3.10-tpm</version>
     </parent>
 
     <artifactId>protocol-common-jdbc</artifactId>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-common</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
     </dependencies>
     <name>TPM-Proxy common library-JDBC</name>

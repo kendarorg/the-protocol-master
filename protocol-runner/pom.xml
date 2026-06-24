@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>${revision}</version>
+        <version>4.3.10-tpm</version>
     </parent>
 
     <artifactId>protocol-runner</artifactId>
@@ -54,42 +54,42 @@
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mongo</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-http</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-postgres</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-amqp-091</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mysql</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-redis</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-mqtt</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-test</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -291,7 +291,7 @@
                             <target>
                                 <echo file="${project.build.sourceDirectory}/../resources/protocol_runner.version"
                                       append="false">
-                                    ${revision}
+                                    4.3.10-tpm
                                 </echo>
                             </target>
                         </configuration>

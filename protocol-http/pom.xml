@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>${revision}</version>
+        <version>4.3.10-tpm</version>
     </parent>
 
     <artifactId>protocol-http</artifactId>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-common</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-test</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
             <scope>test</scope>
         </dependency>
         <dependency>
