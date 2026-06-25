@@ -15,6 +15,7 @@
         <module name="protocol-mqtt" />
         <module name="protocol-mongo" />
         <module name="protocol-test" />
+        <module name="jacoco" />
         <module name="protocol-redis" />
         <module name="protocol-amqp-091" />
       </profile>
@@ -27,8 +28,5 @@
         <module name="sample-plugins" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="jacoco" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>

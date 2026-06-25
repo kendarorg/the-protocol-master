@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>${revision}</version>
+        <version>4.3.10-tpm</version>
     </parent>
 
     <artifactId>sample-plugins</artifactId>
@@ -28,6 +28,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${central.publishing.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>injected-central-publishing</id>
@@ -152,7 +153,7 @@
                             <target>
                                 <echo file="${project.build.sourceDirectory}/../resources/sample_plugins.version"
                                       append="false">
-                                    ${revision}
+                                    4.3.10-tpm
                                 </echo>
                             </target>
                         </configuration>
@@ -180,7 +181,7 @@
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-common</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
             <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>
@@ -188,7 +189,7 @@
             <!-- For http filter-->
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-http</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
             <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>
@@ -196,7 +197,7 @@
             <!-- For postgres filter-->
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-postgres</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
             <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>
@@ -204,7 +205,7 @@
             <!-- For amqp filter-->
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-amqp-091</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
             <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>

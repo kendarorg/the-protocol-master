@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>${revision}</version>
+        <version>4.3.10-tpm</version>
     </parent>
 
     <artifactId>protocol-dns-plugin</artifactId>
@@ -142,7 +142,7 @@
                             <target>
                                 <echo file="${project.build.sourceDirectory}/../resources/protocol_dns_plugin.version"
                                       append="false">
-                                    ${revision}
+                                    4.3.10-tpm
                                 </echo>
                             </target>
                         </configuration>
@@ -170,7 +170,7 @@
         <dependency>
             <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-common</artifactId>
-            <version>${revision}</version>
+            <version>4.3.10-tpm</version>
             <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>

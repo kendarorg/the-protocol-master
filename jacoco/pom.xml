@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.kendar.protocol</groupId>
         <artifactId>protocol-master</artifactId>
-        <version>${revision}</version>
+        <version>4.3.10-tpm</version>
     </parent>
 
     <properties>
@@ -21,6 +21,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
+                <version>${deploy.plugin.version}</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
@@ -177,6 +178,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${central.publishing.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>injected-central-publishing</id>

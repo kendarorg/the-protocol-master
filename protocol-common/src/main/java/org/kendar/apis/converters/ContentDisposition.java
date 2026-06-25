@@ -516,8 +516,7 @@ public class ContentDisposition {
          * Set the value of the {@literal filename*} that will be encoded as defined in the RFC 5987.
          * Only the US-ASCII, UTF-8 and ISO-8859-1 charsets are supported.
          *
-         * <p><strong>Note:</strong> Do not use this for a {@code "multipart/form-data"} requests as per
-         * <a link="<a href="<a href="https://tools.ietf.org/html/rfc7578#section-4.2">...</a> <a href="https://tools.ietf.org/html/rfc7578#section-4.2">...</a> RFC 7578, Section 4.2 and also
+         * <p><strong>Note:</strong> Do not use this for a {@code "multipart/form-data"} requests
          * RFC 5987 itself mentions it does not apply to multipart requests.
          */
         Builder filename(String filename, String charset);
