@@ -56,20 +56,20 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
         var inputBuffer = event.getBuffer();
         inputBuffer.setPosition(0);
         var header = inputBuffer.getBytes(0, 8);
+        // Consume the 8 header bytes so the next state (and the optional 2nd
+        // ProtocolHeader) don't re-match the same header (cf. Postgres SSLRequest).
+        inputBuffer.truncate(8);
         var isSasl = header[4] == 0x03;
         context.setValue(isSasl ? "SASL_REQUESTED" : "SASL_DONE", true);
 
-        // Forward the client's header upstream (fire-and-forget: the broker's reply
-        // header + SASL frames come back through the proxy socket). Wrapped in a
+        // Transparent relay: forward the client's header upstream and let the broker's
+        // reply header (+ SASL frames) come back through the proxy socket, relayed to
+        // the client by HeaderRelay / SaslMechanisms / SaslOutcome. Wrapped in a
         // RawFrame because the proxy API takes a NetworkReturnMessage, not raw bytes.
         var forward = new RawFrame(-1, FrameType.AMQP.asByte());
         forward.setRaw(header);
         proxy.sendAndForget(context, connection, forward);
-
-        // Echo the same header back to the client so negotiation proceeds.
-        var echo = new RawFrame(-1, FrameType.AMQP.asByte());
-        echo.setRaw(header);
-        return iteratorOfList(echo);
+        return iteratorOfEmpty();
     }
 
     @Override

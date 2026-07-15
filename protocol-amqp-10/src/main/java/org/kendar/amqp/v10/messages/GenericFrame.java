@@ -29,35 +29,34 @@ public class GenericFrame extends ProtoState implements NetworkReturnMessage, Ne
 
     public boolean canRun(BytesEvent event) {
         var rb = event.getBuffer();
-        var pos = rb.getPosition();
-        if (rb.size() - pos < 8) {
+        // The relay loop resets position to -1 via truncate(); always start at 0.
+        rb.setPosition(0);
+        if (rb.size() < 8) {
             return false;
         }
-        var head = rb.getBytes(pos, 4);
-        rb.setPosition(pos);
+        var head = rb.getBytes(0, 4);
         if (head[0] == 'A' && head[1] == 'M' && head[2] == 'Q' && head[3] == 'P') {
-            // 8-byte protocol header
-            return rb.size() - pos >= 8;
+            return true; // 8-byte protocol header
         }
+        rb.setPosition(0);
         var size = rb.getInt();
-        rb.setPosition(pos);
-        return size >= 8 && rb.size() - pos >= size;
+        rb.setPosition(0);
+        return size >= 8 && rb.size() >= size;
     }
 
     public BytesEvent execute(BytesEvent event) {
         var rb = event.getBuffer();
-        var pos = rb.getPosition();
-        var head = rb.getBytes(pos, 4);
-        rb.setPosition(pos);
+        rb.setPosition(0);
+        var head = rb.getBytes(0, 4);
         int len;
         if (head[0] == 'A' && head[1] == 'M' && head[2] == 'Q' && head[3] == 'P') {
             len = 8;
         } else {
-            var size = rb.getInt();
-            rb.setPosition(pos);
-            len = size;
+            rb.setPosition(0);
+            len = rb.getInt();
         }
-        var content = rb.getBytes(len);
+        rb.setPosition(0);
+        var content = rb.getBytes(len); // advances position to len so truncate() drops exactly this message
         var bb = new BBuffer();
         bb.write(content);
         bb.setPosition(0);

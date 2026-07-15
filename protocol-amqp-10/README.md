@@ -9,11 +9,23 @@ Protocol design and milestones: see `../protocol-amqp-10.md`.
 
 ## Status
 
-**M3 — in progress (broker-verified loop is now unblocked).** Docker/testcontainers
-here negotiates Docker API 1.32 (docker-java 3.4.0 default), which modern daemons
-(min 1.40) reject. Fixed for the run by passing the version as a JVM system property
-to the surefire fork (docker-java reads only `-Dapi.version`, *not* `DOCKER_HOST`-style
-env). Run the container tests with:
+**M3 — end-to-end passthrough works (broker-verified).** `SimpleTest` is GREEN: a
+qpid-jms producer/consumer round-trips a message through the proxy to ActiveMQ
+Artemis. The full AMQP 1.0 handshake and steady state relay correctly — SASL
+header → `sasl-mechanisms` → `sasl-init` → `sasl-outcome` → AMQP header → `open` →
+`begin` → `attach`/`flow`/`transfer`/`disposition` → clean `detach`/`end`/`close`.
+
+Approach: **transparent SASL relay** (not termination) — client SASL frames/headers
+are forwarded to the broker, and the broker's replies are relayed back by dedicated
+proxy states (`HeaderRelay`, `SaslMechanisms`, `SaslOutcome`, `Open`, `Begin`, …).
+Key fixes that got it green: `ProtocolHeader` forwards via `sendAndForget` and
+`truncate(8)`-consumes the header; the SASL/2nd-header FSM states are `.asOptional()`
+(cf. Postgres `SSLRequest`); `GenericFrame` resets position to 0 so multiple broker
+frames in one packet all split; teardown performatives are interrupt states.
+
+Run the container tests (docker-java 3.4.0 defaults to Docker API 1.32, which modern
+daemons reject — pass the version as a JVM system property to the surefire fork; it
+reads only `-Dapi.version`, not env):
 
 ```
 DOCKER_HOST=unix:///var/run/docker.sock \
@@ -21,13 +33,9 @@ DOCKER_HOST=unix:///var/run/docker.sock \
       -Dsurefire.failIfNoSpecifiedTests=false -DargLine="-Dapi.version=1.51"
 ```
 
-With that, Artemis starts and qpid-jms reaches the proxy. `SimpleTest` currently
-fails at the **AMQP 1.0 SASL handshake**: the proxy must terminate SASL on both
-sides (send `sasl-mechanisms` to the client + `sasl-outcome`, and run PLAIN with the
-broker using the proxy's credentials) before `open`/sessions. That bidirectional
-handshake — built from the M2 codec — is the next implementation step. The header
-forwarding no longer crashes (a `GenericFrame`-as-expect-state `ClassCastException`
-was fixed).
+Still to do: credential-substituting SASL termination (needed for broker-less
+**replay**), record/replay plugins (`ProxyedBehaviour` + `ReceiverLink`), the
+remaining plugins/CLIs/JTE panels, and `ReplayerTest`/`SpecialErrorsTest`.
 
 
 **M2 — type codec (done, unit-verified).** `codec/` — `Amqp10TypeReader`/`Amqp10TypeWriter`

@@ -4,7 +4,10 @@ import org.kendar.amqp.v10.dtos.FrameType;
 import org.kendar.amqp.v10.fsm.events.Amqp10Frame;
 import org.kendar.amqp.v10.messages.EmptyFrame;
 import org.kendar.amqp.v10.messages.GenericFrame;
+import org.kendar.amqp.v10.messages.HeaderRelay;
 import org.kendar.amqp.v10.messages.performatives.*;
+import org.kendar.amqp.v10.messages.sasl.SaslMechanisms;
+import org.kendar.amqp.v10.messages.sasl.SaslOutcome;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
 import org.kendar.protocol.events.ProtocolEvent;
@@ -26,6 +29,13 @@ import java.util.List;
  */
 public class Amqp10ProxySocket extends NettyProxySocket {
     private final List<ProtoState> states = new ArrayList<>(Arrays.asList(
+            // handshake frames the broker sends back, relayed to the client
+            new HeaderRelay().asProxy(),
+            new SaslMechanisms().asProxy(),
+            new SaslOutcome().asProxy(),
+            new Open().asProxy(),
+            new Begin().asProxy(),
+            // steady-state frames the broker can initiate
             new Transfer().asProxy(),
             new Flow().asProxy(),
             new Disposition().asProxy(),

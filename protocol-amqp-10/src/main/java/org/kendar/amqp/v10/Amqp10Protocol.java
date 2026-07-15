@@ -71,11 +71,17 @@ public class Amqp10Protocol extends NetworkProtoDescriptor implements ExtensionP
     protected void initializeProtocol() {
         addInterruptState(new EmptyFrame(Amqp10Frame.class));
         addInterruptState(new Amqp10FrameTranslator(BytesEvent.class));
+        // Teardown frames may arrive at any point (e.g. close right after a
+        // transfer, without ending the session) — handle them as interrupts.
+        addInterruptState(new Detach(Amqp10Frame.class));
+        addInterruptState(new End(Amqp10Frame.class));
+        addInterruptState(new Close(Amqp10Frame.class));
 
         initialize(
                 new ProtoStateSequence(
-                        new ProtocolHeader(BytesEvent.class),
-                        new SaslInit(Amqp10Frame.class),               // optional (SASL path)
+                        new ProtocolHeader(BytesEvent.class),              // SASL or AMQP header
+                        new SaslInit(Amqp10Frame.class).asOptional(),     // SASL path only
+                        new ProtocolHeader(BytesEvent.class).asOptional(),// 2nd (AMQP) header after SASL
                         new Open(Amqp10Frame.class),
                         new Tagged(
                                 Tag.ofKeys("SESSION"),
