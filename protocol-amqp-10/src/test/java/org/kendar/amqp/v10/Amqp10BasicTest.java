@@ -2,19 +2,27 @@ package org.kendar.amqp.v10;
 
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.junit.jupiter.api.TestInfo;
+import org.kendar.amqp.v10.plugins.Amqp10RecordPlugin;
+import org.kendar.plugins.base.ProtocolPluginDescriptor;
+import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
+import org.kendar.settings.ByteProtocolSettingsWithLogin;
 import org.kendar.settings.GlobalSettings;
+import org.kendar.storage.FileStorageRepository;
 import org.kendar.storage.NullStorageRepository;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.tcpserver.NettyServer;
 import org.kendar.tcpserver.Server;
 import org.kendar.tests.testcontainer.images.ArtemisImage;
 import org.kendar.tests.testcontainer.utils.Utils;
+import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.Sleeper;
+import org.kendar.utils.parser.SimpleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,6 +37,8 @@ public class Amqp10BasicTest {
     protected static final Logger log = LoggerFactory.getLogger(Amqp10BasicTest.class);
     protected static ArtemisImage artemisContainer;
     protected static Server protocolServer;
+    protected static ProtocolPluginDescriptor recordPlugin;
+    protected static StorageRepository storage;
     protected JsonMapper mapper = new JsonMapper();
 
     public static void beforeClassBase() {
@@ -56,18 +66,38 @@ public class Amqp10BasicTest {
     }
 
     public static void beforeEachBase(TestInfo testInfo) {
+        beforeEachBase(testInfo, false);
+    }
+
+    public static void beforeEachBase(TestInfo testInfo, boolean record) {
         var baseProtocol = new Amqp10Protocol(FAKE_PORT);
         var proxy = new Amqp10Proxy(artemisContainer.getConnectionString(),
                 artemisContainer.getUserId(), artemisContainer.getPassword());
-        StorageRepository storage = new NullStorageRepository();
+
+        if (record && testInfo != null && testInfo.getTestClass().isPresent()
+                && testInfo.getTestMethod().isPresent()) {
+            var className = testInfo.getTestClass().get().getSimpleName();
+            var method = testInfo.getTestMethod().get().getName();
+            storage = new FileStorageRepository(Path.of("target", "tests", className, method));
+        } else {
+            storage = new NullStorageRepository();
+        }
         storage.initialize();
 
-        proxy.setPluginHandlers(List.of());
+        var gs = new GlobalSettings();
+        var jsonMapper = new JsonMapper();
+        recordPlugin = new Amqp10RecordPlugin(jsonMapper, storage, new MultiTemplateEngine(), new SimpleParser())
+                .initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
+
+        proxy.setPluginHandlers(record ? List.of(recordPlugin) : List.of());
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
 
         protocolServer = new NettyServer(baseProtocol);
         protocolServer.start();
+        if (record) {
+            recordPlugin.setActive(true);
+        }
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
 
