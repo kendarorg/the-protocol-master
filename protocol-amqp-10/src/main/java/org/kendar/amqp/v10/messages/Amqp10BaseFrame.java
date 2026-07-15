@@ -134,6 +134,22 @@ public abstract class Amqp10BaseFrame extends ProtoState implements NetworkRetur
             proxy.respond(message, new PluginContext("AMQP10", "RESPONSE", System.currentTimeMillis(), context));
             return iteratorOfList(message);
         }
-        return iteratorOfRunnable(() -> proxy.sendAndForget(context, connection, message));
+        return iteratorOfRunnable(() -> {
+            proxy.sendAndForget(context, connection, message);
+            drainReplayResponses(context);
+        });
+    }
+
+    /**
+     * In broker-less replay the replay plugin intercepts {@code sendAndForget} and
+     * queues the recorded responses via {@code addResponse}; those are normally
+     * drained only in {@code postWrite} (after a client write). A relay-based state
+     * writes nothing here, so drain and run them now. No-op in passthrough/record
+     * (nothing is queued).
+     */
+    public static void drainReplayResponses(NetworkProtoContext context) {
+        for (var runnable : context.getRunnables()) {
+            runnable.run();
+        }
     }
 }

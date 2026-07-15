@@ -1,7 +1,6 @@
 package org.kendar.amqp.v10;
 
 import org.apache.qpid.jms.JmsConnectionFactory;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kendar.amqp.v10.plugins.Amqp10ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
@@ -30,13 +29,6 @@ class ReplayerTest {
     private static final int FAKE_PORT = 5693;
 
     @Test
-    @Disabled("WIP: replay now matches the recorded input and correlates responses by tag "
-            + "(getContextTags + id-sorted index), but the queued async responses are drained only "
-            + "in NetworkProtoContext.postWrite -- i.e. AFTER a message is written to the client. "
-            + "The relay-based ProtocolHeader returns empty (broker relay writes directly), so in "
-            + "broker-less replay nothing triggers the drain. Fix: local SASL termination in replay "
-            + "mode (ProtocolHeader writes the handshake responses itself), keeping relay for "
-            + "passthrough. Distinct design step; changing it risks the working passthrough.")
     void replaysConnectionOpenWithoutBroker() throws Exception {
         var baseProtocol = new Amqp10Protocol(FAKE_PORT);
         var proxy = new Amqp10Proxy(); // no broker

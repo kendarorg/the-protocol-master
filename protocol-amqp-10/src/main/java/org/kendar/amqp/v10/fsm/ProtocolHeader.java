@@ -1,6 +1,7 @@
 package org.kendar.amqp.v10.fsm;
 
 import org.kendar.amqp.v10.dtos.FrameType;
+import org.kendar.amqp.v10.messages.Amqp10BaseFrame;
 import org.kendar.amqp.v10.messages.RawFrame;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -69,6 +70,9 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
         var forward = new RawFrame(-1, FrameType.AMQP.asByte());
         forward.setRaw(header);
         proxy.sendAndForget(context, connection, forward);
+        // In broker-less replay, flush the recorded responses the replay plugin queued
+        // (no-op in passthrough/record). See Amqp10BaseFrame#drainReplayResponses.
+        Amqp10BaseFrame.drainReplayResponses(context);
         return iteratorOfEmpty();
     }
 
