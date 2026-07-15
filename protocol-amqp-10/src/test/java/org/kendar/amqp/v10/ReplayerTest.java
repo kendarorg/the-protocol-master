@@ -1,6 +1,8 @@
 package org.kendar.amqp.v10;
 
+import jakarta.jms.DeliveryMode;
 import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.junit.jupiter.api.Test;
 import org.kendar.amqp.v10.plugins.Amqp10ReplayPlugin;
@@ -17,6 +19,7 @@ import org.kendar.utils.Sleeper;
 import java.nio.file.Path;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -94,6 +97,32 @@ class ReplayerTest {
             var queue = session.createQueue("amqp10.record.test");
             var producer = session.createProducer(queue); // triggers attach
             assertNotNull(producer, "producer (attach) established via broker-less replay");
+            connection.close();
+        } finally {
+            server.stop();
+        }
+    }
+
+    @Test
+    void replaysProducerAndConsumerWithoutBroker() throws Exception {
+        // Mirrors the recorded RecordTest sequence so order-based matching stays aligned.
+        var server = startReplayServer();
+        try {
+            var factory = new JmsConnectionFactory("amqp://localhost:" + FAKE_PORT);
+            var connection = factory.createConnection("artemis", "artemis");
+            connection.start();
+            var session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            var queue = session.createQueue("amqp10.record.test");
+
+            var producer = session.createProducer(queue);
+            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            producer.send(session.createTextMessage("record-me"));
+
+            var consumer = session.createConsumer(queue);
+            var received = (TextMessage) consumer.receive(10000);
+
+            assertNotNull(received, "recorded delivery did not reach the consumer via replay");
+            assertEquals("record-me", received.getText(), "replayed message body mismatch");
             connection.close();
         } finally {
             server.stop();
