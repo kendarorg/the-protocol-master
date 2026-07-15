@@ -39,6 +39,8 @@ public class Amqp10BasicTest {
     protected static Server protocolServer;
     protected static ProtocolPluginDescriptor recordPlugin;
     protected static StorageRepository storage;
+    /** Extra active plugins (e.g. latency/net-error) added by a subclass before beforeEach. */
+    protected static final java.util.List<ProtocolPluginDescriptor> extraPlugins = new java.util.ArrayList<>();
     protected JsonMapper mapper = new JsonMapper();
 
     public static void beforeClassBase() {
@@ -89,7 +91,12 @@ public class Amqp10BasicTest {
         recordPlugin = new Amqp10RecordPlugin(jsonMapper, storage, new MultiTemplateEngine(), new SimpleParser())
                 .initialize(gs, new ByteProtocolSettingsWithLogin(), new BasicAysncRecordPluginSettings());
 
-        proxy.setPluginHandlers(record ? List.of(recordPlugin) : List.of());
+        var handlers = new java.util.ArrayList<org.kendar.plugins.base.BasePluginDescriptor>();
+        if (record) {
+            handlers.add(recordPlugin);
+        }
+        handlers.addAll(extraPlugins);
+        proxy.setPluginHandlers(handlers);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
 
@@ -97,6 +104,9 @@ public class Amqp10BasicTest {
         protocolServer.start();
         if (record) {
             recordPlugin.setActive(true);
+        }
+        for (var p : extraPlugins) {
+            p.setActive(true);
         }
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }
