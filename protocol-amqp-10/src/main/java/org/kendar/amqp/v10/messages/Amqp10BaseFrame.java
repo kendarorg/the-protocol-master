@@ -130,6 +130,8 @@ public abstract class Amqp10BaseFrame extends ProtoState implements NetworkRetur
         message.setChannel(event.getChannel());
         message.setRaw(all);
 
+        capture(context, all, isProxyed());
+
         if (isProxyed()) {
             proxy.respond(message, new PluginContext("AMQP10", "RESPONSE", System.currentTimeMillis(), context));
             return iteratorOfList(message);
@@ -138,6 +140,22 @@ public abstract class Amqp10BaseFrame extends ProtoState implements NetworkRetur
             proxy.sendAndForget(context, connection, message);
             drainReplayResponses(context);
         });
+    }
+
+    /**
+     * Hook for semantic side-tracking of a frame as it is relayed (attach/transfer
+     * correlation for the publish plugin). {@code proxyed} is {@code true} for
+     * broker-originated frames. Default is a no-op; passthrough is unaffected.
+     */
+    protected void capture(NetworkProtoContext context, byte[] raw, boolean proxyed) {
+    }
+
+    /** Reads the big-endian frame channel (bytes 6-7) from a raw AMQP 1.0 frame. */
+    protected static short channelOf(byte[] raw) {
+        if (raw == null || raw.length < 8) {
+            return -1;
+        }
+        return (short) (((raw[6] & 0xFF) << 8) | (raw[7] & 0xFF));
     }
 
     /**
