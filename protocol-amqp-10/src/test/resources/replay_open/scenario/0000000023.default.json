@@ -1,0 +1,17 @@
+{
+  "trivial" : false,
+  "timestamp" : 1784103798145,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 23,
+  "input" : {
+    "channel" : 1,
+    "frameType" : 0,
+    "proxyed" : false,
+    "raw" : "AAAAFgIAAAEAUxXACQVBQ0NBAFMkRQ=="
+  },
+  "durationMs" : 12,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "inputType" : "RawFrame"
+}

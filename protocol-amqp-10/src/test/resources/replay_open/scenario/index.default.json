@@ -1,0 +1,226 @@
+[ {
+  "index" : 2,
+  "timestamp" : 1784103797489,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 1,
+  "timestamp" : 1784103797489,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 72,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 3,
+  "timestamp" : 1784103797500,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 4,
+  "timestamp" : 1784103797526,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 12,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 5,
+  "timestamp" : 1784103797528,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 6,
+  "timestamp" : 1784103797530,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 7,
+  "timestamp" : 1784103797556,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 12,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 8,
+  "timestamp" : 1784103797569,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 12,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 9,
+  "timestamp" : 1784103797573,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 10,
+  "timestamp" : 1784103797591,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 11,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 11,
+  "timestamp" : 1784103797592,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 12,
+  "timestamp" : 1784103797704,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 12,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 13,
+  "timestamp" : 1784103797706,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 14,
+  "timestamp" : 1784103797851,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 12,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 15,
+  "timestamp" : 1784103797878,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 16,
+  "timestamp" : 1784103797880,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 17,
+  "timestamp" : 1784103798028,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 11,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 19,
+  "timestamp" : 1784103798052,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 18,
+  "timestamp" : 1784103798062,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 11,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 20,
+  "timestamp" : 1784103798086,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 21,
+  "timestamp" : 1784103798109,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 11,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 22,
+  "timestamp" : 1784103798114,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+}, {
+  "index" : 23,
+  "timestamp" : 1784103798157,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 12,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 24,
+  "timestamp" : 1784103798198,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "durationMs" : 11,
+  "tags" : {
+    "input" : "RawFrame"
+  }
+}, {
+  "index" : 25,
+  "timestamp" : 1784103798205,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "durationMs" : 0,
+  "tags" : {
+    "output" : "RawFrame"
+  }
+} ]

@@ -1,0 +1,17 @@
+{
+  "trivial" : false,
+  "timestamp" : 1784103798016,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 17,
+  "input" : {
+    "channel" : 1,
+    "frameType" : 0,
+    "proxyed" : false,
+    "raw" : "AAAAsgIAAAEAUxTACAVDQ6ABAENCAFNywSkEow54LW9wdC1qbXMtZGVzdFEAoxJ4LW9wdC1qbXMtbXNnLXR5cGVRBQBTc9AAAABZAAAACqEvSUQ6ZTJlZDcxY2MtNmRiMi00MjQwLWJmZWItODYzMmIzOTNlZGNmOjE6MToxLTFAoRJhbXFwMTAucmVjb3JkLnRlc3RAQEBAQECDAAABn2TfhKQAU3ehCXJlY29yZC1tZQ=="
+  },
+  "durationMs" : 11,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "inputType" : "RawFrame"
+}
