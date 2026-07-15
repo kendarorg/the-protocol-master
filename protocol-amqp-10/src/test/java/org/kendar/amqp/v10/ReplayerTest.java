@@ -30,11 +30,13 @@ class ReplayerTest {
     private static final int FAKE_PORT = 5693;
 
     @Test
-    @Disabled("WIP: broker-less replay reaches ProtocolHeader but the base plugin's "
-            + "loadAndPrepareTheAsyncResponses only pushes recorded responses whose tags match "
-            + "the context tags. Byte-level RawFrame recordings carry no semantic tags "
-            + "(handle/link-name/delivery-id), so nothing correlates. Enabling this needs the "
-            + "M2 codec wired into the frame states to decode those fields for record/replay tags.")
+    @Disabled("WIP: replay now matches the recorded input and correlates responses by tag "
+            + "(getContextTags + id-sorted index), but the queued async responses are drained only "
+            + "in NetworkProtoContext.postWrite -- i.e. AFTER a message is written to the client. "
+            + "The relay-based ProtocolHeader returns empty (broker relay writes directly), so in "
+            + "broker-less replay nothing triggers the drain. Fix: local SASL termination in replay "
+            + "mode (ProtocolHeader writes the handshake responses itself), keeping relay for "
+            + "passthrough. Distinct design step; changing it risks the working passthrough.")
     void replaysConnectionOpenWithoutBroker() throws Exception {
         var baseProtocol = new Amqp10Protocol(FAKE_PORT);
         var proxy = new Amqp10Proxy(); // no broker

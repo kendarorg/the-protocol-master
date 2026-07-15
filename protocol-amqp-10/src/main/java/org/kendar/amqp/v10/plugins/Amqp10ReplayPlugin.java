@@ -23,6 +23,14 @@ import java.util.Map;
  * bytes ({@link RawFrame}); on each client frame the base plugin matches the next
  * recorded interaction (by caller/type + recorded order) and this class writes the
  * recorded response frames back to the client verbatim — no broker involved.
+ * <p>
+ * Status: input matching and response tag-correlation work ({@link #getContextTags}
+ * + an id-sorted index). The open blocker is that the base plugin queues responses
+ * via {@code NetworkProtoContext.addResponse}, which are drained only in
+ * {@code postWrite} (after a client write). The relay-based {@code ProtocolHeader}
+ * returns empty, so broker-less replay never triggers the drain. Completing replay
+ * needs local SASL termination (ProtocolHeader writes handshake responses itself)
+ * plus per-link semantic tags for attach/transfer correlation. See ReplayerTest.
  */
 @Extension
 @TpmService(tags = "amqp10")
@@ -52,6 +60,21 @@ public class Amqp10ReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPlugin
     protected Map<String, String> buildTag(Object in) {
         // No semantic tags yet: matching is by caller/type + recorded order.
         return new HashMap<>();
+    }
+
+    /**
+     * The base plugin pushes a recorded response only if its tags overlap the
+     * connection's context tags. Recorded responses are tagged {@code output=RawFrame}
+     * (see {@link Amqp10RecordPlugin#buildTag}); returning the same key here makes
+     * every recorded frame correlate to the (single) replay connection. This is
+     * enough for connection setup (SASL + open — broker-generated, no client-specific
+     * ids); per-link correlation (attach/transfer) still needs codec-decoded tags.
+     */
+    @Override
+    protected Map<String, String> getContextTags(ProtoContext context) {
+        var tags = new HashMap<String, String>();
+        tags.put("output", "RawFrame");
+        return tags;
     }
 
     @Override
