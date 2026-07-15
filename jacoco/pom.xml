@@ -68,6 +68,9 @@
                                         <fileset dir="${basedir}/../protocol-amqp-091/target">
                                             <include name="*.exec"/>
                                         </fileset>
+                                        <fileset dir="${basedir}/../protocol-amqp-10/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
                                         <fileset dir="${basedir}/../protocol-common/target">
                                             <include name="*.exec"/>
                                         </fileset>
@@ -104,6 +107,9 @@
                                             <dirset dir="${basedir}/../protocol-amqp-091/src/main/java">
                                                 <include name="**/*"/>
                                             </dirset>
+                                            <dirset dir="${basedir}/../protocol-amqp-10/src/main/java">
+                                                <include name="**/*"/>
+                                            </dirset>
                                             <dirset dir="${basedir}/../protocol-dns-plugin/src/main/java">
                                                 <include name="**/*"/>
                                             </dirset>
@@ -131,6 +137,9 @@
                                         </sourcefiles>
                                         <classfiles>
                                             <fileset dir="${basedir}/../protocol-amqp-091/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-amqp-10/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-dns-plugin/target/classes">

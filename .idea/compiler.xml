@@ -24,6 +24,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processor name="org.pf4j.processor.ExtensionAnnotationProcessor" />
+        <module name="protocol-amqp-10" />
         <module name="protocol-dns-plugin" />
         <module name="sample-plugins" />
       </profile>

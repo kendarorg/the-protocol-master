@@ -4,7 +4,7 @@
 
 "The Protocol Master" is an infrastructure simulator operable via [complete UI](docs/ui.md) or command line to test
 effortlessly your app in minutes (with no coding)
-supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091, DNS ... and all the compatible ones!
+supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091, AMQP 1.0, DNS ... and all the compatible ones!
 
 * Simulate wrong scenarios
 * Block troubles before production
@@ -193,7 +193,7 @@ b value and so on
   ap                  apis                       The port TPM controllers (default 0, as not active)
   h                   help                       Show help
   p                   protocol                   The protocols to start
-                                                 *Options: amqp091|mqtt|dns|http|mysql|mongodb|postgres|redis
+                                                 *Options: amqp091|amqp10|mqtt|dns|http|mysql|mongodb|postgres|redis
 
 MongoDB protocol (mongodb)
 
