@@ -43,6 +43,10 @@
         <deploy.plugin.version>3.1.3</deploy.plugin.version>
         <central.publishing.plugin.version>0.8.0</central.publishing.plugin.version>
         <surfire.plugin.version>3.5.2</surfire.plugin.version>
+        <!-- Pins the docker-java client API version for testcontainers; modern
+             daemons (Docker Engine 25+) reject the 1.32 fallback. Override with
+             -Ddocker.api.version=... if your daemon needs a different value. -->
+        <docker.api.version>1.44</docker.api.version>
         <compiler.plugin.version>3.13.0</compiler.plugin.version>
         <antrun.plugin.version>3.1.0</antrun.plugin.version>
         <aircompressor.version>3.2</aircompressor.version>
@@ -130,6 +134,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surfire.plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <api.version>${docker.api.version}</api.version>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
