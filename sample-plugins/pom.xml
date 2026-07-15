@@ -209,6 +209,14 @@
             <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <!-- For kafka filter-->
+            <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-kafka-plugin</artifactId>
+            <version>4.3.10-tpm</version>
+            <!-- !!! VERY IMPORTANT -->
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 

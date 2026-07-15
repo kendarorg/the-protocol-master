@@ -15,6 +15,7 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,25 +68,41 @@ public class KafkaReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginS
     }
 
     /**
-     * Patch the live request's correlation id into the recorded response so the
-     * client accepts it. {@code in} is the live {@link KafkaRawMessage} request;
-     * {@code toRead} is the {@link KafkaResponseState} about to be written back.
+     * Load the recorded response bytes into the (empty) response state and patch in
+     * the live request's correlation id, so the client accepts the broker-less reply.
+     * {@code in} is the live {@link KafkaRawMessage} request; {@code outObj} is the
+     * recorded output ({@link KafkaResponseState} JSON with a base-64 {@code payload});
+     * {@code toRead} is the {@link KafkaResponseState} the request state will return.
      */
     @Override
     protected void buildState(PluginContext pluginContext, ProtoContext context, Object in,
                               Object outObj, Object toRead, LineToRead lineToRead) {
-        if (!(in instanceof KafkaRawMessage) || !(toRead instanceof KafkaResponseState)) {
+        if (!(in instanceof KafkaRawMessage) || !(toRead instanceof KafkaResponseState) || outObj == null) {
             return;
         }
         var reqRaw = ((KafkaRawMessage) in).getRaw();
-        var resp = (KafkaResponseState) toRead;
-        var payload = resp.getPayload();
-        if (reqRaw == null || reqRaw.length < 8 || payload == null || payload.length < 8) {
+        var payload = recordedPayload(outObj);
+        if (reqRaw == null || reqRaw.length < 12 || payload == null || payload.length < 8) {
             return;
         }
-        // correlation id = bytes 4..7 (big-endian) after the 4-byte size.
-        System.arraycopy(reqRaw, 4, payload, 4, 4);
-        resp.setPayload(payload);
-        log.debug("[REPLAY] patched recorded response with live correlation id");
+        // request corr id is at offset 8 (size[4] + apiKey[2] + apiVersion[2]);
+        // response corr id is at offset 4 (size[4]). Copy live req corr -> recorded resp.
+        System.arraycopy(reqRaw, 8, payload, 4, 4);
+        ((KafkaResponseState) toRead).setPayload(payload);
+        log.debug("[REPLAY] loaded recorded response ({} bytes) with live correlation id", payload.length);
+    }
+
+    /** Extracts the base-64 {@code payload} from a recorded response (any *Response type). */
+    private byte[] recordedPayload(Object outObj) {
+        try {
+            var node = mapper.toJsonNode(outObj);
+            if (node == null || node.get("payload") == null) {
+                return null;
+            }
+            return Base64.getDecoder().decode(node.get("payload").asText());
+        } catch (Exception e) {
+            log.error("[REPLAY] cannot decode recorded payload", e);
+            return null;
+        }
     }
 }

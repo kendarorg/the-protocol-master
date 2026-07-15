@@ -36,8 +36,11 @@ public class KafkaBasicTest {
     protected static final Logger log = LoggerFactory.getLogger(KafkaBasicTest.class);
     protected static KafkaImage kafkaContainer;
     protected static Server protocolServer;
+    protected static KafkaProtocol baseProtocol;
     protected static ProtocolPluginDescriptor recordPlugin;
     protected static StorageRepository storage;
+    /** Extra active plugins (e.g. latency/net-error) added by a subclass before beforeEach. */
+    protected static final ArrayList<ProtocolPluginDescriptor> extraPlugins = new ArrayList<>();
     protected JsonMapper mapper = new JsonMapper();
 
     public static void beforeClassBase() {
@@ -52,7 +55,7 @@ public class KafkaBasicTest {
     }
 
     public static void beforeEachBase(TestInfo testInfo, boolean record) {
-        var baseProtocol = new KafkaProtocol(FAKE_PORT);
+        baseProtocol = new KafkaProtocol(FAKE_PORT);
         var proxy = new KafkaProxy(kafkaContainer.getConnectionString(), null, null);
 
         if (record && testInfo != null && testInfo.getTestClass().isPresent()
@@ -74,6 +77,7 @@ public class KafkaBasicTest {
         if (record) {
             handlers.add(recordPlugin);
         }
+        handlers.addAll(extraPlugins);
         proxy.setPluginHandlers(handlers);
         baseProtocol.setProxy(proxy);
         baseProtocol.initialize();
@@ -82,6 +86,9 @@ public class KafkaBasicTest {
         protocolServer.start();
         if (record) {
             recordPlugin.setActive(true);
+        }
+        for (var p : extraPlugins) {
+            p.setActive(true);
         }
         Sleeper.sleep(5000, () -> protocolServer.isRunning());
     }

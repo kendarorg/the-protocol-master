@@ -108,6 +108,25 @@ public class HelpRunnerTest {
 
 
     @Test
+    void testKafkaHelp() throws Exception {
+
+        var args = new String[]{
+
+                "-datadir", Path.of("target", "tests", "asimpleTest").toString(),
+                // kafka ships as a pf4j plugin jar (not on the runner classpath),
+                // so load it from the shared plugins dir at the repo root.
+                "-pluginsDir", Path.of("..", "target", "plugins").toString(),
+                "-loglevel", "DEBUG",
+                "-help", "kafka", "-unattended"
+        };
+        Main.execute(args);
+        final String standardOutput = getOut();
+        System.out.println(standardOutput);
+        assertTrue(standardOutput.contains("kafka"));
+    }
+
+
+    @Test
     void testMqttHelp() throws Exception {
 
         var args = new String[]{
