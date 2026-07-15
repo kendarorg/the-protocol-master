@@ -1,7 +1,6 @@
 package org.kendar.amqp.v10.fsm;
 
 import org.kendar.amqp.v10.dtos.FrameType;
-import org.kendar.amqp.v10.messages.GenericFrame;
 import org.kendar.amqp.v10.messages.RawFrame;
 import org.kendar.buffers.BBuffer;
 import org.kendar.protocol.context.NetworkProtoContext;
@@ -60,9 +59,12 @@ public class ProtocolHeader extends ProtoState implements NetworkReturnMessage {
         var isSasl = header[4] == 0x03;
         context.setValue(isSasl ? "SASL_REQUESTED" : "SASL_DONE", true);
 
-        // Forward the client's header upstream and consume the broker's header echo
-        // (optional so a not-yet-arrived / pipelined reply does not block M1).
-        proxy.sendBytesAndExpect(context, connection, BBuffer.of(header), new GenericFrame(), true);
+        // Forward the client's header upstream (fire-and-forget: the broker's reply
+        // header + SASL frames come back through the proxy socket). Wrapped in a
+        // RawFrame because the proxy API takes a NetworkReturnMessage, not raw bytes.
+        var forward = new RawFrame(-1, FrameType.AMQP.asByte());
+        forward.setRaw(header);
+        proxy.sendAndForget(context, connection, forward);
 
         // Echo the same header back to the client so negotiation proceeds.
         var echo = new RawFrame(-1, FrameType.AMQP.asByte());

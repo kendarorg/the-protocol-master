@@ -9,6 +9,27 @@ Protocol design and milestones: see `../protocol-amqp-10.md`.
 
 ## Status
 
+**M3 — in progress (broker-verified loop is now unblocked).** Docker/testcontainers
+here negotiates Docker API 1.32 (docker-java 3.4.0 default), which modern daemons
+(min 1.40) reject. Fixed for the run by passing the version as a JVM system property
+to the surefire fork (docker-java reads only `-Dapi.version`, *not* `DOCKER_HOST`-style
+env). Run the container tests with:
+
+```
+DOCKER_HOST=unix:///var/run/docker.sock \
+  mvn -pl protocol-amqp-10 test -Dtest=SimpleTest \
+      -Dsurefire.failIfNoSpecifiedTests=false -DargLine="-Dapi.version=1.51"
+```
+
+With that, Artemis starts and qpid-jms reaches the proxy. `SimpleTest` currently
+fails at the **AMQP 1.0 SASL handshake**: the proxy must terminate SASL on both
+sides (send `sasl-mechanisms` to the client + `sasl-outcome`, and run PLAIN with the
+broker using the proxy's credentials) before `open`/sessions. That bidirectional
+handshake — built from the M2 codec — is the next implementation step. The header
+forwarding no longer crashes (a `GenericFrame`-as-expect-state `ClassCastException`
+was fixed).
+
+
 **M2 — type codec (done, unit-verified).** `codec/` — `Amqp10TypeReader`/`Amqp10TypeWriter`
 (all AMQP 1.0 format codes, smallest-encoding writes, `writeDescribed` with trailing-null
 truncation) + Jackson-friendly wrappers (`AmqpSymbol`, `Unsigned{Byte,Short,Int,Long}`,

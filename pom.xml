@@ -67,6 +67,16 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Converge docker-java (testcontainers vs testcontainers-redis drag a
+                 split core/transport, which falls back to Docker API 1.32 and is
+                 rejected by daemons requiring >= 1.40). Pin to testcontainers 1.20.1's version. -->
+            <dependency>
+                <groupId>com.github.docker-java</groupId>
+                <artifactId>docker-java-bom</artifactId>
+                <version>3.4.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
