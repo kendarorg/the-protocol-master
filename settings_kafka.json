@@ -1,0 +1,31 @@
+{
+  "pluginsDir": "target/plugins",
+  "logLevel": "DEBUG",
+  "dataDir": "target/data",
+  "apiPort": 8095,
+  "plugins": {
+    "report-plugin": {
+      "active": true
+    }
+  },
+  "protocols": {
+    "kafka-01": {
+      "protocol": "kafka",
+      "port": 9092,
+      "login": "",
+      "password": "",
+      "timeout": 60,
+      "connectionString": "tcp://localhost:19092",
+      "advertisedHost": "localhost",
+      "plugins": {
+        "record-plugin": {
+          "resetConnectionsOnStart": true
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": true,
+          "respectCallDuration": true
+        }
+      }
+    }
+  }
+}

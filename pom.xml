@@ -202,6 +202,7 @@
                 <module>protocol-common-jdbc</module>
                 <module>protocol-dns-plugin</module>
                 <module>protocol-amqp-10</module>
+                <module>protocol-kafka-plugin</module>
                 <module>protocol-runner</module>
                 <module>jacoco</module>
             </modules>
@@ -225,6 +226,7 @@
                 <module>protocol-common-jdbc</module>
                 <module>protocol-dns-plugin</module>
                 <module>protocol-amqp-10</module>
+                <module>protocol-kafka-plugin</module>
                 <module>protocol-runner</module>
             </modules>
             <build>

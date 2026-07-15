@@ -27,6 +27,7 @@
         <module name="protocol-amqp-10" />
         <module name="protocol-dns-plugin" />
         <module name="sample-plugins" />
+        <module name="protocol-kafka-plugin" />
       </profile>
     </annotationProcessing>
   </component>
