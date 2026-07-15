@@ -153,6 +153,9 @@ If you want to go on the specific functions by protocol:
 * [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md)
     * Support for all kind of publish/consume
     * Channels multiplexing
+* [AMQP 1.0 (ActiveMQ Artemis)](protocol-amqp-10/README.md)
+    * Passthrough proxy, record and broker-less replay
+    * Packaged as a plugin jar (target/plugins)
 * [Redis](protocol-redis/README.md)
     * Support for subscriptions
     * Support for push parsing

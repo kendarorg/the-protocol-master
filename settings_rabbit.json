@@ -39,6 +39,23 @@
         }
       }
     },
+    "amqp10-01": {
+      "protocol": "amqp10",
+      "port": 5673,
+      "login": "artemis",
+      "password": "artemis",
+      "timeout": 30,
+      "connectionString": "amqp://192.168.1.45:5672",
+      "plugins": {
+        "record-plugin": {
+          "resetConnectionsOnStart": true
+        },
+        "replay-plugin": {
+          "resetConnectionsOnStart": true,
+          "respectCallDuration": true
+        }
+      }
+    },
     "http-01": {
       "protocol": "http",
       "http": 8085,
