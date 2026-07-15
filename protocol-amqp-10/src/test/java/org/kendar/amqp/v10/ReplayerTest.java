@@ -2,7 +2,6 @@ package org.kendar.amqp.v10;
 
 import jakarta.jms.Session;
 import org.apache.qpid.jms.JmsConnectionFactory;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kendar.amqp.v10.plugins.Amqp10ReplayPlugin;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
@@ -27,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Connection open (SASL + open) and session open (begin) replay verbatim — those
  * frames are broker-generated or channel-scoped and don't carry the client's
- * unique ids. Producer attach is the boundary (see the disabled test): it needs
- * link-name rewriting via the M2 codec.
+ * unique ids. Producer attach replays via link-name rewriting: the plugin captures
+ * the client's attach name and surgically rewrites the recorded attach response.
  */
 class ReplayerTest {
     private static final int FAKE_PORT = 5693;
@@ -85,12 +84,6 @@ class ReplayerTest {
     }
 
     @Test
-    @Disabled("Boundary: replay pushes ALL recorded frames incl. the attach responses, but qpid "
-            + "rejects the attach because the recorded broker attach echoes the RECORDED client's "
-            + "link name, not the new client's (note the ~15s retry intervals). Needs link-name "
-            + "rewriting: decode the client's attach (name=field 0, handle=field 1) with the M2 "
-            + "codec and re-encode the recorded attach response to match. Connection + session "
-            + "(begin) replay already work without rewriting since qpid reuses channel 0.")
     void replaysProducerAttachWithoutBroker() throws Exception {
         var server = startReplayServer();
         try {
