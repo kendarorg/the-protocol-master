@@ -6,11 +6,14 @@ import org.kendar.di.annotations.TpmService;
 import org.kendar.mssql.MssqlProtocolSettings;
 import org.kendar.settings.GlobalSettings;
 import org.kendar.settings.ProtocolSettings;
+import org.pf4j.Extension;
+import org.pf4j.ExtensionPoint;
 
 import java.util.List;
 
+@Extension
 @TpmService(tags = "mssql")
-public class MssqlCommandLineHandler extends NetworkProtocolCommandLineHandler {
+public class MssqlCommandLineHandler extends NetworkProtocolCommandLineHandler implements ExtensionPoint {
     @Override
     protected String getConnectionDescription() {
         return "jdbc:sqlserver://localhost:1433;encrypt=false;databaseName=master";

@@ -68,7 +68,7 @@
                                         <fileset dir="${basedir}/../protocol-amqp-091/target">
                                             <include name="*.exec"/>
                                         </fileset>
-                                        <fileset dir="${basedir}/../protocol-amqp-10/target">
+                                        <fileset dir="${basedir}/../protocol-amqp-10-plugin/target">
                                             <include name="*.exec"/>
                                         </fileset>
                                         <fileset dir="${basedir}/../protocol-common/target">
@@ -83,7 +83,7 @@
                                         <fileset dir="${basedir}/../protocol-mysql/target">
                                             <include name="*.exec"/>
                                         </fileset>
-                                        <fileset dir="${basedir}/../protocol-mssql/target">
+                                        <fileset dir="${basedir}/../protocol-mssql-plugin/target">
                                             <include name="*.exec"/>
                                         </fileset>
                                         <fileset dir="${basedir}/../protocol-postgres/target">
@@ -110,7 +110,7 @@
                                             <dirset dir="${basedir}/../protocol-amqp-091/src/main/java">
                                                 <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-amqp-10/src/main/java">
+                                            <dirset dir="${basedir}/../protocol-amqp-10-plugin/src/main/java">
                                                 <include name="**/*"/>
                                             </dirset>
                                             <dirset dir="${basedir}/../protocol-dns-plugin/src/main/java">
@@ -125,7 +125,7 @@
                                             <dirset dir="${basedir}/../protocol-mysql/src/main/java">
                                                 <include name="**/*"/>
                                             </dirset>
-                                            <dirset dir="${basedir}/../protocol-mssql/src/main/java">
+                                            <dirset dir="${basedir}/../protocol-mssql-plugin/src/main/java">
                                                 <include name="**/*"/>
                                             </dirset>
                                             <dirset dir="${basedir}/../protocol-postgres/src/main/java">
@@ -145,7 +145,7 @@
                                             <fileset dir="${basedir}/../protocol-amqp-091/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
-                                            <fileset dir="${basedir}/../protocol-amqp-10/target/classes">
+                                            <fileset dir="${basedir}/../protocol-amqp-10-plugin/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-dns-plugin/target/classes">
@@ -163,7 +163,7 @@
                                             <fileset dir="${basedir}/../protocol-mysql/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
-                                            <fileset dir="${basedir}/../protocol-mssql/target/classes">
+                                            <fileset dir="${basedir}/../protocol-mssql-plugin/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-postgres/target/classes">

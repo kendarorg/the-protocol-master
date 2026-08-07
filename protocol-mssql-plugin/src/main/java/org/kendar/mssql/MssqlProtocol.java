@@ -22,11 +22,14 @@ import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.pf4j.Extension;
+import org.pf4j.ExtensionPoint;
 
 import java.util.List;
 
+@Extension
 @TpmService(tags = "mssql")
-public class MssqlProtocol extends JdbcProtocol {
+public class MssqlProtocol extends JdbcProtocol implements ExtensionPoint {
     private static final Logger log = LoggerFactory.getLogger(MssqlProtocol.class);
     private static final int PORT = 1433;
     private static final boolean IS_BIG_ENDIAN = true;

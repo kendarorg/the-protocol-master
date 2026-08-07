@@ -13,11 +13,13 @@ import org.kendar.storage.generic.StorageRepository;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
 import org.kendar.utils.parser.SimpleParser;
+import org.pf4j.Extension;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Extension
 @TpmService(tags = "mssql")
 public class MssqlRecordPlugin extends JdbcRecordPlugin {
     private static final SqlStringParser parser = new SqlStringParser("@");

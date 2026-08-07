@@ -6,7 +6,9 @@ import org.kendar.plugins.JdbcReplayPlugin;
 import org.kendar.sql.parser.SqlStringParser;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
+import org.pf4j.Extension;
 
+@Extension
 @TpmService(tags = "mssql")
 public class MssqlReplayPlugin extends JdbcReplayPlugin {
 

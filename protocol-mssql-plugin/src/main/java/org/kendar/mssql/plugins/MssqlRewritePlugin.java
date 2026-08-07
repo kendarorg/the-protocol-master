@@ -5,7 +5,9 @@ import org.kendar.plugins.JdbcRewritePlugin;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.ui.MultiTemplateEngine;
 import org.kendar.utils.JsonMapper;
+import org.pf4j.Extension;
 
+@Extension
 @TpmService(tags = "mssql")
 public class MssqlRewritePlugin extends JdbcRewritePlugin {
     public MssqlRewritePlugin(JsonMapper mapper, StorageRepository repository, MultiTemplateEngine resolversFactory) {

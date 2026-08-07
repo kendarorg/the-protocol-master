@@ -194,7 +194,7 @@
                 <module>protocol-postgres</module>
                 <module>protocol-mongo</module>
                 <module>protocol-mysql</module>
-                <module>protocol-mssql</module>
+                <module>protocol-mssql-plugin</module>
                 <module>protocol-amqp-091</module>
                 <module>protocol-redis</module>
                 <module>protocol-mqtt</module>
@@ -203,7 +203,7 @@
                 <module>protocol-common</module>
                 <module>protocol-common-jdbc</module>
                 <module>protocol-dns-plugin</module>
-                <module>protocol-amqp-10</module>
+                <module>protocol-amqp-10-plugin</module>
                 <module>protocol-kafka-plugin</module>
                 <module>protocol-runner</module>
                 <module>jacoco</module>
@@ -219,7 +219,7 @@
                 <module>protocol-postgres</module>
                 <module>protocol-mongo</module>
                 <module>protocol-mysql</module>
-                <module>protocol-mssql</module>
+                <module>protocol-mssql-plugin</module>
                 <module>protocol-amqp-091</module>
                 <module>protocol-redis</module>
                 <module>protocol-mqtt</module>
@@ -228,7 +228,7 @@
                 <module>protocol-common</module>
                 <module>protocol-common-jdbc</module>
                 <module>protocol-dns-plugin</module>
-                <module>protocol-amqp-10</module>
+                <module>protocol-amqp-10-plugin</module>
                 <module>protocol-kafka-plugin</module>
                 <module>protocol-runner</module>
             </modules>
@@ -349,9 +349,9 @@
         <tag>HEAD</tag>
     </scm>
 
-    <name>TPM-Proxy main pom</name>
+    <name>TPM-Proxy</name>
     <description>
-        Base pom for TPM-Proxy
+        TPM-Proxy
     </description>
     <url>https://www.github.com/kendarorg/the-protocol-master</url>
 
