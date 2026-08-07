@@ -1,0 +1,29 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786102957784,
+  "constant" : false,
+  "connectionId" : 6,
+  "index" : 12,
+  "input" : {
+    "raw" : "AAAARwACAAgAAAADAA9jb25zdW1lci1udWxsLTEA/////wACE2thZmthLXJlcGxheS10b3BpYwIAAAAAAAAAAP/////////+AAAA",
+    "decoded" : {
+      "api" : "ListOffsets",
+      "apiVersion" : 8,
+      "correlationId" : 3,
+      "clientId" : "consumer-null-1"
+    }
+  },
+  "output" : {
+    "payload" : "AAAAOwAAAAMAAAAAAAITa2Fma2EtcmVwbGF5LXRvcGljAgAAAAAAAP//////////AAAAAAAAAAAAAAAAAAAA",
+    "decoded" : {
+      "api" : "ListOffsets",
+      "apiVersion" : 8,
+      "correlationId" : 3
+    }
+  },
+  "durationMs" : 16,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "inputType" : "KafkaRawMessage",
+  "outputType" : "GenericResponse"
+}

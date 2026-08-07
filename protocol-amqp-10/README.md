@@ -7,6 +7,45 @@ and discovered at runtime by the runner's `JarPluginManager`.
 
 Protocol design and milestones: see `../protocol-amqp-10.md`.
 
+## Recording format (M5 — readable recordings)
+
+Recorded frames store the **readable JSON as the primary representation**: the
+`decoded` tree produced by `codec/Amqp10FrameDescriber` (performative name,
+spec-named fields from the shared `codec/Amqp10Schema`, and the decoded message
+sections for `transfer`). On replay, `codec/Amqp10FrameEncoder` rebuilds the wire
+frame from that tree — semantically equivalent bytes, verified end to end against
+a live qpid-jms client (`ReplayerTest.replaysReadableScenarioWithoutBroker`).
+
+```json
+{
+  "decoded": {
+    "frameKind": "AMQP", "channel": 1, "performative": "transfer",
+    "fields": {"handle": 0, "delivery-id": 0, "delivery-tag": "AA==",
+               "message-format": 0, "settled": false},
+    "sections": [
+      {"section": "message-annotations",
+       "value": {"x-opt-jms-msg-type": {"type": "byte", "value": 5}}},
+      {"section": "properties", "fields": {"message-id": "ID:...", "to": "my-queue"}},
+      {"section": "amqp-value", "value": "hello"}
+    ]
+  }
+}
+```
+
+Type fidelity: spec-typed fields are plain JSON scalars (the schema restores their
+wire type on encode). Untyped contexts — map values, `amqp-value`, message-id — wrap
+ambiguous scalars as `{"type": "byte", "value": 5}` so the exact wire type survives
+(qpid's JMS layer casts `x-opt-jms-msg-type` to `Byte`, so this matters in practice).
+
+A `raw` base64 fallback is written **only** when `describe → encode → describe` does
+not round-trip (unknown descriptor, codec gap); when present it wins on replay.
+Pre-M5 raw-only scenarios (e.g. `replay_open`) stay valid — `raw` is always honored.
+
+The scenario index (`index.default.json`) tags every line with `performative` and,
+for `attach`, the source/target `address` — making scenarios greppable by frame kind
+and queue (the v09 `consumeOrigin` analog). Gate: `FrameDescribeTest` (no broker) +
+both `ReplayerTest` fixtures (raw-only and readable).
+
 ## Status
 
 **M3 — end-to-end passthrough works (broker-verified).** `SimpleTest` is GREEN: a

@@ -1,0 +1,29 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786102957052,
+  "constant" : false,
+  "connectionId" : 2,
+  "index" : 4,
+  "input" : {
+    "raw" : "AAAAOwATAAcAAAADAA1hZG1pbmNsaWVudC0xAAITa2Fma2EtcmVwbGF5LXRvcGljAAAAAQABAQEAAABOBwAA",
+    "decoded" : {
+      "api" : "CreateTopics",
+      "apiVersion" : 7,
+      "correlationId" : 3,
+      "clientId" : "adminclient-1"
+    }
+  },
+  "output" : {
+    "payload" : "AAAEvAAAAAMAAAAAAAITa2Fma2EtcmVwbGF5LXRvcGljIsits7VeRYeUJwAdJGu3JwAAAAAAAAEAASMPY2xlYW51cC5wb2xpY3kHZGVsZXRlAAUAABdjb21wcmVzc2lvbi5nemlwLmxldmVsAy0xAAUAABZjb21wcmVzc2lvbi5sejQubGV2ZWwCOQAFAAARY29tcHJlc3Npb24udHlwZQlwcm9kdWNlcgAFAAAXY29tcHJlc3Npb24uenN0ZC5sZXZlbAIzAAUAABRkZWxldGUucmV0ZW50aW9uLm1zCTg2NDAwMDAwAAUAABVmaWxlLmRlbGV0ZS5kZWxheS5tcwY2MDAwMAAFAAAPZmx1c2gubWVzc2FnZXMUOTIyMzM3MjAzNjg1NDc3NTgwNwAEAAAJZmx1c2gubXMUOTIyMzM3MjAzNjg1NDc3NTgwNwAFAAAoZm9sbG93ZXIucmVwbGljYXRpb24udGhyb3R0bGVkLnJlcGxpY2FzAQAFAAAVaW5kZXguaW50ZXJ2YWwuYnl0ZXMFNDA5NgAFAAAmbGVhZGVyLnJlcGxpY2F0aW9uLnRocm90dGxlZC5yZXBsaWNhcwEABQAAFmxvY2FsLnJldGVudGlvbi5ieXRlcwMtMgAFAAATbG9jYWwucmV0ZW50aW9uLm1zAy0yAAUAABZtYXguY29tcGFjdGlvbi5sYWcubXMUOTIyMzM3MjAzNjg1NDc3NTgwNwAFAAASbWF4Lm1lc3NhZ2UuYnl0ZXMIMTA0ODU4OAAFAAAebWVzc2FnZS5kb3duY29udmVyc2lvbi5lbmFibGUFdHJ1ZQAFAAAXbWVzc2FnZS5mb3JtYXQudmVyc2lvbggzLjAtSVYxAAUAAB9tZXNzYWdlLnRpbWVzdGFtcC5hZnRlci5tYXgubXMUOTIyMzM3MjAzNjg1NDc3NTgwNwAFAAAgbWVzc2FnZS50aW1lc3RhbXAuYmVmb3JlLm1heC5tcxQ5MjIzMzcyMDM2ODU0Nzc1ODA3AAUAACRtZXNzYWdlLnRpbWVzdGFtcC5kaWZmZXJlbmNlLm1heC5tcxQ5MjIzMzcyMDM2ODU0Nzc1ODA3AAUAABdtZXNzYWdlLnRpbWVzdGFtcC50eXBlC0NyZWF0ZVRpbWUABQAAGm1pbi5jbGVhbmFibGUuZGlydHkucmF0aW8EMC41AAUAABZtaW4uY29tcGFjdGlvbi5sYWcubXMCMAAFAAAUbWluLmluc3luYy5yZXBsaWNhcwIxAAUAAAxwcmVhbGxvY2F0ZQZmYWxzZQAFAAAWcmVtb3RlLnN0b3JhZ2UuZW5hYmxlBmZhbHNlAAUAABByZXRlbnRpb24uYnl0ZXMDLTEABQAADXJldGVudGlvbi5tcwo2MDQ4MDAwMDAABQAADnNlZ21lbnQuYnl0ZXMLMTA3Mzc0MTgyNAAFAAAUc2VnbWVudC5pbmRleC5ieXRlcwkxMDQ4NTc2MAAFAAASc2VnbWVudC5qaXR0ZXIubXMCMAAFAAALc2VnbWVudC5tcwo2MDQ4MDAwMDAABQAAH3VuY2xlYW4ubGVhZGVyLmVsZWN0aW9uLmVuYWJsZQZmYWxzZQAFAAAAAA==",
+    "decoded" : {
+      "api" : "CreateTopics",
+      "apiVersion" : 7,
+      "correlationId" : 3
+    }
+  },
+  "durationMs" : 50,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "inputType" : "KafkaRawMessage",
+  "outputType" : "GenericResponse"
+}

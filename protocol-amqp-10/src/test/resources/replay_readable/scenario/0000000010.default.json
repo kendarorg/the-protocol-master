@@ -1,0 +1,27 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097517041,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 10,
+  "input" : {
+    "channel" : 0,
+    "frameType" : 0,
+    "proxyed" : false,
+    "decoded" : {
+      "frameKind" : "AMQP",
+      "channel" : 0,
+      "performative" : "begin",
+      "fields" : {
+        "next-outgoing-id" : 1,
+        "incoming-window" : 2047,
+        "outgoing-window" : 2147483647,
+        "handle-max" : 65535
+      }
+    }
+  },
+  "durationMs" : 11,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "inputType" : "RawFrame"
+}

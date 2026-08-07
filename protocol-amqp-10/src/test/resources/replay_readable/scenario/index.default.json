@@ -1,0 +1,281 @@
+[
+ {
+  "index": 1,
+  "timestamp": 1786097516802,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 37,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "protocol-header"
+  }
+ },
+ {
+  "index": 2,
+  "timestamp": 1786097516802,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "protocol-header"
+  }
+ },
+ {
+  "index": 3,
+  "timestamp": 1786097516983,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "sasl-mechanisms"
+  }
+ },
+ {
+  "index": 4,
+  "timestamp": 1786097517004,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 11,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "sasl-init"
+  }
+ },
+ {
+  "index": 5,
+  "timestamp": 1786097517006,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "sasl-outcome"
+  }
+ },
+ {
+  "index": 6,
+  "timestamp": 1786097517008,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "protocol-header"
+  }
+ },
+ {
+  "index": 7,
+  "timestamp": 1786097517020,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 11,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "protocol-header"
+  }
+ },
+ {
+  "index": 8,
+  "timestamp": 1786097517035,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 11,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "open"
+  }
+ },
+ {
+  "index": 9,
+  "timestamp": 1786097517037,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "open"
+  }
+ },
+ {
+  "index": 10,
+  "timestamp": 1786097517053,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 11,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "begin"
+  }
+ },
+ {
+  "index": 11,
+  "timestamp": 1786097517054,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "begin"
+  }
+ },
+ {
+  "index": 12,
+  "timestamp": 1786097517117,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 11,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "begin"
+  }
+ },
+ {
+  "index": 13,
+  "timestamp": 1786097517118,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "begin"
+  }
+ },
+ {
+  "index": 14,
+  "timestamp": 1786097517197,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 11,
+  "tags": {
+   "input": "RawFrame",
+   "address": "ID:b8fc25fc-0ad6-48ab-b623-7c53603055d7:1:1:1",
+   "performative": "attach"
+  }
+ },
+ {
+  "index": 15,
+  "timestamp": 1786097517208,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "address": "ID:b8fc25fc-0ad6-48ab-b623-7c53603055d7:1:1:1",
+   "performative": "attach"
+  }
+ },
+ {
+  "index": 16,
+  "timestamp": 1786097517210,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "flow"
+  }
+ },
+ {
+  "index": 17,
+  "timestamp": 1786097517286,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 10,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "transfer"
+  }
+ },
+ {
+  "index": 18,
+  "timestamp": 1786097517303,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 12,
+  "tags": {
+   "input": "RawFrame",
+   "address": "amqp10.record.test",
+   "performative": "attach"
+  }
+ },
+ {
+  "index": 19,
+  "timestamp": 1786097517300,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "disposition"
+  }
+ },
+ {
+  "index": 20,
+  "timestamp": 1786097517324,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "address": "amqp10.record.test",
+   "performative": "attach"
+  }
+ },
+ {
+  "index": 21,
+  "timestamp": 1786097517343,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 11,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "flow"
+  }
+ },
+ {
+  "index": 22,
+  "timestamp": 1786097517347,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "transfer"
+  }
+ },
+ {
+  "index": 23,
+  "timestamp": 1786097517374,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 11,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "disposition"
+  }
+ },
+ {
+  "index": 24,
+  "timestamp": 1786097517395,
+  "type": "RawFrame",
+  "caller": "AMQP10",
+  "durationMs": 10,
+  "tags": {
+   "input": "RawFrame",
+   "performative": "close"
+  }
+ },
+ {
+  "index": 25,
+  "timestamp": 1786097517399,
+  "type": "RESPONSE",
+  "caller": "AMQP10",
+  "durationMs": 0,
+  "tags": {
+   "output": "RawFrame",
+   "performative": "close"
+  }
+ }
+]

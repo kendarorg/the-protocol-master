@@ -1,0 +1,33 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786102957873,
+  "constant" : false,
+  "connectionId" : 6,
+  "index" : 14,
+  "input" : {
+    "raw" : "AAAAbQABAAwAAAAGAA9jb25zdW1lci1udWxsLTEA/////wAAAfQAAAABAyAAAAADA0NRAAAAAQITa2Fma2EtcmVwbGF5LXRvcGljAgAAAAAAAAAAAAAAAAAAAAH///////////////8AEAAAAAABAQA=",
+    "decoded" : {
+      "api" : "Fetch",
+      "apiVersion" : 12,
+      "correlationId" : 6,
+      "clientId" : "consumer-null-1"
+    }
+  },
+  "output" : {
+    "payload" : "AAAAEQAAAAYAAAAAAAAAAwNDUQEA",
+    "decoded" : {
+      "api" : "Fetch",
+      "apiVersion" : 12,
+      "correlationId" : 6,
+      "throttleMs" : 0,
+      "errorCode" : 0,
+      "sessionId" : 50545489,
+      "topics" : [ ]
+    }
+  },
+  "durationMs" : 519,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "inputType" : "KafkaRawMessage",
+  "outputType" : "GenericResponse"
+}

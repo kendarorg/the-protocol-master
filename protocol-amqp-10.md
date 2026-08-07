@@ -269,12 +269,77 @@ Plus the four `plugins/cli/*` classes and JTE panels (`jte/amqp10/record_plugin/
 
 1. **M1 — Skeleton + passthrough**: module pom + registration in root pom, settings/protocol/context/proxy/proxy-socket, frame translator, `ProtocolHeader` with SASL termination, `GenericFrame`, performatives as raw-forwarding states, `ArtemisImage`.
    *Gate: a qpid-jms client sends and receives through the proxy to Artemis.*
-2. **M2 — Codec**: `Amqp10TypeReader/Writer`, `DescribedType` + wrappers, performative field encode/decode, message sections.
-   *Gate: `CodecTest` green including JSON serialization round-trip.*
+2. **M2 — Codec** ✅ (completed 2026-08-07): `Amqp10TypeReader/Writer` (all format codes incl. decimals and arrays), `DescribedType` + wrappers (`AmqpSymbol`, `Unsigned*`, `Amqp10Binary`, `AmqpChar`, `AmqpTimestamp`), performative descriptor codes + field decode via `codec/Amqp10Frames`. Deviation from §4: message sections are built/parsed through the codec (`writeDescribed` + `Performatives` section constants) instead of dedicated `messages/sections/*` classes.
+   *Gate: `CodecTest` green including JSON serialization round-trip.* — **8/8 tests pass.**
 3. **M3 — Record/replay**: `ProxyedBehaviour` + `ReceiverLink` correlation, Record/Replay/Report plugins.
    *Gate: `SimpleTest` and `ReplayerTest` green (replay works with no broker running).*
 4. **M4 — Full parity**: Publish plugin + REST APIs + JTE UI, Latency/NetError/RestPlugins, plugin CLIs, `Amqp10CommandLineHandler`, `Amqp10JteResolver`, runner/jacoco/README/docs/sample-settings integration, `SpecialErrorsTest`, module README.
    *Gate: full build + runner UI shows and drives the amqp10 instance.*
+
+## 9-bis. Milestone M5 — Readable recordings ✅ (completed 2026-08-07; superseded decode-on-save with decoded-primary, see below)
+
+Recordings currently serialize `RawFrame` as opaque base64 (`"raw": "AAAA..."`) because the
+M1 byte-exact-passthrough design never decodes performative fields. This milestone adds a
+**derived readable JSON view next to the raw bytes** — never replacing them. Replay keeps
+reconstructing frames exclusively from `raw` (`Amqp10ReplayPlugin.toRawFrame` already reads
+only `raw`/`frameType`/`channel`, so extra JSON properties are ignored ⇒ zero replay risk,
+and old scenario files without the new fields stay valid).
+
+1. **`codec/Amqp10FrameDescriber`** (new): `describe(byte[] frame) → Map<String,Object>` built
+   on `Amqp10TypeReader` / `Amqp10Frames`:
+   - envelope: `frameKind` (`AMQP`/`SASL`), `channel`, `doff` (only when > 2);
+   - `performative`: symbolic name from the descriptor code (`open`, `begin`, `attach`, `flow`,
+     `transfer`, `disposition`, `detach`, `end`, `close`, `sasl-*`, or `empty` for heartbeats);
+   - `fields`: positional list → named map per spec (open: container-id, hostname, max-frame-size,
+     channel-max, idle-time-out…; begin: remote-channel, next-outgoing-id, incoming-window,
+     outgoing-window…; attach: name, handle, role, snd-settle-mode, rcv-settle-mode, source,
+     target…; flow: next-incoming-id, incoming-window, next-outgoing-id, outgoing-window, handle,
+     delivery-count, link-credit…; transfer: handle, delivery-id, delivery-tag, message-format,
+     settled, more…; disposition: role, first, last, settled, state; detach/end/close: … + error).
+     Trailing-null truncation means absent fields are simply omitted;
+   - for `transfer`: decode the remaining body as message `sections` (header,
+     delivery-annotations, message-annotations, properties [named per spec: message-id, to,
+     subject, reply-to, correlation-id, content-type…], application-properties,
+     data [base64 + `utf8` preview when printable], amqp-value, amqp-sequence, footer);
+   - value rendering: wrappers serialize via their existing `@JsonValue`; `source`/`target`
+     described types recursively expanded with their own field names; anything undecodable
+     falls back to `{"descriptor": "0x…", "value": …}`. Decoder must be total: any exception
+     → `"decoded": null`, never a failed recording.
+2. **`RawFrame.getDecoded()`**: lazy, Jackson-visible read-only property
+   (`@JsonProperty(access = READ_ONLY)` or getter-without-setter) calling the describer on
+   `raw`. This is the minimal integration point — `StorageItem` serializes the frame object
+   itself, so recordings gain `"decoded": {…}` automatically for input and output.
+3. **Index readability**: in `Amqp10RecordPlugin.buildTag`, add `"performative"` (from the
+   describer) and, for attach/transfer, the source/target address — the v09 `consumeOrigin`
+   analog. Do **not** change `inputType`/`outputType` (`"RawFrame"`): the replay plugin
+   matches on `output=RawFrame` tags.
+4. **Tests**: new `FrameDescribeTest` (no container) — feed the committed
+   `test/resources/replay_open/scenario/*.json` raw payloads through the describer and assert
+   performative names + key fields; assert Jackson round-trip ignores `decoded` on
+   deserialize; `ReplayerTest` must stay green against the *existing* (undecoded) scenario
+   files to prove backward compatibility. Re-record one scenario to commit a readable example.
+5. **Docs**: module README — recording format section showing a decoded transfer example;
+   note that `decoded` is informational and `raw` is authoritative.
+
+Explicitly rejected: replacing `raw` with typed frame classes re-encoded at replay (the v09
+model). It forfeits byte-exactness (delivery-ids, flow credit, vendor extensions, DOFF>2)
+for no functional gain — readability only needs the one-way decode above.
+
+*Gate: recordings show named performatives/fields/sections; `FrameDescribeTest` green;
+`ReplayerTest` green on pre-existing raw-only scenarios.* — **Met and extended: the final
+implementation goes further than planned — recordings store ONLY the readable `decoded`
+JSON (no raw blob), and replay re-encodes wire frames from it via the schema-driven
+`Amqp10FrameEncoder` (shared `Amqp10Schema` keeps describer/encoder symmetric). A `raw`
+base64 fallback is written only when describe→encode→describe fails to round-trip, and
+always wins on replay, keeping pre-M5 raw-only scenarios valid. Untyped values (map
+values, amqp-value, message-id) wrap ambiguous scalars as `{"type":"byte","value":5}` to
+preserve exact wire types (qpid casts JMS annotations to Byte). Also fixed a shared
+`FileStorageRepository` replay-init sort: same-millisecond index lines now tie-break by
+index, otherwise a leading RESPONSE could be trimmed at replay activation.
+Verified: FrameDescribeTest 9/9, ReplayerTest 5/5 (incl. full produce+consume replayed to
+a live qpid-jms client purely from readable JSON via the committed `replay_readable`
+fixture), RecordTest/SimpleTest/SpecialErrorsTest against Artemis, protocol-common
+106/106, v09 ReplayerTest 3/3.**
 
 ## 10. Verification
 

@@ -1,0 +1,30 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097517299,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 19,
+  "output" : {
+    "channel" : -1,
+    "frameType" : 0,
+    "proxyed" : false,
+    "decoded" : {
+      "frameKind" : "AMQP",
+      "channel" : 1,
+      "performative" : "disposition",
+      "fields" : {
+        "role" : true,
+        "first" : 0,
+        "last" : 0,
+        "settled" : true,
+        "state" : {
+          "type" : "accepted"
+        }
+      }
+    }
+  },
+  "durationMs" : 0,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "outputType" : "RawFrame"
+}

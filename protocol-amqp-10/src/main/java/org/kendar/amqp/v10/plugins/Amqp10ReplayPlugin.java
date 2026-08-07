@@ -1,5 +1,6 @@
 package org.kendar.amqp.v10.plugins;
 
+import org.kendar.amqp.v10.codec.Amqp10FrameEncoder;
 import org.kendar.amqp.v10.codec.Amqp10TypeReader;
 import org.kendar.amqp.v10.codec.DescribedType;
 import org.kendar.amqp.v10.dtos.Performatives;
@@ -133,14 +134,28 @@ public class Amqp10ReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPlugin
         return q;
     }
 
-    /** Reconstructs a verbatim frame from a recorded RawFrame JSON (avoids Jackson ctor issues). */
+    /**
+     * Reconstructs a verbatim frame from a recorded RawFrame JSON (avoids Jackson
+     * ctor issues). New recordings carry the readable {@code decoded} tree as the
+     * primary representation; {@code raw} is only present as a fallback (or in
+     * pre-M5 scenarios) and wins when both exist.
+     */
     private RawFrame toRawFrame(Object output) {
         try {
             var node = mapper.toJsonNode(output);
-            if (node == null || node.get("raw") == null) {
+            if (node == null) {
                 return null;
             }
-            var bytes = Base64.getDecoder().decode(node.get("raw").asText());
+            byte[] bytes;
+            if (node.get("raw") != null && !node.get("raw").isNull()) {
+                bytes = Base64.getDecoder().decode(node.get("raw").asText());
+            } else if (node.get("decoded") != null && !node.get("decoded").isNull()) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> decoded = mapper.deserialize(node.get("decoded"), Map.class);
+                bytes = Amqp10FrameEncoder.encode(decoded);
+            } else {
+                return null;
+            }
             byte frameType = node.get("frameType") != null ? (byte) node.get("frameType").asInt() : 0;
             var rf = new RawFrame(-1, frameType);
             if (node.get("channel") != null) {

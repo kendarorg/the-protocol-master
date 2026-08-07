@@ -1,0 +1,29 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786102957404,
+  "constant" : false,
+  "connectionId" : 3,
+  "index" : 6,
+  "input" : {
+    "raw" : "AAAAPQADAAwAAAABAApwcm9kdWNlci0xAAIAAAAAAAAAAAAAAAAAAAAAE2thZmthLXJlcGxheS10b3BpYwABAAA=",
+    "decoded" : {
+      "api" : "Metadata",
+      "apiVersion" : 12,
+      "correlationId" : 1,
+      "clientId" : "producer-1"
+    }
+  },
+  "output" : {
+    "payload" : "AAAAgQAAAAEAAAAAAAIAAAABCmxvY2FsaG9zdAAAI+gAABc0TDZnM25TaFQtZU1DdEstLVg4NnN3AAAAAQIAABNrYWZrYS1yZXBsYXktdG9waWMiyK2ztV5Fh5QnAB0ka7cnAAIAAAAAAAAAAAABAAAAAAIAAAABAgAAAAEBAIAAAAAAAA==",
+    "decoded" : {
+      "api" : "Metadata",
+      "apiVersion" : 12,
+      "correlationId" : 1
+    }
+  },
+  "durationMs" : 15,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "inputType" : "KafkaRawMessage",
+  "outputType" : "MetadataResponse"
+}

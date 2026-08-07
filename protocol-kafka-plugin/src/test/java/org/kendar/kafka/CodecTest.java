@@ -6,6 +6,8 @@ import org.kendar.kafka.enums.KafkaApiKeys;
 import org.kendar.kafka.fsm.ApiVersionsResponse;
 import org.kendar.kafka.fsm.MetadataResponse;
 import org.kendar.kafka.utils.KafkaBBuffer;
+import org.kendar.kafka.utils.KafkaFrameDescriber;
+import org.kendar.kafka.utils.KafkaProduceEncoder;
 
 import java.nio.charset.StandardCharsets;
 
@@ -152,5 +154,25 @@ public class CodecTest {
         out.writeInt(body.length);
         out.write(body);
         return out.getAll();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void describerDecodesProduceRequest() {
+        var frame = KafkaProduceEncoder.encode(42, "cli", "codec-topic", 0,
+                KafkaProduceEncoder.utf8("the-key"), KafkaProduceEncoder.utf8("the-value"),
+                (short) 1, 30000, 1234567890L);
+
+        var decoded = KafkaFrameDescriber.describeRequest(frame);
+
+        assertEquals("Produce", decoded.get("api"));
+        assertEquals(42, decoded.get("correlationId"));
+        var topics = (java.util.List<java.util.Map<String, Object>>) decoded.get("topics");
+        assertEquals("codec-topic", topics.get(0).get("topic"));
+        var partitions = (java.util.List<java.util.Map<String, Object>>) topics.get(0).get("partitions");
+        var records = (java.util.List<java.util.Map<String, Object>>) partitions.get(0).get("records");
+        assertEquals("the-key", records.get(0).get("key"));
+        assertEquals("the-value", records.get(0).get("value"));
+        assertEquals(1234567890L, records.get(0).get("timestamp"));
     }
 }

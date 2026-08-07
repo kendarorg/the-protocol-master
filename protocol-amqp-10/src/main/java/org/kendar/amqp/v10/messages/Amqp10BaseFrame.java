@@ -1,5 +1,10 @@
 package org.kendar.amqp.v10.messages;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.kendar.amqp.v10.codec.Amqp10FrameDescriber;
+import org.kendar.amqp.v10.codec.Amqp10FrameEncoder;
 import org.kendar.amqp.v10.dtos.FrameType;
 import org.kendar.amqp.v10.fsm.Amqp10FrameTranslator;
 import org.kendar.amqp.v10.fsm.events.Amqp10Frame;
@@ -14,6 +19,7 @@ import org.kendar.proxy.PluginContext;
 import org.kendar.proxy.ProxyConnection;
 
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Base class for AMQP 1.0 performative / SASL states (analog of the v09
@@ -27,6 +33,7 @@ import java.util.Iterator;
  * Semantic field encode/decode arrives with the M2 codec.
  */
 public abstract class Amqp10BaseFrame extends ProtoState implements NetworkReturnMessage {
+    private static final org.kendar.utils.JsonMapper jsonMapper = new org.kendar.utils.JsonMapper();
     private short channel;
     private byte frameType = FrameType.AMQP.asByte();
     private boolean proxyed;
@@ -76,8 +83,54 @@ public abstract class Amqp10BaseFrame extends ProtoState implements NetworkRetur
         this.frameType = frameType;
     }
 
+    @JsonIgnore
     public byte[] getRaw() {
         return raw;
+    }
+
+    /**
+     * Human-readable view of {@link #getRaw()} for recordings (performative name,
+     * named fields, message sections). This is the primary stored representation:
+     * replay re-encodes the frame from it via {@code Amqp10FrameEncoder} unless a
+     * {@code raw} fallback is present (see {@link #getRawBase64()}).
+     */
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Map<String, Object> getDecoded() {
+        return Amqp10FrameDescriber.describe(raw);
+    }
+
+    /**
+     * Raw-bytes fallback, serialized ONLY when {@code decoded} does not survive an
+     * encode→describe round-trip through the JSON representation (unknown
+     * descriptor, lossy value, codec gap). When this returns null the readable
+     * {@code decoded} tree alone fully determines the replayed frame.
+     */
+    @JsonProperty("raw")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getRawBase64() {
+        if (raw == null) {
+            return null;
+        }
+        try {
+            var decoded = getDecoded();
+            if (decoded != null) {
+                var canonical = canonical(decoded);
+                var redecoded = Amqp10FrameDescriber.describe(Amqp10FrameEncoder.encode(canonical));
+                if (canonical.equals(canonical(redecoded))) {
+                    return null;
+                }
+            }
+        } catch (Exception e) {
+            // fall through: keep the raw fallback
+        }
+        return java.util.Base64.getEncoder().encodeToString(raw);
+    }
+
+    /** The tree as replay will see it after a JSON round-trip (number types normalized). */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> canonical(Map<String, Object> tree) {
+        return jsonMapper.deserialize(jsonMapper.serialize(tree), Map.class);
     }
 
     public void setRaw(byte[] raw) {

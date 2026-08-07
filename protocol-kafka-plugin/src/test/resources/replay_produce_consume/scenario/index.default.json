@@ -1,0 +1,167 @@
+[ {
+  "index" : 1,
+  "timestamp" : 1786102956622,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 62,
+  "tags" : {
+    "output" : "ApiVersionsResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "ApiVersions"
+  }
+}, {
+  "index" : 2,
+  "timestamp" : 1786102957017,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 18,
+  "tags" : {
+    "output" : "MetadataResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "Metadata"
+  }
+}, {
+  "index" : 3,
+  "timestamp" : 1786102957048,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 14,
+  "tags" : {
+    "output" : "ApiVersionsResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "ApiVersions"
+  }
+}, {
+  "index" : 4,
+  "timestamp" : 1786102957104,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 50,
+  "tags" : {
+    "output" : "GenericResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "CreateTopics"
+  }
+}, {
+  "index" : 5,
+  "timestamp" : 1786102957397,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 13,
+  "tags" : {
+    "output" : "ApiVersionsResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "ApiVersions"
+  }
+}, {
+  "index" : 6,
+  "timestamp" : 1786102957420,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 15,
+  "tags" : {
+    "output" : "MetadataResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "Metadata"
+  }
+}, {
+  "index" : 7,
+  "timestamp" : 1786102957497,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 13,
+  "tags" : {
+    "output" : "ApiVersionsResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "ApiVersions"
+  }
+}, {
+  "index" : 8,
+  "timestamp" : 1786102957548,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 26,
+  "tags" : {
+    "output" : "GenericResponse",
+    "input" : "KafkaRawMessage",
+    "topic" : "kafka-replay-topic",
+    "api" : "Produce"
+  }
+}, {
+  "index" : 9,
+  "timestamp" : 1786102957734,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 13,
+  "tags" : {
+    "output" : "ApiVersionsResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "ApiVersions"
+  }
+}, {
+  "index" : 10,
+  "timestamp" : 1786102957749,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 13,
+  "tags" : {
+    "output" : "MetadataResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "Metadata"
+  }
+}, {
+  "index" : 11,
+  "timestamp" : 1786102957781,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 13,
+  "tags" : {
+    "output" : "ApiVersionsResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "ApiVersions"
+  }
+}, {
+  "index" : 12,
+  "timestamp" : 1786102957801,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 16,
+  "tags" : {
+    "output" : "GenericResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "ListOffsets"
+  }
+}, {
+  "index" : 13,
+  "timestamp" : 1786102957852,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 24,
+  "tags" : {
+    "output" : "GenericResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "Fetch"
+  }
+}, {
+  "index" : 14,
+  "timestamp" : 1786102958392,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 519,
+  "tags" : {
+    "output" : "GenericResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "Fetch"
+  }
+}, {
+  "index" : 15,
+  "timestamp" : 1786102958409,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "durationMs" : 14,
+  "tags" : {
+    "output" : "GenericResponse",
+    "input" : "KafkaRawMessage",
+    "api" : "Fetch"
+  }
+} ]

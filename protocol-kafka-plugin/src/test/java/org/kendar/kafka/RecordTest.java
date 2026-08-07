@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,6 +67,26 @@ public class RecordTest extends KafkaBasicTest {
         try (var files = Files.list(dir)) {
             assertTrue(files.findAny().isPresent(), "recording dir should contain files");
         }
+    }
+
+    /**
+     * Fixture generator for the committed broker-less replay scenario. Run with
+     * {@code -Dtpm.record.fixture=true} (Docker needed), then copy
+     * {@code target/tests/RecordTest/recordReplayFixture/scenario} to
+     * {@code src/test/resources/replay_produce_consume/scenario}
+     * (see {@link ReplayScenario} and {@code ReplayerScenarioTest}).
+     */
+    @Test
+    @EnabledIfSystemProperty(named = "tpm.record.fixture", matches = "true")
+    void recordReplayFixture() throws Exception {
+        var received = ReplayScenario.run(proxyBootstrap());
+        assertTrue(received != null
+                        && ReplayScenario.KEY.equals(received.key())
+                        && ReplayScenario.VALUE.equals(received.value()),
+                "fixture scenario must produce and consume the known message");
+
+        var dir = Path.of("target", "tests", "RecordTest", "recordReplayFixture", "scenario");
+        assertTrue(Files.exists(dir), "recording dir should exist: " + dir);
     }
 
     private Properties adminProps() {

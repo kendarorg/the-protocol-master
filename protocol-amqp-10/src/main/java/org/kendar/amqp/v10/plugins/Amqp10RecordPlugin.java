@@ -1,5 +1,6 @@
 package org.kendar.amqp.v10.plugins;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.kendar.di.annotations.TpmService;
 import org.kendar.plugins.BasicRecordPlugin;
 import org.kendar.plugins.settings.BasicAysncRecordPluginSettings;
@@ -61,6 +62,46 @@ public class Amqp10RecordPlugin extends BasicRecordPlugin<BasicAysncRecordPlugin
                 ? (item.getInputType().equalsIgnoreCase("BBuffer") ? "byte[]" : item.getInputType()) : null);
         data.put("output", item.getOutput() != null
                 ? (item.getOutputType().equalsIgnoreCase("BBuffer") ? "byte[]" : item.getOutputType()) : null);
+        // Informational tags for the scenario index (matching is score-based, so
+        // extra tags never break replay of older recordings).
+        var decoded = decodedOf(item.getInput());
+        if (decoded == null) {
+            decoded = decodedOf(item.getOutput());
+        }
+        if (decoded != null) {
+            var performative = decoded.get("performative");
+            if (performative != null) {
+                data.put("performative", performative.asText());
+            }
+            var address = attachAddress(decoded);
+            if (address != null) {
+                data.put("address", address);
+            }
+        }
         return data;
+    }
+
+    /** The {@code decoded} node of a serialized frame (see {@code Amqp10BaseFrame#getDecoded}). */
+    private static JsonNode decodedOf(Object serialized) {
+        if (!(serialized instanceof JsonNode)) {
+            return null;
+        }
+        var decoded = ((JsonNode) serialized).get("decoded");
+        return decoded == null || decoded.isNull() ? null : decoded;
+    }
+
+    /** The source/target address of a decoded attach, or {@code null}. */
+    private static String attachAddress(JsonNode decoded) {
+        var performative = decoded.get("performative");
+        if (performative == null || !"attach".equals(performative.asText())) {
+            return null;
+        }
+        for (var end : new String[]{"source", "target"}) {
+            var address = decoded.at("/fields/" + end + "/fields/address");
+            if (address.isTextual()) {
+                return address.asText();
+            }
+        }
+        return null;
     }
 }

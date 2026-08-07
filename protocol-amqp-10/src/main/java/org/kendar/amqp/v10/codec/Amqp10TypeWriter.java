@@ -99,6 +99,8 @@ public class Amqp10TypeWriter {
             writeList(rb, (List<?>) v);
         } else if (v instanceof Map) {
             writeMap(rb, (Map<?, ?>) v);
+        } else if (v instanceof Amqp10FrameEncoder.RawBytes) {
+            rb.write(((Amqp10FrameEncoder.RawBytes) v).getBytes());
         } else if (v instanceof DescribedType) {
             var dt = (DescribedType) v;
             rb.write((byte) 0x00);

@@ -1,0 +1,51 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097517273,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 17,
+  "input" : {
+    "channel" : 1,
+    "frameType" : 0,
+    "proxyed" : false,
+    "decoded" : {
+      "frameKind" : "AMQP",
+      "channel" : 1,
+      "performative" : "transfer",
+      "fields" : {
+        "handle" : 0,
+        "delivery-id" : 0,
+        "delivery-tag" : "AA==",
+        "message-format" : 0,
+        "settled" : false
+      },
+      "sections" : [ {
+        "section" : "message-annotations",
+        "value" : {
+          "x-opt-jms-dest" : {
+            "type" : "byte",
+            "value" : 0
+          },
+          "x-opt-jms-msg-type" : {
+            "type" : "byte",
+            "value" : 5
+          }
+        }
+      }, {
+        "section" : "properties",
+        "fields" : {
+          "message-id" : "ID:b8fc25fc-0ad6-48ab-b623-7c53603055d7:1:1:1-1",
+          "to" : "amqp10.record.test",
+          "creation-time" : 1786097517230
+        }
+      }, {
+        "section" : "amqp-value",
+        "value" : "record-me"
+      } ]
+    }
+  },
+  "durationMs" : 10,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "inputType" : "RawFrame"
+}

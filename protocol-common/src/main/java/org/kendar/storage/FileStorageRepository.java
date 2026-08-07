@@ -199,7 +199,11 @@ public class FileStorageRepository extends StorageRepository {
                 }
 
                 currRepo.index = retrieveIndexFile(protocolInstanceId);
-                currRepo.index.sort(Comparator.comparing(CompactLine::getTimestamp));
+                // Tie-break same-millisecond lines by index: async writes may land in the
+                // file out of order, and a leading RESPONSE would otherwise be trimmed by
+                // the replay plugins' activation scan.
+                currRepo.index.sort(Comparator.comparingLong(CompactLine::getTimestamp)
+                        .thenComparingLong(CompactLine::getIndex));
                 if (!currRepo.index.isEmpty()) {
                     var maxRepoIndex = currRepo.index.stream().max(Comparator.comparing(CompactLine::getIndex));
                     var maxIndex = Math.max(storageCounter.get(), maxRepoIndex.get().getIndex() + 1);

@@ -1,0 +1,32 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097517035,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 9,
+  "output" : {
+    "channel" : -1,
+    "frameType" : 0,
+    "proxyed" : false,
+    "decoded" : {
+      "frameKind" : "AMQP",
+      "channel" : 0,
+      "performative" : "open",
+      "fields" : {
+        "container-id" : "6955ff25-9248-11f1-a778-165a4066c986",
+        "max-frame-size" : 131072,
+        "channel-max" : 65535,
+        "idle-time-out" : 30000,
+        "offered-capabilities" : [ "sole-connection-for-container", "DELAYED_DELIVERY", "SHARED-SUBS", "ANONYMOUS-RELAY" ],
+        "properties" : {
+          "product" : "apache-activemq-artemis",
+          "version" : "2.44.0"
+        }
+      }
+    }
+  },
+  "durationMs" : 0,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "outputType" : "RawFrame"
+}

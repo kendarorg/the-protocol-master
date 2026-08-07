@@ -1,0 +1,26 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097516992,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 4,
+  "input" : {
+    "channel" : 0,
+    "frameType" : 1,
+    "proxyed" : false,
+    "decoded" : {
+      "frameKind" : "SASL",
+      "channel" : 0,
+      "performative" : "sasl-init",
+      "fields" : {
+        "mechanism" : "PLAIN",
+        "initial-response" : "AGFydGVtaXMAYXJ0ZW1pcw==",
+        "hostname" : "localhost"
+      }
+    }
+  },
+  "durationMs" : 11,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "inputType" : "RawFrame"
+}

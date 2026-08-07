@@ -70,6 +70,14 @@ public abstract class BasicReplayPlugin<W extends BasicReplayPluginSettings> ext
     }
 
     /**
+     * The request indexes loaded on activation, for subclasses implementing their
+     * own {@link #findIndex} strategy.
+     */
+    protected List<CompactLine> getIndexes() {
+        return indexes;
+    }
+
+    /**
      * Retrieve the settings class, must match the <W> parameter
      *
      * @return

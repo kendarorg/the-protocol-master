@@ -1,0 +1,43 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786102957518,
+  "constant" : false,
+  "connectionId" : 4,
+  "index" : 8,
+  "input" : {
+    "raw" : "AAAAkwAAAAkAAAAEAApwcm9kdWNlci0xAAAAAQAATiACE2thZmthLXJlcGxheS10b3BpYwIAAAAAWwAAAAAAAAAAAAAATv////8C9aYvOQAAAAAAAAAAAZ/cCEV3AAABn9wIRXf//////////////////wAAAAE4AAAAFHJlcGxheS1rZXkYcmVwbGF5LXZhbHVlAAAAAA==",
+    "decoded" : {
+      "api" : "Produce",
+      "apiVersion" : 9,
+      "correlationId" : 4,
+      "clientId" : "producer-1",
+      "acks" : 1,
+      "timeoutMs" : 20000,
+      "topics" : [ {
+        "topic" : "kafka-replay-topic",
+        "partitions" : [ {
+          "partition" : 0,
+          "records" : [ {
+            "offset" : 0,
+            "timestamp" : 1786102957431,
+            "key" : "replay-key",
+            "value" : "replay-value"
+          } ]
+        } ]
+      } ]
+    }
+  },
+  "output" : {
+    "payload" : "AAAAQQAAAAQAAhNrYWZrYS1yZXBsYXktdG9waWMCAAAAAAAAAAAAAAAAAAD//////////wAAAAAAAAAAAQAAAAAAAAAA",
+    "decoded" : {
+      "api" : "Produce",
+      "apiVersion" : 9,
+      "correlationId" : 4
+    }
+  },
+  "durationMs" : 26,
+  "type" : "KafkaRawMessage",
+  "caller" : "KAFKA",
+  "inputType" : "KafkaRawMessage",
+  "outputType" : "GenericResponse"
+}

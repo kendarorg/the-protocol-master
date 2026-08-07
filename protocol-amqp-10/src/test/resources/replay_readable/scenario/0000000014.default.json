@@ -1,0 +1,52 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097517181,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 14,
+  "input" : {
+    "channel" : 1,
+    "frameType" : 0,
+    "proxyed" : false,
+    "decoded" : {
+      "frameKind" : "AMQP",
+      "channel" : 1,
+      "performative" : "attach",
+      "fields" : {
+        "name" : "qpid-jms:sender:ID:b8fc25fc-0ad6-48ab-b623-7c53603055d7:1:1:1:amqp10.record.test",
+        "handle" : 0,
+        "role" : false,
+        "snd-settle-mode" : 0,
+        "rcv-settle-mode" : 0,
+        "source" : {
+          "type" : "source",
+          "fields" : {
+            "address" : "ID:b8fc25fc-0ad6-48ab-b623-7c53603055d7:1:1:1",
+            "durable" : 0,
+            "expiry-policy" : "session-end",
+            "timeout" : 0,
+            "dynamic" : false,
+            "outcomes" : [ "amqp:accepted:list", "amqp:rejected:list", "amqp:released:list", "amqp:modified:list" ]
+          }
+        },
+        "target" : {
+          "type" : "target",
+          "fields" : {
+            "address" : "amqp10.record.test",
+            "durable" : 0,
+            "expiry-policy" : "session-end",
+            "timeout" : 0,
+            "dynamic" : false,
+            "capabilities" : [ "queue" ]
+          }
+        },
+        "incomplete-unsettled" : false,
+        "initial-delivery-count" : 0
+      }
+    }
+  },
+  "durationMs" : 11,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "inputType" : "RawFrame"
+}

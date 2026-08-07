@@ -5,9 +5,12 @@ import org.kendar.kafka.enums.KafkaApiKeys;
 import org.kendar.kafka.fsm.KafkaResponseState;
 import org.kendar.kafka.messages.KafkaRawMessage;
 import org.kendar.plugins.BasicReplayPlugin;
+import org.kendar.plugins.ReplayFindIndexResult;
 import org.kendar.plugins.settings.BasicAysncReplayPluginSettings;
 import org.kendar.protocol.context.ProtoContext;
 import org.kendar.proxy.PluginContext;
+import org.kendar.storage.CompactLine;
+import org.kendar.storage.generic.CallItemsQuery;
 import org.kendar.storage.generic.LineToRead;
 import org.kendar.storage.generic.StorageRepository;
 import org.kendar.utils.JsonMapper;
@@ -16,8 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Broker-less replay of recorded Kafka sessions. Kafka is a pure request/response
@@ -34,6 +40,15 @@ import java.util.Map;
 @TpmService(tags = "kafka")
 public class KafkaReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginSettings> {
     private static final Logger log = LoggerFactory.getLogger(KafkaReplayPlugin.class);
+    /**
+     * APIs a client re-issues in its poll/handshake loops (metadata refresh, fetch
+     * polling, group heartbeats). Once every recorded instance is consumed, further
+     * calls replay the best already-used one instead of failing the match — Produce
+     * and topic-mutating APIs stay strictly one-shot.
+     */
+    private static final Set<String> REPEATABLE_APIS = Set.of(
+            "ApiVersions", "Metadata", "FindCoordinator", "DescribeCluster",
+            "ListOffsets", "Fetch", "Heartbeat", "OffsetFetch");
 
     public KafkaReplayPlugin(JsonMapper mapper, StorageRepository storage) {
         super(mapper, storage);
@@ -52,6 +67,38 @@ public class KafkaReplayPlugin extends BasicReplayPlugin<BasicAysncReplayPluginS
     @Override
     protected boolean hasCallbacks() {
         return false;
+    }
+
+    /**
+     * Strict per-API matching. The generic matcher falls back to "best unused index
+     * even with zero tag matches", which lets a timing-dependent extra request (e.g.
+     * a metadata refresh) steal a recorded response of a DIFFERENT api — the client
+     * then misdecodes it. Here a request only ever matches an index with the same
+     * {@code api} tag: earliest unused wins; once exhausted, poll-loop APIs replay
+     * the last recorded instance again, anything else is a genuine miss.
+     */
+    @Override
+    protected ReplayFindIndexResult findIndex(CallItemsQuery query, Object in) {
+        var api = query.getTags().get("api");
+        var candidates = getIndexes().stream()
+                .filter(a -> !"RESPONSE".equalsIgnoreCase(a.getType()))
+                .filter(a -> a.getCaller().equalsIgnoreCase(query.getCaller()))
+                .filter(a -> Objects.equals(api, a.getTags().get("api")))
+                .sorted(Comparator.comparingLong(CompactLine::getIndex))
+                .toList();
+        for (var candidate : candidates) {
+            if (query.getUsed().stream().noneMatch(n -> n == candidate.getIndex())) {
+                log.debug("[REPLAY] matched api {} at index {}", api, candidate.getIndex());
+                return new ReplayFindIndexResult(candidate, false);
+            }
+        }
+        if (REPEATABLE_APIS.contains(api) && !candidates.isEmpty()) {
+            var last = candidates.get(candidates.size() - 1);
+            log.debug("[REPLAY] repeating api {} from index {}", api, last.getIndex());
+            return new ReplayFindIndexResult(mapper.clone(last), true);
+        }
+        log.error("[REPLAY] no recorded response for api {} ({})", api, query);
+        return null;
     }
 
     @Override

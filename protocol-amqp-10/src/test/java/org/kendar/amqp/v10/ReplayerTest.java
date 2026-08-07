@@ -36,11 +36,15 @@ class ReplayerTest {
     private static final int FAKE_PORT = 5693;
 
     private Server startReplayServer() {
+        return startReplayServer("replay_open");
+    }
+
+    private Server startReplayServer(String scenario) {
         var baseProtocol = new Amqp10Protocol(FAKE_PORT);
         var proxy = new Amqp10Proxy(); // no broker
 
         StorageRepository storage = new FileStorageRepository(
-                Path.of("src", "test", "resources", "replay_open"));
+                Path.of("src", "test", "resources", scenario));
         storage.initialize();
 
         var gs = new GlobalSettings();
@@ -123,6 +127,33 @@ class ReplayerTest {
 
             assertNotNull(received, "recorded delivery did not reach the consumer via replay");
             assertEquals("record-me", received.getText(), "replayed message body mismatch");
+            connection.close();
+        } finally {
+            server.stop();
+        }
+    }
+
+    @Test
+    void replaysReadableScenarioWithoutBroker() throws Exception {
+        // replay_readable stores NO raw bytes: every frame is re-encoded from its
+        // readable `decoded` JSON (M5), so this proves the encoder path end to end.
+        var server = startReplayServer("replay_readable");
+        try {
+            var factory = new JmsConnectionFactory("amqp://localhost:" + FAKE_PORT);
+            var connection = factory.createConnection("artemis", "artemis");
+            connection.start();
+            var session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            var queue = session.createQueue("amqp10.record.test");
+
+            var producer = session.createProducer(queue);
+            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            producer.send(session.createTextMessage("record-me"));
+
+            var consumer = session.createConsumer(queue);
+            var received = (TextMessage) consumer.receive(10000);
+
+            assertNotNull(received, "delivery did not reach the consumer via decoded-JSON replay");
+            assertEquals("record-me", received.getText(), "re-encoded message body mismatch");
             connection.close();
         } finally {
             server.stop();

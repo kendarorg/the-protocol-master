@@ -1,0 +1,24 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097517005,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 5,
+  "output" : {
+    "channel" : -1,
+    "frameType" : 1,
+    "proxyed" : false,
+    "decoded" : {
+      "frameKind" : "SASL",
+      "channel" : 0,
+      "performative" : "sasl-outcome",
+      "fields" : {
+        "code" : 0
+      }
+    }
+  },
+  "durationMs" : 0,
+  "type" : "RESPONSE",
+  "caller" : "AMQP10",
+  "outputType" : "RawFrame"
+}

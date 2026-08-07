@@ -1,0 +1,21 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097516669,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 1,
+  "input" : {
+    "channel" : 0,
+    "frameType" : 0,
+    "proxyed" : false,
+    "decoded" : {
+      "performative" : "protocol-header",
+      "layer" : "SASL",
+      "version" : "1.0.0"
+    }
+  },
+  "durationMs" : 37,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "inputType" : "RawFrame"
+}

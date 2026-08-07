@@ -1,0 +1,34 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786097517022,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 8,
+  "input" : {
+    "channel" : 0,
+    "frameType" : 0,
+    "proxyed" : false,
+    "decoded" : {
+      "frameKind" : "AMQP",
+      "channel" : 0,
+      "performative" : "open",
+      "fields" : {
+        "container-id" : "ID:c50a6f3a-178d-42ec-8dc2-33b400fd3c93:1",
+        "hostname" : "localhost",
+        "max-frame-size" : 1048576,
+        "channel-max" : 32767,
+        "idle-time-out" : 30000,
+        "desired-capabilities" : [ "sole-connection-for-container", "DELAYED_DELIVERY", "ANONYMOUS-RELAY", "SHARED-SUBS" ],
+        "properties" : {
+          "product" : "QpidJMS",
+          "version" : "2.6.1",
+          "platform" : "JVM: 25.0.3, 25.0.3+9-LTS, Amazon.com Inc., OS: Linux, 6.18.33.1-microsoft-standard-WSL2, amd64"
+        }
+      }
+    }
+  },
+  "durationMs" : 11,
+  "type" : "RawFrame",
+  "caller" : "AMQP10",
+  "inputType" : "RawFrame"
+}
