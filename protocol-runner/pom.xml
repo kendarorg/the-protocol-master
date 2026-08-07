@@ -78,6 +78,11 @@
         </dependency>
         <dependency>
             <groupId>org.kendar.protocol</groupId>
+            <artifactId>protocol-mssql-plugin</artifactId>
+            <version>4.3.10-tpm</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kendar.protocol</groupId>
             <artifactId>protocol-redis</artifactId>
             <version>4.3.10-tpm</version>
         </dependency>

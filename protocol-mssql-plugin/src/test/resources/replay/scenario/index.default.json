@@ -1,0 +1,118 @@
+[ {
+  "index" : 1,
+  "timestamp" : 1786105044181,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 43,
+  "tags" : {
+    "tokenized" : "CREATE TABLE COMPANY_ (ID INT PRIMARY KEY NOT , DENOMINATION VARCHAR( ) NOT , AGE INT NOT , ADDRESS CHAR( ) , SALARY REAL)",
+    "query" : "CREATE TABLE COMPANY_2 (ID INT PRIMARY KEY NOT NULL, DENOMINATION VARCHAR(255) NOT NULL,  AGE INT NOT NULL,  ADDRESS CHAR(50),  SALARY REAL)",
+    "isIntResult" : "true",
+    "resultsCount" : "0",
+    "parametersCount" : "0"
+  }
+}, {
+  "index" : 2,
+  "timestamp" : 1786105044196,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 6,
+  "tags" : {
+    "tokenized" : "INSERT INTO COMPANY_ (ID , DENOMINATION , AGE , ADDRESS , SALARY) VALUES ( , , , , );",
+    "query" : "INSERT INTO COMPANY_2 (ID,DENOMINATION, AGE, ADDRESS, SALARY) VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);",
+    "isIntResult" : "true",
+    "resultsCount" : "1",
+    "parametersCount" : "0"
+  }
+}, {
+  "index" : 3,
+  "timestamp" : 1786105044220,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 20,
+  "tags" : {
+    "tokenized" : "SELECT DENOMINATION FROM COMPANY_ ;",
+    "query" : "SELECT DENOMINATION FROM COMPANY_2;",
+    "isIntResult" : "false",
+    "resultsCount" : "1",
+    "parametersCount" : "0"
+  }
+}, {
+  "index" : 5,
+  "timestamp" : 1786105078599,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 9,
+  "tags" : {
+    "tokenized" : "CREATE TABLE COMPANY_ (ID INT PRIMARY KEY NOT , DENOMINATION VARCHAR( ) NOT , AGE INT NOT , ADDRESS CHAR( ) , SALARY REAL)",
+    "query" : "CREATE TABLE COMPANY_2 (ID INT PRIMARY KEY NOT NULL, DENOMINATION VARCHAR(255) NOT NULL,  AGE INT NOT NULL,  ADDRESS CHAR(50),  SALARY REAL)",
+    "isIntResult" : "true",
+    "resultsCount" : "0",
+    "parametersCount" : "0"
+  }
+}, {
+  "index" : 6,
+  "timestamp" : 1786105078606,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 6,
+  "tags" : {
+    "tokenized" : "INSERT INTO COMPANY_ (ID , DENOMINATION , AGE , ADDRESS , SALARY) VALUES ( , , , , );",
+    "query" : "INSERT INTO COMPANY_2 (ID,DENOMINATION, AGE, ADDRESS, SALARY) VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);",
+    "isIntResult" : "true",
+    "resultsCount" : "1",
+    "parametersCount" : "0"
+  }
+}, {
+  "index" : 7,
+  "timestamp" : 1786105078610,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 1,
+  "tags" : {
+    "tokenized" : "SELECT DENOMINATION FROM COMPANY_ ;",
+    "query" : "SELECT DENOMINATION FROM COMPANY_2;",
+    "isIntResult" : "false",
+    "resultsCount" : "1",
+    "parametersCount" : "0"
+  }
+}, {
+  "index" : 9,
+  "timestamp" : 1786105352724,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 5,
+  "tags" : {
+    "tokenized" : "CREATE TABLE COMPANY_ (ID INT PRIMARY KEY NOT , DENOMINATION VARCHAR( ) NOT , AGE INT NOT , ADDRESS CHAR( ) , SALARY REAL)",
+    "query" : "CREATE TABLE COMPANY_2 (ID INT PRIMARY KEY NOT NULL, DENOMINATION VARCHAR(255) NOT NULL,  AGE INT NOT NULL,  ADDRESS CHAR(50),  SALARY REAL)",
+    "isIntResult" : "true",
+    "resultsCount" : "0",
+    "parametersCount" : "0"
+  }
+}, {
+  "index" : 10,
+  "timestamp" : 1786105352732,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 5,
+  "tags" : {
+    "tokenized" : "INSERT INTO COMPANY_ (ID , DENOMINATION , AGE , ADDRESS , SALARY) VALUES ( , , , , );",
+    "query" : "INSERT INTO COMPANY_2 (ID,DENOMINATION, AGE, ADDRESS, SALARY) VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);",
+    "isIntResult" : "true",
+    "resultsCount" : "1",
+    "parametersCount" : "0"
+  }
+}, {
+  "index" : 11,
+  "timestamp" : 1786105352735,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "durationMs" : 1,
+  "tags" : {
+    "tokenized" : "SELECT DENOMINATION FROM COMPANY_ ;",
+    "query" : "SELECT DENOMINATION FROM COMPANY_2;",
+    "isIntResult" : "false",
+    "resultsCount" : "1",
+    "parametersCount" : "0"
+  }
+} ]

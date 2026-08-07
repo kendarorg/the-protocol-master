@@ -1,0 +1,46 @@
+package org.kendar.mssql.constants;
+
+public class TdsDataType {
+    public static final int NULLTYPE = 0x1F;
+    public static final int INT1 = 0x30;
+    public static final int BIT = 0x32;
+    public static final int INT2 = 0x34;
+    public static final int INT4 = 0x38;
+    public static final int DATETIM4 = 0x3A;
+    public static final int FLT4 = 0x3B;
+    public static final int MONEY = 0x3C;
+    public static final int DATETIME = 0x3D;
+    public static final int FLT8 = 0x3E;
+    public static final int MONEY4 = 0x7A;
+    public static final int INT8 = 0x7F;
+    public static final int GUID = 0x24;
+    public static final int INTN = 0x26;
+    public static final int DECIMAL = 0x37;
+    public static final int NUMERIC = 0x3F;
+    public static final int BITN = 0x68;
+    public static final int DECIMALN = 0x6A;
+    public static final int NUMERICN = 0x6C;
+    public static final int FLTN = 0x6D;
+    public static final int MONEYN = 0x6E;
+    public static final int DATETIMN = 0x6F;
+    public static final int DATEN = 0x28;
+    public static final int TIMEN = 0x29;
+    public static final int DATETIME2N = 0x2A;
+    public static final int DATETIMEOFFSETN = 0x2B;
+    public static final int CHAR = 0x2F;
+    public static final int VARCHAR = 0x27;
+    public static final int BINARY = 0x2D;
+    public static final int VARBINARY = 0x25;
+    public static final int BIGVARBIN = 0xA5;
+    public static final int BIGVARCHR = 0xA7;
+    public static final int BIGBINARY = 0xAD;
+    public static final int BIGCHAR = 0xAF;
+    public static final int NVARCHAR = 0xE7;
+    public static final int NCHAR = 0xEF;
+    public static final int XML = 0xF1;
+    public static final int UDT = 0xF0;
+    public static final int TEXT = 0x23;
+    public static final int IMAGE = 0x22;
+    public static final int NTEXT = 0x63;
+    public static final int SSVARIANT = 0x62;
+}

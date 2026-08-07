@@ -1,0 +1,26 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786105078598,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 5,
+  "input" : {
+    "query" : "CREATE TABLE COMPANY_2 (ID INT PRIMARY KEY NOT NULL, DENOMINATION VARCHAR(255) NOT NULL,  AGE INT NOT NULL,  ADDRESS CHAR(50),  SALARY REAL)",
+    "parameterValues" : [ ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ ],
+      "metadata" : [ ],
+      "count" : 0,
+      "intResult" : true,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 0
+  },
+  "durationMs" : 9,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
+}

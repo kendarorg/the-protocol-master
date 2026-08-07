@@ -1,0 +1,272 @@
+[
+  {
+    "name": "int",
+    "dataType": 4,
+    "precision": 10,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 56,
+    "className": "java.lang.Integer"
+  },
+  {
+    "name": "intn",
+    "dataType": 4,
+    "precision": 10,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 38,
+    "className": "java.lang.Integer"
+  },
+  {
+    "name": "smallint",
+    "dataType": 5,
+    "precision": 5,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 52,
+    "className": "java.lang.Short"
+  },
+  {
+    "name": "tinyint",
+    "dataType": -6,
+    "precision": 3,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 48,
+    "className": "java.lang.Short"
+  },
+  {
+    "name": "bigint",
+    "dataType": -5,
+    "precision": 19,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 127,
+    "className": "java.lang.Long"
+  },
+  {
+    "name": "bit",
+    "dataType": -7,
+    "precision": 1,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 50,
+    "className": "java.lang.Boolean"
+  },
+  {
+    "name": "bitn",
+    "dataType": -7,
+    "precision": 1,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 104,
+    "className": "java.lang.Boolean"
+  },
+  {
+    "name": "float",
+    "dataType": 8,
+    "precision": 15,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 62,
+    "className": "java.lang.Double"
+  },
+  {
+    "name": "fltn",
+    "dataType": 8,
+    "precision": 15,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 109,
+    "className": "java.lang.Double"
+  },
+  {
+    "name": "real",
+    "dataType": 7,
+    "precision": 7,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 59,
+    "className": "java.lang.Float"
+  },
+  {
+    "name": "decimal",
+    "dataType": 3,
+    "precision": 38,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 106,
+    "className": "java.math.BigDecimal"
+  },
+  {
+    "name": "numeric",
+    "dataType": 2,
+    "precision": 38,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 108,
+    "className": "java.math.BigDecimal"
+  },
+  {
+    "name": "money",
+    "dataType": 2,
+    "precision": 19,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 60,
+    "className": "java.math.BigDecimal"
+  },
+  {
+    "name": "moneyn",
+    "dataType": 2,
+    "precision": 19,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 10,
+    "dbSpecificId": 110,
+    "className": "java.math.BigDecimal"
+  },
+  {
+    "name": "nvarchar",
+    "dataType": -9,
+    "precision": 4000,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 231,
+    "className": "java.lang.String"
+  },
+  {
+    "name": "nchar",
+    "dataType": -15,
+    "precision": 4000,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 239,
+    "className": "java.lang.String"
+  },
+  {
+    "name": "varchar",
+    "dataType": 12,
+    "precision": 8000,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 167,
+    "className": "java.lang.String"
+  },
+  {
+    "name": "char",
+    "dataType": 1,
+    "precision": 8000,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 175,
+    "className": "java.lang.String"
+  },
+  {
+    "name": "varbinary",
+    "dataType": -3,
+    "precision": 8000,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 165,
+    "className": "[B"
+  },
+  {
+    "name": "binary",
+    "dataType": -2,
+    "precision": 8000,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 173,
+    "className": "[B"
+  },
+  {
+    "name": "date",
+    "dataType": 91,
+    "precision": 10,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 40,
+    "className": "java.sql.Date"
+  },
+  {
+    "name": "time",
+    "dataType": 92,
+    "precision": 16,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 41,
+    "className": "java.sql.Time"
+  },
+  {
+    "name": "datetime2",
+    "dataType": 93,
+    "precision": 27,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 42,
+    "className": "java.sql.Timestamp"
+  },
+  {
+    "name": "datetime",
+    "dataType": 93,
+    "precision": 23,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 61,
+    "className": "java.sql.Timestamp"
+  },
+  {
+    "name": "datetimn",
+    "dataType": 93,
+    "precision": 23,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 111,
+    "className": "java.sql.Timestamp"
+  },
+  {
+    "name": "smalldatetime",
+    "dataType": 93,
+    "precision": 16,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 58,
+    "className": "java.sql.Timestamp"
+  },
+  {
+    "name": "uniqueidentifier",
+    "dataType": 1,
+    "precision": 36,
+    "sqlDataType": 0,
+    "sqlDateTimeSub": 0,
+    "numPrecRadix": 0,
+    "dbSpecificId": 36,
+    "className": "java.lang.String"
+  }
+]

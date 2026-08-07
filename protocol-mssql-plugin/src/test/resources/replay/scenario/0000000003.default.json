@@ -1,0 +1,31 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786105044219,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 3,
+  "input" : {
+    "query" : "SELECT DENOMINATION FROM COMPANY_2;",
+    "parameterValues" : [ ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ [ "Test Ltd" ] ],
+      "metadata" : [ {
+        "columnName" : "DENOMINATION",
+        "byteData" : false,
+        "columnType" : "VARCHAR",
+        "precision" : 255
+      } ],
+      "count" : 1,
+      "intResult" : false,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 0
+  },
+  "durationMs" : 20,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
+}

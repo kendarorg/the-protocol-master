@@ -103,6 +103,7 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
     * anything that goes through http/https
     * postgres
     * mysql (and all mysql compatible like mariadb) with SSL support
+    * mssql (SQL Server, TDS protocol) with SSL support
     * mongoDB
     * redis 3,redis 2
     * mqtt
@@ -147,6 +148,10 @@ If you want to go on the specific functions by protocol:
 * [MySQL](protocol-mysql/README.md)
     * Support for cached queries and stored procedures
     * Possibility of using the real users passwords
+    * Simple authentication (could add an "auth provider")
+* [MS SQL Server](protocol-mssql/README.md)
+    * TDS protocol with TLS support
+    * SQL batches, prepared statements and transactions
     * Simple authentication (could add an "auth provider")
 * [MongoDB](protocol-mongo/README.md)
     * Basic authentication

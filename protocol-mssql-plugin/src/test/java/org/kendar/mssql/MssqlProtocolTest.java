@@ -1,0 +1,121 @@
+package org.kendar.mssql;
+
+import org.junit.jupiter.api.*;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SuppressWarnings("SqlNoDataSourceInspection")
+public class MssqlProtocolTest extends MssqlBasicTest {
+    @BeforeAll
+    public static void beforeClass() {
+        beforeClassBase();
+    }
+
+    @AfterAll
+    public static void afterClass() throws Exception {
+        afterClassBase();
+    }
+
+    @BeforeEach
+    public void beforeEach(TestInfo testInfo) {
+        beforeEachBase(testInfo);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        afterEachBase();
+    }
+
+    @Test
+    void simpleProxyTest() throws Exception {
+
+        var runned = false;
+        Connection c = getProxyConnection();
+        Statement stmt;
+        stmt = c.createStatement();
+        stmt.executeUpdate("CREATE TABLE COMPANY_2 " +
+                "(ID INT PRIMARY KEY NOT NULL," +
+                " DENOMINATION VARCHAR(255) NOT NULL, " +
+                " AGE INT NOT NULL, " +
+                " ADDRESS CHAR(50), " +
+                " SALARY REAL)");
+        stmt.close();
+        stmt = c.createStatement();
+        stmt.executeUpdate("INSERT INTO COMPANY_2 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
+        stmt.close();
+
+        stmt = c.createStatement();
+        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_2;");
+        while (resultset.next()) {
+            assertEquals("Test Ltd", resultset.getString("DENOMINATION"));
+            runned = true;
+        }
+        resultset.close();
+        stmt.close();
+        c.close();
+
+        assertTrue(runned);
+    }
+
+    @Test
+    void proxyTestTransactions() throws Exception {
+
+        var runned = false;
+
+        Connection c = getProxyConnection();
+
+        var stmt = c.createStatement();
+        stmt.executeUpdate("CREATE TABLE COMPANY_1 " +
+                "(ID INT PRIMARY KEY NOT NULL," +
+                " DENOMINATION VARCHAR(255) NOT NULL, " +
+                " AGE INT NOT NULL, " +
+                " ADDRESS CHAR(50), " +
+                " SALARY REAL)");
+        stmt.close();
+
+        c.setAutoCommit(false);
+        stmt = c.createStatement();
+        stmt.executeUpdate("INSERT INTO COMPANY_1 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);");
+        stmt.close();
+
+        c.commit();
+        c.setAutoCommit(true);
+
+        c.setAutoCommit(false);
+        stmt = c.createStatement();
+        stmt.executeUpdate("INSERT INTO COMPANY_1 (ID,DENOMINATION, AGE, ADDRESS, SALARY) " +
+                "VALUES (12,'other', 42, 'Ping Road 22', 25000.7);");
+        stmt.close();
+
+        c.rollback();
+        c.setAutoCommit(true);
+        stmt = c.createStatement();
+        var resultset = stmt.executeQuery("SELECT DENOMINATION FROM COMPANY_1;");
+        while (resultset.next()) {
+            assertEquals("Test Ltd", resultset.getString("DENOMINATION"));
+            runned = true;
+        }
+
+        resultset.close();
+        stmt.close();
+        c.close();
+
+        assertTrue(runned);
+    }
+
+    @Test
+    void testErrorPropagation() throws Exception {
+        Connection c = getProxyConnection();
+        var stmt = c.createStatement();
+        Assertions.assertThrows(SQLException.class, () ->
+                stmt.executeQuery("SELECT * FROM NOT_EXISTING_TABLE_AT_ALL"));
+        stmt.close();
+        c.close();
+    }
+}

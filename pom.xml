@@ -18,6 +18,7 @@
         <junit.jupiter.version>RELEASE</junit.jupiter.version>
         <mybatis.version>3.5.7</mybatis.version>
         <mysql.version>8.2.0</mysql.version>
+        <mssql.version>12.8.1.jre11</mssql.version>
         <postgres.version>42.7.0</postgres.version>
         <jackson.version>2.16.0</jackson.version>
         <beanutils.version>1.9.4</beanutils.version>
@@ -193,6 +194,7 @@
                 <module>protocol-postgres</module>
                 <module>protocol-mongo</module>
                 <module>protocol-mysql</module>
+                <module>protocol-mssql</module>
                 <module>protocol-amqp-091</module>
                 <module>protocol-redis</module>
                 <module>protocol-mqtt</module>
@@ -217,6 +219,7 @@
                 <module>protocol-postgres</module>
                 <module>protocol-mongo</module>
                 <module>protocol-mysql</module>
+                <module>protocol-mssql</module>
                 <module>protocol-amqp-091</module>
                 <module>protocol-redis</module>
                 <module>protocol-mqtt</module>

@@ -1,0 +1,26 @@
+{
+  "trivial" : false,
+  "timestamp" : 1786105078606,
+  "constant" : false,
+  "connectionId" : 1,
+  "index" : 6,
+  "input" : {
+    "query" : "INSERT INTO COMPANY_2 (ID,DENOMINATION, AGE, ADDRESS, SALARY) VALUES (10,'Test Ltd', 42, 'Ping Road 22', 25000.7);",
+    "parameterValues" : [ ]
+  },
+  "output" : {
+    "selectResult" : {
+      "records" : [ ],
+      "metadata" : [ ],
+      "count" : 1,
+      "intResult" : true,
+      "lastInsertedId" : 0
+    },
+    "intResult" : 1
+  },
+  "durationMs" : 6,
+  "type" : "QUERY",
+  "caller" : "JDBC",
+  "inputType" : "JdbcCall",
+  "outputType" : "SelectResult"
+}

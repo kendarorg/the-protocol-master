@@ -83,6 +83,9 @@
                                         <fileset dir="${basedir}/../protocol-mysql/target">
                                             <include name="*.exec"/>
                                         </fileset>
+                                        <fileset dir="${basedir}/../protocol-mssql/target">
+                                            <include name="*.exec"/>
+                                        </fileset>
                                         <fileset dir="${basedir}/../protocol-postgres/target">
                                             <include name="*.exec"/>
                                         </fileset>
@@ -122,6 +125,9 @@
                                             <dirset dir="${basedir}/../protocol-mysql/src/main/java">
                                                 <include name="**/*"/>
                                             </dirset>
+                                            <dirset dir="${basedir}/../protocol-mssql/src/main/java">
+                                                <include name="**/*"/>
+                                            </dirset>
                                             <dirset dir="${basedir}/../protocol-postgres/src/main/java">
                                                 <include name="**/*"/>
                                             </dirset>
@@ -155,6 +161,9 @@
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-mysql/target/classes">
+                                                <include name="org/kendar/**/*"/>
+                                            </fileset>
+                                            <fileset dir="${basedir}/../protocol-mssql/target/classes">
                                                 <include name="org/kendar/**/*"/>
                                             </fileset>
                                             <fileset dir="${basedir}/../protocol-postgres/target/classes">

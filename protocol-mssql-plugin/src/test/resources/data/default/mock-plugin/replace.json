@@ -1,0 +1,42 @@
+{
+  "constant": false,
+  "connectionId": 1,
+  "index": 12,
+  "count": 9999,
+  "input": {
+    "query": "SELECT ADDRESS,AGE FROM COMPANY_R WHERE DENOMINATION='${denomination}' AND AGE=${age};",
+    "parameterValues": []
+  },
+  "output": {
+    "selectResult": {
+      "records": [
+        [
+          "${denomination}",
+          "${age}"
+        ]
+      ],
+      "metadata": [
+        {
+          "columnName": "ADDRESS",
+          "byteData": false,
+          "columnType": "CHAR",
+          "precision": 50
+        },
+        {
+          "columnName": "AGE",
+          "byteData": false,
+          "columnType": "INTEGER"
+        }
+      ],
+      "count": 1,
+      "intResult": false,
+      "lastInsertedId": 0
+    },
+    "intResult": 0
+  },
+  "durationMs": 2,
+  "type": "QUERY",
+  "caller": "JDBC",
+  "inputType": "JdbcCall",
+  "outputType": "SelectResult"
+}
