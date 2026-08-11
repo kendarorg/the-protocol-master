@@ -4,7 +4,7 @@
 
 "The Protocol Master" is an infrastructure simulator operable via [complete UI](docs/ui.md) or command line to test
 effortlessly your app in minutes (with no coding)
-supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091, AMQP 1.0, DNS ... and all the compatible ones!
+supporting HTTP, HTTPS, Postgres, MySQL, Redis, Mqtt, RabbitMQ, AMQP 091, AMQP 1.0, DNS, MSSql, Kafka ... and all the compatible ones!
 
 * Simulate wrong scenarios
 * Block troubles before production
@@ -104,10 +104,12 @@ java -jar protocol-runner.jar -protocol http -proxy 9999 \
     * postgres
     * mysql (and all mysql compatible like mariadb) with SSL support
     * mssql (SQL Server, TDS protocol) with SSL support
+    * kafka
     * mongoDB
     * redis 3,redis 2
     * mqtt
     * rabbitmq/Amqp 0.9
+    * rabbitmq/Amqp 1.0
 * Operate unattended via command lime
 * Operate via a [complete UI](docs/ui.md)
 * Mocked flow (all)
@@ -149,7 +151,7 @@ If you want to go on the specific functions by protocol:
     * Support for cached queries and stored procedures
     * Possibility of using the real users passwords
     * Simple authentication (could add an "auth provider")
-* [MS SQL Server](protocol-mssql/README.md)
+* [MS SQL Server](protocol-mssql-plugin/README.md)
     * TDS protocol with TLS support
     * SQL batches, prepared statements and transactions
     * Simple authentication (could add an "auth provider")
@@ -158,7 +160,10 @@ If you want to go on the specific functions by protocol:
 * [RabbitMq/AMQP 0.9.1](protocol-amqp-091/README.md)
     * Support for all kind of publish/consume
     * Channels multiplexing
-* [AMQP 1.0 (ActiveMQ Artemis)](protocol-amqp-10/README.md)
+* [AMQP 1.0 (ActiveMQ Artemis)](protocol-amqp-10-plugin/README.md)
+    * Passthrough proxy, record and broker-less replay
+    * Packaged as a plugin jar (target/plugins)
+* [Kafka](protocol-kafka-plugin/README.md)
     * Passthrough proxy, record and broker-less replay
     * Packaged as a plugin jar (target/plugins)
 * [Redis](protocol-redis/README.md)
@@ -198,7 +203,7 @@ b value and so on
   ap                  apis                       The port TPM controllers (default 0, as not active)
   h                   help                       Show help
   p                   protocol                   The protocols to start
-                                                 *Options: amqp091|amqp10|mqtt|dns|http|mysql|mongodb|postgres|redis
+                                                 *Options: amqp091|amqp10|mqtt|dns|http|mysql|mongodb|postgres|redis|mssql|kafka
 
 MongoDB protocol (mongodb)
 

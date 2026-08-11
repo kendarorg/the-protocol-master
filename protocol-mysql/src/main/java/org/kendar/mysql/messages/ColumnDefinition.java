@@ -28,9 +28,9 @@ public class ColumnDefinition extends MySQLReturnMessage {
         resultBuffer.writeWithLength(field.getColumnName().getBytes());//label
         resultBuffer.writeWithLength(field.getColumnName().getBytes());//name
         resultBuffer.writeLength(0x0c);
-        resultBuffer.writeUB2(language.getValue());
+        resultBuffer.writeUB2(field.isByteData() ? Language.BINARY.getValue() : language.getValue());
         resultBuffer.writeUB4(getMaxColumnDisplaySize(field.getColumnType()));
-        if (binary) {
+        if (binary || field.isByteData()) {
             resultBuffer.write((byte) toMysql(field.getColumnType()));
         } else {
             resultBuffer.write((byte) MySQLType.MYSQL_TYPE_VAR_STRING.getValue());
@@ -67,6 +67,7 @@ public class ColumnDefinition extends MySQLReturnMessage {
             case DATE -> MySQLType.MYSQL_TYPE_DATE;
             case TIME, TIME_WITH_TIMEZONE -> MySQLType.MYSQL_TYPE_TIME;
             case TIMESTAMP, TIMESTAMP_WITH_TIMEZONE -> MySQLType.MYSQL_TYPE_TIMESTAMP;
+            case BLOB, LONGVARBINARY -> MySQLType.MYSQL_TYPE_BLOB;
             default -> MySQLType.MYSQL_TYPE_VAR_STRING;
         };
         return value.getValue();
